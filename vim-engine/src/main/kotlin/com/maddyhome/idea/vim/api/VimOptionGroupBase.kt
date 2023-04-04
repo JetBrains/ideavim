@@ -66,10 +66,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     val cachedValues = when (scope) {
       is OptionScope.GLOBAL -> globalParsedValues
       is OptionScope.LOCAL -> {
-        injector.vimStorageService.getDataFromEditor(scope.editor, parsedEffectiveValueKey)
-          ?: mutableMapOf<String, Any>().also {
-            injector.vimStorageService.putDataToEditor(scope.editor, parsedEffectiveValueKey, it)
-          }
+        injector.vimStorageService.getOrPutEditorData(scope.editor, parsedEffectiveValueKey) { mutableMapOf() }
       }
     }
 
@@ -86,16 +83,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     globalValues[optionName] = value
   }
 
-  private fun getLocalOptions(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storageService = injector.vimStorageService
-    val storedData = storageService.getDataFromEditor(editor, localOptionsKey)
-    if (storedData != null) {
-      return storedData
-    }
-    val localOptions = mutableMapOf<String, VimDataType>()
-    storageService.putDataToEditor(editor, localOptionsKey, localOptions)
-    return localOptions
-  }
+  private fun getLocalOptions(editor: VimEditor) =
+    injector.vimStorageService.getOrPutEditorData(editor, localOptionsKey) { mutableMapOf() }
 
   private fun setLocalOptionValue(optionName: String, value: VimDataType, editor: VimEditor) {
     val localOptions = getLocalOptions(editor)
