@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.options.helpers
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.options.OptionScope
 import java.util.regex.Pattern
 
@@ -32,9 +31,10 @@ public object KeywordOptionHelper {
       return true
     }
 
-    // TODO: This value should not be re-parsed on each check
-    val isKeyword = injector.options(editor).iskeyword
-    val specs = valuesToValidatedAndReversedSpecs(isKeyword) ?: return false
+    val specs =
+      injector.optionGroup.getParsedEffectiveOptionValue(Options.iskeyword, OptionScope.LOCAL(editor)) { optionValue ->
+        valuesToValidatedAndReversedSpecs(parseValues(optionValue.asString()))!!
+      }
     for (spec in specs) {
       if (spec.contains(c.code)) {
         return !spec.negate()

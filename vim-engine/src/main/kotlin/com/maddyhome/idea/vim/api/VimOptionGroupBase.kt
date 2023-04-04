@@ -16,7 +16,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 public abstract class VimOptionGroupBase : VimOptionGroup {
   private val globalOptionsAccessor = GlobalOptions()
   private val globalValues = mutableMapOf<String, VimDataType>()
+  private val globalParsedValues = mutableMapOf<String, Any>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
+  private val parsedEffectiveValueKey = Key<MutableMap<String, Any>>("parsedEffectiveOptionValues")
 
   override fun initialiseOptions() {
     Options.initialise()
@@ -32,12 +34,49 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T) {
     option.checkIfValueValid(value, value.asString())
 
+    // TODO: We should only be storing, and therefore clearing, the cached data for the effective value
+    // We should introduce OptionScope.AUTO, that sets the option value at the appropriate scope - locally for local
+    // options and globally for global options. We would clear (and create) the parsed value only for AUTO
     val oldValue = getOptionValue(option, scope)
     when (scope) {
-      is OptionScope.LOCAL -> setLocalOptionValue(option.name, value, scope.editor)
-      is OptionScope.GLOBAL -> setGlobalOptionValue(option.name, value)
+      is OptionScope.LOCAL -> {
+        setLocalOptionValue(option.name, value, scope.editor)
+        injector.vimStorageService.getDataFromEditor(scope.editor, parsedEffectiveValueKey)?.remove(option.name)
+      }
+      is OptionScope.GLOBAL -> {
+        setGlobalOptionValue(option.name, value)
+        globalParsedValues.remove(option.name)
+      }
     }
+
     option.onChanged(scope, oldValue)
+  }
+
+  override fun <T : VimDataType, TData : Any> getParsedEffectiveOptionValue(
+    option: Option<T>,
+    scope: OptionScope,
+    provider: (T) -> TData,
+  ): TData {
+    // TODO: Introduce OptionDeclaredScope so that we know what each option's effective scope is
+    // This will allow us to set values to the correct scope via OptionScope.AUTO
+//    StrictMode.assert(
+//      option.declaredScope != OptionDeclaredScope.GLOBAL && editor != null,
+//      "Editor must be supplied unless option's declared scope is global"
+//    )
+    val cachedValues = when (scope) {
+      is OptionScope.GLOBAL -> globalParsedValues
+      is OptionScope.LOCAL -> {
+        injector.vimStorageService.getDataFromEditor(scope.editor, parsedEffectiveValueKey)
+          ?: mutableMapOf<String, Any>().also {
+            injector.vimStorageService.putDataToEditor(scope.editor, parsedEffectiveValueKey, it)
+          }
+      }
+    }
+
+    // Unless the user is calling this method multiple times with different providers, we can be confident this cast
+    // will succeed
+    @Suppress("UNCHECKED_CAST")
+    return cachedValues.getOrPut(option.name) { provider(getOptionValue(option, scope)) } as TData
   }
 
   override fun getOption(key: String): Option<VimDataType>? = Options.getOption(key)
@@ -77,9 +116,14 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun resetAllOptions() {
+    // TODO: This should be split into two functions. One for testing that resets everything, and one for `:set alL&`
+    // which should only reset the global options, and the options for the current editor
     globalValues.clear()
-    injector.editorGroup.localEditors()
-      .forEach { injector.vimStorageService.getDataFromEditor(it, localOptionsKey)?.clear() }
+    injector.editorGroup.localEditors().forEach {
+      injector.vimStorageService.getDataFromEditor(it, localOptionsKey)?.clear()
+      injector.vimStorageService.getDataFromEditor(it, parsedEffectiveValueKey)?.clear()
+    }
+    globalParsedValues.clear()
   }
 
   override fun addOption(option: Option<out VimDataType>) {
