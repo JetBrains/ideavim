@@ -31,7 +31,7 @@ object ReleaseDev : BuildType({
   }
 
   requirements {
-    equals("teamcity.agent.name", "Linux-Medium")
+    equals("agent.name", "Linux-Medium-i")
   }
 
   vcs {
