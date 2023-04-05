@@ -3,7 +3,7 @@ package _Self.buildTypes
 import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.DEV_VERSION
 import _Self.Constants.RELEASE_DEV
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
@@ -11,7 +11,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailu
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 
-object ReleaseDev : BuildType({
+object ReleaseDev : IdeaVimBuildType({
   name = "Publish Dev Build"
   description = "Build and publish Dev of IdeaVim plugin"
 
