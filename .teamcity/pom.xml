@@ -22,7 +22,7 @@
     </repository>
     <repository>
       <id>teamcity-server</id>
-      <url>https://teamcity.jetbrains.com/app/dsl-plugins-repository</url>
+      <url>https://ideavim.teamcity.com/</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>

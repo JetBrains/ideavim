@@ -156,7 +156,7 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 
 ### Resources:
 
-* [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
+* [Continuous integration builds](https://ideavim.teamcity.com/)
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
 * [Chat on gitter](https://gitter.im/JetBrains/ideavim)
 * [IdeaVim Channel](https://jb.gg/bi6zp7) on [JetBrains Server](https://discord.gg/jetbrains)
@@ -164,5 +164,5 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 * [Changelog](CHANGES.md)
 * [Contributors listing](AUTHORS.md)
 
-[teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJEAP&guest=1
-[teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJEAP)/statusIcon.svg?guest=1
+[teamcity-build-status]: https://ideavim.teamcity.com/viewType.html?buildTypeId=Ideavim_IdeaVimTests_Latest_EAP&guest=1
+[teamcity-build-status-svg]: https://ideavim.teamcity.com/app/rest/builds/buildType:(id:Ideavim_IdeaVimTests_Latest_EAP)/statusIcon.svg?guest=1
