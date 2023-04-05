@@ -68,4 +68,5 @@ private fun String.vanish(): String {
   return this
     .replace(' ', '_')
     .replace('.', '_')
+    .replace('-', '_')
 }
