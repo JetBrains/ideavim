@@ -17,7 +17,7 @@ open class TestingBuildType(
   private val javaVersion: String? = null,
   private val javaPlugin: Boolean = true,
 ) : IdeaVimBuildType({
-  id("IdeaVimTests-${testName.replace(' ', '-')}")
+  id("IdeaVimTests_${testName.vanish()}")
   name = "Tests for IntelliJ $version"
 
   params {
@@ -63,3 +63,9 @@ open class TestingBuildType(
     }
   }
 })
+
+private fun String.vanish(): String {
+  return this
+    .replace(' ', '_')
+    .replace('.', '_')
+}
