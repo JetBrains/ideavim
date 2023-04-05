@@ -9,6 +9,7 @@ import _Self.vcsRoots.Branch_Release
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
@@ -36,6 +37,7 @@ object Release : BuildType({
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
       label = "Slack Token"
     )
+    password("env.ORG_GRADLE_PROJECT_youtrackToken", "credentialsJSON:3cd3e867-282c-451f-b958-bc95d56a8450", display = ParameterDisplay.HIDDEN)
   }
 
   vcs {
@@ -46,9 +48,19 @@ object Release : BuildType({
 
   steps {
     gradle {
-      tasks = "clean publishPlugin slackNotification"
+      tasks = "clean publishPlugin"
       buildFile = ""
       enableStacktrace = true
+      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+    }
+    gradle {
+      name = "Run Integrations"
+      tasks = "releaseActions"
+      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+    }
+    gradle {
+      name = "Slack Notification"
+      tasks = "slackNotification"
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }

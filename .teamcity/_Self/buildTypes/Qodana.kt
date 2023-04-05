@@ -5,10 +5,10 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
-import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
@@ -27,43 +27,41 @@ object Qodana : BuildType({
   }
 
   steps {
+    gradle {
+      name = "Generate grammar"
+      tasks = "generateGrammarSource"
+    }
     qodana {
       name = "Qodana"
-/*
-      reportAsTestsEnable = ""
-      failBuildOnErrors = ""
-      codeInspectionXmlConfig = "Custom"
-      codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
-      reportAsTestsEnable = "true"
-*/
-      clearConditions()
-      param("licenseaudit-enable", "true")
-      param("clonefinder-languages", "Java")
-      param("clonefinder-mode", "")
-      param("report-version", "")
-      param("clonefinder-languages-container", "Java Kotlin")
-      param("namesAndTagsCustom", "repo.labs.intellij.net/static-analyser/qodana")
-      param("clonefinder-queried-project", "src")
-      param("clonefinder-enable", "true")
-      param("clonefinder-reference-projects", "src")
-      param("yaml-configuration", "")
+      param("clonefinder-languages", "")
+      param("collect-anonymous-statistics", "")
+      param("licenseaudit-enable", "")
+      param("clonefinder-languages-container", "")
+      param("linterVersion", "")
+      param("clonefinder-queried-project", "")
+      param("clonefinder-enable", "")
+      param("clonefinder-reference-projects", "")
       linter = jvm {
         version = Qodana.JVMVersion.LATEST
       }
+      reportAsTests = true
+      additionalDockerArguments = "-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzUFZrQSIsInByb2plY3QiOiIzN1FlQSIsInRva2VuIjoiM0t2bXoifQ.uohp81tM7iAfvvB6k8faarfpV-OjusAaEbWQ8iNrOgs"
+      additionalQodanaArguments = "--baseline qodana.sarif.json"
     }
   }
 
   triggers {
     vcs {
-      enabled = true
+      enabled = false
       branchFilter = ""
     }
     schedule {
-      schedulingPolicy = weekly {
-        dayOfWeek = ScheduleTrigger.DAY.Tuesday
+      schedulingPolicy = daily {
+        hour = 12
+        minute = 0
+        timezone = "SERVER"
       }
-      branchFilter = ""
-      triggerBuild = always()
+      param("dayOfWeek", "Sunday")
     }
   }
 
@@ -74,7 +72,7 @@ object Qodana : BuildType({
       comparison = BuildFailureOnMetric.MetricComparison.MORE
       compareTo = value()
       metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
-      param("metricKey", "QodanaProblemsTotal")
+      param("metricKey", "QodanaProblemsNew")
     }
   }
 

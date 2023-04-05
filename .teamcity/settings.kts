@@ -1,4 +1,5 @@
-import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.project
+import jetbrains.buildServer.configs.kotlin.v2019_2.version
 
 /*
 The settings script is an entry point for defining a single
@@ -29,5 +30,5 @@ node (Plugins -> teamcity-configs -> teamcity-configs:generate),
 the 'Debug' option is available in the context menu for the task.
 */
 
-version = "2020.2"
+version = "2022.04"
 project(_Self.Project)
