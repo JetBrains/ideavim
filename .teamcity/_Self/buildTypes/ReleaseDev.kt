@@ -32,7 +32,7 @@ object ReleaseDev : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
-    branchFilter = "+:release"
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
