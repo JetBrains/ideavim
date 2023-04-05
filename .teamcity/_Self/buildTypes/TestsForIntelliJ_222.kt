@@ -10,21 +10,42 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailu
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object TestsForIntelliJ20222 : TestsForIntelliJ_222_branch("2022.2.3")
+object TestsForIntelliJ20222 : TestingBuildType("IC-2022.2.3", branch = "222", javaPlugin = false)
+object TestsForIntelliJ20213 : TestingBuildType("IC-2021.3.2", "213-221", "1.8", javaPlugin = false)
+object TestsForIntelliJ20212 : TestingBuildType("IC-2021.2.2", "203-212", "1.8", javaPlugin = false)
+object TestsForIntelliJ20211 : TestingBuildType("IC-2021.1", "203-212", "1.8", javaPlugin = false)
+object TestsForIntelliJ20203 : TestingBuildType("IC-2020.3", "203-212", "1.8", javaPlugin = false)
+object TestsForIntelliJ20202 : TestingBuildType("IC-2020.2", "202", "1.8", javaPlugin = false)
+object TestsForIntelliJ20201 : TestingBuildType("IC-2020.1", "201", "1.8", javaPlugin = false)
+object TestsForIntelliJ20191 : TestingBuildType("IC-2019.1", "191-193", "1.8", javaPlugin = false)
+object TestsForIntelliJ20192 : TestingBuildType("IC-2019.2", "191-193", "1.8", javaPlugin = false)
+object TestsForIntelliJ20193 : TestingBuildType("IC-2019.3", "191-193", "1.8", javaPlugin = false)
+object TestsForIntelliJ20181 : TestingBuildType("IC-2018.1", "181-182", "1.8", javaPlugin = false)
+object TestsForIntelliJ20182 : TestingBuildType("IC-2018.2", "181-182", "1.8", javaPlugin = false)
+object TestsForIntelliJ20183 : TestingBuildType("IC-2018.3", "183", "1.8", javaPlugin = false)
 
-sealed class TestsForIntelliJ_222_branch(private val version: String) : IdeaVimBuildType({
+sealed class TestingBuildType(
+  private val testName: String,
+  private val branch: String,
+  private val version: String = testName,
+  private val javaVersion: String? = null,
+  private val javaPlugin: Boolean = true,
+) : IdeaVimBuildType({
   name = "Tests for IntelliJ $version"
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_legacyNoJavaPlugin", "true")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "IC-$version")
+    param("env.ORG_GRADLE_PROJECT_legacyNoJavaPlugin", javaPlugin.not().toString())
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", version)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
+    if (javaVersion != null) {
+      param("env.ORG_GRADLE_PROJECT_javaVersion", javaVersion)
+    }
   }
 
   vcs {
     root(DslContext.settingsRoot)
-    branchFilter = "+:222"
+    branchFilter = "+:$branch"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -39,7 +60,7 @@ sealed class TestsForIntelliJ_222_branch(private val version: String) : IdeaVimB
 
   triggers {
     vcs {
-      branchFilter = "+:222"
+      branchFilter = "+:$branch"
     }
   }
 
