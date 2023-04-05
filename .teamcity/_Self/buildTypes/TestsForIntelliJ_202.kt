@@ -2,7 +2,7 @@
 
 package _Self.buildTypes
 
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
@@ -12,7 +12,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object TestsForIntelliJ20202 : TestsForIntelliJ_202_branch("2020.2")
 
-sealed class TestsForIntelliJ_202_branch(private val version: String) : BuildType({
+sealed class TestsForIntelliJ_202_branch(private val version: String) : IdeaVimBuildType({
   name = "Tests for IntelliJ $version"
 
   params {

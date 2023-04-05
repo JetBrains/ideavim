@@ -3,7 +3,7 @@ package _Self.buildTypes
 import _Self.Constants.DEV_VERSION
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE_EAP
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
@@ -11,7 +11,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
-object ReleaseEap : BuildType({
+object ReleaseEap : IdeaVimBuildType({
   name = "Publish EAP Build"
   description = "Build and publish EAP of IdeaVim plugin"
 

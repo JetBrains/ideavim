@@ -1,12 +1,12 @@
 package _Self.buildTypes
 
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.golang
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 
-object Compatibility : BuildType({
+object Compatibility : IdeaVimBuildType({
   id("IdeaVimCompatibility")
   name = "IdeaVim compatibility with external plugins"
 

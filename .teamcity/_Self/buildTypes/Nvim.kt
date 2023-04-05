@@ -1,7 +1,7 @@
 package _Self.buildTypes
 
 import _Self.Constants.NVIM_TESTS
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
@@ -10,7 +10,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailu
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object Nvim : BuildType({
+object Nvim : IdeaVimBuildType({
   name = "Tests with nvim"
   description = "Running tests with nvim integration"
 

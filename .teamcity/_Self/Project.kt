@@ -35,6 +35,7 @@ object Project : Project({
   buildType(Qodana)
 })
 
+// Common build type for all configurations
 abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
   init()
 

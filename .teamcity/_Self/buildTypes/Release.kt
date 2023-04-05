@@ -5,7 +5,7 @@ import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE
 import _Self.Constants.VERSION
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
@@ -14,7 +14,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
-object Release : BuildType({
+object Release : IdeaVimBuildType({
   name = "Publish Release"
   description = "Build and publish IdeaVim plugin"
 

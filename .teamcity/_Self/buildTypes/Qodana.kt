@@ -1,7 +1,7 @@
 package _Self.buildTypes
 
 import _Self.Constants.QODANA_TESTS
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
@@ -12,7 +12,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetr
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object Qodana : BuildType({
+object Qodana : IdeaVimBuildType({
   name = "Qodana checks"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")

@@ -1,6 +1,6 @@
 package _Self.buildTypes
 
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
@@ -11,7 +11,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object TestsForIntelliJEAP : ActiveTests("Tests for IntelliJ Latest EAP", "LATEST-EAP-SNAPSHOT")
 
-sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
+sealed class ActiveTests(buildName: String, ijVersion: String) : IdeaVimBuildType({
   name = buildName
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")

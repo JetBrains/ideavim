@@ -1,8 +1,8 @@
 package _Self.buildTypes
 
 import _Self.Constants.GITHUB_TESTS
+import _Self.IdeaVimBuildType
 import _Self.vcsRoots.GitHubPullRequest
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.commitStatusPublisher
@@ -13,7 +13,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object GithubTests : Github("clean test", "Tests")
 
-sealed class Github(command: String, desc: String) : BuildType({
+sealed class Github(command: String, desc: String) : IdeaVimBuildType({
   name = "GitHub Pull Requests $desc"
   description = "Test GitHub pull requests $desc"
 
