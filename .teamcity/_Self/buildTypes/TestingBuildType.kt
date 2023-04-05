@@ -10,21 +10,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailu
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object TestsForIntelliJ20222 : TestingBuildType("IC-2022.2.3", branch = "222", javaPlugin = false)
-object TestsForIntelliJ20213 : TestingBuildType("IC-2021.3.2", "213-221", "1.8", javaPlugin = false)
-object TestsForIntelliJ20212 : TestingBuildType("IC-2021.2.2", "203-212", "1.8", javaPlugin = false)
-object TestsForIntelliJ20211 : TestingBuildType("IC-2021.1", "203-212", "1.8", javaPlugin = false)
-object TestsForIntelliJ20203 : TestingBuildType("IC-2020.3", "203-212", "1.8", javaPlugin = false)
-object TestsForIntelliJ20202 : TestingBuildType("IC-2020.2", "202", "1.8", javaPlugin = false)
-object TestsForIntelliJ20201 : TestingBuildType("IC-2020.1", "201", "1.8", javaPlugin = false)
-object TestsForIntelliJ20191 : TestingBuildType("IC-2019.1", "191-193", "1.8", javaPlugin = false)
-object TestsForIntelliJ20192 : TestingBuildType("IC-2019.2", "191-193", "1.8", javaPlugin = false)
-object TestsForIntelliJ20193 : TestingBuildType("IC-2019.3", "191-193", "1.8", javaPlugin = false)
-object TestsForIntelliJ20181 : TestingBuildType("IC-2018.1", "181-182", "1.8", javaPlugin = false)
-object TestsForIntelliJ20182 : TestingBuildType("IC-2018.2", "181-182", "1.8", javaPlugin = false)
-object TestsForIntelliJ20183 : TestingBuildType("IC-2018.3", "183", "1.8", javaPlugin = false)
-
-sealed class TestingBuildType(
+open class TestingBuildType(
   private val testName: String,
   private val branch: String,
   private val version: String = testName,

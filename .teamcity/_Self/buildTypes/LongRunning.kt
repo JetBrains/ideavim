@@ -5,6 +5,7 @@ import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object LongRunning : IdeaVimBuildType({
@@ -32,7 +33,14 @@ object LongRunning : IdeaVimBuildType({
 
   triggers {
     vcs {
+      enabled = false
       branchFilter = "+:<default>"
+    }
+    schedule {
+      enabled = true
+      schedulingPolicy = daily {
+        hour = 5
+      }
     }
   }
 })

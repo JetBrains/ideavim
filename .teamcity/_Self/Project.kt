@@ -6,7 +6,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.Qodana
-import _Self.buildTypes.TestsForIntelliJEAP
+import _Self.buildTypes.TestingBuildType
 import _Self.subprojects.GitHub
 import _Self.subprojects.OldTests
 import _Self.subprojects.Releases
@@ -22,8 +22,8 @@ object Project : Project({
   // VCS roots
   vcsRoot(GitHubPullRequest)
 
-  // Builds
-  buildType(TestsForIntelliJEAP)
+  // Active tests
+  buildType(TestingBuildType("Latest EAP", "<default>", version = "LATEST-EAP-SNAPSHOT"))
 
   buildType(PropertyBased)
   buildType(LongRunning)
