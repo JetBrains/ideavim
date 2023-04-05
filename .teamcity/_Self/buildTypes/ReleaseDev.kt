@@ -31,8 +31,8 @@ object ReleaseDev : BuildType({
   }
 
   requirements {
-    startsWith("agent.name", "Linux-Medium")
     equals("teamcity.agent.hardware.cpuCount", "4")
+    equals("teamcity.agent.os.family", "Linux")
   }
 
   vcs {
