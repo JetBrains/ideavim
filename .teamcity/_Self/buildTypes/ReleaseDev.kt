@@ -30,6 +30,10 @@ object ReleaseDev : BuildType({
     param("env.ORG_GRADLE_PROJECT_publishChannels", DEV_CHANNEL)
   }
 
+  requirements {
+    equals("agent.name", "Linux-Medium")
+  }
+
   vcs {
     root(DslContext.settingsRoot)
     branchFilter = "+:<default>"
