@@ -31,7 +31,7 @@ object ReleaseDev : BuildType({
   }
 
   requirements {
-    startsWith("agent.name", "Linux-Medium-i")
+    startsWith("agent.name", "Linux-Medium")
   }
 
   vcs {
