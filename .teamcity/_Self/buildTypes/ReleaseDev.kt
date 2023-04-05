@@ -30,11 +30,6 @@ object ReleaseDev : BuildType({
     param("env.ORG_GRADLE_PROJECT_publishChannels", DEV_CHANNEL)
   }
 
-  requirements {
-    equals("teamcity.agent.hardware.cpuCount", "4")
-    equals("teamcity.agent.os.family", "Linux")
-  }
-
   vcs {
     root(DslContext.settingsRoot)
     branchFilter = "+:<default>"
