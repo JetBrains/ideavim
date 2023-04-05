@@ -8,6 +8,9 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailu
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
+
+object TestsForIntelliJEAP : ActiveTests("Tests for IntelliJ Latest EAP", "LATEST-EAP-SNAPSHOT")
+
 sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
   name = buildName
   params {
@@ -18,6 +21,7 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -33,12 +37,8 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 
   triggers {
     vcs {
-      branchFilter = ""
+      branchFilter = "+:<default>"
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 
   failureConditions {
@@ -53,5 +53,3 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
     }
   }
 })
-
-object TestsForIntelliJEAP : ActiveTests("Tests for IntelliJ Latest EAP", "LATEST-EAP-SNAPSHOT")

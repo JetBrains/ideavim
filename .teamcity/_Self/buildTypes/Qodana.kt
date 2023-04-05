@@ -22,6 +22,7 @@ object Qodana : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -53,7 +54,7 @@ object Qodana : BuildType({
   triggers {
     vcs {
       enabled = false
-      branchFilter = ""
+      branchFilter = "+:<default>"
     }
     schedule {
       schedulingPolicy = daily {
@@ -74,9 +75,5 @@ object Qodana : BuildType({
       metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
       param("metricKey", "QodanaProblemsNew")
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 })

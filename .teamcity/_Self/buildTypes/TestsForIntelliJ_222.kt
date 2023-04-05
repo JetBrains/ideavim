@@ -4,10 +4,13 @@ package _Self.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
+import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
+
+object TestsForIntelliJ20222 : TestsForIntelliJ_222_branch("2022.2.3")
 
 sealed class TestsForIntelliJ_222_branch(private val version: String) : BuildType({
   name = "Tests for IntelliJ $version"
@@ -20,7 +23,8 @@ sealed class TestsForIntelliJ_222_branch(private val version: String) : BuildTyp
   }
 
   vcs {
-    root(_Self.vcsRoots.Branch_222)
+    root(DslContext.settingsRoot)
+    branchFilter = "+:222"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -30,13 +34,12 @@ sealed class TestsForIntelliJ_222_branch(private val version: String) : BuildTyp
       tasks = "clean test"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
   triggers {
     vcs {
-      branchFilter = ""
+      branchFilter = "+:222"
     }
   }
 
@@ -52,6 +55,3 @@ sealed class TestsForIntelliJ_222_branch(private val version: String) : BuildTyp
     }
   }
 })
-
-
-object TestsForIntelliJ20222 : TestsForIntelliJ_222_branch("2022.2.3")

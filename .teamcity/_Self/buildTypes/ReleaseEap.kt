@@ -37,6 +37,7 @@ object ReleaseEap : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -46,7 +47,6 @@ object ReleaseEap : BuildType({
       tasks = "clean publishPlugin"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
@@ -55,7 +55,7 @@ object ReleaseEap : BuildType({
       vcsRootId = "${DslContext.settingsRoot.id}"
       labelingPattern = "%system.build.number%"
       successfulOnly = false
-      branchFilter = ""
+      branchFilter = "+:<default>"
     }
   }
 

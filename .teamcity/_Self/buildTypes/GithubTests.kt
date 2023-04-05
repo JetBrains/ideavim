@@ -38,7 +38,6 @@ sealed class Github(command: String, desc: String) : BuildType({
       tasks = command
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
@@ -69,9 +68,5 @@ sealed class Github(command: String, desc: String) : BuildType({
       }
       param("github_oauth_user", "AlexPl292")
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 })

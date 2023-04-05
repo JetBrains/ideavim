@@ -4,10 +4,13 @@ package _Self.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
+import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
+
+object TestsForIntelliJ20213 : TestsForIntelliJ_213_221_branch("2021.3.2")
 
 sealed class TestsForIntelliJ_213_221_branch(private val version: String) : BuildType({
   name = "Tests for IntelliJ $version"
@@ -21,7 +24,8 @@ sealed class TestsForIntelliJ_213_221_branch(private val version: String) : Buil
   }
 
   vcs {
-    root(_Self.vcsRoots.Branch_213_221)
+    root(DslContext.settingsRoot)
+    branchFilter = "+:213-221"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -31,18 +35,13 @@ sealed class TestsForIntelliJ_213_221_branch(private val version: String) : Buil
       tasks = "clean test"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
   triggers {
     vcs {
-      branchFilter = ""
+      branchFilter = "+:213-221"
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 
   failureConditions {
@@ -57,6 +56,3 @@ sealed class TestsForIntelliJ_213_221_branch(private val version: String) : Buil
     }
   }
 })
-
-
-object TestsForIntelliJ20213 : TestsForIntelliJ_213_221_branch("2021.3.2")

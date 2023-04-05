@@ -15,6 +15,7 @@ object PluginVerifier : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -24,17 +25,12 @@ object PluginVerifier : BuildType({
       tasks = "clean runPluginVerifier"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
   triggers {
     vcs {
-      branchFilter = ""
+      branchFilter = "+:<default>"
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 })

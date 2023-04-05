@@ -5,7 +5,6 @@ import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE
 import _Self.Constants.VERSION
-import _Self.vcsRoots.Branch_Release
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -41,7 +40,8 @@ object Release : BuildType({
   }
 
   vcs {
-    root(Branch_Release)
+    root(DslContext.settingsRoot)
+    branchFilter = "+:release"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -51,17 +51,14 @@ object Release : BuildType({
       tasks = "clean publishPlugin"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
     gradle {
       name = "Run Integrations"
       tasks = "releaseActions"
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
     gradle {
       name = "Slack Notification"
       tasks = "slackNotification"
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 

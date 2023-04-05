@@ -32,6 +32,7 @@ object ReleaseDev : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:release"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -41,7 +42,6 @@ object ReleaseDev : BuildType({
       tasks = "clean publishPlugin"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 

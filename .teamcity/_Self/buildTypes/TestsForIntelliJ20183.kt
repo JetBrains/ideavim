@@ -2,6 +2,7 @@ package _Self.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
+import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
@@ -20,7 +21,8 @@ object TestsForIntelliJ20183 : BuildType({
   }
 
   vcs {
-    root(_Self.vcsRoots.Branch_183)
+    root(DslContext.settingsRoot)
+    branchFilter = "+:183"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -30,18 +32,13 @@ object TestsForIntelliJ20183 : BuildType({
       tasks = "clean test"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
   triggers {
     vcs {
-      branchFilter = ""
+      branchFilter = "+:183"
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 
   failureConditions {

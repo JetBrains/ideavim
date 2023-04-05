@@ -17,6 +17,7 @@ object LongRunning : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
@@ -26,17 +27,12 @@ object LongRunning : BuildType({
       tasks = "clean testLongRunning"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
   triggers {
     vcs {
-      branchFilter = ""
+      branchFilter = "+:<default>"
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 })

@@ -12,6 +12,7 @@ object Compatibility : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
   }
 
   steps {
