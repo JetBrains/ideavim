@@ -18,7 +18,7 @@ open class TestingBuildType(
   private val javaPlugin: Boolean = true,
 ) : IdeaVimBuildType({
   id("IdeaVimTests_${testName.vanish()}")
-  name = "Tests for IntelliJ $version"
+  name = "Tests for IntelliJ $testName"
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
