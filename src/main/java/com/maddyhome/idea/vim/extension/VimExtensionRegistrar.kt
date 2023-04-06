@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.statistic.PluginState
@@ -58,7 +59,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    val option = ToggleOption(name, getAbbrev(name), false)
+    val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
     VimPlugin.getOptionGroup().addOption(option)
     VimPlugin.getOptionGroup().addListener(
       option,

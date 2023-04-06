@@ -31,7 +31,10 @@ import java.util.*
  *
  * We also want to avoid a sealed hierarchy, since we create object instances with custom validation for some options.
  */
-public abstract class Option<T : VimDataType>(public val name: String, public val abbrev: String, defaultValue: T) {
+public abstract class Option<T : VimDataType>(public val name: String,
+                                              public val declaredScope: OptionDeclaredScope,
+                                              public val abbrev: String,
+                                              defaultValue: T) {
   private val listeners = mutableSetOf<OptionChangeListener<T>>()
 
   private var defaultValueField = defaultValue
@@ -71,8 +74,21 @@ public abstract class Option<T : VimDataType>(public val name: String, public va
   public abstract fun parseValue(value: String, token: String): VimDataType
 }
 
-public open class StringOption(name: String, abbrev: String, defaultValue: VimString, public val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
-  public constructor(name: String, abbrev: String, defaultValue: String, boundedValues: Collection<String>? = null) : this(name, abbrev, VimString(defaultValue), boundedValues)
+public open class StringOption(
+  name: String,
+  declaredScope: OptionDeclaredScope,
+  abbrev: String,
+  defaultValue: VimString,
+  public val boundedValues: Collection<String>? = null,
+) : Option<VimString>(name, declaredScope, abbrev, defaultValue) {
+
+  public constructor(
+    name: String,
+    declaredScope: OptionDeclaredScope,
+    abbrev: String,
+    defaultValue: String,
+    boundedValues: Collection<String>? = null,
+  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -113,13 +129,19 @@ public open class StringOption(name: String, abbrev: String, defaultValue: VimSt
  */
 public open class StringListOption(
   name: String,
+  declaredScope: OptionDeclaredScope,
   abbrev: String,
   defaultValue: VimString,
   public val boundedValues: Collection<String>? = null,
-) : Option<VimString>(name, abbrev, defaultValue) {
+) : Option<VimString>(name, declaredScope, abbrev, defaultValue) {
 
-  public constructor(name: String, abbrev: String, defaultValue: String, boundedValues: Collection<String>? = null)
-    : this(name, abbrev, VimString(defaultValue), boundedValues)
+  public constructor(
+    name: String,
+    declaredScope: OptionDeclaredScope,
+    abbrev: String,
+    defaultValue: String,
+    boundedValues: Collection<String>? = null,
+  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -171,9 +193,15 @@ public open class StringListOption(
   }
 }
 
-public open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) :
-  Option<VimInt>(name, abbrev, defaultValue) {
-  public constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
+public open class NumberOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt) :
+  Option<VimInt>(name, declaredScope, abbrev, defaultValue) {
+
+  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int) : this(
+    name,
+    declaredScope,
+    abbrev,
+    VimInt(defaultValue)
+  )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimInt) throw exExceptionMessage("E521", token)
@@ -187,10 +215,19 @@ public open class NumberOption(name: String, abbrev: String, defaultValue: VimIn
   public fun subtractValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value - value2.value)
 }
 
-public open class UnsignedNumberOption(name: String, abbrev: String, defaultValue: VimInt) :
-  NumberOption(name, abbrev, defaultValue) {
+public open class UnsignedNumberOption(
+  name: String,
+  declaredScope: OptionDeclaredScope,
+  abbrev: String,
+  defaultValue: VimInt,
+) : NumberOption(name, declaredScope, abbrev, defaultValue) {
 
-  public constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
+  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int) : this(
+    name,
+    declaredScope,
+    abbrev,
+    VimInt(defaultValue)
+  )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     super.checkIfValueValid(value, token)
@@ -200,8 +237,14 @@ public open class UnsignedNumberOption(name: String, abbrev: String, defaultValu
   }
 }
 
-public class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
-  public constructor(name: String, abbrev: String, defaultValue: Boolean) : this(name, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO)
+public class ToggleOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt) :
+  Option<VimInt>(name, declaredScope, abbrev, defaultValue) {
+  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Boolean) : this(
+    name,
+    declaredScope,
+    abbrev,
+    if (defaultValue) VimInt.ONE else VimInt.ZERO
+  )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimInt) throw exExceptionMessage("E474", token)

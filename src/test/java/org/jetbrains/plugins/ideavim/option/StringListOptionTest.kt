@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -23,7 +24,7 @@ import kotlin.test.assertEquals
 
 class StringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
-  private val option = StringListOption(optionName, optionName, "", null)
+  private val option = StringListOption(optionName, OptionDeclaredScope.GLOBAL, optionName, "", null)
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
