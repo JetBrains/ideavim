@@ -14,7 +14,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.elementType
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -431,6 +430,16 @@ private fun findMatchingPair(
   }
 
   if (closestSearchPair != null) {
+    val initialPatternStart = currentLineStart + closestMatchStart
+    val initialPatternEnd = currentLineStart + closestMatchEnd
+
+    val initialPsiElement = PsiHelper.getFile(editor)!!.findElementAt(initialPatternStart)
+    if (isSkippedJavaScriptElement(initialPsiElement)) {
+      // Special case: Ignore the skipped JS elements completely. In Ruby, however, we still want to jump if the
+      // cursor is on e.g. a "do" after an "if", but that "do" should be skipped when the cursor is on "if".
+      return -1
+    }
+
     val targetOpeningPattern: String
     val targetClosingPattern: String
 
@@ -443,14 +452,10 @@ private fun findMatchingPair(
       targetClosingPattern = closestSearchPair.second
     }
 
-    val initialPatternStart = currentLineStart + closestMatchStart
-    val initialPatternEnd = currentLineStart + closestMatchEnd
-
-    val initialPsiElement = PsiHelper.getFile(editor)!!.findElementAt(initialPatternStart)
     val skipComments = !isComment(initialPsiElement)
     val skipQuotes = !isQuoted(initialPsiElement)
-
     val searchParams = MatchitSearchParams(initialPatternStart, initialPatternEnd, targetOpeningPattern, targetClosingPattern, skipComments, skipQuotes)
+
     val matchingPairOffset = if (direction == Direction.FORWARDS) {
       findClosingPair(editor, isInOpPending, searchParams)
     } else {
@@ -567,13 +572,15 @@ private fun containsDefaultPairs(chars: CharSequence): Boolean {
   return false
 }
 
+private fun getElementType(psiElement: PsiElement?): String? {
+  return psiElement?.node?.elementType?.debugName
+}
+
 private fun matchShouldBeSkipped(editor: Editor, offset: Int, skipComments: Boolean, skipStrings: Boolean): Boolean {
   val psiFile = PsiHelper.getFile(editor)
   val psiElement = psiFile!!.findElementAt(offset)
 
-  // TODO: as we add support for more languages, we should store the ignored keywords for each language in its own
-  //  data structure. The original plugin stores that information in strings called match_skip.
-  if (isSkippedRubyKeyword(psiElement)) {
+  if (isSkippedRubyElement(psiElement) || isSkippedJavaScriptElement(psiElement)) {
     return true
   }
 
@@ -583,14 +590,21 @@ private fun matchShouldBeSkipped(editor: Editor, offset: Int, skipComments: Bool
     (skipStrings && insideQuotes) || (!skipStrings && !insideQuotes)
 }
 
-private fun isSkippedRubyKeyword(psiElement: PsiElement?): Boolean {
-  // In Ruby code, we want to ignore anything inside of a regular expression like "/ class /" and identifiers like
-  // "Foo.class". Matchit also ignores any "do" keywords that follow a loop or an if condition, as well as any inline
-  // "if" and "unless" expressions (a.k.a conditional modifiers).
-  val elementType = psiElement?.node?.elementType?.debugName
+private fun isSkippedRubyElement(psiElement: PsiElement?): Boolean {
+  // We want to ignore "do" keywords after conditions, any inline "if" or "unless" expressions, regex strings,
+  // and identifiers like "Foo.class",
+  val type = getElementType(psiElement)
+  return type == "do_cond" || type == "if modifier" || type == "unless modifier" ||
+    type == "regexp content" || type == "identifier"
+}
 
-  return elementType == "do_cond" || elementType == "if modifier" || elementType == "unless modifier" ||
-    elementType == "regexp content" || elementType == "identifier"
+private fun isSkippedJavaScriptElement(psiElement: PsiElement?): Boolean {
+  val type = getElementType(psiElement)
+  val parentType = getElementType(psiElement?.parent)
+
+  // Ignore regex strings, arrow functions, and angle brackets used for comparisons.
+  return type == "REGEXP_LITERAL" || type == "EQGT" ||
+    (parentType == "BINARY_EXPRESSION" && (type == "LT" || type == "LE" || type == "GT" || type == "GE"))
 }
 
 private fun isComment(psiElement: PsiElement?): Boolean {
@@ -598,7 +612,7 @@ private fun isComment(psiElement: PsiElement?): Boolean {
 }
 
 private fun isQuoted(psiElement: PsiElement?): Boolean {
-  val elementType = psiElement?.elementType?.debugName
-  return elementType == "STRING_LITERAL" || elementType == "XML_ATTRIBUTE_VALUE_TOKEN" ||
-    elementType == "string content" // Ruby specific.
+  val type = getElementType(psiElement)
+  return type == "STRING_LITERAL" || type == "XML_ATTRIBUTE_VALUE_TOKEN" ||
+    type == "string content" // Ruby specific.
 }
