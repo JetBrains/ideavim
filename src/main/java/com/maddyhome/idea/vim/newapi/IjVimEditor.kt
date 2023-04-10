@@ -57,6 +57,7 @@ import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import org.jetbrains.annotations.ApiStatus
+import java.lang.System.identityHashCode
 
 @ApiStatus.Internal
 internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
@@ -474,6 +475,11 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun hashCode(): Int {
     error("equals and hashCode should not be used with IjVimEditor")
+  }
+
+  override fun toString(): String {
+    // We can't use Object.toString() as this includes hashcode, which produces an error
+    return "IjVimEditor[$editor@${identityHashCode(editor).toString(16)}]"
   }
 }
 
