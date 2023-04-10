@@ -443,16 +443,14 @@ private fun findMatchingPair(
       targetClosingPattern = closestSearchPair.second
     }
 
-    // HTML attributes are a special case where the cursor is inside of quotes, but we want to jump as if we were
-    // anywhere else inside the opening tag.
-    val currentPsiElement = PsiHelper.getFile(editor)!!.findElementAt(caretOffset)
-    val skipComments = !isComment(currentPsiElement)
-    val skipQuotes = !isQuoted(currentPsiElement) || isHtmlAttribute(currentPsiElement)
-
     val initialPatternStart = currentLineStart + closestMatchStart
     val initialPatternEnd = currentLineStart + closestMatchEnd
-    val searchParams = MatchitSearchParams(initialPatternStart, initialPatternEnd, targetOpeningPattern, targetClosingPattern, skipComments, skipQuotes)
 
+    val initialPsiElement = PsiHelper.getFile(editor)!!.findElementAt(initialPatternStart)
+    val skipComments = !isComment(initialPsiElement)
+    val skipQuotes = !isQuoted(initialPsiElement)
+
+    val searchParams = MatchitSearchParams(initialPatternStart, initialPatternEnd, targetOpeningPattern, targetClosingPattern, skipComments, skipQuotes)
     val matchingPairOffset = if (direction == Direction.FORWARDS) {
       findClosingPair(editor, isInOpPending, searchParams)
     } else {
@@ -603,9 +601,4 @@ private fun isQuoted(psiElement: PsiElement?): Boolean {
   val elementType = psiElement?.elementType?.debugName
   return elementType == "STRING_LITERAL" || elementType == "XML_ATTRIBUTE_VALUE_TOKEN" ||
     elementType == "string content" // Ruby specific.
-}
-
-private fun isHtmlAttribute(psiElement: PsiElement?): Boolean {
-  val elementType = psiElement?.elementType?.debugName
-  return elementType == "XML_ATTRIBUTE_VALUE_TOKEN"
 }
