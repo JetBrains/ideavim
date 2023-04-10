@@ -607,6 +607,28 @@ class MatchitHtmlTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun `test jump from multiline opening tag to closing`() {
+    doTest(
+      "%",
+      """
+        <h1 ${c}id="title"
+           class="red right-aligned">
+           Header Content
+        </h1>
+      """.trimIndent(),
+      """
+        <h1 id="title"
+           class="red right-aligned">
+           Header Content
+        <$c/h1>
+      """.trimIndent(),
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
+    )
+  }
+
   /*
    *  g% motion tests. For HTML, g% should behave the same as %.
    */
@@ -1123,25 +1145,4 @@ class MatchitHtmlTest : VimTestCase() {
     )
   }
 
-  @Test
-  fun `test jump from multiline opening tag to closing`() {
-    doTest(
-      "%",
-      """
-        <h1 ${c}id="title"
-           class="red right-aligned">
-           Header Content
-        </h1>
-      """.trimIndent(),
-      """
-        <h1 id="title"
-           class="red right-aligned">
-           Header Content
-        <$c/h1>
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
-      HtmlFileType.INSTANCE,
-    )
-  }
 }
