@@ -150,11 +150,14 @@ public class FileGroup extends VimFileBase {
       final VirtualFile virtualFile = EditorHelper.getVirtualFile(((IjVimEditor)editor).getEditor());
 
       if (virtualFile != null && window != null) {
-        window.closeFile(virtualFile);
-      }
-      if (!ApplicationManager.getApplication().isUnitTestMode()) {
-        // This thing doesn't have an implementation in test mode
-        EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+        window.getManager().closeFile(virtualFile, true, false);
+
+        // Get focus after closing tab
+        window.requestFocus(true);
+        if (!ApplicationManager.getApplication().isUnitTestMode()) {
+          // This thing doesn't have an implementation in test mode
+          EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+        }
       }
     }
   }
