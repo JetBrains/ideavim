@@ -3,6 +3,8 @@ package patches.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -11,6 +13,21 @@ To apply the patch, change the buildType with id = 'Github'
 accordingly, and delete the patch script.
 */
 changeBuildType(RelativeId("Github")) {
+    triggers {
+        val trigger1 = find<VcsTrigger> {
+            vcs {
+                branchFilter = """
+                    +:refs/(pull/*)/head
+                    -:<default>
+                """.trimIndent()
+            }
+        }
+        trigger1.apply {
+            branchFilter = "-:<default>"
+
+        }
+    }
+
     features {
         val feature1 = find<PullRequests> {
             pullRequests {
