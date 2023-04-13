@@ -24,7 +24,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
 
-    compileOnly("org.jetbrains:annotations:23.0.0")
+    compileOnly("org.jetbrains:annotations:24.0.1")
 }
 
 tasks {
