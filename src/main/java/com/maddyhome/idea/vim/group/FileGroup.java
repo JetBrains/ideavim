@@ -147,7 +147,7 @@ public class FileGroup extends VimFileBase {
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final VirtualFile virtualFile = EditorHelper.getVirtualFile(((IjVimEditor)editor).getEditor());
+      final VirtualFile virtualFile = fileEditorManager.getCurrentFile();
 
       if (virtualFile != null && window != null) {
         window.getManager().closeFile(virtualFile, true, false);
