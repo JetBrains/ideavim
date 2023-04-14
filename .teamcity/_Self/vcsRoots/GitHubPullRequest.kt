@@ -7,6 +7,6 @@ object GitHubPullRequest : GitVcsRoot({
   url = "git@github.com:JetBrains/ideavim.git"
   branchSpec = "+:refs/(pull/*)/head"
   authMethod = uploadedKey {
-    uploadedKey = "Alex Plate TeamCity key"
+    uploadedKey = "IdeaVim ssh keys"
   }
 })
