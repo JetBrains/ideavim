@@ -67,7 +67,7 @@ class Github(command: String, desc: String) : IdeaVimBuildType({
       }
     }
     commitStatusPublisher {
-      vcsRootExtId = "${GitHubPullRequest.id}"
+      vcsRootExtId = "${DslContext.settingsRoot.id}"
       publisher = github {
         githubUrl = "https://api.github.com"
         authType = personalToken {
