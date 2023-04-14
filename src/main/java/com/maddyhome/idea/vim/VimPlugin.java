@@ -377,13 +377,17 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
         final Boolean isKeyRepeat = getEditor().isKeyRepeat();
         if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {
           // This system property is used in IJ ui robot to hide the startup tips
-          boolean showNotification = Boolean.getBoolean("ide.show.tips.on.startup.default.value");
-          if (showNotification && VimPlugin.getNotifications().enableRepeatingMode() == Messages.YES) {
-            getEditor().setKeyRepeat(true);
-            keyRepeat.setEnabled(true);
-          }
-          else {
-            getEditor().setKeyRepeat(false);
+          boolean showNotification =
+            Boolean.parseBoolean(System.getProperty("ide.show.tips.on.startup.default.value", "true"));
+          LOG.info("Do not show mac repeat notification because ide.show.tips.on.startup.default.value=false");
+          if (showNotification) {
+            if (VimPlugin.getNotifications().enableRepeatingMode() == Messages.YES) {
+              getEditor().setKeyRepeat(true);
+              keyRepeat.setEnabled(true);
+            }
+            else {
+              getEditor().setKeyRepeat(false);
+            }
           }
         }
       }
