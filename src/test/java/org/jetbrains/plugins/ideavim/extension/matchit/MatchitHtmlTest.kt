@@ -641,6 +641,46 @@ class MatchitHtmlTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun `test jump from opening tag to closing tag ignoring inner tag with similar name`() {
+    doTest(
+      "%",
+      """
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
+      """.trimIndent(),
+      """
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
+      """.trimIndent(),
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test jump from closing tag to opening tag ignoring inner tag with similar name`() {
+    doTest(
+      "%",
+      """
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
+      """.trimIndent(),
+      """
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
+      """.trimIndent(),
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
+    )
+  }
+
   /*
    *  g% motion tests. For HTML, g% should behave the same as %.
    */
@@ -1163,6 +1203,46 @@ class MatchitHtmlTest : VimTestCase() {
       "g%",
       "$c  <!-- A comment -->",
       "  <!-- A comment --$c>",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test reverse jump from opening tag to closing tag ignoring inner tag with similar name`() {
+    doTest(
+      "g%",
+      """
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
+      """.trimIndent(),
+      """
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
+      """.trimIndent(),
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test reverse jump from closing tag to opening tag ignoring inner tag with similar name`() {
+    doTest(
+      "g%",
+      """
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
+      """.trimIndent(),
+      """
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
+      """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
       HtmlFileType.INSTANCE,

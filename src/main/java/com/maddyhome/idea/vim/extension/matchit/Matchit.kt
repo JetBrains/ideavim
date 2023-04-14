@@ -261,7 +261,7 @@ private object FileTypePatterns {
     val closingTagPattern = String.format("(?<=<)/%s(?=>)", tagNamePattern)
 
     // The tag name is left as %s so we can substitute the back reference we captured.
-    val htmlSearchPair = Pair("(?<=<)%s(?:\\s[^<>]*(\".*\")?)?", "(?<=<)/%s>")
+    val htmlSearchPair = Pair("(?<=<)%s(?:\\s[^<>]*(\".*\")?)?(?=>)", "(?<=<)/%s>")
 
     return (
       LanguagePatterns("<", ">") +
