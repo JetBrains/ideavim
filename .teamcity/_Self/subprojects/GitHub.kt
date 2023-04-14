@@ -60,7 +60,7 @@ class Github(command: String, desc: String) : IdeaVimBuildType({
     pullRequests {
       provider = github {
         authType = token {
-          token = "credentialsJSON:43afd6e5-6ad5-4d12-a218-cf1547717a7f"
+          token = "credentialsJSON:90f3b439-6e91-40f7-a086-d4dd8e0ea9b8"
         }
         filterTargetBranch = "refs/heads/master"
         filterAuthorRole = PullRequests.GitHubRoleFilter.EVERYBODY
@@ -71,7 +71,7 @@ class Github(command: String, desc: String) : IdeaVimBuildType({
       publisher = github {
         githubUrl = "https://api.github.com"
         authType = personalToken {
-          token = "credentialsJSON:43afd6e5-6ad5-4d12-a218-cf1547717a7f"
+          token = "credentialsJSON:90f3b439-6e91-40f7-a086-d4dd8e0ea9b8"
         }
       }
       param("github_oauth_user", "AlexPl292")
