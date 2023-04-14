@@ -10,6 +10,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object GitHub : Project({
@@ -30,11 +31,11 @@ class Github(command: String, desc: String) : IdeaVimBuildType({
   }
 
   vcs {
-    root(DslContext.settingsRoot)
+    root(GitHubPullRequest)
 
     checkoutMode = CheckoutMode.AUTO
     branchFilter = """
-            +:refs/(pull/*)/head
+            +:*
             -:<default>
         """.trimIndent()
   }
@@ -49,10 +50,8 @@ class Github(command: String, desc: String) : IdeaVimBuildType({
 
   triggers {
     vcs {
-      branchFilter = """
-            +:refs/(pull/*)/head
-            -:<default>
-      """.trimIndent()
+      quietPeriodMode = VcsTrigger.QuietPeriodMode.USE_DEFAULT
+      branchFilter = ""
     }
   }
 
