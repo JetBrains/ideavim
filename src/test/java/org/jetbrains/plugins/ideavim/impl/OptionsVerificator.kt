@@ -13,9 +13,9 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.maddyhome.idea.vim.api.VimInjector
-import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.group.IjVimOptionGroup
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -181,10 +181,10 @@ internal class OptionsTraceCollector {
 }
 
 internal class OptionsTracer(
-  private val vimOptionGroup: VimOptionGroup,
+  private val vimOptionGroup: IjVimOptionGroup,
   private val trace: OptionsTraceCollector,
   private val ignoreFlag: AtomicBoolean,
-) : VimOptionGroup by vimOptionGroup {
+) : IjVimOptionGroup by vimOptionGroup {
   override fun getOption(key: String): Option<VimDataType>? {
     if (!ignoreFlag.get()) {
       trace.requestedKeys += key

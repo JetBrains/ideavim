@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.impl
 
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.group.IjVimOptionGroup
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -31,7 +32,7 @@ class TestInjector(val injector: VimInjector) : VimInjector by injector {
       val tracer = tracers[OptionsTracer] as? OptionsTraceCollector
       return if (tracer != null) {
         val ignoreFlag = tracers["OptionTracerIgnore"] as AtomicBoolean
-        OptionsTracer(injector.optionGroup, tracer, ignoreFlag)
+        OptionsTracer(injector.optionGroup as IjVimOptionGroup, tracer, ignoreFlag)
       } else {
         injector.optionGroup
       }
