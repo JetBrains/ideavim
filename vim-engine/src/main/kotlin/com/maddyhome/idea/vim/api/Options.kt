@@ -69,10 +69,11 @@ public object Options {
   }
 
   // Simple options, sorted by name
-  // Note that we expose options as strongly typed properties to make it easier to consume them. The VimOptionGroup API
-  // will return strongly typed VimDataType derived instances if given a strongly typed option, but fetching by name
-  // loses that type information, and we also have to check that the option is not null, even if we know it exists.
-  // types
+  // Note that we have extensively refactored options several times, and want to avoid further changes, if possible.
+  // Options were originally simple strongly typed properties with a single global value, that was then refactored into
+  // a name-based API when global/local scope was introduced. Unfortuantely, this leads to a loosely typed approach
+  // where calling code must upcast to the expected data type. Using strongly typed properties allows us to build a nice
+  // strongly typed accessor API that makes it easy to both get and set options.
   public val digraph: ToggleOption = addOption(ToggleOption("digraph", "dg", false))
   public val gdefault: ToggleOption = addOption(ToggleOption("gdefault", "gd", false))
   public val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", "hi", 50))

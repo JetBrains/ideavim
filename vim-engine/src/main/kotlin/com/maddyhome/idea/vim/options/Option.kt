@@ -105,6 +105,11 @@ public open class StringOption(name: String, abbrev: String, defaultValue: VimSt
 
 /**
  * Represents a string that is a comma-separated list of values
+ *
+ * Note that we have tried multiple ways to represent a string list option, from a separate class similar to
+ * [StringListOption] or a combined string option. While a string list option "is-a" string option, its operations
+ * (append, prepend and remove) are implemented very differently to the string option. Unless there is a good reason to
+ * do so, we do not expect this to change again.
  */
 public open class StringListOption(
   name: String,
