@@ -63,6 +63,7 @@ import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.HistoryGroup
+import com.maddyhome.idea.vim.group.IjVimOptionGroup
 import com.maddyhome.idea.vim.group.MacroGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
@@ -70,8 +71,6 @@ import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
-import com.maddyhome.idea.vim.group.getEffectiveIjOptions
-import com.maddyhome.idea.vim.group.getGlobalIjOptions
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
@@ -218,18 +217,13 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<EditorGroup>()
 }
 
-// While these functions don't use VimInjector, they mirror VimInjector.globalOptions() so it's good for discovery
-// They are specific to the IntelliJ implementation of VimOptionGroup. We can't rely on upcasting injector.optionGroup
-// because we override it in tests to track what options are used.
-
 /**
  * Convenience function to get the IntelliJ implementation specific global option accessor
  */
-@Suppress("UnusedReceiverParameter")
-public fun VimInjector.globalIjOptions(): GlobalIjOptions = getGlobalIjOptions()
+public fun VimInjector.globalIjOptions(): GlobalIjOptions = (this.optionGroup as IjVimOptionGroup).getGlobalIjOptions()
 
 /**
  * Convenience function to get the IntelliJ implementation specific option accessor for the given editor's scope
  */
-@Suppress("UnusedReceiverParameter")
-public fun VimInjector.ijOptions(editor: VimEditor): EffectiveIjOptions = getEffectiveIjOptions(editor)
+public fun VimInjector.ijOptions(editor: VimEditor): EffectiveIjOptions =
+  (this.optionGroup as IjVimOptionGroup).getEffectiveIjOptions(editor)
