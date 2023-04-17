@@ -12,6 +12,7 @@ import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
+import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -113,6 +114,7 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
     val testInjector = TestInjector(injector)
     val traceCollector = OptionsTraceCollector()
     val ignore = AtomicBoolean(false)
+    getStore(context).put("OriginalInjector", injector)
     getStore(context).put("TraceCollector", traceCollector)
     testInjector.setTracer(OptionsTracer, traceCollector)
     testInjector.setTracer("OptionTracerIgnore", ignore)
@@ -120,6 +122,7 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
   }
 
   override fun afterTestExecution(context: ExtensionContext) {
+    injector = getStore(context).get("OriginalInjector", VimInjector::class.java)
     val collector = getStore(context).get("TraceCollector", OptionsTraceCollector::class.java)
     val usedOptions = collector.requestedKeys
       .mapNotNull { injector.optionGroup.getOption(it)?.name }
