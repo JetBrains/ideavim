@@ -518,4 +518,16 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
+
+  @Test
+  fun `test replace in visual with clipboard unnamedplus`() {
+    VimPlugin.getRegister().resetRegisters()
+
+    configureByText("one ${c}two three")
+    enterCommand("set clipboard+=unnamedplus")
+    injector.registerGroup.storeText('+', "four")
+
+    typeText(injector.parser.parseKeys("vegr"))
+    assertState("one four three")
+  }
 }
