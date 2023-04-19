@@ -19,15 +19,6 @@ import java.util.*
 
 @Service
 internal class IjVimSearchHelper : VimSearchHelperBase() {
-  override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): Int {
-    return SearchHelper.findNextParagraph(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      count,
-      allowBlanks,
-    )
-  }
-
   override fun findNextSentenceStart(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -123,10 +114,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
 
   override fun findSentenceRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange {
     return SearchHelper.findSentenceRange(editor.ij, caret.ij, count, isOuter)
-  }
-
-  override fun findParagraphRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
-    return SearchHelper.findParagraphRange(editor.ij, caret.ij, count, isOuter)
   }
 
   override fun findBlockTagRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {

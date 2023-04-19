@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -33,7 +34,7 @@ public sealed class MotionParagraphAction(public val direction: Direction) : Mot
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToNextParagraph(editor, caret, direction.toInt() * operatorArguments.count1).toMotionOrError()
+    return moveCaretToNextParagraph(editor, caret, direction.toInt() * operatorArguments.count1)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
@@ -42,12 +43,7 @@ public sealed class MotionParagraphAction(public val direction: Direction) : Mot
 public class MotionParagraphNextAction : MotionParagraphAction(Direction.FORWARDS)
 public class MotionParagraphPreviousAction : MotionParagraphAction(Direction.BACKWARDS)
 
-private fun moveCaretToNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
-  var res = injector.searchHelper.findNextParagraph(editor, caret, count, false)
-  res = if (res >= 0) {
-    editor.normalizeOffset(res, true)
-  } else {
-    -1
-  }
-  return res
+private fun moveCaretToNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+  val res = injector.searchHelper.findNextParagraph(editor, caret, count, false) ?: return Motion.Error
+  return editor.normalizeOffset(res, true).toMotion()
 }

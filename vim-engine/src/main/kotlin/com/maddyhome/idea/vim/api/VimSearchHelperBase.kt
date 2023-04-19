@@ -10,11 +10,14 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import kotlin.math.abs
 import kotlin.math.min
 
+// todo all this methods should return Long since editor.fileSize is long
+// todo same for TextRange and motions
 public abstract class VimSearchHelperBase : VimSearchHelper {
   override fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Long {
     return findNextWord(editor.text(), searchFrom.toLong(), editor.fileSize(), count, bigWord, false)
@@ -39,6 +42,8 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
   }
 
   public companion object {
+    private val logger = vimLogger<VimSearchHelperBase>()
+
     public fun findNextWord(
       chars: CharSequence,
       pos: Long,
@@ -125,6 +130,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
      * An empty line is considered a whitespace break.
      */
     // TODO: 18.08.2022 Make private
+    // todo refactor
     public fun skipSpace(chars: CharSequence, offset: Long, step: Int, size: Long): Long {
       var _offset = offset
       var prev = 0.toChar()
@@ -427,5 +433,206 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       backslashCounter++
     }
     return backslashCounter % 2 == 0
+  }
+
+  override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): Int? {
+    val line: Int = findNextParagraphLine(editor, caret.getBufferPosition().line, count, allowBlanks) ?: return null
+    val lineCount: Int = editor.nativeLineCount()
+    return if (line == lineCount - 1) {
+      if (count > 0) editor.fileSize().toInt() - 1 else 0
+    } else {
+      editor.getLineStartOffset(line)
+    }
+  }
+
+  /**
+   * Find next paragraph bound offset
+   * @param editor target editor
+   * @param startLine line to start the search from (included in search)
+   * @param direction search direction
+   * @param allowBlanks true if we consider lines with whitespaces as empty
+   * @return next paragraph offset
+   */
+  private fun findNextParagraph(editor: VimEditor, startLine: Int, direction: Direction, allowBlanks: Boolean): Int {
+    val line: Int? = findNextParagraphLine(editor, startLine, direction, allowBlanks)
+    return if (line == null) {
+      if (direction == Direction.FORWARDS) editor.fileSize().toInt() - 1 else 0
+    } else {
+      editor.getLineStartOffset(line)
+    }
+  }
+
+  override fun findParagraphRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
+    val line: Int = caret.getBufferPosition().line
+
+    if (logger.isDebug()) {
+      logger.debug("Starting paragraph range search on line $line")
+    }
+
+    val rangeInfo = (if (isOuter) findOuterParagraphRange(editor, line, count) else findInnerParagraphRange(editor, line, count)) ?: return null
+    val startLine: Int = rangeInfo.first
+    val endLine: Int = rangeInfo.second
+
+    if (logger.isDebug()) {
+      logger.debug("final start line= $startLine")
+      logger.debug("final end line= $endLine")
+    }
+
+    val start: Int = editor.getLineStartOffset(startLine)
+    val end: Int = editor.getLineStartOffset(endLine)
+    return TextRange(start, end + 1)
+  }
+
+  private fun findOuterParagraphRange(editor: VimEditor, line: Int, count: Int): Pair<Int, Int>? {
+    var expandStart = false
+    var expandEnd = false
+
+    var startLine: Int = if (editor.isLineEmpty(line, true)) {
+      line
+    } else {
+      findNextParagraphLine(editor, line, -1, true) ?: return null
+    }
+
+    var endLine: Int = findNextParagraphLine(editor, line, count, true) ?: return null
+
+    if (editor.isLineEmpty(startLine, true) && editor.isLineEmpty(endLine, true)) {
+      if (startLine == line) {
+        endLine--
+        expandStart = true
+      } else {
+        startLine++
+        expandEnd = true
+      }
+    } else if (!editor.isLineEmpty(endLine, true) && !editor.isLineEmpty(startLine, true) && startLine > 0) {
+      startLine--
+      expandStart = true
+    } else {
+      expandStart = editor.isLineEmpty(startLine, true)
+      expandEnd = editor.isLineEmpty(endLine, true)
+    }
+    if (expandStart) {
+      startLine = if (editor.isLineEmpty(startLine, true)) findLastEmptyLine(editor, startLine, Direction.BACKWARDS) else startLine
+    }
+    if (expandEnd) {
+      endLine = if (editor.isLineEmpty(endLine, true)) findLastEmptyLine(editor, endLine, Direction.FORWARDS) else endLine
+    }
+    return Pair(startLine, endLine)
+  }
+
+  private fun findInnerParagraphRange(editor: VimEditor, line: Int, count: Int): Pair<Int, Int>? {
+    val lineCount: Int = editor.lineCount()
+
+    var startLine = line
+    var endLine: Int
+
+    if (!editor.isLineEmpty(startLine, true)) {
+      startLine = findNextParagraphLine(editor, line, -1, true) ?: return null
+      if (editor.isLineEmpty(startLine, true)) {
+        startLine++
+      }
+      endLine = line
+    } else {
+      endLine = line - 1
+    }
+    // todo someone please refactor this if you understand what is going on
+    var which = if (editor.isLineEmpty(startLine, true)) 0 else 1
+    for (i in 0 until count) {
+      if (which % 2 == 1) {
+        val nextParagraphLine = findNextParagraphLine(editor, endLine, Direction.FORWARDS, true)
+        endLine = if (nextParagraphLine == null || nextParagraphLine == 0) {
+          if (i == count - 1) {
+            lineCount - 1
+          } else {
+            return null
+          }
+        } else {
+          nextParagraphLine - 1
+        }
+      } else {
+        endLine++
+      }
+      which++
+    }
+    startLine = if (editor.isLineEmpty(startLine, true)) findLastEmptyLine(editor, startLine, Direction.BACKWARDS) else startLine
+    endLine = if (editor.isLineEmpty(endLine, true)) findLastEmptyLine(editor, endLine, Direction.FORWARDS) else endLine
+    return Pair(startLine, endLine)
+  }
+
+  /**
+   * If we have multiple consecutive empty lines in an editor, the method returns the first
+   * or last empty line in the group of empty lines, depending on the specified direction
+   */
+  private fun findLastEmptyLine(editor: VimEditor, line: Int, direction: Direction): Int {
+    if (!editor.isLineEmpty(line, true)) {
+      logger.error("Method findLastEmptyLine was called for non-empty line")
+      return line
+    }
+    return if (direction == Direction.BACKWARDS) {
+      val previousNonEmptyLine = skipEmptyLines(editor, line, Direction.BACKWARDS, true)
+      previousNonEmptyLine + 1
+    } else {
+      val nextNonEmptyLine = skipEmptyLines(editor, line, Direction.FORWARDS, true)
+      nextNonEmptyLine - 1
+    }
+  }
+  /**
+   * Find next paragraph bound line
+   * @param editor target editor
+   * @param startLine line to start the search from (included in search)
+   * @param count search for the count-th occurrence
+   * @param allowBlanks true if we consider lines with whitespaces as empty
+   * @return next paragraph bound line if there is any
+   */
+  private fun findNextParagraphLine(editor: VimEditor, startLine: Int, count: Int, allowBlanks: Boolean): Int? {
+    var line: Int? = startLine
+    val lineCount: Int = editor.lineCount()
+    val direction = if (count > 0) Direction.FORWARDS else Direction.BACKWARDS
+
+    var i = abs(count)
+    while (i > 0 && line != null) {
+      line = findNextParagraphLine(editor, line, direction, allowBlanks)
+      i--
+    }
+
+    if (count != 0 && i == 0 && line == null) {
+      line = if (direction == Direction.FORWARDS) lineCount - 1 else 0
+    }
+
+    return line
+  }
+
+  /**
+   * Searches for the next paragraph boundary (empty line)
+   * @param editor target editor
+   * @param startLine line to start the search from (included in search)
+   * @param direction search direction
+   * @param allowBlanks true if we consider lines with whitespaces as empty
+   * @return next empty line if there is any
+   */
+  private fun findNextParagraphLine(editor: VimEditor, startLine: Int, direction: Direction, allowBlanks: Boolean): Int? {
+    var line = skipEmptyLines(editor, startLine, direction, allowBlanks)
+    while (line in 0 until editor.nativeLineCount()) {
+      if (editor.isLineEmpty(line, allowBlanks)) return line
+      line += direction.toInt()
+    }
+    return null
+  }
+
+  /**
+   * Searches for the next non-empty line in the given direction
+   * @param editor target editor
+   * @param startLine line to start the search from (included in search)
+   * @param direction search direction
+   * @param allowBlanks true if we consider lines with whitespaces as empty
+   * @return next non-empty line if there is any.
+   * If there is no such line, the [editor.nativeLineCount()] is returned for Forwards direction and -1 for Backwards
+   */
+  private fun skipEmptyLines(editor: VimEditor, startLine: Int, direction: Direction, allowBlanks: Boolean): Int {
+    var i = startLine
+    while (i in 0 until editor.nativeLineCount()) {
+      if (!editor.isLineEmpty(i, allowBlanks)) break
+      i += direction.toInt()
+    }
+    return i
   }
 }

@@ -490,6 +490,10 @@ public abstract class VimMarkServiceBase : VimMarkService {
       else -> throw IllegalArgumentException("Invalid paragraph mark char")
     }
     var offset = injector.searchHelper.findNextParagraph(editor, caret, count, allowBlanks = false)
+    if (offset == null) {
+      logger.error("Failed to find next paragraph with count = $count")
+      return null
+    }
     offset = editor.normalizeOffset(offset, false)
     val lp = editor.offsetToBufferPosition(offset)
     return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())

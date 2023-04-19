@@ -13,12 +13,20 @@ import com.maddyhome.idea.vim.helper.SearchOptions
 import java.util.*
 
 public interface VimSearchHelper {
+  /**
+   * Find next paragraph bound offset
+   * @param editor target editor
+   * @param caret caret whose position will be used to start the search from
+   * @param count search for the count-th occurrence
+   * @param allowBlanks true if we consider lines with whitespaces as empty
+   * @return next paragraph off
+   */
   public fun findNextParagraph(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
     allowBlanks: Boolean,
-  ): Int
+  ): Int?
 
   public fun findNextSentenceStart(
     editor: VimEditor,
@@ -145,6 +153,14 @@ public interface VimSearchHelper {
     isOuter: Boolean,
   ): TextRange
 
+  /**
+   * Returns range of a paragraph containing the given caret
+   * @param editor target editor
+   * @param caret caret whose position will be used to start the search from
+   * @param count search for the count paragraphs forward
+   * @param isOuter true if it is an outer motion, false otherwise
+   * @return the paragraph text range
+   */
   public fun findParagraphRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,

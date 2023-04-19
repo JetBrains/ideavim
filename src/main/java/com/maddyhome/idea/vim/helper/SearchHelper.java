@@ -1989,21 +1989,6 @@ public class SearchHelper {
     }
   }
 
-  public static int findNextParagraph(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowBlanks) {
-    int line = findNextParagraphLine(editor, caret, count, allowBlanks);
-
-    int maxline = new IjVimEditor(editor).lineCount();
-    if (line >= 0 && line < maxline) {
-      return new IjVimEditor(editor).getLineStartOffset(line);
-    }
-    else if (line == maxline) {
-      return count > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
-    }
-    else {
-      return -1;
-    }
-  }
-
   private static int findNextParagraph(@NotNull Editor editor,
                                        int lline,
                                        int dir,
@@ -2017,32 +2002,6 @@ public class SearchHelper {
     else {
       return dir > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
     }
-  }
-
-  private static int findNextParagraphLine(@NotNull Editor editor,
-                                           @NotNull Caret caret,
-                                           int count,
-                                           boolean allowBlanks) {
-    int line = caret.getLogicalPosition().line;
-
-    int maxline = new IjVimEditor(editor).lineCount();
-    int dir = count > 0 ? 1 : -1;
-    boolean skipLines = count > 1;
-    count = Math.abs(count);
-    int total = count;
-
-    for (; count > 0 && line >= 0; count--) {
-      line = findNextParagraphLine(editor, line, dir, allowBlanks, skipLines);
-    }
-
-    if (total == 1 && line < 0) {
-      line = dir > 0 ? maxline - 1 : 0;
-    }
-    else if (total > 1 && count == 0 && line < 0) {
-      line = dir > 0 ? maxline - 1 : 0;
-    }
-
-    return line;
   }
 
   private static int findNextParagraphLine(@NotNull Editor editor,
@@ -2079,129 +2038,6 @@ public class SearchHelper {
     }
 
     return line;
-  }
-
-  public static @Nullable TextRange findParagraphRange(@NotNull Editor editor,
-                                                       @NotNull Caret caret,
-                                                       int count,
-                                                       boolean isOuter) {
-    int line = caret.getLogicalPosition().line;
-    int maxline = new IjVimEditor(editor).lineCount();
-    if (logger.isDebugEnabled()) logger.debug("starting on line " + line);
-    int sline;
-    int eline;
-    boolean fixstart = false;
-    boolean fixend = false;
-    if (isOuter) {
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, true)) {
-        sline = line;
-      }
-      else {
-        sline = findNextParagraphLine(editor, caret, -1, true);
-      }
-
-      eline = findNextParagraphLine(editor, caret, count, true);
-      if (eline < 0) {
-        return null;
-      }
-
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) &&
-          EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
-        if (sline == line) {
-          eline--;
-          fixstart = true;
-        }
-        else {
-          sline++;
-          fixend = true;
-        }
-      }
-      else if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true) &&
-               !EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) &&
-               sline > 0) {
-        sline--;
-        fixstart = true;
-      }
-      else {
-        if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
-          fixend = true;
-        }
-        else {
-          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-            fixstart = true;
-          }
-        }
-      }
-    }
-    else {
-      sline = line;
-      if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-        sline = findNextParagraphLine(editor, caret, -1, true);
-        if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-          sline++;
-        }
-        eline = line;
-      }
-      else {
-        eline = line - 1;
-      }
-
-      int which = EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) ? 0 : 1;
-      for (int i = 0; i < count; i++) {
-        if (which % 2 == 1) {
-          eline = findNextParagraphLine(editor, eline, 1, true, false) - 1;
-          if (eline < 0) {
-            if (i == count - 1) {
-              eline = maxline - 1;
-            }
-            else {
-              return null;
-            }
-          }
-        }
-        else {
-          eline++;
-        }
-        which++;
-      }
-      fixstart = true;
-      fixend = true;
-    }
-
-    if (fixstart) {
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-        while (sline > 0) {
-          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline - 1, true)) {
-            sline--;
-          }
-          else {
-            break;
-          }
-        }
-      }
-    }
-
-    if (fixend) {
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
-        while (eline < maxline - 1) {
-          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline + 1, true)) {
-            eline++;
-          }
-          else {
-            break;
-          }
-        }
-      }
-    }
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("final sline=" + sline);
-      logger.debug("final eline=" + eline);
-    }
-    int start = new IjVimEditor(editor).getLineStartOffset(sline);
-    int end = new IjVimEditor(editor).getLineStartOffset(eline);
-
-    return new TextRange(start, end + 1);
   }
 
   public static int findMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {

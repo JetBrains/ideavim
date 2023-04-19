@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -39,21 +38,16 @@ internal class ParagraphMotion : VimExtension {
   private class ParagraphMotionHandler(private val count: Int) : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       editor.ij.vimForEachCaret { caret ->
-        val motion = moveCaretToNextParagraph(editor.ij, caret, count)
-        if (motion >= 0) {
+        val motion = moveCaretToNextParagraph(editor, caret, count)
+        if (motion != null) {
           caret.vim.moveToOffset(motion)
         }
       }
     }
 
-    fun moveCaretToNextParagraph(editor: Editor, caret: Caret, count: Int): Int {
-      var res = SearchHelper.findNextParagraph(editor, caret, count, true)
-      res = if (res >= 0) {
-        editor.vim.normalizeOffset(res, true)
-      } else {
-        -1
-      }
-      return res
+    fun moveCaretToNextParagraph(editor: VimEditor, caret: Caret, count: Int): Int? {
+      return injector.searchHelper.findNextParagraph(editor, caret.vim, count, true)
+        ?.let { editor.normalizeOffset(it, true) }
     }
   }
 }
