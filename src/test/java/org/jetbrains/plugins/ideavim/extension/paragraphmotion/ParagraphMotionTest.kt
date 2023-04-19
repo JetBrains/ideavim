@@ -157,4 +157,21 @@ class ParagraphMotionTest : VimTestCase() {
     """.trimMargin().dotToSpace()
     doTest("d{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
+
+  @Test
+  fun `test paragraph next on the last line`() {
+    val before = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |
+        |Sed in orci mauris.
+        |${c}Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    val after = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas${c}.
+    """.trimMargin()
+    doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
 }
