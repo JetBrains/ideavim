@@ -68,12 +68,36 @@ public object Options {
     option.overrideDefaultValue(newDefaultValue)
   }
 
+  /*
+   * Option declarations
+   *
+   * Options are declared as strongly typed public properties. The GlobalOptions and EffectiveOptions classes provide
+   * strongly typed properties that make it easy to get/set option values from code using native types.
+   * A small note on history: Options were originally declared as simple strongly typed properties that wrapped a single
+   * global value. This was refactored into a name-based API with the introduction of global and local values (as
+   * required by scripting). The downside to this approach was that it naturally became loosely typed, and consuming
+   * code was required to upcast option values to the expected type before use. Reintroducing strongly typed properties
+   * allows us to build a strongly typed accessor API that makes it easy to get/set option values. We'd like to avoid
+   * such API churn in the future of options, if possible.
+   *
+   * To add an option:
+   * * Add a new public property below, sorted alphabetically. Note that the options are grouped into simple
+   *   declarations, typically one-liners, followed by options with more complex splitting or validation logic, and then
+   *   followed by IdeaVim specific (but implementation agnostic) options
+   * * The property should be named the same as the Vim option. Add the name to the ideavim.dic dictionary to avoid
+   *   spelling inspections in ~/.ideavimrc
+   * * If the option is to be accessed from Java, add @JvmField. This is usually only required for adding a change
+   *   listener, and should probably be avoided (or migrated to Kotlin)
+   * * Create an instance of the option type, wrapped in a call to addOption. Do not forget to call addOption!
+   *   If the option requires additional validation or custom splitting, derive from one of the option types and
+   *   implement inline
+   * * Add a public var delegated property in GlobalOptions (for global options) or EffectiveOptions (for options that
+   *   are local-to-buffer, local-to-window or global-local). The delegated property will handle getting and setting the
+   *   option value, as a native type, at the correct scope
+   * * Add tests :)
+   */
+
   // Simple options, sorted by name
-  // Note that we have extensively refactored options several times, and want to avoid further changes, if possible.
-  // Options were originally simple strongly typed properties with a single global value, that was then refactored into
-  // a name-based API when global/local scope was introduced. Unfortuantely, this leads to a loosely typed approach
-  // where calling code must upcast to the expected data type. Using strongly typed properties allows us to build a nice
-  // strongly typed accessor API that makes it easy to both get and set options.
   public val digraph: ToggleOption = addOption(ToggleOption("digraph", "dg", false))
   public val gdefault: ToggleOption = addOption(ToggleOption("gdefault", "gd", false))
   public val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", "hi", 50))
