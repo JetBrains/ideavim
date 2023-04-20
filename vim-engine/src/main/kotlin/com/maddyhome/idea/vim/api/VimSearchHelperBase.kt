@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import org.jetbrains.annotations.Contract
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -433,6 +434,439 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       backslashCounter++
     }
     return backslashCounter % 2 == 0
+  }
+
+  override fun findNextSentenceStart(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int {
+    var count = count
+    val dir = if (count > 0) 1 else -1
+    count = Math.abs(count)
+    val total = count
+    val chars: CharSequence = editor.text()
+    val start: Int = caret.offset.point
+    val max: Int = editor.fileSize().toInt()
+    var res = start
+    while (count > 0 && res >= 0 && res <= max - 1) {
+      res = findSentenceStart(editor, chars, res, max, dir, countCurrent, count > 1)
+      if (res == 0 || res == max - 1) {
+        count--
+        break
+      }
+      count--
+    }
+    if (res < 0 && (!requireAll || total == 1)) {
+      res = if (dir > 0) max - 1 else 0
+    } else if (count > 0 && total > 1 && !requireAll) {
+      res = if (dir > 0) max - 1 else 0
+    } else if (count > 0 && total > 1 && requireAll) {
+      res = -count
+    }
+    return res
+  }
+
+  override fun findNextSentenceEnd(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int {
+    var count = count
+    val dir = if (count > 0) 1 else -1
+    count = Math.abs(count)
+    val total = count
+    val chars: CharSequence = editor.text()
+    val start: Int = caret.offset.point
+    val max: Int = editor.fileSize().toInt()
+    var res = start
+    while (count > 0 && res >= 0 && res <= max - 1) {
+      res = findSentenceEnd(editor, chars, res, max, dir, countCurrent && count == total, count > 1)
+      if (res == 0 || res == max - 1) {
+        count--
+        break
+      }
+      count--
+    }
+    if (res < 0 && (!requireAll || total == 1)) {
+      res = if (dir > 0) max - 1 else 0
+    } else if (count > 0 && total > 1 && !requireAll) {
+      res = if (dir > 0) max - 1 else 0
+    } else if (count > 0 && total > 1 && requireAll) {
+      res = -count
+    }
+    return res
+  }
+
+  private fun findSentenceStart(
+    editor: VimEditor,
+    chars: CharSequence,
+    start: Int,
+    max: Int,
+    dir: Int,
+    countCurrent: Boolean,
+    multiple: Boolean,
+  ): Int {
+    // Save off the next paragraph since a paragraph is a valid sentence.
+    val lline: Int = editor.offsetToBufferPosition(start).line
+    val np: Int = findNextParagraph(editor, lline, if (dir == 1) Direction.FORWARDS else Direction.BACKWARDS, false)
+    var end: Int
+    // start < max was added to avoid exception and it may be incorrect
+    end = if (start < max && chars[start] == '\n' && !countCurrent) {
+      findSentenceEnd(editor, chars, start, max, -1, false, multiple)
+    } else {
+      findSentenceEnd(editor, chars, start, max, -1, true, multiple)
+    }
+    if (end == start && countCurrent && chars[end] == '\n') {
+      return end
+    }
+    val pos = end - 1
+    if (end >= 0) {
+      var offset = end + 1
+      while (offset < max) {
+        val ch = chars[offset]
+        if (!Character.isWhitespace(ch)) {
+          break
+        }
+        offset++
+      }
+      if (dir > 0) {
+        if (offset == start && countCurrent) {
+          return offset
+        } else if (offset > start) {
+          return offset
+        }
+      } else {
+        if (offset == start && countCurrent) {
+          return offset
+        } else if (offset < start) {
+          return offset
+        }
+      }
+    }
+    end = if (dir > 0) {
+      findSentenceEnd(editor, chars, start, max, dir, true, multiple)
+    } else {
+      findSentenceEnd(editor, chars, pos, max, dir, countCurrent, multiple)
+    }
+    var res = end + 1
+    if (end != -1 && (chars[end] != '\n' || !countCurrent)) {
+      while (res < max) {
+        val ch = chars[res]
+        if (!Character.isWhitespace(ch)) {
+          break
+        }
+        res++
+      }
+    }
+
+    // Now let's see which to return, the sentence we found or the paragraph we found.
+    // This mess returns which ever is closer to our starting point (and in the right direction).
+    if (res >= 0 && np >= 0) {
+      if (dir > 0) {
+        if (np < res || res < start) {
+          res = np
+        }
+      } else {
+        if (np > res || res >= start && !countCurrent) {
+          res = np
+        }
+      }
+    } else if (res == -1 && np >= 0) {
+      res = np
+    }
+    // else we found neither, res already -1
+    return res
+  }
+
+  private fun findSentenceEnd(
+    editor: VimEditor,
+    chars: CharSequence,
+    start: Int,
+    max: Int,
+    dir: Int,
+    countCurrent: Boolean,
+    multiple: Boolean,
+  ): Int {
+    if (dir > 0 && start >= editor.fileSize().toInt() - 1) {
+      return -1
+    } else if (dir < 0 && start <= 0) {
+      return -1
+    }
+
+    // Save off the next paragraph since a paragraph is a valid sentence.
+    val lline: Int = editor.offsetToBufferPosition(start).line
+    var np: Int = findNextParagraph(editor, lline, if (dir == 1) Direction.FORWARDS else Direction.BACKWARDS, false)
+
+    // Sections are also end-of-sentence markers. However, { and } in column 1 don't count.
+    // Since our section implementation only supports these and form-feed chars, we'll just
+    // check for form-feeds below.
+    var res = -1
+    var offset = start
+    var found = false
+    // Search forward looking for a candidate end-of-sentence character (., !, or ?)
+    while (offset >= 0 && offset < max && !found) {
+      var ch = chars[offset]
+      if (".!?".indexOf(ch) >= 0) {
+        val end = offset // Save where we found the punctuation.
+        offset++
+        // This can be followed by any number of ), ], ", or ' characters.
+        while (offset < max) {
+          ch = chars[offset]
+          if (")]\"'".indexOf(ch) == -1) {
+            break
+          }
+          offset++
+        }
+
+        // The next character must be whitespace for this to be a valid end-of-sentence.
+        if (offset >= max || Character.isWhitespace(ch)) {
+          // So we have found the end of the next sentence. Now let's see if we ended
+          // where we started (or further) on a back search. This will happen if we happen
+          // to start this whole search already on a sentence end.
+          if (offset - 1 == start && !countCurrent) {
+            // Skip back to the sentence end so we can search backward from there
+            // for the real previous sentence.
+            offset = end
+          } else {
+            // Yeah - we found the real end-of-sentence. Save it off.
+            res = offset - 1
+            found = true
+          }
+        } else {
+          // Turned out not to be an end-of-sentence so move back to where we were.
+          offset = end
+        }
+      } else if (ch == '\n') {
+        val end = offset // Save where we found the newline.
+        if (dir > 0) {
+          offset++
+          while (offset < max) {
+            ch = chars[offset]
+            if (ch != '\n') {
+              offset--
+              break
+            }
+            if (offset == np && (end - 1 != start || countCurrent)) {
+              break
+            }
+            offset++
+          }
+          if (offset == np && (end - 1 != start || countCurrent)) {
+            res = end - 1
+            found = true
+          } else if (offset > end) {
+            res = offset
+            np = res
+            found = true
+          } else if (offset == end) {
+            if (offset > 0 && chars[offset - 1] == '\n' && countCurrent) {
+              res = end
+              np = res
+              found = true
+            }
+          }
+        } else {
+          if (offset > 0) {
+            offset--
+            while (offset > 0) {
+              ch = chars[offset]
+              if (ch != '\n') {
+                offset++
+                break
+              }
+              offset--
+            }
+          }
+          if (offset < end) {
+            res = if (end == start && countCurrent) {
+              end
+            } else {
+              offset - 1
+            }
+            found = true
+          }
+        }
+        offset = end
+      } else if (ch == '\u000C') {
+        res = offset
+        found = true
+      }
+      offset += dir
+    }
+
+    // Now let's see which to return, the sentence we found or the paragraph we found.
+    // This mess returns which ever is closer to our starting point (and in the right direction).
+    if (res >= 0 && np >= 0) {
+      if (dir > 0) {
+        if (np < res || res < start) {
+          res = np
+        }
+      } else {
+        if (np > res || res >= start && !countCurrent) {
+          res = np
+        }
+      }
+    }
+    /*
+    else if (res == -1 && np >= 0)
+    {
+        res = np;
+    }
+    */return res
+  }
+
+  private fun findSentenceRangeEnd(
+    editor: VimEditor,
+    chars: CharSequence,
+    start: Int,
+    max: Int,
+    count: Int,
+    isOuter: Boolean,
+    oneway: Boolean,
+  ): Int {
+    var count = count
+    val dir = if (count > 0) 1 else -1
+    count = Math.abs(count)
+    val total = count
+    val toggle = !isOuter
+    var findend = dir < 1
+    // Even = start, odd = end
+    var which: Int
+    val eprev = findSentenceEnd(editor, chars, start, max, -1, true, false)
+    val enext = findSentenceEnd(editor, chars, start, max, 1, true, false)
+    val sprev = findSentenceStart(editor, chars, start, max, -1, true, false)
+    val snext = findSentenceStart(editor, chars, start, max, 1, true, false)
+    if (snext == eprev) // On blank line
+    {
+      if (dir < 0 && !oneway) {
+        return start
+      }
+      which = 0
+      if (oneway) {
+        findend = dir > 0
+      } else if (dir > 0 && start < max - 1 && !Character.isSpaceChar(chars[start + 1])) {
+        findend = true
+      }
+    } else if (start == snext) // On sentence start
+    {
+      if (dir < 0 && !oneway) {
+        return start
+      }
+      which = if (dir > 0) 1 else 0
+      if (dir < 0 && oneway) {
+        findend = false
+      }
+    } else if (start == enext) // On sentence end
+    {
+      if (dir > 0 && !oneway) {
+        return start
+      }
+      which = 0
+      if (dir > 0 && oneway) {
+        findend = true
+      }
+    } else if (start >= sprev && start <= enext && enext < snext) // Middle of sentence
+    {
+      which = if (dir > 0) 1 else 0
+    } else  // Between sentences
+    {
+      which = if (dir > 0) 0 else 1
+      if (dir > 0) {
+        if (oneway) {
+          if (start < snext - 1) {
+            findend = true
+          } else if (start == snext - 1) {
+            count++
+          }
+        } else {
+          findend = true
+        }
+      } else {
+        if (oneway) {
+          if (start > eprev + 1) {
+            findend = false
+          } else if (start == eprev + 1) {
+            count++
+          }
+        } else {
+          findend = true
+        }
+      }
+    }
+    var res = start
+    while (count > 0 && res >= 0 && res <= max - 1) {
+      res = if (toggle && which % 2 == 1 || isOuter && findend) {
+        findSentenceEnd(editor, chars, res, max, dir, false, total > 1)
+      } else {
+        findSentenceStart(editor, chars, res, max, dir, false, total > 1)
+      }
+      if (res == 0 || res == max - 1) {
+        count--
+        break
+      }
+      if (toggle) {
+        if (which % 2 == 1 && dir < 0) {
+          res++
+        } else if (which % 2 == 0 && dir > 0) {
+          res--
+        }
+      }
+      which++
+      count--
+    }
+    if (res < 0 || count > 0) {
+      res = if (dir > 0) (if (max > 0) max - 1 else 0) else 0
+    } else if (isOuter && (dir < 0 && findend || dir > 0 && !findend)) {
+      if (res != 0 && res != max - 1) {
+        res -= dir
+      }
+    }
+    if (chars[res] == '\n' && res > 0 && chars[res - 1] != '\n') {
+      res--
+    }
+    return res
+  }
+
+  @Contract("_, _, _, _ -> new")
+  override fun findSentenceRange(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange {
+    val chars: CharSequence = editor.text()
+    if (chars.length == 0) return TextRange(0, 0)
+    val max: Int = editor.fileSize().toInt()
+    val offset: Int = caret.offset.point
+    val ssel: Int = caret.selectionStart
+    val esel: Int = caret.selectionEnd
+    return if (Math.abs(esel - ssel) > 1) {
+      val start: Int
+      val end: Int
+      // Forward selection
+      if (offset == esel - 1) {
+        start = ssel
+        end = findSentenceRangeEnd(editor, chars, offset, max, count, isOuter, true)
+        TextRange(start, end + 1)
+      } else {
+        end = esel - 1
+        start = findSentenceRangeEnd(editor, chars, offset, max, -count, isOuter, true)
+        TextRange(end, start + 1)
+      }
+    } else {
+      val end = findSentenceRangeEnd(editor, chars, offset, max, count, isOuter, false)
+      var space = isOuter
+      if (Character.isSpaceChar(chars[end])) {
+        space = false
+      }
+      val start = findSentenceRangeEnd(editor, chars, offset, max, -1, space, false)
+      TextRange(start, end + 1)
+    }
   }
 
   override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): Int? {

@@ -19,22 +19,6 @@ import java.util.*
 
 @Service
 internal class IjVimSearchHelper : VimSearchHelperBase() {
-  override fun findNextSentenceStart(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    count: Int,
-    countCurrent: Boolean,
-    requireAll: Boolean,
-  ): Int {
-    return SearchHelper.findNextSentenceStart(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      count,
-      countCurrent,
-      requireAll,
-    )
-  }
-
   override fun findSection(editor: VimEditor, caret: ImmutableVimCaret, type: Char, dir: Int, count: Int): Int {
     return SearchHelper.findSection(
       (editor as IjVimEditor).editor,
@@ -42,22 +26,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
       type,
       dir,
       count,
-    )
-  }
-
-  override fun findNextSentenceEnd(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    count: Int,
-    countCurrent: Boolean,
-    requireAll: Boolean,
-  ): Int {
-    return SearchHelper.findNextSentenceEnd(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      count,
-      countCurrent,
-      requireAll,
     )
   }
 
@@ -110,10 +78,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     hasSelection: Boolean,
   ): TextRange {
     return SearchHelper.findWordUnderCursor(editor.ij, caret.ij, count, dir, isOuter, isBig, hasSelection)
-  }
-
-  override fun findSentenceRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange {
-    return SearchHelper.findSentenceRange(editor.ij, caret.ij, count, isOuter)
   }
 
   override fun findBlockTagRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
