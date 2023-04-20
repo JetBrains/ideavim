@@ -65,7 +65,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
           }
           LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> {
             setWindowLocalOptionValue(option, scope.editor, value)
-            injector.vimStorageService.getDataFromEditor(scope.editor, parsedEffectiveValueKey)?.remove(option.name)
+            injector.vimStorageService.getDataFromWindow(scope.editor, parsedEffectiveValueKey)?.remove(option.name)
           }
         }
       }
@@ -97,7 +97,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     else {
       // Note that for simplicity, we cache all local values per window, even local-to-buffer values
       check(editor != null) { "Editor must be supplied for local options" }
-      injector.vimStorageService.getOrPutEditorData(editor, parsedEffectiveValueKey) { mutableMapOf() }
+      injector.vimStorageService.getOrPutWindowData(editor, parsedEffectiveValueKey) { mutableMapOf() }
     }
 
     // Unless the user is calling this method multiple times with different providers, we can be confident this cast
@@ -117,8 +117,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     globalValues.clear()
     injector.editorGroup.localEditors().forEach {
       injector.vimStorageService.getDataFromBuffer(it, localOptionsKey)?.clear()
-      injector.vimStorageService.getDataFromEditor(it, localOptionsKey)?.clear()
-      injector.vimStorageService.getDataFromEditor(it, parsedEffectiveValueKey)?.clear()
+      injector.vimStorageService.getDataFromWindow(it, localOptionsKey)?.clear()
+      injector.vimStorageService.getDataFromWindow(it, parsedEffectiveValueKey)?.clear()
     }
     globalParsedValues.clear()
   }
@@ -191,7 +191,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
 
   private fun getWindowLocalOptionStorage(editor: VimEditor) =
-    injector.vimStorageService.getOrPutEditorData(editor, localOptionsKey) { mutableMapOf() }
+    injector.vimStorageService.getOrPutWindowData(editor, localOptionsKey) { mutableMapOf() }
 
   private fun <T : VimDataType> setWindowLocalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
     val options = getWindowLocalOptionStorage(editor)

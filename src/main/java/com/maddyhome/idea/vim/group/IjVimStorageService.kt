@@ -15,22 +15,20 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.newapi.ij
 
 internal class IjVimStorageService : VimStorageServiceBase() {
-  override fun <T> getDataFromEditor(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
+  override fun <T> getDataFromWindow(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
     return editor.ij.getUserData(key.ij)
   }
 
-  override fun <T> putDataToEditor(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
+  override fun <T> putDataToWindow(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
     editor.ij.putUserData(key.ij, data)
   }
 
   override fun <T> getDataFromBuffer(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
-    val document = editor.ij.document
-    return document.getUserData(key.ij)
+    return editor.ij.document.getUserData(key.ij)
   }
 
   override fun <T> putDataToBuffer(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
-    val document = editor.ij.document
-    document.putUserData(key.ij, data)
+    editor.ij.document.putUserData(key.ij, data)
   }
 
   override fun <T> getDataFromTab(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
