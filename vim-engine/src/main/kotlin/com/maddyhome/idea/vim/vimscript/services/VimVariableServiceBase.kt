@@ -12,8 +12,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOrPutBufferData
-import com.maddyhome.idea.vim.api.getOrPutEditorData
 import com.maddyhome.idea.vim.api.getOrPutTabData
+import com.maddyhome.idea.vim.api.getOrPutWindowData
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.Direction
@@ -34,7 +34,7 @@ public abstract class VimVariableServiceBase : VariableService {
   private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
 
   private fun getWindowVariables(editor: VimEditor) =
-    injector.vimStorageService.getOrPutEditorData(editor, windowVariablesKey) { mutableMapOf() }
+    injector.vimStorageService.getOrPutWindowData(editor, windowVariablesKey) { mutableMapOf() }
 
   private fun getBufferVariables(editor: VimEditor) =
     injector.vimStorageService.getOrPutBufferData(editor, bufferVariablesKey) { mutableMapOf() }
