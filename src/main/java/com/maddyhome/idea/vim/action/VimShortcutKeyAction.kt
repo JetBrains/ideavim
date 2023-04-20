@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -259,7 +258,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
   private object LookupKeys {
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
       val parsedLookupKeys =
-        injector.optionGroup.getParsedEffectiveOptionValue(IjOptions.lookupkeys, OptionScope.GLOBAL, ::parseLookupKeys)
+        injector.optionGroup.getParsedEffectiveOptionValue(IjOptions.lookupkeys, null, ::parseLookupKeys)
       return keyStroke !in parsedLookupKeys
     }
 

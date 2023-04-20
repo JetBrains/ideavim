@@ -32,7 +32,7 @@ public object KeywordOptionHelper {
     }
 
     val specs =
-      injector.optionGroup.getParsedEffectiveOptionValue(Options.iskeyword, OptionScope.LOCAL(editor)) { optionValue ->
+      injector.optionGroup.getParsedEffectiveOptionValue(Options.iskeyword, editor) { optionValue ->
         valuesToValidatedAndReversedSpecs(parseValues(optionValue.asString()))!!
       }
     for (spec in specs) {

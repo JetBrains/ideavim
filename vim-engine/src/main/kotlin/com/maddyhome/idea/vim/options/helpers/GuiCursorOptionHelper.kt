@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
@@ -75,7 +74,7 @@ public object GuiCursorOptionHelper {
   }
 
   public fun getAttributes(mode: GuiCursorMode): GuiCursorAttributes {
-    val attributes = injector.optionGroup.getParsedEffectiveOptionValue(Options.guicursor, OptionScope.GLOBAL, ::parseGuicursor)
+    val attributes = injector.optionGroup.getParsedEffectiveOptionValue(Options.guicursor, null, ::parseGuicursor)
     return attributes[mode] ?: GuiCursorAttributes.DEFAULT
   }
 
