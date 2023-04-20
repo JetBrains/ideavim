@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
@@ -54,26 +55,32 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun <T : VimDataType, TData : Any> getParsedEffectiveOptionValue(
     option: Option<T>,
-    scope: OptionScope,
+    editor: VimEditor?,
     provider: (T) -> TData,
   ): TData {
-    // TODO: Introduce OptionDeclaredScope so that we know what each option's effective scope is
-    // This will allow us to set values to the correct scope via OptionScope.AUTO
-//    StrictMode.assert(
-//      option.declaredScope != OptionDeclaredScope.GLOBAL && editor != null,
-//      "Editor must be supplied unless option's declared scope is global"
-//    )
-    val cachedValues = when (scope) {
-      is OptionScope.GLOBAL -> globalParsedValues
-      is OptionScope.LOCAL -> {
-        injector.vimStorageService.getOrPutEditorData(scope.editor, parsedEffectiveValueKey) { mutableMapOf() }
-      }
+    // TODO: We can't correctly clear global-local options
+    // We have to cache global-local values locally, because they can be set locally. But if they're not overridden
+    // locally, we would cache a global value per-window. When the global value is changed with OptionScope.GLOBAL, we
+    // are unable to clear the per-window cached value, so windows would end up with stale cached (global) values.
+    check(option.declaredScope != OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
+      && option.declaredScope != OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
+    ) { "Global-local options cannot currently be cached" }
+
+    val cachedValues = if (option.declaredScope == OptionDeclaredScope.GLOBAL) {
+      globalParsedValues
+    }
+    else {
+      // Note that for simplicity, we cache all local values per window, even local-to-buffer values
+      check(editor != null) { "Editor must be supplied for local options" }
+      injector.vimStorageService.getOrPutEditorData(editor, parsedEffectiveValueKey) { mutableMapOf() }
     }
 
     // Unless the user is calling this method multiple times with different providers, we can be confident this cast
     // will succeed
     @Suppress("UNCHECKED_CAST")
-    return cachedValues.getOrPut(option.name) { provider(getOptionValue(option, scope)) } as TData
+    return cachedValues.getOrPut(option.name) {
+      provider(getOptionValue(option, if (editor == null) OptionScope.GLOBAL else OptionScope.LOCAL(editor)))
+    } as TData
   }
 
   override fun getOption(key: String): Option<VimDataType>? = Options.getOption(key)
