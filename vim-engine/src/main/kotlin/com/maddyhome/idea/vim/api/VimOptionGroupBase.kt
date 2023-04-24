@@ -100,11 +100,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T {
+    // For get, AUTO is very similar to LOCAL, apart from global-local
     val editor = when (scope) {
+      is OptionScope.AUTO -> scope.editor
       is OptionScope.LOCAL -> scope.editor
-      OptionScope.GLOBAL -> return getGlobalOptionValue(option)
-    }
+      OptionScope.GLOBAL -> null
+    } ?: return getGlobalOptionValue(option)
 
+    // TODO: Support global-local correctly
+    // LOCAL should return the local value, or the unset value. AUTO should return the local value, or the global value
     return when (option.declaredScope) {
       GLOBAL -> getGlobalOptionValue(option)
       LOCAL_TO_BUFFER -> getBufferLocalOptionValue(option, editor)
@@ -117,33 +121,12 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T) {
     option.checkIfValueValid(value, value.asString())
 
-    // TODO: We should only be storing, and therefore clearing, the cached data for the effective value
-    // We should introduce OptionScope.AUTO, that sets the option value at the appropriate scope - locally for local
-    // options and globally for global options. We would clear (and create) the parsed value only for AUTO
     val oldValue = getOptionValue(option, scope)
 
     when (scope) {
-      is OptionScope.LOCAL -> {
-        when (option.declaredScope) {
-          GLOBAL -> {
-            setGlobalOptionValue(option, value)
-            globalParsedValues.remove(option.name)
-          }
-          LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> {
-            setBufferLocalOptionValue(option, scope.editor, value)
-            injector.vimStorageService.getDataFromBuffer(scope.editor, parsedEffectiveValueKey)?.remove(option.name)
-          }
-          LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> {
-            setWindowLocalOptionValue(option, scope.editor, value)
-            injector.vimStorageService.getDataFromWindow(scope.editor, parsedEffectiveValueKey)?.remove(option.name)
-          }
-        }
-      }
-      is OptionScope.GLOBAL -> {
-        // TODO: How to set the per-window global value of a LOCAL_TO_WINDOW option!? We don't have the editor...
-        setGlobalOptionValue(option, value)
-        globalParsedValues.remove(option.name)
-      }
+      is OptionScope.AUTO -> setEffectiveOptionValue(option, scope.editor, value)
+      is OptionScope.LOCAL -> setLocalOptionValue(option, scope.editor, value)
+      OptionScope.GLOBAL -> setGlobalOptionValue(option, value)
     }
 
     option.onChanged(scope, oldValue)
@@ -166,16 +149,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
       globalParsedValues
     }
     else {
-      // Note that for simplicity, we cache all local values per window, even local-to-buffer values
       check(editor != null) { "Editor must be supplied for local options" }
-      injector.vimStorageService.getOrPutWindowData(editor, parsedEffectiveValueKey) { mutableMapOf() }
+      getParsedEffectiveOptionStorage(option, editor)
     }
 
     // Unless the user is calling this method multiple times with different providers, we can be confident this cast
     // will succeed
     @Suppress("UNCHECKED_CAST")
     return cachedValues.getOrPut(option.name) {
-      provider(getOptionValue(option, if (editor == null) OptionScope.GLOBAL else OptionScope.LOCAL(editor)))
+      provider(getOptionValue(option, if (editor == null) OptionScope.GLOBAL else OptionScope.AUTO(editor)))
     } as TData
   }
 
@@ -235,7 +217,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun getGlobalOptions(): GlobalOptions = globalOptionsAccessor
 
-  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionScope.LOCAL(editor))
+  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionScope.AUTO(editor))
 
 
   private fun <T : VimDataType> getGlobalOptionValue(option: Option<T>): T {
@@ -246,6 +228,47 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   private fun <T : VimDataType> setGlobalOptionValue(option: Option<T>, value: T) {
     globalValues[option.name] = value
+
+    globalParsedValues.remove(option.name)
+  }
+
+
+  /**
+   * Set the effective value of the option. This is the equivalent of `:set`
+   *
+   * For local-to-buffer and local-to-window options, this function will set the local value of the option. It also sets
+   * the global value (so that we remember the most recently set value for initialising new windows). For global
+   * options, this function will also set the global value. For global-local, this function will always set the global
+   * value, but only set the local value it's already set.
+   */
+  private fun <T : VimDataType> setEffectiveOptionValue(option: Option<T>, editor: VimEditor, value: T) {
+    // TODO: Implement global-local. Only set the local value if it's already set. Reset to the unset value if necessary
+    when (option.declaredScope) {
+      GLOBAL -> setGlobalOptionValue(option, value)
+      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> {
+        setBufferLocalOptionValue(option, editor, value)
+        setGlobalOptionValue(option, value)
+      }
+      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> {
+        setWindowLocalOptionValue(option, editor, value)
+        setGlobalOptionValue(option, value)
+      }
+    }
+  }
+
+
+  /**
+   * Set the option explicitly at local scope. This is the equivalent of `:setlocal`
+   *
+   * This will always set the local option value, even for global-local options (global options obviously only have a
+   * global value).
+   */
+  private fun <T : VimDataType> setLocalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
+    when (option.declaredScope) {
+      GLOBAL -> setGlobalOptionValue(option, value)
+      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> setBufferLocalOptionValue(option, editor, value)
+      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> setWindowLocalOptionValue(option, editor, value)
+    }
   }
 
 
@@ -255,6 +278,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private fun <T : VimDataType> setBufferLocalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
     val options = getBufferLocalOptionStorage(editor)
     options[option.name] = value
+
+    getParsedEffectiveOptionStorage(option, editor).remove(option.name)
   }
 
   private fun <T : VimDataType> getBufferLocalOptionValue(option: Option<T>, editor: VimEditor): T {
@@ -282,6 +307,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private fun <T : VimDataType> setWindowLocalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
     val options = getWindowLocalOptionStorage(editor)
     options[option.name] = value
+
+    getParsedEffectiveOptionStorage(option, editor).remove(option.name)
   }
 
   private fun <T : VimDataType> getWindowLocalOptionValue(option: Option<T>, editor: VimEditor): T {
@@ -300,5 +327,20 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     // We set the value via Option<T> so it's safe to cast to T
     @Suppress("UNCHECKED_CAST")
     return options[option.name] as? T
+  }
+
+
+  private fun getParsedEffectiveOptionStorage(option: Option<out VimDataType>, editor: VimEditor): MutableMap<String, Any> {
+    return when (option.declaredScope) {
+      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> {
+        injector.vimStorageService.getOrPutWindowData(editor, parsedEffectiveValueKey) { mutableMapOf() }
+      }
+      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> {
+        injector.vimStorageService.getOrPutBufferData(editor, parsedEffectiveValueKey) { mutableMapOf() }
+      }
+      else -> {
+        throw IllegalStateException("Unexpected option declared scope for parsed effective storage: ${option.name}")
+      }
+    }
   }
 }

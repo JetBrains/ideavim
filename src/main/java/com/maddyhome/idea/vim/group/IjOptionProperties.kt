@@ -39,11 +39,11 @@ public open class GlobalIjOptions(scope: OptionScope = OptionScope.GLOBAL) : Glo
 }
 
 /**
- * An accessor class for IntelliJ implementation specific option values effective for the given local scope
+ * An accessor class for IntelliJ implementation specific option values effective in the given editor
  *
- * As a convenience, this class will also provide access to the global options that are effective for the local scope.
+ * As a convenience, this class also provides access to the global options, via inheritance.
  */
-public class EffectiveIjOptions(scope: OptionScope.LOCAL): GlobalIjOptions(scope) {
+public class EffectiveIjOptions(scope: OptionScope.AUTO): GlobalIjOptions(scope) {
   public var ideacopypreprocess: Boolean by optionProperty(IjOptions.ideacopypreprocess)
   public var ideajoin: Boolean by optionProperty(IjOptions.ideajoin)
   public var idearefactormode: String by optionProperty(IjOptions.idearefactormode)

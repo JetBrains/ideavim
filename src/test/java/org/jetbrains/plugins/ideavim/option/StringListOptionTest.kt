@@ -40,7 +40,7 @@ class StringListOptionTest : VimTestCase() {
   }
 
   private fun getOptionValue() =
-    injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)).value
+    injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)).value
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test

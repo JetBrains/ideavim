@@ -35,7 +35,7 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   }
 
   override fun getGlobalIjOptions() = globalOptionsAccessor
-  override fun getEffectiveIjOptions(editor: VimEditor) = EffectiveIjOptions(OptionScope.LOCAL(editor))
+  override fun getEffectiveIjOptions(editor: VimEditor) = EffectiveIjOptions(OptionScope.AUTO(editor))
 }
 
 internal class IjOptionConstants {

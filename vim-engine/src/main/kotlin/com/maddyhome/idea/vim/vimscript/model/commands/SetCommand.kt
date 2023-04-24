@@ -43,13 +43,7 @@ public data class SetCommand(val ranges: Ranges, val argument: String) : Command
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    // TODO: We need an AUTO here to distinguish between :set and :setlocal
-    // Temporarily using LOCAL to make tests pass
-    // Note that previously, `:set` would only set the global value, and the local value would only ever be set
-    // explicitly via `:setlocal`. So all local options have effectively been global-local. This commit changes this,
-    // so that the effective value of local options is the local value. We still need to fix setting the global value
-    // when setting the local value, which we will do with OptionScope.AUTO
-    val result = parseOptionLine(editor, argument, OptionScope.LOCAL(editor), failOnBad = true)
+    val result = parseOptionLine(editor, argument, OptionScope.AUTO(editor), failOnBad = true)
     return if (result) {
       ExecutionResult.Success
     } else {
@@ -70,6 +64,8 @@ public data class SetLocalCommand(val ranges: Ranges, val argument: String) : Co
     }
   }
 }
+
+// TODO: Implement SetGlobalCommand
 
 /**
  * This parses a set of :set commands. The following types of commands are supported:

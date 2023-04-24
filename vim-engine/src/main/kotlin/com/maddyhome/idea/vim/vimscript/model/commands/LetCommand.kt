@@ -183,6 +183,7 @@ public data class LetCommand(
             ?: throw exExceptionMessage("E518", variable.originalString)
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
+            // TODO: Handle AUTO scope as well as explicitly global and explicitly local
             Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, newValue)
             Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(editor), newValue)
             else -> throw ExException("Invalid option scope")
