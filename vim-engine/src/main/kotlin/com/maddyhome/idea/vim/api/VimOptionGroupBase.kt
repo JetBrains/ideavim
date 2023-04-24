@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
@@ -27,6 +28,75 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun initialiseOptions() {
     Options.initialise()
+  }
+
+  override fun initialiseLocalOptions(editor: VimEditor, sourceEditor: VimEditor?, isSplit: Boolean) {
+    // Initialise local-to-buffer options
+    // They are stored per-buffer, so shared across all editors for the buffer. If the key exists, they've previously
+    // been initialised, else initialise the options from the global values, which is always the most recently set value
+    // (`:set` on a buffer-local option will set the local value, but it also sets the global value, for exactly this
+    // reason)
+    injector.vimStorageService.getOrPutBufferData(editor, localOptionsKey) {
+      mutableMapOf<String, VimDataType>().also { bufferOptions ->
+        getAllOptions()
+          .filter { it.declaredScope == LOCAL_TO_BUFFER }
+          .forEach { bufferOptions[it.name] = getGlobalOptionValue(it) }
+      }
+    }
+
+    // TODO: We don't support per-window "global" values right now
+    // These functions are here so we know what the semantics should be when it comes time to implement.
+    // Default to getting the per-instance global value for now (per-instance meaning per VimOptionGroup service instance)
+    // Set does nothing, because it's called with the current "global" value, which would be a no-op
+    fun getPerWindowGlobalOptionValue(option: Option<VimDataType>, editor: VimEditor?) = getGlobalOptionValue(option)
+    fun setPerWindowGlobalOptionValue(option: Option<VimDataType>, editor: VimEditor, value: VimDataType) {}
+
+    // Initialising local-to-window options is a little more involved (see [OptionDeclaredScope])
+    // Assumptions:
+    // * Vim always has at least one open window. A new window or buffer is initialised from this source window
+    //   IdeaVim does not always have an open window. The passed source window might be null.
+    //   TODO: How does this handle `:setlocal` in `~/.ideavimrc`?
+    //   We might need to create a dummy "root" window that evaluates `~/.ideavimrc` and is used to initialise the local
+    //   options of other windows.
+    // * Vim's local-to-window options store "global" values as per-window global values.
+    //   TODO: IdeaVim does not currently support per-window global values
+    // Scenarios:
+    // 1. Split the current window
+    //    Vim tries to make the split an exact clone. Copy the source window's local and per-window global to the new
+    //    window
+    // 2. Edit a new buffer in the current window (`:edit {file}`)
+    //    Reapply the current window's per-window global values as local values, to get rid of explicitly local values
+    //    IdeaVim does not currently support this scenario, because IdeaVim's implementation of `:edit` does not open
+    //    a file in the current window. It instead behaves like `:new {file}`.
+    //    We could implement it like the platform implements preview tabs, or reusing unmodified tabs - by opening a new
+    //    editor and immediately closing the old one. This would still behave like `:new` - copying the per-window
+    //    global values and applying them as local values, which would be the correct behaviour
+    // 3. Open a new buffer in a new window (`:new {file}`)
+    //    Vim implements this as a split, then editing a new buffer in the new current window. This will copy the source
+    //    window's local and per-window global values to the new split window, then reapply the new window's per-window
+    //    global values to the new window's local options. In effect, copying the source window's per-window global
+    //    values to the new window
+    // 3. Edit a previously edited buffer (in the current window)
+    //    Vim will reapply options saved from the last window used to edit this buffer. Details are a bit sketchy - when
+    //    are the options saved, when are the released, etc. so this scenario is not currently supported.
+    //    IdeaVim does not support this
+    injector.vimStorageService.getOrPutWindowData(editor, localOptionsKey) {
+      mutableMapOf<String, VimDataType>().also { windowOptions ->
+        getAllOptions()
+          .filter { it.declaredScope == LOCAL_TO_WINDOW }
+          .forEach { option ->
+            if (isSplit && sourceEditor != null) {
+              // Splitting the current window, make it look and behave the same as the source editor
+              windowOptions[option.name] = getWindowLocalOptionValue(option, sourceEditor)
+              setPerWindowGlobalOptionValue(option, editor, getPerWindowGlobalOptionValue(option, sourceEditor))
+            }
+            else {
+              // All other scenarios (open new buffer in new or current window)
+              windowOptions[option.name] = getPerWindowGlobalOptionValue(option, sourceEditor)
+            }
+          }
+      }
+    }
   }
 
   override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T {
@@ -70,6 +140,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
         }
       }
       is OptionScope.GLOBAL -> {
+        // TODO: How to set the per-window global value of a LOCAL_TO_WINDOW option!? We don't have the editor...
         setGlobalOptionValue(option, value)
         globalParsedValues.remove(option.name)
       }
@@ -125,6 +196,18 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun addOption(option: Option<out VimDataType>) {
     Options.addOption(option)
+
+    // Initialise the option values. Don't call setOptionValue to avoid unnecessarily invoking listeners
+    when (option.declaredScope) {
+      GLOBAL, GLOBAL_OR_LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_WINDOW -> globalValues[option.name] = option.defaultValue
+      LOCAL_TO_BUFFER -> injector.editorGroup.localEditors().forEach {
+        getBufferLocalOptionStorage(it)[option.name] = option.defaultValue
+        globalValues[option.name] = option.defaultValue
+      }
+      LOCAL_TO_WINDOW -> injector.editorGroup.localEditors().forEach {
+        getWindowLocalOptionStorage(it)[option.name] = option.defaultValue
+      }
+    }
   }
 
   override fun removeOption(optionName: String) {
@@ -176,9 +259,12 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   private fun <T : VimDataType> getBufferLocalOptionValue(option: Option<T>, editor: VimEditor): T {
     check(option.declaredScope == LOCAL_TO_BUFFER || option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER)
-    // TODO: Once we initialise the options during buffer creation, we should never get null here
-    // What about options that are added dynamically, e.g. extensions?
-    return tryGetBufferLocalOptionValue(option, editor) ?: getGlobalOptionValue(option)
+
+    // This should never return null, because we initialise local options when initialising the editor, even when adding
+    // options dynamically, e.g. registering an extension. We fall back to global option, just in case
+    val value = tryGetBufferLocalOptionValue(option, editor)
+    StrictMode.assert(value != null, "Buffer local option value is missing: ${option.name}")
+    return value ?:getGlobalOptionValue(option)
   }
 
   private fun <T : VimDataType> tryGetBufferLocalOptionValue(option: Option<T>, editor: VimEditor): T? {
@@ -200,8 +286,12 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   private fun <T : VimDataType> getWindowLocalOptionValue(option: Option<T>, editor: VimEditor): T {
     check(option.declaredScope == LOCAL_TO_WINDOW || option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW)
-    // TODO: Once we initialise the options during window creation, we should never get null here
-    return tryGetWindowLocalOptionValue(option, editor) ?: getGlobalOptionValue(option)
+
+    // This should never return null, because we initialise local options when initialising the editor, even when adding
+    // options dynamically, e.g. registering an extension. We fall back to global option, just in case
+    val value = tryGetWindowLocalOptionValue(option, editor)
+    StrictMode.assert(value != null, "Window local option value is missing: ${option.name}")
+    return value ?: getGlobalOptionValue(option)
   }
 
   private fun <T : VimDataType> tryGetWindowLocalOptionValue(option: Option<T>, editor: VimEditor): T? {

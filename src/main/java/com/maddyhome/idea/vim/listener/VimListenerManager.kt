@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.editor.impl.EditorImpl
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.rd.createLifetime
@@ -154,6 +155,11 @@ internal object VimListenerManager {
       editor.contentComponent.addKeyListener(VimKeyListener)
       Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
 
+      // Initialise the local options. We MUST do this before anything has the chance to query options
+      val sourceEditor = getOpeningEditor(editor)
+      val isSplit = editor.document == sourceEditor?.document
+      VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, sourceEditor?.vim, isSplit)
+
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler, disposable)
       eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler, disposable)
@@ -182,6 +188,17 @@ internal object VimListenerManager {
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
 
       VimPlugin.getChange().editorReleased(editor)
+    }
+
+    // We need the editor that was in use when the new editor was opened, so we can copy its window local options (e.g.
+    // which window hosted the command line for `:e {file}` or was the source of a ctrl+click navigation).
+    // Unfortunately, we're not given enough context to know what caused the new editor to open (and we might be
+    // initialising already open editors after disabling/enabling the plugin). So we'll use the currently selected
+    // editor. It should be the last focused editor, so will work for Vim command line commands, ctrl+click, etc. but
+    // also for opening a file from Shift+Shift or a tool window such as Project view or Find Usages.
+    // Make sure the current editor is not the new editor, which can happen if there are no other editors open
+    private fun getOpeningEditor(newEditor: Editor) = newEditor.project?.let { project ->
+      FileEditorManager.getInstance(project).selectedTextEditor?.takeUnless { it == newEditor }
     }
   }
 

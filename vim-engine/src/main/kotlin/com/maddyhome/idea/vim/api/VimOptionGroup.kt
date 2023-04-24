@@ -25,6 +25,26 @@ public interface VimOptionGroup {
   public fun initialiseOptions()
 
   /**
+   * Initialise the local to buffer and local to window options for this editor
+   *
+   * Local to buffer options are copied from the current global values, while local to window options should be copied
+   * from the per-window "global" values of the editor that caused this editor to open. Both of these global values are
+   * updated by the `:set` or `:setglobal` commands.
+   *
+   * Note that global-local options are not copied from the source window. They are global values that are overridden
+   * locally, and local values are never copied.
+   *
+   * TODO: IdeaVim currently does not support per-window "global" values
+   *
+   * @param editor  The editor to initialise
+   * @param sourceEditor  The editor which is opening the new editor. This source editor is used to get the per-window
+   *                      "global" values to initialise the new editor. If null, there is no source editor (e.g. all
+   *                      editor windows are closed), and the options should be initialised to some other value.
+   * @param isSplit True if the new editor is a split view of the source editor
+   */
+  public fun initialiseLocalOptions(editor: VimEditor, sourceEditor: VimEditor?, isSplit: Boolean)
+
+  /**
    * Get the [Option] by its name or abbreviation
    */
   public fun getOption(key: String): Option<VimDataType>?

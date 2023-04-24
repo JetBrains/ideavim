@@ -12,11 +12,8 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.EditorHolderService
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import javax.swing.Action
@@ -234,17 +231,12 @@ internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrev
     val caret = target.caret
     val project = target.editor.project
 
-    // Note that we need an editor when searching because we need per-editor options (i.e. 'iskeyword')
-    // TODO: We also need to initialise the options when creating TextComponentImpl
+    // Note that we need an editor when searching because we need per-editor options (i.e. 'iskeyword'). We initialise
+    // it based on the owning editor, and treat it like a split, so we get a full copy of the local-to-window options
+    // TODO: Over time, we should migrate ex actions to be based on VimEditor
+    // This will give us an editor we can use for options, etc. and we can reuse the actions for other implementations
     val editor = TextComponentEditorImpl(project, target).vim
-
-    // TODO: This copying should be automatic
-    // findNextWord eventually requires the 'iskeyword' option, which is local-to-buffer. Vim's command line uses the
-    // option from the owning editor, but in order to use findNextWord, we have to treat the command line as its own
-    // editor. We'll copy the option across explicitly for now, but this should be automatically handled when
-    // initialising editors (even temporary editors for the text field)
-    val isKeyword = injector.optionGroup.getOptionValue(Options.iskeyword, OptionScope.LOCAL(EditorHolderService.getInstance().editor!!.vim))
-    injector.optionGroup.setOptionValue(Options.iskeyword, OptionScope.LOCAL(editor), isKeyword)
+    injector.optionGroup.initialiseLocalOptions(editor, target.editor.vim, true)
 
     val offset = injector.searchHelper.findNextWord(editor, caret.dot, -1, bigWord = false, spaceWords = false)
     if (logger.isDebugEnabled) logger.debug("offset=$offset")
