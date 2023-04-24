@@ -111,7 +111,10 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
       return true
     }
     argument == "all&" -> {
-      optionGroup.resetAllOptions()
+      // Note that `all&` resets all options in the current editor at local and global scope. This includes global,
+      // global-local and local-to-buffer options, which will affect other windows. It does not affect the local values
+      // of local-to-window options in other windows
+      optionGroup.resetAllOptions(editor)
       return true
     }
   }

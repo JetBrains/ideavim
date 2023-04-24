@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import org.jetbrains.annotations.TestOnly
 
 public interface VimOptionGroup {
   /**
@@ -87,9 +88,21 @@ public interface VimOptionGroup {
   ): TData
 
   /**
-   * Resets all options back to default values.
+   * Resets all options for the given editor, including global options, back to default values.
+   *
+   * In line with `:set all&`, this will reset all option for the given editor. This means resetting global,
+   * global-local and local-to-buffer options, which will affect other editors/windows. It resets the local-to-window
+   * options for the current editor; this does not affect other editors.
    */
-  public fun resetAllOptions()
+  public fun resetAllOptions(editor: VimEditor)
+
+  /**
+   * Resets all options across all editors, to reset state for testing
+   *
+   * This is required to reset global options set for tests that don't create an editor
+   */
+  @TestOnly
+  public fun resetAllOptionsForTesting()
 
   /**
    * Adds the option.

@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.ex
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -62,7 +63,7 @@ class ExEntryTest : VimTestCase() {
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionGroup().resetAllOptions()
+    VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
 
     assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-J>")
@@ -70,7 +71,7 @@ class ExEntryTest : VimTestCase() {
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionGroup().resetAllOptions()
+    VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
 
     assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-M>")
@@ -642,7 +643,7 @@ class ExEntryTest : VimTestCase() {
       // <Left> doesn't work correctly in tests. The DefaultEditorKit.NextVisualPositionAction action is correctly
       // called, but fails to move the caret correctly because the text component has never been painted
       if (it.keyCode == KeyEvent.VK_LEFT && it.modifiers == 0) {
-        if (keys.count() > 0) {
+        if (keys.isNotEmpty()) {
           typeText(keys)
           keys.clear()
         }
@@ -652,7 +653,7 @@ class ExEntryTest : VimTestCase() {
         keys.add(it)
       }
     }
-    if (keys.count() > 0) {
+    if (keys.isNotEmpty()) {
       typeText(keys)
     }
   }

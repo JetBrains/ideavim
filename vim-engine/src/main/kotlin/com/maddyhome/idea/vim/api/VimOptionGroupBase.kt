@@ -164,9 +164,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun getOption(key: String): Option<VimDataType>? = Options.getOption(key)
   override fun getAllOptions(): Set<Option<VimDataType>> = Options.getAllOptions()
 
-  override fun resetAllOptions() {
-    // TODO: This should be split into two functions. One for testing that resets everything, and one for `:set alL&`
-    // which should only reset the global options, and the options for the current editor
+  override fun resetAllOptions(editor: VimEditor) {
+    // Reset all options to default values at global and local scope. This will fire any listeners and clear any caches
+    Options.getAllOptions().forEach { option ->
+      resetDefaultValue(option, OptionScope.GLOBAL)
+      resetDefaultValue(option, OptionScope.LOCAL(editor))
+    }
+  }
+
+  override fun resetAllOptionsForTesting() {
     globalValues.clear()
     injector.editorGroup.localEditors().forEach {
       injector.vimStorageService.getDataFromBuffer(it, localOptionsKey)?.clear()
