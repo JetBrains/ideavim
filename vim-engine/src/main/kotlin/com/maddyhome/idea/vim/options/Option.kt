@@ -57,6 +57,15 @@ public abstract class Option<T : VimDataType>(public val name: String,
   public fun onChanged(scope: OptionScope, oldValue: T) {
     for (listener in listeners) {
       when (scope) {
+        is OptionScope.AUTO -> {
+          if (listener is LocalOptionChangeListener && declaredScope != OptionDeclaredScope.GLOBAL) {
+            // TODO: What happens with a global-local option that has no local value?
+            listener.processLocalValueChange(oldValue, scope.editor)
+          }
+          else {
+            listener.processGlobalValueChange(oldValue)
+          }
+        }
         is OptionScope.GLOBAL -> listener.processGlobalValueChange(oldValue)
         is OptionScope.LOCAL -> {
           if (listener is LocalOptionChangeListener) {

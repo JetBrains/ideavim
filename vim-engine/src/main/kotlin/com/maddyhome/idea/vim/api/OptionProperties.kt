@@ -55,13 +55,12 @@ public open class GlobalOptions(scope: OptionScope = OptionScope.GLOBAL): Option
 }
 
 /**
- * An accessor class for the values of options in effect for the given scope
+ * An accessor class for the values of options in effect in the given editor
  *
- * As a convenience, this class can also access the global options that are effective in the given scope. The values
- * will be the same as in the global scope.
+ * As a convenience, this class also provides access to the global options, via inheritance.
  */
 @Suppress("unused")
-public open class EffectiveOptions(scope: OptionScope.LOCAL): GlobalOptions(scope) {
+public open class EffectiveOptions(scope: OptionScope.AUTO): GlobalOptions(scope) {
   public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
   public val matchpairs: StringListOptionValue by optionProperty(Options.matchpairs)
   public val nrformats: StringListOptionValue by optionProperty(Options.nrformats)

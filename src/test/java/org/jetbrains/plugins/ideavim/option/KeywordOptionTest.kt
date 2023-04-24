@@ -177,26 +177,21 @@ class KeywordOptionTest : VimTestCase() {
     assertIsKeyword('Ź')
   }
 
-  // TODO: These tests require :set to support AUTO
-  // Previously, local options were global-local, and the local options were set on demand - `:set` would only set the
-  // global value. Now we initialise options early, and `:set` only sets the local value. However,
-  // KeywordOptionHelper.toRegex incorrectly treats a local-to-buffer option as global, and only reads the global value
-  // which hasn't been set
-//  @Suppress("DEPRECATION")
-//  @Test
-//  fun testToRegex() {
-//    setKeyword("-,a-c")
-//    val res = KeywordOptionHelper.toRegex()
-//    assertEquals(2, res.size)
-//    assertTrue(res.contains("-"))
-//    assertTrue(res.contains("[a-c]"))
-//  }
-//
-//  @Suppress("DEPRECATION")
-//  @Test
-//  fun testAllLettersToRegex() {
-//    setKeyword("@")
-//    val res = KeywordOptionHelper.toRegex()
-//    assertEquals(res[0], "\\p{L}")
-//  }
+  @Suppress("DEPRECATION")
+  @Test
+  fun testToRegex() {
+    setKeyword("-,a-c")
+    val res = KeywordOptionHelper.toRegex()
+    assertEquals(2, res.size)
+    assertTrue(res.contains("-"))
+    assertTrue(res.contains("[a-c]"))
+  }
+
+  @Suppress("DEPRECATION")
+  @Test
+  fun testAllLettersToRegex() {
+    setKeyword("@")
+    val res = KeywordOptionHelper.toRegex()
+    assertEquals(res[0], "\\p{L}")
+  }
 }

@@ -125,6 +125,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
 
   // Check option values are set and read from the correct scopes in different buffers/windows
+  // Note that these tests are very similar to OptionScopeTest, but test changes across buffers/windows
   @Test
   fun `test global option affects all buffers and windows`() {
     withOption(OptionDeclaredScope.GLOBAL) {
@@ -160,10 +161,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
   fun `test global-local with auto scope acts like global and affects all buffers and windows`() {
     // It doesn't matter if we use local to buffer or window
     withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER) {
-      // TODO: This should be setEffectiveValue, but currently that only sets the local value
-      // For global-local, it should set the global value unless the local value is already set
-      setGlobalValue()
-//      setEffectiveValue(originalEditor)
+      setEffectiveValue(originalEditor)
 
       assertEffectiveValueChanged(otherBufferWindow)
       assertEffectiveValueChanged(splitWindow)
@@ -344,9 +342,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     injector.optionGroup.setOptionValue(this, OptionScope.LOCAL(editor.vim), setValue)
 
   private fun Option<VimString>.setEffectiveValue(editor: Editor) {
-    // TODO: This should be AUTO, not explicitly LOCAL
-    // It should set both global + local, depending on declared scope
-    injector.optionGroup.setOptionValue(this, OptionScope.LOCAL(editor.vim), setValue)
+    injector.optionGroup.setOptionValue(this, OptionScope.AUTO(editor.vim), setValue)
   }
 
   private fun getGlobalValue(option: Option<VimString>) =
@@ -355,9 +351,8 @@ class OptionDeclaredScopeTest : VimTestCase() {
   private fun getLocalValue(option: Option<VimString>, editor: Editor) =
     injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(editor.vim))
 
-  // TODO: This should be AUTO, not explicitly LOCAL
   private fun getEffectiveValue(option: Option<VimString>, editor: Editor) =
-    injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(editor.vim))
+    injector.optionGroup.getOptionValue(option, OptionScope.AUTO(editor.vim))
 
   private fun assertValueUnmodified(actualValue: VimString) = assertEquals(defaultValue, actualValue)
   private fun assertValueChanged(actualValue: VimString) = assertEquals(setValue, actualValue)
