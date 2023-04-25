@@ -129,7 +129,9 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
       OptionScope.GLOBAL -> setGlobalOptionValue(option, value)
     }
 
-    option.onChanged(scope, oldValue)
+    if (oldValue != value) {
+      option.onChanged(scope, oldValue)
+    }
   }
 
   override fun <T : VimDataType, TData : Any> getParsedEffectiveOptionValue(
