@@ -43,6 +43,7 @@ public data class VimInt(val value: Int) : VimDataType() {
   public operator fun compareTo(b: Int): Int = this.value.compareTo(b)
 
   public companion object {
+    public val MINUS_ONE: VimInt = VimInt(-1)
     public val ZERO: VimInt = VimInt(0)
     public val ONE: VimInt = VimInt(1)
   }

@@ -179,8 +179,10 @@ public object Options {
   public val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
   public val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
   public val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", GLOBAL, "tm", 1000))
-  public val undolevels: UnsignedNumberOption = addOption(
-    UnsignedNumberOption("undolevels", GLOBAL_OR_LOCAL_TO_BUFFER, "ul", 1000)
+  public val undolevels: NumberOption = addOption(
+    // -1 means no undo. Vim uses -123456 as "unset"
+    // TODO: This option doesn't appear to be used anywhere...
+    NumberOption("undolevels", GLOBAL_OR_LOCAL_TO_BUFFER, "ul", 1000, -123456)
   )
   public val viminfo: StringListOption = addOption(StringListOption("viminfo", GLOBAL, "vi", "'100,<50,s10,h"))
   public val virtualedit: StringListOption = addOption(

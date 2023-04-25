@@ -83,4 +83,8 @@ public data class VimString(val value: String) : VimDataType() {
   override fun unlockVar(depth: Int) {
     this.isLocked = false
   }
+
+  public companion object {
+    public val EMPTY: VimString = VimString("")
+  }
 }
