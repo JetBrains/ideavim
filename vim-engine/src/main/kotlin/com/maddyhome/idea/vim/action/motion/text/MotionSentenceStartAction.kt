@@ -32,7 +32,7 @@ public class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() 
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToNextSentenceStart(editor, caret, operatorArguments.count1).toMotionOrError()
+    return moveCaretToNextSentenceStart(editor, caret, operatorArguments.count1)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
@@ -48,18 +48,17 @@ public class MotionSentencePreviousStartAction : MotionActionHandler.ForEachCare
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToNextSentenceStart(editor, caret, -operatorArguments.count1).toMotionOrError()
+    return moveCaretToNextSentenceStart(editor, caret, -operatorArguments.count1)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-private fun moveCaretToNextSentenceStart(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
-  var res = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true)
-  res = if (res >= 0) {
-    editor.normalizeOffset(res, true)
+private fun moveCaretToNextSentenceStart(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+  val res = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true)
+  return if (res != null) {
+    editor.normalizeOffset(res, true).toMotionOrError()
   } else {
-    -1
+    Motion.Error
   }
-  return res
 }

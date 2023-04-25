@@ -14,15 +14,6 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class MotionSentencePreviousStartActionTest : VimTestCase() {
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-        
-        
-        ${c}all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
-        hard by the torrent of a mountain pass.
-      """,
-  )
   @Test
   fun `test with two empty lines`() {
     doTest(
@@ -36,8 +27,8 @@ class MotionSentencePreviousStartActionTest : VimTestCase() {
       """.trimIndent(),
       """
         
-        $c
-        all rocks and lavender and tufted grass,
+        
+        ${c}all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         hard by the torrent of a mountain pass.
       """.trimIndent(),

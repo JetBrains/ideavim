@@ -36,18 +36,17 @@ public sealed class MotionSentenceEndAction(public val direction: Direction) : M
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToNextSentenceEnd(editor, caret, direction.toInt() * operatorArguments.count1).toMotionOrError()
+    return moveCaretToNextSentenceEnd(editor, caret, direction.toInt() * operatorArguments.count1)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-private fun moveCaretToNextSentenceEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
-  var res = injector.searchHelper.findNextSentenceEnd(editor, caret, count, false, true)
-  res = if (res >= 0) {
-    editor.normalizeOffset(res, false)
+private fun moveCaretToNextSentenceEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+  val res = injector.searchHelper.findNextSentenceEnd(editor, caret, count, false, true)
+  return if (res != null) {
+    editor.normalizeOffset(res, false).toMotionOrError()
   } else {
-    -1
+    Motion.Error
   }
-  return res
 }

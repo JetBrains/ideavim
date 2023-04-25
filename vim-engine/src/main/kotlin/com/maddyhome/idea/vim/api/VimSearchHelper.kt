@@ -34,7 +34,7 @@ public interface VimSearchHelper {
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
-  ): Int
+  ): Int?
 
   public fun findSection(
     editor: VimEditor,
@@ -82,7 +82,7 @@ public interface VimSearchHelper {
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
-  ): Int
+  ): Int?
 
   public fun findMethodEnd(
     editor: VimEditor,
