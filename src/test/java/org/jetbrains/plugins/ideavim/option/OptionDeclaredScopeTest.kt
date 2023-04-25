@@ -236,10 +236,9 @@ class OptionDeclaredScopeTest : VimTestCase() {
       // Note that opening a window split should get a copy of the local values, too
       val newWindow = openSplitWindow(originalEditor)
 
-      // TODO: For a new split window, we should copy both per-window global + local value
-      // The new window would then be a clone of the current window
+      // When we split a window, we copy both per-window global + local values, rather than initialising from global
       assertEffectiveValueUnmodified(newWindow)
-      assertGlobalValueChanged()  // Assert per-window "global"?!
+      assertGlobalValueChanged()
     }
   }
 
@@ -251,6 +250,39 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
       val newWindow = openSplitWindow(originalEditor)
 
+      // When we split a window, we copy both per-window global + local values, rather than initialising from global
+      assertEffectiveValueChanged(newWindow)
+      assertGlobalValueUnmodified()
+    }
+  }
+
+  @Test
+  fun `test initialise new split window by duplicating per-window global and local values of global-local local-to-window option`() {
+    withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW) {
+      // TODO: This should be a per-window "global" value, but we currently have no way to set that value
+      // Set the (per-window) "global" value, make sure the new split window gets this value
+      setGlobalValue()
+
+      // Note that opening a window split should get a copy of the local values, too
+      val newWindow = openSplitWindow(originalEditor)
+
+      // When we split a window, we copy both per-window global + local values, rather than initialising from global
+      // The local value is unset, so the effective value is the same as the changed value, which is modified
+      assertEffectiveValueChanged(newWindow)
+      assertLocalValueUnset(newWindow)
+      assertGlobalValueChanged()
+    }
+  }
+
+  @Test
+  fun `test initialise new split window by duplicating per-window global and local values of global-local local-to-window option 2`() {
+    withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW) {
+      // Set the window's local value. Both "global" and local values are copied across to a new split window
+      setLocalValue(originalEditor)
+
+      val newWindow = openSplitWindow(originalEditor)
+
+      // When we split a window, we copy both per-window global + local values, rather than initialising from global
       assertEffectiveValueChanged(newWindow)
       assertGlobalValueUnmodified()
     }
@@ -365,4 +397,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
   private fun Option<VimString>.assertGlobalValueUnmodified() = assertValueUnmodified(getGlobalValue(this))
   private fun Option<VimString>.assertGlobalValueChanged() = assertValueChanged(getGlobalValue(this))
+
+  private fun Option<VimString>.assertLocalValueUnset(editor: Editor) =
+    assertEquals(this.unsetValue, getLocalValue(this, editor))
 }

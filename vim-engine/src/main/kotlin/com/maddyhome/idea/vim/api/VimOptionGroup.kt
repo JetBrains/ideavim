@@ -164,6 +164,9 @@ public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, sco
 
 /**
  * Resets the option back to its default value
+ *
+ * Resetting a global-local value at local scope will set it to the default value, rather than set it to its unset
+ * value. This matches Vim behaviour.
  */
 public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionScope) {
   setOptionValue(option, scope, option.defaultValue)

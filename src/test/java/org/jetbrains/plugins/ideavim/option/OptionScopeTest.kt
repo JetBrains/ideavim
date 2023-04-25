@@ -175,9 +175,10 @@ class OptionScopeTest: VimTestCase() {
 
 
   // Global-local is tricky. The local value is initially not set, and the global value is used until it is. For string
-  // options, this is represented by the local value showing as an empty string. Number options (and this includes
-  // boolean options) usually use the value -1 to indicate unset. This is not true for `'undolevels'`, which uses -1 to
-  // represent "no undo", and so uses the sentinel value -123456 to represent unset.
+  // options, this is represented by the local value showing as an empty string. Number options usually use the value -1
+  // to indicate unset. This is not true for `'undolevels'`, which uses -1 to represent "no undo", and so uses the
+  // sentinel value -123456 to represent unset. Since booleans are internally represented as number options, they also
+  // use the -1 value to represent unset.
   // The `:setglobal` command always gets/sets the global value, without affecting the local value.
   // The `:setlocal` command will set the local value without affecting the global value. It will always get the current
   // value of the option, even if that is the sentinel value to indicate "unset". When showing the value of a boolean
@@ -196,9 +197,8 @@ class OptionScopeTest: VimTestCase() {
   // GLOBAL_OR_LOCAL_TO_BUFFER
   // Int (unset value defaults to -1)
   @Test
-  fun `test set global-local to buffer number option at global scope does not change local value`() {
+  fun `test set global-local (buffer) number option at global scope does not change unset local value`() {
     val defaultValue = VimInt(10)
-//    val unsetValue = VimInt(-1)
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
@@ -206,13 +206,12 @@ class OptionScopeTest: VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, globalValue)
 
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    // TODO: This should be `unsetValue`, but we don't support that right now
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   @Test
-  fun `test set global or local to buffer number option at local scope does not change global value`() {
+  fun `test set global-local (buffer) number option at local scope does not change global value`() {
     val defaultValue = VimInt(10)
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
@@ -226,24 +225,40 @@ class OptionScopeTest: VimTestCase() {
   }
 
   @Test
-  fun `test set global or local to buffer number option at effective scope does not change local value`() {
+  fun `test set global-local (buffer) number option at effective scope does not change unset local value`() {
     val defaultValue = VimInt(10)
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
     val effectiveValue = VimInt(100)
-    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), effectiveValue)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), effectiveValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
+  }
+
+  @Test
+  fun `test set global-local (buffer) number option at effective scope with existing local value updates global and local values`() {
+    val defaultValue = VimInt(10)
+    val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
+    injector.optionGroup.addOption(option)
+
+    val initialLocalValue = VimInt(100)
+    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), initialLocalValue)
+
+    val newValue = VimInt(200)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), newValue)
+
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   // Boolean (unset value defaults to -1)
   @Test
-  fun `test set global-local to buffer toggle option at global scope does not change local value`() {
+  fun `test set global-local (buffer) toggle option at global scope does not change unset local value`() {
     val defaultValue = VimInt.ONE
-//    val unsetValue = VimInt(-1)
     val option = ToggleOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
@@ -251,13 +266,12 @@ class OptionScopeTest: VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, globalValue)
 
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    // TODO: This should be `unsetValue`, but we don't support that now
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   @Test
-  fun `test set global or local to buffer toggle option at local scope does not change global value`() {
+  fun `test set global-local (buffer) toggle option at local scope does not change global value`() {
     val defaultValue = VimInt.ONE
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
@@ -271,24 +285,40 @@ class OptionScopeTest: VimTestCase() {
   }
 
   @Test
-  fun `test set global or local to buffer toggle option at effective scope does not change local value`() {
+  fun `test set global-local (buffer) toggle option at effective scope does not change unset local value`() {
     val defaultValue = VimInt.ONE
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
     val effectiveValue = VimInt.ZERO
-    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), effectiveValue)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), effectiveValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
+  }
+
+  @Test
+  fun `test set global-local (buffer) toggle option at effective scope with existing local value updates global and local values`() {
+    val defaultValue = VimInt.ONE
+    val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
+    injector.optionGroup.addOption(option)
+
+    val initialLocalValue = VimInt.ZERO
+    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), initialLocalValue)
+
+    val newValue = VimInt(100)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), newValue)
+
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   // String (unset value is empty string)
   @Test
-  fun `test set global-local to buffer string option at global scope does not change local value`() {
+  fun `test set global-local (buffer) string option at global scope does not change unset local value`() {
     val defaultValue = VimString("default")
-//    val unsetValue = VimString("")
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
@@ -296,13 +326,12 @@ class OptionScopeTest: VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, globalValue)
 
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    // TODO: This should be `unsetValue`, but we don't support that right now
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   @Test
-  fun `test set global or local to buffer string option at local scope does not change global value`() {
+  fun `test set global-local (buffer) string option at local scope does not change global value`() {
     val defaultValue = VimString("default")
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
@@ -316,26 +345,43 @@ class OptionScopeTest: VimTestCase() {
   }
 
   @Test
-  fun `test set global or local to buffer string option at effective scope does not change local value`() {
+  fun `test set global-local (buffer) string option at effective scope does not change unset local value`() {
     val defaultValue = VimString("default")
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
     val effectiveValue = VimString("lorem ipsum")
-    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), effectiveValue)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), effectiveValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
+  }
+
+  // Note that this behaviour is different to number based options! (including toggle options)
+  @Test
+  fun `test set global-local (buffer) string option at effective scope with existing local value updates global value and unsets local value`() {
+    val defaultValue = VimString("default")
+    val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
+    injector.optionGroup.addOption(option)
+
+    val initialLocalValue = VimString("lorem ipsum")
+    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), initialLocalValue)
+
+    val newValue = VimString("dolor sit amet")
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), newValue)
+
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
 
   // GLOBAL_OR_LOCAL_TO_WINDOW
   // Int (unset value defaults to -1)
   @Test
-  fun `test set global-local to window number option at global scope does not change local value`() {
+  fun `test set global-local (window) number option at global scope does not change unset local value`() {
     val defaultValue = VimInt(10)
-//    val unsetValue = VimInt(-1)
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
@@ -343,13 +389,12 @@ class OptionScopeTest: VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, globalValue)
 
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    // TODO: This should be `unsetValue`, but we don't support that right now
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   @Test
-  fun `test set global or local to window number option at local scope does not change global value`() {
+  fun `test set global-local (window) number option at local scope does not change global value`() {
     val defaultValue = VimInt(10)
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
@@ -363,24 +408,42 @@ class OptionScopeTest: VimTestCase() {
   }
 
   @Test
-  fun `test set global or local to window number option at effective scope does not change local value`() {
+  fun `test set global-local (window) number option at effective scope does not change unset local value`() {
     val defaultValue = VimInt(10)
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
     val effectiveValue = VimInt(100)
-    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), effectiveValue)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), effectiveValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
+  @Test
+  fun `test set global-local (window) number option at effective scope with existing local value updates global and local values`() {
+    val defaultValue = VimInt(10)
+    val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
+    injector.optionGroup.addOption(option)
+
+    val initialLocalValue = VimInt(100)
+    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), initialLocalValue)
+
+    val newValue = VimInt(200)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), newValue)
+
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
+  }
+
+
+
   // Boolean (unset value defaults to -1)
   @Test
-  fun `test set global-local to window toggle option at global scope does not change local value`() {
+  fun `test set global-local (window) toggle option at global scope does not change unset local value`() {
     val defaultValue = VimInt.ONE
-//    val unsetValue = VimInt(-1)
     val option = ToggleOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
@@ -388,13 +451,12 @@ class OptionScopeTest: VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, globalValue)
 
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    // TODO: This should be `unsetValue`, but we don't support that now
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   @Test
-  fun `test set global or local to window toggle option at local scope does not change global value`() {
+  fun `test set global-local (window) toggle option at local scope does not change global value`() {
     val defaultValue = VimInt.ONE
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
@@ -408,24 +470,40 @@ class OptionScopeTest: VimTestCase() {
   }
 
   @Test
-  fun `test set global or local to window toggle option at effective scope does not change local value`() {
+  fun `test set global-local (window) toggle option at effective scope does not change unset local value`() {
     val defaultValue = VimInt.ONE
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
     val effectiveValue = VimInt.ZERO
-    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), effectiveValue)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), effectiveValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
+  }
+
+  @Test
+  fun `test set global-local (window) toggle option at effective scope with existing local value updates global and local values`() {
+    val defaultValue = VimInt.ONE
+    val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
+    injector.optionGroup.addOption(option)
+
+    val initialLocalValue = VimInt.ZERO
+    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), initialLocalValue)
+
+    val newValue = VimInt(100)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), newValue)
+
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   // String (unset value is empty string)
   @Test
-  fun `test set global-local to window string option at global scope does not change local value`() {
+  fun `test set global-local (window) string option at global scope does not change unset local value`() {
     val defaultValue = VimString("default")
-//    val unsetValue = VimString("")
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
@@ -433,13 +511,12 @@ class OptionScopeTest: VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, globalValue)
 
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    // TODO: This should be `unsetValue`, but we don't support that right now
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 
   @Test
-  fun `test set global or local to window string option at local scope does not change global value`() {
+  fun `test set global-local (window) string option at local scope does not change global value`() {
     val defaultValue = VimString("default")
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
@@ -453,16 +530,34 @@ class OptionScopeTest: VimTestCase() {
   }
 
   @Test
-  fun `test set global or local to window string option at effective scope does not change local value`() {
+  fun `test set global-local (window) string option at effective scope does not change unset local value`() {
     val defaultValue = VimString("default")
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
     injector.optionGroup.addOption(option)
 
     val effectiveValue = VimString("lorem ipsum")
-    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), effectiveValue)
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), effectiveValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
+  }
+
+  // Note that this behaviour is different to number based options! (including toggle options)
+  @Test
+  fun `test set global-local (window) string option at effective scope with existing local value updates global value and unsets local value`() {
+    val defaultValue = VimString("default")
+    val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
+    injector.optionGroup.addOption(option)
+
+    val initialLocalValue = VimString("lorem ipsum")
+    injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(fixture.editor.vim), initialLocalValue)
+
+    val newValue = VimString("dolor sit amet")
+    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), newValue)
+
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL))
+    assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)))
   }
 }

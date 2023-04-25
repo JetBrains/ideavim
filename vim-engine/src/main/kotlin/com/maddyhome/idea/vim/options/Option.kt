@@ -30,11 +30,18 @@ import java.util.*
  * treated as an error.
  *
  * We also want to avoid a sealed hierarchy, since we create object instances with custom validation for some options.
+ *
+ * @param name  The name of the option
+ * @param declaredScope The declared scope of the option - global, global-local, local-to-buffer, local-to-window
+ * @param abbrev  An abbreviated name for the option, recognised by `:set`
+ * @param defaultValue  The default value of the option, if not set by the user
+ * @param unsetValue    The value of the local part of a global-local option, if the local part has not been set
  */
 public abstract class Option<T : VimDataType>(public val name: String,
                                               public val declaredScope: OptionDeclaredScope,
                                               public val abbrev: String,
-                                              defaultValue: T) {
+                                              defaultValue: T,
+                                              public val unsetValue: T) {
   private val listeners = mutableSetOf<OptionChangeListener<T>>()
 
   private var defaultValueField = defaultValue
@@ -88,8 +95,9 @@ public open class StringOption(
   declaredScope: OptionDeclaredScope,
   abbrev: String,
   defaultValue: VimString,
+  unsetValue: VimString = VimString.EMPTY,
   public val boundedValues: Collection<String>? = null,
-) : Option<VimString>(name, declaredScope, abbrev, defaultValue) {
+) : Option<VimString>(name, declaredScope, abbrev, defaultValue, unsetValue) {
 
   public constructor(
     name: String,
@@ -97,7 +105,7 @@ public open class StringOption(
     abbrev: String,
     defaultValue: String,
     boundedValues: Collection<String>? = null,
-  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues)
+  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues = boundedValues)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -142,7 +150,7 @@ public open class StringListOption(
   abbrev: String,
   defaultValue: VimString,
   public val boundedValues: Collection<String>? = null,
-) : Option<VimString>(name, declaredScope, abbrev, defaultValue) {
+) : Option<VimString>(name, declaredScope, abbrev, defaultValue, VimString.EMPTY) {
 
   public constructor(
     name: String,
@@ -202,14 +210,21 @@ public open class StringListOption(
   }
 }
 
-public open class NumberOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt) :
-  Option<VimInt>(name, declaredScope, abbrev, defaultValue) {
+public open class NumberOption(
+  name: String,
+  declaredScope: OptionDeclaredScope,
+  abbrev: String,
+  defaultValue: VimInt,
+  unsetValue: VimInt = VimInt.MINUS_ONE
+) :
+  Option<VimInt>(name, declaredScope, abbrev, defaultValue, unsetValue) {
 
-  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int) : this(
+  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int, unsetValue: Int = -1) : this(
     name,
     declaredScope,
     abbrev,
-    VimInt(defaultValue)
+    VimInt(defaultValue),
+    if (unsetValue == -1) VimInt.MINUS_ONE else VimInt(unsetValue)
   )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
@@ -247,7 +262,7 @@ public open class UnsignedNumberOption(
 }
 
 public class ToggleOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt) :
-  Option<VimInt>(name, declaredScope, abbrev, defaultValue) {
+  Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE) {
   public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Boolean) : this(
     name,
     declaredScope,
