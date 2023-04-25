@@ -84,6 +84,7 @@ public data class SetLocalCommand(val ranges: Ranges, val argument: String) : Co
  *  * :set {option}+={value} - append or add to option value
  *  * :set {option}-={value} - remove or subtract from option value
  *  * :set {option}^={value} - prepend or multiply option value
+ *  * :set {option}< - set the option to a copy of the global value
  *
  *
  * @param editor    The editor the command was entered for, null if no editor - reading .ideavimrc
@@ -134,19 +135,28 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
       }
     }
 
+    // Look for the = or : first
+    var eq = token.indexOf('=')
+    if (eq == -1) {
+      eq = token.indexOf(':')
+    }
+
     when {
-      token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
-      token.startsWith("no") -> optionGroup.unsetToggleOption(getValidToggleOption(token.substring(2), token), scope)
-      token.startsWith("inv") -> optionGroup.invertToggleOption(getValidToggleOption(token.substring(3), token), scope)
-      token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
-      token.endsWith("&") -> optionGroup.resetDefaultValue(getValidOption(token.dropLast(1), token), scope)
+      eq == -1 && token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
+      eq == -1 && token.startsWith("no") -> optionGroup.unsetToggleOption(getValidToggleOption(token.substring(2), token), scope)
+      eq == -1 && token.startsWith("inv") -> optionGroup.invertToggleOption(getValidToggleOption(token.substring(3), token), scope)
+      eq == -1 && token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
+      eq == -1 && token.endsWith("&") -> optionGroup.resetDefaultValue(getValidOption(token.dropLast(1), token), scope)
+      eq == -1 && token.endsWith("<") -> {
+        // Copy the global value to the target scope. If the target scope is global, this is a no-op. When copying a
+        // string global-local option to effective scope, Vim's behaviour matches setting that option at effective
+        // scope. That is, it sets the global value (a no-op) and resets the local value.
+        val option = getValidOption(token.dropLast(1), token)
+        val globalValue = optionGroup.getOptionValue(option, OptionScope.GLOBAL)
+        optionGroup.setOptionValue(option, scope, globalValue)
+      }
       else -> {
         // This must be one of =, :, +=, -=, or ^=
-        // Look for the = or : first
-        var eq = token.indexOf('=')
-        if (eq == -1) {
-          eq = token.indexOf(':')
-        }
         // No operator so only the option name was given
         if (eq == -1) {
           // We must explicitly treat the return value as covariant instead of `Option<VimDataType>?` so that we can
