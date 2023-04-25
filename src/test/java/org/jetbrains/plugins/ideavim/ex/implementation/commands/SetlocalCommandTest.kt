@@ -34,6 +34,13 @@ class SetlocalCommandTest : VimTestCase() {
     configureByText("\n")
   }
 
+  private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("setlocal shell=/dummy/path/to/bash")
+    enterCommand("setlocal shellcmdflag=-x")
+    enterCommand("setlocal shellxescape=@")
+    enterCommand("setlocal shellxquote={")
+  }
+
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("setlocal nu")
@@ -105,6 +112,19 @@ class SetlocalCommandTest : VimTestCase() {
     enterCommand("setlocal invrnu")
 
     assertCommandOutput("setlocal rnu?", "  relativenumber\n")
+  }
+
+  @Test
+  fun `test show unset global-local toggle option value with -- prefix`() {
+    val option = ToggleOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", true)
+    try {
+      injector.optionGroup.addOption(option)
+
+      assertCommandOutput("setlocal test?", "--test\n")
+    }
+    finally {
+      injector.optionGroup.removeOption(option.name)
+    }
   }
 
   @Test
@@ -329,5 +349,186 @@ class SetlocalCommandTest : VimTestCase() {
     enterCommand("setlocal nrformats=alpha")
     enterCommand("setlocal nrformats&")
     assertEquals("hex", options().nrformats.value)
+  }
+
+  @Test
+  fun `test show all modified local option and unset global-local values`() {
+    assertCommandOutput("setlocal", """
+      |--- Local option values ---
+      |--ideajoin            ideastrictmode      sidescrolloff=-1
+      |  idearefactormode=   scrolloff=-1
+      |--ideacopypreprocess
+      |  undolevels=-123456
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show all modified local option and unset global-local values 2`() {
+    enterCommand("setlocal number relativenumber scrolloff=10 nrformats=alpha,hex,octal sidescrolloff=10")
+    assertCommandOutput("setlocal", """
+      |--- Local option values ---
+      |--ideajoin            ideastrictmode      relativenumber      sidescrolloff=10
+      |  idearefactormode=   number              scrolloff=10
+      |--ideacopypreprocess
+      |  nrformats=alpha,hex,octal
+      |  undolevels=-123456
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show all local option values`() {
+    setOsSpecificOptionsToSafeValues()
+    assertCommandOutput("setlocal all", """
+      |--- Local option values ---
+      |noargtextobj        noideatracetime       scroll=0          notextobj-entire
+      |  closenotebooks      ideawrite=all       scrolljump=1      notextobj-indent
+      |nocommentary        noignorecase          scrolloff=-1        timeout
+      |nodigraph           noincsearch           selectmode=         timeoutlen=1000
+      |noexchange          nomatchit             shellcmdflag=-x   notrackactionids
+      |nogdefault            maxmapdepth=20      shellxescape=@      unifyjumps
+      |nohighlightedyank     more                shellxquote={       virtualedit=
+      |  history=50        nomultiple-cursors    showcmd           novisualbell
+      |nohlsearch          noNERDTree            showmode            visualdelay=100
+      |noideaglobalmode      nrformats=hex       sidescroll=0        whichwrap=b,s
+      |--ideajoin          nonumber              sidescrolloff=-1    wrapscan
+      |  ideamarks         nooctopushandler    nosmartcase
+      |  idearefactormode=   oldundo             startofline
+      |  ideastrictmode    norelativenumber    nosurround
+      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  excommandannotation
+      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+      |  ide=IntelliJ IDEA Community Edition
+      |--ideacopypreprocess
+      |  ideastatusicon=enabled
+      |  ideavimsupport=dialog
+      |  iskeyword=@,48-57,_
+      |  keymodel=continueselect,stopselect
+      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+      |  matchpairs=(:),{:},[:]
+      |noReplaceWithRegister
+      |  selection=inclusive
+      |  shell=/dummy/path/to/bash
+      |  undolevels=-123456
+      |novim-paragraph-motion
+      |  viminfo='100,<50,s10,h
+      |  vimscriptfunctionannotation
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show named options`() {
+    assertCommandOutput("setlocal number? relativenumber? scrolloff? nrformats?", """
+      |  nrformats=hex     nonumber            norelativenumber      scrolloff=-1
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show all modified local option values in single column`() {
+    assertCommandOutput("setlocal!", """
+      |--- Local option values ---
+      |--ideacopypreprocess
+      |--ideajoin
+      |  idearefactormode=
+      |  ideastrictmode
+      |  scrolloff=-1
+      |  sidescrolloff=-1
+      |  undolevels=-123456
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show all local option values in single column`() {
+    setOsSpecificOptionsToSafeValues()
+    assertCommandOutput("setlocal! all", """
+      |--- Local option values ---
+      |noargtextobj
+      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  closenotebooks
+      |nocommentary
+      |nodigraph
+      |noexchange
+      |  excommandannotation
+      |nogdefault
+      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+      |nohighlightedyank
+      |  history=50
+      |nohlsearch
+      |  ide=IntelliJ IDEA Community Edition
+      |--ideacopypreprocess
+      |noideaglobalmode
+      |--ideajoin
+      |  ideamarks
+      |  idearefactormode=
+      |  ideastatusicon=enabled
+      |  ideastrictmode
+      |noideatracetime
+      |  ideavimsupport=dialog
+      |  ideawrite=all
+      |noignorecase
+      |noincsearch
+      |  iskeyword=@,48-57,_
+      |  keymodel=continueselect,stopselect
+      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+      |nomatchit
+      |  matchpairs=(:),{:},[:]
+      |  maxmapdepth=20
+      |  more
+      |nomultiple-cursors
+      |noNERDTree
+      |  nrformats=hex
+      |nonumber
+      |nooctopushandler
+      |  oldundo
+      |norelativenumber
+      |noReplaceWithRegister
+      |  scroll=0
+      |  scrolljump=1
+      |  scrolloff=-1
+      |  selection=inclusive
+      |  selectmode=
+      |  shell=/dummy/path/to/bash
+      |  shellcmdflag=-x
+      |  shellxescape=@
+      |  shellxquote={
+      |  showcmd
+      |  showmode
+      |  sidescroll=0
+      |  sidescrolloff=-1
+      |nosmartcase
+      |  startofline
+      |nosurround
+      |notextobj-entire
+      |notextobj-indent
+      |  timeout
+      |  timeoutlen=1000
+      |notrackactionids
+      |  undolevels=-123456
+      |  unifyjumps
+      |novim-paragraph-motion
+      |  viminfo='100,<50,s10,h
+      |  vimscriptfunctionannotation
+      |  virtualedit=
+      |novisualbell
+      |  visualdelay=100
+      |  whichwrap=b,s
+      |  wrapscan
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show named options in single column`() {
+    assertCommandOutput("setlocal! number? relativenumber? scrolloff? nrformats?", """
+      |  nrformats=hex
+      |nonumber
+      |norelativenumber
+      |  scrolloff=-1
+      |""".trimMargin()
+    )
   }
 }

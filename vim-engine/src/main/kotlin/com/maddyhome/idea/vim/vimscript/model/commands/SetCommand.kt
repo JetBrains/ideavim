@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
@@ -254,7 +255,11 @@ private fun showOptions(
 
   val output = buildString {
     if (showIntro) {
-      appendLine("--- Options ---")
+      when (scope) {
+        is OptionScope.AUTO -> appendLine("--- Options ---")
+        is OptionScope.LOCAL -> appendLine("--- Local option values ---")
+        OptionScope.GLOBAL -> appendLine("--- Global option values ---")
+      }
     }
 
     for (h in 0 until height) {
@@ -287,10 +292,18 @@ private fun showOptions(
 
 private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: OptionScope): String {
   val value = injector.optionGroup.getOptionValue(option, scope)
-  return if (option is ToggleOption) {
-    if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
+  if (option is ToggleOption) {
+
+    // Unset global-local toggle option
+    if ((option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
+        || option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
+      && scope is OptionScope.LOCAL && value == VimInt.MINUS_ONE) {
+      return "--${option.name}"
+    }
+
+    return if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
   } else {
-    "  ${option.name}=$value"
+    return "  ${option.name}=$value"
   }
 }
 
