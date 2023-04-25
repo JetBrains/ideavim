@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.jetbrains.com/teamcity/schemas/2021.1/project-config.xsd">
+  <name>Publish EAP Build</name>
+  <description>Build and publish EAP of IdeaVim plugin</description>
+  <settings>
+    <options>
+      <option name="artifactRules" value="build/distributions/*" />
+      <option name="branchFilter" value="+:&lt;default&gt;" />
+      <option name="buildNumberPattern" value="2.2.0-eap.%build.counter%" />
+      <option name="checkoutMode" value="AUTO" />
+    </options>
+    <parameters>
+      <param name="env.ORG_GRADLE_PROJECT_downloadIdeaSources" value="false" />
+      <param name="env.ORG_GRADLE_PROJECT_ideaVersion" value="LATEST-EAP-SNAPSHOT" />
+      <param name="env.ORG_GRADLE_PROJECT_publishChannels" value="eap" />
+      <param name="env.ORG_GRADLE_PROJECT_publishToken" value="credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde" spec="password label='Password'" />
+      <param name="env.ORG_GRADLE_PROJECT_slackUrl" value="credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5" spec="password label='Slack Token'" />
+      <param name="env.ORG_GRADLE_PROJECT_version" value="%build.number%" />
+    </parameters>
+    <build-runners>
+      <runner id="RUNNER_1" name="" type="gradle-runner">
+        <parameters>
+          <param name="teamcity.coverage.emma.include.source" value="true" />
+          <param name="teamcity.coverage.emma.instr.parameters" value="-ix -*Test*" />
+          <param name="teamcity.coverage.idea.includePatterns" value="*" />
+          <param name="teamcity.coverage.jacoco.patterns" value="+:*" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.tool.jacoco" value="%teamcity.tool.jacoco.DEFAULT%" />
+          <param name="ui.gradleRUnner.gradle.build.file" value="" />
+          <param name="ui.gradleRunner.gradle.stacktrace.enabled" value="true" />
+          <param name="ui.gradleRunner.gradle.tasks.names" value="clean publishPlugin" />
+          <param name="ui.gradleRunner.gradle.wrapper.useWrapper" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="Ideavim_HttpsGithubComJetBrainsIdeavimRefsHeadsMaster" />
+    </vcs-settings>
+    <requirements>
+      <equals id="RQ_1" name="teamcity.agent.hardware.cpuCount" value="4" />
+      <equals id="RQ_2" name="teamcity.agent.os.family" value="Linux" />
+    </requirements>
+    <build-triggers />
+    <build-extensions>
+      <extension id="BUILD_EXT_1" type="VcsLabeling">
+        <parameters>
+          <param name="branchFilter" value="+:&lt;default&gt;" />
+          <param name="labelingPattern" value="%system.build.number%" />
+          <param name="successfulOnly" value="" />
+          <param name="vcsRootId" value="Ideavim_HttpsGithubComJetBrainsIdeavimRefsHeadsMaster" />
+        </parameters>
+      </extension>
+      <extension id="BUILD_EXT_2" type="BuildFailureOnMetric">
+        <parameters>
+          <param name="anchorBuild" value="lastSuccessful" />
+          <param name="metricKey" value="VisibleArtifactsSize" />
+          <param name="metricThreshold" value="5" />
+          <param name="metricUnits" value="metricUnitsPercents" />
+          <param name="moreOrLess" value="different" />
+          <param name="withBuildAnchor" value="true" />
+        </parameters>
+      </extension>
+    </build-extensions>
+    <cleanup />
+  </settings>
+</build-type>
+

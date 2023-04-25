@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.jetbrains.com/teamcity/schemas/2021.1/project-config.xsd">
+  <name>Qodana checks</name>
+  <description />
+  <settings>
+    <options>
+      <option name="branchFilter" value="+:&lt;default&gt;" />
+      <option name="checkoutMode" value="AUTO" />
+    </options>
+    <disabled-settings>
+      <setting-ref ref="TRIGGER_1" />
+    </disabled-settings>
+    <parameters>
+      <param name="env.ORG_GRADLE_PROJECT_downloadIdeaSources" value="false" />
+      <param name="env.ORG_GRADLE_PROJECT_ideaVersion" value="LATEST-EAP-SNAPSHOT" />
+      <param name="env.ORG_GRADLE_PROJECT_instrumentPluginCode" value="false" />
+    </parameters>
+    <build-runners>
+      <runner id="RUNNER_1" name="Generate grammar" type="gradle-runner">
+        <parameters>
+          <param name="teamcity.coverage.emma.include.source" value="true" />
+          <param name="teamcity.coverage.emma.instr.parameters" value="-ix -*Test*" />
+          <param name="teamcity.coverage.idea.includePatterns" value="*" />
+          <param name="teamcity.coverage.jacoco.patterns" value="+:*" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.tool.jacoco" value="%teamcity.tool.jacoco.DEFAULT%" />
+          <param name="ui.gradleRunner.gradle.tasks.names" value="generateGrammarSource" />
+          <param name="ui.gradleRunner.gradle.wrapper.useWrapper" value="true" />
+        </parameters>
+      </runner>
+      <runner id="RUNNER_2" name="Qodana" type="Qodana">
+        <parameters>
+          <param name="arguments-command-docker" value="-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzUFZrQSIsInByb2plY3QiOiIzN1FlQSIsInRva2VuIjoiM0t2bXoifQ.uohp81tM7iAfvvB6k8faarfpV-OjusAaEbWQ8iNrOgs" />
+          <param name="arguments-entry-point-docker" value="--baseline qodana.sarif.json" />
+          <param name="clonefinder-enable" value="" />
+          <param name="clonefinder-languages" value="" />
+          <param name="clonefinder-languages-container" value="" />
+          <param name="clonefinder-queried-project" value="" />
+          <param name="clonefinder-reference-projects" value="" />
+          <param name="code-inspection-profile-name" value="qodana.recommended" />
+          <param name="code-inspection-xml-config" value="Default" />
+          <param name="collect-anonymous-statistics" value="" />
+          <param name="licenseaudit-enable" value="" />
+          <param name="linterVersion" value="latest" />
+          <param name="namesAndTags" value="public-image-qodana-jvm" />
+          <param name="namesAndTagsCustom" value="jetbrains/qodana" />
+          <param name="project-key" value="" />
+          <param name="report-as-test" value="true" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="Ideavim_HttpsGithubComJetBrainsIdeavimRefsHeadsMaster" />
+    </vcs-settings>
+    <requirements>
+      <equals id="RQ_1" name="teamcity.agent.hardware.cpuCount" value="4" />
+      <equals id="RQ_2" name="teamcity.agent.os.family" value="Linux" />
+    </requirements>
+    <build-triggers>
+      <build-trigger id="TRIGGER_1" type="vcsTrigger">
+        <parameters>
+          <param name="branchFilter" value="+:&lt;default&gt;" />
+          <param name="enableQueueOptimization" value="true" />
+          <param name="quietPeriodMode" value="DO_NOT_USE" />
+        </parameters>
+      </build-trigger>
+      <build-trigger id="TRIGGER_2" type="schedulingTrigger">
+        <parameters>
+          <param name="branchFilter" value="+:*" />
+          <param name="cronExpression_dm" value="*" />
+          <param name="cronExpression_dw" value="?" />
+          <param name="cronExpression_hour" value="*" />
+          <param name="cronExpression_min" value="0" />
+          <param name="cronExpression_month" value="*" />
+          <param name="cronExpression_sec" value="0" />
+          <param name="cronExpression_year" value="*" />
+          <param name="dayOfWeek" value="Sunday" />
+          <param name="enableQueueOptimization" value="true" />
+          <param name="hour" value="12" />
+          <param name="minute" value="0" />
+          <param name="promoteWatchedBuild" value="true" />
+          <param name="revisionRule" value="lastFinished" />
+          <param name="revisionRuleBuildBranch" value="+:&lt;default&gt;" />
+          <param name="schedulingPolicy" value="daily" />
+          <param name="timezone" value="SERVER" />
+          <param name="triggerBuildWithPendingChangesOnly" value="true" />
+        </parameters>
+      </build-trigger>
+    </build-triggers>
+    <build-extensions>
+      <extension id="BUILD_EXT_1" type="BuildFailureOnMetric">
+        <parameters>
+          <param name="metricKey" value="QodanaProblemsNew" />
+          <param name="metricThreshold" value="0" />
+          <param name="metricUnits" value="metricUnitsDefault" />
+          <param name="moreOrLess" value="more" />
+          <param name="withBuildAnchor" value="false" />
+        </parameters>
+      </extension>
+    </build-extensions>
+    <cleanup />
+  </settings>
+</build-type>
+

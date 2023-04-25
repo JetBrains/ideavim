@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.jetbrains.com/teamcity/schemas/2021.1/project-config.xsd">
+  <name>GitHub Pull Requests Tests</name>
+  <description>Test GitHub pull requests Tests</description>
+  <settings>
+    <options>
+      <option name="branchFilter" value="+:*&#xA;-:&lt;default&gt;" />
+      <option name="checkoutMode" value="AUTO" />
+    </options>
+    <parameters>
+      <param name="env.ORG_GRADLE_PROJECT_downloadIdeaSources" value="false" />
+      <param name="env.ORG_GRADLE_PROJECT_ideaVersion" value="LATEST-EAP-SNAPSHOT" />
+      <param name="env.ORG_GRADLE_PROJECT_instrumentPluginCode" value="false" />
+    </parameters>
+    <build-runners>
+      <runner id="RUNNER_1" name="" type="gradle-runner">
+        <parameters>
+          <param name="teamcity.coverage.emma.include.source" value="true" />
+          <param name="teamcity.coverage.emma.instr.parameters" value="-ix -*Test*" />
+          <param name="teamcity.coverage.idea.includePatterns" value="*" />
+          <param name="teamcity.coverage.jacoco.patterns" value="+:*" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.tool.jacoco" value="%teamcity.tool.jacoco.DEFAULT%" />
+          <param name="ui.gradleRUnner.gradle.build.file" value="" />
+          <param name="ui.gradleRunner.gradle.stacktrace.enabled" value="true" />
+          <param name="ui.gradleRunner.gradle.tasks.names" value="clean test" />
+          <param name="ui.gradleRunner.gradle.wrapper.useWrapper" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="Ideavim_GitHubPullRequest" />
+    </vcs-settings>
+    <requirements>
+      <equals id="RQ_1" name="teamcity.agent.hardware.cpuCount" value="4" />
+      <equals id="RQ_2" name="teamcity.agent.os.family" value="Linux" />
+    </requirements>
+    <build-triggers>
+      <build-trigger id="TRIGGER_1" type="vcsTrigger">
+        <parameters>
+          <param name="branchFilter" value="" />
+          <param name="enableQueueOptimization" value="true" />
+          <param name="quietPeriodMode" value="USE_DEFAULT" />
+        </parameters>
+      </build-trigger>
+    </build-triggers>
+    <build-extensions>
+      <extension id="BUILD_EXT_1" type="pullRequests">
+        <parameters>
+          <param name="authenticationType" value="token" />
+          <param name="filterAuthorRole" value="EVERYBODY" />
+          <param name="filterTargetBranch" value="refs/heads/master" />
+          <param name="providerType" value="github" />
+          <param name="secure:accessToken" value="credentialsJSON:90f3b439-6e91-40f7-a086-d4dd8e0ea9b8" />
+        </parameters>
+      </extension>
+      <extension id="BUILD_EXT_2" type="commit-status-publisher">
+        <parameters>
+          <param name="github_authentication_type" value="token" />
+          <param name="github_host" value="https://api.github.com" />
+          <param name="github_oauth_user" value="AlexPl292" />
+          <param name="publisherId" value="githubStatusPublisher" />
+          <param name="secure:github_access_token" value="credentialsJSON:90f3b439-6e91-40f7-a086-d4dd8e0ea9b8" />
+          <param name="vcsRootId" value="Ideavim_GitHubPullRequest" />
+        </parameters>
+      </extension>
+    </build-extensions>
+    <cleanup />
+  </settings>
+</build-type>
+
