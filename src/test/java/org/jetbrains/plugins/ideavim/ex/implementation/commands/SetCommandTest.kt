@@ -12,6 +12,8 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,6 +23,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @Suppress("SpellCheckingInspection")
+@TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class SetCommandTest : VimTestCase() {
 
   @BeforeEach
@@ -47,7 +50,11 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option`() {
     enterCommand("set rnu")
     assertTrue(options().relativenumber)
+    enterCommand("set nornu")
+    assertFalse(options().relativenumber)
     enterCommand("set rnu!")
+    assertTrue(options().relativenumber)
+    enterCommand("set invrnu")
     assertFalse(options().relativenumber)
   }
 
@@ -303,5 +310,31 @@ class SetCommandTest : VimTestCase() {
       |  scrolloff=0
       |""".trimMargin()
     )
+  }
+
+  @Test
+  fun `test reset local value for local-to-buffer option`() {
+    enterCommand("set nrformats=octal")
+
+    enterCommand("set nrformats&")
+
+    assertCommandOutput("set nrformats?", "  nrformats=hex\n")
+  }
+
+  @Test
+  fun `test reset local value for global-local option`() {
+    enterCommand("set virtualedit=block") // Sets the global + effective values. Local is unset
+    enterCommand("setlocal virtualedit=onemore")  // Sets the local + effective values
+    assertCommandOutput("set virtualedit?", "  virtualedit=onemore\n")
+    assertCommandOutput("setlocal virtualedit?", "  virtualedit=onemore\n")
+
+    // This is like setting the global-local value to its own global value. :set with a global-local option will set the
+    // global value and unset the local value
+    enterCommand("set virtualedit<")
+
+    assertCommandOutput("set virtualedit?", "  virtualedit=block\n")
+    assertCommandOutput("setlocal virtualedit?", "  virtualedit=\n")
+
+    // Note that :setlocal virtualedit< has different behaviour. See SetLocalCommandTest
   }
 }
