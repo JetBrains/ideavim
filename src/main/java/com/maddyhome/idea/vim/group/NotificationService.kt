@@ -95,7 +95,7 @@ internal class NotificationService(private val project: Project?) {
       AppendToIdeaVimRcAction(
         notification,
         "set ideajoin",
-        "idejoin"
+        "ideajoin"
       ) {
         // 'ideajoin' is global-local, so we'll set it as a global value
         injector.optionGroup.setOptionValue(IjOptions.ideajoin, OptionScope.GLOBAL, VimInt.ONE)
