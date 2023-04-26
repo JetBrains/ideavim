@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 import kotlin.math.ceil
-import kotlin.math.min
 
 /**
  * see "h :set"
@@ -222,6 +221,8 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
     if (optionAsString.length >= colWidth) extra.add(optionAsString) else cols.add(optionAsString)
   }
 
+  // Note that this is the approximate width of the associated editor, not the ex output panel!
+  // It excludes gutter width, for example
   val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 20) 80 else it }
   val colCount = width / colWidth
   val height = ceil(cols.size.toDouble() / colCount.toDouble()).toInt()
@@ -255,13 +256,9 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
       appendLine()
     }
 
-    // Add any extra, long options and hard wrap to the screen width
-    for (opt in extra) {
-      val seg = (opt.length - 1) / width
-      for (j in 0..seg) {
-        append(opt, j * width, min(j * width + width, opt.length))
-        appendLine()
-      }
+    // Add any lines that are too long to fit into columns. The panel will soft wrap text
+    for (option in extra) {
+      appendLine(option)
     }
   }
   injector.exOutputPanel.getPanel(editor).output(output)
