@@ -213,54 +213,60 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
     }
   }
 
+  val colWidth = 20
   val cols = mutableListOf<String>()
   val extra = mutableListOf<String>()
   for (option in optionsToShow) {
     val optionAsString = formatKnownOptionValue(option, scope)
-    if (optionAsString.length > 19) extra.add(optionAsString) else cols.add(optionAsString)
+    if (optionAsString.length >= colWidth) extra.add(optionAsString) else cols.add(optionAsString)
   }
 
   cols.sort()
   extra.sort()
 
-  var width = injector.engineEditorHelper.getApproximateScreenWidth(editor)
-  if (width < 20) {
-    width = 80
-  }
-  val colCount = width / 20
+  val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 20) 80 else it }
+  val colCount = width / colWidth
   val height = ceil(cols.size.toDouble() / colCount.toDouble()).toInt()
   var empty = cols.size % colCount
   empty = if (empty == 0) colCount else empty
 
-  val res = StringBuilder()
-  if (showIntro) {
-    res.append("--- Options ---\n")
-  }
-  for (h in 0 until height) {
-    for (c in 0 until colCount) {
-      if (h == height - 1 && c >= empty) {
-        break
-      }
-
-      var pos = c * height + h
-      if (c > empty) {
-        pos -= c - empty
-      }
-
-      val opt = cols[pos]
-      res.append(opt.padEnd(20))
+  val output = buildString {
+    if (showIntro) {
+      append("--- Options ---\n")
     }
-    res.append("\n")
-  }
 
-  for (opt in extra) {
-    val seg = (opt.length - 1) / width
-    for (j in 0..seg) {
-      res.append(opt, j * width, min(j * width + width, opt.length))
-      res.append("\n")
+    for (h in 0 until height) {
+      val lengthAtStartOfLine = length
+      for (c in 0 until colCount) {
+        if (h == height - 1 && c >= empty) {
+          break
+        }
+
+        var pos = c * height + h
+        if (c > empty) {
+          pos -= c - empty
+        }
+
+        val padLength = lengthAtStartOfLine + (c * colWidth) - length
+        for (i in 1 .. padLength) {
+          append(' ')
+        }
+
+        append(cols[pos])
+      }
+      appendLine()
+    }
+
+    // Add any extra, long options and hard wrap to the screen width
+    for (opt in extra) {
+      val seg = (opt.length - 1) / width
+      for (j in 0..seg) {
+        append(opt, j * width, min(j * width + width, opt.length))
+        appendLine()
+      }
     }
   }
-  injector.exOutputPanel.getPanel(editor).output(res.toString())
+  injector.exOutputPanel.getPanel(editor).output(output)
 
   if (unknownOption != null) {
     throw exExceptionMessage("E518", unknownOption.second)

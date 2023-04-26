@@ -11,14 +11,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionScope
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@Suppress("SpellCheckingInspection")
 class SetCommandTest : VimTestCase() {
 
   @Test
@@ -38,36 +37,32 @@ class SetCommandTest : VimTestCase() {
     assertFalse(options().relativenumber)
   }
 
-  // todo we have spaces in assertExOutput because of pad(20) in the com.maddyhome.idea.vim.vimscript.model.commands.SetCommandKt#showOptions method
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   @Test
   fun `test number option`() {
     configureByText("\n")
     enterCommand("set scrolloff&")
     assertEquals(0, options().scrolloff)
     enterCommand("set scrolloff?")
-    assertExOutput("scrolloff=0         \n")
+    assertExOutput("scrolloff=0\n")
     enterCommand("set scrolloff=5")
     assertEquals(5, options().scrolloff)
     enterCommand("set scrolloff?")
-    assertExOutput("scrolloff=5         \n")
+    assertExOutput("scrolloff=5\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   @Test
   fun `test toggle option as a number`() {
     configureByText("\n")
     enterCommand("set number&")
     assertEquals(0, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
     enterCommand("set number?")
-    assertExOutput("nonumber            \n")
+    assertExOutput("nonumber\n")
     enterCommand("let &nu=1000")
     assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
     enterCommand("set number?")
-    assertExOutput("  number            \n")
+    assertExOutput("  number\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test toggle option exceptions`() {
     configureByText("\n")
@@ -93,7 +88,6 @@ class SetCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("E474: Invalid argument: number-=test")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test number option exceptions`() {
     configureByText("\n")
@@ -116,33 +110,30 @@ class SetCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("E521: Number required after =: scrolloff-=test")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   @Test
   fun `test string option`() {
     configureByText("\n")
     enterCommand("set selection&")
     assertEquals("inclusive", options().selection)
     enterCommand("set selection?")
-    assertExOutput("selection=inclusive \n")
+    assertExOutput("selection=inclusive\n")
     enterCommand("set selection=exclusive")
     assertEquals("exclusive", options().selection)
     enterCommand("set selection?")
-    assertExOutput("selection=exclusive \n")
+    assertExOutput("selection=exclusive\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   @Test
   fun `test show numbered value`() {
     configureByText("\n")
     enterCommand("set so")
-    assertExOutput("scrolloff=0         \n")
+    assertExOutput("scrolloff=0\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   @Test
   fun `test show numbered value with question mark`() {
     configureByText("\n")
     enterCommand("set so?")
-    assertExOutput("scrolloff=0         \n")
+    assertExOutput("scrolloff=0\n")
   }
 }
