@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
 
     implementation("io.ktor:ktor-client-core:2.2.4")
     implementation("io.ktor:ktor-client-cio:2.2.4")
