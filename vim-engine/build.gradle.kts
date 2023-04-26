@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
 
     compileOnly("org.jetbrains:annotations:24.0.1")
