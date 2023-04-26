@@ -276,7 +276,7 @@ private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: Optio
   return if (option is ToggleOption) {
     if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
   } else {
-    "${option.name}=$value"
+    "  ${option.name}=$value"
   }
 }
 

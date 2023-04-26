@@ -42,10 +42,10 @@ class SetCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("set scrolloff&")
     assertEquals(0, options().scrolloff)
-    assertCommandOutput("set scrolloff?", "scrolloff=0\n")
+    assertCommandOutput("set scrolloff?", "  scrolloff=0\n")
     enterCommand("set scrolloff=5")
     assertEquals(5, options().scrolloff)
-    assertCommandOutput("set scrolloff?", "scrolloff=5\n")
+    assertCommandOutput("set scrolloff?", "  scrolloff=5\n")
   }
 
   @Test
@@ -111,21 +111,21 @@ class SetCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("set selection&")
     assertEquals("inclusive", options().selection)
-    assertCommandOutput("set selection?", "selection=inclusive\n")
+    assertCommandOutput("set selection?", "  selection=inclusive\n")
     enterCommand("set selection=exclusive")
     assertEquals("exclusive", options().selection)
-    assertCommandOutput("set selection?", "selection=exclusive\n")
+    assertCommandOutput("set selection?", "  selection=exclusive\n")
   }
 
   @Test
   fun `test show numbered value`() {
     configureByText("\n")
-    assertCommandOutput("set so", "scrolloff=0\n")
+    assertCommandOutput("set so", "  scrolloff=0\n")
   }
 
   @Test
   fun `test show numbered value with question mark`() {
     configureByText("\n")
-    assertCommandOutput("set so?", "scrolloff=0\n")
+    assertCommandOutput("set so?", "  scrolloff=0\n")
   }
 }
