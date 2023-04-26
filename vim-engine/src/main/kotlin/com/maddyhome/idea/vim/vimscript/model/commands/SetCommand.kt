@@ -203,7 +203,8 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
   val optionService = injector.optionGroup
   val optionsToShow = mutableListOf<Option<VimDataType>>()
   var unknownOption: Pair<String, String>? = null
-  for (pair in nameAndToken) {
+
+  for (pair in nameAndToken.sortedWith { o1, o2 -> String.CASE_INSENSITIVE_ORDER.compare(o1.first, o2.first) }) {
     val myOption = optionService.getOption(pair.first)
     if (myOption != null) {
       optionsToShow.add(myOption)
@@ -220,9 +221,6 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
     val optionAsString = formatKnownOptionValue(option, scope)
     if (optionAsString.length >= colWidth) extra.add(optionAsString) else cols.add(optionAsString)
   }
-
-  cols.sort()
-  extra.sort()
 
   val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 20) 80 else it }
   val colCount = width / colWidth

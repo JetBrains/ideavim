@@ -531,9 +531,14 @@ abstract class VimTestCase {
     assertEquals(expected, selected)
   }
 
+  fun assertCommandOutput(command: String, expected: String) {
+    enterCommand(command)
+    assertExOutput(expected)
+  }
+
   fun assertExOutput(expected: String) {
     val actual = getInstance(fixture.editor).text
-    assertNotNull("No Ex output", actual)
+    assertNotNull(actual, "No Ex output")
     assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", testInfo, fixture.editor)
   }
