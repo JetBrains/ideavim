@@ -235,7 +235,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
 
     VimPlugin.getVimState().setIdeaJoinNotified(true);
-    VimPlugin.getNotifications(project).notifyAboutIdeaJoin();
+    VimPlugin.getNotifications(project).notifyAboutIdeaJoin(editor);
   }
 
   @Nullable

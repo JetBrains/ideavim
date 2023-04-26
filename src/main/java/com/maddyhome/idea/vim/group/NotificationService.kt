@@ -29,17 +29,17 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
 import java.io.File
@@ -81,7 +81,7 @@ internal class NotificationService(private val project: Project?) {
     notification.notify(project)
   }
 
-  fun notifyAboutIdeaJoin() {
+  fun notifyAboutIdeaJoin(editor: VimEditor) {
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -97,8 +97,8 @@ internal class NotificationService(private val project: Project?) {
         "set ideajoin",
         "ideajoin"
       ) {
-        // 'ideajoin' is global-local, so we'll set it as a global value
-        injector.optionGroup.setOptionValue(IjOptions.ideajoin, OptionScope.GLOBAL, VimInt.ONE)
+        // This is a global-local option. Setting it will always set the global value
+        injector.ijOptions(editor).ideajoin = true
       },
     )
 
