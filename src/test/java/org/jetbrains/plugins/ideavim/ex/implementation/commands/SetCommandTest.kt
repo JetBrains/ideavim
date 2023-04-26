@@ -42,12 +42,10 @@ class SetCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("set scrolloff&")
     assertEquals(0, options().scrolloff)
-    enterCommand("set scrolloff?")
-    assertExOutput("scrolloff=0\n")
+    assertCommandOutput("set scrolloff?", "scrolloff=0\n")
     enterCommand("set scrolloff=5")
     assertEquals(5, options().scrolloff)
-    enterCommand("set scrolloff?")
-    assertExOutput("scrolloff=5\n")
+    assertCommandOutput("set scrolloff?", "scrolloff=5\n")
   }
 
   @Test
@@ -55,12 +53,10 @@ class SetCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("set number&")
     assertEquals(0, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
-    enterCommand("set number?")
-    assertExOutput("nonumber\n")
+    assertCommandOutput("set number?", "nonumber\n")
     enterCommand("let &nu=1000")
     assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
-    enterCommand("set number?")
-    assertExOutput("  number\n")
+    assertCommandOutput("set number?", "  number\n")
   }
 
   @Test
@@ -115,25 +111,21 @@ class SetCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("set selection&")
     assertEquals("inclusive", options().selection)
-    enterCommand("set selection?")
-    assertExOutput("selection=inclusive\n")
+    assertCommandOutput("set selection?", "selection=inclusive\n")
     enterCommand("set selection=exclusive")
     assertEquals("exclusive", options().selection)
-    enterCommand("set selection?")
-    assertExOutput("selection=exclusive\n")
+    assertCommandOutput("set selection?", "selection=exclusive\n")
   }
 
   @Test
   fun `test show numbered value`() {
     configureByText("\n")
-    enterCommand("set so")
-    assertExOutput("scrolloff=0\n")
+    assertCommandOutput("set so", "scrolloff=0\n")
   }
 
   @Test
   fun `test show numbered value with question mark`() {
     configureByText("\n")
-    enterCommand("set so?")
-    assertExOutput("scrolloff=0\n")
+    assertCommandOutput("set so?", "scrolloff=0\n")
   }
 }
