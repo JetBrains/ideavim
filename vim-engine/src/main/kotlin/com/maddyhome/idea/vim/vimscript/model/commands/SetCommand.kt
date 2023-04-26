@@ -214,20 +214,18 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
   }
 
   val colWidth = 20
-  val cols = mutableListOf<String>()
+  val cells = mutableListOf<String>()
   val extra = mutableListOf<String>()
   for (option in optionsToShow) {
     val optionAsString = formatKnownOptionValue(option, scope)
-    if (optionAsString.length >= colWidth) extra.add(optionAsString) else cols.add(optionAsString)
+    if (optionAsString.length >= colWidth) extra.add(optionAsString) else cells.add(optionAsString)
   }
 
   // Note that this is the approximate width of the associated editor, not the ex output panel!
   // It excludes gutter width, for example
   val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 20) 80 else it }
   val colCount = width / colWidth
-  val height = ceil(cols.size.toDouble() / colCount.toDouble()).toInt()
-  var empty = cols.size % colCount
-  empty = if (empty == 0) colCount else empty
+  val height = ceil(cells.size.toDouble() / colCount.toDouble()).toInt()
 
   val output = buildString {
     if (showIntro) {
@@ -237,21 +235,15 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
     for (h in 0 until height) {
       val lengthAtStartOfLine = length
       for (c in 0 until colCount) {
-        if (h == height - 1 && c >= empty) {
-          break
-        }
+        val index = c * height + h
+        if (index < cells.size) {
+          val padLength = lengthAtStartOfLine + (c * colWidth) - length
+          for (i in 1..padLength) {
+            append(' ')
+          }
 
-        var pos = c * height + h
-        if (c > empty) {
-          pos -= c - empty
+          append(cells[index])
         }
-
-        val padLength = lengthAtStartOfLine + (c * colWidth) - length
-        for (i in 1 .. padLength) {
-          append(' ')
-        }
-
-        append(cols[pos])
       }
       appendLine()
     }
