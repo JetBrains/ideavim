@@ -29,6 +29,9 @@ usual beta standards.
 * [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
 * [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
 
+### Merged PRs:
+* [616](https://github.com/JetBrains/ideavim/pull/616) by [Matt Ellis](https://github.com/citizenmatt): Refactor/option delegated properties
+
 ## 2.2.0, 2023-04-20
 
 ### Features:
