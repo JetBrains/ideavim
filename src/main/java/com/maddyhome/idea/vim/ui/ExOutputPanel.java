@@ -68,7 +68,9 @@ public class ExOutputPanel extends JPanel {
     add(myScrollPane, BorderLayout.CENTER);
     add(myLabel, BorderLayout.SOUTH);
 
+    // Set the text area read only, and support wrap
     myText.setEditable(false);
+    myText.setLineWrap(true);
 
     myAdapter = new ComponentAdapter() {
       @Override
