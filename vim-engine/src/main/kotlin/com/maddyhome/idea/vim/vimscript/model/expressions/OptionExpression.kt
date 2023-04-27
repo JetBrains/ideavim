@@ -17,14 +17,14 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-public data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
+public data class OptionExpression(val scope: Scope?, val optionName: String) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", originalString)
     return when (scope) {
-      // TODO: Handle AUTO scope as well as explicitly global and explicitly local
       Scope.GLOBAL_VARIABLE -> injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
       Scope.LOCAL_VARIABLE -> injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(editor))
+      null -> injector.optionGroup.getOptionValue(option, OptionScope.AUTO(editor))
       else -> throw ExException("Invalid option scope")
     }
   }

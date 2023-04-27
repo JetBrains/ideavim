@@ -219,9 +219,14 @@ internal object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitOptionExpression(ctx: OptionExpressionContext): Expression {
-    // TODO: Support no specified scope, which should be treated the same as `:set`
-    // E.g. `:let &nu=1000` is equivalent to `:set`, while `&l:nu` is `:setlocal` and `&g:nu` is `:setglobal`
-    val result = OptionExpression(Scope.getByValue(ctx.option()?.text ?: "") ?: Scope.GLOBAL_VARIABLE, ctx.option().optionName().text)
+    val scope = ctx.option().optionScope()?.anyScope()?.let {
+      when {
+        it.G_LOWERCASE() != null -> Scope.GLOBAL_VARIABLE
+        it.L_LOWERCASE() != null -> Scope.LOCAL_VARIABLE
+        else -> null
+      }
+    }
+    val result = OptionExpression(scope, ctx.option().optionName().text)
     result.originalString = ctx.text
     return result
   }

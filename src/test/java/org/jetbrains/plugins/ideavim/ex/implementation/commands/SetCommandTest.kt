@@ -74,12 +74,12 @@ class SetCommandTest : VimTestCase() {
     assertEquals(0, injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
     assertCommandOutput("set number?", "nonumber\n")
 
-    // TODO: This should set both local and global value, like `:set` does, but currently only sets the global value
+    // Should have the same effect as `:set` (although `:set` doesn't allow assigning a number to a boolean)
+    // I.e. this sets the local value and the per-window "global" value
     enterCommand("let &nu=1000")
     assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
-    // TODO: Uncomment when `let &nu=1000` works like `:set`
-//    assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
-//    assertCommandOutput("set number?", "  number\n")
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertCommandOutput("set number?", "  number\n")
   }
 
   @Test
