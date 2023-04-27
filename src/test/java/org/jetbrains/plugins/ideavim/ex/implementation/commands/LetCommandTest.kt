@@ -8,8 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -23,69 +26,62 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test assignment to string`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = \"foo\""))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("foo\n")
+    enterCommand("let s = \"foo\"")
+    assertCommandOutput("echo s", "foo\n")
   }
 
   @Test
   fun `test assignment to number`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = 100"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("100\n")
+    enterCommand("let s = 100")
+    assertCommandOutput("echo s", "100\n")
   }
 
   @Test
   fun `test assignment to expression`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = 10 + 20 * 4"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("90\n")
+    enterCommand("let s = 10 + 20 * 4")
+    assertCommandOutput("echo s", "90\n")
   }
 
   @Test
   fun `test adding new pair to dictionary`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = {'key1' : 1}"))
-    typeText(commandToKeys("let s['key2'] = 2"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("{'key1': 1, 'key2': 2}\n")
+    enterCommand("let s = {'key1' : 1}")
+    enterCommand("let s['key2'] = 2")
+    assertCommandOutput("echo s", "{'key1': 1, 'key2': 2}\n")
   }
 
   @Test
   fun `test editing existing pair in dictionary`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = {'key1' : 1}"))
-    typeText(commandToKeys("let s['key1'] = 2"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("{'key1': 2}\n")
+    enterCommand("let s = {'key1' : 1}")
+    enterCommand("let s['key1'] = 2")
+    assertCommandOutput("echo s", "{'key1': 2}\n")
   }
 
   @Test
   fun `test assignment plus operator`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = 10"))
-    typeText(commandToKeys("let s += 5"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("15\n")
+    enterCommand("let s = 10")
+    enterCommand("let s += 5")
+    assertCommandOutput("echo s", "15\n")
   }
 
   @Test
   fun `test changing list item`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = [1, 1]"))
-    typeText(commandToKeys("let s[1] = 2"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("[1, 2]\n")
+    enterCommand("let s = [1, 1]")
+    enterCommand("let s[1] = 2")
+    assertCommandOutput("echo s", "[1, 2]\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test changing list item with index out of range`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = [1, 1]"))
-    typeText(commandToKeys("let s[2] = 2"))
+    enterCommand("let s = [1, 1]")
+    enterCommand("let s[2] = 2")
     assertPluginError(true)
     assertPluginErrorMessageContains("E684: list index out of range: 2")
   }
@@ -93,18 +89,17 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test changing list with sublist expression`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = [1, 2, 3]"))
-    typeText(commandToKeys("let s[0:1] = [5, 4]"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("[5, 4, 3]\n")
+    enterCommand("let s = [1, 2, 3]")
+    enterCommand("let s[0:1] = [5, 4]")
+    assertCommandOutput("echo s", "[5, 4, 3]\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test changing list with sublist expression and larger list`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = [1, 2, 3]"))
-    typeText(commandToKeys("let s[0:1] = [5, 4, 3, 2, 1]"))
+    enterCommand("let s = [1, 2, 3]")
+    enterCommand("let s[0:1] = [5, 4, 3, 2, 1]")
     assertPluginError(true)
     assertPluginErrorMessageContains("E710: List value has more items than targets")
   }
@@ -113,8 +108,8 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test changing list with sublist expression and smaller list`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = [1, 2, 3]"))
-    typeText(commandToKeys("let s[0:1] = [5]"))
+    enterCommand("let s = [1, 2, 3]")
+    enterCommand("let s[0:1] = [5]")
     assertPluginError(true)
     assertPluginErrorMessageContains("E711: List value does not have enough items")
   }
@@ -122,186 +117,230 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test changing list with sublist expression and undefined end`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = [1, 2, 3]"))
-    typeText(commandToKeys("let s[1:] = [5, 5, 5, 5]"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("[1, 5, 5, 5, 5]\n")
+    enterCommand("let s = [1, 2, 3]")
+    enterCommand("let s[1:] = [5, 5, 5, 5]")
+    assertCommandOutput("echo s", "[1, 5, 5, 5, 5]\n")
   }
 
   @Test
-  fun `test let option`() {
+  fun `test let option updates toggle option with number value`() {
     configureByText("\n")
-    typeText(commandToKeys("set noincsearch"))
-    assertFalse(options().incsearch)
-    typeText(commandToKeys("let &incsearch = 12"))
+    enterCommand("let &incsearch=1")
     assertTrue(options().incsearch)
-    typeText(commandToKeys("set noincsearch"))
+    enterCommand("let &incsearch = 0")
     assertFalse(options().incsearch)
   }
 
   @Test
-  fun `test let option2`() {
+  fun `test let option without scope behaves like set`() {
     configureByText("\n")
-    typeText(commandToKeys("set incsearch"))
-    assertTrue(options().incsearch)
-    typeText(commandToKeys("let &incsearch = 0"))
-    assertFalse(options().incsearch)
+
+    // 'number' is a local-to-window toggle option
+    enterCommand("let &number = 12")
+    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim))
+    assertEquals(12, globalValue.value)
+    assertEquals(12, localValue.value)
+    assertTrue(options().number)
+  }
+
+  @Test
+  fun `test let option with local scope behaves like setlocal`() {
+    configureByText("\n")
+
+    // 'number' is a local-to-window option
+    enterCommand("let &l:number = 12")
+    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim))
+    assertEquals(0, globalValue.value)
+    assertEquals(12, localValue.value)
+    assertTrue(options().number)
+  }
+
+  @Test
+  fun `test let option with global scope behaves like setglobal`() {
+    configureByText("\n")
+
+    // 'number' is a local-to-window option
+    enterCommand("let &g:number = 12")
+    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim))
+    assertEquals(12, globalValue.value)
+    assertEquals(0, localValue.value)
+    assertFalse(options().number)
+  }
+
+  @Test
+  fun `test let option with operator and no scope`() {
+    configureByText("\n")
+
+    // 'scroll' is a local to window number option
+    enterCommand("set scroll=42")
+    enterCommand("let &scroll+=10")
+    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.LOCAL(fixture.editor.vim))
+    assertEquals(52, globalValue.value)
+    assertEquals(52, localValue.value)
+    assertEquals(52, options().scroll)
+  }
+
+  @Test
+  fun `test let local option with operator`() {
+    configureByText("\n")
+
+    enterCommand("setlocal scroll=42")
+    enterCommand("let &l:scroll+=10")
+    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.LOCAL(fixture.editor.vim))
+    assertEquals(0, globalValue.value)
+    assertEquals(52, localValue.value)
+    assertEquals(52, options().scroll)
+  }
+
+  @Test
+  fun `test let global option with operator`() {
+    configureByText("\n")
+
+    enterCommand("setglobal scroll=42")
+    enterCommand("let &g:scroll+=10")
+    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.LOCAL(fixture.editor.vim))
+    assertEquals(52, globalValue.value)
+    assertEquals(0, localValue.value)
+    assertEquals(0, options().scroll)
   }
 
   @Test
   fun `test comment`() {
     configureByText("\n")
-    typeText(commandToKeys("let s = [1, 2, 3] \" my list for storing numbers"))
-    typeText(commandToKeys("echo s"))
-    assertExOutput("[1, 2, 3]\n")
+    enterCommand("let s = [1, 2, 3] \" my list for storing numbers")
+    assertCommandOutput("echo s", "[1, 2, 3]\n")
   }
 
   @Test
   fun `test vimScriptGlobalEnvironment`() {
     configureByText("\n")
-    typeText(commandToKeys("let g:WhichKey_ShowVimActions = \"true\""))
-    typeText(commandToKeys("echo g:WhichKey_ShowVimActions"))
-    assertExOutput("true\n")
+    enterCommand("let g:WhichKey_ShowVimActions = \"true\"")
+    assertCommandOutput("echo g:WhichKey_ShowVimActions", "true\n")
     assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
   }
 
   @Test
   fun `test list is passed by reference`() {
     configureByText("\n")
-    typeText(commandToKeys("let list = [1, 2, 3]"))
-    typeText(commandToKeys("let l2 = list"))
-    typeText(commandToKeys("let list += [4]"))
-    typeText(commandToKeys("echo l2"))
-
-    assertExOutput("[1, 2, 3, 4]\n")
+    enterCommand("let list = [1, 2, 3]")
+    enterCommand("let l2 = list")
+    enterCommand("let list += [4]")
+    assertCommandOutput("echo l2", "[1, 2, 3, 4]\n")
   }
 
   @Test
   fun `test list is passed by reference 2`() {
     configureByText("\n")
-    typeText(commandToKeys("let list = [1, 2, 3, []]"))
-    typeText(commandToKeys("let l2 = list"))
-    typeText(commandToKeys("let list[3] += [4]"))
-    typeText(commandToKeys("echo l2"))
-
-    assertExOutput("[1, 2, 3, [4]]\n")
+    enterCommand("let list = [1, 2, 3, []]")
+    enterCommand("let l2 = list")
+    enterCommand("let list[3] += [4]")
+    assertCommandOutput("echo l2", "[1, 2, 3, [4]]\n")
   }
 
   @Test
   fun `test list is passed by reference 3`() {
     configureByText("\n")
-    typeText(commandToKeys("let list = [1, 2, 3, []]"))
-    typeText(commandToKeys("let dict = {}"))
-    typeText(commandToKeys("let dict.l2 = list"))
-    typeText(commandToKeys("let list[3] += [4]"))
-    typeText(commandToKeys("echo dict.l2"))
-
-    assertExOutput("[1, 2, 3, [4]]\n")
+    enterCommand("let list = [1, 2, 3, []]")
+    enterCommand("let dict = {}")
+    enterCommand("let dict.l2 = list")
+    enterCommand("let list[3] += [4]")
+    assertCommandOutput("echo dict.l2", "[1, 2, 3, [4]]\n")
   }
 
   @Test
   fun `test list is passed by reference 4`() {
     configureByText("\n")
-    typeText(commandToKeys("let list = [1, 2, 3]"))
-    typeText(commandToKeys("let dict = {}"))
-    typeText(commandToKeys("let dict.l2 = list"))
-    typeText(commandToKeys("let dict.l2 += [4]"))
-    typeText(commandToKeys("echo dict.l2"))
-
-    assertExOutput("[1, 2, 3, 4]\n")
+    enterCommand("let list = [1, 2, 3]")
+    enterCommand("let dict = {}")
+    enterCommand("let dict.l2 = list")
+    enterCommand("let dict.l2 += [4]")
+    assertCommandOutput("echo dict.l2", "[1, 2, 3, 4]\n")
   }
 
   @Test
   fun `test number is passed by value`() {
     configureByText("\n")
-    typeText(commandToKeys("let number = 10"))
-    typeText(commandToKeys("let n2 = number"))
-    typeText(commandToKeys("let number += 2"))
-    typeText(commandToKeys("echo n2"))
-
-    assertExOutput("10\n")
+    enterCommand("let number = 10")
+    enterCommand("let n2 = number")
+    enterCommand("let number += 2")
+    assertCommandOutput("echo n2", "10\n")
   }
 
   @Test
   fun `test string is passed by value`() {
     configureByText("\n")
-    typeText(commandToKeys("let string = 'abc'"))
-    typeText(commandToKeys("let str2 = string"))
-    typeText(commandToKeys("let string .= 'd'"))
-    typeText(commandToKeys("echo str2"))
-
-    assertExOutput("abc\n")
+    enterCommand("let string = 'abc'")
+    enterCommand("let str2 = string")
+    enterCommand("let string .= 'd'")
+    assertCommandOutput("echo str2", "abc\n")
   }
 
   @Test
   fun `test dict is passed by reference`() {
     configureByText("\n")
-    typeText(commandToKeys("let dictionary = {}"))
-    typeText(commandToKeys("let dict2 = dictionary"))
-    typeText(commandToKeys("let dictionary.one = 1"))
-    typeText(commandToKeys("let dictionary['two'] = 2"))
-    typeText(commandToKeys("echo dict2"))
-
-    assertExOutput("{'one': 1, 'two': 2}\n")
+    enterCommand("let dictionary = {}")
+    enterCommand("let dict2 = dictionary")
+    enterCommand("let dictionary.one = 1")
+    enterCommand("let dictionary['two'] = 2")
+    assertCommandOutput("echo dict2", "{'one': 1, 'two': 2}\n")
   }
 
   @Test
   fun `test dict is passed by reference 2`() {
     configureByText("\n")
-    typeText(commandToKeys("let list = [1, 2, 3, {'a': 'b'}]"))
-    typeText(commandToKeys("let dict = list[3]"))
-    typeText(commandToKeys("let list[3].key = 'value'"))
-    typeText(commandToKeys("echo dict"))
-
-    assertExOutput("{'a': 'b', 'key': 'value'}\n")
+    enterCommand("let list = [1, 2, 3, {'a': 'b'}]")
+    enterCommand("let dict = list[3]")
+    enterCommand("let list[3].key = 'value'")
+    assertCommandOutput("echo dict", "{'a': 'b', 'key': 'value'}\n")
   }
 
   @Test
   fun `test numbered register`() {
     configureByText("\n")
-    typeText(commandToKeys("let @4 = 'inumber register works'"))
-    typeText(commandToKeys("echo @4"))
-    assertExOutput("inumber register works\n")
+    enterCommand("let @4 = 'inumber register works'")
+    assertCommandOutput("echo @4", "inumber register works\n")
 
-    typeText(injector.parser.parseKeys("@4"))
+    typeText("@4")
     assertState("number register works\n")
   }
 
   @Test
   fun `test lowercase letter register`() {
     configureByText("\n")
-    typeText(commandToKeys("let @o = 'ilowercase letter register works'"))
-    typeText(commandToKeys("echo @o"))
-    assertExOutput("ilowercase letter register works\n")
+    enterCommand("let @o = 'ilowercase letter register works'")
+    assertCommandOutput("echo @o", "ilowercase letter register works\n")
 
-    typeText(injector.parser.parseKeys("@o"))
+    typeText("@o")
     assertState("lowercase letter register works\n")
   }
 
   @Test
   fun `test uppercase letter register`() {
     configureByText("\n")
-    typeText(commandToKeys("let @O = 'iuppercase letter register works'"))
-    typeText(commandToKeys("echo @O"))
-    assertExOutput("iuppercase letter register works\n")
+    enterCommand("let @O = 'iuppercase letter register works'")
+    assertCommandOutput("echo @O", "iuppercase letter register works\n")
 
-    typeText(injector.parser.parseKeys("@O"))
+    typeText("@O")
     assertState("uppercase letter register works\n")
-    typeText(injector.parser.parseKeys("<Esc>"))
+    typeText("<Esc>")
 
-    typeText(commandToKeys("let @O = '!'"))
-    typeText(commandToKeys("echo @O"))
-    assertExOutput("iuppercase letter register works!\n")
+    enterCommand("let @O = '!'")
+    assertCommandOutput("echo @O", "iuppercase letter register works!\n")
   }
 
   @Test
   fun `test unnamed register`() {
     configureByText("\n")
-    typeText(commandToKeys("let @\" = 'iunnamed register works'"))
-    typeText(commandToKeys("echo @\""))
-    assertExOutput("iunnamed register works\n")
+    enterCommand("let @\" = 'iunnamed register works'")
+    assertCommandOutput("echo @\"", "iunnamed register works\n")
 
-    typeText(injector.parser.parseKeys("@\""))
+    typeText("@\"")
     assertState("unnamed register works\n")
   }
 
@@ -309,7 +348,7 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test define script variable with command line context`() {
     configureByText("\n")
-    typeText(commandToKeys("let s:my_var = 'oh, hi Mark'"))
+    enterCommand("let s:my_var = 'oh, hi Mark'")
     assertPluginError(true)
     assertPluginErrorMessageContains("E461: Illegal variable name: s:my_var")
   }
@@ -318,7 +357,7 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test define local variable with command line context`() {
     configureByText("\n")
-    typeText(commandToKeys("let l:my_var = 'oh, hi Mark'"))
+    enterCommand("let l:my_var = 'oh, hi Mark'")
     assertPluginError(true)
     assertPluginErrorMessageContains("E461: Illegal variable name: l:my_var")
   }
@@ -327,7 +366,7 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test define function variable with command line context`() {
     configureByText("\n")
-    typeText(commandToKeys("let a:my_var = 'oh, hi Mark'"))
+    enterCommand("let a:my_var = 'oh, hi Mark'")
     assertPluginError(true)
     assertPluginErrorMessageContains("E461: Illegal variable name: a:my_var")
   }
