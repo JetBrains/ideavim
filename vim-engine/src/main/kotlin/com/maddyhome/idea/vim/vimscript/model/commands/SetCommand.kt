@@ -40,33 +40,38 @@ import kotlin.math.ceil
  * see "h :set"
  */
 @ExCommand(command = "se[t]")
-public data class SetCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+public data class SetCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
+  override fun getScope(editor: VimEditor): OptionScope = OptionScope.AUTO(editor)
+}
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val result = parseOptionLine(editor, argument, OptionScope.AUTO(editor), failOnBad = true)
-    return if (result) {
-      ExecutionResult.Success
-    } else {
-      ExecutionResult.Error
-    }
-  }
+@ExCommand(command = "setg[lobal]")
+public data class SetglobalCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
+  override fun getScope(editor: VimEditor): OptionScope = OptionScope.GLOBAL
 }
 
 @ExCommand(command = "setl[ocal]")
-public data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+public data class SetlocalCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
+  override fun getScope(editor: VimEditor): OptionScope = OptionScope.LOCAL(editor)
+}
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    return if (parseOptionLine(editor, argument, OptionScope.LOCAL(editor), failOnBad = true)) {
+public abstract class SetCommandBase(ranges: Ranges, argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments
+  ): ExecutionResult {
+    return if (parseOptionLine(editor, commandArgument, getScope(editor), failOnBad = true)) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error
     }
   }
-}
 
-// TODO: Implement SetGlobalCommand
+  protected abstract fun getScope(editor: VimEditor): OptionScope
+}
 
 /**
  * This parses a set of :set commands. The following types of commands are supported:
@@ -136,7 +141,7 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
       }
     }
 
-    // Look for the = or : first
+    // Look for the `=` or `:` first
     var eq = token.indexOf('=')
     if (eq == -1) {
       eq = token.indexOf(':')

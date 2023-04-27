@@ -110,7 +110,7 @@ command:
     (WS | COLON)* range? (WS | COLON)*
       name = (
         Y_LOWERCASE | YANK_LINES | X_LOWERCASE | WRITE_QUIT | WRITE_PREVIOUS | WRITE_NEXT | W_LOWERCASE | WRITE
-        | WRITE_ALL | U_LOWERCASE | UNDO | TAB_ONLY | TAB_CLOSE | SOURCE | V_SPLIT | SPLIT | SHELL | SET_HANDLER | SET | SETLOCAL
+        | WRITE_ALL | U_LOWERCASE | UNDO | TAB_ONLY | TAB_CLOSE | SOURCE | V_SPLIT | SPLIT | SHELL | SET_HANDLER | SET | SETGLOBAL | SETLOCAL
         | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | AT | REDO | Q_LOWERCASE | QUIT | PUT_LINES | PROMPT_FIND
         | PROMPT_REPLACE | P_LOWERCASE | P_UPPERCASE | PRINT | PREVIOUS_TAB | N_UPPERCASE | PREVIOUS_FILE | PLUG
         | ONLY | NO_HL_SEARCH | NEXT_TAB | N_LOWERCASE | NEXT_FILE | M_LOWERCASE | MOVE_TEXT | MARKS | K_LOWERCASE
@@ -484,6 +484,7 @@ existingCommands:       RETURN
                     |   SELECT_FIRST_FILE
                     |   SELECT_LAST_FILE
                     |   SET
+                    |   SETGLOBAL
                     |   SETLOCAL
                     |   SET_HANDLER
                     |   SHELL
@@ -658,6 +659,7 @@ SELECT_FILE:            'argu' | 'argum' | 'argume' | 'argumen' | 'argument';
 SELECT_FIRST_FILE:      'fir' | 'firs' | 'first';
 SELECT_LAST_FILE:       'la' | 'las' | 'last';
 SET:                    'se' | 'set';
+SETGLOBAL:              'setg' | 'setgl' | 'setglo' | 'setglob' | 'setgloba' | 'setglobal';
 SETLOCAL:               'setl' | 'setlo' | 'setloc' | 'setloca' | 'setlocal';
 SET_HANDLER:            'sethandler';
 SHELL:                  'sh' | 'she' | 'shel' | 'shell';

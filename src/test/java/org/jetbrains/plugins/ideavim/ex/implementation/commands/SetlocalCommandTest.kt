@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
-import com.maddyhome.idea.vim.vimscript.model.commands.SetLocalCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SetlocalCommand
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -44,7 +44,7 @@ class SetlocalCommandTest : VimTestCase() {
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("setlocal nu")
-    assertTrue(command is SetLocalCommand)
+    assertTrue(command is SetlocalCommand)
     assertEquals("nu", command.argument)
   }
 
