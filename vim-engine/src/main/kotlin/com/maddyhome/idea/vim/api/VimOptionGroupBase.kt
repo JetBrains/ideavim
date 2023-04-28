@@ -8,9 +8,11 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
@@ -24,6 +26,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private val globalOptionsAccessor = GlobalOptions()
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val globalParsedValues = mutableMapOf<String, Any>()
+  private val globalOptionListeners = mutableMapOf<String, MutableSet<GlobalOptionChangeListener>>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val parsedEffectiveValueKey = Key<MutableMap<String, Any>>("parsedEffectiveOptionValues")
 
@@ -126,6 +129,10 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
       OptionScope.GLOBAL -> setGlobalOptionValue(option, value)
     }
 
+    if (option.declaredScope == GLOBAL) {
+      onGlobalOptionValueChanged(option)
+    }
+
     if (oldValue != value) {
       option.onChanged(scope, oldValue)
     }
@@ -196,6 +203,21 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun removeOption(optionName: String) {
     Options.removeOption(optionName)
+  }
+
+  override fun <T : VimDataType> addGlobalOptionChangeListener(
+    option: Option<T>,
+    listener: GlobalOptionChangeListener
+  ) {
+    check(option.declaredScope == OptionDeclaredScope.GLOBAL)
+    getGlobalOptionListeners(option).add(listener)
+  }
+
+  override fun <T : VimDataType> removeGlobalOptionChangeListener(
+    option: Option<T>,
+    listener: GlobalOptionChangeListener
+  ) {
+    getGlobalOptionListeners(option).remove(listener)
   }
 
   override fun <T : VimDataType> addListener(
@@ -413,6 +435,16 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     // We set the value via Option<T> so it's safe to cast to T
     @Suppress("UNCHECKED_CAST")
     return options[option.name] as? T
+  }
+
+
+  private fun <T : VimDataType> getGlobalOptionListeners(option: Option<T>) =
+    globalOptionListeners.getOrPut(option.name) { mutableSetOf() }
+
+  private fun <T : VimDataType> onGlobalOptionValueChanged(option: Option<T>) {
+    globalOptionListeners[option.name]?.forEach {
+      it.onGlobalOptionChanged()
+    }
   }
 
 

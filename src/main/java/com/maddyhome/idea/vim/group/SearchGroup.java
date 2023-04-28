@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionChangeListener;
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
@@ -70,18 +70,18 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 })
 public class SearchGroup extends VimSearchGroupBase implements PersistentStateComponent<Element> {
   public SearchGroup() {
-    VimPlugin.getOptionGroup().addListener(Options.hlsearch, oldValue -> {
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch, () -> {
       resetShowSearchHighlight();
       forceUpdateSearchHighlights();
-    }, false);
+    });
 
-    final OptionChangeListener<VimInt> updateHighlightsIfVisible = oldValue -> {
+    final GlobalOptionChangeListener updateHighlightsIfVisible = () -> {
       if (showSearchHighlight) {
         forceUpdateSearchHighlights();
       }
     };
-    VimPlugin.getOptionGroup().addListener(Options.ignorecase, updateHighlightsIfVisible, false);
-    VimPlugin.getOptionGroup().addListener(Options.smartcase, updateHighlightsIfVisible, false);
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.ignorecase, updateHighlightsIfVisible);
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.smartcase, updateHighlightsIfVisible);
   }
 
   public void turnOn() {

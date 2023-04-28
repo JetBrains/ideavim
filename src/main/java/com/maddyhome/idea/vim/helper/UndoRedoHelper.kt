@@ -31,9 +31,12 @@ import com.maddyhome.idea.vim.undo.UndoRedoBase
 @Service
 internal class UndoRedoHelper : UndoRedoBase() {
   init {
-    injector.optionGroup.addListener(IjOptions.oldundo, {
+    fun onOldUndoChanged() {
       UndoManagerImpl.ourNeverAskUser = !injector.globalIjOptions().oldundo
-    }, true)
+    }
+
+    injector.optionGroup.addGlobalOptionChangeListener(IjOptions.oldundo, ::onOldUndoChanged)
+    onOldUndoChanged()
   }
 
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {

@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.IjVimOptionGroup
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -205,6 +206,32 @@ internal class OptionsTracer(
       trace.requestedKeys += option.name
     }
     return vimOptionGroup.getOptionValue(option, scope)
+  }
+
+  override fun <T : VimDataType> addGlobalOptionChangeListener(
+    option: Option<T>,
+    listener: GlobalOptionChangeListener
+  ) {
+    ignoreFlag.set(true)
+    try {
+      vimOptionGroup.addGlobalOptionChangeListener(option, listener)
+    }
+    finally {
+      ignoreFlag.set(false)
+    }
+  }
+
+  override fun <T : VimDataType> removeGlobalOptionChangeListener(
+    option: Option<T>,
+    listener: GlobalOptionChangeListener
+  ) {
+    ignoreFlag.set(true)
+    try {
+      vimOptionGroup.removeGlobalOptionChangeListener(option, listener)
+    }
+    finally {
+      ignoreFlag.set(false)
+    }
   }
 
   override fun <T : VimDataType> addListener(option: Option<T>, listener: OptionChangeListener<T>, executeOnAdd: Boolean) {
