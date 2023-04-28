@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
@@ -26,7 +25,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private val globalOptionsAccessor = GlobalOptions()
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val globalParsedValues = mutableMapOf<String, Any>()
-  private val globalOptionListeners = mutableMapOf<String, MutableSet<GlobalOptionChangeListener>>()
+  private val globalOptionListeners = MultiSet<String, GlobalOptionChangeListener>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val parsedEffectiveValueKey = Key<MutableMap<String, Any>>("parsedEffectiveOptionValues")
 
@@ -209,15 +208,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     option: Option<T>,
     listener: GlobalOptionChangeListener
   ) {
-    check(option.declaredScope == OptionDeclaredScope.GLOBAL)
-    getGlobalOptionListeners(option).add(listener)
+    check(option.declaredScope == GLOBAL)
+    globalOptionListeners.add(option.name, listener)
   }
 
   override fun <T : VimDataType> removeGlobalOptionChangeListener(
     option: Option<T>,
     listener: GlobalOptionChangeListener
   ) {
-    getGlobalOptionListeners(option).remove(listener)
+    globalOptionListeners.remove(option.name, listener)
   }
 
   override fun <T : VimDataType> addListener(
@@ -438,9 +437,6 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
 
-  private fun <T : VimDataType> getGlobalOptionListeners(option: Option<T>) =
-    globalOptionListeners.getOrPut(option.name) { mutableSetOf() }
-
   private fun <T : VimDataType> onGlobalOptionValueChanged(option: Option<T>) {
     globalOptionListeners[option.name]?.forEach {
       it.onGlobalOptionChanged()
@@ -460,5 +456,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
         throw IllegalStateException("Unexpected option declared scope for parsed effective storage: ${option.name}")
       }
     }
+  }
+}
+
+private class MultiSet<K, V> : HashMap<K, MutableSet<V>>() {
+  fun add(key: K, value: V) {
+    getOrPut(key) { mutableSetOf() }.add(value)
+  }
+
+  fun remove(key: K, value: V) {
+    this[key]?.remove(value)
   }
 }
