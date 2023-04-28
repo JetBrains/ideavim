@@ -13,6 +13,8 @@ import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -58,7 +60,6 @@ internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
 
 internal object GuicursorChangeListener : OptionChangeListener<VimString> {
   override fun processGlobalValueChange(oldValue: VimString?) {
-    AttributesCache.clear()
     localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
   }
 }
@@ -118,11 +119,18 @@ private val BLOCK = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NOR
 private val BAR = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
 
 private object AttributesCache {
+  private var lastGuicursorValue = ""
   private val cache = mutableMapOf<GuiCursorMode, CaretVisualAttributes>()
 
   fun getCaretVisualAttributes(editor: Editor): CaretVisualAttributes {
     if (isBlockCursorOverride()) {
       return BLOCK
+    }
+
+    val guicursor = injector.globalOptions().guicursor.value
+    if (lastGuicursorValue != guicursor) {
+      cache.clear()
+      lastGuicursorValue = guicursor
     }
 
     val guicursorMode = editor.guicursorMode()
@@ -137,8 +145,6 @@ private object AttributesCache {
       CaretVisualAttributes(colour, CaretVisualAttributes.Weight.NORMAL, shape, attributes.thickness / 100F)
     }
   }
-
-  fun clear() = cache.clear()
 }
 
 @TestOnly
