@@ -27,8 +27,7 @@ import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import java.awt.event.MouseEvent
@@ -65,8 +64,8 @@ internal object ShowCmd {
   }
 }
 
-internal object ShowCmdOptionChangeListener : OptionChangeListener<VimInt> {
-  override fun processGlobalValueChange(oldValue: VimInt?) {
+internal object ShowCmdOptionChangeListener : GlobalOptionChangeListener {
+  override fun onGlobalOptionChanged() {
     ShowCmd.update()
 
     val extension = StatusBarWidgetFactory.EP_NAME.findExtension(ShowCmdStatusBarWidgetFactory::class.java) ?: return

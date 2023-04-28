@@ -8,8 +8,10 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -119,6 +121,27 @@ public interface VimOptionGroup {
    * @param optionName option name or alias
    */
   public fun removeOption(optionName: String)
+
+  /**
+   * Add a listener for when a global option value changes
+   *
+   * This listener will get called once when a global option's value changes. It is intended for non-editor features,
+   * such as updating the status bar widget for `'showcmd'` or updating the default register when `'clipboard'` changes.
+   * It can only be used for global options, and will not be called when the global value of a local-to-buffer or
+   * local-to-window option is changed. It is also not called when a global-local option is changed.
+   *
+   * @param option  The option to listen to for changes. It must be a [OptionDeclaredScope.GLOBAL] option
+   * @param listener  The listener that will be invoked when the global option changes
+   */
+  public fun <T : VimDataType> addGlobalOptionChangeListener(option: Option<T>, listener: GlobalOptionChangeListener)
+
+  /**
+   * Remove a global option change listener
+   *
+   * @param option  The global option that has previously been subscribed to
+   * @param listener  The listener to remove
+   */
+  public fun <T : VimDataType> removeGlobalOptionChangeListener(option: Option<T>, listener: GlobalOptionChangeListener)
 
   /**
    * Adds a listener to the option.

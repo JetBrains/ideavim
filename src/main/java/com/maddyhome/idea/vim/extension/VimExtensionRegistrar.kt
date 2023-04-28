@@ -15,12 +15,10 @@ import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.statistic.PluginState
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 internal object VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
@@ -61,19 +59,14 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     registerAliases(extensionBean)
     val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
     VimPlugin.getOptionGroup().addOption(option)
-    VimPlugin.getOptionGroup().addListener(
-      option,
-      object : OptionChangeListener<VimInt> {
-        override fun processGlobalValueChange(oldValue: VimInt?) {
-          if (injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean()) {
-            initExtension(extensionBean, name)
-            PluginState.enabledExtensions.add(name)
-          } else {
-            extensionBean.instance.dispose()
-          }
-        }
-      },
-    )
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(option) {
+      if (injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean()) {
+        initExtension(extensionBean, name)
+        PluginState.enabledExtensions.add(name)
+      } else {
+        extensionBean.instance.dispose()
+      }
+    }
   }
 
   private fun getAbbrev(name: String): String {

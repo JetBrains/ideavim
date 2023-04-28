@@ -114,7 +114,7 @@ internal object VimListenerManager {
       optionGroup.addListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.addListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.addListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
-      optionGroup.addListener(Options.showcmd, ShowCmdOptionChangeListener)
+      optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.addListener(Options.guicursor, GuicursorChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
@@ -129,7 +129,7 @@ internal object VimListenerManager {
       optionGroup.removeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.removeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.removeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
-      optionGroup.removeListener(Options.showcmd, ShowCmdOptionChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeListener(Options.guicursor, GuicursorChangeListener)
     }
   }
