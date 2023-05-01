@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -144,6 +145,41 @@ public interface VimOptionGroup {
   public fun <T : VimDataType> removeGlobalOptionChangeListener(option: Option<T>, listener: GlobalOptionChangeListener)
 
   /**
+   * Add a listener for when the effective value of an option is changed
+   *
+   * This listener will be called for all editors that are affected by the value change. For global options, this is all
+   * open editors. For local-to-buffer options, this is all editors for the buffer, and for local-to-window options,
+   * this will be the single editor for the window.
+   *
+   * Global-local options are slightly more complicated. If the global value is changed, all editors that are using the
+   * global value are notified - any editor that has an overriding local value is not notified. If the local value is
+   * changed, then all editors for the buffer or window will be notified. When the effective value of a global-local
+   * option is changed with `:set`, both the global and local values are updated. In this case, all editors that are
+   * unset are notified, as are the editors affected by the local value update (the editors associated with the buffer
+   * or window)
+   *
+   * Note that the listener is not called for global value changes to local options.
+   *
+   * @param option  The option to listen to for changes
+   * @param listener  The listener to call when the effective value chagnse.
+   */
+  public fun <T : VimDataType> addEffectiveOptionValueChangeListener(
+    option: Option<T>,
+    listener: EffectiveOptionValueChangeListener,
+  )
+
+  /**
+   * Remove an effective option value change listener
+   *
+   * @param option  The option that has previously been subscribed to
+   * @param listener  The listener to remove
+   */
+  public fun <T : VimDataType> removeEffectiveOptionValueChangeListener(
+    option: Option<T>,
+    listener: EffectiveOptionValueChangeListener
+  )
+
+  /**
    * Adds a listener to the option.
    * @param option the option
    * @param listener option listener
@@ -193,6 +229,15 @@ public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, sco
  */
 public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionScope) {
   setOptionValue(option, scope, option.defaultValue)
+}
+
+/**
+ *
+ */
+public fun <T: VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
+  check(option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
+    || option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
+  return getOptionValue(option, OptionScope.LOCAL(editor)) == option.unsetValue
 }
 
 /**
