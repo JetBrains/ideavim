@@ -13,10 +13,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorGutter;
-import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.LineNumberConverter;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
@@ -25,6 +22,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
@@ -309,6 +307,15 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   @Override
   public Collection<VimEditor> localEditors() {
     return HelperKt.localEditors().stream()
+      .map(IjVimEditor::new)
+      .collect(Collectors.toList());
+  }
+
+  @NotNull
+  @Override
+  public Collection<VimEditor> localEditors(@NotNull VimDocument buffer) {
+    final Document document = ((IjVimDocument)buffer).getDocument();
+    return HelperKt.localEditors(document).stream()
       .map(IjVimEditor::new)
       .collect(Collectors.toList());
   }
