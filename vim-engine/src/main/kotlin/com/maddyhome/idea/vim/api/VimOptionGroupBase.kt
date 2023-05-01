@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
@@ -122,16 +121,10 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T) {
     option.checkIfValueValid(value, value.asString())
 
-    val oldValue = getOptionValue(option, scope)
-
     when (scope) {
       is OptionScope.AUTO -> setEffectiveOptionValue(option, scope.editor, value)
       is OptionScope.LOCAL -> setLocalOptionValue(option, scope.editor, value)
       OptionScope.GLOBAL -> setGlobalOptionValue(option, value)
-    }
-
-    if (oldValue != value) {
-      option.onChanged(scope, oldValue)
     }
   }
 
@@ -231,21 +224,6 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     listener: EffectiveOptionValueChangeListener
   ) {
     effectiveOptionValueListeners.remove(option.name, listener)
-  }
-
-  override fun <T : VimDataType> addListener(
-    option: Option<T>,
-    listener: OptionChangeListener<T>,
-    executeOnAdd: Boolean
-  ) {
-    option.addOptionChangeListener(listener)
-    if (executeOnAdd) {
-      listener.processGlobalValueChange(getGlobalOptionValue(option))
-    }
-  }
-
-  override fun <T : VimDataType> removeListener(option: Option<T>, listener: OptionChangeListener<T>) {
-    option.removeOptionChangeListener(listener)
   }
 
   final override fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {

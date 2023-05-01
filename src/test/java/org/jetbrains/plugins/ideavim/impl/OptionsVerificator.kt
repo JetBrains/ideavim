@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
@@ -257,24 +256,6 @@ internal class OptionsTracer(
       vimOptionGroup.removeEffectiveOptionValueChangeListener(option, listener)
     }
     finally {
-      ignoreFlag.set(false)
-    }
-  }
-
-  override fun <T : VimDataType> addListener(option: Option<T>, listener: OptionChangeListener<T>, executeOnAdd: Boolean) {
-    ignoreFlag.set(true)
-    try {
-      vimOptionGroup.addListener(option, listener, executeOnAdd)
-    } finally {
-      ignoreFlag.set(false)
-    }
-  }
-
-  override fun <T : VimDataType> removeListener(option: Option<T>, listener: OptionChangeListener<T>) {
-    ignoreFlag.set(true)
-    try {
-      vimOptionGroup.removeListener(option, listener)
-    } finally {
       ignoreFlag.set(false)
     }
   }
