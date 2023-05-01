@@ -39,14 +39,3 @@ public fun interface GlobalOptionChangeListener {
 public fun interface EffectiveOptionValueChangeListener {
   public fun onEffectiveValueChanged(editor: VimEditor)
 }
-
-public fun interface OptionChangeListener<in T> {
-
-  public fun processGlobalValueChange(oldValue: T?)
-}
-
-// options that can change their values in specific editors
-public interface LocalOptionChangeListener<in T> : OptionChangeListener<T> {
-
-  public fun processLocalValueChange(oldValue: T?, editor: VimEditor)
-}

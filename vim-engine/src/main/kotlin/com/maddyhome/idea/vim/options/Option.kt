@@ -25,9 +25,9 @@ import java.util.*
  * A note on variance: derived classes will also use a derived type of [VimDataType], which means that e.g.
  * `StringOption` would derive from `Option<VimString>`, which is not assignable to `Option<VimDataType>`. This can work
  * if we make the type covariant (e.g. `Option<out T : VimDataType>`) however the type is not covariant - it's not
- * solely a producer ([onChanged] is a consumer, for example), so we must keep [T] as invariant. Furthermore, if we make
- * it covariant, then we also lose some type safety, with something like `setValue(numberOption, VimString("foo"))` not
- * treated as an error.
+ * solely a producer ([checkIfValueValid] is a consumer, for example), so we must keep [T] as invariant. Furthermore,
+ * if we make it covariant, then we also lose some type safety, with something like
+ * `setValue(numberOption, VimString("foo"))` not treated as an error.
  *
  * We also want to avoid a sealed hierarchy, since we create object instances with custom validation for some options.
  *
@@ -42,8 +42,6 @@ public abstract class Option<T : VimDataType>(public val name: String,
                                               public val abbrev: String,
                                               defaultValue: T,
                                               public val unsetValue: T) {
-  private val listeners = mutableSetOf<OptionChangeListener<T>>()
-
   private var defaultValueField = defaultValue
 
   public open val defaultValue: T
@@ -51,38 +49,6 @@ public abstract class Option<T : VimDataType>(public val name: String,
 
   internal fun overrideDefaultValue(newDefaultValue: T) {
     defaultValueField = newDefaultValue
-  }
-
-  public open fun addOptionChangeListener(listener: OptionChangeListener<T>) {
-    listeners.add(listener)
-  }
-
-  public open fun removeOptionChangeListener(listener: OptionChangeListener<T>) {
-    listeners.remove(listener)
-  }
-
-  public fun onChanged(scope: OptionScope, oldValue: T) {
-    for (listener in listeners) {
-      when (scope) {
-        is OptionScope.AUTO -> {
-          if (listener is LocalOptionChangeListener && declaredScope != OptionDeclaredScope.GLOBAL) {
-            // TODO: What happens with a global-local option that has no local value?
-            listener.processLocalValueChange(oldValue, scope.editor)
-          }
-          else {
-            listener.processGlobalValueChange(oldValue)
-          }
-        }
-        is OptionScope.GLOBAL -> listener.processGlobalValueChange(oldValue)
-        is OptionScope.LOCAL -> {
-          if (listener is LocalOptionChangeListener) {
-            listener.processLocalValueChange(oldValue, scope.editor)
-          } else {
-            listener.processGlobalValueChange(oldValue)
-          }
-        }
-      }
-    }
   }
 
   // todo 1.9 should return Result with exceptions

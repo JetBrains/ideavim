@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringListOption
@@ -178,23 +177,6 @@ public interface VimOptionGroup {
     option: Option<T>,
     listener: EffectiveOptionValueChangeListener
   )
-
-  /**
-   * Adds a listener to the option.
-   * @param option the option
-   * @param listener option listener
-   * @param executeOnAdd whether execute listener after the method call or not
-   */
-  public fun <T : VimDataType> addListener(option: Option<T>,
-                                           listener: OptionChangeListener<T>,
-                                           executeOnAdd: Boolean = false)
-
-  /**
-   * Remove the listener from the option.
-   * @param option the option
-   * @param listener option listener
-   */
-  public fun <T : VimDataType> removeListener(option: Option<T>, listener: OptionChangeListener<T>)
 
   /**
    * Override the original default value of the option with an implementation specific value
