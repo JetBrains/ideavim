@@ -56,7 +56,6 @@ import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.editorMode
@@ -129,7 +128,6 @@ abstract class VimTestCase {
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
     injector.globalOptions().ideastrictmode = true
-    GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
     clearClipboard()
 

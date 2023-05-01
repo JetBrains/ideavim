@@ -24,8 +24,7 @@ import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -254,7 +253,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject(), editor);
   }
 
-  public static class NumberChangeListener implements LocalOptionChangeListener<VimInt> {
+  public static class NumberChangeListener implements EffectiveOptionValueChangeListener {
     public static NumberChangeListener INSTANCE = new NumberChangeListener();
 
     @Contract(pure = true)
@@ -262,16 +261,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
 
     @Override
-    public void processGlobalValueChange(@Nullable VimInt oldValue) {
-      for (Editor editor : HelperKt.localEditors()) {
-        if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
-          updateLineNumbers(editor);
-        }
-      }
-    }
-
-    @Override
-    public void processLocalValueChange(@Nullable VimInt oldValue, @NotNull VimEditor editor) {
+    public void onEffectiveValueChanged(@NotNull VimEditor editor) {
       Editor ijEditor = ((IjVimEditor)editor).getEditor();
 
       if (UserDataManager.getVimEditorGroup(ijEditor) && supportsVimLineNumbers(ijEditor)) {

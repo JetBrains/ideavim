@@ -13,15 +13,16 @@ import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.TestOnly
 import java.awt.Color
 
@@ -58,9 +59,9 @@ internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
     it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
   }
 
-internal object GuicursorChangeListener : OptionChangeListener<VimString> {
-  override fun processGlobalValueChange(oldValue: VimString?) {
-    localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
+internal object GuicursorChangeListener : EffectiveOptionValueChangeListener {
+  override fun onEffectiveValueChanged(editor: VimEditor) {
+    editor.ij.updatePrimaryCaretVisualAttributes()
   }
 }
 

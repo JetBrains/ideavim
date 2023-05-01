@@ -24,12 +24,10 @@ import com.maddyhome.idea.vim.helper.ScrollViewHelper
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
-import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.vimEditorGroup
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.LocalOptionChangeListener
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -258,16 +256,8 @@ internal class ScrollGroup : VimScrollGroup {
     TOP, MIDDLE, BOTTOM
   }
 
-  object ScrollOptionsChangeListener : LocalOptionChangeListener<VimInt> {
-    override fun processGlobalValueChange(oldValue: VimInt?) {
-      for (editor in localEditors()) {
-        if (editor.vimEditorGroup) {
-          ScrollViewHelper.scrollCaretIntoView(editor)
-        }
-      }
-    }
-
-    override fun processLocalValueChange(oldValue: VimInt?, editor: VimEditor) {
+  object ScrollOptionsChangeListener : EffectiveOptionValueChangeListener {
+    override fun onEffectiveValueChanged(editor: VimEditor) {
       editor.ij.apply {
         if (vimEditorGroup) {
           ScrollViewHelper.scrollCaretIntoView(this)
