@@ -111,11 +111,11 @@ internal object VimListenerManager {
       }
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.addListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
-      optionGroup.addListener(Options.guicursor, GuicursorChangeListener)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
 
@@ -126,11 +126,11 @@ internal object VimListenerManager {
       EventFacade.getInstance().restoreTypedActionHandler()
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.removeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
-      optionGroup.removeListener(Options.guicursor, GuicursorChangeListener)
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
     }
   }
 
