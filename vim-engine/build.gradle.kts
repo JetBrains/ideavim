@@ -33,7 +33,7 @@ dependencies {
 
     ksp(project(":annotation-processors"))
     implementation(project(":annotation-processors"))
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0")
+    implementation("org.yaml:snakeyaml:2.0")
 }
 
 tasks {
