@@ -13,7 +13,7 @@ import java.io.File
 
 class FileWriter {
   fun generateResourceFile(fileName: String, content: String, environment: SymbolProcessorEnvironment) {
-    val resourcesDir = environment.options["resourcesDir"]
+    val resourcesDir = environment.options["generated_directory"]
     val file = File("$resourcesDir/$fileName")
     file.writeText(content)
   }

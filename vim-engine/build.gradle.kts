@@ -21,7 +21,8 @@ repositories {
 }
 
 ksp {
-  arg("resourcesDir", "$projectDir/src/main/resources")
+  arg("generated_directory", "$projectDir/src/main/resources")
+  arg("vimscript_functions_file", "engine_vimscript_functions.yaml")
 }
 
 dependencies {

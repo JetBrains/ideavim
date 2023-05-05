@@ -79,7 +79,8 @@ plugins {
 }
 
 ksp {
-  arg("resourcesDir", "$projectDir/src/main/resources")
+  arg("generated_directory", "$projectDir/src/main/resources")
+  arg("vimscript_functions_file", "intellij_vimscript_functions.yaml")
 }
 
 afterEvaluate {
