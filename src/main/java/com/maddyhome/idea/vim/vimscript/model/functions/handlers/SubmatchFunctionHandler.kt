@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
@@ -18,8 +19,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
+@VimscriptFunction(name = "submatch")
 internal class SubmatchFunctionHandler : FunctionHandler() {
-  override val name = "submatch"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2
 

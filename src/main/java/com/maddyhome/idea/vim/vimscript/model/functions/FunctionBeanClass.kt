@@ -17,18 +17,17 @@ import com.maddyhome.idea.vim.api.injector
 internal class FunctionBeanClass : BaseKeyedLazyInstance<FunctionHandler>() {
 
   @Attribute("implementation")
-  var implementation: String? = null
+  lateinit var implementation: String
 
   @Attribute("name")
-  var name: String? = null
+  lateinit var name: String
 
-  override fun getImplementationClassName(): String? = implementation
+  override fun getImplementationClassName(): String = implementation
 
   fun register() {
     if (this.pluginDescriptor.pluginId != VimPlugin.getPluginId()) {
       logger<FunctionHandler>().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: ${this.pluginDescriptor.pluginId}")
       return
     }
-    injector.functionService.addHandler(this)
   }
 }

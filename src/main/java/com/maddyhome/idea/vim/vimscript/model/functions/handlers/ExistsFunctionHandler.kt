@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -24,9 +25,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
+@VimscriptFunction(name = "exists")
 internal class ExistsFunctionHandler : FunctionHandler() {
-
-  override val name = "exists"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 

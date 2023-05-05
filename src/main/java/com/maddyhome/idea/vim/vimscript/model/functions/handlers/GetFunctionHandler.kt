@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
@@ -22,8 +23,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
+@VimscriptFunction(name = "get")
 internal class GetFunctionHandler : FunctionHandler() {
-  override val name: String = "get"
   override val minimumNumberOfArguments: Int = 2
   override val maximumNumberOfArguments: Int = 3
 

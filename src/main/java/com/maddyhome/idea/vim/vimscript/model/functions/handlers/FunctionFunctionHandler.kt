@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -22,8 +23,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
+@VimscriptFunction(name = "function")
 internal class FunctionFunctionHandler : FunctionHandler() {
-  override val name = "function"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 3
 
@@ -69,8 +70,8 @@ internal class FunctionFunctionHandler : FunctionHandler() {
   }
 }
 
+@VimscriptFunction(name = "funcref")
 internal class FuncrefFunctionHandler : FunctionHandler() {
-  override val name = "function"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 3
 

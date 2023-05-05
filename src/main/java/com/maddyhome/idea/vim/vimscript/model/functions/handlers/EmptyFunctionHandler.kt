@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -23,9 +24,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
+@VimscriptFunction(name = "empty")
 internal class EmptyFunctionHandler : FunctionHandler() {
-
-  override val name = "empty"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 1
 

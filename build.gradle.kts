@@ -74,6 +74,16 @@ plugins {
 
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
     id("com.dorongold.task-tree") version "2.1.1"
+
+    id("com.google.devtools.ksp") version "1.8.21-1.0.11"
+}
+
+ksp {
+  arg("resourcesDir", "$projectDir/src/main/resources")
+}
+
+afterEvaluate {
+  tasks.named("kspKotlin").configure { dependsOn("generateGrammarSource") }
 }
 
 // Import variables from gradle.properties file
@@ -117,6 +127,9 @@ dependencies {
     antlr("org.antlr:antlr4:$antlrVersion")
 
     api(project(":vim-engine"))
+
+    ksp(project(":annotation-processors"))
+    implementation(project(":annotation-processors"))
 
     testApi("com.squareup.okhttp3:okhttp:4.10.0")
 
