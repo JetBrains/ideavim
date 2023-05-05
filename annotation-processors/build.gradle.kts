@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.ir.backend.js.compile
+
 /*
  * Copyright 2003-2023 The IdeaVim authors
  *
@@ -18,6 +20,6 @@ repositories {
 }
 
 dependencies {
-  implementation("com.google.devtools.ksp:symbol-processing-api:1.8.0-1.0.8")
+  compileOnly("com.google.devtools.ksp:symbol-processing-api:1.8.21-1.0.11")
   implementation("org.yaml:snakeyaml:2.0")
 }

@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -21,6 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 /**
  * see :h lockvar
  */
+@ExCommand(command = "lockv[ar]")
 public class LockVarCommand(public val ranges: Ranges, public val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
@@ -35,6 +37,7 @@ public class LockVarCommand(public val ranges: Ranges, public val argument: Stri
 /**
  * see :h unlockvar
  */
+@ExCommand(command = "unlo[ckvar]")
 public class UnlockVarCommand(public val ranges: Ranges, public val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 

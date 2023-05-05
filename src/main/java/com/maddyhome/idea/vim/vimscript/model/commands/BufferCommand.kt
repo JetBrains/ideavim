@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  *
  * @author John Weigel
  */
+@ExCommand(command = "b[uffer]")
 internal data class BufferCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 

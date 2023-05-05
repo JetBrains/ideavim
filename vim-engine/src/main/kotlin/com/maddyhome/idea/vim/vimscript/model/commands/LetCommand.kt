@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -42,6 +43,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 /**
  * see "h :let"
  */
+@ExCommand(command = "let")
 public data class LetCommand(
   val ranges: Ranges,
   val variable: Expression,

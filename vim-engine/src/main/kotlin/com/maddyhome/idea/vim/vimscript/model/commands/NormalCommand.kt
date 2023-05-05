@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -23,6 +24,7 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // todo make it for each caret
+@ExCommand(command = "norm[al]")
 public data class NormalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,
