@@ -18,8 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
 public abstract class FunctionHandler {
-
-  public abstract val name: String
+  public lateinit var name: String
   public open val scope: Scope? = null
   public abstract val minimumNumberOfArguments: Int?
   public abstract val maximumNumberOfArguments: Int?

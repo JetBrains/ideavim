@@ -29,12 +29,14 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
 public data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionHandler() {
-
   private val logger = vimLogger<DefinedFunctionHandler>()
-  override val name: String = function.name
   override val scope: Scope? = function.scope
   override val minimumNumberOfArguments: Int = function.args.size
   override val maximumNumberOfArguments: Int? get() = if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
+
+  init {
+    name = function.name
+  }
 
   override fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     var returnValue: VimDataType? = null

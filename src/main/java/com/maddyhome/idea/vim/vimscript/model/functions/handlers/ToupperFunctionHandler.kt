@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -17,8 +18,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import java.util.*
 
+@VimscriptFunction(name = "toupper")
 internal class ToupperFunctionHandler : FunctionHandler() {
-  override val name: String = "toupper"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 1
 
