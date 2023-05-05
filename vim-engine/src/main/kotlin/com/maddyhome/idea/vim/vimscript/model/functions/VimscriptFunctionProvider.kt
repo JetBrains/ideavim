@@ -8,19 +8,21 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import org.yaml.snakeyaml.Yaml
 import java.io.InputStream
-import javax.swing.InputMap
 
 public interface VimscriptFunctionProvider {
-  public val functionListFile: InputStream
+  public val functionListFileName: String
 
   public fun getFunctions(): Collection<LazyVimscriptFunction> {
-    val mapper = YAMLMapper()
+    val yaml = Yaml()
     val classLoader = this.javaClass.classLoader
-    val typeReference = object : TypeReference<HashMap<String, String>>() {}
-    val functionDict = mapper.readValue(functionListFile, typeReference)
+    val functionDict: Map<String, String> = yaml.load(getFile())
     return functionDict.map { LazyVimscriptFunction(it.key, it.value, classLoader) }
+  }
+
+  private fun getFile(): InputStream {
+    return object {}.javaClass.classLoader.getResourceAsStream(functionListFileName)
+      ?: throw RuntimeException("Failed to fetch functions for ${javaClass.name}")
   }
 }
