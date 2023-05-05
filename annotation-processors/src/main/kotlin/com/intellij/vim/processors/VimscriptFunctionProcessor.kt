@@ -36,7 +36,7 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
-    writer.generateResourceFile("VimscriptFunctions.yaml", generateFunctionDict(), environment)
+    writer.generateResourceFile(environment.options["vimscript_functions_file"]!!, generateFunctionDict(), environment)
     return emptyList()
   }
 

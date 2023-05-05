@@ -20,6 +20,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.IntellijFunctionProvider
+import com.maddyhome.idea.vim.vimscript.model.functions.LazyVimscriptFunction
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
 internal class FunctionStorage : VimscriptFunctionService {
@@ -28,7 +30,7 @@ internal class FunctionStorage : VimscriptFunctionService {
 
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
 
-  private val builtInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
+  private val builtInFunctions: MutableMap<String, LazyVimscriptFunction> = mutableMapOf()
 
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
@@ -138,7 +140,7 @@ internal class FunctionStorage : VimscriptFunctionService {
   }
 
   override fun getBuiltInFunction(name: String): FunctionHandler? {
-    return builtInFunctions[name]
+    return builtInFunctions[name]?.instance
   }
 
   private fun storeScriptFunction(functionDeclaration: FunctionDeclaration) {
@@ -164,16 +166,12 @@ internal class FunctionStorage : VimscriptFunctionService {
   }
 
   override fun registerHandlers() {
-    extensionPoint.getExtensionList(ApplicationManager.getApplication()).forEach(FunctionBeanClass::register)
+    val intellijFunctions = IntellijFunctionProvider.getFunctions()
+    intellijFunctions.forEach { addHandler(it) }
   }
 
-  override fun addHandler(handlerHolder: Any) {
-    handlerHolder as FunctionBeanClass
-    if (handlerHolder.name != null) {
-      builtInFunctions[handlerHolder.name!!] = handlerHolder.instance
-    } else {
-      logger.error("Received function handler with null name")
-    }
+  override fun addHandler(handler: LazyVimscriptFunction) {
+    builtInFunctions[handler.name] = handler
   }
 
   companion object {
