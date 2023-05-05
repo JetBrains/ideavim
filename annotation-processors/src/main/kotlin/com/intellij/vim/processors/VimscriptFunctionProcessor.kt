@@ -8,8 +8,6 @@
 
 package com.intellij.vim.processors
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.processing.Resolver
@@ -21,6 +19,8 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.FileWriter
 import com.intellij.vim.annotations.VimscriptFunction
+import org.yaml.snakeyaml.DumperOptions
+import org.yaml.snakeyaml.Yaml
 
 class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   private val visitor = VimscriptFunctionVisitor()
@@ -35,11 +35,13 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
   }
 
   private fun generateFunctionDict(): String {
-    val mapper = YAMLMapper()
+    val options = DumperOptions()
+    options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
+    val yaml = Yaml(options)
     val dictToWrite: Map<String, String> = nameToFunction
       .map { it.key to it.value.qualifiedName!!.asString() }
       .toMap()
-    return mapper.writeValueAsString(dictToWrite)
+    return yaml.dump(dictToWrite)
   }
 
   // todo inspection that annotation is properly used on proper classes

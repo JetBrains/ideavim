@@ -19,5 +19,5 @@ repositories {
 
 dependencies {
   implementation("com.google.devtools.ksp:symbol-processing-api:1.8.0-1.0.8")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0")
+  implementation("org.yaml:snakeyaml:2.0")
 }
