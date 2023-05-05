@@ -16,14 +16,10 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
-import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
 @VimscriptFunction(name = "exists")
 internal class ExistsFunctionHandler : FunctionHandler() {
@@ -37,7 +33,7 @@ internal class ExistsFunctionHandler : FunctionHandler() {
     vimContext: VimLContext,
   ): VimDataType {
     val expressionValue = argumentValues[0].evaluate(editor, context, vimContext)
-    val parsedExpression = VimscriptParser.parseExpression(expressionValue.asString())
+    val parsedExpression = injector.vimscriptParser.parseExpression(expressionValue.asString())
     val result = when (parsedExpression) {
       is OptionExpression -> {
         injector.optionGroup.getOption(parsedExpression.optionName) != null
