@@ -84,7 +84,9 @@ ksp {
 }
 
 afterEvaluate {
+//  tasks.named("kspKotlin").configure { dependsOn("clean") }
   tasks.named("kspKotlin").configure { dependsOn("generateGrammarSource") }
+  tasks.named("kspTestKotlin").configure { enabled = false }
 }
 
 // Import variables from gradle.properties file
