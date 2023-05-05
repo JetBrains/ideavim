@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.editor.RangeMarker
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -31,6 +32,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :global" / "h :vglobal"
  */
+@ExCommand(command = "g[lobal],vg[lobal]")
 internal data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: Boolean) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 

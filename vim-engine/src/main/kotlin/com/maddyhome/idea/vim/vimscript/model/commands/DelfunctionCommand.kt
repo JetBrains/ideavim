@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -20,6 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 /**
  * see "h :delfunction"
  */
+@ExCommand(command = "delf[unction]")
 public data class DelfunctionCommand(
   val ranges: Ranges,
   val scope: Scope?,

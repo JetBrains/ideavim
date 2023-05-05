@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,6 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author Elliot Courant
  * see "h :command"
  */
+@ExCommand(command = "com[mand]")
 public data class CmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
