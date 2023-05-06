@@ -1,1 +1,2 @@
 com.intellij.vim.providers.VimscriptFunctionProcessorProvider
+com.intellij.vim.providers.ExCommandProcessorProvider

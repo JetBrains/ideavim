@@ -11,6 +11,9 @@ package com.maddyhome.idea.vim.vimscript.parser
 import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.model.commands.EngineExCommandProvider
+import com.maddyhome.idea.vim.vimscript.model.commands.ExCommandTree
+import com.maddyhome.idea.vim.vimscript.model.commands.IntellijExCommandProvider
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptLexer
@@ -30,6 +33,12 @@ internal object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
   private const val MAX_NUMBER_OF_TRIES = 5
   private var tries = 0
   private var deletionInfo: DeletionInfo = DeletionInfo()
+  override val exCommands = ExCommandTree()
+
+  init {
+    EngineExCommandProvider.getCommands().forEach { exCommands.addCommand(it.key, it.value) }
+    IntellijExCommandProvider.getCommands().forEach { exCommands.addCommand(it.key, it.value) }
+  }
 
   override fun parse(script: String): Script {
     val preprocessedText = uncommentIdeaVimIgnore(getTextWithoutErrors(script))

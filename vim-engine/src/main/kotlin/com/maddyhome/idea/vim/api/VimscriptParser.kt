@@ -10,9 +10,11 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.model.commands.ExCommandTree
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 public interface VimscriptParser {
+  public val exCommands: ExCommandTree
 
   public fun parse(script: String): Script
   public fun parseCommand(command: String): Command?
