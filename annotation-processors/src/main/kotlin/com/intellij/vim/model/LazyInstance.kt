@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 
 open class LazyInstance<T>(private val className: String, private val classLoader: ClassLoader) {
-  val instance: T by lazy {
+  open val instance: T by lazy {
     val aClass = classLoader.loadClass(className)
     val lookup = MethodHandles.privateLookupIn(aClass, MethodHandles.lookup())
     val instance = lookup.findConstructor(aClass, MethodType.methodType(Void.TYPE)).invoke()

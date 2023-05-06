@@ -11,4 +11,10 @@ package com.maddyhome.idea.vim.vimscript.model.functions
 import com.intellij.vim.model.LazyInstance
 
 public class LazyVimscriptFunction(public val name: String, className: String, classLoader: ClassLoader):
-  LazyInstance<FunctionHandler>(className, classLoader)
+  LazyInstance<FunctionHandler>(className, classLoader) {
+    override val instance: FunctionHandler by lazy {
+      val function = super.instance
+      function.name = name
+      function
+    }
+  }
