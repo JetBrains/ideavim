@@ -67,12 +67,12 @@ public fun String.removeAsciiColorCodes(): String {
   return this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
 }
 
-internal fun String.indexOfOrNull(char: Char, startIndex: Int): Int? {
+internal fun String.indexOfOrNull(char: Char, startIndex: Int = 0): Int? {
   val index = this.indexOf(char, startIndex)
   return if (index < 0) null else index
 }
 
-internal fun String.lastIndexOfOrNull(char: Char, startIndex: Int, endIndex: Int): Int? {
+internal fun String.lastIndexOfOrNull(char: Char, startIndex: Int = 0, endIndex: Int = length): Int? {
   if (startIndex < 0 || endIndex > this.length) return null
   var i = endIndex - 1
   while (i >= startIndex) {
