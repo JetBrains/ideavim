@@ -176,11 +176,9 @@ internal class ReplaceWithRegister : VimExtension {
             editor.editorMode,
             editor.subMode,
           ),
+          saveToRegister = false
         )
       }
-
-      caret.registerStorage.saveRegister(savedRegister.name, savedRegister)
-      caret.registerStorage.saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)
     }
   }
 }

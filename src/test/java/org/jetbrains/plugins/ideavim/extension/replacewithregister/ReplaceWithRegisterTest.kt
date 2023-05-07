@@ -529,5 +529,36 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     typeText(injector.parser.parseKeys("vegr"))
     assertState("one four three")
+    enterCommand("set clipboard&")
+  }
+
+  @Test
+  fun `test replace in visual with clipboard unnamed`() {
+    VimPlugin.getRegister().resetRegisters()
+
+    configureByText("""
+      ${c}test
+      copyMe
+
+      selectMe
+      selectMe
+      selectMe
+      selectMe
+    """.trimIndent())
+    enableExtensions("multiple-cursors")
+    enterCommand("set clipboard+=unnamed")
+
+    typeText(injector.parser.parseKeys("yiw" + "j" + "griw" + "jj" + "<A-n><A-n><A-n><A-n>" + "gr"))
+    assertState("""
+      test
+      test
+
+      test
+      test
+      test
+      test
+    """.trimIndent())
+
+    enterCommand("set clipboard&")
   }
 }
