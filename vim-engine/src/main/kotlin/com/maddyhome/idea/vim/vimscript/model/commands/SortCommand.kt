@@ -32,16 +32,17 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val arg = argument
     val nonEmptyArg = arg.trim().isNotEmpty()
-
-    val reverse = nonEmptyArg && "!" in arg
-    val ignoreCase = nonEmptyArg && "i" in arg
-    val number = nonEmptyArg && "n" in arg
-
-    val lineComparator = LineComparator(ignoreCase, number, reverse)
+    val sortOption = SortOption(
+      reverse = nonEmptyArg && "!" in arg,
+      ignoreCase = nonEmptyArg && "i" in arg,
+      numeric = nonEmptyArg && "n" in arg,
+      unique = nonEmptyArg && "u" in arg,
+    )
+    val lineComparator = LineComparator(sortOption.ignoreCase, sortOption.numeric, sortOption.reverse)
     if (editor.inBlockSubMode) {
       val primaryCaret = editor.primaryCaret()
       val range = getSortLineRange(editor, primaryCaret)
-      val worked = injector.changeGroup.sortRange(editor, primaryCaret, range, lineComparator)
+      val worked = injector.changeGroup.sortRange(editor, primaryCaret, range, lineComparator, sortOption)
       primaryCaret.moveToInlayAwareOffset(
         injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine),
       )
@@ -51,7 +52,7 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
     var worked = true
     for (caret in editor.nativeCarets()) {
       val range = getSortLineRange(editor, caret)
-      if (!injector.changeGroup.sortRange(editor, caret, range, lineComparator)) {
+      if (!injector.changeGroup.sortRange(editor, caret, range, lineComparator, sortOption)) {
         worked = false
       }
       caret.moveToInlayAwareOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine))
@@ -87,31 +88,34 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
   }
 
   private class LineComparator(
-    private val myIgnoreCase: Boolean,
-    private val myNumber: Boolean,
-    private val myReverse: Boolean,
+    private val ignoreCase: Boolean,
+    private val numeric: Boolean,
+    private val reverse: Boolean,
   ) : Comparator<String> {
 
     override fun compare(o1: String, o2: String): Int {
       var o1ToCompare = o1
       var o2ToCompare = o2
-      if (myReverse) {
+      if (reverse) {
         val tmp = o2ToCompare
         o2ToCompare = o1ToCompare
         o1ToCompare = tmp
       }
-      if (myIgnoreCase) {
+      if (ignoreCase) {
         o1ToCompare = o1ToCompare.uppercase(Locale.getDefault())
         o2ToCompare = o2ToCompare.uppercase(Locale.getDefault())
       }
-      return if (myNumber) {
-        // About natural sort order - http://www.codinghorror.com/blog/2007/12/sorting-for-humans-natural-sort-order.html
+      return if (numeric) {
+        // About natural sort order - https://blog.codinghorror.com/sorting-for-humans-natural-sort-order/
         val n1 = injector.searchGroup.findDecimalNumber(o1ToCompare)
         val n2 = injector.searchGroup.findDecimalNumber(o2ToCompare)
         if (n1 == null) {
-          if (n2 == null) 0 else -1
+          if (n2 == null) {
+            // no number, fallback to default
+            o1ToCompare.compareTo(o2ToCompare)
+          } else -1
         } else {
-          if (n2 == null) 1 else n1.compareTo(n2)
+          if (n2 == null) 1 else n1.compareTo(n2) // what if tied?
         }
       } else {
         o1ToCompare.compareTo(o2ToCompare)
@@ -119,3 +123,10 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
     }
   }
 }
+
+public data class SortOption(
+  val ignoreCase: Boolean,
+  val numeric: Boolean,
+  val reverse: Boolean,
+  val unique: Boolean,
+)

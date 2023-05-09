@@ -8,7 +8,6 @@
 package com.maddyhome.idea.vim.group;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.intellij.codeInsight.actions.AsyncActionExecutionService;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -49,6 +48,7 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContextKt;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.vimscript.model.commands.SortOption;
 import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -58,10 +58,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
@@ -500,9 +499,11 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param editor         The editor to replace text in
    * @param range          The range to sort
    * @param lineComparator The comparator to use to sort
+   * @param sortOption     The option to sort the range
    * @return true if able to sort the text, false if not
    */
-  public boolean sortRange(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull LineRange range, @NotNull Comparator<String> lineComparator) {
+  public boolean sortRange(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull LineRange range, @NotNull Comparator<String> lineComparator,
+                           @NotNull SortOption sortOption) {
     final int startLine = range.startLine;
     final int endLine = range.endLine;
     final int count = endLine - startLine + 1;
@@ -513,7 +514,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     final int startOffset = editor.getLineStartOffset(startLine);
     final int endOffset = editor.getLineEndOffset(endLine);
 
-    return sortTextRange(editor, caret, startOffset, endOffset, lineComparator);
+    return sortTextRange(editor, caret, startOffset, endOffset, lineComparator, sortOption);
   }
 
   /**
@@ -523,19 +524,34 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param start          The starting position for the sort
    * @param end            The ending position for the sort
    * @param lineComparator The comparator to use to sort
+   * @param sortOption     The option to sort the range
    * @return true if able to sort the text, false if not
    */
   private boolean sortTextRange(@NotNull VimEditor editor,
                                 @NotNull VimCaret caret,
                                 int start,
                                 int end,
-                                @NotNull Comparator<String> lineComparator) {
+                                @NotNull Comparator<String> lineComparator,
+                                @NotNull SortOption sortOption) {
     final String selectedText = ((IjVimEditor) editor).getEditor().getDocument().getText(new TextRangeInterval(start, end));
-    final List<String> lines = Lists.newArrayList(Splitter.on("\n").split(selectedText));
+    final List<String> lines = StreamSupport.stream(Splitter.on("\n").split(selectedText).spliterator(), false).sorted(lineComparator)
+      .collect(Collectors.toCollection(ArrayList::new));
+    if (sortOption.getUnique()) {
+      Iterator<String> iterator = lines.iterator();
+      String previous = null;
+      while (iterator.hasNext()) {
+        String current = iterator.next();
+        if (current.equals(previous) || sortOption.getIgnoreCase() && current.equalsIgnoreCase(previous)) {
+          iterator.remove();
+        }
+        else {
+          previous = current;
+        }
+      }
+    }
     if (lines.size() < 1) {
       return false;
     }
-    lines.sort(lineComparator);
     replaceText(editor, caret, start, end, StringUtil.join(lines, "\n"));
     return true;
   }
