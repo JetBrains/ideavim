@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
@@ -163,7 +164,7 @@ public interface VimChangeGroup {
 
   public fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean
 
-  public fun sortRange(editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>): Boolean
+  public fun sortRange(editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>, sortOptions: SortOption): Boolean
 
   public fun reset()
 

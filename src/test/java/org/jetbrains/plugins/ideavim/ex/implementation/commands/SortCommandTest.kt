@@ -13,116 +13,631 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import javax.swing.KeyStroke
 
 @Suppress("SpellCheckingInspection")
 class SortCommandTest : VimTestCase() {
-  @Test
-  fun testBasicSort() {
-    configureByText(
-      """
-    Test
-    Hello World!
-    
+  private fun assertSort(testCase: TestCase) {
+    val (content, visualSelect, sortCommand, expected) = testCase
+    configureByText(content)
+    if (visualSelect.isNotBlank()) {
+      val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
+      keys.addAll(injector.parser.stringToKeys(visualSelect))
+      typeText(keys)
+    }
+    typeText(commandToKeys(sortCommand))
+    assertState(expected)
+  }
+
+  data class TestCase(val content: String, val visualSelect: String = "", val sortCommand: String, val expected: String)
+
+  companion object {
+    @JvmStatic
+    fun defaultSortTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
       """.trimIndent(),
-    )
-    val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
-    keys.addAll(injector.parser.stringToKeys("\$j"))
-    typeText(keys)
-    typeText(commandToKeys("sort"))
-    assertState(
-      """
-    Hello World!
-    Test
-    
+          sortCommand = "sort",
+          expected = """
+        10
+        2
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
       """.trimIndent(),
-    )
+          visualSelect = "$7j",
+          sortCommand = "sort",
+          expected = """
+        10
+        2
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        a
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        z
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          sortCommand = "2,9sort",
+          expected = """
+        z
+        10
+        2
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        a
+      """.trimIndent()
+        )
+      )
+    }
+
+    @JvmStatic
+    fun numericSortTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+      """.trimIndent(),
+          sortCommand = "sort n",
+          expected = """
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        2
+        10
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          visualSelect = "$7j",
+          sortCommand = "sort n",
+          expected = """
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        2
+        10
+        a
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        z
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          sortCommand = "2,9sort n",
+          expected = """
+        z
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        2
+        10
+        a
+      """.trimIndent()
+        )
+      )
+    }
+
+    @JvmStatic
+    fun caseInsensitiveSortTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+      """.trimIndent(),
+          sortCommand = "sort i",
+          expected = """
+        10
+        2
+        AB
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          visualSelect = "$7j",
+          sortCommand = "sort i",
+          expected = """
+        10
+        2
+        AB
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        z
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          sortCommand = "2,9sort i",
+          expected = """
+        z
+        10
+        2
+        AB
+        ac
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent()
+        )
+      )
+    }
+
+    @JvmStatic
+    fun reverseSortTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+      """.trimIndent(),
+          sortCommand = "sort!",
+          expected = """
+        ignore_case_duplicate
+        duplicate
+        duplicate
+        ac
+        IGNORE_CASE_DUPLICATE
+        AB
+        2
+        10
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          visualSelect = "$7j",
+          sortCommand = "sort!",
+          expected = """
+        ignore_case_duplicate
+        duplicate
+        duplicate
+        ac
+        IGNORE_CASE_DUPLICATE
+        AB
+        2
+        10
+        a
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        z
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          sortCommand = "2,9sort!",
+          expected = """
+        z
+        ignore_case_duplicate
+        duplicate
+        duplicate
+        ac
+        IGNORE_CASE_DUPLICATE
+        AB
+        2
+        10
+        a
+      """.trimIndent()
+        )
+      )
+    }
+
+    @JvmStatic
+    fun uniqueSortTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+      """.trimIndent(),
+          sortCommand = "sort u",
+          expected = """
+        10
+        2
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        ignore_case_duplicate
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          visualSelect = "$7j",
+          sortCommand = "sort u",
+          expected = """
+        10
+        2
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        ignore_case_duplicate
+        a
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        z
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          sortCommand = "2,9sort u",
+          expected = """
+        z
+        10
+        2
+        AB
+        IGNORE_CASE_DUPLICATE
+        ac
+        duplicate
+        ignore_case_duplicate
+        a
+      """.trimIndent()
+        )
+      )
+    }
+
+    @JvmStatic
+    fun caseInsensitiveUniqueSortTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+      """.trimIndent(),
+          sortCommand = "sort iu",
+          expected = """
+        10
+        2
+        AB
+        ac
+        duplicate
+        ignore_case_duplicate
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          visualSelect = "$7j",
+          sortCommand = "sort iu",
+          expected = """
+        10
+        2
+        AB
+        ac
+        duplicate
+        ignore_case_duplicate
+        a
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        z
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          sortCommand = "2,9sort iu",
+          expected = """
+        z
+        10
+        2
+        AB
+        ac
+        duplicate
+        ignore_case_duplicate
+        a
+      """.trimIndent()
+        )
+      )
+    }
+
+    @JvmStatic
+    fun numericCaseInsensitiveReverseUniqueSortTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+      """.trimIndent(),
+          sortCommand = "sort! niu",
+          expected = """
+        10
+        2
+        ignore_case_duplicate
+        duplicate
+        ac
+        AB
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          visualSelect = "$7j",
+          sortCommand = "sort! niu",
+          expected = """
+        10
+        2
+        ignore_case_duplicate
+        duplicate
+        ac
+        AB
+        a
+      """.trimIndent()
+        ),
+        TestCase(
+          content = """
+        z
+        ac
+        AB
+        10
+        2
+        duplicate
+        duplicate
+        ignore_case_duplicate
+        IGNORE_CASE_DUPLICATE
+        a
+      """.trimIndent(),
+          sortCommand = "2,9sort! niu",
+          expected = """
+        z
+        10
+        2
+        ignore_case_duplicate
+        duplicate
+        ac
+        AB
+        a
+      """.trimIndent()
+        )
+      )
+    }
   }
 
-  @Test
-  fun testMultipleSortLine() {
-    configureByText("zee\nyee\na\nb\n")
-    val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
-    keys.addAll(injector.parser.stringToKeys("$3j"))
-    typeText(keys)
-    typeText(commandToKeys("sort"))
-    assertState("a\nb\nyee\nzee\n")
-  }
+
+  @ParameterizedTest
+  @MethodSource("defaultSortTestCases")
+  fun `test default sort is case sensitive, not numeric, ascending and not unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
+
+  @ParameterizedTest
+  @MethodSource("numericSortTestCases")
+  fun `test numeric sort is case sensitive, numeric, ascending and not unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
+
+  @ParameterizedTest
+  @MethodSource("caseInsensitiveSortTestCases")
+  fun `test case insensive sort is case insensitive, not numeric, ascending and not unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  @Test
-  fun testInverseSort() {
-    configureByText("kay\nzee\nyee\na\nb\n")
-    val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
-    keys.addAll(injector.parser.stringToKeys("$4j"))
-    typeText(keys)
-    typeText(commandToKeys("sort !"))
-    assertState("zee\nyee\nkay\nb\na\n")
-  }
+  @ParameterizedTest
+  @MethodSource("reverseSortTestCases")
+  fun `test reverse sort is case sensitive, not numeric, descending and not unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
 
-  @Test
-  fun testCaseSensitiveSort() {
-    configureByText("apple\nAppetite\nApp\napparition\n")
-    val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
-    keys.addAll(injector.parser.stringToKeys("$3j"))
-    typeText(keys)
-    typeText(commandToKeys("sort"))
-    assertState("App\nAppetite\napparition\napple\n")
-  }
+  @ParameterizedTest
+  @MethodSource("uniqueSortTestCases")
+  fun `test unique sort is case sensitive, not numeric, ascending and unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
 
-  @Test
-  fun testCaseInsensitiveSort() {
-    configureByText("apple\nAppetite\nApp\napparition\n")
-    val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
-    keys.addAll(injector.parser.stringToKeys("$3j"))
-    typeText(keys)
-    typeText(commandToKeys("sort i"))
-    assertState("App\napparition\nAppetite\napple\n")
-  }
-
-  @Test
-  fun testRangeSort() {
-    configureByText("zee\nc\na\nb\nwhatever\n")
-    typeText(commandToKeys("2,4sort"))
-    assertState("zee\na\nb\nc\nwhatever\n")
-  }
-
-  @Test
-  fun testNumberSort() {
-    configureByText("120\n70\n30\n2000")
-    typeText(commandToKeys("sort n"))
-    assertState("30\n70\n120\n2000")
-  }
-
-  @Test
-  fun testNaturalOrderSort() {
-    configureByText("hello1000\nhello102\nhello70000\nhello1001")
-    typeText(commandToKeys("sort n"))
-    assertState("hello102\nhello1000\nhello1001\nhello70000")
-  }
+  @ParameterizedTest
+  @MethodSource("caseInsensitiveUniqueSortTestCases")
+  fun `test case insensitive unique sort is case insensitive, not numeric, ascending and unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  @Test
-  fun testNaturalOrderReverseSort() {
-    configureByText("hello1000\nhello102\nhello70000\nhello1001")
-    typeText(commandToKeys("sort n!"))
-    assertState("hello70000\nhello1001\nhello1000\nhello102")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  @Test
-  fun testNaturalOrderInsensitiveReverseSort() {
-    configureByText("Hello1000\nhello102\nhEllo70000\nhello1001")
-    typeText(commandToKeys("sort ni!"))
-    assertState("hEllo70000\nhello1001\nHello1000\nhello102")
-  }
-
-  @Test
-  fun testGlobalSort() {
-    configureByText("zee\nc\na\nb\nwhatever")
-    typeText(commandToKeys("sort"))
-    assertState("a\nb\nc\nwhatever\nzee")
-  }
+  @ParameterizedTest
+  @MethodSource("numericCaseInsensitiveReverseUniqueSortTestCases")
+  fun `test numeric, case insensitive, reverse and unique sort is case insensitive, numeric, descending and unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
 
   @Test
   fun testSortWithPrecedingWhiteSpace() {
