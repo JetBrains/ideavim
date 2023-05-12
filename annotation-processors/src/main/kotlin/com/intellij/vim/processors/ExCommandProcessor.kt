@@ -42,7 +42,10 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
     @OptIn(KspExperimental::class)
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
       val exCommandAnnotation = classDeclaration.getAnnotationsByType(ExCommand::class).firstOrNull() ?: return
-      commandToClass[exCommandAnnotation.command] = classDeclaration.qualifiedName!!.asString()
+      val commands = exCommandAnnotation.command.split(",")
+      for (command in commands) {
+        commandToClass[command] = classDeclaration.qualifiedName!!.asString()
+      }
     }
 
     override fun visitFile(file: KSFile, data: Unit) {

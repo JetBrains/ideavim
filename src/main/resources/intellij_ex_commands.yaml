@@ -3,7 +3,10 @@
 
 actionl[ist]: com.maddyhome.idea.vim.vimscript.model.commands.ActionListCommand
 b[uffer]: com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand
-ls,files,buffers: com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand
+ls: com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand
+files: com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand
+buffers: com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand
 '!': com.maddyhome.idea.vim.vimscript.model.commands.CmdFilterCommand
-g[lobal],vg[lobal]: com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
+g[lobal]: com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
+vg[lobal]: com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 h[elp]: com.maddyhome.idea.vim.vimscript.model.commands.HelpCommand
