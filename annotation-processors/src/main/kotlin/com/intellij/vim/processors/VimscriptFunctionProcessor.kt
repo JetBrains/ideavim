@@ -21,6 +21,7 @@ import com.intellij.vim.FileWriter
 import com.intellij.vim.annotations.VimscriptFunction
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
+import kotlin.io.path.Path
 
 class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   companion object {
@@ -36,7 +37,7 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
-    val filePath = environment.options["generated_directory"]!! + "/" + environment.options["vimscript_functions_file"]!!
+    val filePath = Path(environment.options["generated_directory"]!!, environment.options["vimscript_functions_file"]!!)
     writer.writeFile(filePath, writer.getYAML(comment, nameToClass))
     return emptyList()
   }
