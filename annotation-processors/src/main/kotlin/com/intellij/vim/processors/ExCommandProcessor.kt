@@ -19,6 +19,7 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.FileWriter
 import com.intellij.vim.annotations.ExCommand
+import kotlin.io.path.Path
 
 class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): SymbolProcessor {
   companion object {
@@ -33,7 +34,7 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
-    val filePath = environment.options["generated_directory"]!! + "/" + environment.options["ex_commands_file"]!!
+    val filePath = Path(environment.options["generated_directory"]!!, environment.options["ex_commands_file"]!!)
     writer.writeFile(filePath, writer.getYAML(comment, commandToClass))
     return emptyList()
   }
