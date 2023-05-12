@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :mark"
  */
-@ExCommand(command = "k,ma[rks]")
+@ExCommand(command = "k,ma[rk]")
 public data class MarkCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
