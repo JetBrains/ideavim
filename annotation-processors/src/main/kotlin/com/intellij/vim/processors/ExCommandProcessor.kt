@@ -34,8 +34,13 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
+    val fileContent = writer.getYAML(comment, commandToClass)
     val filePath = Path(environment.options["generated_directory"]!!, environment.options["ex_commands_file"]!!)
-    writer.writeFile(filePath, writer.getYAML(comment, commandToClass))
+    writer.writeFile(filePath, fileContent)
+
+    val testFilePath = Path(environment.options["generated_test_directory"]!!, environment.options["ex_commands_file"]!!)
+    writer.writeFile(testFilePath, fileContent)
+
     return emptyList()
   }
 

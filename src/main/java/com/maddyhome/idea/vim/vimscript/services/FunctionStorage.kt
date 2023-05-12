@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.EngineFunctionProvider
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.IntellijFunctionProvider
@@ -166,21 +167,14 @@ internal class FunctionStorage : VimscriptFunctionService {
   }
 
   override fun registerHandlers() {
+    val engineFunctions = EngineFunctionProvider.getFunctions()
+    engineFunctions.forEach { addHandler(it) }
+
     val intellijFunctions = IntellijFunctionProvider.getFunctions()
     intellijFunctions.forEach { addHandler(it) }
   }
 
   override fun addHandler(handler: LazyVimscriptFunction) {
     builtInFunctions[handler.name] = handler
-  }
-
-  companion object {
-    private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
-
-    inline fun <reified T : FunctionHandler> getFunctionOfType(): T {
-      val point = extensionPoint.getExtensionList(ApplicationManager.getApplication())
-        .single { it.implementation == T::class.java.name }
-      return point.instance as T
-    }
   }
 }
