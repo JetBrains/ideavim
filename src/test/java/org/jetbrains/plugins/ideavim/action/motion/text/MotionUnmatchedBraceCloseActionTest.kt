@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -56,16 +55,6 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-      class Xxx {
-        int main() {
-          
-          String  x = "}"
-        $c}
-      }
-  """,
-  )
   @Test
   fun `test go to next bracket with quotes`() {
     doTest(
@@ -82,8 +71,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       class Xxx {
         int main() {
           
-          String  x = "$c}"
-        }
+          String  x = "}"
+        $c}
       }
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,

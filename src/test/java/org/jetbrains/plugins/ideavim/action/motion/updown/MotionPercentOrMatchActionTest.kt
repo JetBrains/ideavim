@@ -372,4 +372,28 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     typeText("25%")
     assertPosition(24, 33)
   }
+
+  @Test
+  fun `test percent match with false match in string`() {
+    typeTextInFile(
+      "%",
+      """
+        (a = ")")
+        ${c}(b = ")")
+      """.trimIndent()
+    )
+    assertOffset(18)
+  }
+
+  @Test
+  fun `test percent match with false match in string backwards`() {
+    typeTextInFile(
+      "%",
+      """
+        (a = ")")
+        (b = ")"${c})
+      """.trimIndent()
+    )
+    assertOffset(10)
+  }
 }

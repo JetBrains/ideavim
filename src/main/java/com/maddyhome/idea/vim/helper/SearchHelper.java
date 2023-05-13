@@ -668,10 +668,10 @@ public class SearchHelper {
                                        boolean allowInString) {
     int res = -1;
     int initialPos = pos;
+    boolean initialInString = checkInString(chars, pos, true);
     Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACKWARDS && x > 0 ? x - 1 : x + 1;
     final int inCheckPos = inCheckPosF.apply(pos);
     boolean inString = checkInString(chars, inCheckPos, true);
-    boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
     int stack = 0;
     // Search to start or end of file, as appropriate
