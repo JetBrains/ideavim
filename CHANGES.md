@@ -29,6 +29,7 @@ usual beta standards.
 * [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
 * [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
 * [VIM-2930](https://youtrack.jetbrains.com/issue/VIM-2930) vim-multiple-cursors + ReplaceWithRegister issue
+* [VIM-2945](https://youtrack.jetbrains.com/issue/VIM-2945) %-movement mismatches braces
 
 ### Merged PRs:
 * [616](https://github.com/JetBrains/ideavim/pull/616) by [Matt Ellis](https://github.com/citizenmatt): Refactor/option delegated properties
