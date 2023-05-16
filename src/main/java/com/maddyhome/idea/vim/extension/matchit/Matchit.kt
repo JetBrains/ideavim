@@ -163,8 +163,8 @@ private data class LanguagePatterns(
   // back references, should be built with the default constructor.
   companion object {
     operator fun invoke(openingPattern: String, closingPattern: String): LanguagePatterns {
-      val openingPatternsTable = mapOf(openingPattern to Pair(openingPattern, closingPattern))
-      val closingPatternsTable = mapOf(closingPattern to Pair(openingPattern, closingPattern))
+      val openingPatternsTable = linkedMapOf(openingPattern to Pair(openingPattern, closingPattern))
+      val closingPatternsTable = linkedMapOf(closingPattern to Pair(openingPattern, closingPattern))
       return LanguagePatterns(openingPatternsTable, closingPatternsTable)
     }
 
@@ -172,16 +172,16 @@ private data class LanguagePatterns(
       val openingAndMiddlePatterns = "(?:$openingPattern)|(?:$middlePattern)"
       val middleAndClosingPatterns = "(?:$middlePattern)|(?:$closingPattern)"
 
-      val openings = mapOf(openingAndMiddlePatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
-      val closings = mapOf(closingPattern to Pair(openingPattern, closingPattern))
+      val openings = linkedMapOf(openingAndMiddlePatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
+      val closings = linkedMapOf(closingPattern to Pair(openingPattern, closingPattern))
 
       // Supporting the g% motion is just a matter of rearranging the patterns table.
       // This particular arrangement relies on our checking if the cursor is on a closing pattern first.
-      val reversedOpenings = mapOf(
+      val reversedOpenings = linkedMapOf(
         openingPattern to Pair(openingPattern, closingPattern),
         middlePattern to Pair(openingAndMiddlePatterns, middlePattern),
       )
-      val reversedClosings = mapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
+      val reversedClosings = linkedMapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
 
       return LanguagePatterns(openings, closings, reversedOpenings, reversedClosings)
     }
@@ -264,7 +264,7 @@ private object FileTypePatterns {
 
     return (
       LanguagePatterns("<", ">") +
-        LanguagePatterns(mapOf(openingTagPattern to htmlSearchPair), mapOf(closingTagPattern to htmlSearchPair))
+        LanguagePatterns(linkedMapOf(openingTagPattern to htmlSearchPair), linkedMapOf(closingTagPattern to htmlSearchPair))
       )
   }
 
