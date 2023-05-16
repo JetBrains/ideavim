@@ -246,18 +246,18 @@ private object FileTypePatterns {
   private val gnuMakePatterns = createGnuMakePatterns()
   private val cMakePatterns = createCMakePatterns()
 
-  private fun createHtmlPatterns(): LanguagePatterns {
-    // A tag name may contain any characters except slashes, whitespace, and angle brackets.
-    // We surround the tag name in a capture group so that we can use it when searching for a match later.
-    val tagNamePattern = "([^/\\s><]+)"
+  private fun createHtmlPatterns(tagNamePattern: String = "[^/\\s><]+"): LanguagePatterns {
+    // By default, a tag name may contain any characters except slashes, whitespace, and angle brackets.
+    // A custom tagNamePattern can be provided if we need to interop with other languages.
 
     // An opening tag consists of "<" followed by a tag name and optionally some additional text after whitespace.
+    // We surround the tag name in a capture group so that we can use it when searching for a match later.
     // Note the assertion on "<" to not match on that character. If the cursor is on an angle bracket, then we want to
     // match angle brackets, not HTML tags.
-    val openingTagPattern = String.format("(?<=<)%s(?:\\s[^<>]*(\".*\")?)?", tagNamePattern)
+    val openingTagPattern = String.format("(?<=<)(%s)(?:\\s[^<>]*(\".*\")?)?", tagNamePattern)
 
     // A closing tag consists of a "<" followed by a slash, the tag name, and a ">".
-    val closingTagPattern = String.format("(?<=<)/%s(?=>)", tagNamePattern)
+    val closingTagPattern = String.format("(?<=<)/(%s)(?=>)", tagNamePattern)
 
     // The tag name is left as %s so we can substitute the back reference we captured.
     val htmlSearchPair = Pair("(?<=<)%s(?:\\s[^<>]*(\".*\")?)?(?=>)", "(?<=<)/%s>")
