@@ -8,8 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
-import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
+import com.intellij.notification.Notification
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
@@ -22,9 +22,11 @@ import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Disabled
 
 @TraceOptions(TestOptionConstants.clipboard)
 class IdeaPutNotificationsTest : VimTestCase() {
+  @Disabled("[VERSION UPDATE] Enable when min version is 2023.2+")
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
@@ -35,7 +37,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
       .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
-    val notification = ActionCenter.getNotifications(fixture.project, true).last()
+    val notification = notifications().last()
     try {
       kotlin.test.assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
       kotlin.test.assertTrue(OptionConstants.clipboard_ideaput in notification.content)
@@ -45,6 +47,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
     }
   }
 
+  @Disabled("[VERSION UPDATE] Enable when min version is 2023.2+")
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test no notification on ideaput`() {
     val before = "${c}I found it in a legendary land"
@@ -55,8 +58,13 @@ class IdeaPutNotificationsTest : VimTestCase() {
       .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
-    val notifications = ActionCenter.getNotifications(fixture.project, true)
+    val notifications = notifications()
     kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
+  }
+
+  private fun notifications(): MutableList<Notification> {
+    TODO()
+//    return ActionCenter.getNotifications(fixture.project)
   }
 
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
@@ -74,7 +82,6 @@ class IdeaPutNotificationsTest : VimTestCase() {
   }
 
   private fun appReadySetup(notifierEnabled: Boolean) {
-    EventLog.markAllAsRead(fixture.project)
     VimPlugin.getVimState().isIdeaPutNotified = notifierEnabled
   }
 }
