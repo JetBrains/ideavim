@@ -79,16 +79,18 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler
  * - Lookup - It disappears after putting our esc before templateEscape. But I'm not sure why it works like that
  * - App code - Need to review
  * - Template - Need to review
- *
- * Also, we need to pass esc to IDE if we're in normal mode and there is nothing to cancel
- * (e.g. we still can cancel numbers)
  */
 internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<Esc>"
 
+  /**
+   * Also, we need to pass esc to IDE if we're in normal mode and there is nothing to cancel
+   * (e.g. we still can cancel numbers, or cancel the replace character mode)
+   */
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
     return editor.mode != CommandState.Mode.COMMAND ||
-      editor.vimStateMachine?.commandBuilder?.count != 0
+      editor.vimStateMachine?.commandBuilder?.count != 0 ||
+      editor.vimStateMachine?.isReplaceCharacter == true
   }
 }
 
