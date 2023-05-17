@@ -34,6 +34,7 @@ usual beta standards.
 ### Merged PRs:
 * [616](https://github.com/JetBrains/ideavim/pull/616) by [Matt Ellis](https://github.com/citizenmatt): Refactor/option delegated properties
 * [626](https://github.com/JetBrains/ideavim/pull/626) by [Martin Yzeiri](https://github.com/myzeiri): Matchit bug fixes
+* [619](https://github.com/JetBrains/ideavim/pull/619) by [Matt Ellis](https://github.com/citizenmatt): Fix some local options being used as global options
 
 ## 2.2.0, 2023-04-20
 
