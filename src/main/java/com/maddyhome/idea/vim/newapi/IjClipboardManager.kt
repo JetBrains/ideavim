@@ -76,7 +76,11 @@ internal class IjClipboardManager : VimClipboardManager {
     val project = editor.project ?: return emptyList()
 
     val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return emptyList()
-    DumbService.getInstance(project).withAlternativeResolveEnabled {
+
+    // This thing enables alternative context resolve for dumb mode.
+    // Please read docs for com.intellij.openapi.project.DumbService.isAlternativeResolveEnabled
+    // [VERSION UPDATE] 2023.2+ Enable alternative context back
+//    DumbService.getInstance(project).withAlternativeResolveEnabled {
       for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
         try {
           logger.debug { "Copy paste processor: ${processor.javaClass.name}" }
@@ -91,7 +95,7 @@ internal class IjClipboardManager : VimClipboardManager {
         } catch (ignore: IndexNotReadyException) {
         }
       }
-    }
+//    }
     transferableData.add(CaretStateTransferableData(intArrayOf(0), intArrayOf(text.length)))
 
     // These data provided by {@link com.intellij.openapi.editor.richcopy.TextWithMarkupProcessor} doesn't work with
