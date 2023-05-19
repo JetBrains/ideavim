@@ -195,8 +195,7 @@ public class VimArgTextObjExtension implements VimExtension {
                                 @NotNull ImmutableVimCaret caret,
                                 @NotNull ExecutionContext context,
                                 int count,
-                                int rawCount,
-                                @Nullable Argument argument) {
+                                int rawCount) {
         BracketPairs bracketPairs = DEFAULT_BRACKET_PAIRS;
         final String bracketPairsVar = bracketPairsVariable();
         if (bracketPairsVar != null) {
@@ -252,7 +251,7 @@ public class VimArgTextObjExtension implements VimExtension {
       //noinspection DuplicatedCode
       if (!vimStateMachine.isOperatorPending()) {
         editor.nativeCarets().forEach((VimCaret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
+          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {

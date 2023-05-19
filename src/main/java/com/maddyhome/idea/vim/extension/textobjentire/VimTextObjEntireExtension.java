@@ -95,8 +95,7 @@ public class VimTextObjEntireExtension implements VimExtension {
                                 @NotNull ImmutableVimCaret caret,
                                 @NotNull ExecutionContext context,
                                 int count,
-                                int rawCount,
-                                @Nullable Argument argument) {
+                                int rawCount) {
         int start = 0, end = ((IjVimEditor)editor).getEditor().getDocument().getTextLength();
 
         // for the `ie` text object we don't want leading an trailing spaces
@@ -137,7 +136,7 @@ public class VimTextObjEntireExtension implements VimExtension {
       //noinspection DuplicatedCode
       if (!vimStateMachine.isOperatorPending()) {
         ((IjVimEditor) editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, new IjVimCaret(caret), context, count, 0, null);
+          final TextRange range = textObjectHandler.getRange(editor, new IjVimCaret(caret), context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {

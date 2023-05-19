@@ -190,7 +190,6 @@ internal class CommentaryExtension : VimExtension {
       context: ExecutionContext,
       count: Int,
       rawCount: Int,
-      argument: Argument?,
     ): TextRange? {
       val nativeEditor = (editor as IjVimEditor).editor
       val file = PsiHelper.getFile(nativeEditor) ?: return null

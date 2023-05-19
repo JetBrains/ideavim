@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
@@ -31,7 +30,6 @@ public class GnNextTextObject : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     if (caret != editor.primaryCaret()) return null
     val range = injector.searchGroup.getNextSearchRange(editor, count, true)

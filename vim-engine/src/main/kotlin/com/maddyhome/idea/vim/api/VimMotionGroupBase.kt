@@ -307,7 +307,7 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
           }
         }
       } else if (cmdAction is TextObjectActionHandler) {
-        val range: TextRange = cmdAction.getRange(editor, caret, context, cnt, raw, cmd.argument)
+        val range: TextRange = cmdAction.getRange(editor, caret, context, cnt, raw)
           ?: return null
         start = range.startOffset
         end = range.endOffset

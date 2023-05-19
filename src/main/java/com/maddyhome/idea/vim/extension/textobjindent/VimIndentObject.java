@@ -98,8 +98,7 @@ public class VimIndentObject implements VimExtension {
                                 @NotNull ImmutableVimCaret caret,
                                 @NotNull ExecutionContext context,
                                 int count,
-                                int rawCount,
-                                @Nullable Argument argument) {
+                                int rawCount) {
         final CharSequence charSequence = ((IjVimEditor)editor).getEditor().getDocument().getCharsSequence();
         final int caretOffset = ((IjVimCaret)caret).getCaret().getOffset();
 
@@ -265,7 +264,7 @@ public class VimIndentObject implements VimExtension {
 
       if (!vimStateMachine.isOperatorPending()) {
         ((IjVimEditor)editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0, null);
+          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {

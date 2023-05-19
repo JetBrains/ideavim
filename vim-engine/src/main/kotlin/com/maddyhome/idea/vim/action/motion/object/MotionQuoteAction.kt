@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
@@ -32,7 +31,6 @@ public class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '`', false)
   }
@@ -50,7 +48,6 @@ public class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '"', false)
   }
@@ -68,7 +65,6 @@ public class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '\'', false)
   }
@@ -86,7 +82,6 @@ public class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '`', true)
   }
@@ -104,7 +99,6 @@ public class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '"', true)
   }
@@ -122,7 +116,6 @@ public class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '\'', true)
   }

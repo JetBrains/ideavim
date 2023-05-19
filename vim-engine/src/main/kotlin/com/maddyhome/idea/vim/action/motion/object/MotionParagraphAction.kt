@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
@@ -32,7 +31,6 @@ public class MotionOuterParagraphAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findParagraphRange(editor, caret, count, true)
   }
@@ -50,7 +48,6 @@ public class MotionInnerParagraphAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findParagraphRange(editor, caret, count, false)
   }

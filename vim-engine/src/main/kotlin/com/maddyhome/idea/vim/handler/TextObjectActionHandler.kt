@@ -49,7 +49,6 @@ public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange?
 
   /**
@@ -64,7 +63,7 @@ public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
   ): Boolean {
     if (!editor.inVisualMode) return true
 
-    val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
+    val range = getRange(editor, caret, context, cmd.count, cmd.rawCount) ?: return false
 
     val block = CommandFlags.FLAG_TEXT_BLOCK in cmd.flags
     val newstart = if (block || caret.offset.point >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive

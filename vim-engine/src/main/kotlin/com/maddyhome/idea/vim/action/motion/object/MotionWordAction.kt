@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
@@ -29,7 +28,6 @@ public class MotionInnerBigWordAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = false, isBig = true)
   }
@@ -45,7 +43,6 @@ public class MotionOuterBigWordAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = true, isBig = true)
   }
@@ -61,7 +58,6 @@ public class MotionInnerWordAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = false, isBig = false)
   }
@@ -77,7 +73,6 @@ public class MotionOuterWordAction : TextObjectActionHandler() {
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = true, isBig = false)
   }
