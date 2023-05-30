@@ -475,6 +475,10 @@ Contributors:
   [![icon][github]](https://github.com/Stzx)
   &nbsp;
   Silence Tai
+* [![icon][mail]](mailto:tszsumng90@gmail.com)
+  [![icon][github]](https://github.com/samabcde)
+  &nbsp;
+  Sam Ng
 
 Previous contributors:
 
