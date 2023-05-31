@@ -150,7 +150,10 @@ public class FileGroup extends VimFileBase {
       final VirtualFile virtualFile = fileEditorManager.getCurrentFile();
 
       if (virtualFile != null && window != null) {
-        window.getManager().closeFile(virtualFile, true, false);
+        // During the work on VIM-2912 I've changed the close function to this one.
+        //   However, the function with manager seems to work weirdly and it causes VIM-2953
+        //window.getManager().closeFile(virtualFile, true, false);
+        window.closeFile(virtualFile);
 
         // Get focus after closing tab
         window.requestFocus(true);
