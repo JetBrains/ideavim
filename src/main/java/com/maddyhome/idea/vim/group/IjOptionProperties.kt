@@ -34,6 +34,7 @@ public open class GlobalIjOptions(scope: OptionScope = OptionScope.GLOBAL) : Glo
   public var octopushandler: Boolean by optionProperty(IjOptions.octopushandler)
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
   public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
+  public var exCommandAnnotation: Boolean by optionProperty(IjOptions.exCommandAnnotation)
 }
 
 /**
