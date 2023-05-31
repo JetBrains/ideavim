@@ -16,6 +16,11 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class DeleteMotionActionTest : VimTestCase() {
 
@@ -117,6 +122,29 @@ class DeleteMotionActionTest : VimTestCase() {
       """.trimIndent(),
     )
     assertState("${c}abcde\n${c}")
+  }
+
+  companion object {
+    @JvmStatic
+    fun repeatFindAndTillTestCase(): Stream<Arguments> {
+      return Stream.of(
+        arguments("${c}111b222b333", "dtbd;", "${c}b333"),
+        arguments("111b2${c}22b333", "dtbd,", "111b${c}b333"),
+        arguments("111b222b33${c}3", "dTbd;", "111b${c}3"),
+        arguments("111b2${c}22b333", "dTbd,", "111b${c}b333"),
+        arguments("${c}111b222b333", "dfbd;", "${c}333"),
+        arguments("111b2${c}22b333", "dfbd,", "111${c}333"),
+        arguments("111b222b33${c}3", "dFbd;", "111${c}3"),
+        arguments("111b2${c}22b333", "dFbd,", "111${c}333"),
+      )
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("repeatFindAndTillTestCase")
+  fun `test delete repeat find and till motion`(content: String, keys: String, expected: String) {
+    typeTextInFile(keys, content)
+    assertState(expected)
   }
 
   @Test
