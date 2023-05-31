@@ -24,4 +24,5 @@ public interface VimscriptFunctionService {
   public fun getBuiltInFunction(name: String): FunctionHandler?
   public fun registerHandlers()
   public fun addHandler(handler: LazyVimscriptFunction)
+  public fun addOldHandler(handler: Any)
 }

@@ -43,6 +43,7 @@ public open class GlobalIjOptions(scope: OptionScope = OptionScope.GLOBAL) : Glo
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
   public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
   public var exCommandAnnotation: Boolean by optionProperty(IjOptions.exCommandAnnotation)
+  public var vimscriptFunctionAnnotation: Boolean by optionProperty(IjOptions.vimscriptFunctionAnnotation)
 }
 
 /**
