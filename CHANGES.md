@@ -30,6 +30,7 @@ usual beta standards.
 * [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
 * [VIM-2930](https://youtrack.jetbrains.com/issue/VIM-2930) vim-multiple-cursors + ReplaceWithRegister issue
 * [VIM-2945](https://youtrack.jetbrains.com/issue/VIM-2945) %-movement mismatches braces
+* [VIM-2953](https://youtrack.jetbrains.com/issue/VIM-2953) The previous fix for :q command caused weird behavior of tab closing
 
 ### Merged PRs:
 * [616](https://github.com/JetBrains/ideavim/pull/616) by [Matt Ellis](https://github.com/citizenmatt): Refactor/option delegated properties
