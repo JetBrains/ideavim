@@ -14,6 +14,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 
+@Deprecated("Moved to annotation approach and lazy initialization")
 internal class FunctionBeanClass : BaseKeyedLazyInstance<FunctionHandler>() {
 
   @Attribute("implementation")
@@ -29,5 +30,6 @@ internal class FunctionBeanClass : BaseKeyedLazyInstance<FunctionHandler>() {
       logger<FunctionHandler>().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: ${this.pluginDescriptor.pluginId}")
       return
     }
+    injector.functionService.addOldHandler(this)
   }
 }

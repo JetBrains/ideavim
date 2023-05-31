@@ -76,6 +76,7 @@ public object IjOptions {
   public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", "unifyjumps", true))
   public val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", "visualdelay", 100))
   public val exCommandAnnotation: ToggleOption = addOption(ToggleOption("excommandannotation", "excommandannotation", true))
+  public val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", "vimscriptfunctionannotation", true))
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>
