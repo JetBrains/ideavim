@@ -526,7 +526,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       end?.let { findSentenceEnd(editor, chars, it - 1, max, dir, countCurrent) }
     }
     var res: Int? = null
-    if (end != null && (chars[end] != '\n' || !countCurrent)) {
+    if (end != null && end < chars.length && (chars[end] != '\n' || !countCurrent)) {
       res = end + 1
       while (res < max) {
         val ch = chars[res]
