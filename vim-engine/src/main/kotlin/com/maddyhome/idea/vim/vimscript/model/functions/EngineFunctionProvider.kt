@@ -9,5 +9,5 @@
 package com.maddyhome.idea.vim.vimscript.model.functions
 
 public object EngineFunctionProvider : VimscriptFunctionProvider {
-  override val functionListFileName: String = "engine_vimscript_functions.yaml"
+  override val functionListFileName: String = "engine_vimscript_functions.json"
 }

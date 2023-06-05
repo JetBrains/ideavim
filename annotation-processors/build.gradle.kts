@@ -19,5 +19,5 @@ repositories {
 
 dependencies {
   compileOnly("com.google.devtools.ksp:symbol-processing-api:1.8.21-1.0.11")
-  implementation("org.yaml:snakeyaml:2.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.5.0")
 }

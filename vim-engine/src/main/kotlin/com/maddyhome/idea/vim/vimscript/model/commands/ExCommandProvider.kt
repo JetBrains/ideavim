@@ -8,16 +8,18 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import org.yaml.snakeyaml.Yaml
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import java.io.InputStream
 
 public interface ExCommandProvider {
   public val exCommandsFileName: String
 
+  @OptIn(ExperimentalSerializationApi::class)
   public fun getCommands(): Map<String, LazyExCommandInstance> {
-    val yaml = Yaml()
     val classLoader = this.javaClass.classLoader
-    val commandToClass: Map<String, String> = yaml.load(getFile())
+    val commandToClass: Map<String, String> = Json.decodeFromStream(getFile())
     return commandToClass.entries.associate { it.key to LazyExCommandInstance(it.value, classLoader) }
   }
 
