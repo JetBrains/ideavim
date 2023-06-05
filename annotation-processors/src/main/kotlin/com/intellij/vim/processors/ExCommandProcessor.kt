@@ -38,9 +38,6 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
     val filePath = Path(environment.options["generated_directory"]!!, environment.options["ex_commands_file"]!!)
     writer.writeFile(filePath, fileContent)
 
-    val testFilePath = Path(environment.options["generated_test_directory"]!!, environment.options["ex_commands_file"]!!)
-    writer.writeFile(testFilePath, fileContent)
-
     return emptyList()
   }
 
