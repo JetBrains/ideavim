@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.ir.backend.js.compile
-
 /*
  * Copyright 2003-2023 The IdeaVim authors
  *
