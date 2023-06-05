@@ -8,19 +8,10 @@
 
 package com.intellij.vim
 
-import org.yaml.snakeyaml.DumperOptions
-import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.file.Path
 
 class FileWriter {
-  fun getYAML(comment: String, any: Any): String {
-    val options = DumperOptions()
-    options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
-    val yaml = Yaml(options)
-    return comment + yaml.dump(any)
-  }
-
   fun writeFile(filePath: Path, content: String) {
     val file = File(filePath.toUri())
     file.writeText(content)

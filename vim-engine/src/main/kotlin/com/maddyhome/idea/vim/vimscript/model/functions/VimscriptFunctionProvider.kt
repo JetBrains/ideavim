@@ -8,16 +8,18 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions
 
-import org.yaml.snakeyaml.Yaml
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import java.io.InputStream
 
 public interface VimscriptFunctionProvider {
   public val functionListFileName: String
 
+  @OptIn(ExperimentalSerializationApi::class)
   public fun getFunctions(): Collection<LazyVimscriptFunction> {
-    val yaml = Yaml()
     val classLoader = this.javaClass.classLoader
-    val functionDict: Map<String, String> = yaml.load(getFile())
+    val functionDict: Map<String, String> = Json.decodeFromStream(getFile())
     return functionDict.map { LazyVimscriptFunction(it.key, it.value, classLoader) }
   }
 
