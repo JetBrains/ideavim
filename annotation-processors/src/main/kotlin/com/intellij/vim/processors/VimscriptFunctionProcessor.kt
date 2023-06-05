@@ -19,8 +19,6 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.FileWriter
 import com.intellij.vim.annotations.VimscriptFunction
-import org.yaml.snakeyaml.DumperOptions
-import org.yaml.snakeyaml.Yaml
 import kotlin.io.path.Path
 
 class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
@@ -40,9 +38,6 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
     val fileContent = writer.getYAML(comment, nameToClass)
     val filePath = Path(environment.options["generated_directory"]!!, environment.options["vimscript_functions_file"]!!)
     writer.writeFile(filePath, fileContent)
-
-    val testFilePath = Path(environment.options["generated_test_directory"]!!, environment.options["vimscript_functions_file"]!!)
-    writer.writeFile(testFilePath, fileContent)
 
     return emptyList()
   }
