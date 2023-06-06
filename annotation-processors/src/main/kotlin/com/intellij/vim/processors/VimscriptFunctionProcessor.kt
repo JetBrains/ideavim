@@ -17,8 +17,8 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.intellij.vim.FileWriter
 import com.intellij.vim.annotations.VimscriptFunction
+import com.intellij.vim.writeFile
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.io.path.Path
@@ -28,13 +28,12 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
   private val nameToClass = mutableMapOf<String, String>()
   
   private val json = Json { prettyPrint = true }
-  private val writer = FileWriter()
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
     val filePath = Path(environment.options["generated_directory"]!!, environment.options["vimscript_functions_file"]!!)
     val fileContent = json.encodeToString(nameToClass)
-    writer.writeFile(filePath, fileContent)
+    writeFile(filePath, fileContent)
 
     return emptyList()
   }

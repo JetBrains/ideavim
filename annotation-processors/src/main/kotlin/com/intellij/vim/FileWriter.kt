@@ -11,9 +11,7 @@ package com.intellij.vim
 import java.io.File
 import java.nio.file.Path
 
-class FileWriter {
-  fun writeFile(filePath: Path, content: String) {
-    val file = File(filePath.toUri())
-    file.writeText(content)
-  }
+fun writeFile(filePath: Path, content: String) {
+  val file = File(filePath.toUri())
+  file.writeText(content)
 }
