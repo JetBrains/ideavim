@@ -133,7 +133,7 @@ dependencies {
     api(project(":vim-engine"))
 
     ksp(project(":annotation-processors"))
-    implementation(project(":annotation-processors"))
+    compileOnly(project(":annotation-processors"))
 
     testApi("com.squareup.okhttp3:okhttp:4.10.0")
 

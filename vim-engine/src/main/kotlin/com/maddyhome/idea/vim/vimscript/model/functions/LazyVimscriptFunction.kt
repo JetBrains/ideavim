@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions
 
-import com.intellij.vim.model.LazyInstance
+import com.maddyhome.idea.vim.vimscript.model.LazyInstance
 
 public class LazyVimscriptFunction(public val name: String, className: String, classLoader: ClassLoader):
   LazyInstance<FunctionHandler>(className, classLoader) {

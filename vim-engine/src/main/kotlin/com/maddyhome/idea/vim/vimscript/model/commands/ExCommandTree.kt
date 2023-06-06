@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.vim.model.LazyInstance
 import com.maddyhome.idea.vim.helper.indexOfOrNull
 import com.maddyhome.idea.vim.helper.lastIndexOfOrNull
 
