@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import javax.swing.KeyStroke
 
 public abstract class VimRegisterGroupBase : VimRegisterGroup {
@@ -69,20 +70,22 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   override val lastRegister: Register?
     get() = getRegister(lastRegisterChar)
 
+  private val listener: (oldValue: VimString?) -> Unit = {
+    val clipboardOptionValue = injector.globalOptions().clipboard
+    defaultRegisterChar = when {
+      "unnamed" in clipboardOptionValue -> '*'
+      "unnamedplus" in clipboardOptionValue -> '+'
+      else -> UNNAMED_REGISTER
+    }
+    lastRegisterChar = defaultRegisterChar
+  }
+
   init {
-    injector.optionGroup.addListener(
-      Options.clipboard,
-      {
-        val clipboardOptionValue = injector.globalOptions().clipboard
-        defaultRegisterChar = when {
-          "unnamed" in clipboardOptionValue -> '*'
-          "unnamedplus" in clipboardOptionValue -> '+'
-          else -> UNNAMED_REGISTER
-        }
-        lastRegisterChar = defaultRegisterChar
-      },
-      true,
-    )
+    injector.optionGroup.addListener(Options.clipboard, listener, true)
+  }
+
+  public fun clearListener() {
+    injector.optionGroup.removeListener(Options.clipboard, listener)
   }
 
   override fun isValid(reg: Char): Boolean = VALID_REGISTERS.indexOf(reg) != -1
