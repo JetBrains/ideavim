@@ -46,4 +46,9 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
     equals("teamcity.agent.hardware.cpuCount", "4")
     equals("teamcity.agent.os.family", "Linux")
   }
+
+  failureConditions {
+    // Disable detection of the java OOM
+    javaCrash = false
+  }
 })
