@@ -18,10 +18,10 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.annotations.ExCommand
-import com.intellij.vim.writeFile
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.io.path.Path
+import kotlin.io.path.writeText
 
 class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): SymbolProcessor {
   private val visitor = EXCommandVisitor()
@@ -33,7 +33,7 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
     val filePath = Path(environment.options["generated_directory"]!!, environment.options["ex_commands_file"]!!)
     val fileContent = json.encodeToString(commandToClass)
-    writeFile(filePath, fileContent)
+    filePath.writeText(fileContent)
 
     return emptyList()
   }
