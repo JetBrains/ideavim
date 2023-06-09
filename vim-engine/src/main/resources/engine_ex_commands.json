@@ -68,6 +68,8 @@
     "setl[ocal]": "com.maddyhome.idea.vim.vimscript.model.commands.SetLocalCommand",
     "sethandler": "com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand",
     "sh[ell]": "com.maddyhome.idea.vim.vimscript.model.commands.ShellCommand",
+    "<": "com.maddyhome.idea.vim.vimscript.model.commands.ShiftLeftCommand",
+    ">": "com.maddyhome.idea.vim.vimscript.model.commands.ShiftRightCommand",
     "sor[t]": "com.maddyhome.idea.vim.vimscript.model.commands.SortCommand",
     "so[urce]": "com.maddyhome.idea.vim.vimscript.model.commands.SourceCommand",
     "sp[lit]": "com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand",
