@@ -603,8 +603,7 @@ private fun isSkippedJavaScriptElement(psiElement: PsiElement?): Boolean {
   val parentType = getElementType(psiElement?.parent)
 
   // Ignore regex strings, arrow functions, and angle brackets used for comparisons.
-  return type == "REGEXP_LITERAL" || type == "EQGT" ||
-    (parentType == "BINARY_EXPRESSION" && (type == "LT" || type == "LE" || type == "GT" || type == "GE"))
+  return type == "REGEXP_LITERAL" || type == "EQGT" || parentType == "BINARY_EXPRESSION"
 }
 
 private fun isComment(psiElement: PsiElement?): Boolean {
