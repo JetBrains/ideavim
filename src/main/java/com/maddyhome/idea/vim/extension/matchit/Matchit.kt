@@ -221,6 +221,8 @@ private object FileTypePatterns {
       this.rubyPatterns
     } else if (fileTypeName == "RHTML" || fileExtension == "erb") {
       this.rubyAndHtmlPatterns
+    } else if (fileTypeName == "PHP" || fileExtension == "php") {
+      this.phpPatterns
     } else if (fileTypeName == "C++" || fileTypeName == "C#" || fileTypeName == "ObjectiveC" || fileExtension == "c") {
       // "C++" also covers plain C.
       this.cPatterns
@@ -242,6 +244,7 @@ private object FileTypePatterns {
   private val htmlPatterns = createHtmlPatterns()
   private val rubyPatterns = createRubyPatterns()
   private val rubyAndHtmlPatterns = rubyPatterns + htmlPatterns
+  private val phpPatterns = createPhpPatterns()
   private val cPatterns = createCPatterns()
   private val gnuMakePatterns = createGnuMakePatterns()
   private val cMakePatterns = createCMakePatterns()
@@ -286,6 +289,26 @@ private object FileTypePatterns {
     return (
       LanguagePatterns(blockCommentStart, blockCommentEnd) +
         LanguagePatterns(openingKeywords, middleKeywords, endKeyword)
+      )
+  }
+
+  private fun createPhpPatterns(): LanguagePatterns {
+    // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/php.vim
+    val loopOpenings = "(?:\\b(?:for|do|foreach|switch)\\b)|(?:\\bwhile \\(.*?\\)\\s*:)"
+    val loopClosings = "(?:\\bend(?:for|foreach|while|switch)\\b)|(?:\\bwhile \\(.*\\)\\s*;)"
+
+    val openingDoc = "(?<=<<<)\\s*'?(\\w+)'?"
+    val closingDoc = "^\\s*(\\w+)\\s*[,;]"
+    val docSearchPair = Pair("(?<=<<<)\\s*'?%s'?", "%s") // %s for the captured doc string name.
+    val docPatterns = LanguagePatterns(linkedMapOf(openingDoc to docSearchPair), linkedMapOf(closingDoc to docSearchPair))
+
+    return (
+      LanguagePatterns("(?<=<)\\?(?:php|=)?", "\\?>") +
+        LanguagePatterns("<(?=\\?(?:php|=)?)", "\\?>") +
+        LanguagePatterns("\\bif\\b", "\\b(?:else|elseif)\\b", "\\bendif\\b") +
+        LanguagePatterns(loopOpenings, "\\b(?:case|break|continue)\\b", loopClosings) +
+        docPatterns +
+        createHtmlPatterns("[^/\\s><?]+") // Exclude question marks from tag names.
       )
   }
 
@@ -434,9 +457,10 @@ private fun findMatchingPair(
     val initialPatternEnd = currentLineStart + closestMatchEnd
 
     val initialPsiElement = PsiHelper.getFile(editor)!!.findElementAt(initialPatternStart)
-    if (isSkippedJavaScriptElement(initialPsiElement)) {
-      // Special case: Ignore the skipped JS elements completely. In Ruby, however, we still want to jump if the
-      // cursor is on e.g. a "do" after an "if", but that "do" should be skipped when the cursor is on "if".
+    if (isGlobalSkippedElement(initialPsiElement)) {
+      // Check if the element is one to always ignore, regardless of the cursor position.
+      // In Ruby, however, we still want to jump if the cursor is on e.g. a "do" after an "if", but that "do" should be
+      // ignored when the cursor is on "if".
       return -1
     }
 
@@ -580,7 +604,7 @@ private fun matchShouldBeSkipped(editor: Editor, offset: Int, skipComments: Bool
   val psiFile = PsiHelper.getFile(editor)
   val psiElement = psiFile!!.findElementAt(offset)
 
-  if (isSkippedRubyElement(psiElement) || isSkippedJavaScriptElement(psiElement)) {
+  if (isSkippedRubyElement(psiElement) || isGlobalSkippedElement(psiElement)) {
     return true
   }
 
@@ -598,12 +622,14 @@ private fun isSkippedRubyElement(psiElement: PsiElement?): Boolean {
     type == "regexp content" || type == "identifier"
 }
 
-private fun isSkippedJavaScriptElement(psiElement: PsiElement?): Boolean {
+private fun isGlobalSkippedElement(psiElement: PsiElement?): Boolean {
   val type = getElementType(psiElement)
   val parentType = getElementType(psiElement?.parent)
 
-  // Ignore regex strings, arrow functions, and angle brackets used for comparisons.
-  return type == "REGEXP_LITERAL" || type == "EQGT" || parentType == "BINARY_EXPRESSION"
+  // JavaScript: Ignore regex strings, arrow functions, and angle brackets used for comparisons.
+  return type == "REGEXP_LITERAL" || type == "EQGT" || parentType == "BINARY_EXPRESSION" ||
+    // PHP: Ignore arrow functions and comparison brackets.
+    type == "arrow" || parentType == "Relational expression"
 }
 
 private fun isComment(psiElement: PsiElement?): Boolean {
