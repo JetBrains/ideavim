@@ -39,6 +39,7 @@ usual beta standards.
 * [619](https://github.com/JetBrains/ideavim/pull/619) by [Matt Ellis](https://github.com/citizenmatt): Fix some local options being used as global options
 * [638](https://github.com/JetBrains/ideavim/pull/638) by [Sam Ng](https://github.com/samabcde): VIM-2615 add support to sort u command
 * [646](https://github.com/JetBrains/ideavim/pull/646) by [Sam Ng](https://github.com/samabcde): VIM-1990 fix repeat delete find or till wrong MotionType
+* [649](https://github.com/JetBrains/ideavim/pull/649) by [Martin Yzeiri](https://github.com/myzeiri): Add Matchit support for PHP 
 
 ## 2.2.0, 2023-04-20
 
