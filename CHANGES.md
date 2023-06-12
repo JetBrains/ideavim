@@ -25,6 +25,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Matchit now supports PHP files | [VIM-2678](https://youtrack.jetbrains.com/issue/VIM-2678)
+
 ### Fixes:
 * [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
 * [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
