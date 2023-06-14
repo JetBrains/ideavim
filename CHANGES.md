@@ -23,6 +23,16 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-2964](https://youtrack.jetbrains.com/issue/VIM-2964) Fix an issue with leaking caret instance
+* [VIM-2953](https://youtrack.jetbrains.com/issue/VIM-2953) The previous fix for :q command caused weird behavior of tab closing
+* [VIM-2945](https://youtrack.jetbrains.com/issue/VIM-2945) %-movement mismatches braces
+* [VIM-2930](https://youtrack.jetbrains.com/issue/VIM-2930) vim-multiple-cursors + ReplaceWithRegister issue
+* [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
+* [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
+
 ## 2.3.0, 2023-06-14
 
 ### Features:
