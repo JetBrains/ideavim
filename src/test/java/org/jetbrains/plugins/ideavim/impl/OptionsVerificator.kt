@@ -143,7 +143,7 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
     }
     val specifiedButNotUsed = specifiedNames.filter { it !in usedOptions }
     if (specifiedButNotUsed.isNotEmpty()) {
-      LOG.warn("Options $specifiedButNotUsed are specified in annotation, but not actually used")
+//      LOG.warn("Options $specifiedButNotUsed are specified in annotation, but not actually used for test ${context.testClass.get().simpleName}.${context.testMethod.get().name}")
     }
   }
 
