@@ -32,6 +32,7 @@ usual beta standards.
 * [VIM-2930](https://youtrack.jetbrains.com/issue/VIM-2930) vim-multiple-cursors + ReplaceWithRegister issue
 * [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
 * [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
+* [VIM-2975](https://youtrack.jetbrains.com/issue/VIM-2975) Fix the offset after the rendered docs
 
 ## 2.3.0, 2023-06-14
 
