@@ -33,6 +33,17 @@ usual beta standards.
 * [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
 * [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
 * [VIM-2975](https://youtrack.jetbrains.com/issue/VIM-2975) Fix the offset after the rendered docs
+* [VIM-2896](https://youtrack.jetbrains.com/issue/VIM-2896) Correct ordering of handlers
+* [VIM-2433](https://youtrack.jetbrains.com/issue/VIM-2433) Do not clear clipboard after inserting with ideaput
+* [VIM-2286](https://youtrack.jetbrains.com/issue/VIM-2286) Set surround not working for me as expected
+* [VIM-1750](https://youtrack.jetbrains.com/issue/VIM-1750) Surround with tag wrong position
+* [VIM-1746](https://youtrack.jetbrains.com/issue/VIM-1746) IdeaVim Surround removes unwanted characters
+* [VIM-1551](https://youtrack.jetbrains.com/issue/VIM-1551) Surround: line surround not working
+* [VIM-795](https://youtrack.jetbrains.com/issue/VIM-795) Ctrl-w + h doesn't alway work (window navigation to the left window)
+* [VIM-2819](https://youtrack.jetbrains.com/issue/VIM-2819) Move command works incorrectly
+* [VIM-2868](https://youtrack.jetbrains.com/issue/VIM-2868) Pasting in visual mode with P should not replace yank register like when pasting with p
+* [VIM-2884](https://youtrack.jetbrains.com/issue/VIM-2884) Moving multiple lines in visual mode is not working
+* [VIM-2733](https://youtrack.jetbrains.com/issue/VIM-2733) vim-surround emulation interacts incorrectly with unmatched quotes on previous lines
 
 ## 2.3.0, 2023-06-14
 
