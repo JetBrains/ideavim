@@ -2880,4 +2880,28 @@ rtyfg${c}hzxc"""
     """.trimIndent()
     assertState(after)
   }
+
+  @Test
+  fun `storing text to black hole register`() {
+    val before = """
+            attachD${c}ownload(0)
+            attachD${c}ownload(1)
+            attachD${c}ownload(2)
+            attachD${c}ownload(3)
+            attachD${c}ownload(4)
+            
+    """.trimIndent()
+    configureByText(before)
+    enterCommand("nnoremap c \"_c")
+    typeText("ciw")
+    val after = """
+            (0)
+            (1)
+            (2)
+            (3)
+            (4)
+            
+    """.trimIndent()
+    assertState(after)
+  }
 }

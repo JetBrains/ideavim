@@ -37,7 +37,7 @@ public open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret
       registerService.lastRegisterChar = registerChar
       return registerService.storeText(editor, caret, range, type, isDelete)
     } else {
-      if (!RegisterConstants.RECORDABLE_REGISTERS.contains(registerChar)) {
+      if (!RegisterConstants.RECORDABLE_REGISTERS.contains(registerChar) && registerChar != RegisterConstants.BLACK_HOLE_REGISTER) {
         return false
       }
       val text = preprocessTextBeforeStoring(editor.getText(range), type)
