@@ -443,6 +443,17 @@ public class SearchHelper {
     return findBlockLocation(chars, found, match, dir, pos, count, false);
   }
 
+  /**
+   * Find block enclosing the caret
+   *
+   * @param editor  The editor to search in
+   * @param caret   The caret currently at
+   * @param type    The type of block, e.g. (, [, {, <
+   * @param count   Find the nth next occurrence of the block
+   * @param isOuter Control whether the match includes block character
+   * @return When block is found, return text range matching where end offset is exclusive,
+   * otherwise return null
+   */
   public static @Nullable TextRange findBlockRange(@NotNull Editor editor,
                                                    @NotNull Caret caret,
                                                    char type,
@@ -455,6 +466,30 @@ public class SearchHelper {
 
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
+
+    // extend the range for blank line after type and before close, as they are excluded when inner match
+    if (!isOuter) {
+      if (start > 1 && chars.charAt(start - 2) == type && chars.charAt(start - 1) == '\n') {
+        start--;
+      }
+      if (end < chars.length() && chars.charAt(end) == '\n') {
+        boolean isSingleLineAllWhiteSpaceUntilClose = false;
+        int countWhiteSpaceCharacter = 1;
+        for (; end + countWhiteSpaceCharacter < chars.length(); countWhiteSpaceCharacter++) {
+          if (Character.isWhitespace(chars.charAt(end + countWhiteSpaceCharacter)) &&
+              chars.charAt(end + countWhiteSpaceCharacter) != '\n') {
+            continue;
+          }
+          if (chars.charAt(end + countWhiteSpaceCharacter) == close) {
+            isSingleLineAllWhiteSpaceUntilClose = true;
+          }
+          break;
+        }
+        if (isSingleLineAllWhiteSpaceUntilClose) {
+          end += countWhiteSpaceCharacter;
+        }
+      }
+    }
 
     boolean rangeSelection = end - start > 1;
     if (rangeSelection && start == 0) // early return not only for optimization
@@ -527,6 +562,7 @@ public class SearchHelper {
 
     if (!isOuter) {
       bstart++;
+      // exclude first line break after start for inner match
       if (chars.charAt(bstart) == '\n') {
         bstart++;
       }

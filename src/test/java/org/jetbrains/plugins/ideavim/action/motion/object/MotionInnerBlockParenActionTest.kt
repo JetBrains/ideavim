@@ -81,6 +81,74 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test double motion parentheses start end are not line break`() {
+    configureByText(
+      """(outer(b
+        |${c}inner
+        |b)outer)
+      """.trimMargin(),
+    )
+    typeText(injector.parser.parseKeys("vi)i)"))
+    assertSelection(
+      """outer(b
+        |inner
+        |b)outer
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test double motion parentheses start end are line break`() {
+    configureByText(
+      """(outer(
+        |${c}inner
+        |)outer)
+      """.trimMargin(),
+    )
+    typeText(injector.parser.parseKeys("vi)i)"))
+    assertSelection(
+      """outer(
+        |inner
+        |)outer
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test double motion parentheses start is line break end is not`() {
+    configureByText(
+      """(outer(
+        |${c}inner
+        |b)outer)
+      """.trimMargin(),
+    )
+    typeText(injector.parser.parseKeys("vi)i)"))
+    assertSelection(
+      """outer(
+        |inner
+        |b)outer
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test double motion parentheses end is line break start is not`() {
+    configureByText(
+      """(outer(b
+         |${c}inner
+         |)outer)
+      """.trimMargin(),
+    )
+    typeText(injector.parser.parseKeys("vi)i)"))
+    assertSelection(
+      """outer(b
+        |inner
+        |)outer
+      """.trimMargin(),
+    )
+  }
+
+  @Test
   fun `test motion with count`() {
     configureByText(
       """(outer
