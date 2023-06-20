@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.vimscript.model.commands.ActionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ActionListCommand
@@ -34,15 +33,12 @@ import com.maddyhome.idea.vim.vimscript.model.commands.DeleteLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DeleteMarksCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DelfunctionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DigraphCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.DumpLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EditFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ExecuteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.FileCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.FindClassCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.FindFileCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.FindSymbolCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GoToLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GotoCharacterCommand
@@ -65,8 +61,6 @@ import com.maddyhome.idea.vim.vimscript.model.commands.PlugCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PrintCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.PromptFindCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.PromptReplaceCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PutLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.QuitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.RedoCommand
@@ -375,9 +369,6 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "buffers" to BufferListCommand::class,
     "cal" to CallCommand::class,
     "call" to CallCommand::class,
-    "cla" to FindClassCommand::class,
-    "clas" to FindClassCommand::class,
-    "class" to FindClassCommand::class,
     "com" to CmdCommand::class,
     "comm" to CmdCommand::class,
     "comma" to CmdCommand::class,
@@ -417,11 +408,6 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "digrap" to DigraphCommand::class,
     "digraph" to DigraphCommand::class,
     "digraphs" to DigraphCommand::class,
-    "dump" to DumpLineCommand::class,
-    "dumpl" to DumpLineCommand::class,
-    "dumpli" to DumpLineCommand::class,
-    "dumplin" to DumpLineCommand::class,
-    "dumpline" to DumpLineCommand::class,
     "ec" to EchoCommand::class,
     "ech" to EchoCommand::class,
     "echo" to EchoCommand::class,
@@ -451,10 +437,6 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "file" to FileCommand::class,
     "fin" to FindFileCommand::class,
     "find" to FindFileCommand::class,
-    "sym" to FindSymbolCommand::class,
-    "symb" to FindSymbolCommand::class,
-    "symbo" to FindSymbolCommand::class,
-    "symbol" to FindSymbolCommand::class,
     "g" to GlobalCommand::class,
     "gl" to GlobalCommand::class,
     "glo" to GlobalCommand::class,
@@ -572,21 +554,6 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "Pri" to PrintCommand::class,
     "Prin" to PrintCommand::class,
     "Print" to PrintCommand::class,
-    "pro" to PromptFindCommand::class,
-    "prom" to PromptFindCommand::class,
-    "promp" to PromptFindCommand::class,
-    "prompt" to PromptFindCommand::class,
-    "promptf" to PromptFindCommand::class,
-    "promptfi" to PromptFindCommand::class,
-    "promptfin" to PromptFindCommand::class,
-    "promptfind" to PromptFindCommand::class,
-    "promptr" to PromptReplaceCommand::class,
-    "promptre" to PromptReplaceCommand::class,
-    "promptrep" to PromptReplaceCommand::class,
-    "promptrepl" to PromptReplaceCommand::class,
-    "promptrepla" to PromptReplaceCommand::class,
-    "promptreplac" to PromptReplaceCommand::class,
-    "promptreplace" to PromptReplaceCommand::class,
     "pu" to PutLinesCommand::class,
     "put" to PutLinesCommand::class,
     "q" to QuitCommand::class,
