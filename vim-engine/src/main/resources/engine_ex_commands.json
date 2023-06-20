@@ -47,7 +47,7 @@
     "prev[ious]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",
     "bp[revious]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",
     "N[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",
-    "tabp[previous]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand",
+    "tabp[revious]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand",
     "tabN[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand",
     "p[rint]": "com.maddyhome.idea.vim.vimscript.model.commands.PrintCommand",
     "P[rint]": "com.maddyhome.idea.vim.vimscript.model.commands.PrintCommand",

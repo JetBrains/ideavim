@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :tabprevious"
  */
-@ExCommand(command = "tabp[previous],tabN[ext]")
+@ExCommand(command = "tabp[revious],tabN[ext]")
 public data class PreviousTabCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
