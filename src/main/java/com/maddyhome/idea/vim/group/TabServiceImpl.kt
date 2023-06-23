@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer
 import com.intellij.openapi.fileEditor.impl.EditorWindow
+import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.ui.tabs.JBTabs
 import com.intellij.ui.tabs.TabInfo
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -23,6 +24,9 @@ internal class TabServiceImpl : TabService {
   override fun removeTabAt(indexToDelete: Int, indexToSelect: Int, context: ExecutionContext) {
     val tabbedPane = getTabbedPane(context)
     tabbedPane?.removeTabAt(indexToDelete, indexToDelete)
+
+    val currentTab = getCurrentTab(context) ?: return
+    IdeFocusManager.findInstance().requestFocus(currentTab.component, true)
   }
 
   override fun getTabCount(context: ExecutionContext): Int {
