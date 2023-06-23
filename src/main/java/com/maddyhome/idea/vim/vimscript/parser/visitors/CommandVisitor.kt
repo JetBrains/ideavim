@@ -112,6 +112,7 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.RangeOf
 import org.antlr.v4.runtime.ParserRuleContext
 import java.util.stream.Collectors
 import kotlin.reflect.KClass
+import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
 
 internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
@@ -323,8 +324,10 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
       command.rangeInScript = ctx.getTextRange()
       return command
     }
-
-    val command = UnknownCommand(ranges, name, argument)
+    val commandConstructor = getCommandByName(name).constructors
+      .filter { it.parameters.size == 2 }
+      .firstOrNull { it.parameters[0].type == Ranges::class.createType() && it.parameters[1].type == String::class.createType() }
+    val command = commandConstructor?.call(ranges, argument) ?: UnknownCommand(ranges, name, argument)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
