@@ -8,12 +8,17 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.codeInsight.intention.IntentionActionDelegate
+import com.intellij.codeInsight.intention.IntentionManager
+import com.intellij.codeInsight.intention.impl.invokeAsAction
 import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
@@ -60,7 +65,7 @@ internal class IjActionExecutor : VimActionExecutor {
   /**
    * Execute an action
    *
-   * @param ijAction  The action to execute
+   * @param action  The action to execute
    * @param context The context to run it in
    */
   override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
@@ -142,9 +147,7 @@ internal class IjActionExecutor : VimActionExecutor {
    * @param context The context to run it in
    */
   override fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean {
-    val aMgr = ActionManager.getInstance()
-    val action = aMgr.getAction(name)
-    return action != null && executeAction(null, IjNativeAction(action), context)
+    return getAction(name)?.let { executeAction(null, it, context) } ?: false
   }
 
   override fun executeCommand(
@@ -186,7 +189,33 @@ internal class IjActionExecutor : VimActionExecutor {
   }
 
   override fun getAction(actionId: String): NativeAction? {
-    return ActionManager.getInstance().getAction(actionId)?.let { IjNativeAction(it) }
+    return ActionManager.getInstance().getAction(actionId)?.let { IjNativeAction(it) } ?: getIntentionAsAction(actionId)
+  }
+
+  private fun getIntentionAsAction(id: String): NativeAction? {
+    val intention = IntentionManager.getInstance().availableIntentions.firstOrNull {
+      (if (it is IntentionActionDelegate) it.implementationClassName else it.javaClass.name) == id
+    } ?: return null
+
+    return IjNativeAction(object : AnAction() {
+      override fun update(e: AnActionEvent) {
+        val project = e.project ?: return
+        val dataContext = e.dataContext
+        val editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
+        val file = dataContext.getData(CommonDataKeys.PSI_FILE) ?: return
+
+        e.presentation.isEnabled = intention.isAvailable(project, editor, file)
+      }
+
+      override fun actionPerformed(e: AnActionEvent) {
+        val dataContext = e.dataContext
+        val editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
+        val file = dataContext.getData(CommonDataKeys.PSI_FILE) ?: return
+        intention.invokeAsAction(editor, file)
+      }
+
+      override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+    })
   }
 
   override fun getActionIdList(idPrefix: String): List<String> {
