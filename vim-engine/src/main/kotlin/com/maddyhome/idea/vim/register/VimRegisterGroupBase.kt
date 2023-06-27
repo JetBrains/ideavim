@@ -366,7 +366,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   override fun getRegisters(): List<Register> {
-    val res = ArrayList(myRegisters.values)
+    val res = ArrayList(myRegisters.values).filter { !CLIPBOARD_REGISTERS.contains(it.name) }.toMutableList()
     for (i in CLIPBOARD_REGISTERS.indices) {
       val r = CLIPBOARD_REGISTERS[i]
       val register = refreshClipboardRegister(r)

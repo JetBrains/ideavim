@@ -10,6 +10,8 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.register.Register
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -220,6 +222,22 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "+   clipboard content
       |  c  ":   ascii
       |  c  "/   search pattern
+      """.trimMargin(),
+    )
+  }
+  
+  @Test
+  fun `test clipboard registers are not duplicated`() {
+    configureByText("<caret>line 0 ")
+
+    injector.registerGroup.saveRegister('+', Register('+', SelectionType.LINE_WISE, "Lorem ipsum dolor", mutableListOf()))
+    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  "*   clipboard content
+      |  c  "+   clipboard content
       """.trimMargin(),
     )
   }
