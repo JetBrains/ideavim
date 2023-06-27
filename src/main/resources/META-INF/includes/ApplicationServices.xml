@@ -35,6 +35,8 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.WindowGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.TabServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.group.TabService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.SplitServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.group.SplitService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.EditorGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.visual.VisualMotionGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimVisualMotionGroup"/>

@@ -67,6 +67,7 @@ import com.maddyhome.idea.vim.group.IjVimOptionGroup
 import com.maddyhome.idea.vim.group.MacroGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.SplitService
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
@@ -108,6 +109,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val extensionRegistrator: VimExtensionRegistrator
     get() = VimExtensionRegistrar
   override val tabService: TabService
+    get() = service()
+  override val splitService: SplitService
     get() = service()
   override val regexpService: VimRegexpService
     get() = PatternService

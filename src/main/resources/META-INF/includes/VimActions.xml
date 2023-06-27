@@ -300,6 +300,13 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowRightAction" mappingModes="N" keys="«C-W»l,«C-W»«C-L»,«C-W»«Right»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowUpAction" mappingModes="N" keys="«C-W»k,«C-W»«C-K»,«C-W»«Up»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowDownAction" mappingModes="N" keys="«C-W»j,«C-W»«C-J»,«C-W»«Down»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowStretchVerticallyAction" mappingModes="N" keys="«C-W»+"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowShrinkVerticallyAction" mappingModes="N" keys="«C-W»-"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowStretchHorizontallyAction" mappingModes="N" keys="«C-W»&gt;"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowShrinkHorizontallyAction" mappingModes="N" keys="«C-W»&lt;"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowEqualizeSplitsAction" mappingModes="N" keys="«C-W»="/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowMaximizeVerticallyAction" mappingModes="N" keys="«C-W»_"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowMaximizeHorizontallyAction" mappingModes="N" keys="«C-W»|"/>
 
     <!-- Tabs -->
     <vimAction implementation="com.maddyhome.idea.vim.action.window.tabs.NextTabAction" mappingModes="NXO" keys="gt"/>

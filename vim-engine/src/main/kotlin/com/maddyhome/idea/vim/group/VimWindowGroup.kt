@@ -9,6 +9,8 @@ package com.maddyhome.idea.vim.group
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.group.SplitService.AdjustmentType
+import com.maddyhome.idea.vim.group.SplitService.MaximizeType
 
 public interface VimWindowGroup {
   public fun selectWindowInRow(caret: VimCaret, context: ExecutionContext, relativePosition: Int, vertical: Boolean)
@@ -20,4 +22,7 @@ public interface VimWindowGroup {
   public fun splitWindowHorizontal(context: ExecutionContext, filename: String)
   public fun closeCurrentWindow(context: ExecutionContext)
   public fun closeAll(context: ExecutionContext)
+  public fun adjustOwningWindow(caret: VimCaret, adjustmentType: AdjustmentType, context: ExecutionContext)
+  public fun maximizeOwningWindow(caret: VimCaret, maximizeType: MaximizeType, context: ExecutionContext)
+  public fun equalizeWindows(context: ExecutionContext)
 }

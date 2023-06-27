@@ -34,6 +34,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+
 public class WindowGroup extends WindowGroupBase {
   @Override
   public void closeCurrentWindow(@NotNull ExecutionContext context) {
@@ -113,6 +115,44 @@ public class WindowGroup extends WindowGroupBase {
       final EditorWindow[] windows = fileEditorManager.getWindows();
       final List<EditorWindow> row = findWindowsInRow(ijCaret, currentWindow, Arrays.asList(windows), vertical);
       selectWindow(currentWindow, row, relativePosition);
+    }
+  }
+
+  @Override
+  public void adjustOwningWindow(@NotNull VimCaret caret,
+                                 @NotNull SplitService.AdjustmentType adjustmentType,
+                                 @NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final EditorWindow currentWindow =  fileEditorManager.getCurrentWindow();
+    if (currentWindow != null && currentWindow.inSplitter()) {
+      final SplitService splitService = injector.getSplitService();
+      final Caret ijCaret = ((IjVimCaret)caret).getCaret();
+      final Point caretLocation = getCaretPoint(ijCaret);
+      splitService.adjustOwner(caretLocation, adjustmentType, context);
+    }
+  }
+
+  @Override
+  public void maximizeOwningWindow(@NotNull VimCaret caret,
+                                   @NotNull SplitService.MaximizeType maximizeType,
+                                   @NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final EditorWindow currentWindow =  fileEditorManager.getCurrentWindow();
+    if (currentWindow != null && currentWindow.inSplitter()) {
+      final SplitService splitService = injector.getSplitService();
+      final Caret ijCaret = ((IjVimCaret)caret).getCaret();
+      final Point caretLocation = getCaretPoint(ijCaret);
+      splitService.maximizeOwner(caretLocation, maximizeType, context);
+    }
+  }
+
+  @Override
+  public void equalizeWindows(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final EditorWindow currentWindow =  fileEditorManager.getCurrentWindow();
+    if (currentWindow != null && currentWindow.inSplitter()) {
+      final SplitService splitService = injector.getSplitService();
+      splitService.equalizeSplits(context);
     }
   }
 

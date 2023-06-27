@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
+import com.maddyhome.idea.vim.group.SplitService
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
@@ -116,6 +117,8 @@ public interface VimInjector {
 
   // Can't be fully moved to vim-engine.
   public val tabService: TabService
+
+  public val splitService: SplitService
 
   // !! in progress
   public val regexpService: VimRegexpService
