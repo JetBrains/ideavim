@@ -22,7 +22,8 @@ IdeaVim is a Vim engine for JetBrains IDEs.
 
 ##### Resources:
 
-* [Plugin homepage](https://plugins.jetbrains.com/plugin/164-ideavim)
+* [Plugin homepage](https://lp.jetbrains.com/ideavim/)
+* [Plugin on Marketplace](https://plugins.jetbrains.com/plugin/164-ideavim)
 * [Changelog](CHANGES.md)
 * [Continuous integration builds](https://ideavim.teamcity.com/)
 
