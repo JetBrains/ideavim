@@ -214,6 +214,12 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     if (!editor.isEndAllowed) {
       resultOffset = editor.normalizeOffset(resultOffset, false)
     }
+
+    val collapsedRegion = editor.getCollapsedRegionAtOffset(resultOffset)
+    if (collapsedRegion != null) {
+      resultOffset = collapsedRegion.startOffset
+    }
+
     return resultOffset
   }
 

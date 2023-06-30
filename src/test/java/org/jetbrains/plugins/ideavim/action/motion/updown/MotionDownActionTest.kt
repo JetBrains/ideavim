@@ -11,10 +11,13 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 /**
  * @author Alex Plate
@@ -267,5 +270,25 @@ class MotionDownActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
     )
+  }
+
+  @Test
+  fun `test vertical motions do not unfold text`() {
+    configureByJavaText("""
+      // My long comment that will be the longest line in the text
+      /* 
+      pu${c}pa
+      */
+    """.trimIndent())
+
+    val foldingModel = fixture.editor.foldingModel
+    foldingModel.runBatchFoldingOperation {
+      val foldRegion = foldingModel.addFoldRegion(61, 71, "pupa")
+      foldRegion!!.isExpanded = false
+    }
+    assertEquals(2, IjVimEditor(fixture.editor).getVisualLineCount())
+
+    typeText("gg" + "$" + "j")
+    assertEquals(2, IjVimEditor(fixture.editor).getVisualLineCount())
   }
 }
