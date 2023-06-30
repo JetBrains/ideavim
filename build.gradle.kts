@@ -965,7 +965,7 @@ fun changes(): List<Change> {
     val newFixes = mutableListOf<Change>()
     println("Last successful commit: $lastSuccessfulCommit")
     println("Amount of commits: ${messages.size}")
-    println("Start emails processing")
+    println("Start changes processing")
     for (message in messages) {
         println("Processing '$message'...")
         val lowercaseMessage = message.toLowerCase()
