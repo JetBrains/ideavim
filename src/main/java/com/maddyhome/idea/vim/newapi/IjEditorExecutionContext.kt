@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.util.UserDataHolderBase
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -25,7 +26,7 @@ internal class IjCaretAndEditorExecutionContext(override val context: DataContex
  * Data context that defines that some action was started from IdeaVim.
  * You can call use [runFromVimKey] key to define if intellij action was started from IdeaVim
  */
-internal class VimDataContext(private val delegate: DataContext) : DataContext {
+internal class VimDataContext(private val delegate: DataContext) : DataContext, UserDataHolderBase() {
   override fun getData(dataId: String): Any? {
     if (dataId == runFromVimKey) return true
     return delegate.getData(dataId)
