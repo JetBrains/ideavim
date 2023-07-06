@@ -198,7 +198,7 @@ public class KeyHandler {
     }
 
     // This will update immediately, if we're on the EDT (which we are)
-    injector.messages.updateStatusBar()
+    injector.messages.updateStatusBar(editor)
     LOG.trace("----------- Key Handler Finished -----------")
   }
 

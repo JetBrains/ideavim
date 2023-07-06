@@ -68,7 +68,7 @@ internal class IjVimMessages : VimMessagesBase() {
   override fun isError(): Boolean = error
 
   override fun message(key: String, vararg params: Any): String = MessageHelper.message(key, *params)
-  override fun updateStatusBar() {
+  override fun updateStatusBar(editor: VimEditor) {
     ShowCmd.update()
   }
 }

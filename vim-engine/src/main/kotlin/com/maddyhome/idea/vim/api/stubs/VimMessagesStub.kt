@@ -41,7 +41,7 @@ public class VimMessagesStub : VimMessagesBase() {
     TODO("Not yet implemented")
   }
 
-  override fun updateStatusBar() {
+  override fun updateStatusBar(editor: VimEditor) {
     TODO("Not yet implemented")
   }
 }
