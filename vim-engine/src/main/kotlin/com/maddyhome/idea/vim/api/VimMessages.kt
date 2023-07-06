@@ -16,7 +16,7 @@ public interface VimMessages {
   public fun isError(): Boolean
   public fun message(key: String, vararg params: Any): String
 
-  public fun updateStatusBar()
+  public fun updateStatusBar(editor: VimEditor)
 
   public fun showMode(editor: VimEditor?, msg: String) {
     showStatusBarMessage(editor, msg)
