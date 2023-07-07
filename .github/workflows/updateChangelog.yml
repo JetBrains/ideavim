@@ -43,10 +43,10 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update changelog
-          commit_user_name: Alex Plate
-          commit_user_email: aleksei.plate@jetbrains.com
-          commit_author: Alex Plate <aleksei.plate@jetbrains.com>
+          commit_message: Update changelog. Action id - ${{ github.run_id }}
+          commit_user_name: GitHub Action
+          commit_user_email: maintainers@ideavim.dev
+          commit_author: GitHub Action <maintainers@ideavim.dev>
           file_pattern: CHANGES.md
 
       - name: Update tags
