@@ -57,3 +57,9 @@ jobs:
           commit_user_email: aleksei.plate@jetbrains.com
           commit_author: Alex Plate <aleksei.plate@jetbrains.com>
           file_pattern: CHANGES.md
+
+      - run: |
+          git tag --delete workflow-changelog || true
+          git push origin :refs/tags/workflow-changelog || true
+          git tag workflow-changelog
+          git push origin workflow-changelog
