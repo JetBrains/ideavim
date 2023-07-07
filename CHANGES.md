@@ -49,6 +49,7 @@ usual beta standards.
 
 ### Merged PRs:
 * [662](https://github.com/JetBrains/ideavim/pull/662) by [ludwig-jb](https://github.com/ludwig-jb): Update VimMessages#updateStatusBar to accept VimEditor
+* [659](https://github.com/JetBrains/ideavim/pull/659) by [Sam Ng](https://github.com/samabcde): VIM-2920 fix select block expansion when enclose boundary is line break
 
 ## 2.3.0, 2023-06-14
 
