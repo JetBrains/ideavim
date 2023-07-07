@@ -479,6 +479,10 @@ Contributors:
   [![icon][github]](https://github.com/samabcde)
   &nbsp;
   Sam Ng
+* [![icon][mail]](mailto:ludwig.valda.vasquez@jetbrains.com)
+  [![icon][github]](https://github.com/ludwig-jb)
+  &nbsp;
+  ludwig-jb
 
 Previous contributors:
 
