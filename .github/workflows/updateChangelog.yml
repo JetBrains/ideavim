@@ -30,22 +30,7 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: AlexPl292/nx-set-shas@main
-        with:
-          main-branch-name: 'master'
-
-      - run: |
-          echo "BASE: ${{ env.NX_BASE }}"
-          echo "HEAD: ${{ env.NX_HEAD }}"
-
-      - uses: AlexPl292/last-successful-commit-action@master
-        id: last_successful_commit
-        with:
-          branch: 'master'
-          workflow_id: 'updateChangelog.yml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
+        # The last successful job was marked with a tag
       - name: Get commit with last workflow
         run: |
           echo "LAST_COMMIT=$(git rev-list -n 1 tags/workflow-changelog)" >> $GITHUB_ENV
