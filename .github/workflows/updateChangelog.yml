@@ -44,9 +44,9 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update changelog. Action id - ${{ github.run_id }}
-          commit_user_name: GitHub Action
+          commit_user_name: IdeaVim Bot
           commit_user_email: maintainers@ideavim.dev
-          commit_author: GitHub Action <maintainers@ideavim.dev>
+          commit_author: IdeaVim Bot <maintainers@ideavim.dev>
           file_pattern: CHANGES.md
 
       - name: Update tags
