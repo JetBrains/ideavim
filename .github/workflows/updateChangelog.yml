@@ -44,11 +44,11 @@ jobs:
           workflow_id: 'updateChangelog.yml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update changelog
-        run: ./gradlew updateChangelog
-        env:
-          SUCCESS_COMMIT: ${{ steps.last_successful_commit.outputs.commit_hash }}
-
+#      - name: Update changelog
+#        run: ./gradlew updateChangelog
+#        env:
+#          SUCCESS_COMMIT: ${{ steps.last_successful_commit.outputs.commit_hash }}
+#
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
