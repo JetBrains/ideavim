@@ -47,6 +47,9 @@ usual beta standards.
 * [VIM-2685](https://youtrack.jetbrains.com/issue/VIM-2685) Register command outputs different values for same registers
 * [VIM-1294](https://youtrack.jetbrains.com/issue/VIM-1294) unvoluntary unfolding when using ideavim
 
+### Merged PRs:
+* [662](https://github.com/JetBrains/ideavim/pull/662) by [ludwig-jb](https://github.com/ludwig-jb): Update VimMessages#updateStatusBar to accept VimEditor
+
 ## 2.3.0, 2023-06-14
 
 ### Features:
