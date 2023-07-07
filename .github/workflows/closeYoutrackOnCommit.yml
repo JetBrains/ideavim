@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 300
+      - name: Get tags
+        run: git fetch --tags origin
       - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -25,15 +27,20 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - uses: nrwl/last-successful-commit-action@v1
-        id: last_successful_commit
-        with:
-          branch: 'master'
-          workflow_id: 'closeYoutrackOnCommit.yml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        # The last successful job was marked with a tag
+      - name: Get commit with last workflow
+        run: |
+          echo "LAST_COMMIT=$(git rev-list -n 1 tags/workflow-close-youtrack)" >> $GITHUB_ENV
 
       - name: Update YouTrack
         run: ./gradlew updateYoutrackOnCommit
         env:
-          SUCCESS_COMMIT: ${{ steps.last_successful_commit.outputs.commit_hash }}
+          SUCCESS_COMMIT: ${{ env.LAST_COMMIT }}
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
+
+      - name: Update tags
+        run: |
+          git tag --delete workflow-close-youtrack || true
+          git push origin :refs/tags/workflow-close-youtrack || true
+          git tag workflow-close-youtrack
+          git push origin workflow-close-youtrack
