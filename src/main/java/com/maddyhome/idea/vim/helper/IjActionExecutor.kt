@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
+import com.intellij.openapi.actionSystem.DataContextWrapper
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
@@ -35,8 +36,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
-import com.maddyhome.idea.vim.newapi.VimDataContext
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.runFromVimKey
 import org.jetbrains.annotations.NonNls
 import javax.swing.SwingUtilities
 
@@ -65,7 +66,14 @@ internal class IjActionExecutor : VimActionExecutor {
    */
   override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
     val ijAction = (action as IjNativeAction).action
-    val dataContext = VimDataContext(context.ij)
+
+    /**
+     * Data context that defines that some action was started from IdeaVim.
+     * You can call use [runFromVimKey] key to define if intellij action was started from IdeaVim
+     */
+    val dataContext = DataContextWrapper(context.ij)
+    dataContext.putUserData(runFromVimKey, true)
+
     val event = AnActionEvent(
       null,
       dataContext,

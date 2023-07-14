@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.actionStartedFromVim
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.runFromVimKey
 import com.maddyhome.idea.vim.newapi.vim
@@ -47,7 +48,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
   private fun isThisHandlerEnabled(editor: Editor, caret: Caret?, dataContext: DataContext?): Boolean {
     if (!VimPlugin.isEnabled()) return false
     if (!isHandlerEnabled(editor, dataContext)) return false
-    if (dataContext?.getData(runFromVimKey) == true) return false
+    if (dataContext?.actionStartedFromVim == true) return false
     if (!enableOctopus) return false
     return true
   }
