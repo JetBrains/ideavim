@@ -153,9 +153,7 @@ public open class YankGroupBase : VimYankGroup {
    */
   override fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
     range ?: return false
-
     val caretToRange = HashMap<ImmutableVimCaret, TextRange>()
-    val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
 
     if (type == SelectionType.LINE_WISE) {
       for (i in 0 until range.size()) {
@@ -185,9 +183,9 @@ public open class YankGroupBase : VimYankGroup {
     }
 
     return if (moveCursor) {
-      yankRange(editor, caretToRange, range, selectionType, startOffsets)
+      yankRange(editor, caretToRange, range, type, startOffsets)
     } else {
-      yankRange(editor, caretToRange, range, selectionType, null)
+      yankRange(editor, caretToRange, range, type, null)
     }
   }
 

@@ -2904,4 +2904,26 @@ rtyfg${c}hzxc"""
     """.trimIndent()
     assertState(after)
   }
+
+  @Test
+  @TestFor(issues = ["VIM-2818"])
+  fun `carets position after paste`() {
+    val before = """
+            ${c}word 0
+            ${c}word 1
+            ${c}word 2
+            ${c}word 3
+            ${c}word 4
+    """.trimIndent()
+    configureByText(before)
+    typeText("vey\$p")
+    val after = """
+            word 0wor${c}d
+            word 1wor${c}d
+            word 2wor${c}d
+            word 3wor${c}d
+            word 4wor${c}d
+    """.trimIndent()
+    assertState(after)
+  }
 }
