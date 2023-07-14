@@ -12,34 +12,25 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimStorageServiceBase
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.ij
 
 internal class IjVimStorageService : VimStorageServiceBase() {
-  val bufferToKey = mutableMapOf<String, MutableMap<String, Any?>>()
-
   override fun <T> getDataFromEditor(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
-    return editor.ij.getUserData(getOrCreateIjKey(key))
+    return editor.ij.getUserData(key.ij)
   }
 
   override fun <T> putDataToEditor(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
-    editor.ij.putUserData(getOrCreateIjKey(key), data)
+    editor.ij.putUserData(key.ij, data)
   }
 
-  @Suppress("UNCHECKED_CAST")
   override fun <T> getDataFromBuffer(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
-    val buffer = EditorHelper.getVirtualFile(editor.ij)?.path ?: "empty path"
-    return bufferToKey[buffer]?.get(key.name) as T?
+    val document = editor.ij.document
+    return document.getUserData(key.ij)
   }
 
   override fun <T> putDataToBuffer(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
-    val buffer = EditorHelper.getVirtualFile(editor.ij)?.path ?: "empty path"
-    var bufferStorage = bufferToKey[buffer]
-    if (bufferStorage == null) {
-      bufferStorage = mutableMapOf()
-      bufferToKey[buffer] = bufferStorage
-    }
-    bufferStorage[key.name] = data
+    val document = editor.ij.document
+    document.putUserData(key.ij, data)
   }
 
   override fun <T> getDataFromTab(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
@@ -53,13 +44,14 @@ internal class IjVimStorageService : VimStorageServiceBase() {
   private val ijKeys = mutableMapOf<String, Key<out Any?>>()
 
   @Suppress("UNCHECKED_CAST")
-  private fun <T> getOrCreateIjKey(key: com.maddyhome.idea.vim.api.Key<T>): Key<T> {
-    val storedIjKey = ijKeys[key.name]
+  private val <T> com.maddyhome.idea.vim.api.Key<T>.ij : Key<T>
+    get(): Key<T> {
+    val storedIjKey = ijKeys[this.name]
     if (storedIjKey != null) {
       return storedIjKey as Key<T>
     }
-    val newKey = Key<T>(key.name)
-    ijKeys[key.name] = newKey
+    val newKey = Key<T>(this.name)
+    ijKeys[this.name] = newKey
     return newKey
   }
 }
