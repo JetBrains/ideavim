@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -346,5 +347,33 @@ class RepeatChangeActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
     )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-481"])
+  fun `test dot after overwrite mode`() {
+    configureByText("""
+    /**
+     * @param array ${'$'}arr_footers
+     * @param array ${'$'}arr_totals_data
+     * @param array ${'$'}arr_circulation_keys (Started beneath the 'a' of array on the line above; did Shift-R and typed 'array')
+     * @param $c      ${'$'}arr_periods
+     * @param       ${'$'}arr_options
+     *
+     * @return array
+     */
+    """.trimIndent())
+    typeText("Rarray<C-[>", "jgell.")
+    assertState("""
+    /**
+     * @param array ${'$'}arr_footers
+     * @param array ${'$'}arr_totals_data
+     * @param array ${'$'}arr_circulation_keys (Started beneath the 'a' of array on the line above; did Shift-R and typed 'array')
+     * @param array ${'$'}arr_periods
+     * @param array ${'$'}arr_options
+     *
+     * @return array
+     */
+    """.trimIndent())
   }
 }
