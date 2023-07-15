@@ -94,17 +94,21 @@ public data class SetLocalCommand(val ranges: Ranges, val argument: String) : Co
 public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
   val optionGroup = injector.optionGroup
+
+  val columnFormat = args.startsWith("!")
+  val argument = args.removePrefix("!").trimStart()
+
   when {
-    args.isEmpty() -> {
+    argument.isEmpty() -> {
       val changedOptions = optionGroup.getAllOptions().filter { !optionGroup.isDefaultValue(it, scope) }
-      showOptions(editor, changedOptions.map { Pair(it.name, it.name) }, scope, true)
+      showOptions(editor, changedOptions.map { Pair(it.name, it.name) }, scope, true, columnFormat)
       return true
     }
-    args == "all" -> {
-      showOptions(editor, optionGroup.getAllOptions().map { Pair(it.name, it.name) }, scope, true)
+    argument == "all" -> {
+      showOptions(editor, optionGroup.getAllOptions().map { Pair(it.name, it.name) }, scope, true, columnFormat)
       return true
     }
-    args == "all&" -> {
+    argument == "all&" -> {
       optionGroup.resetAllOptions()
       return true
     }
@@ -113,7 +117,7 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
   // We now have 1 or more option operators separator by spaces
   var error: String? = null
   var token = ""
-  val tokenizer = StringTokenizer(args)
+  val tokenizer = StringTokenizer(argument)
   val toShow = mutableListOf<Pair<String, String>>()
   while (tokenizer.hasMoreTokens()) {
     token = tokenizer.nextToken()
@@ -182,7 +186,7 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
 
   // Now show all options that were individually requested
   if (toShow.size > 0) {
-    showOptions(editor, toShow, scope, false)
+    showOptions(editor, toShow, scope, false, columnFormat)
   }
 
   if (error != null) {
@@ -198,7 +202,13 @@ private fun getValidOption(optionName: String, token: String = optionName) =
 private fun getValidToggleOption(optionName: String, token: String) =
   getValidOption(optionName, token) as? ToggleOption ?: throw exExceptionMessage("E474", token)
 
-private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
+private fun showOptions(
+  editor: VimEditor,
+  nameAndToken: Collection<Pair<String, String>>,
+  scope: OptionScope,
+  showIntro: Boolean,
+  columnFormat: Boolean
+) {
   val optionService = injector.optionGroup
   val optionsToShow = mutableListOf<Option<VimDataType>>()
   var unknownOption: Pair<String, String>? = null
@@ -218,7 +228,7 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
   val extra = mutableListOf<String>()
   for (option in optionsToShow) {
     val optionAsString = formatKnownOptionValue(option, scope)
-    if (optionAsString.length >= colWidth) extra.add(optionAsString) else cells.add(optionAsString)
+    if (columnFormat || optionAsString.length >= colWidth) extra.add(optionAsString) else cells.add(optionAsString)
   }
 
   // Note that this is the approximate width of the associated editor, not the ex output panel!
@@ -229,7 +239,7 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
 
   val output = buildString {
     if (showIntro) {
-      append("--- Options ---\n")
+      appendLine("--- Options ---")
     }
 
     for (h in 0 until height) {
