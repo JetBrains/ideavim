@@ -45,6 +45,7 @@ usual beta standards.
 * [VIM-2884](https://youtrack.jetbrains.com/issue/VIM-2884) Moving multiple lines in visual mode is not working
 * [VIM-2685](https://youtrack.jetbrains.com/issue/VIM-2685) Register command outputs different values for same registers
 * [VIM-1294](https://youtrack.jetbrains.com/issue/VIM-1294) unvoluntary unfolding when using ideavim
+* [VIM-2818](https://youtrack.jetbrains.com/issue/VIM-2818) Wrong caret position after multicaret paste
 
 ### Merged PRs:
 * [662](https://github.com/JetBrains/ideavim/pull/662) by [ludwig-jb](https://github.com/ludwig-jb): Update VimMessages#updateStatusBar to accept VimEditor
