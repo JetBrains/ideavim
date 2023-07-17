@@ -28,6 +28,13 @@ class SetCommandTest : VimTestCase() {
     configureByText("\n")
   }
 
+  private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("set shell=/dummy/path/to/bash")
+    enterCommand("set shellcmdflag=-x")
+    enterCommand("set shellxescape=@")
+    enterCommand("set shellxquote={")
+  }
+
   @Test
   fun `test unknown option`() {
     enterCommand("set unknownOption")
@@ -141,15 +148,16 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all effective option values`() {
+    setOsSpecificOptionsToSafeValues()
     assertCommandOutput("set all",
       """
         |--- Options ---
         |noargtextobj          ideawrite=all       scrolljump=1      notextobj-indent
         |  closenotebooks    noignorecase          scrolloff=0         timeout
         |nocommentary        noincsearch           selectmode=         timeoutlen=1000
-        |nodigraph           nomatchit             shellcmdflag=-c   notrackactionids
-        |noexchange            maxmapdepth=20      shellxescape=       undolevels=1000
-        |nogdefault            more                shellxquote=        unifyjumps
+        |nodigraph           nomatchit             shellcmdflag=-x   notrackactionids
+        |noexchange            maxmapdepth=20      shellxescape=@      undolevels=1000
+        |nogdefault            more                shellxquote={       unifyjumps
         |nohighlightedyank   nomultiple-cursors    showcmd             virtualedit=
         |  history=50        noNERDTree            showmode          novisualbell
         |nohlsearch            nrformats=hex       sidescroll=0        visualdelay=100
@@ -172,7 +180,7 @@ class SetCommandTest : VimTestCase() {
         |  matchpairs=(:),{:},[:]
         |noReplaceWithRegister
         |  selection=inclusive
-        |  shell=/usr/local/bin/bash
+        |  shell=/dummy/path/to/bash
         |novim-paragraph-motion
         |  viminfo='100,<50,s10,h
         |  vimscriptfunctionannotation
@@ -203,6 +211,7 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all option values in single column`() {
+    setOsSpecificOptionsToSafeValues()
     assertCommandOutput("set! all", """
       |--- Options ---
       |noargtextobj
@@ -250,10 +259,10 @@ class SetCommandTest : VimTestCase() {
       |  scrolloff=0
       |  selection=inclusive
       |  selectmode=
-      |  shell=/usr/local/bin/bash
-      |  shellcmdflag=-c
-      |  shellxescape=
-      |  shellxquote=
+      |  shell=/dummy/path/to/bash
+      |  shellcmdflag=-x
+      |  shellxescape=@
+      |  shellxquote={
       |  showcmd
       |  showmode
       |  sidescroll=0
