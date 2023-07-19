@@ -13,6 +13,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
 import com.intellij.util.childScope
 import com.maddyhome.idea.vim.api.injector
@@ -65,6 +67,11 @@ class OptionDeclaredScopeTest : VimTestCase() {
       splitWindow = openSplitWindow(originalEditor) // aaa.txt
       manager.currentWindow = it
     }
+  }
+
+  override fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
+    val fixture = factory.createFixtureBuilder("IdeaVim").fixture
+    return factory.createCodeInsightFixture(fixture)
   }
 
   // Note that this overwrites fixture.editor! This is the equivalent of `:new {file}`

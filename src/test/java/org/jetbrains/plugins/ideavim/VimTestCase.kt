@@ -109,13 +109,7 @@ abstract class VimTestCase {
   @BeforeEach
   open fun setUp(testInfo: TestInfo) {
     val factory = IdeaTestFixtureFactory.getFixtureFactory()
-    val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
-    val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor, "IdeaVim")
-    val fixture = fixtureBuilder.fixture
-    this.fixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
-      fixture,
-      LightTempDirTestFixtureImpl(true),
-    )
+    this.fixture = createFixture(factory)
     this.fixture.setUp()
     this.fixture.testDataPath = testDataPath
     // Note that myFixture.editor is usually null here. It's only set once configureByText has been called
@@ -139,6 +133,15 @@ abstract class VimTestCase {
     VimPlugin.clearError()
 
     this.testInfo = testInfo
+  }
+
+  protected open fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
+    val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
+    val fixture = factory.createLightFixtureBuilder(projectDescriptor, "IdeaVim").fixture
+    return factory.createCodeInsightFixture(
+      fixture,
+      LightTempDirTestFixtureImpl(true),
+    )
   }
 
   private val testDataPath: String
