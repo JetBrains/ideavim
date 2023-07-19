@@ -13,6 +13,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
 import com.intellij.util.childScope
 import com.maddyhome.idea.vim.api.VimEditor
@@ -68,6 +70,11 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
 
     // Split the current window. Since no options have been set, it will have default values
     splitWindow = openSplitWindow(originalEditor) // aaa.txt
+  }
+
+  override fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
+    val fixture = factory.createFixtureBuilder("IdeaVim").fixture
+    return factory.createCodeInsightFixture(fixture)
   }
 
   // Note that this overwrites fixture.editor! This is the equivalent of `:new {file}`
