@@ -11,6 +11,7 @@ plugins {
     kotlin("jvm")
 //    id("org.jlleitschuh.gradle.ktlint")
     id("com.google.devtools.ksp") version "1.8.21-1.0.11"
+  `maven-publish`
 }
 
 // group 'org.jetbrains.ideavim'
@@ -59,4 +60,29 @@ tasks {
 
 kotlin {
     explicitApi()
+}
+
+val spaceUsername: String by project
+val spacePassword: String by project
+val engineVersion: String by project
+val uploadUrl: String by project
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      groupId = "com.maddyhome.idea.vim"
+      artifactId = "vim-engine"
+      version = engineVersion
+      from(components["java"])
+    }
+  }
+  repositories {
+    maven {
+      url = uri(uploadUrl)
+      credentials {
+        username = spaceUsername
+        password = spacePassword
+      }
+    }
+  }
 }
