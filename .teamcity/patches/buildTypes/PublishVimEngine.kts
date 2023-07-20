@@ -11,6 +11,9 @@ accordingly, and delete the patch script.
 changeBuildType(RelativeId("PublishVimEngine")) {
     params {
         add {
+            param("env.ORG_GRADLE_PROJECT_uploadUrl", "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+        }
+        add {
             param("env.ORG_GRADLE_PROJECT_spaceUsername", "Aleksei.Plate")
         }
         add {
