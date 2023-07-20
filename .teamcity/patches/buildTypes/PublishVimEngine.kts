@@ -13,5 +13,8 @@ changeBuildType(RelativeId("PublishVimEngine")) {
         add {
             param("env.ORG_GRADLE_PROJECT_spaceUsername", "Aleksei.Plate")
         }
+        add {
+            password("env.ORG_GRADLE_PROJECT_spacePassword", "credentialsJSON:790b4e43-ee83-4184-b81b-678afab60409", display = ParameterDisplay.HIDDEN)
+        }
     }
 }
