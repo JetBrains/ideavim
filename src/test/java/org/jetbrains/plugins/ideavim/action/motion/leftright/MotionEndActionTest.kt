@@ -159,4 +159,27 @@ class MotionEndActionTest : VimTestCase() {
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  fun `test motion end with multiple code point grapheme cluster at the end`() {
+    val keys = listOf("<End>")
+    val before = """
+            Lorem Ipsum
+
+            I found it in ${c}a legendary land👩‍👩‍👧‍👧
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    val after = """
+            Lorem Ipsum
+
+            I found it in a legendary land${c}👩‍👩‍👧‍👧
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
 }

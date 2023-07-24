@@ -191,6 +191,32 @@ class MotionRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  fun `test simple motion multiple code point grapheme cluster`() {
+    doTest(
+      "l",
+      """
+            Lorem Ipsum
+
+            I found it in a legendar${c}👩‍👩‍👧‍👧 land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+            Lorem Ipsum
+
+            I found it in a legendar👩‍👩‍👧‍👧${c} land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion czech`() {
     doTest(
       "l",
