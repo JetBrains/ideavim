@@ -3,6 +3,8 @@ package patches.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -11,6 +13,25 @@ To apply the patch, change the buildType with id = 'Qodana'
 accordingly, and delete the patch script.
 */
 changeBuildType(RelativeId("Qodana")) {
+    triggers {
+        val trigger1 = find<ScheduleTrigger> {
+            schedule {
+                schedulingPolicy = daily {
+                    hour = 12
+                    minute = 0
+                    timezone = "SERVER"
+                }
+                triggerBuild = always()
+                param("dayOfWeek", "Sunday")
+            }
+        }
+        trigger1.apply {
+            enabled = false
+            triggerBuild = always()
+
+        }
+    }
+
     failureConditions {
         val feature1 = find<BuildFailureOnMetric> {
             failOnMetricChange {
