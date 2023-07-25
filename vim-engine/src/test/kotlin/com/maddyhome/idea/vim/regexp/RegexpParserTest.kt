@@ -134,8 +134,48 @@ class RegexpParserTest {
   }
 
   @Test
-  fun `single char with range multi`() {
-    assertSuccess("a\\{1,3}", PATTERN)
+  fun `'ab'`() {
+    assertSuccess("ab", PATTERN)
+  }
+
+  @Test
+  fun `sequence of 0 or more 'ab'`() {
+    assertSuccess("\\(ab\\)*", PATTERN)
+  }
+
+  @Test
+  fun `sequence of 0 or more 'ab' no magic`() {
+    assertSuccess("\\M\\(ab\\)\\*", PATTERN)
+  }
+
+  @Test
+  fun `sequence of 1 or more 'ab'`() {
+    assertSuccess("\\(ab\\)\\+", PATTERN)
+  }
+
+  @Test
+  fun `0 or 1 'ab' with equals`() {
+    assertSuccess("\\(ab\\)\\=", PATTERN)
+  }
+
+  @Test
+  fun `0 or 1 'ab' with question mark`() {
+    assertSuccess("\\(ab\\)\\?", PATTERN)
+  }
+
+  @Test
+  fun `nested groups with multi`() {
+    assertSuccess("\\(\\(a\\)*b\\)\\+", PATTERN)
+  }
+
+  @Test
+  fun `unclosed group`() {
+    assertFailure("\\(ab", PATTERN)
+  }
+
+  @Test
+  fun `unmatched closing )`() {
+    assertFailure("ab\\)", PATTERN)
   }
 
   private fun generateParser(pattern: String): RegexParser {

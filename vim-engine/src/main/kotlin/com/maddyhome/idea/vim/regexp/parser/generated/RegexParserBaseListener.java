@@ -28,6 +28,18 @@ public class RegexParserBaseListener implements RegexParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSub_pattern(RegexParser.Sub_patternContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSub_pattern(RegexParser.Sub_patternContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBranch(RegexParser.BranchContext ctx) { }
 	/**
 	 * {@inheritDoc}
