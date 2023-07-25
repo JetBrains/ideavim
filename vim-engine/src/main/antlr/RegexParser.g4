@@ -2,8 +2,11 @@ parser grammar RegexParser;
 
 options { tokenVocab=RegexLexer; }
 
-pattern : (branch (ALTERNATION_MAGIC | ALTERNATION_NOMAGIC))* branch
+pattern : sub_pattern EOF
         ;
+
+sub_pattern : (branch (ALTERNATION_MAGIC | ALTERNATION_NOMAGIC))* branch
+            ;
 
 branch : (concat (AND_MAGIC | AND_NOMAGIC))* concat
        ;
@@ -14,8 +17,8 @@ concat : piece+
 piece : atom multi?
       ;
 
-atom : ordinary_atom                                                                              #OrdinaryAtom
-     | (LEFT_PAREN_MAGIC | LEFT_PAREN_NOMAGIC) pattern? (RIGHT_PAREN_MAGIC | RIGHT_PAREN_NOMAGIC) #Grouping
+atom : ordinary_atom                                                                                  #OrdinaryAtom
+     | (LEFT_PAREN_MAGIC | LEFT_PAREN_NOMAGIC) sub_pattern? (RIGHT_PAREN_MAGIC | RIGHT_PAREN_NOMAGIC) #Grouping
      ;
 
 multi : (STAR_MAGIC | STAR_NOMAGIC)         #ZeroOrMore

@@ -18,6 +18,16 @@ public interface RegexParserListener extends ParseTreeListener {
 	 */
 	void exitPattern(RegexParser.PatternContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link RegexParser#sub_pattern}.
+	 * @param ctx the parse tree
+	 */
+	void enterSub_pattern(RegexParser.Sub_patternContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link RegexParser#sub_pattern}.
+	 * @param ctx the parse tree
+	 */
+	void exitSub_pattern(RegexParser.Sub_patternContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link RegexParser#branch}.
 	 * @param ctx the parse tree
 	 */

@@ -17,6 +17,12 @@ public interface RegexParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPattern(RegexParser.PatternContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link RegexParser#sub_pattern}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSub_pattern(RegexParser.Sub_patternContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link RegexParser#branch}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
