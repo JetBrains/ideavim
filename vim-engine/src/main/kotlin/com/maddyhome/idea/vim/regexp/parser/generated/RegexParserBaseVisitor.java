@@ -353,12 +353,12 @@ public class RegexParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSingleColChar(RegexParser.SingleColCharContext ctx) { return visitChildren(ctx); }
+	@Override public T visitRangeColElem(RegexParser.RangeColElemContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRangeColChar(RegexParser.RangeColCharContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSingleColElem(RegexParser.SingleColElemContext ctx) { return visitChildren(ctx); }
 }

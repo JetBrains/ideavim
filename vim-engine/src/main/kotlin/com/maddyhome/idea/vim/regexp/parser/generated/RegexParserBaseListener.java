@@ -592,25 +592,25 @@ public class RegexParserBaseListener implements RegexParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSingleColChar(RegexParser.SingleColCharContext ctx) { }
+	@Override public void enterRangeColElem(RegexParser.RangeColElemContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSingleColChar(RegexParser.SingleColCharContext ctx) { }
+	@Override public void exitRangeColElem(RegexParser.RangeColElemContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRangeColChar(RegexParser.RangeColCharContext ctx) { }
+	@Override public void enterSingleColElem(RegexParser.SingleColElemContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRangeColChar(RegexParser.RangeColCharContext ctx) { }
+	@Override public void exitSingleColElem(RegexParser.SingleColElemContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
