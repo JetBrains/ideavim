@@ -574,27 +574,27 @@ public interface RegexParserListener extends ParseTreeListener {
 	 */
 	void exitCollectionNeg(RegexParser.CollectionNegContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code SingleColChar}
+	 * Enter a parse tree produced by the {@code RangeColElem}
 	 * labeled alternative in {@link RegexParser#collection_elem}.
 	 * @param ctx the parse tree
 	 */
-	void enterSingleColChar(RegexParser.SingleColCharContext ctx);
+	void enterRangeColElem(RegexParser.RangeColElemContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code SingleColChar}
+	 * Exit a parse tree produced by the {@code RangeColElem}
 	 * labeled alternative in {@link RegexParser#collection_elem}.
 	 * @param ctx the parse tree
 	 */
-	void exitSingleColChar(RegexParser.SingleColCharContext ctx);
+	void exitRangeColElem(RegexParser.RangeColElemContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code RangeColChar}
+	 * Enter a parse tree produced by the {@code SingleColElem}
 	 * labeled alternative in {@link RegexParser#collection_elem}.
 	 * @param ctx the parse tree
 	 */
-	void enterRangeColChar(RegexParser.RangeColCharContext ctx);
+	void enterSingleColElem(RegexParser.SingleColElemContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code RangeColChar}
+	 * Exit a parse tree produced by the {@code SingleColElem}
 	 * labeled alternative in {@link RegexParser#collection_elem}.
 	 * @param ctx the parse tree
 	 */
-	void exitRangeColChar(RegexParser.RangeColCharContext ctx);
+	void exitSingleColElem(RegexParser.SingleColElemContext ctx);
 }

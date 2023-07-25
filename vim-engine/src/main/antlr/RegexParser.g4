@@ -71,6 +71,6 @@ collection : (COLLECTION_START_MAGIC | COLLECTION_START_NOMAGIC) collection_elem
            | (COLLECTION_START_MAGIC | COLLECTION_START_NOMAGIC) CARET collection_elem* COLLECTION_END #CollectionNeg
            ;
 
-collection_elem : COLLECTION_CHAR                      #SingleColChar
-                | COLLECTION_CHAR DASH COLLECTION_CHAR #RangeColChar
+collection_elem : (COLLECTION_CHAR | DASH | ESCAPED_CHAR) DASH (COLLECTION_CHAR | DASH | ESCAPED_CHAR) #RangeColElem
+                | (COLLECTION_CHAR | DASH | ESCAPED_CHAR)                                              #SingleColElem
                 ;

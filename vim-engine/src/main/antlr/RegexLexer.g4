@@ -138,5 +138,5 @@ mode INSIDE_COLLECTION;
 COLLECTION_END: ']' -> popMode;
 CARET: '^';
 DASH: '-';
-LITERAL_DASH: '\\-';
+ESCAPED_CHAR: '\\\\' | '\\-' | '\\^' | '\\]';
 COLLECTION_CHAR: [a-zA-Z0-9];

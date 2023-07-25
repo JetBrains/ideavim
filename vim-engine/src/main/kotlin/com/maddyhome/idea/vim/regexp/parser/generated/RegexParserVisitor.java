@@ -342,17 +342,17 @@ public interface RegexParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCollectionNeg(RegexParser.CollectionNegContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code SingleColChar}
+	 * Visit a parse tree produced by the {@code RangeColElem}
 	 * labeled alternative in {@link RegexParser#collection_elem}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSingleColChar(RegexParser.SingleColCharContext ctx);
+	T visitRangeColElem(RegexParser.RangeColElemContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code RangeColChar}
+	 * Visit a parse tree produced by the {@code SingleColElem}
 	 * labeled alternative in {@link RegexParser#collection_elem}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRangeColChar(RegexParser.RangeColCharContext ctx);
+	T visitSingleColElem(RegexParser.SingleColElemContext ctx);
 }
