@@ -18,8 +18,6 @@ import kotlin.test.fail
 
 
 class RegexpParserTest {
-  private val PATTERN = "pattern"
-  private val RANGE = "range"
   @Test
   fun `range both bounds`() {
     assertSuccess("\\{2,5}", RANGE)
@@ -61,6 +59,81 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `collection a to z`() {
+    assertSuccess("[a-z]", COLLECTION)
+  }
+
+  @Test
+  fun `collection 0 to 9`() {
+    assertSuccess("[0-9]", COLLECTION)
+  }
+  @Test
+  fun `collection single element`() {
+    assertSuccess("[f]", COLLECTION)
+  }
+
+  @Test
+  fun `collection a to z and A`() {
+    assertSuccess("[a-zA]", COLLECTION)
+  }
+
+  @Test
+  fun `collection a to z and A to Z`() {
+    assertSuccess("[a-zA-Z]", COLLECTION)
+  }
+
+  @Test
+  fun `collection a to z, 9 and A to Z`() {
+    assertSuccess("[a-z9A-Z]", COLLECTION)
+  }
+
+  @Test
+  fun `collection a to z, dash and Z`() {
+    /**
+     * This pattern looks like it should
+     * be illegal, but Vim allows it and
+     * matches the characters 'a' to 'z', a
+     * literal dash '-' and a 'Z'
+     */
+    assertSuccess("[a-z-Z]", COLLECTION)
+  }
+
+  @Test
+  fun `collection with single dash`() {
+    assertSuccess("[-]", COLLECTION)
+  }
+
+  @Test
+  fun `collection dash to 0`() {
+    assertSuccess("[--0]", COLLECTION)
+  }
+
+  @Test
+  fun `collection literal dash and a to z`() {
+    assertSuccess("[-a-z]", COLLECTION)
+  }
+
+  @Test
+  fun `collection a to z and literal dash`() {
+    assertSuccess("[a-z-]", COLLECTION)
+  }
+
+  @Test
+  fun `collection a, literal dash and b`() {
+    assertSuccess("[a\\-b]", COLLECTION)
+  }
+
+  @Test
+  fun `collection escaped backslash`() {
+    assertSuccess("[\\\\]", COLLECTION)
+  }
+
+  @Test
+  fun `collection a to z negated`() {
+    assertSuccess("[^a-z]", COLLECTION)
+  }
+
+  @Test
   fun `single char with range multi`() {
     assertSuccess("a\\{1,3}", PATTERN)
   }
@@ -85,5 +158,11 @@ class RegexpParserTest {
       return
     }
     fail("Pattern $pattern should fail for rule $startSymbol")
+  }
+
+  companion object {
+    private const val PATTERN = "pattern"
+    private const val COLLECTION = "collection"
+    private const val RANGE = "range"
   }
 }
