@@ -8,12 +8,12 @@
 
 package com.maddyhome.idea.vim.regexp
 
-import com.maddyhome.idea.vim.regexp.parser.error.RegexParserErrorListener
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexLexer
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
+import com.maddyhome.idea.vim.regexp.parser.error.BailErrorLexer
+import com.maddyhome.idea.vim.regexp.parser.RegexParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.jupiter.api.Test
+import java.lang.reflect.InvocationTargetException
 import kotlin.test.fail
 
 
@@ -56,17 +56,19 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `range non integer bound`() {
+    assertFailure("\\{2,g}", RANGE)
+  }
+
+  @Test
   fun `single char with range multi`() {
     assertSuccess("a\\{1,3}", PATTERN)
   }
 
-  private fun generateParser(pattern : String) : RegexParser {
-    val regexLexer = RegexLexer(CharStreams.fromString(pattern))
+  private fun generateParser(pattern: String): RegexParser {
+    val regexLexer = BailErrorLexer(CharStreams.fromString(pattern))
     val tokens = CommonTokenStream(regexLexer)
-    val parser = RegexParser(tokens)
-    parser.removeErrorListeners()
-    parser.addErrorListener(RegexParserErrorListener())
-    return parser
+    return RegexParser(tokens)
   }
 
   private fun assertSuccess(pattern: String, startSymbol : String) {
@@ -78,7 +80,8 @@ class RegexpParserTest {
     try {
       val parser = generateParser(pattern)
       parser.javaClass.getMethod(startSymbol).invoke(parser)
-    } catch (exception: Exception) {
+    } catch (exception: InvocationTargetException) {
+      exception.printStackTrace()
       return
     }
     fail("Pattern $pattern should fail for rule $startSymbol")
