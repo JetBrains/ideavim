@@ -26,7 +26,6 @@ object ReleaseMinor : IdeaVimBuildType({
   description = "Build and publish IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = VERSION
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", RELEASE)
