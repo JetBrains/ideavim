@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
@@ -431,8 +432,22 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return IndentConfig.create(editor).createIndentBySize(size)
   }
 
-  override fun getCollapsedRegionAtOffset(offset: Int): TextRange? {
-    return editor.foldingModel.getCollapsedRegionAtOffset(offset)?.let { TextRange(it.startOffset, it.endOffset) }
+  override fun getFoldRegionAtOffset(offset: Int): VimFoldRegion? {
+    val ijFoldRegion = editor.foldingModel.getCollapsedRegionAtOffset(offset) ?: return null
+    return object : VimFoldRegion {
+      override var isExpanded: Boolean
+        get() = ijFoldRegion.isExpanded
+        set(value) {
+          editor.foldingModel.runBatchFoldingOperation {
+            ijFoldRegion.isExpanded = value
+          }
+        }
+      override val startOffset: Offset
+        get() = Offset(ijFoldRegion.startOffset)
+      override val endOffset: Offset
+        get() = Offset(ijFoldRegion.endOffset)
+
+    }
   }
 
   override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T {

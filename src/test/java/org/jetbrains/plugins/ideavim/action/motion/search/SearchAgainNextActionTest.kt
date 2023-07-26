@@ -8,8 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.search
 
+import com.maddyhome.idea.vim.api.getVisualLineCount
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class SearchAgainNextActionTest : VimTestCase() {
   @Test
@@ -97,5 +100,25 @@ class SearchAgainNextActionTest : VimTestCase() {
 
     // Should search again for the substitution pattern, but apply offset from search
     doTest(listOf(searchCommand("/land/2"), exCommand("s/it/I"), "n"), before, after)
+  }
+
+  @Test
+  fun `test search unfolds text`() {
+    configureByJavaText("""
+      // My long comment that will be the longest line in the text
+      /* 
+      pu${c}pa
+      */
+    """.trimIndent())
+
+    val foldingModel = fixture.editor.foldingModel
+    foldingModel.runBatchFoldingOperation {
+      val foldRegion = foldingModel.addFoldRegion(61, 71, "pupa")
+      foldRegion!!.isExpanded = false
+    }
+    assertEquals(2, IjVimEditor(fixture.editor).getVisualLineCount())
+
+    typeText("/pupa<CR>")
+    assertEquals(4, IjVimEditor(fixture.editor).getVisualLineCount())
   }
 }

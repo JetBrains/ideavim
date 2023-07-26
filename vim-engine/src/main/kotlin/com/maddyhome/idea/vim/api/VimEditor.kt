@@ -266,7 +266,7 @@ public interface VimEditor {
   }
 
   public fun createIndentBySize(size: Int): String
-  public fun getCollapsedRegionAtOffset(offset: Int): TextRange?
+  public fun getFoldRegionAtOffset(offset: Int): VimFoldRegion?
 
   /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret
@@ -314,3 +314,9 @@ public class BufferPosition(
 
 // TODO: [visual] Try to remove this. It's an IntelliJ concept and doesn't have a Vim equivalent
 public data class VimVisualPosition(val line: Int, public val column: Int, public val leansRight: Boolean = false)
+
+public interface VimFoldRegion {
+  public var isExpanded: Boolean
+  public val startOffset: Offset
+  public val endOffset: Offset
+}

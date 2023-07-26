@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 
 public open class MotionUpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
+  override val keepFold: Boolean = true
 
   override fun getOffset(
     editor: VimEditor,

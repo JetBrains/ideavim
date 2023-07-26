@@ -26,6 +26,7 @@ public class MotionGotoLineLastAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override val motionType: MotionType = MotionType.LINE_WISE
+  override val keepFold: Boolean = true
 
   override fun getOffset(
     editor: VimEditor,

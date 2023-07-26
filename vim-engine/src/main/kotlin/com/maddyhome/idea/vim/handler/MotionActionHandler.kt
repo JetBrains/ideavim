@@ -35,6 +35,10 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
  * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
 public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
+  /**
+   * By default, we unfold collapsed regions after caret movement inside the fold
+   */
+  public open val keepFold: Boolean = false
 
   /**
    * Base class for motion handlers.
@@ -215,9 +219,13 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       resultOffset = editor.normalizeOffset(resultOffset, false)
     }
 
-    val collapsedRegion = editor.getCollapsedRegionAtOffset(resultOffset)
-    if (collapsedRegion != null) {
-      resultOffset = collapsedRegion.startOffset
+    val foldRegion = editor.getFoldRegionAtOffset(resultOffset)
+    if (foldRegion != null && !foldRegion.isExpanded) {
+      if (keepFold) {
+        resultOffset = foldRegion.startOffset.point
+      } else {
+        foldRegion.isExpanded = true
+      }
     }
 
     return resultOffset

@@ -23,6 +23,7 @@ import javax.swing.KeyStroke
 
 public class MotionArrowDownAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.LINE_WISE
+  override val keepFold: Boolean = true
 
   override val keyStrokesSet: Set<List<KeyStroke>> =
     setOf(injector.parser.parseKeys("<Down>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))

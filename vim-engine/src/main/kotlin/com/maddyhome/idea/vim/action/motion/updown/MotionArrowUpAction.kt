@@ -23,6 +23,7 @@ import javax.swing.KeyStroke
 
 public class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.LINE_WISE
+  override val keepFold: Boolean = true
 
   override val keyStrokesSet: Set<List<KeyStroke>> =
     setOf(injector.parser.parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
