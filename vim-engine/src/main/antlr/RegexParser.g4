@@ -2,40 +2,92 @@ parser grammar RegexParser;
 
 options { tokenVocab=RegexLexer; }
 
+/**
+ * A pattern is a sub_pattern, followed by an end-of-file.
+ */
 pattern : sub_pattern EOF
         ;
 
+/**
+ * A sub-pattern is one or more branches, separated by "\|".  It matches anything
+ * that matches one of the branches. Example: "vim\|VIM" matches "vim" and
+ * matches "VIM". If more than one branch matches, the first one is used.
+ */
 sub_pattern : (branch ALTERNATION)* branch
             ;
-
+/**
+ * A branch is one or more concats, separated by "\&". It matches the last
+ * concat, but only if all the preceding concats also match at the same
+ * position. Example: "IdeaVim\&Idea matches "Idea" in "IdeaVim".
+ */
 branch : (concat AND)* concat
        ;
 
+/**
+ * A concat is one or more pieces, concatenated.  It matches a match for the
+ * first piece, followed by a match for the second piece, etc. Example:
+ * "i[0-9]v", first matches "i", then a digit and then "v".
+ */
 concat : piece+
        ;
 
+/**
+ * A piece is an atom, possibly followed by a multi, an indication of how many
+ * times the atom can be matched. Example: "a*" matches any sequence of "a"
+ * characters: "", "a", "aa", etc.
+ */
 piece : atom multi?
       ;
 
-atom : ordinary_atom                       #OrdinaryAtom
-     | LEFT_PAREN sub_pattern? RIGHT_PAREN #Grouping
+/**
+ * An atom is an ordinary_atom, or a sub_pattern surrounded with parenthesis.
+ * If the left parenthesis is preceded by a %, it doesn't count as a
+ * capture group.
+ */
+atom : ordinary_atom                                 #OrdinaryAtom
+     | LEFT_PAREN sub_pattern? RIGHT_PAREN           #Grouping
+     | LEFT_PAREN_NOCAPTURE sub_pattern? RIGHT_PAREN #Grouping
      ;
 
+/**
+ * A multi is an indication of how many times the preceding atom should be
+ * matched. It can be a "*" for zero or more times, "\+" for one or more times,
+ * "\?" or "\=" for zero or one times, or a range for a more customizable
+ * number of times.
+ */
 multi : STAR     #ZeroOrMore
       | PLUS     #OneOrMore
       | OPTIONAL #ZeroOrOne
       | range    #RangeQuantifier
       ;
 
+/**
+ * A range is a custom quantification of the number of times that the
+ * preceding atom can be matched. It can be a range from a number to another,
+ * up to a number, more that a number, or an absolute number of times.
+ * Examples: "a\{3,5}" matches any sequence of 3 to 5 "a" characters;
+ * "a\{,5}" matches any sequence of up to, and including, 5 "a" characters;
+ * "a\{3,}" matches any sequence of 3 or more "a" characters;
+ * "a\{4}" matches a sequence of exactly 4 "a" characters;
+ * "a\{}" matches any sequence of "a" characters.
+ */
+range : RANGE_START INT? (COMMA INT?)? RANGE_END
+      ;
+
+/**
+ * An ordinary_atom can be a single character that matches itself, a token with
+ * a special meaning, or a collection of characters.
+ */
 ordinary_atom : LITERAL_CHAR #LiteralChar
               | DOT          #AnyChar
               | char_class   #CharClass
               | collection   #Collec
               ;
 
-range : RANGE_START INT? (COMMA INT?)? RANGE_END
-      ;
-
+/**
+ * A character class matches any character that is in that class. Example:
+ * \d matches any digit from 0 to 9.
+ */
 char_class : CLASS_IDENTIFIER   #Identifier
            | CLASS_IDENTIFIER_D #IdentifierNotDigit
            | CLASS_KEYWORD      #Keyword
@@ -69,6 +121,15 @@ char_class : CLASS_IDENTIFIER   #Identifier
            | CLASS_NL           #NL
            ;
 
+/**
+ * A collection is a sequence of characters inside square brackets. It
+ * matches any single caracter in the collection. If two characters in
+ * the sequence are separated by '-', this is shorthand for the full list
+ * of ASCII characters between them. Examples:
+ * "[abc]" matches either "a", "b", or "c". Equivalent to "a\|b\|c";
+ * "[0-9]" matches any digit from 0 to 9;
+ * "[a-zA-Z]" matches any alphabetic character.
+ */
 collection : COLLECTION_START collection_elem* COLLECTION_END       #CollectionPos
            | COLLECTION_START CARET collection_elem* COLLECTION_END #CollectionNeg
            ;
