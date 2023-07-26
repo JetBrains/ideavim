@@ -1,6 +1,8 @@
 package patches.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.GradleBuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
@@ -52,5 +54,30 @@ changeBuildType(RelativeId("ReleaseMinor")) {
                 scriptContent = "git fetch --tags origin"
             }
         }
+        update<GradleBuildStep>(1) {
+            enabled = true
+            clearConditions()
+        }
+        update<GradleBuildStep>(2) {
+            clearConditions()
+        }
+        update<GradleBuildStep>(3) {
+            clearConditions()
+        }
+        update<GradleBuildStep>(4) {
+            enabled = false
+            clearConditions()
+        }
     }
+
+    features {
+        add {
+            sshAgent {
+                teamcitySshKey = "IdeaVim ssh keys"
+            }
+        }
+    }
+
+    expectDisabledSettings()
+    updateDisabledSettings("RUNNER_3", "RUNNER_4")
 }
