@@ -25,6 +25,7 @@ fun main(args: Array<String>) {
 private fun getVersion(projectDir: String): Semver {
   val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
   val git = Git(repository)
+  git.pull().call()
 
   val version = git.tagList().call().mapNotNull { ref ->
     runCatching {
