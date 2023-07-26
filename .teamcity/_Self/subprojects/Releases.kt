@@ -4,6 +4,7 @@ import _Self.buildTypes.PublishVimEngine
 import _Self.buildTypes.Release
 import _Self.buildTypes.ReleaseDev
 import _Self.buildTypes.ReleaseEap
+import _Self.buildTypes.ReleaseMinor
 import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
@@ -30,6 +31,7 @@ object Releases : Project({
   }
 
   buildType(Release)
+  buildType(ReleaseMinor)
   buildType(ReleaseEap)
   buildType(ReleaseDev)
   buildType(PublishVimEngine)
