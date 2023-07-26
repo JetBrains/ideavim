@@ -7,7 +7,8 @@ tokens {
   CLASS_WS, CLASS_NOT_WS, CLASS_DIGIT, CLASS_NOT_DIGIT, CLASS_HEX, CLASS_NOT_HEX,
   CLASS_OCTAL, CLASS_NOT_OCTAL, CLASS_WORD, CLASS_NOT_WORD, CLASS_HEADWORD, CLASS_NOT_HEADWORD,
   CLASS_ALPHA, CLASS_NOT_ALPHA, CLASS_LCASE, CLASS_NOT_LCASE, CLASS_UCASE, CLASS_NOT_UCASE,
-  CLASS_ESC, CLASS_TAB, CLASS_CR, CLASS_BS, CLASS_NL, COLLECTION_LITERAL_CHAR
+  CLASS_ESC, CLASS_TAB, CLASS_CR, CLASS_BS, CLASS_NL, COLLECTION_LITERAL_CHAR,
+  LEFT_PAREN_NOCAPTURE
 }
 
 // ------------------------------------------------------------------------------------------------ //
@@ -20,6 +21,7 @@ tokens {
 ALTERNATION_MAGIC: '\\|' -> type(ALTERNATION);
 AND_MAGIC: '\\&' -> type(AND);
 LEFT_PAREN_MAGIC: '\\(' -> type(LEFT_PAREN);
+LEFT_PAREN_NOCAPTURE_MAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_MAGIC: '\\)' -> type(RIGHT_PAREN);
 LITERAL_CHAR_MAGIC: ([ -#%-)+--0-9:-@A-Z\]_`a-}] | '\\\\' | '\\$'| '\\.' | '\\/' | '\\[' | '\\^' | '\\~') -> type(LITERAL_CHAR);
 DOT_MAGIC: '.' -> type(DOT);
@@ -80,6 +82,7 @@ mode NO_MAGIC;
 ALTERNATION_NOMAGIC: '\\|' -> type(ALTERNATION);
 AND_NOMAGIC: '\\&' -> type(AND);
 LEFT_PAREN_NOMAGIC: '\\(' -> type(LEFT_PAREN);
+LEFT_PAREN_NOCAPTURE_NOMAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_NOMAGIC: '\\)' -> type(RIGHT_PAREN);
 LITERAL_CHAR_NOMAGIC: ([ -#%-.0-9:-@A-Z[\]_`a-~] | '\\\\' | '\\$'| '\\/' | '\\^') -> type(LITERAL_CHAR);
 DOT_NOMAGIC: '\\.' -> type(DOT);
