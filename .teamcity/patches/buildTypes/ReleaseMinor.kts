@@ -46,7 +46,7 @@ changeBuildType(RelativeId("ReleaseMinor")) {
         }
     }
     steps {
-        insert(4) {
+        insert(0) {
             script {
                 name = "Pull git tags"
                 scriptContent = "git fetch --tags origin"
