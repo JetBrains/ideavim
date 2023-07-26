@@ -60,16 +60,19 @@ object ReleaseMinor : IdeaVimBuildType({
       scriptContent = "git fetch --tags origin"
     }
     gradle {
-      tasks = "clean scripts:calculateNewVersion"
+      name = "Calculate new version"
+      tasks = "scripts:calculateNewVersion"
       buildFile = ""
       enableStacktrace = true
     }
     gradle {
-      tasks = "clean scripts:changelogUpdateUnreleased"
+      name = "Update change log"
+      tasks = "scripts:changelogUpdateUnreleased"
       buildFile = ""
       enableStacktrace = true
     }
     gradle {
+      name = "Publish release"
       tasks = "clean publishPlugin"
       buildFile = ""
       enableStacktrace = true

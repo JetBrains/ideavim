@@ -19,7 +19,9 @@ fun main(args: Array<String>) {
   println("Working directory: $projectDir")
   val lastVersion = getVersion(projectDir)
 
-  println("Next minor version: ${lastVersion.nextMinor()}")
+  val nextMinor = lastVersion.nextMinor()
+  println("Next minor version: $nextMinor")
+  println("##teamcity[setParameter name='env.ORG_GRADLE_PROJECT_version' value='$nextMinor']")
 }
 
 private fun getVersion(projectDir: String): Semver {
