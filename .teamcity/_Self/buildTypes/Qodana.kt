@@ -63,6 +63,7 @@ object Qodana : IdeaVimBuildType({
         timezone = "SERVER"
       }
       param("dayOfWeek", "Sunday")
+      enabled = false
     }
   }
 
@@ -74,6 +75,7 @@ object Qodana : IdeaVimBuildType({
       compareTo = value()
       metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
       param("metricKey", "QodanaProblemsNew")
+      enabled = false
     }
   }
 })
