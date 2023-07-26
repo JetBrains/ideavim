@@ -67,3 +67,9 @@ tasks.register("calculateNewVersion", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf("${rootProject.rootDir}")
 }
+
+tasks.register("changelogUpdateUnreleased", JavaExec::class) {
+  mainClass.set("scripts.ChangelogUpdateUnreleasedKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), "${rootProject.rootDir}")
+}

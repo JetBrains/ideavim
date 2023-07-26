@@ -17,7 +17,9 @@ import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
@@ -53,8 +55,17 @@ object ReleaseMinor : IdeaVimBuildType({
   }
 
   steps {
+    script {
+      name = "Pull git tags"
+      scriptContent = "git fetch --tags origin"
+    }
     gradle {
       tasks = "clean scripts:calculateNewVersion"
+      buildFile = ""
+      enableStacktrace = true
+    }
+    gradle {
+      tasks = "clean scripts:changelogUpdateUnreleased"
       buildFile = ""
       enableStacktrace = true
     }
@@ -73,6 +84,12 @@ object ReleaseMinor : IdeaVimBuildType({
       name = "Slack Notification"
       tasks = "slackNotification"
       enabled = false
+    }
+  }
+
+  features {
+    sshAgent {
+      teamcitySshKey = "IdeaVim ssh keys"
     }
   }
 
