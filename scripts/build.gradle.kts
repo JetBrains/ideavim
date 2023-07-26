@@ -65,5 +65,5 @@ tasks.register("updateAffectedRates", JavaExec::class) {
 tasks.register("calculateNewVersion", JavaExec::class) {
   mainClass.set("scripts.CalculateNewVersionKt")
   classpath = sourceSets["main"].runtimeClasspath
-  args = listOf("$rootDir")
+  args = listOf("${rootProject.rootDir}")
 }
