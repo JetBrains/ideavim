@@ -5,6 +5,7 @@ import _Self.Constants.RELEASE_DEV
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
@@ -59,6 +60,12 @@ object ReleaseDev : IdeaVimBuildType({
         hour = 2
       }
       branchFilter = ""
+    }
+  }
+
+  features {
+    sshAgent {
+      teamcitySshKey = "IdeaVim ssh keys"
     }
   }
 
