@@ -68,57 +68,46 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Select branch"
       tasks = "scripts:selectBranch"
-      enableStacktrace = true
     }
     gradle {
       name = "Calculate new version"
       tasks = "scripts:calculateNewVersion"
-      enableStacktrace = true
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
-      enableStacktrace = true
     }
     gradle {
       name = "Update change log"
       tasks = "scripts:changelogUpdateUnreleased"
-      enableStacktrace = true
     }
     gradle {
       name = "Commit preparation changes"
       tasks = "scripts:commitChanges"
-      enableStacktrace = true
     }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
-      enableStacktrace = true
     }
     gradle {
       name = "Reset release branch"
       tasks = "scripts:resetReleaseBranch"
-      enableStacktrace = true
     }
     gradle {
       name = "Publish release"
       tasks = "publishPlugin"
-      enableStacktrace = true
     }
     gradle {
       name = "Push changes to the repo"
       tasks = "scripts:pushChanges"
-      enableStacktrace = true
     }
     gradle {
       name = "Run Integrations"
       tasks = "releaseActions"
-      enableStacktrace = true
     }
     gradle {
       name = "Slack Notification"
       tasks = "slackNotification"
-      enableStacktrace = true
     }
   }
 
