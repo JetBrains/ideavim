@@ -23,8 +23,6 @@ AND_MAGIC: '\\&' -> type(AND);
 LEFT_PAREN_MAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_MAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_MAGIC: '\\)' -> type(RIGHT_PAREN);
-LITERAL_CHAR_MAGIC: ([ -#%-)+--0-9:-@A-Z\]_`a-}] | ('\\' ~[ -#%-)+--0-9:-@A-Z\]_`a-}])) -> type(LITERAL_CHAR);
-UNICODE_MAGIC: ('\u0080'..'\uFFFF' | '\u{010000}'..'\u{10FFFF}') -> type(LITERAL_CHAR);
 DOT_MAGIC: '.' -> type(DOT);
 STAR_MAGIC: '*' -> type(STAR);
 PLUS_MAGIC: '\\+' -> type(PLUS);
@@ -71,6 +69,8 @@ SETNOMAGIC_MAGIC: '\\M' -> mode(NO_MAGIC), skip;
 SETVMAGIC_MAGIC: '\\v' -> mode(V_MAGIC), skip;
 SETVNOMAGIC_MAGIC: '\\V' -> mode(V_NO_MAGIC), skip;
 
+// everything else, either escaped or not, should be taken literally
+LITERAL_CHAR_MAGIC: '\\'? . -> type(LITERAL_CHAR);
 
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
@@ -85,8 +85,6 @@ AND_NOMAGIC: '\\&' -> type(AND);
 LEFT_PAREN_NOMAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_NOMAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_NOMAGIC: '\\)' -> type(RIGHT_PAREN);
-LITERAL_CHAR_NOMAGIC: ([ -#%-.0-9:-@A-Z[\]_`a-~] | ('\\' ~[ -#%-.0-9:-@A-Z[\]_`a-~])) -> type(LITERAL_CHAR);
-UNICODE_NOMAGIC: ('\u0080'..'\uFFFF' | '\u{010000}'..'\u{10FFFF}') -> type(LITERAL_CHAR);
 DOT_NOMAGIC: '\\.' -> type(DOT);
 STAR_NOMAGIC: '\\*' -> type(STAR);
 PLUS_NOMAGIC: '\\+' -> type(PLUS);
@@ -133,6 +131,9 @@ SETNOMAGIC_NOMAGIC: '\\M' -> skip; // already in nomagic mode
 SETVMAGIC_NOMAGIC: '\\v' -> mode(V_MAGIC), skip;
 SETVNOMAGIC_NOMAGIC: '\\V' -> mode(V_NO_MAGIC), skip;
 
+// everything else, either escaped or not, should be taken literally
+LITERAL_CHAR_NOMAGIC: '\\'? . -> type(LITERAL_CHAR);
+
 
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
@@ -147,8 +148,6 @@ AND_VMAGIC: '&' -> type(AND);
 LEFT_PAREN_VMAGIC: '(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_VMAGIC: '%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_VMAGIC: ')' -> type(RIGHT_PAREN);
-LITERAL_CHAR_VMAGIC: ([0-9a-zA-Z_ ] | ('\\' ~[0-9a-zA-Z_ ])) -> type(LITERAL_CHAR);
-UNICODE_VMAGIC: ('\u0080'..'\uFFFF' | '\u{010000}'..'\u{10FFFF}') -> type(LITERAL_CHAR);
 DOT_VMAGIC: '.' -> type(DOT);
 STAR_VMAGIC: '*' -> type(STAR);
 PLUS_VMAGIC: '+' -> type(PLUS);
@@ -195,6 +194,8 @@ SETNOMAGIC_VMAGIC: '\\M' -> mode(NO_MAGIC), skip;
 SETVMAGIC_VMAGIC: '\\v' -> skip; // already in very magic mode
 SETVNOMAGIC_VMAGIC: '\\V' -> mode(V_NO_MAGIC), skip;
 
+// everything else, either escaped or not, should be taken literally
+LITERAL_CHAR_VMAGIC: '\\'? . -> type(LITERAL_CHAR);
 
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
@@ -209,8 +210,6 @@ AND_VNOMAGIC: '\\&' -> type(AND);
 LEFT_PAREN_VNOMAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_VNOMAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_VNOMAGIC: '\\)' -> type(RIGHT_PAREN);
-LITERAL_CHAR_VNOMAGIC: (~[\\/] | ('\\' [\\/])) -> type(LITERAL_CHAR);
-UNICODE_VNOMAGIC: ('\u0080'..'\uFFFF' | '\u{010000}'..'\u{10FFFF}') -> type(LITERAL_CHAR);
 DOT_VNOMAGIC: '\\.' -> type(DOT);
 STAR_VNOMAGIC: '\\*' -> type(STAR);
 PLUS_VNOMAGIC: '\\+' -> type(PLUS);
@@ -257,6 +256,9 @@ SETNOMAGIC_VNOMAGIC: '\\M' -> mode(NO_MAGIC), skip;
 SETVMAGIC_VNOMAGIC: '\\v' -> mode(V_MAGIC), skip;
 SETVNOMAGIC_VNOMAGIC: '\\V' -> skip; // already in very nomagic mode
 
+// everything else, either escaped or not, should be taken literally
+LITERAL_CHAR_VNOMAGIC: '\\'? . -> type(LITERAL_CHAR);
+
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
 //                                                                                                  //
@@ -278,4 +280,4 @@ CARET: '^';
 DASH: '-';
 UNICODE_ESCAPE: '\\u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(COLLECTION_LITERAL_CHAR);
 ESCAPED_CHAR: ('\\\\' | '\\-' | '\\^' | '\\]') -> type(COLLECTION_LITERAL_CHAR);
-COLLECTION_CHAR: ('\u0000'..'\uFFFF' | '\u{010000}'..'\u{10FFFF}') -> type(COLLECTION_LITERAL_CHAR);
+COLLECTION_CHAR: . -> type(COLLECTION_LITERAL_CHAR);

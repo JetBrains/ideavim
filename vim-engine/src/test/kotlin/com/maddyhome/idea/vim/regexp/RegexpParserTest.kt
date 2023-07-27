@@ -193,6 +193,11 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `wider unicode character`() {
+    assertSuccess("\uD83E\uDE24", ATOM)
+  }
+
+  @Test
   fun `'ab'`() {
     assertSuccess("ab", PATTERN)
   }
@@ -270,11 +275,6 @@ class RegexpParserTest {
   @Test
   fun `unescaped group close`() {
     assertFailure("\\(a)", PATTERN)
-  }
-
-  @Test
-  fun `invalid very magic character`() {
-    assertFailure("\\v%", PATTERN)
   }
 
   private fun generateParser(pattern: String): RegexParser {
