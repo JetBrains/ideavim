@@ -65,30 +65,35 @@ tasks.register("updateAffectedRates", JavaExec::class) {
 }
 
 tasks.register("calculateNewVersion", JavaExec::class) {
+  group = "release"
   mainClass.set("scripts.release.CalculateNewVersionKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf("${rootProject.rootDir}", releaseType ?: "")
 }
 
 tasks.register("changelogUpdateUnreleased", JavaExec::class) {
+  group = "release"
   mainClass.set("scripts.release.ChangelogUpdateUnreleasedKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
 
 tasks.register("commitChanges", JavaExec::class) {
+  group = "release"
   mainClass.set("scripts.release.CommitChangesKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
 
 tasks.register("addReleaseTag", JavaExec::class) {
+  group = "release"
   mainClass.set("scripts.release.AddReleaseTagKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
 
 tasks.register("resetReleaseBranch", JavaExec::class) {
+  group = "release"
   mainClass.set("scripts.release.ResetReleaseBranchKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
@@ -101,6 +106,7 @@ tasks.register("pushChanges", JavaExec::class) {
 }
 
 tasks.register("selectBranch", JavaExec::class) {
+  group = "release"
   mainClass.set("scripts.release.SelectBranchKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")

@@ -27,7 +27,7 @@ object ReleaseMinor : ReleasePlugin("minor")
 object ReleasePatch : ReleasePlugin("patch")
 
 sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
-  name = "Publish Minor Release"
+  name = "Publish $releaseType Release"
   description = "Build and publish IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
@@ -39,8 +39,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       "credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde",
       label = "Password"
     )
-    param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
-    param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_publishChannels", "$DEFAULT_CHANNEL,$EAP_CHANNEL,$DEV_CHANNEL")
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
@@ -66,51 +64,35 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Select branch"
       tasks = "scripts:selectBranch"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Calculate new version"
       tasks = "scripts:calculateNewVersion"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Update change log"
       tasks = "scripts:changelogUpdateUnreleased"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Commit preparation changes"
       tasks = "scripts:commitChanges"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Reset release branch"
       tasks = "scripts:resetReleaseBranch"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Publish release"
       tasks = "publishPlugin"
-      buildFile = ""
-      enableStacktrace = true
       enabled = false
     }
     gradle {
       name = "Push changes to the repo"
       tasks = "scripts:pushChanges"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Run Integrations"
