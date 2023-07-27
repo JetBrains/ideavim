@@ -111,3 +111,10 @@ tasks.register("selectBranch", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
+
+tasks.register("calculateNewEapVersion", JavaExec::class) {
+  group = "release"
+  mainClass.set("scripts.release.CalculateNewEapVersionKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf("${rootProject.rootDir}")
+}
