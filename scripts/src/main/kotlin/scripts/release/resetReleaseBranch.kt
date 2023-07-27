@@ -26,6 +26,7 @@ fun main(args: Array<String>) {
   println("Current commit id: ${currentCommit.id.name}")
 
   git.checkout()
+    .setCreateBranch(true)
     .setName("release")
     .call()
   println("Checked out release branch")
@@ -36,6 +37,7 @@ fun main(args: Array<String>) {
   println("release branch reset")
 
   git.checkout()
+    .setCreateBranch(true)
     .setName("master")
     .call()
   println("Checked out master branch")

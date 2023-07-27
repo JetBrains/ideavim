@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
     else -> error("Unsupported release type: $releaseType")
   }
 
-  git.checkout().setName(branchName).call()
+  git.checkout().setCreateBranch(true).setName(branchName).call()
 
   val currentBranch = getRepo(rootDir).branch
   check(currentBranch == branchName) {

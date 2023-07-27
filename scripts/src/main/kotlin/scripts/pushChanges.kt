@@ -21,7 +21,9 @@ fun main(args: Array<String>) {
   val git = getGit(rootDir)
 
   if (currentBranch != "master") {
-    git.checkout().setName("master").call()
+    git.checkout()
+      .setCreateBranch(true)
+      .setName("master").call()
     println("Check out master branch")
   }
 
@@ -31,6 +33,7 @@ fun main(args: Array<String>) {
   println("Master pushed with tags")
 
   git.checkout()
+    .setCreateBranch(true)
     .setName("release")
     .call()
   println("Checked out release")
@@ -43,6 +46,7 @@ fun main(args: Array<String>) {
   println("Pushed release branch with tags")
 
   git.checkout()
+    .setCreateBranch(true)
     .setName(currentBranch)
     .call()
   println("Checked out $currentBranch branch")
