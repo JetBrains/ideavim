@@ -13,12 +13,7 @@ import org.eclipse.jgit.lib.RepositoryBuilder
 import java.io.File
 
 fun main(args: Array<String>) {
-  val newVersion = args[0]
-  val rootDir = args[1]
-  val releaseType = args[2]
-  println("New version: $newVersion")
-  println("root dir: $rootDir")
-  println("Release Type: $releaseType")
+  val (newVersion, rootDir, releaseType) = readArgs(args)
 
   checkReleaseType(releaseType)
 
@@ -27,8 +22,7 @@ fun main(args: Array<String>) {
     return
   }
 
-  val repository = RepositoryBuilder().setGitDir(File("$rootDir/.git")).build()
-  val git = Git(repository)
+  val git = getGit(rootDir)
 
   git
     .commit()
@@ -41,3 +35,4 @@ fun main(args: Array<String>) {
   val lastGitMessage = git.log().call().first().shortMessage
   println("Changes committed. Last gitlog message: $lastGitMessage")
 }
+

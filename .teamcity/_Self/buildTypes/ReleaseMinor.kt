@@ -73,6 +73,18 @@ object ReleaseMinor : IdeaVimBuildType({
       enableStacktrace = true
     }
     gradle {
+      name = "Commit preparation changes"
+      tasks = "scripts:commitChanges"
+      buildFile = ""
+      enableStacktrace = true
+    }
+    gradle {
+      name = "Add release tag"
+      tasks = "scripts:addReleaseTag"
+      buildFile = ""
+      enableStacktrace = true
+    }
+    gradle {
       name = "Publish release"
       tasks = "clean publishPlugin"
       buildFile = ""
