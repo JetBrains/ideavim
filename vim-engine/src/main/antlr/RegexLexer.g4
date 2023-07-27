@@ -24,6 +24,7 @@ LEFT_PAREN_MAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_MAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_MAGIC: '\\)' -> type(RIGHT_PAREN);
 LITERAL_CHAR_MAGIC: ([ -#%-)+--0-9:-@A-Z\]_`a-}] | ('\\' ~[ -#%-)+--0-9:-@A-Z\]_`a-}])) -> type(LITERAL_CHAR);
+UNICODE_MAGIC: ('\u0080'..'\uFFFF' | '\u{010000}'..'\u{10FFFF}') -> type(LITERAL_CHAR);
 DOT_MAGIC: '.' -> type(DOT);
 STAR_MAGIC: '*' -> type(STAR);
 PLUS_MAGIC: '\\+' -> type(PLUS);

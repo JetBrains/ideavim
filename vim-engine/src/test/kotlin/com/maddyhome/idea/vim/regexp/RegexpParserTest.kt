@@ -139,6 +139,11 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `unicode character`() {
+    assertSuccess("\u03b5", ATOM)
+  }
+
+  @Test
   fun `'ab'`() {
     assertSuccess("ab", PATTERN)
   }
@@ -249,5 +254,6 @@ class RegexpParserTest {
     private const val PATTERN = "pattern"
     private const val COLLECTION = "collection"
     private const val RANGE = "range"
+    private const val ATOM = "atom"
   }
 }
