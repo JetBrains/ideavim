@@ -67,11 +67,17 @@ tasks.register("updateAffectedRates", JavaExec::class) {
 tasks.register("calculateNewVersion", JavaExec::class) {
   mainClass.set("scripts.CalculateNewVersionKt")
   classpath = sourceSets["main"].runtimeClasspath
-  args = listOf("${rootProject.rootDir}", releaseType)
+  args = listOf("${rootProject.rootDir}", releaseType ?: "")
 }
 
 tasks.register("changelogUpdateUnreleased", JavaExec::class) {
   mainClass.set("scripts.ChangelogUpdateUnreleasedKt")
   classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(project.version.toString(), "${rootProject.rootDir}")
+  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+}
+
+tasks.register("commitChanges", JavaExec::class) {
+  mainClass.set("scripts.release.CommitChangesKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }

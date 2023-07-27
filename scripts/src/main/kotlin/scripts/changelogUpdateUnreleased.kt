@@ -8,6 +8,7 @@
 
 package scripts
 
+import scripts.release.checkReleaseType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.io.path.Path
@@ -18,8 +19,17 @@ fun main(args: Array<String>) {
   println("Start updating unreleased section")
   val newVersion = args[0]
   val rootDir = args[1]
+  val releaseType = args[2]
   println("New version: $newVersion")
   println("root dir: $rootDir")
+  println("Release Type: $releaseType")
+
+  checkReleaseType(releaseType)
+
+  if (releaseType == "patch") {
+    println("Skip updating the changelog because release type is 'patch'")
+    return
+  }
 
   val currentDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
   val newItem = "## $newVersion, $currentDate"
