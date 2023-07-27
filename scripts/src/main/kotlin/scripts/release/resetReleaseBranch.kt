@@ -25,10 +25,7 @@ fun main(args: Array<String>) {
   val currentCommit = git.log().setMaxCount(1).call().first()
   println("Current commit id: ${currentCommit.id.name}")
 
-  git.checkout()
-    .setCreateBranch(true)
-    .setName("release")
-    .call()
+  git.checkoutBranch("release")
   println("Checked out release branch")
 
   git.reset()
@@ -36,9 +33,6 @@ fun main(args: Array<String>) {
     .call()
   println("release branch reset")
 
-  git.checkout()
-    .setCreateBranch(true)
-    .setName("master")
-    .call()
+  git.checkoutBranch("master")
   println("Checked out master branch")
 }

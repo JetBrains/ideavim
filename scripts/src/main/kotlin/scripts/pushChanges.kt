@@ -8,6 +8,8 @@
 
 package scripts
 
+import org.eclipse.jgit.api.Git
+import scripts.release.checkoutBranch
 import scripts.release.getGit
 import scripts.release.getRepo
 
@@ -21,9 +23,7 @@ fun main(args: Array<String>) {
   val git = getGit(rootDir)
 
   if (currentBranch != "master") {
-    git.checkout()
-      .setCreateBranch(true)
-      .setName("master").call()
+    git.checkoutBranch("master")
     println("Check out master branch")
   }
 
@@ -32,10 +32,7 @@ fun main(args: Array<String>) {
     .call()
   println("Master pushed with tags")
 
-  git.checkout()
-    .setCreateBranch(true)
-    .setName("release")
-    .call()
+  git.checkoutBranch("release")
   println("Checked out release")
 
   git
@@ -45,9 +42,6 @@ fun main(args: Array<String>) {
     .call()
   println("Pushed release branch with tags")
 
-  git.checkout()
-    .setCreateBranch(true)
-    .setName(currentBranch)
-    .call()
+  git.checkoutBranch(currentBranch)
   println("Checked out $currentBranch branch")
 }
