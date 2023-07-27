@@ -6,9 +6,8 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package scripts
+package scripts.release
 
-import scripts.release.checkReleaseType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.io.path.Path

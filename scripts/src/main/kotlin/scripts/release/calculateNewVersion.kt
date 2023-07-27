@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package scripts
+package scripts.release
 
 import com.vdurmont.semver4j.Semver
 import org.eclipse.jgit.api.Git
