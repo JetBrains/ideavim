@@ -27,7 +27,7 @@ object ReleaseMinor : ReleasePlugin("minor")
 object ReleasePatch : ReleasePlugin("patch")
 
 sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
-  name = "Publish $releaseType Release"
+  name = "Publish $releaseType release"
   description = "Build and publish IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
