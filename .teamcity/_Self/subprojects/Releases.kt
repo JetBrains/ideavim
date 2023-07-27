@@ -32,7 +32,7 @@ object Releases : Project({
     )
   }
 
-  buildType(Release)
+//  buildType(Release)
   buildType(ReleaseMajor)
   buildType(ReleaseMinor)
   buildType(ReleasePatch)

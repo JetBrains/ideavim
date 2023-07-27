@@ -96,7 +96,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Publish release"
       tasks = "publishPlugin"
-      enabled = false
     }
     gradle {
       name = "Push changes to the repo"
@@ -105,12 +104,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Run Integrations"
       tasks = "releaseActions"
-      enabled = false
     }
     gradle {
       name = "Slack Notification"
       tasks = "slackNotification"
-      enabled = false
     }
   }
 
