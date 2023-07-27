@@ -13,6 +13,7 @@ fun main(args: Array<String>) {
   val projectDir = args[0]
   println("Working directory: $projectDir")
   val (lastVersion, objectId) = getVersion(projectDir, onlyStable = true)
+  println("Last version: $lastVersion, hash: ${objectId.name}")
 
   val git = getGit(projectDir)
   val logDiff = git.log().setMaxCount(500).call().takeWhile { it.id.name != objectId.name }
