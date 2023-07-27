@@ -7,6 +7,7 @@ import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
@@ -16,7 +17,6 @@ object ReleaseDev : IdeaVimBuildType({
   description = "Build and publish Dev of IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "$DEV_VERSION-dev.%build.counter%"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", RELEASE_DEV)
@@ -25,8 +25,6 @@ object ReleaseDev : IdeaVimBuildType({
       "credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde",
       label = "Password"
     )
-    param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
-    param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_publishChannels", DEV_CHANNEL)
   }
 
@@ -38,10 +36,16 @@ object ReleaseDev : IdeaVimBuildType({
   }
 
   steps {
+    script {
+      name = "Pull git tags"
+      scriptContent = "git fetch --tags origin"
+    }
     gradle {
-      tasks = "clean publishPlugin"
-      buildFile = ""
-      enableStacktrace = true
+      name = "Calculate new dev version"
+      tasks = "scripts:calculateNewDevVersion"
+    }
+    gradle {
+      tasks = "publishPlugin"
     }
   }
 

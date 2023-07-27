@@ -1,12 +1,11 @@
 package _Self.buildTypes
 
-import _Self.Constants.DEV_VERSION
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE_EAP
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
@@ -55,8 +54,6 @@ object ReleaseEap : IdeaVimBuildType({
     }
     gradle {
       tasks = "publishPlugin"
-      buildFile = ""
-      enableStacktrace = true
     }
     gradle {
       name = "Push changes to the repo"
@@ -65,11 +62,8 @@ object ReleaseEap : IdeaVimBuildType({
   }
 
   features {
-    vcsLabeling {
-      vcsRootId = "${DslContext.settingsRoot.id}"
-      labelingPattern = "%system.build.number%"
-      successfulOnly = false
-      branchFilter = "+:<default>"
+    sshAgent {
+      teamcitySshKey = "IdeaVim ssh keys"
     }
   }
 
