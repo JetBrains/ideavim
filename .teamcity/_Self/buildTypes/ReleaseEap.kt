@@ -8,6 +8,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
@@ -16,7 +17,6 @@ object ReleaseEap : IdeaVimBuildType({
   description = "Build and publish EAP of IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "$DEV_VERSION-eap.%build.counter%"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", RELEASE_EAP)
@@ -25,8 +25,6 @@ object ReleaseEap : IdeaVimBuildType({
       "credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde",
       label = "Password"
     )
-    param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
-    param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_publishChannels", EAP_CHANNEL)
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
@@ -43,10 +41,26 @@ object ReleaseEap : IdeaVimBuildType({
   }
 
   steps {
+    script {
+      name = "Pull git tags"
+      scriptContent = "git fetch --tags origin"
+    }
     gradle {
-      tasks = "clean publishPlugin"
+      name = "Calculate new eap version"
+      tasks = "scripts:calculateNewEapVersion"
+    }
+    gradle {
+      name = "Add release tag"
+      tasks = "scripts:addReleaseTag"
+    }
+    gradle {
+      tasks = "publishPlugin"
       buildFile = ""
       enableStacktrace = true
+    }
+    gradle {
+      name = "Push changes to the repo"
+      tasks = "scripts:pushChanges"
     }
   }
 
