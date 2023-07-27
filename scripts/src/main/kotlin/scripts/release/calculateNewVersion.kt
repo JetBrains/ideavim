@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
   val releaseType = args[1]
   println("Working directory: $projectDir")
   println("Release type: $releaseType")
-  val lastVersion = getVersion(projectDir, onlyStable = true)
+  val (lastVersion, _) = getVersion(projectDir, onlyStable = true)
 
   val nextVersion = when (releaseType) {
     "major" -> lastVersion.nextMajor()
