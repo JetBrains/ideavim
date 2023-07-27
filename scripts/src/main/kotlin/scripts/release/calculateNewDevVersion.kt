@@ -20,8 +20,8 @@ fun main(args: Array<String>) {
     "We should be on master branch"
   }
   val git = getGit(projectDir)
-  val log = git.log().setMaxCount(500).call()
-  println("First commit hash in log: " + log.first().name)
+  val log = git.log().setMaxCount(500).call().toList()
+  println("First commit hash in log: " + log.first().name + " log size: ${log.size}")
   val logDiff = log.takeWhile { it.id.name != objectId.name }
   val numCommits = logDiff.size
   println("Log diff size is $numCommits")
