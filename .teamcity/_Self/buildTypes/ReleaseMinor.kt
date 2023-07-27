@@ -67,6 +67,12 @@ object ReleaseMinor : IdeaVimBuildType({
       enableStacktrace = true
     }
     gradle {
+      name = "Select branch"
+      tasks = "scripts:selectBranch"
+      buildFile = ""
+      enableStacktrace = true
+    }
+    gradle {
       name = "Update change log"
       tasks = "scripts:changelogUpdateUnreleased"
       buildFile = ""
@@ -92,10 +98,16 @@ object ReleaseMinor : IdeaVimBuildType({
     }
     gradle {
       name = "Publish release"
-      tasks = "clean publishPlugin"
+      tasks = "publishPlugin"
       buildFile = ""
       enableStacktrace = true
       enabled = false
+    }
+    gradle {
+      name = "Push changes to the repo"
+      tasks = "scripts:pushChanges"
+      buildFile = ""
+      enableStacktrace = true
     }
     gradle {
       name = "Run Integrations"

@@ -93,3 +93,15 @@ tasks.register("resetReleaseBranch", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
+
+tasks.register("pushChanges", JavaExec::class) {
+  mainClass.set("scripts.PushChangesKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
+}
+
+tasks.register("selectBranch", JavaExec::class) {
+  mainClass.set("scripts.release.SelectBranchKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+}

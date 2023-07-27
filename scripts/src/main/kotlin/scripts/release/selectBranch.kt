@@ -1,0 +1,31 @@
+/*
+ * Copyright 2003-2023 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
+package scripts.release
+
+fun main(args: Array<String>) {
+  val (_, rootDir, releaseType) = readArgs(args)
+
+  checkReleaseType(releaseType)
+
+  val git = getGit(rootDir)
+
+  val branchName = when (releaseType) {
+    "major", "minor" -> "master"
+    "patch" -> "release"
+    else -> error("Unsupported release type: $releaseType")
+  }
+
+  git.checkout().setName(branchName).call()
+
+  val currentBranch = getRepo(rootDir).branch
+  check(currentBranch == branchName) {
+    "Branch wasn't checked out. Current branch: $currentBranch"
+  }
+  println("Checked out $branchName branch")
+}
