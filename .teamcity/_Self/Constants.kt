@@ -6,7 +6,6 @@ object Constants {
   const val DEV_CHANNEL = "Dev"
 
   const val VERSION = "2.4.0"
-  const val DEV_VERSION = "2.5.0"
 
   const val GITHUB_TESTS = "LATEST-EAP-SNAPSHOT"
   const val NVIM_TESTS = "LATEST-EAP-SNAPSHOT"

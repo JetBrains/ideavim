@@ -1,7 +1,6 @@
 package _Self.buildTypes
 
 import _Self.Constants.DEV_CHANNEL
-import _Self.Constants.DEV_VERSION
 import _Self.Constants.RELEASE_DEV
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
