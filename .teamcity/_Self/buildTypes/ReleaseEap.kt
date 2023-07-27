@@ -44,6 +44,10 @@ object ReleaseEap : IdeaVimBuildType({
       name = "Pull git tags"
       scriptContent = "git fetch --tags origin"
     }
+    script {
+      name = "Pull git history"
+      scriptContent = "git fetch --unshallow"
+    }
     gradle {
       name = "Calculate new eap version"
       tasks = "scripts:calculateNewEapVersion"

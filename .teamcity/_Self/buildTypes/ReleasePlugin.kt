@@ -61,6 +61,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Pull git tags"
       scriptContent = "git fetch --tags origin"
     }
+    script {
+      name = "Pull git history"
+      scriptContent = "git fetch --unshallow"
+    }
     gradle {
       name = "Select branch"
       tasks = "scripts:selectBranch"
