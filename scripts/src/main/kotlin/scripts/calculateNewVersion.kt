@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
     "major" -> TODO()
     "minor" -> lastVersion.nextMinor()
     "patch" -> TODO()
-    else -> error("Only major, minor, and patch versions are supported")
+    else -> error("Only major, minor, and patch versions are supported. Got '$releaseType'")
   }
   println("Next $releaseType version: $nextVersion")
   println("##teamcity[setParameter name='env.ORG_GRADLE_PROJECT_version' value='$nextVersion']")
