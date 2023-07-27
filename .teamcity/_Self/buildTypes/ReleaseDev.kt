@@ -42,7 +42,7 @@ object ReleaseDev : IdeaVimBuildType({
     }
     script {
       name = "Pull git history"
-      scriptContent = "git pull --unshallow"
+      scriptContent = "git fetch --unshallow"
     }
     gradle {
       name = "Calculate new dev version"
