@@ -130,10 +130,10 @@ char_class : CLASS_IDENTIFIER   #Identifier
  * "[0-9]" matches any digit from 0 to 9;
  * "[a-zA-Z]" matches any alphabetic character.
  */
-collection : COLLECTION_START collection_elem* COLLECTION_END       #CollectionPos
-           | COLLECTION_START CARET collection_elem* COLLECTION_END #CollectionNeg
+collection : COLLECTION_START CARET collection_elem* COLLECTION_END #CollectionNeg
+           | COLLECTION_START collection_elem* COLLECTION_END       #CollectionPos
            ;
 
-collection_elem : COLLECTION_LITERAL_CHAR DASH COLLECTION_LITERAL_CHAR #RangeColElem
-                | COLLECTION_LITERAL_CHAR                              #SingleColElem
+collection_elem : (COLLECTION_LITERAL_CHAR | DASH | CARET) DASH (COLLECTION_LITERAL_CHAR | DASH | CARET) #RangeColElem
+                | (COLLECTION_LITERAL_CHAR | DASH | CARET)                                               #SingleColElem
                 ;
