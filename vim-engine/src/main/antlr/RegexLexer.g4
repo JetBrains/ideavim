@@ -14,7 +14,7 @@ tokens {
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
 //                                                                                                  //
-// DEFAULT_MODE - This is the default lexer mode, and can be set after seeing a \m token             //
+// DEFAULT_MODE - This is the default lexer mode, and can be set after seeing a \m token            //
 //                                                                                                  //
 //                                                                                                  //
 // ------------------------------------------------------------------------------------------------ //
@@ -23,7 +23,7 @@ AND_MAGIC: '\\&' -> type(AND);
 LEFT_PAREN_MAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_MAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_MAGIC: '\\)' -> type(RIGHT_PAREN);
-LITERAL_CHAR_MAGIC: ([ -#%-)+--0-9:-@A-Z\]_`a-}] | '\\\\' | '\\$'| '\\.' | '\\/' | '\\[' | '\\^' | '\\~') -> type(LITERAL_CHAR);
+LITERAL_CHAR_MAGIC: ([ -#%-)+--0-9:-@A-Z\]_`a-}] | ('\\' ~[ -#%-)+--0-9:-@A-Z\]_`a-}])) -> type(LITERAL_CHAR);
 DOT_MAGIC: '.' -> type(DOT);
 STAR_MAGIC: '*' -> type(STAR);
 PLUS_MAGIC: '\\+' -> type(PLUS);
@@ -65,16 +65,16 @@ CLASS_BS_MAGIC: '\\b' -> type(CLASS_BS);
 CLASS_NL_MAGIC: '\\n' -> type(CLASS_NL);
 
 // tokens related to changing lexer mode. These are only used by the lexer and not sent to the parser
-SETMAGIC_MAGIC: '\\m' -> skip;
+SETMAGIC_MAGIC: '\\m' -> skip; // already in magic mode
 SETNOMAGIC_MAGIC: '\\M' -> mode(NO_MAGIC), skip;
-SETVMAGIC_MAGIC: '\\v' -> skip; // TODO: add very magic mode
-SETVNOMAGIC_MAGIC: '\\V' -> skip; // TODO: add very nomagic mode
+SETVMAGIC_MAGIC: '\\v' -> mode(V_MAGIC), skip;
+SETVNOMAGIC_MAGIC: '\\V' -> mode(V_NO_MAGIC), skip;
 
 
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
 //                                                                                                  //
-// NO_MAGIC - This mode is set when the lexer comes across an \M token                               //
+// NO_MAGIC - This mode is set when the lexer comes across an \M token                              //
 //                                                                                                  //
 //                                                                                                  //
 // ------------------------------------------------------------------------------------------------ //
@@ -84,7 +84,7 @@ AND_NOMAGIC: '\\&' -> type(AND);
 LEFT_PAREN_NOMAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_NOMAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_NOMAGIC: '\\)' -> type(RIGHT_PAREN);
-LITERAL_CHAR_NOMAGIC: ([ -#%-.0-9:-@A-Z[\]_`a-~] | '\\\\' | '\\$'| '\\/' | '\\^') -> type(LITERAL_CHAR);
+LITERAL_CHAR_NOMAGIC: ([ -#%-.0-9:-@A-Z[\]_`a-~] | ('\\' ~[ -#%-.0-9:-@A-Z[\]_`a-~])) -> type(LITERAL_CHAR);
 DOT_NOMAGIC: '\\.' -> type(DOT);
 STAR_NOMAGIC: '\\*' -> type(STAR);
 PLUS_NOMAGIC: '\\+' -> type(PLUS);
@@ -128,9 +128,130 @@ CLASS_NL_NOMAGIC: '\\n' -> type(CLASS_NL);
 // tokens related to changing lexer mode. These are only used by the lexer and not sent to the parser
 SETMAGIC_NOMAGIC: '\\m' -> mode(DEFAULT_MODE), skip;
 SETNOMAGIC_NOMAGIC: '\\M' -> skip; // already in nomagic mode
-SETVMAGIC_NOMAGIC: '\\v' -> skip; // TODO: add very magic mode
-SETVNOMAGIC_NOMAGIC: '\\V' -> skip; // TODO: add very nomagic mode
+SETVMAGIC_NOMAGIC: '\\v' -> mode(V_MAGIC), skip;
+SETVNOMAGIC_NOMAGIC: '\\V' -> mode(V_NO_MAGIC), skip;
 
+
+// ------------------------------------------------------------------------------------------------ //
+//                                                                                                  //
+//                                                                                                  //
+// V_MAGIC - This mode is set when the lexer comes across an \v token                               //
+//                                                                                                  //
+//                                                                                                  //
+// ------------------------------------------------------------------------------------------------ //
+mode V_MAGIC;
+ALTERNATION_VMAGIC: '|' -> type(ALTERNATION);
+AND_VMAGIC: '&' -> type(AND);
+LEFT_PAREN_VMAGIC: '(' -> type(LEFT_PAREN);
+LEFT_PAREN_NOCAPTURE_VMAGIC: '%(' -> type(LEFT_PAREN_NOCAPTURE);
+RIGHT_PAREN_VMAGIC: ')' -> type(RIGHT_PAREN);
+LITERAL_CHAR_VMAGIC: ([0-9a-zA-Z_ ] | ('\\' ~[0-9a-zA-Z_ ])) -> type(LITERAL_CHAR);
+DOT_VMAGIC: '.' -> type(DOT);
+STAR_VMAGIC: '*' -> type(STAR);
+PLUS_VMAGIC: '+' -> type(PLUS);
+OPTIONAL_VMAGIC: ('=' | '?') -> type(OPTIONAL);
+RANGE_START_VMAGIC: '{' -> pushMode(INSIDE_RANGE), type(RANGE_START);
+COLLECTION_START_VMAGIC: '[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION_START);
+
+// character classes
+CLASS_IDENTIFIER_VMAGIC: '\\i' -> type(CLASS_IDENTIFIER);
+CLASS_IDENTIFIER_D_VMAGIC: '\\I' -> type(CLASS_IDENTIFIER_D);
+CLASS_KEYWORD_VMAGIC: '\\k' -> type(CLASS_KEYWORD);
+CLASS_KEYWORD_D_VMAGIC: '\\K' -> type(CLASS_KEYWORD_D);
+CLASS_FILENAME_VMAGIC: '\\f' -> type(CLASS_FILENAME);
+CLASS_FILENAME_D_VMAGIC: '\\F' -> type(CLASS_FILENAME_D);
+CLASS_PRINTABLE_VMAGIC: '\\p' -> type(CLASS_PRINTABLE);
+CLASS_PRINTABLE_D_VMAGIC: '\\P' -> type(CLASS_PRINTABLE_D);
+CLASS_WS_VMAGIC: '\\s' -> type(CLASS_WS);
+CLASS_NOT_WS_VMAGIC: '\\S' -> type(CLASS_NOT_WS);
+CLASS_DIGIT_VMAGIC: '\\d' -> type(CLASS_DIGIT);
+CLASS_NOT_DIGIT_VMAGIC: '\\D' -> type(CLASS_NOT_DIGIT);
+CLASS_HEX_VMAGIC: '\\x' -> type(CLASS_HEX);
+CLASS_NOT_HEX_VMAGIC: '\\X' -> type(CLASS_NOT_HEX);
+CLASS_OCTAL_VMAGIC: '\\o' -> type(CLASS_OCTAL);
+CLASS_NOT_OCTAL_VMAGIC: '\\O' -> type(CLASS_NOT_OCTAL);
+CLASS_WORD_VMAGIC: '\\w' -> type(CLASS_WORD);
+CLASS_NOT_WORD_VMAGIC: '\\W' -> type(CLASS_NOT_WORD);
+CLASS_HEADWORD_VMAGIC: '\\h' -> type(CLASS_HEADWORD);
+CLASS_NOT_HEADWORD_VMAGIC: '\\H' -> type(CLASS_NOT_HEADWORD);
+CLASS_ALPHA_VMAGIC: '\\a' -> type(CLASS_ALPHA);
+CLASS_NOT_ALPHA_VMAGIC: '\\A' -> type(CLASS_NOT_ALPHA);
+CLASS_LCASE_VMAGIC: '\\l' -> type(CLASS_LCASE);
+CLASS_NOT_LCASE_VMAGIC: '\\L' -> type(CLASS_NOT_LCASE);
+CLASS_UCASE_VMAGIC: '\\u' -> type(CLASS_UCASE);
+CLASS_NOT_UCASE_VMAGIC: '\\U' -> type(CLASS_NOT_UCASE);
+CLASS_ESC_VMAGIC: '\\e' -> type(CLASS_ESC);
+CLASS_TAB_VMAGIC: '\\t' -> type(CLASS_TAB);
+CLASS_CR_VMAGIC: '\\r' -> type(CLASS_CR);
+CLASS_BS_VMAGIC: '\\b' -> type(CLASS_BS);
+CLASS_NL_VMAGIC: '\\n' -> type(CLASS_NL);
+
+// tokens related to changing lexer mode. These are only used by the lexer and not sent to the parser
+SETMAGIC_VMAGIC: '\\m' -> mode(DEFAULT_MODE), skip;
+SETNOMAGIC_VMAGIC: '\\M' -> mode(NO_MAGIC), skip;
+SETVMAGIC_VMAGIC: '\\v' -> skip; // already in very magic mode
+SETVNOMAGIC_VMAGIC: '\\V' -> mode(V_NO_MAGIC), skip;
+
+
+// ------------------------------------------------------------------------------------------------ //
+//                                                                                                  //
+//                                                                                                  //
+// V_NO_MAGIC - This mode is set when the lexer comes across an \V token                            //
+//                                                                                                  //
+//                                                                                                  //
+// ------------------------------------------------------------------------------------------------ //
+mode V_NO_MAGIC;
+ALTERNATION_VNOMAGIC: '\\|' -> type(ALTERNATION);
+AND_VNOMAGIC: '\\&' -> type(AND);
+LEFT_PAREN_VNOMAGIC: '\\(' -> type(LEFT_PAREN);
+LEFT_PAREN_NOCAPTURE_VNOMAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
+RIGHT_PAREN_VNOMAGIC: '\\)' -> type(RIGHT_PAREN);
+LITERAL_CHAR_VNOMAGIC: (~[\\/] | ('\\' [\\/])) -> type(LITERAL_CHAR);
+DOT_VNOMAGIC: '\\.' -> type(DOT);
+STAR_VNOMAGIC: '\\*' -> type(STAR);
+PLUS_VNOMAGIC: '\\+' -> type(PLUS);
+OPTIONAL_VNOMAGIC: ('\\=' | '\\?') -> type(OPTIONAL);
+RANGE_START_VNOMAGIC: '\\{' -> pushMode(INSIDE_RANGE), type(RANGE_START);
+COLLECTION_START_VNOMAGIC: '\\[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION_START);
+
+// character classes
+CLASS_IDENTIFIER_VNOMAGIC: '\\i' -> type(CLASS_IDENTIFIER);
+CLASS_IDENTIFIER_D_VNOMAGIC: '\\I' -> type(CLASS_IDENTIFIER_D);
+CLASS_KEYWORD_VNOMAGIC: '\\k' -> type(CLASS_KEYWORD);
+CLASS_KEYWORD_D_VNOMAGIC: '\\K' -> type(CLASS_KEYWORD_D);
+CLASS_FILENAME_VNOMAGIC: '\\f' -> type(CLASS_FILENAME);
+CLASS_FILENAME_D_VNOMAGIC: '\\F' -> type(CLASS_FILENAME_D);
+CLASS_PRINTABLE_VNOMAGIC: '\\p' -> type(CLASS_PRINTABLE);
+CLASS_PRINTABLE_D_VNOMAGIC: '\\P' -> type(CLASS_PRINTABLE_D);
+CLASS_WS_VNOMAGIC: '\\s' -> type(CLASS_WS);
+CLASS_NOT_WS_VNOMAGIC: '\\S' -> type(CLASS_NOT_WS);
+CLASS_DIGIT_VNOMAGIC: '\\d' -> type(CLASS_DIGIT);
+CLASS_NOT_DIGIT_VNOMAGIC: '\\D' -> type(CLASS_NOT_DIGIT);
+CLASS_HEX_VNOMAGIC: '\\x' -> type(CLASS_HEX);
+CLASS_NOT_HEX_VNOMAGIC: '\\X' -> type(CLASS_NOT_HEX);
+CLASS_OCTAL_VNOMAGIC: '\\o' -> type(CLASS_OCTAL);
+CLASS_NOT_OCTAL_VNOMAGIC: '\\O' -> type(CLASS_NOT_OCTAL);
+CLASS_WORD_VNOMAGIC: '\\w' -> type(CLASS_WORD);
+CLASS_NOT_WORD_VNOMAGIC: '\\W' -> type(CLASS_NOT_WORD);
+CLASS_HEADWORD_VNOMAGIC: '\\h' -> type(CLASS_HEADWORD);
+CLASS_NOT_HEADWORD_VNOMAGIC: '\\H' -> type(CLASS_NOT_HEADWORD);
+CLASS_ALPHA_VNOMAGIC: '\\a' -> type(CLASS_ALPHA);
+CLASS_NOT_ALPHA_VNOMAGIC: '\\A' -> type(CLASS_NOT_ALPHA);
+CLASS_LCASE_VNOMAGIC: '\\l' -> type(CLASS_LCASE);
+CLASS_NOT_LCASE_VNOMAGIC: '\\L' -> type(CLASS_NOT_LCASE);
+CLASS_UCASE_VNOMAGIC: '\\u' -> type(CLASS_UCASE);
+CLASS_NOT_UCASE_VNOMAGIC: '\\U' -> type(CLASS_NOT_UCASE);
+CLASS_ESC_VNOMAGIC: '\\e' -> type(CLASS_ESC);
+CLASS_TAB_VNOMAGIC: '\\t' -> type(CLASS_TAB);
+CLASS_CR_VNOMAGIC: '\\r' -> type(CLASS_CR);
+CLASS_BS_VNOMAGIC: '\\b' -> type(CLASS_BS);
+CLASS_NL_VNOMAGIC: '\\n' -> type(CLASS_NL);
+
+// tokens related to changing lexer mode. These are only used by the lexer and not sent to the parser
+SETMAGIC_VNOMAGIC: '\\m' -> mode(DEFAULT_MODE), skip;
+SETNOMAGIC_VNOMAGIC: '\\M' -> mode(NO_MAGIC), skip;
+SETVMAGIC_VNOMAGIC: '\\v' -> mode(V_MAGIC), skip;
+SETVNOMAGIC_VNOMAGIC: '\\V' -> skip; // already in very nomagic mode
 
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
@@ -142,7 +263,7 @@ SETVNOMAGIC_NOMAGIC: '\\V' -> skip; // TODO: add very nomagic mode
 // ------------------------------------------------------------------------------------------------ //
 // Mode for when inside the range quantifier
 mode INSIDE_RANGE;
-RANGE_END: '}' -> popMode;
+RANGE_END: ('}' | '\\}') -> popMode;
 INT: [0-9]+;
 COMMA: ',';
 

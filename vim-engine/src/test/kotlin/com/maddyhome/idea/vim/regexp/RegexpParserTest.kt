@@ -134,6 +134,11 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `unclosed collection`() {
+    assertFailure("[a-z", COLLECTION)
+  }
+
+  @Test
   fun `'ab'`() {
     assertSuccess("ab", PATTERN)
   }
@@ -169,6 +174,31 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `non-capture group`() {
+    assertSuccess("\\%(a\\)", PATTERN)
+  }
+
+  @Test
+  fun `very nomagic characters`() {
+    assertSuccess("\\V%(", PATTERN)
+  }
+
+  @Test
+  fun `date format`() {
+    assertSuccess("\\(\\d\\{2}\\)\\{2}\\d\\{4}", PATTERN)
+  }
+
+  @Test
+  fun `switching to nomagic`() {
+    assertSuccess("a*\\Ma*", PATTERN)
+  }
+
+  @Test
+  fun `switching to all magic modes`() {
+    assertSuccess("\\m.*\\M\\.\\*\\v.*\\V\\.\\*", PATTERN)
+  }
+
+  @Test
   fun `unclosed group`() {
     assertFailure("\\(ab", PATTERN)
   }
@@ -176,6 +206,21 @@ class RegexpParserTest {
   @Test
   fun `unmatched closing )`() {
     assertFailure("ab\\)", PATTERN)
+  }
+
+  @Test
+  fun `unclosed non-capture group`() {
+    assertFailure("\\%(a", PATTERN)
+  }
+
+  @Test
+  fun `unescaped group close`() {
+    assertFailure("\\(a)", PATTERN)
+  }
+
+  @Test
+  fun `invalid very magic character`() {
+    assertFailure("\\v%", PATTERN)
   }
 
   private fun generateParser(pattern: String): RegexParser {
