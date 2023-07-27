@@ -12,7 +12,6 @@ import _Self.Constants.DEFAULT_CHANNEL
 import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE
-import _Self.Constants.VERSION
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -23,7 +22,11 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
-object ReleaseMinor : IdeaVimBuildType({
+object ReleaseMajor : ReleasePlugin("major")
+object ReleaseMinor : ReleasePlugin("minor")
+object ReleasePatch : ReleasePlugin("patch")
+
+sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
   name = "Publish Minor Release"
   description = "Build and publish IdeaVim plugin"
 
@@ -45,7 +48,7 @@ object ReleaseMinor : IdeaVimBuildType({
       label = "Slack Token"
     )
     password("env.ORG_GRADLE_PROJECT_youtrackToken", "credentialsJSON:3cd3e867-282c-451f-b958-bc95d56a8450", display = ParameterDisplay.HIDDEN)
-    param("env.ORG_GRADLE_PROJECT_releaseType", "minor")
+    param("env.ORG_GRADLE_PROJECT_releaseType", releaseType)
   }
 
   vcs {
