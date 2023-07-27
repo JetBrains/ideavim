@@ -40,6 +40,10 @@ object ReleaseDev : IdeaVimBuildType({
       name = "Pull git tags"
       scriptContent = "git fetch --tags origin"
     }
+    script {
+      name = "Pull pull history"
+      scriptContent = "git pull"
+    }
     gradle {
       name = "Calculate new dev version"
       tasks = "scripts:calculateNewDevVersion"

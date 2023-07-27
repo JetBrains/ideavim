@@ -20,7 +20,6 @@ fun main(args: Array<String>) {
     "We should be on master branch"
   }
   val git = getGit(projectDir)
-  git.pull().call()
   val log = git.log().setMaxCount(500).call()
   println("First commit hash in log: " + log.first().name)
   val logDiff = log.takeWhile { it.id.name != objectId.name }
