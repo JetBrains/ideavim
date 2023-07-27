@@ -22,9 +22,9 @@ fun main(args: Array<String>) {
   val lastVersion = getVersion(projectDir)
 
   val nextVersion = when (releaseType) {
-    "major" -> TODO()
+    "major" -> lastVersion.nextMajor()
     "minor" -> lastVersion.nextMinor()
-    "patch" -> TODO()
+    "patch" -> lastVersion.nextPatch()
     else -> error("Only major, minor, and patch versions are supported. Got '$releaseType'")
   }
   println("Next $releaseType version: $nextVersion")

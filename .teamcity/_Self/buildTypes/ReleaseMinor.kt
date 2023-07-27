@@ -61,14 +61,14 @@ object ReleaseMinor : IdeaVimBuildType({
       scriptContent = "git fetch --tags origin"
     }
     gradle {
-      name = "Calculate new version"
-      tasks = "scripts:calculateNewVersion"
+      name = "Select branch"
+      tasks = "scripts:selectBranch"
       buildFile = ""
       enableStacktrace = true
     }
     gradle {
-      name = "Select branch"
-      tasks = "scripts:selectBranch"
+      name = "Calculate new version"
+      tasks = "scripts:calculateNewVersion"
       buildFile = ""
       enableStacktrace = true
     }

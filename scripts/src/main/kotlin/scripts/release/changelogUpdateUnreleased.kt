@@ -16,12 +16,7 @@ import kotlin.io.path.writeText
 
 fun main(args: Array<String>) {
   println("Start updating unreleased section")
-  val newVersion = args[0]
-  val rootDir = args[1]
-  val releaseType = args[2]
-  println("New version: $newVersion")
-  println("root dir: $rootDir")
-  println("Release Type: $releaseType")
+  val (newVersion, rootDir, releaseType) = readArgs(args)
 
   checkReleaseType(releaseType)
 
