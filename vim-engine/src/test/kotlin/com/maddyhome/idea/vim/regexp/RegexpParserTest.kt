@@ -134,8 +134,52 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `collection with negated unescaped caret`() {
+    /**
+     * Matches everything except "^".
+     * It's more correct to write it as
+     * "[^\^]", escaping the "^", but "^"
+     * is still allowed to be unescaped and
+     * taken literally when not immediately
+     * after the "["
+     */
+    assertSuccess("[^^]", COLLECTION)
+  }
+
+  @Test
+  fun `collection with escaped caret`() {
+    assertSuccess("[\\^]", COLLECTION)
+  }
+
+  @Test
+  fun `collection unescaped backslash not at end`() {
+    /**
+     * Matches a "\" or "a".
+     * Since "\a" isn't an escape sequence,
+     * the "\" is taken literally.
+     * Equivalent to "[\\a]]"
+     */
+    assertSuccess("[\\a]", COLLECTION)
+  }
+
+  @Test
+  fun `collection unicode code range`() {
+    assertSuccess("[\\u0-\\uFFFF]", COLLECTION)
+  }
+
+  @Test
+  fun `collection russian alphabet`() {
+    assertSuccess("[А-яЁё]", COLLECTION)
+  }
+
+  @Test
   fun `unclosed collection`() {
     assertFailure("[a-z", COLLECTION)
+  }
+
+  @Test
+  fun `collection unescaped backslash at end`() {
+    assertFailure("[abc\\]", COLLECTION)
   }
 
   @Test
