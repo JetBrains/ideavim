@@ -144,6 +144,11 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `unicode character in nomagic mode`() {
+    assertSuccess("\\M\u03b5", ATOM)
+  }
+
+  @Test
   fun `'ab'`() {
     assertSuccess("ab", PATTERN)
   }
