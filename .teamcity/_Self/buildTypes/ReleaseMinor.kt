@@ -85,6 +85,12 @@ object ReleaseMinor : IdeaVimBuildType({
       enableStacktrace = true
     }
     gradle {
+      name = "Reset release branch"
+      tasks = "scripts:resetReleaseBranch"
+      buildFile = ""
+      enableStacktrace = true
+    }
+    gradle {
       name = "Publish release"
       tasks = "clean publishPlugin"
       buildFile = ""

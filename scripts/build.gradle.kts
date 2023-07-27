@@ -87,3 +87,9 @@ tasks.register("addReleaseTag", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
+
+tasks.register("resetReleaseBranch", JavaExec::class) {
+  mainClass.set("scripts.release.ResetReleaseBranchKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+}

@@ -8,10 +8,6 @@
 
 package scripts.release
 
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.RepositoryBuilder
-import java.io.File
-
 fun main(args: Array<String>) {
   val (newVersion, rootDir, releaseType) = readArgs(args)
 
