@@ -8,18 +8,13 @@
 
 package scripts.release
 
-import com.vdurmont.semver4j.Semver
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.RepositoryBuilder
-import java.io.File
-
 fun main(args: Array<String>) {
   println("HI!")
   val projectDir = args[0]
   val releaseType = args[1]
   println("Working directory: $projectDir")
   println("Release type: $releaseType")
-  val lastVersion = getVersion(projectDir)
+  val lastVersion = getVersion(projectDir, onlyStable = true)
 
   val nextVersion = when (releaseType) {
     "major" -> lastVersion.nextMajor()
@@ -29,20 +24,4 @@ fun main(args: Array<String>) {
   }
   println("Next $releaseType version: $nextVersion")
   println("##teamcity[setParameter name='env.ORG_GRADLE_PROJECT_version' value='$nextVersion']")
-}
-
-private fun getVersion(projectDir: String): Semver {
-  val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
-  val git = Git(repository)
-  println(git.log().call().first())
-  println(git.tagList().call().first())
-
-  val version = git.tagList().call().mapNotNull { ref ->
-    runCatching {
-      Semver(ref.name.removePrefix("refs/tags/"))
-    }.getOrNull()
-  }
-    .sortedBy { it }
-    .last { it.isStable }
-  return version
 }

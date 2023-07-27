@@ -8,6 +8,7 @@
 
 package scripts.release
 
+import com.vdurmont.semver4j.Semver
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.lib.RepositoryBuilder
@@ -48,4 +49,26 @@ internal fun checkBranch(rootDir: String, releaseType: String) {
   ) {
     "Incorrect branch for the release type. Release type: '$releaseType', branch '$branch'"
   }
+}
+
+internal fun getVersion(projectDir: String, onlyStable: Boolean): Semver {
+  val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+  val git = Git(repository)
+  println(git.log().call().first())
+  println(git.tagList().call().first())
+
+  val versions = git.tagList().call().mapNotNull { ref ->
+    runCatching {
+      Semver(ref.name.removePrefix("refs/tags/"))
+    }.getOrNull()
+  }
+    .sortedBy { it }
+
+  val version = if (onlyStable) {
+    versions.last { it.isStable }
+  } else {
+    versions.last()
+  }
+
+  return version
 }
