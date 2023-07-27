@@ -16,11 +16,14 @@ fun main(args: Array<String>) {
   println("root dir: $rootDir")
 
   val currentBranch = getRepo(rootDir).branch
-  check(currentBranch == "master") {
-    "You should be on master. Current branch: $currentBranch"
-  }
+  println("Current branch is $currentBranch")
 
   val git = getGit(rootDir)
+
+  if (currentBranch != "master") {
+    git.checkout().setName("master").call()
+    println("Check out master branch")
+  }
 
   git.push()
     .setPushTags()
@@ -40,7 +43,7 @@ fun main(args: Array<String>) {
   println("Pushed release branch with tags")
 
   git.checkout()
-    .setName("master")
+    .setName(currentBranch)
     .call()
-  println("Checked out master branch")
+  println("Checked out $currentBranch branch")
 }
