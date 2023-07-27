@@ -16,12 +16,19 @@ import java.io.File
 fun main(args: Array<String>) {
   println("HI!")
   val projectDir = args[0]
+  val releaseType = args[1]
   println("Working directory: $projectDir")
+  println("Release type: $releaseType")
   val lastVersion = getVersion(projectDir)
 
-  val nextMinor = lastVersion.nextMinor()
-  println("Next minor version: $nextMinor")
-  println("##teamcity[setParameter name='env.ORG_GRADLE_PROJECT_version' value='$nextMinor']")
+  val nextVersion = when (releaseType) {
+    "major" -> TODO()
+    "minor" -> lastVersion.nextMinor()
+    "patch" -> TODO()
+    else -> error("Only major, minor, and patch versions are supported")
+  }
+  println("Next $releaseType version: $nextVersion")
+  println("##teamcity[setParameter name='env.ORG_GRADLE_PROJECT_version' value='$nextVersion']")
 }
 
 private fun getVersion(projectDir: String): Semver {

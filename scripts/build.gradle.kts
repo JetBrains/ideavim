@@ -33,6 +33,8 @@ dependencies {
     implementation("com.vdurmont:semver4j:3.1.0")
 }
 
+val releaseType: String? by project
+
 tasks {
     compileKotlin {
         kotlinOptions {
@@ -65,7 +67,7 @@ tasks.register("updateAffectedRates", JavaExec::class) {
 tasks.register("calculateNewVersion", JavaExec::class) {
   mainClass.set("scripts.CalculateNewVersionKt")
   classpath = sourceSets["main"].runtimeClasspath
-  args = listOf("${rootProject.rootDir}")
+  args = listOf("${rootProject.rootDir}", releaseType)
 }
 
 tasks.register("changelogUpdateUnreleased", JavaExec::class) {

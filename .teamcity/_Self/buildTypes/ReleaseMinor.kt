@@ -45,6 +45,7 @@ object ReleaseMinor : IdeaVimBuildType({
       label = "Slack Token"
     )
     password("env.ORG_GRADLE_PROJECT_youtrackToken", "credentialsJSON:3cd3e867-282c-451f-b958-bc95d56a8450", display = ParameterDisplay.HIDDEN)
+//    param("env.ORG_GRADLE_PROJECT_releaseType", "")
   }
 
   vcs {
