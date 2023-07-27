@@ -9,11 +9,7 @@
 package scripts.release
 
 fun main(args: Array<String>) {
-  val (newVersion, rootDir, releaseType) = readArgs(args)
-
-  checkReleaseType(releaseType)
-
-  checkBranch(rootDir, releaseType)
+  val (newVersion, rootDir, _) = readArgs(args)
 
   val git = getGit(rootDir)
 
