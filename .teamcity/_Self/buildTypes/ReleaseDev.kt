@@ -44,6 +44,10 @@ object ReleaseDev : IdeaVimBuildType({
       tasks = "scripts:calculateNewDevVersion"
     }
     gradle {
+      name = "Set TeamCity build number"
+      tasks = "scripts:setTeamCityBuildNumber"
+    }
+    gradle {
       tasks = "publishPlugin"
     }
   }

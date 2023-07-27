@@ -125,3 +125,10 @@ tasks.register("calculateNewDevVersion", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf("${rootProject.rootDir}")
 }
+
+tasks.register("setTeamCityBuildNumber", JavaExec::class) {
+  group = "release"
+  mainClass.set("scripts.release.SetTeamCityBuildNumberKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+}

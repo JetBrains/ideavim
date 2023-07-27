@@ -49,6 +49,10 @@ object ReleaseEap : IdeaVimBuildType({
       tasks = "scripts:calculateNewEapVersion"
     }
     gradle {
+      name = "Set TeamCity build number"
+      tasks = "scripts:setTeamCityBuildNumber"
+    }
+    gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
     }

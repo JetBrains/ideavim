@@ -70,6 +70,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       tasks = "scripts:calculateNewVersion"
     }
     gradle {
+      name = "Set TeamCity build number"
+      tasks = "scripts:setTeamCityBuildNumber"
+    }
+    gradle {
       name = "Update change log"
       tasks = "scripts:changelogUpdateUnreleased"
     }
