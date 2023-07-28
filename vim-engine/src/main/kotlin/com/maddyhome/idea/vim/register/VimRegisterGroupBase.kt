@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTERS
@@ -75,8 +76,8 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   private val listener: (oldValue: VimString?) -> Unit = {
     val clipboardOptionValue = injector.globalOptions().clipboard
     defaultRegisterChar = when {
+      "unnamedplus" in clipboardOptionValue && isPrimaryRegisterSupported() -> PRIMARY_REGISTER
       "unnamed" in clipboardOptionValue -> CLIPBOARD_REGISTER
-      "unnamedplus" in clipboardOptionValue -> PRIMARY_REGISTER
       else -> UNNAMED_REGISTER
     }
     lastRegisterChar = defaultRegisterChar
@@ -212,10 +213,16 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     if (register == CLIPBOARD_REGISTER) {
       injector.clipboardManager.setClipboardText(processedText, text, ArrayList(transferableData))
+      if (!isRegisterSpecifiedExplicitly && !isDelete && isPrimaryRegisterSupported() && OptionConstants.clipboard_unnamedplus in injector.globalOptions().clipboard) {
+        injector.clipboardManager.setPrimaryText(processedText, text, ArrayList(transferableData))
+      }
     }
     if (register == PRIMARY_REGISTER) {
       if (isPrimaryRegisterSupported()) {
         injector.clipboardManager.setPrimaryText(processedText, text, ArrayList(transferableData))
+        if (!isRegisterSpecifiedExplicitly && !isDelete && OptionConstants.clipboard_unnamed in injector.globalOptions().clipboard) {
+          injector.clipboardManager.setClipboardText(processedText, text, ArrayList(transferableData))
+        }
       } else {
         injector.clipboardManager.setClipboardText(processedText, text, ArrayList(transferableData))
       }

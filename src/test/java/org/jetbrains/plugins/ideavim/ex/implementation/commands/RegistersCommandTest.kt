@@ -387,4 +387,85 @@ class RegistersCommandTest : VimTestCase() {
       """.trimMargin(),
     )
   }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test registers after yank with unnamed and unnamedplus linux`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamed,unnamedplus")
+
+    typeText("ye")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "0   line
+      |  c  "*   line
+      |  c  "+   line
+      |  c  ":   set clipboard=unnamed,unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test registers after yank with unnamed and unnamedplus`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamed,unnamedplus")
+
+    typeText("ye")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "0   line
+      |  c  "*   line
+      |  c  ":   set clipboard=unnamed,unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test registers after delete with unnamed and unnamedplus linux`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamed,unnamedplus")
+
+    typeText("de")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "-   line
+      |  c  "+   line
+      |  c  ":   set clipboard=unnamed,unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test registers after delete with unnamed and unnamedplus`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamed,unnamedplus")
+
+    typeText("de")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "-   line
+      |  c  "*   line
+      |  c  ":   set clipboard=unnamed,unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
 }
