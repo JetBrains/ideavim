@@ -14,4 +14,6 @@ import com.maddyhome.idea.vim.api.SystemInfoService
 internal class IjVimSystemInfoService : SystemInfoService {
   override val isWindows: Boolean
     get() = SystemInfo.isWindows
+  override val isXWindow: Boolean
+    get() = SystemInfo.isXWindow
 }

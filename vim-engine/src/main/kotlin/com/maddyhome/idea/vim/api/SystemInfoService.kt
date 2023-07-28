@@ -10,4 +10,5 @@ package com.maddyhome.idea.vim.api
 
 public interface SystemInfoService {
   public val isWindows: Boolean
+  public val isXWindow: Boolean
 }

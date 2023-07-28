@@ -14,13 +14,24 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.register.Register
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 
 class RegistersCommandTest : VimTestCase() {
   @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
   fun `test list empty registers`() {
     configureByText("")
     enterCommand("registers")
     assertExOutput("Type Name Content\n")
+  }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test list empty registers linux`() {
+    configureByText("")
+    enterCommand("registers")
+    assertExOutput("Type Name Content\n  c  \"+   ")
   }
 
   @Test
@@ -97,6 +108,7 @@ class RegistersCommandTest : VimTestCase() {
   }
 
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test correctly encodes non printable characters`() {
     configureByText("")
 
@@ -106,6 +118,22 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput(
       """Type Name Content
                      |  c  "a   ^IHello World^J^[
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test correctly encodes non printable characters linux`() {
+    configureByText("")
+
+    VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+                     |  c  "a   ^IHello World^J^[
+                     |  c  "+   
       """.trimMargin(),
     )
   }
@@ -130,6 +158,7 @@ class RegistersCommandTest : VimTestCase() {
   }
 
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test list all registers in correct order`() {
     configureByText(
       """"<caret>line 0
@@ -219,25 +248,142 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "z   Hello world z
       |  c  "-   s
       |  c  "*   clipboard content
-      |  c  "+   clipboard content
       |  c  ":   ascii
       |  c  "/   search pattern
       """.trimMargin(),
     )
   }
-  
+
   @Test
-  fun `test clipboard registers are not duplicated`() {
+  @EnabledOnOs(OS.LINUX)
+  fun `test list all registers in correct order linux`() {
+    configureByText(
+      """"<caret>line 0
+      |line 1
+      |line 2
+      |line 3
+      |line 4
+      |line 5
+      |line 6
+      |line 7
+      |line 8
+      |line 9
+      |last yank register
+      |small delete register
+      """.trimMargin(),
+    )
+
+    // Populate unnamed "" and numbered "1-9 registers - linewise
+    for (i in 1..10) {
+      typeText(injector.parser.parseKeys("dd"))
+    }
+
+    // Last yank register "0 - "last yank"
+    typeText(injector.parser.parseKeys("2yw" + "<CR>"))
+
+    // Small delete register "- - deletes "s"
+    typeText(injector.parser.parseKeys("x"))
+
+    // Populate named registers "a-z - characterwise
+    val registerGroup = VimPlugin.getRegister()
+    for (i in 'a'..'z') {
+      registerGroup.setKeys(i, injector.parser.parseKeys("Hello world $i"))
+    }
+
+    // Clipboard registers "* "+
+    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+
+    // Last search register "/
+    enterSearch("search pattern")
+
+    enterCommand("ascii")
+    typeText("V<Esc>")
+
+    // IdeaVim does not support:
+    // ". last inserted text
+    // "% current file name
+    // "# alternate file name
+    // "= expression register
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   s
+      |  c  "0   last yank 
+      |  l  "1   line 9^J
+      |  l  "2   line 8^J
+      |  l  "3   line 7^J
+      |  l  "4   line 6^J
+      |  l  "5   line 5^J
+      |  l  "6   line 4^J
+      |  l  "7   line 3^J
+      |  l  "8   line 2^J
+      |  l  "9   line 1^J
+      |  c  "a   Hello world a
+      |  c  "b   Hello world b
+      |  c  "c   Hello world c
+      |  c  "d   Hello world d
+      |  c  "e   Hello world e
+      |  c  "f   Hello world f
+      |  c  "g   Hello world g
+      |  c  "h   Hello world h
+      |  c  "i   Hello world i
+      |  c  "j   Hello world j
+      |  c  "k   Hello world k
+      |  c  "l   Hello world l
+      |  c  "m   Hello world m
+      |  c  "n   Hello world n
+      |  c  "o   Hello world o
+      |  c  "p   Hello world p
+      |  c  "q   Hello world q
+      |  c  "r   Hello world r
+      |  c  "s   Hello world s
+      |  c  "t   Hello world t
+      |  c  "u   Hello world u
+      |  c  "v   Hello world v
+      |  c  "w   Hello world w
+      |  c  "x   Hello world x
+      |  c  "y   Hello world y
+      |  c  "z   Hello world z
+      |  c  "-   s
+      |  c  "*   clipboard content
+      |  c  "+   mall delete register
+      |  c  ":   ascii
+      |  c  "/   search pattern
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test clipboard registers are not duplicated linux`() {
     configureByText("<caret>line 0 ")
 
     injector.registerGroup.saveRegister('+', Register('+', SelectionType.LINE_WISE, "Lorem ipsum dolor", mutableListOf()))
     injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+    typeText("V<Esc>")
 
     enterCommand("registers")
     assertExOutput(
       """Type Name Content
       |  c  "*   clipboard content
-      |  c  "+   clipboard content
+      |  c  "+   line 0 
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test clipboard registers are not duplicated`() {
+    configureByText("<caret>line 0 ")
+
+    injector.registerGroup.saveRegister('+', Register('+', SelectionType.LINE_WISE, "Lorem ipsum dolor", mutableListOf()))
+    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+    typeText("V<Esc>")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  "*   clipboard content
       """.trimMargin(),
     )
   }

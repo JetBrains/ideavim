@@ -20,6 +20,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Ignore
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 
 /**
  * @author Alex Plate
@@ -207,7 +209,36 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   // Legacy tests
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text linewise multicaret`() {
+    val before = """
+            q${c}werty
+            as${c}dfgh
+            ${c}zxcvbn
+
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('+', "zxcvbn\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("vl" + "\"+gp"))
+    val after = """
+            q
+            zxcvbn
+            ${c}rty
+            as
+            zxcvbn
+            ${c}gh
+
+            zxcvbn
+            ${c}cvbn
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  // Legacy tests
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text linewise multicaret clipboard register`() {
     val before = """
             q${c}werty
             as${c}dfgh

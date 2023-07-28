@@ -7,12 +7,14 @@
  */
 package org.jetbrains.plugins.ideavim.action
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
@@ -251,23 +253,24 @@ class CopyActionTest : VimTestCase() {
     kotlin.test.assertEquals("bar\n", starRegister.text)
   }
 
-  // VIM-792 |"*| |yy| |p|
   // TODO: Review this test
   // This doesn't use the system clipboard, but the TestClipboardModel
   @Test
+  @TestFor(issues = ["VIM-792"])
   fun testLineWiseClipboardYankPaste() {
     configureByText("<caret>foo\n")
-    typeText("\"*yy" + "\"*p")
+    typeText("\"*yy" +  "\"*p")
     val register = VimPlugin.getRegister().getRegister('*')
     assertNotNull<Any>(register)
     kotlin.test.assertEquals("foo\n", register.text)
-    assertState(
-      """
-    foo
-    <caret>foo
-    
-      """.trimIndent(),
-    )
+    val editor = fixture.editor
+    waitAndAssert {
+      editor.document.text == """
+        foo
+        foo
+        
+      """.trimIndent() && editor.caretModel.primaryCaret.offset == 4
+    }
   }
 
   // VIM-792 |"*| |CTRL-V| |v_y| |p|

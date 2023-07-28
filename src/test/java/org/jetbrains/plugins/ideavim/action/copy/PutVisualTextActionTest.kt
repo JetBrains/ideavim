@@ -20,6 +20,8 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 
 /**
  * @author Alex Plate
@@ -106,7 +108,19 @@ class PutVisualTextActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text multicaret`() {
+    val before = "${c}I found ${c}it in a ${c}legendary land"
+    configureByText(before)
+    injector.registerGroup.storeText('+', "legendary", SelectionType.CHARACTER_WISE)
+    typeText(injector.parser.parseKeys("ve" + "\"+p"))
+    val after = "legendar${c}y legendar${c}y in a legendar${c}y land"
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text multicaret clipboard register`() {
     val before = "${c}I found ${c}it in a ${c}legendary land"
     configureByText(before)
     injector.registerGroup.storeText('*', "legendary", SelectionType.CHARACTER_WISE)
@@ -243,6 +257,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text linewise multicaret`() {
     val before = """
             A Discovery
@@ -274,7 +289,68 @@ class PutVisualTextActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  fun `test put visual text linewise multicaret clipboard register`() {
+    val before = """
+            A Discovery
+
+            ${c}I found it in a legendary land
+            ${c}all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('*', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("ve" + "\"*p"))
+    val after = """
+            A Discovery
+
+
+            ${c}A Discovery
+             it in a legendary land
+
+            ${c}A Discovery
+             rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            ${c}A Discovery
+             by the torrent of a mountain pass.
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text linewise multicaret on same line`() {
+    val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}hard by the$c torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("ve" + "\"+p"))
+    val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            ${c}A Discovery
+             by the
+            ${c}A Discovery
+             of a mountain pass.
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text linewise multicaret on same line clipboard register`() {
     val before = """
             A Discovery
 
@@ -303,7 +379,39 @@ class PutVisualTextActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text linewise multicaret on same line twice`() {
+    val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}hard by the$c torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("ve" + "2\"+p"))
+    val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            ${c}A Discovery
+            A Discovery
+             by the
+            ${c}A Discovery
+            A Discovery
+             of a mountain pass.
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text linewise multicaret on same line twice clipboard register`() {
     val before = """
             A Discovery
 
@@ -448,7 +556,46 @@ class PutVisualTextActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text blockwise multicaret`() {
+    val before = """
+            A Discovery
+
+            I |found| it in a ${c}legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy ${c}underside, the checquered fringe.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+//    VimPlugin.getRegister().storeText(editor.vim, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(injector.parser.parseKeys("ve" + "\"+p"))
+    val after = """
+            A Discovery
+
+            I |found| it in a $c|found| land
+            al|l roc|ks and la|l roc|vender and tufted grass,
+            wh|ere i|t was set|ere i|tled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy $c|found|, the checquered fringe.
+                      |l roc|
+                      |ere i|
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text blockwise multicaret clipboard register`() {
     val before = """
             A Discovery
 
@@ -588,6 +735,7 @@ class PutVisualTextActionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text character to line multicaret`() {
     val before = """
             A Discovery
@@ -624,7 +772,80 @@ class PutVisualTextActionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  fun `test put visual text character to line multicaret clipboard register`() {
+    val before = """
+            A Discovery
+
+            I found ${c}it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the ${c}torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('*', "Discovery", SelectionType.CHARACTER_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"*p"))
+    val after = """
+            A Discovery
+
+            ${c}Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}Discovery
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+            A Discovery
+
+            ${c}Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}Discovery
+    """,
+  )
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text character to line multicaret on same line`() {
+    val before = """
+            A Discovery
+
+            I found ${c}it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the ${c}torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('+', "Discovery", SelectionType.CHARACTER_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
+    val after = """
+            A Discovery
+
+            ${c}Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}Discovery
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+            A Discovery
+
+            ${c}Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}Discovery
+    """,
+  )
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text character to line multicaret on same line clipboard register`() {
     val before = """
             A Discovery
 
@@ -752,6 +973,7 @@ class PutVisualTextActionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text line to line multicaret`() {
     val before = """
             A Discovery
@@ -788,7 +1010,80 @@ class PutVisualTextActionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  fun `test put visual text line to line multicaret clipboard register`() {
+    val before = """
+            A Discovery
+
+            I found ${c}it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the ${c}torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('*', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"*p"))
+    val after = """
+            A Discovery
+
+            ${c}A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}A Discovery
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+            A Discovery
+
+            ${c}A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}A Discovery
+    """,
+  )
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text line to line multicaret on same line`() {
+    val before = """
+            A Discovery
+
+            I found ${c}it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the ${c}torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
+    val after = """
+            A Discovery
+
+            ${c}A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}A Discovery
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+            A Discovery
+
+            ${c}A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}A Discovery
+    """,
+  )
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text line to line multicaret on same line clipboard register`() {
     val before = """
             A Discovery
 
@@ -992,7 +1287,69 @@ class PutVisualTextActionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test put visual text blockwise multicaret to line`() {
+    val before = """
+            A Discovery
+
+            I |found| it in a ${c}legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy ${c}underside, the checquered fringe.
+    """.trimIndent()
+    configureByText(before)
+    injector.registerGroup.storeText('+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
+    val after = """
+            A Discovery
+
+            $c|found|
+            |l roc|
+            |ere i|
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            $c|found|
+            |l roc|
+            |ere i|
+
+
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+            A Discovery
+
+            $c|found|
+            |l roc|
+            |ere i|
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            $c|found|
+            |l roc|
+            |ere i|
+    """,
+  )
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test put visual text blockwise multicaret to line clipboard register`() {
     val before = """
             A Discovery
 

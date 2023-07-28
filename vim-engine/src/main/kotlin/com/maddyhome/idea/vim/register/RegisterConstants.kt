@@ -18,7 +18,11 @@ public object RegisterConstants {
   public const val ALTERNATE_BUFFER_REGISTER: Char = '#'
   public const val EXPRESSION_BUFFER_REGISTER: Char = '='
   public const val CURRENT_FILENAME_REGISTER: Char = '%'
-  public const val CLIPBOARD_REGISTERS: String = "*+"
+
+  public const val CLIPBOARD_REGISTER: Char = '*'
+  public const val PRIMARY_REGISTER: Char = '+'
+  public const val CLIPBOARD_REGISTERS: String = CLIPBOARD_REGISTER.toString() + PRIMARY_REGISTER
+
   public const val NUMBERED_REGISTERS: String = "0123456789"
   public const val NAMED_REGISTERS: String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 

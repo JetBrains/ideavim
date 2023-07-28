@@ -22,6 +22,8 @@ import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 import kotlin.test.assertEquals
 
 class ReplaceWithRegisterTest : VimTestCase() {
@@ -520,6 +522,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
   }
 
   @Test
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   fun `test replace in visual with clipboard unnamedplus`() {
     VimPlugin.getRegister().resetRegisters()
 
@@ -529,6 +532,20 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     typeText(injector.parser.parseKeys("vegr"))
     assertState("one four three")
+    enterCommand("set clipboard&")
+  }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test replace in visual with clipboard unnamedplus linux`() {
+    VimPlugin.getRegister().resetRegisters()
+
+    configureByText("one ${c}two three")
+    enterCommand("set clipboard+=unnamedplus")
+    injector.registerGroup.storeText('+', "four")
+
+    typeText(injector.parser.parseKeys("vegr"))
+    assertState("one two three")
     enterCommand("set clipboard&")
   }
 

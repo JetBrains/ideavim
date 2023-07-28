@@ -12,6 +12,7 @@ public class OptionConstants {
   public companion object {
     public const val clipboard_ideaput: String = "ideaput"
     public const val clipboard_unnamed: String = "unnamed"
+    public const val clipboard_unnamedplus: String = "unnamedplus"
 
     public const val keymodel_startsel: String = "startsel"
     public const val keymodel_stopsel: String = "stopsel"

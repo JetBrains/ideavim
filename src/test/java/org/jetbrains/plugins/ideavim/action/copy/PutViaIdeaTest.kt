@@ -24,6 +24,8 @@ import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 import java.awt.datatransfer.StringSelection
 import java.util.*
 
@@ -119,8 +121,9 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @EnabledOnOs(OS.MAC, OS.WINDOWS)
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
-  fun `test insert block w1ith newline`() {
+  fun `test insert block w1ith newline primary selection`() {
     val before = """
             A Discovery
             $c
@@ -134,6 +137,32 @@ class PutViaIdeaTest : VimTestCase() {
     CopyPasteManagerEx.getInstance().setContents(StringSelection("Hello"))
 
     typeText("\"+p", "\"+p")
+    val after = """
+            A Discovery
+            HelloHello
+            I found it in a legendary land
+            
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  fun `test insert block w1ith newline clipboard selection`() {
+    val before = """
+            A Discovery
+            $c
+            I found it in a legendary land
+            
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+
+    // For this particular test, we want to set exact this type of transferable
+    CopyPasteManagerEx.getInstance().setContents(StringSelection("Hello"))
+
+    typeText("\"*p", "\"*p")
     val after = """
             A Discovery
             HelloHello

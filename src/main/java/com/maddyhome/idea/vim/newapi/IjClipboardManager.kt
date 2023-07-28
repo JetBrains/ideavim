@@ -18,9 +18,9 @@ import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData
 import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.HeadlessException
+import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
@@ -35,11 +36,21 @@ import java.io.IOException
 
 @Service
 internal class IjClipboardManager : VimClipboardManager {
+  override fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>? {
+    val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return null
+    val contents = clipboard.getContents(null) ?: return null
+    return getTextAndTransferableData(contents)
+  }
+
   override fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>? {
+    val contents = getContents() ?: return null
+    return getTextAndTransferableData(contents)
+  }
+
+  private fun getTextAndTransferableData(trans: Transferable): Pair<String, List<Any>?>? {
     var res: String? = null
     var transferableData: List<TextBlockTransferableData> = ArrayList()
     try {
-      val trans = getContents() ?: return null
       val data = trans.getTransferData(DataFlavor.stringFlavor)
       res = data.toString()
       transferableData = collectTransferableData(trans)
@@ -48,22 +59,32 @@ internal class IjClipboardManager : VimClipboardManager {
     } catch (ignored: IOException) {
     }
     if (res == null) return null
-
     return Pair(res, transferableData)
   }
 
-  @Suppress("UNCHECKED_CAST")
   override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Transferable? {
-    val transferableData1 = (transferableData as List<TextBlockTransferableData>).toMutableList()
+    return handleTextSetting(text, rawText, transferableData) { content -> setContents(content) }
+  }
+
+  override fun setPrimaryText(text: String, rawText: String, transferableData: List<Any>): Transferable? {
+    return handleTextSetting(text, rawText, transferableData) { content ->
+      val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return@handleTextSetting null
+      clipboard.setContents(content, EmptyClipboardOwner.INSTANCE)
+    }
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  private fun handleTextSetting(text: String, rawText: String, transferableData: List<Any>, setContent: (TextBlockTransferable) -> Unit?): Transferable? {
+    val mutableTransferableData = (transferableData as List<TextBlockTransferableData>).toMutableList()
     try {
-      val s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData1)
-      if (transferableData1.none { it is CaretStateTransferableData }) {
-        // Manually add CaretStateTransferableData to avoid adjustment of copied text to multicaret
-        transferableData1 += CaretStateTransferableData(intArrayOf(0), intArrayOf(s.length))
+      val s = TextBlockTransferable.convertLineSeparators(text, "\n", mutableTransferableData)
+      if (mutableTransferableData.none { it is CaretStateTransferableData }) {
+        // Manually add CaretStateTransferableData to avoid adjustment of a copied text to multicaret
+        mutableTransferableData += CaretStateTransferableData(intArrayOf(0), intArrayOf(s.length))
       }
-      logger.debug { "Paste text with transferable data: ${transferableData1.joinToString { it.javaClass.name }}" }
-      val content = TextBlockTransferable(s, transferableData1, RawText(rawText))
-      setContents(content)
+      logger.debug { "Paste text with transferable data: ${mutableTransferableData.joinToString { it.javaClass.name }}" }
+      val content = TextBlockTransferable(s, mutableTransferableData, RawText(rawText))
+      setContent(content)
       return content
     } catch (ignored: HeadlessException) {
     }

@@ -353,6 +353,13 @@ public class ChangeGroup extends VimChangeGroupBase {
     final int endOffset = EngineEditorHelperKt.getLineEndForOffset(editor, range.getEndOffset());
 
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
+
+    // Here we do selection, and it is not a good idea, because it updates primary selection in Linux
+    // I'll leave here a dirty fix that restores primary selection, but it would be better to rewrite this method
+    Pair<String, List<Object>> primaryTextAndTransferableData = null;
+    if (injector.getSystemInfoService().isXWindow()) {
+      primaryTextAndTransferableData = injector.getClipboardManager().getPrimaryTextAndTransferableData();
+    }
     VisualModeHelperKt.vimSetSystemSelectionSilently(ijEditor.getSelectionModel(), startOffset, endOffset);
 
     Project project = ijEditor.getProject();
@@ -376,6 +383,10 @@ public class ChangeGroup extends VimChangeGroupBase {
     } else {
       actionExecution.invoke();
       afterAction.invoke();
+    }
+
+    if (primaryTextAndTransferableData != null) {
+      injector.getClipboardManager().setPrimaryText(primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getSecond());
     }
   }
 
@@ -668,7 +679,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       logger.debug("text=" + text);
     }
     String number = text;
-    if (text.length() == 0) {
+    if (text.isEmpty()) {
       return null;
     }
 
@@ -711,7 +722,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
     else if (alpha && NumberType.ALPHA.equals(numberType)) {
       if (!Character.isLetter(ch)) throw new RuntimeException("Not alpha number : " + text);
-      ch += count;
+      ch += (char)count;
       if (Character.isLetter(ch)) {
         number = String.valueOf(ch);
       }
