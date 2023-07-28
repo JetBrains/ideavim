@@ -80,6 +80,7 @@ range : RANGE_START INT? (COMMA INT?)? RANGE_END
  */
 ordinary_atom : LITERAL_CHAR #LiteralChar
               | DOT          #AnyChar
+              | zero_width   #ZeroWidth
               | char_class   #CharClass
               | collection   #Collec
               ;
@@ -137,3 +138,12 @@ collection : COLLECTION_START CARET collection_elem* COLLECTION_END #CollectionN
 collection_elem : (COLLECTION_LITERAL_CHAR | DASH | CARET) DASH (COLLECTION_LITERAL_CHAR | DASH | CARET) #RangeColElem
                 | (COLLECTION_LITERAL_CHAR | DASH | CARET)                                               #SingleColElem
                 ;
+
+/**
+ * When using zero-width tokens, no characters are
+ * included in the match.
+ */
+zero_width : CURSOR      #Cursor
+           | START_MATCH #StartMatch
+           | END_MATCH   #EndMatch
+           ;

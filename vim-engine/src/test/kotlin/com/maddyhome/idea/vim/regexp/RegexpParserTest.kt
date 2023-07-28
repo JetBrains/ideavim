@@ -203,6 +203,11 @@ class RegexpParserTest {
   }
 
   @Test
+  fun `'ab' after cursor`() {
+    assertSuccess("\\%#ab", PATTERN);
+  }
+
+  @Test
   fun `sequence of 0 or more 'ab'`() {
     assertSuccess("\\(ab\\)*", PATTERN)
   }
