@@ -113,7 +113,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T = when (scope) {
-    is OptionScope.AUTO -> getEffectiveOptionValue(option, scope.editor)
+    is OptionScope.EFFECTIVE -> getEffectiveOptionValue(option, scope.editor)
     is OptionScope.LOCAL -> getLocalOptionValue(option, scope.editor)
     OptionScope.GLOBAL -> getGlobalOptionValue(option)
   }
@@ -122,7 +122,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     option.checkIfValueValid(value, value.asString())
 
     when (scope) {
-      is OptionScope.AUTO -> setEffectiveOptionValue(option, scope.editor, value)
+      is OptionScope.EFFECTIVE -> setEffectiveOptionValue(option, scope.editor, value)
       is OptionScope.LOCAL -> setLocalOptionValue(option, scope.editor, value)
       OptionScope.GLOBAL -> setGlobalOptionValue(option, value)
     }
@@ -153,7 +153,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     // will succeed
     @Suppress("UNCHECKED_CAST")
     return cachedValues.getOrPut(option.name) {
-      provider(getOptionValue(option, if (editor == null) OptionScope.GLOBAL else OptionScope.AUTO(editor)))
+      provider(getOptionValue(option, if (editor == null) OptionScope.GLOBAL else OptionScope.EFFECTIVE(editor)))
     } as TData
   }
 
@@ -232,7 +232,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun getGlobalOptions(): GlobalOptions = globalOptionsAccessor
 
-  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionScope.AUTO(editor))
+  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionScope.EFFECTIVE(editor))
 
 
   // We can't use StrictMode.assert because it checks an option, which calls into VimOptionGroupBase...

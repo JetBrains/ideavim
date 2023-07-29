@@ -132,7 +132,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all editors when global option changes at effective scope`() {
     val option = addOption(OptionDeclaredScope.GLOBAL)
-    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(originalEditor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -156,7 +156,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all buffer editors when local-to-buffer option changes at effective scope`() {
     val option = addOption(OptionDeclaredScope.LOCAL_TO_BUFFER)
-    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(originalEditor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow)
   }
@@ -180,7 +180,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for single window when local-to-window option changes at effective scope`() {
     val option = addOption(OptionDeclaredScope.LOCAL_TO_WINDOW)
-    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(originalEditor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor)
   }
@@ -204,7 +204,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all editors when unset global-local local-to-buffer option changes at effective scope`() {
     val option = addOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER)
-    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(originalEditor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -215,7 +215,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(otherBufferWindow.vim), VimString("localValue"))
     Listener.notifiedEditors.clear()
 
-    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(otherBufferWindow.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(otherBufferWindow.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -250,7 +250,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all editors when unset global-local local-to-window option changes at effective scope`() {
     val option = addOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
-    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(originalEditor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -261,7 +261,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(originalEditor.vim), VimString("localValue"))
     Listener.notifiedEditors.clear()
 
-    injector.optionGroup.setOptionValue(option, OptionScope.AUTO(originalEditor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
