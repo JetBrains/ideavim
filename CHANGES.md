@@ -25,6 +25,10 @@ usual beta standards.
 
 ## To Be Released
 
+### Fixes:
+* [VIM-802](https://youtrack.jetbrains.com/issue/VIM-802) IdeaVim vs. Vim: discrepancies in using registers
+* [VIM-2246](https://youtrack.jetbrains.com/issue/VIM-2246) X11/Xorg Primary selection register "* not supported
+
 ### Merged PRs:
 * [666](https://github.com/JetBrains/ideavim/pull/666) by [Matt Ellis](https://github.com/citizenmatt): Improve formatting of `:set` command output
 
