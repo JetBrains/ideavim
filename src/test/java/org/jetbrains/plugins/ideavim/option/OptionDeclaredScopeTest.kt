@@ -29,6 +29,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import javax.swing.SwingConstants
@@ -310,6 +311,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     }
   }
 
+  @Disabled("IdeaVim does not currently support reusing the current window")
   fun `test initialise new buffer in current window with per-window global copy of local-to-window option`() {
     TODO("The IntelliJ implementation does not support reusing the current window for a different buffer/file")
 
@@ -349,7 +351,8 @@ class OptionDeclaredScopeTest : VimTestCase() {
     }
   }
 
-//  @Test
+  @Disabled("IdeaVim does not maintain a history of local to window option values. It is unclear what Vim's behaviour here is. " +
+    "Leaving this test as documentation that Vim does actually do this")
   fun `test reopening a buffer should maintain the last used local-to-window options`() {
     withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
       setLocalValue(otherBufferWindow)
@@ -364,7 +367,6 @@ class OptionDeclaredScopeTest : VimTestCase() {
     }
 
     TODO("Not implemented. This is Vim behaviour, but this data is not saved by IdeaVim")
-    // Leaving this test as a form of documentation for Vim behaviour
   }
 
   private inline fun withOption(declaredScope: OptionDeclaredScope, action: Option<VimString>.() -> Unit) {

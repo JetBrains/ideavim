@@ -18,6 +18,8 @@ relativenumber
 scrolljump
 scrolloff
 selectmode
+setglobal
+setlocal
 shellcmdflag
 shellxescape
 shellxquote

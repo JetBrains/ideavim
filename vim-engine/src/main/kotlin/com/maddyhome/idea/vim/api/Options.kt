@@ -180,7 +180,7 @@ public object Options {
   public val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
   public val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", GLOBAL, "tm", 1000))
   public val undolevels: NumberOption = addOption(
-    // -1 means no undo. Vim uses -123456 as "unset"
+    // -1 means no undo. Vim uses -123456 as "unset". See `:help undolevels`
     // TODO: This option doesn't appear to be used anywhere...
     NumberOption("undolevels", GLOBAL_OR_LOCAL_TO_BUFFER, "ul", 1000, -123456)
   )
