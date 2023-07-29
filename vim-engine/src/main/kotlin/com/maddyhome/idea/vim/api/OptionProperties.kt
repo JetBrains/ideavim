@@ -60,7 +60,7 @@ public open class GlobalOptions(scope: OptionScope = OptionScope.GLOBAL): Option
  * As a convenience, this class also provides access to the global options, via inheritance.
  */
 @Suppress("unused")
-public open class EffectiveOptions(scope: OptionScope.AUTO): GlobalOptions(scope) {
+public open class EffectiveOptions(scope: OptionScope.EFFECTIVE): GlobalOptions(scope) {
   public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
   public val matchpairs: StringListOptionValue by optionProperty(Options.matchpairs)
   public val nrformats: StringListOptionValue by optionProperty(Options.nrformats)

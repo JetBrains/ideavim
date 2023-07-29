@@ -52,5 +52,5 @@ public sealed class OptionScope {
    *
    * TODO: Support per-window "global" options
    */
-  public class AUTO(public val editor: VimEditor) : OptionScope()
+  public class EFFECTIVE(public val editor: VimEditor) : OptionScope()
 }

@@ -185,7 +185,7 @@ public data class LetCommand(
           when (variable.scope) {
             Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, newValue)
             Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(editor), newValue)
-            null -> injector.optionGroup.setOptionValue(option, OptionScope.AUTO(editor), newValue)
+            null -> injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(editor), newValue)
             else -> throw ExException("Invalid option scope")
           }
         } else {

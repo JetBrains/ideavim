@@ -43,7 +43,7 @@ public open class GlobalIjOptions(scope: OptionScope = OptionScope.GLOBAL) : Glo
  *
  * As a convenience, this class also provides access to the global options, via inheritance.
  */
-public class EffectiveIjOptions(scope: OptionScope.AUTO): GlobalIjOptions(scope) {
+public class EffectiveIjOptions(scope: OptionScope.EFFECTIVE): GlobalIjOptions(scope) {
   public var ideacopypreprocess: Boolean by optionProperty(IjOptions.ideacopypreprocess)
   public var ideajoin: Boolean by optionProperty(IjOptions.ideajoin)
   public var idearefactormode: String by optionProperty(IjOptions.idearefactormode)

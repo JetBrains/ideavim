@@ -41,7 +41,7 @@ import kotlin.math.ceil
  */
 @ExCommand(command = "se[t]")
 public data class SetCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
-  override fun getScope(editor: VimEditor): OptionScope = OptionScope.AUTO(editor)
+  override fun getScope(editor: VimEditor): OptionScope = OptionScope.EFFECTIVE(editor)
 }
 
 @ExCommand(command = "setg[lobal]")
@@ -256,7 +256,7 @@ private fun showOptions(
   val output = buildString {
     if (showIntro) {
       when (scope) {
-        is OptionScope.AUTO -> appendLine("--- Options ---")
+        is OptionScope.EFFECTIVE -> appendLine("--- Options ---")
         is OptionScope.LOCAL -> appendLine("--- Local option values ---")
         OptionScope.GLOBAL -> appendLine("--- Global option values ---")
       }

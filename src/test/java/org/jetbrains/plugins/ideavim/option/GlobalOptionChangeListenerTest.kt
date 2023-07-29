@@ -66,7 +66,7 @@ class GlobalOptionChangeListenerTest: VimTestCase() {
       injector.optionGroup.addOption(option)
       injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
 
-      injector.optionGroup.setOptionValue(option, OptionScope.AUTO(fixture.editor.vim), VimString("newValue"))
+      injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(fixture.editor.vim), VimString("newValue"))
 
       assertTrue(Listener.called)
     }

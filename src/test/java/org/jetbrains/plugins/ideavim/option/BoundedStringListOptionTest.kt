@@ -47,7 +47,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   }
 
   private fun getOptionValue() =
-    injector.optionGroup.getOptionValue(option, OptionScope.AUTO(fixture.editor.vim)).value
+    injector.optionGroup.getOptionValue(option, OptionScope.EFFECTIVE(fixture.editor.vim)).value
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test

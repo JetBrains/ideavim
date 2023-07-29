@@ -383,7 +383,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     injector.optionGroup.setOptionValue(this, OptionScope.LOCAL(editor.vim), setValue)
 
   private fun Option<VimString>.setEffectiveValue(editor: Editor) {
-    injector.optionGroup.setOptionValue(this, OptionScope.AUTO(editor.vim), setValue)
+    injector.optionGroup.setOptionValue(this, OptionScope.EFFECTIVE(editor.vim), setValue)
   }
 
   private fun getGlobalValue(option: Option<VimString>) =
@@ -393,7 +393,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(editor.vim))
 
   private fun getEffectiveValue(option: Option<VimString>, editor: Editor) =
-    injector.optionGroup.getOptionValue(option, OptionScope.AUTO(editor.vim))
+    injector.optionGroup.getOptionValue(option, OptionScope.EFFECTIVE(editor.vim))
 
   private fun assertValueUnmodified(actualValue: VimString) = assertEquals(defaultValue, actualValue)
   private fun assertValueChanged(actualValue: VimString) = assertEquals(setValue, actualValue)

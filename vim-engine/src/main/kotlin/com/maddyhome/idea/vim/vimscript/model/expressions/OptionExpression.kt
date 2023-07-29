@@ -24,7 +24,7 @@ public data class OptionExpression(val scope: Scope?, val optionName: String) : 
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
       Scope.LOCAL_VARIABLE -> injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(editor))
-      null -> injector.optionGroup.getOptionValue(option, OptionScope.AUTO(editor))
+      null -> injector.optionGroup.getOptionValue(option, OptionScope.EFFECTIVE(editor))
       else -> throw ExException("Invalid option scope")
     }
   }
