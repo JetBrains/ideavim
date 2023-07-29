@@ -56,6 +56,24 @@ public abstract class Option<T : VimDataType>(public val name: String,
   public abstract fun parseValue(value: String, token: String): VimDataType
 }
 
+/**
+ * Represents a string option
+ *
+ * If the string option is global-local, the [unsetValue] will be used as a sentinel value to recognise that a local
+ * value is not set. Vim's help pages do not explicitly state that string global-local options are an empty string, but
+ * it is implied by the use of `set {option}=` to reset back to an unset state. This can also be seen interactively - an
+ * unset global-local string option will be reported as `{option}=`, meaning it does not have a string value. See also
+ * `:help global-local`.
+ *
+ * @constructor Creates a new [StringOption] instance
+ * @param name The name of the option
+ * @param declaredScope The declared scope of the option - global, global-local, local-to-buffer, local-to-window
+ * @param abbrev  An abbreviated name for the option, recognised by `:set`
+ * @param defaultValue The option's default value of the option
+ * @param unsetValue The unset value of the option if the [declaredScope] is [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER]
+ * or [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW]. The default value is an empty string.
+ * @param boundedValues The collection of bounded values for the option.
+ */
 public open class StringOption(
   name: String,
   declaredScope: OptionDeclaredScope,
@@ -103,7 +121,7 @@ public open class StringOption(
 }
 
 /**
- * Represents a string that is a comma-separated list of values
+ * Represents a string option that is a comma-separated list of values
  *
  * Note that we have tried multiple ways to represent a string list option, from a separate class similar to
  * [StringListOption] or a combined string option. While a string list option "is-a" string option, its operations
@@ -176,6 +194,21 @@ public open class StringListOption(
   }
 }
 
+/**
+ * Represents a number option
+ *
+ * If a number option is global-local, the [unsetValue] will be used as a sentinel value to recognise that a local value
+ * is not set. Vim's help pages do not specify that a number option's unset value is `-1`, but this can be seen in the
+ * output for `:setlocal {option}?` for a number global-local option.
+ *
+ * @constructor Creates a new [NumberOption] instance
+ * @param name The name of the option
+ * @param declaredScope The declared scope of the option - global, global-local, local-to-buffer, local-to-window
+ * @param abbrev  An abbreviated name for the option, recognised by `:set`
+ * @param defaultValue The option's default value of the option
+ * @param unsetValue The unset value of the option if the [declaredScope] is [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER]
+ * or [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW]. The default value is `-1`.
+ */
 public open class NumberOption(
   name: String,
   declaredScope: OptionDeclaredScope,
@@ -205,6 +238,20 @@ public open class NumberOption(
   public fun subtractValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value - value2.value)
 }
 
+/**
+ * Represents a number option that always has a positive value
+ *
+ * If an unsigned number option is global-local, then its [unsetValue] is inherited from [NumberOption] and will be
+ * `-1`. While this value is invalid, it is used as a sentinel value to know that the local value is not set. Consumers
+ * of the options API will not use the raw local value, but will get the effective value (if unset, the global value is
+ * used). Only the `:setlocal {option}?` command needs the raw local value, but uses it for output purposes only.
+ *
+ * @constructor Creates a new [UnsignedNumberOption] instance
+ * @param name The name of the option
+ * @param declaredScope The declared scope of the option - global, global-local, local-to-buffer, local-to-window
+ * @param abbrev  An abbreviated name for the option, recognised by `:set`
+ * @param defaultValue The option's default value of the option
+ */
 public open class UnsignedNumberOption(
   name: String,
   declaredScope: OptionDeclaredScope,
@@ -227,6 +274,20 @@ public open class UnsignedNumberOption(
   }
 }
 
+/**
+ * Represents a boolean option
+ *
+ * Boolean options are represented as a number, using the [VimInt] datatype. A value of zero is treated as false, and
+ * any other value is treated as true. If a boolean option is global-local, the [unsetValue] is set to the `-1` sentinel
+ * value. Vim does not document this anywhere, however it can be observed using `:echo &l:autoread` which will output
+ * the unset value of the local boolean option `'autoread'` as `-1`.
+ *
+ * @constructor Creates a new [UnsignedNumberOption] instance
+ * @param name The name of the option
+ * @param declaredScope The declared scope of the option - global, global-local, local-to-buffer, local-to-window
+ * @param abbrev  An abbreviated name for the option, recognised by `:set`
+ * @param defaultValue The option's default value of the option
+ */
 public class ToggleOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt) :
   Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE) {
   public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Boolean) : this(

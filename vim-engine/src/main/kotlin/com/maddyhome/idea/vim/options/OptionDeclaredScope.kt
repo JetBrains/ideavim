@@ -8,8 +8,6 @@
 
 package com.maddyhome.idea.vim.options
 
-import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
-
 /**
  * Represents the declared scope for an option, e.g. global, global-local or local to window or buffer.
  *
@@ -79,7 +77,7 @@ public enum class OptionDeclaredScope {
    * Vim first splits the window (copying the "global" and local values) and then edits the buffer (reapplying any saved
    * values, or copying the new current window's "global" values over the local values).
    *
-   * This means a coouple of things:
+   * This means a couple of things:
    * * A local-to-window option with an explicitly local value will be copied to the new window if the window is split.
    *   It will be reset to the "global" value if editing a new buffer, or editing a new buffer in a new window. It will
    *   be reset to a previously saved value if editing a previously edited buffer.
