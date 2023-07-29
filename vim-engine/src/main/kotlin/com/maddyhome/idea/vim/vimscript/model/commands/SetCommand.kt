@@ -63,11 +63,8 @@ public abstract class SetCommandBase(ranges: Ranges, argument: String) : Command
     context: ExecutionContext,
     operatorArguments: OperatorArguments
   ): ExecutionResult {
-    return if (parseOptionLine(editor, commandArgument, getScope(editor), failOnBad = true)) {
-      ExecutionResult.Success
-    } else {
-      ExecutionResult.Error
-    }
+    parseOptionLine(editor, commandArgument, getScope(editor))
+    return ExecutionResult.Success
   }
 
   protected abstract fun getScope(editor: VimEditor): OptionScope
@@ -91,17 +88,14 @@ public abstract class SetCommandBase(ranges: Ranges, argument: String) : Command
  *  * :set {option}-={value} - remove or subtract from option value
  *  * :set {option}^={value} - prepend or multiply option value
  *  * :set {option}< - set the option to a copy of the global value
- *
+ *  * Also supports repeated statements, e.g. `:set {option} {option} {option}`. Will try to evaluate everything up to
+ *    the first error, such as an unknown option or an incorrectly formatted operation.
  *
  * @param editor    The editor the command was entered for, null if no editor - reading .ideavimrc
- * @param args      The :set command arguments
- * @param failOnBad True if processing should stop when a bad argument is found, false if a bad argument is simply
- * skipped and processing continues.
- * @return True if no errors were found, false if there were any errors
+ * @param args      The raw text passed to the `:set` command
+ * @throws ExException Thrown if any option names or operations are incorrect
  */
-// todo is failOnBad used anywhere?
-public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
-  // No arguments so we show changed values
+public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope) {
   val optionGroup = injector.optionGroup
 
   val columnFormat = args.startsWith("!")
@@ -109,20 +103,21 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
 
   when {
     argument.isEmpty() -> {
+      // No arguments mean we show only changed values
       val changedOptions = optionGroup.getAllOptions().filter { !optionGroup.isDefaultValue(it, scope) }
       showOptions(editor, changedOptions.map { Pair(it.name, it.name) }, scope, true, columnFormat)
-      return true
+      return
     }
     argument == "all" -> {
       showOptions(editor, optionGroup.getAllOptions().map { Pair(it.name, it.name) }, scope, true, columnFormat)
-      return true
+      return
     }
     argument == "all&" -> {
       // Note that `all&` resets all options in the current editor at local and global scope. This includes global,
       // global-local and local-to-buffer options, which will affect other windows. It does not affect the local values
       // of local-to-window options in other windows
       optionGroup.resetAllOptions(editor)
-      return true
+      return
     }
   }
 
@@ -141,66 +136,68 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
       }
     }
 
-    // Look for the `=` or `:` first
-    var eq = token.indexOf('=')
-    if (eq == -1) {
-      eq = token.indexOf(':')
-    }
+    val isKeyValueOperation = token.indexOf('=') != -1 || token.indexOf(':') != -1
+    if (!isKeyValueOperation) {
+      when {
+        token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
+        token.startsWith("no") -> optionGroup.unsetToggleOption(getValidToggleOption(token.substring(2), token), scope)
+        token.startsWith("inv") -> optionGroup.invertToggleOption(
+          getValidToggleOption(token.substring(3), token),
+          scope
+        )
 
-    when {
-      eq == -1 && token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
-      eq == -1 && token.startsWith("no") -> optionGroup.unsetToggleOption(getValidToggleOption(token.substring(2), token), scope)
-      eq == -1 && token.startsWith("inv") -> optionGroup.invertToggleOption(getValidToggleOption(token.substring(3), token), scope)
-      eq == -1 && token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
-      eq == -1 && token.endsWith("&") -> optionGroup.resetDefaultValue(getValidOption(token.dropLast(1), token), scope)
-      eq == -1 && token.endsWith("<") -> {
-        // Copy the global value to the target scope. If the target scope is global, this is a no-op. When copying a
-        // string global-local option to effective scope, Vim's behaviour matches setting that option at effective
-        // scope. That is, it sets the global value (a no-op) and resets the local value.
-        val option = getValidOption(token.dropLast(1), token)
-        val globalValue = optionGroup.getOptionValue(option, OptionScope.GLOBAL)
-        optionGroup.setOptionValue(option, scope, globalValue)
-      }
-      else -> {
-        // This must be one of =, :, +=, -=, or ^=
-        // No operator so only the option name was given
-        if (eq == -1) {
-          // We must explicitly treat the return value as covariant instead of `Option<VimDataType>?` so that we can
-          // successfully check the type against `ToggleOption`.
+        token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
+        token.endsWith("&") -> optionGroup.resetDefaultValue(getValidOption(token.dropLast(1), token), scope)
+        token.endsWith("<") -> {
+          // Copy the global value to the target scope. If the target scope is global, this is a no-op. When copying a
+          // string global-local option to effective scope, Vim's behaviour matches setting that option at effective
+          // scope. That is, it sets the global value (a no-op) and resets the local value.
+          val option = getValidOption(token.dropLast(1), token)
+          val globalValue = optionGroup.getOptionValue(option, OptionScope.GLOBAL)
+          optionGroup.setOptionValue(option, scope, globalValue)
+        }
+        else -> {
+          // `getOption` returns `Option<VimDataType>?`, but we need to treat it as `Option<out VimDataType>?` because
+          // `ToggleOption` derives from `Option<out VimDataType>`, and the compiler will complain if the types are
+          // different.
           val option: Option<out VimDataType>? = optionGroup.getOption(token)
           when (option) {
             null -> error = Msg.unkopt
             is ToggleOption -> optionGroup.setToggleOption(option, scope)
             else -> toShow.add(Pair(option.name, option.abbrev))
           }
-        } else {
-          // Make sure there is an option name
-          if (eq > 0) {
-            // See if an operator before the equal sign
-            val op = token[eq - 1]
-            var end = eq
-            if (op in "+-^") {
-              end--
-            }
-            // Get option name and value after operator
-            val optionName = token.take(end)
-            val option = getValidOption(optionName)
-            val existingValue = optionGroup.getOptionValue(option, scope)
-            val value = option.parseValue(token.substring(eq + 1), token)
-            val newValue = when (op) {
-              '+' -> appendValue(option, existingValue, value)
-              '^' -> prependValue(option, existingValue, value)
-              '-' -> removeValue(option, existingValue, value)
-              else -> value
-            } ?: throw exExceptionMessage("E474", token)
-            optionGroup.setOptionValue(option, scope, newValue)
-          } else {
-            error = Msg.unkopt
-          }
         }
       }
     }
-    if (failOnBad && error != null) {
+    else {
+      // This must be one of =, :, +=, -=, or ^=
+      val eq = token.indexOf('=')
+      val colon = token.indexOf(':')
+      if (eq > 0 || colon > 0) {
+        // Could be option:value, option=value, option+=value, option-=value or option^=value
+        val idx = if (eq > 0) eq else colon
+        val op = if (eq > 0) token[eq - 1] else Char(0)
+        val end = if (eq > 0 && op in "+-^") idx - 1 else idx
+
+        // Get option name and value after operator
+        val optionName = token.take(end)
+        val option = getValidOption(optionName)
+        val existingValue = optionGroup.getOptionValue(option, scope)
+        val value = option.parseValue(token.substring(idx + 1), token)
+        val newValue = when (op) {
+          '+' -> appendValue(option, existingValue, value)
+          '^' -> prependValue(option, existingValue, value)
+          '-' -> removeValue(option, existingValue, value)
+          else -> value
+        } ?: throw exExceptionMessage("E474", token)
+        optionGroup.setOptionValue(option, scope, newValue)
+      }
+      else {
+        // We're either missing the equals sign, the colon, or the option name itself
+        error = Msg.unkopt
+      }
+    }
+    if (error != null) {
       break
     }
   }
@@ -213,8 +210,6 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
   if (error != null) {
     throw ExException(injector.messages.message(error, token))
   }
-
-  return true
 }
 
 private fun getValidOption(optionName: String, token: String = optionName) =
