@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.group
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 
 internal interface IjVimOptionGroup: VimOptionGroup {
   /**
@@ -35,7 +35,7 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   }
 
   override fun getGlobalIjOptions() = globalOptionsAccessor
-  override fun getEffectiveIjOptions(editor: VimEditor) = EffectiveIjOptions(OptionScope.EFFECTIVE(editor))
+  override fun getEffectiveIjOptions(editor: VimEditor) = EffectiveIjOptions(OptionAccessScope.EFFECTIVE(editor))
 }
 
 internal class IjOptionConstants {

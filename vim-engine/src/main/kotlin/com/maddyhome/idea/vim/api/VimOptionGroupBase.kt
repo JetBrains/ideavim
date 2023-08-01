@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUF
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
@@ -112,19 +112,19 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     }
   }
 
-  override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T = when (scope) {
-    is OptionScope.EFFECTIVE -> getEffectiveOptionValue(option, scope.editor)
-    is OptionScope.LOCAL -> getLocalOptionValue(option, scope.editor)
-    OptionScope.GLOBAL -> getGlobalOptionValue(option)
+  override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T = when (scope) {
+    is OptionAccessScope.EFFECTIVE -> getEffectiveOptionValue(option, scope.editor)
+    is OptionAccessScope.LOCAL -> getLocalOptionValue(option, scope.editor)
+    OptionAccessScope.GLOBAL -> getGlobalOptionValue(option)
   }
 
-  override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T) {
+  override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionAccessScope, value: T) {
     option.checkIfValueValid(value, value.asString())
 
     when (scope) {
-      is OptionScope.EFFECTIVE -> setEffectiveOptionValue(option, scope.editor, value)
-      is OptionScope.LOCAL -> setLocalOptionValue(option, scope.editor, value)
-      OptionScope.GLOBAL -> setGlobalOptionValue(option, value)
+      is OptionAccessScope.EFFECTIVE -> setEffectiveOptionValue(option, scope.editor, value)
+      is OptionAccessScope.LOCAL -> setLocalOptionValue(option, scope.editor, value)
+      OptionAccessScope.GLOBAL -> setGlobalOptionValue(option, value)
     }
   }
 
@@ -153,7 +153,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     // will succeed
     @Suppress("UNCHECKED_CAST")
     return cachedValues.getOrPut(option.name) {
-      provider(getOptionValue(option, if (editor == null) OptionScope.GLOBAL else OptionScope.EFFECTIVE(editor)))
+      provider(getOptionValue(option, if (editor == null) OptionAccessScope.GLOBAL else OptionAccessScope.EFFECTIVE(editor)))
     } as TData
   }
 
@@ -163,12 +163,12 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun resetAllOptions(editor: VimEditor) {
     // Reset all options to default values at global and local scope. This will fire any listeners and clear any caches
     Options.getAllOptions().forEach { option ->
-      resetDefaultValue(option, OptionScope.GLOBAL)
+      resetDefaultValue(option, OptionAccessScope.GLOBAL)
       when (option.declaredScope) {
         GLOBAL -> {}
-        LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> resetDefaultValue(option, OptionScope.LOCAL(editor))
+        LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> resetDefaultValue(option, OptionAccessScope.LOCAL(editor))
         GLOBAL_OR_LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_WINDOW -> {
-          setOptionValue(option, OptionScope.LOCAL(editor), option.unsetValue)
+          setOptionValue(option, OptionAccessScope.LOCAL(editor), option.unsetValue)
         }
       }
     }
@@ -176,7 +176,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun resetAllOptionsForTesting() {
     Options.getAllOptions().forEach {
-      resetDefaultValue(it, OptionScope.GLOBAL)
+      resetDefaultValue(it, OptionAccessScope.GLOBAL)
     }
     // During testing, this collection is usually empty
     injector.editorGroup.localEditors().forEach { resetAllOptions(it) }
@@ -232,7 +232,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun getGlobalOptions(): GlobalOptions = globalOptionsAccessor
 
-  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionScope.EFFECTIVE(editor))
+  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionAccessScope.EFFECTIVE(editor))
 
 
   // We can't use StrictMode.assert because it checks an option, which calls into VimOptionGroupBase...

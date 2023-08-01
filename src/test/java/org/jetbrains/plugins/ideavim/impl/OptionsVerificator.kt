@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -201,7 +201,7 @@ internal class OptionsTracer(
     return allOptions
   }
 
-  override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T {
+  override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T {
     if (!ignoreFlag.get()) {
       trace.requestedKeys += option.name
     }
@@ -422,7 +422,7 @@ class OptionsSetup(private val options: List<Pair<Option<out VimDataType>, VimDa
         // compiler will treat the value as type `CapturedType(out VimDataType)`, which cannot be passed in (producer vs
         // consumer)
         @Suppress("UNCHECKED_CAST") val option = key as Option<VimDataType>
-        injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, value)
+        injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, value)
       }
     }
   }

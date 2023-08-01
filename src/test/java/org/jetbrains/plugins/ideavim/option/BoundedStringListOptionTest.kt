@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.option
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -47,7 +47,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   }
 
   private fun getOptionValue() =
-    injector.optionGroup.getOptionValue(option, OptionScope.EFFECTIVE(fixture.editor.vim)).value
+    injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).value
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test

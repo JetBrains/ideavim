@@ -17,7 +17,7 @@ package com.maddyhome.idea.vim.options
  *
  * The `:set`, `:setglobal` and `:setlocal` commands set or show an option's value at a specific scope - explicitly
  * global, explicitly local, or the "effective" value, which depends on the option's declared scope. The declared scope
- * should not be confused with the accessor scope (see [OptionScope]).
+ * should not be confused with the accessor scope (see [OptionAccessScope]).
  *
  * Vim tries to do what the user expects when editing a new buffer or opening a new window, with the effect roughly
  * being that the new buffer or window looks and acts like the current window, ignoring locally set options. To avoid

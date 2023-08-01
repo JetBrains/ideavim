@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -307,12 +307,12 @@ class PlugMissingKeysTest : VimTestCase() {
 
   private fun assertOptionSet(name: String) {
     val option = injector.optionGroup.getOption(name)!!
-    assertTrue(injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean())
+    assertTrue(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL).asBoolean())
   }
 
   private fun assertOptionUnset(name: String) {
     val option = injector.optionGroup.getOption(name)!!
-    assertFalse(injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean())
+    assertFalse(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL).asBoolean())
   }
 
   private fun executeLikeVimrc(vararg text: String) {

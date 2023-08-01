@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.options.helpers
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import java.util.regex.Pattern
 
 public object KeywordOptionHelper {
@@ -48,7 +48,7 @@ public object KeywordOptionHelper {
   @Deprecated("Only maintained for compatibility. Does not handle local-to-buffer iskeyword option")
   public fun toRegex(): List<String> {
     // 'iskeyword' is a local-to-buffer option, but we're not passed an editor. We have to use the global value
-    val isKeyword = injector.optionGroup.getOptionValue(Options.iskeyword, OptionScope.GLOBAL).value
+    val isKeyword = injector.optionGroup.getOptionValue(Options.iskeyword, OptionAccessScope.GLOBAL).value
     val specs = valuesToValidatedAndReversedSpecs(parseValues(isKeyword)) ?: emptyList()
     return specs.map {
       it.initializeValues()

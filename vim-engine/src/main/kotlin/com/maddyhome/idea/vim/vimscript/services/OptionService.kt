@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
@@ -35,7 +35,7 @@ public interface OptionService {
    * @throws ExException("E518: Unknown option: $token")
    */
   // Used by which-key 0.8.0 - "which-key", "timeout" and "timeoutlen"
-  public fun getOptionValue(scope: OptionScope, optionName: String, token: String = optionName): VimDataType
+  public fun getOptionValue(scope: OptionAccessScope, optionName: String, token: String = optionName): VimDataType
 
   /**
    * COMPATIBILITY-LAYER: New method added
@@ -58,15 +58,15 @@ public interface OptionService {
 
 @Suppress("DEPRECATION")
 internal class OptionServiceImpl : OptionService {
-  override fun getOptionValue(scope: OptionScope, optionName: String, token: String): VimDataType {
+  override fun getOptionValue(scope: OptionAccessScope, optionName: String, token: String): VimDataType {
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
     return injector.optionGroup.getOptionValue(option, scope)
   }
 
   override fun setOption(scope: OptionService.Scope, optionName: String, token: String) {
     val newScope = when (scope) {
-      is OptionService.Scope.GLOBAL -> OptionScope.GLOBAL
-      is OptionService.Scope.LOCAL -> OptionScope.LOCAL(scope.editor)
+      is OptionService.Scope.GLOBAL -> OptionAccessScope.GLOBAL
+      is OptionService.Scope.LOCAL -> OptionAccessScope.LOCAL(scope.editor)
     }
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
     val toggleOption = (option as? ToggleOption) ?: throw exExceptionMessage("E474", token)

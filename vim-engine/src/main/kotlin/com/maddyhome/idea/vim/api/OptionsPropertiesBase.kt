@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -25,7 +25,7 @@ import kotlin.reflect.KProperty
 /**
  * Base class to provide mechanisms to delegate properties to get/set option values
  */
-public abstract class OptionsPropertiesBase(private val scope: OptionScope = OptionScope.GLOBAL) {
+public abstract class OptionsPropertiesBase(private val scope: OptionAccessScope = OptionAccessScope.GLOBAL) {
   /**
    * Provide a delegate property to get/set boolean option values
    */
@@ -107,7 +107,7 @@ public abstract class OptionsPropertiesBase(private val scope: OptionScope = Opt
  */
 public class StringListOptionValue(
   private val option: StringListOption,
-  private val scope: OptionScope
+  private val scope: OptionAccessScope
 ) : AbstractList<String>() {
 
   // We cache the value at creation time, and update whenever it's changed via one of its own methods. We lazily fetch

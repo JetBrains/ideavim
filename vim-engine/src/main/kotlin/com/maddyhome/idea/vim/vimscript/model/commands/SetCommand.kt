@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -41,17 +41,17 @@ import kotlin.math.ceil
  */
 @ExCommand(command = "se[t]")
 public data class SetCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
-  override fun getScope(editor: VimEditor): OptionScope = OptionScope.EFFECTIVE(editor)
+  override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.EFFECTIVE(editor)
 }
 
 @ExCommand(command = "setg[lobal]")
 public data class SetglobalCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
-  override fun getScope(editor: VimEditor): OptionScope = OptionScope.GLOBAL
+  override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.GLOBAL
 }
 
 @ExCommand(command = "setl[ocal]")
 public data class SetlocalCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
-  override fun getScope(editor: VimEditor): OptionScope = OptionScope.LOCAL(editor)
+  override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.LOCAL(editor)
 }
 
 public abstract class SetCommandBase(ranges: Ranges, argument: String) : Command.SingleExecution(ranges, argument) {
@@ -67,7 +67,7 @@ public abstract class SetCommandBase(ranges: Ranges, argument: String) : Command
     return ExecutionResult.Success
   }
 
-  protected abstract fun getScope(editor: VimEditor): OptionScope
+  protected abstract fun getScope(editor: VimEditor): OptionAccessScope
 }
 
 /**
@@ -95,7 +95,7 @@ public abstract class SetCommandBase(ranges: Ranges, argument: String) : Command
  * @param args      The raw text passed to the `:set` command
  * @throws ExException Thrown if any option names or operations are incorrect
  */
-public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope) {
+public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessScope) {
   val optionGroup = injector.optionGroup
 
   val columnFormat = args.startsWith("!")
@@ -153,7 +153,7 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope) 
           // string global-local option to effective scope, Vim's behaviour matches setting that option at effective
           // scope. That is, it sets the global value (a no-op) and resets the local value.
           val option = getValidOption(token.dropLast(1), token)
-          val globalValue = optionGroup.getOptionValue(option, OptionScope.GLOBAL)
+          val globalValue = optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL)
           optionGroup.setOptionValue(option, scope, globalValue)
         }
         else -> {
@@ -221,7 +221,7 @@ private fun getValidToggleOption(optionName: String, token: String) =
 private fun showOptions(
   editor: VimEditor,
   nameAndToken: Collection<Pair<String, String>>,
-  scope: OptionScope,
+  scope: OptionAccessScope,
   showIntro: Boolean,
   columnFormat: Boolean
 ) {
@@ -256,9 +256,9 @@ private fun showOptions(
   val output = buildString {
     if (showIntro) {
       when (scope) {
-        is OptionScope.EFFECTIVE -> appendLine("--- Options ---")
-        is OptionScope.LOCAL -> appendLine("--- Local option values ---")
-        OptionScope.GLOBAL -> appendLine("--- Global option values ---")
+        is OptionAccessScope.EFFECTIVE -> appendLine("--- Options ---")
+        is OptionAccessScope.LOCAL -> appendLine("--- Local option values ---")
+        OptionAccessScope.GLOBAL -> appendLine("--- Global option values ---")
       }
     }
 
@@ -290,14 +290,14 @@ private fun showOptions(
   }
 }
 
-private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: OptionScope): String {
+private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: OptionAccessScope): String {
   val value = injector.optionGroup.getOptionValue(option, scope)
   if (option is ToggleOption) {
 
     // Unset global-local toggle option
     if ((option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
         || option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
-      && scope is OptionScope.LOCAL && value == VimInt.MINUS_ONE) {
+      && scope is OptionAccessScope.LOCAL && value == VimInt.MINUS_ONE) {
       return "--${option.name}"
     }
 

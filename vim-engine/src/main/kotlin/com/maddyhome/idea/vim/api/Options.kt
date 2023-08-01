@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUF
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -266,7 +266,7 @@ public object Options {
     override val defaultValue: VimString
       get() {
         // Default value depends on the "shell" option
-        val shell = injector.optionGroup.getOptionValue(shell, OptionScope.GLOBAL).asString()
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL).asString()
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
@@ -281,7 +281,7 @@ public object Options {
     override val defaultValue: VimString
       get() {
         // Default value depends on the "shell" option
-        val shell = injector.optionGroup.getOptionValue(shell, OptionScope.GLOBAL).asString()
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL).asString()
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("
