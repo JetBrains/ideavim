@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
@@ -183,9 +183,9 @@ public data class LetCommand(
             ?: throw exExceptionMessage("E518", variable.originalString)
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
-            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, newValue)
-            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(editor), newValue)
-            null -> injector.optionGroup.setOptionValue(option, OptionScope.EFFECTIVE(editor), newValue)
+            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, newValue)
+            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(editor), newValue)
+            null -> injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(editor), newValue)
             else -> throw ExException("Invalid option scope")
           }
         } else {

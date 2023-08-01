@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.mode
@@ -56,7 +56,7 @@ public val CommandState.Mode.isEndAllowed: Boolean
   get() {
     fun possiblyUsesVirtualSpace(): Boolean {
       // virtualedit is GLOBAL_OR_LOCAL_TO_WINDOW. We should NOT be using the global value!
-      return injector.optionGroup.hasValue(Options.virtualedit, OptionScope.GLOBAL, OptionConstants.virtualedit_onemore)
+      return injector.optionGroup.hasValue(Options.virtualedit, OptionAccessScope.GLOBAL, OptionConstants.virtualedit_onemore)
     }
 
     return when (this) {

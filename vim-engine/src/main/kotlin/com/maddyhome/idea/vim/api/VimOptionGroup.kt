@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -60,12 +60,12 @@ public interface VimOptionGroup {
   /**
    * Get the value for the option in the given scope
    */
-  public fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T
+  public fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T
 
   /**
    * Set the value for the option in the given scope
    */
-  public fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T)
+  public fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionAccessScope, value: T)
 
   /**
    * Get or create cached, parsed data for the option value effective for the editor
@@ -200,7 +200,7 @@ public interface VimOptionGroup {
 /**
  * Checks if option is set to its default value
  */
-public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionScope): Boolean =
+public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionAccessScope): Boolean =
   getOptionValue(option, scope) == option.defaultValue
 
 /**
@@ -209,7 +209,7 @@ public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, sco
  * Resetting a global-local value at local scope will set it to the default value, rather than set it to its unset
  * value. This matches Vim behaviour.
  */
-public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionScope) {
+public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionAccessScope) {
   setOptionValue(option, scope, option.defaultValue)
 }
 
@@ -219,7 +219,7 @@ public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, 
 public fun <T: VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
   check(option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
     || option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
-  return getOptionValue(option, OptionScope.LOCAL(editor)) == option.unsetValue
+  return getOptionValue(option, OptionAccessScope.LOCAL(editor)) == option.unsetValue
 }
 
 /**
@@ -227,28 +227,28 @@ public fun <T: VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, edito
  *
  * E.g. the `fileencodings` option with value "ucs-bom,utf-8,default,latin1" will result listOf("ucs-bom", "utf-8", "default", "latin1")
  */
-public fun VimOptionGroup.getStringListValues(option: StringListOption, scope: OptionScope): List<String> {
+public fun VimOptionGroup.getStringListValues(option: StringListOption, scope: OptionAccessScope): List<String> {
   return option.split(getOptionValue(option, scope).asString())
 }
 
 /**
  * Sets the toggle option on
  */
-public fun VimOptionGroup.setToggleOption(option: ToggleOption, scope: OptionScope) {
+public fun VimOptionGroup.setToggleOption(option: ToggleOption, scope: OptionAccessScope) {
   setOptionValue(option, scope, VimInt.ONE)
 }
 
 /**
  * Unsets a toggle option
  */
-public fun VimOptionGroup.unsetToggleOption(option: ToggleOption, scope: OptionScope) {
+public fun VimOptionGroup.unsetToggleOption(option: ToggleOption, scope: OptionAccessScope) {
   setOptionValue(option, scope, VimInt.ZERO)
 }
 
 /**
  * Inverts toggle option value, setting it on if off, or off if on.
  */
-public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) {
+public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionAccessScope) {
   val optionValue = getOptionValue(option, scope)
   setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
 }
@@ -256,7 +256,7 @@ public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: Option
 /**
  * Checks a string list option to see if it contains a specific value
  */
-public fun VimOptionGroup.hasValue(option: StringListOption, scope: OptionScope, value: String): Boolean {
+public fun VimOptionGroup.hasValue(option: StringListOption, scope: OptionAccessScope, value: String): Boolean {
   val optionValue = getOptionValue(option, scope)
   return option.split(optionValue.asString()).contains(value)
 }

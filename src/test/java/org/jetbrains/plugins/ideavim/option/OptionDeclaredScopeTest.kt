@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -377,23 +377,23 @@ class OptionDeclaredScopeTest : VimTestCase() {
   }
 
   private fun Option<VimString>.setGlobalValue() =
-    injector.optionGroup.setOptionValue(this, OptionScope.GLOBAL, setValue)
+    injector.optionGroup.setOptionValue(this, OptionAccessScope.GLOBAL, setValue)
 
   private fun Option<VimString>.setLocalValue(editor: Editor) =
-    injector.optionGroup.setOptionValue(this, OptionScope.LOCAL(editor.vim), setValue)
+    injector.optionGroup.setOptionValue(this, OptionAccessScope.LOCAL(editor.vim), setValue)
 
   private fun Option<VimString>.setEffectiveValue(editor: Editor) {
-    injector.optionGroup.setOptionValue(this, OptionScope.EFFECTIVE(editor.vim), setValue)
+    injector.optionGroup.setOptionValue(this, OptionAccessScope.EFFECTIVE(editor.vim), setValue)
   }
 
   private fun getGlobalValue(option: Option<VimString>) =
-    injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
+    injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL)
 
   private fun getLocalValue(option: Option<VimString>, editor: Editor) =
-    injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(editor.vim))
+    injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(editor.vim))
 
   private fun getEffectiveValue(option: Option<VimString>, editor: Editor) =
-    injector.optionGroup.getOptionValue(option, OptionScope.EFFECTIVE(editor.vim))
+    injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(editor.vim))
 
   private fun assertValueUnmodified(actualValue: VimString) = assertEquals(defaultValue, actualValue)
   private fun assertValueChanged(actualValue: VimString) = assertEquals(setValue, actualValue)

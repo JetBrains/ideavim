@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -137,8 +137,8 @@ class LetCommandTest : VimTestCase() {
 
     // 'number' is a local-to-window toggle option
     enterCommand("let &number = 12")
-    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL)
-    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(12, globalValue.value)
     assertEquals(12, localValue.value)
     assertTrue(options().number)
@@ -150,8 +150,8 @@ class LetCommandTest : VimTestCase() {
 
     // 'number' is a local-to-window option
     enterCommand("let &l:number = 12")
-    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL)
-    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(0, globalValue.value)
     assertEquals(12, localValue.value)
     assertTrue(options().number)
@@ -163,8 +163,8 @@ class LetCommandTest : VimTestCase() {
 
     // 'number' is a local-to-window option
     enterCommand("let &g:number = 12")
-    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL)
-    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(12, globalValue.value)
     assertEquals(0, localValue.value)
     assertFalse(options().number)
@@ -177,8 +177,8 @@ class LetCommandTest : VimTestCase() {
     // 'scroll' is a local to window number option
     enterCommand("set scroll=42")
     enterCommand("let &scroll+=10")
-    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.GLOBAL)
-    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(52, globalValue.value)
     assertEquals(52, localValue.value)
     assertEquals(52, options().scroll)
@@ -190,8 +190,8 @@ class LetCommandTest : VimTestCase() {
 
     enterCommand("setlocal scroll=42")
     enterCommand("let &l:scroll+=10")
-    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.GLOBAL)
-    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(0, globalValue.value)
     assertEquals(52, localValue.value)
     assertEquals(52, options().scroll)
@@ -203,8 +203,8 @@ class LetCommandTest : VimTestCase() {
 
     enterCommand("setglobal scroll=42")
     enterCommand("let &g:scroll+=10")
-    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.GLOBAL)
-    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.GLOBAL)
+    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(52, globalValue.value)
     assertEquals(0, localValue.value)
     assertEquals(0, options().scroll)

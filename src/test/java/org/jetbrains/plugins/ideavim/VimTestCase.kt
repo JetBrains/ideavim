@@ -67,7 +67,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
@@ -173,7 +173,7 @@ abstract class VimTestCase {
   protected fun enableExtensions(vararg extensionNames: String) {
     for (name in extensionNames) {
       val option = injector.optionGroup.getOption(name) as ToggleOption
-      injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
+      injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL)
     }
   }
 
