@@ -37,7 +37,7 @@ jobs:
         with:
           branch: master
           commit_message: Update changelog after merging PR
-          commit_user_name: Alex Plate
-          commit_user_email: aleksei.plate@jetbrains.com
-          commit_author: Alex Plate <aleksei.plate@jetbrains.com>
+          commit_user_name: IdeaVim Bot
+          commit_user_email: maintainers@ideavim.dev
+          commit_author: IdeaVim Bot <maintainers@ideavim.dev>
           file_pattern: CHANGES.md
