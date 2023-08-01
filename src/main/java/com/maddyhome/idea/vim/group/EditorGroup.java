@@ -207,8 +207,18 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     VimPlugin.getKey().registerRequiredShortcutKeys(new IjVimEditor(editor));
 
     initLineNumbers(editor);
-    // Turn on insert mode if editor doesn't have any file
-    if (!EditorHelper.isFileEditor(editor) &&
+
+    // We add Vim bindings to all opened editors, even read-only editors. We automatically start INSERT mode for editors
+    // that are not the traditional file-backed editor to provide a more intuitive "just start typing" experience for
+    // editors that are more likely to be used as part of the UI, such as the VCS commit message editor, as opposed to
+    // an editor for a source file in the project.
+    // We do not start INSERT mode if the editor is in read-only "viewer" mode (which includes "rendered" mode, which
+    // is read-only and also hides the caret). This means we start INSERT mode for in-memory editors such as the VCS
+    // commit message, but start in the usual COMMAND mode for read-only editors with writable documents, such as log
+    // or console output for run configurations and tests (the document is writable because the app is updating it. It's
+    // not user-writable.)
+    if (!editor.isViewer() &&
+        !EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
       ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
