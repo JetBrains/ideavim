@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.OperatedRange
@@ -26,6 +25,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
+import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -942,9 +943,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     var endOffset = range.endOffset
     val fileSize = editor.fileSize().toInt()
     if (endOffset > fileSize) {
-      check(!injector.globalOptions().ideastrictmode) {
-        "Incorrect offset. File size: $fileSize, offset: $endOffset"
-      }
+      StrictMode.fail("Incorrect offset. File size: $fileSize, offset: $endOffset")
       endOffset = fileSize
     }
     return (type === SelectionType.LINE_WISE) && range.startOffset != 0 && editor.text()[endOffset - 1] != '\n' && endOffset == fileSize

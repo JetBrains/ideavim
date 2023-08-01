@@ -71,7 +71,7 @@ class UndoActionTest : VimTestCase() {
 
   @Test
   fun `test cursor movements do not require additional undo`() {
-    if (!optionsNoEditor().oldundo) {
+    if (!optionsIjNoEditor().oldundo) {
       val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
       val before = """
                 Lorem Ipsum

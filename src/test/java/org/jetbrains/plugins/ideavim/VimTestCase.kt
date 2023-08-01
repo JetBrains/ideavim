@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.EffectiveOptions
+import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -51,6 +52,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
@@ -66,6 +68,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -379,6 +382,19 @@ abstract class VimTestCase {
   }
 
   /**
+   * Gets an accessor for the effective values of IntelliJ specific options
+   *
+   * This will return an accessor for the global or effective option values, but only for the IntelliJ specific options.
+   */
+  protected fun optionsIj(): EffectiveIjOptions {
+    assertNotNull(
+      fixture.editor,
+      "Editor is null! Move the call to after editor is initialised, or use optionsNoEditor",
+    )
+    return injector.ijOptions(fixture.editor.vim)
+  }
+
+  /**
    * Gets an option value accessor purely for global options, when there is no editor available
    *
    * Tests should normally use effective option values, via [options], but that requires a test that has created an
@@ -388,7 +404,15 @@ abstract class VimTestCase {
    * Note that this isn't handled automatically by [options] to avoid the scenario of trying to use effective values
    * before the editor has been initialised.
    */
-  protected fun optionsNoEditor(): GlobalIjOptions {
+  protected fun optionsNoEditor(): GlobalOptions {
+    assertNull(fixture.editor, "Editor is not null! Use options() to access effective option values")
+    return injector.globalOptions()
+  }
+
+  /**
+   * Gets an option value accessor for IntelliJ specific global options, when there is no editor available
+   */
+  protected fun optionsIjNoEditor(): GlobalIjOptions {
     assertNull(fixture.editor, "Editor is not null! Use options() to access effective option values")
     return injector.globalIjOptions()
   }
