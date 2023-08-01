@@ -14,6 +14,9 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 public class InsertExitModeAction : VimActionHandler.SingleExecution() {
+  // Note that hitting Escape can insert text when exiting insert mode after visual block mode.
+  // If the editor is read-only, we'll get a "This view is read-only" tooltip. However, we should only enter insert
+  // mode if both editor and document are writable.
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
