@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -946,9 +947,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     var endOffset = range.endOffset
     val fileSize = editor.fileSize().toInt()
     if (endOffset > fileSize) {
-      check(!injector.globalOptions().ideastrictmode) {
-        "Incorrect offset. File size: $fileSize, offset: $endOffset"
-      }
+      StrictMode.fail("Incorrect offset. File size: $fileSize, offset: $endOffset")
       endOffset = fileSize
     }
     return (type === SelectionType.LINE_WISE) && range.startOffset != 0 && editor.text()[endOffset - 1] != '\n' && endOffset == fileSize

@@ -25,7 +25,7 @@ import kotlin.reflect.KProperty
 /**
  * Base class to provide mechanisms to delegate properties to get/set option values
  */
-public abstract class OptionsPropertiesBase(private val scope: OptionAccessScope = OptionAccessScope.GLOBAL) {
+public abstract class OptionsPropertiesBase(private val scope: OptionAccessScope) {
   /**
    * Provide a delegate property to get/set boolean option values
    */

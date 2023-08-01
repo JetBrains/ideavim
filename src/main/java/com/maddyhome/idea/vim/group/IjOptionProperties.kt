@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.group
 
-import com.maddyhome.idea.vim.api.GlobalOptions
+import com.maddyhome.idea.vim.api.OptionsPropertiesBase
 import com.maddyhome.idea.vim.api.StringListOptionValue
 import com.maddyhome.idea.vim.options.OptionAccessScope
 
@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
  * options
  */
 @Suppress("SpellCheckingInspection")
-public open class GlobalIjOptions(scope: OptionAccessScope = OptionAccessScope.GLOBAL) : GlobalOptions(scope) {
+public open class GlobalIjOptions(scope: OptionAccessScope = OptionAccessScope.GLOBAL) : OptionsPropertiesBase(scope) {
   public var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
   public var ide: String by optionProperty(IjOptions.ide)
   public var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)
@@ -41,7 +41,7 @@ public open class GlobalIjOptions(scope: OptionAccessScope = OptionAccessScope.G
 /**
  * An accessor class for IntelliJ implementation specific option values effective in the given editor
  *
- * As a convenience, this class also provides access to the global options, via inheritance.
+ * As a convenience, this class also provides access to the IntelliJ specific global options, via inheritance.
  */
 public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(scope) {
   public var ideacopypreprocess: Boolean by optionProperty(IjOptions.ideacopypreprocess)
