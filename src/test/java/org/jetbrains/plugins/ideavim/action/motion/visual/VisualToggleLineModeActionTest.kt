@@ -131,4 +131,28 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     typeText("V")
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_LINE)
   }
+
+  @Test
+  fun `enter visual line from visual block with motion up`() {
+    doTest(
+      "<C-V>khV",
+      """
+        Lorem Ipsum
+
+        Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit
+        Sed in${c} orci mauris.
+        Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+        Lorem Ipsum
+
+        Lorem ipsum dolor sit amet,
+        ${s}conse${c}ctetur adipiscing elit
+        Sed in orci mauris.
+        ${se}Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+    )
+  }
 }
