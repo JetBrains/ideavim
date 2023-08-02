@@ -2,7 +2,7 @@
 
 IdeaVim supports the NERDTree plugin. Update your `~/.ideavimrc` to turn it on:
 ```vim
-Plug 'preservim/nerdtree`
+Plug 'preservim/nerdtree'
 ```
 or
 ```vim
@@ -15,7 +15,7 @@ Use `set noNERDTree` to disable this extension.
 
 ```vim
 set NERDTree
-Plug 'preservim/nerdtree`
+Plug 'preservim/nerdtree'
 Plug 'https://github.com/preservim/nerdtree'
 Plug 'https://github.com/scrooloose/nerdtree'
 Plug 'scrooloose/nerdtree'
