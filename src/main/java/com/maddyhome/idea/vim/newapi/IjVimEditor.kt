@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.LogicalPosition
@@ -171,6 +172,17 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 
   override fun isWritable(): Boolean {
+    // The Editor is in read-only "viewer" mode. This includes "rendered" mode which is read-only and hides the caret
+    if (editor.isViewer) {
+      // The editor might be a console view with a running process, such as the stdin/stdout of a console-based run
+      // configuration. We can consider this to be writable
+      editor.getUserData(ConsoleViewImpl.CONSOLE_VIEW_IN_EDITOR_VIEW)?.let { if (it.isRunning) return true }
+    }
+
+    // Check if the editor allows modification (weirdly, TextComponentEditor doesn't?!) and also request writing access
+    // to the document. Both can display a hint that can be configured per-editor, or from the WritingAccessProvider EP.
+    // If the editor is read-only, we get a "This view is read-only" hint, and if we can't write to the file, we get
+    // "File is read-only"
     val modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor)
     val writeRequested = EditorModificationUtil.requestWriting(editor)
     return modificationAllowed && writeRequested

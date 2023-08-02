@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group;
 
+import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.find.EditorSearchSession;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -208,23 +209,43 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
     initLineNumbers(editor);
 
-    // We add Vim bindings to all opened editors, even read-only editors. We automatically start INSERT mode for editors
-    // that are not the traditional file-backed editor to provide a more intuitive "just start typing" experience for
-    // editors that are more likely to be used as part of the UI, such as the VCS commit message editor, as opposed to
-    // an editor for a source file in the project.
-    // We do not start INSERT mode if the editor is in read-only "viewer" mode (which includes "rendered" mode, which
-    // is read-only and also hides the caret). This means we start INSERT mode for in-memory editors such as the VCS
-    // commit message, but start in the usual COMMAND mode for read-only editors with writable documents, such as log
-    // or console output for run configurations and tests (the document is writable because the app is updating it. It's
-    // not user-writable.)
+    // We add Vim bindings to all opened editors, even read-only editors. We also add bindings to editors that are used
+    // elsewhere in the IDE, rather than just for editing project files. This includes editors used as part of the UI,
+    // such as the VCS commit message, or used as read-only viewers for text output, such as log files in run
+    // configurations or the Git Console tab. And editors are used for interactive stdin/stdout for console-based run
+    // configurations.
+    // We want to provide an intuitive experience for working with these additional editors, so we automatically switch
+    // to INSERT mode for interactive editors. Recognising these can be a bit tricky.
+    // These additional interactive editors are not file-based, but must have a writable document. However, log output
+    // documents are also writable (the IDE is writing new content as it becomes available) just not user-editable. So
+    // we must also check that the editor is not in read-only "viewer" mode (this includes "rendered" mode, which is
+    // read-only and also hides the caret).
+    // Furthermore, the interactive stdin/stdout console output is hosted in a read-only editor, but it can still be
+    // edited. The `ConsoleViewImpl` class installs a typing handler that ignores the editor's `isViewer` property and
+    // allows typing if the associated process (if any) is still running. We can get the editor's console view and check
+    // this ourselves, but we have to wait until the editor has finished initialising before it's available in user
+    // data.
+    // Note that we need a similar check in `VimEditor.isWritable` to allow Escape to work to exit insert mode. We need
+    // to know that a read-only editor that is hosting a console view with a running process can be treated as writable.
+    Runnable switchToInsertMode = () -> {
+      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
+      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), context);
+      KeyHandler.getInstance().reset(new IjVimEditor(editor));
+    };
     if (!editor.isViewer() &&
         !EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
-      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), context);
-      KeyHandler.getInstance().reset(new IjVimEditor(editor));
+      switchToInsertMode.run();
     }
+    ApplicationManager.getApplication().invokeLater(
+      () -> {
+        if (editor.isDisposed()) return;
+        ConsoleViewImpl consoleView = editor.getUserData(ConsoleViewImpl.CONSOLE_VIEW_IN_EDITOR_VIEW);
+        if (consoleView != null && consoleView.isRunning() && !CommandStateHelper.inInsertMode(editor)) {
+          switchToInsertMode.run();
+        }
+      });
     updateCaretsVisualAttributes(editor);
   }
 
