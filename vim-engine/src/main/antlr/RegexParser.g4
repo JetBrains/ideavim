@@ -13,14 +13,14 @@ pattern : sub_pattern EOF
  * that matches one of the branches. Example: "vim\|VIM" matches "vim" and
  * matches "VIM". If more than one branch matches, the first one is used.
  */
-sub_pattern : (branch ALTERNATION)* branch
+sub_pattern : (branches+=branch ALTERNATION)* branches+=branch
             ;
 /**
  * A branch is one or more concats, separated by "\&". It matches the last
  * concat, but only if all the preceding concats also match at the same
  * position. Example: "IdeaVim\&Idea matches "Idea" in "IdeaVim".
  */
-branch : (concat AND)* concat
+branch : (concats+=concat AND)* concats+=concat
        ;
 
 /**
@@ -28,7 +28,7 @@ branch : (concat AND)* concat
  * first piece, followed by a match for the second piece, etc. Example:
  * "i[0-9]v", first matches "i", then a digit and then "v".
  */
-concat : piece+
+concat : pieces+=piece+
        ;
 
 /**
@@ -71,7 +71,7 @@ multi : STAR     #ZeroOrMore
  * "a\{4}" matches a sequence of exactly 4 "a" characters;
  * "a\{}" matches any sequence of "a" characters.
  */
-range : RANGE_START INT? (COMMA INT?)? RANGE_END
+range : RANGE_START lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END
       ;
 
 /**

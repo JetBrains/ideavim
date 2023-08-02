@@ -17,9 +17,10 @@ internal interface Matcher {
   /**
    * Determines whether the matcher should match.
    *
-   * @param char The character that is next in the input
+   * @param input         The input string
+   * @param stringPointer The current index in the input string
    */
-  fun matches(char : Char) : Boolean
+  fun matches(input : String, stringPointer : Int) : Boolean
 
   /**
    * Determines whether the matcher should consume

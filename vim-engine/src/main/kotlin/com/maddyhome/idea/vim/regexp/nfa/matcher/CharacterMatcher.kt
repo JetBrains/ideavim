@@ -12,8 +12,8 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
  * Matcher used to match against single characters
  */
 internal class CharacterMatcher(val char: Char) : Matcher {
-  override fun matches(char: Char): Boolean {
-    return this.char == char
+  override fun matches(input: String, stringPointer: Int): Boolean {
+    return stringPointer < input.length && input[stringPointer] == char
   }
 
   override fun isEpsilon(): Boolean {

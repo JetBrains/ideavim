@@ -30,8 +30,9 @@ internal class NFA private constructor(
    * that are accepted by the old NFA followed the other.
    *
    * @param other The NFA to concatenate with
+   * @return The new NFA representing the concatenation
    */
-  fun concatenate(other: NFA) {
+  fun concatenate(other: NFA) : NFA {
     /**
      * The acceptState is guaranteed to not have any transitions, so
      * to concatenate the two NFAs together, make the acceptState of
@@ -43,6 +44,8 @@ internal class NFA private constructor(
 
     this.acceptState.isAccept = false
     this.acceptState = other.acceptState
+
+    return this
   }
 
   /**
@@ -50,8 +53,9 @@ internal class NFA private constructor(
    * that are accepted by either the old NFA or the other.
    *
    * @param other The NFA to unify with
+   * @return The new NFA representing the union
    */
-  fun unify(other: NFA) {
+  fun unify(other: NFA) : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
@@ -65,13 +69,17 @@ internal class NFA private constructor(
 
     this.startState = newStart
     this.acceptState = newEnd
+
+    return this
   }
 
   /**
    * Applies Kleene closure to the NFA. The new NFA accepts inputs
    * that are accepted by the old NFA 0 or more times.
+   *
+   * @return The new NFA representing the closure
    */
-  fun closure() {
+  fun closure() : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
@@ -84,6 +92,20 @@ internal class NFA private constructor(
 
     this.startState = newStart
     this.acceptState = newEnd
+
+    return this
+  }
+
+  fun simulate(input: String, stringPointer : Int = 0, currentState: NFAState = startState) : Boolean {
+    if (currentState.isAccept) return true
+    for (transition in currentState.transitions) {
+      val matcher = transition.first
+      if (matcher.matches(input, stringPointer)) {
+        val newStringPointer = if (matcher.isEpsilon()) stringPointer else stringPointer + 1
+        if (simulate(input, newStringPointer, transition.second)) return true
+      }
+    }
+    return false
   }
 
   companion object {

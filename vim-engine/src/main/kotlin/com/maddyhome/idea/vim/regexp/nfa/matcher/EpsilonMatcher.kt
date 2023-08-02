@@ -14,7 +14,7 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
  * taken and without consuming any character.
  */
 internal class EpsilonMatcher : Matcher {
-  override fun matches(char: Char): Boolean {
+  override fun matches(input: String, stringPointer: Int): Boolean {
     return true
   }
 
