@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimEditor
+
 /**
  * A matcher is used to decide if a transition can be taken,
  * depending on what character is next in the input as well
@@ -17,10 +19,10 @@ internal interface Matcher {
   /**
    * Determines whether the matcher should match.
    *
-   * @param input         The input string
-   * @param stringPointer The current index in the input string
+   * @param editor The editor in its current state
+   * @param index  The current index in the text of the editor
    */
-  fun matches(input : String, stringPointer : Int) : Boolean
+  fun matches(editor: VimEditor, index : Int) : Boolean
 
   /**
    * Determines whether the matcher should consume

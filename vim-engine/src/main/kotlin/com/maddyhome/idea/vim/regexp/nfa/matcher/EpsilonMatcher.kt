@@ -8,13 +8,15 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimEditor
+
 /**
  * Matcher that always matches. It is used to represent
  * epsilon transitions. This transitions can always be
  * taken and without consuming any character.
  */
 internal class EpsilonMatcher : Matcher {
-  override fun matches(input: String, stringPointer: Int): Boolean {
+  override fun matches(editor: VimEditor, index: Int): Boolean {
     return true
   }
 
