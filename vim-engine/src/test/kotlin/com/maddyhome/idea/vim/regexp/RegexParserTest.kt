@@ -17,7 +17,7 @@ import java.lang.reflect.InvocationTargetException
 import kotlin.test.fail
 
 
-class RegexpParserTest {
+class RegexParserTest {
   @Test
   fun `range both bounds`() {
     assertSuccess("\\{2,5}", RANGE)

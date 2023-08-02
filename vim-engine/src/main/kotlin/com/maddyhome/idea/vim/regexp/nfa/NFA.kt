@@ -8,6 +8,9 @@
 
 package com.maddyhome.idea.vim.regexp.nfa
 
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.Offset
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
 
@@ -96,16 +99,27 @@ internal class NFA private constructor(
     return this
   }
 
-  fun simulate(input: String, stringPointer : Int = 0, currentState: NFAState = startState) : Boolean {
-    if (currentState.isAccept) return true
+  /**
+   * Simulates the NFA in a depth-first search fashion.
+   *
+   * @param editor       The editor that is used for the simulation
+   * @param startIndex   The index of the text in the editor where the simulation should start at
+   * @param currentIndex The current index of the text in the simulation
+   * @param currentState The current NFA state in the simulation
+   *
+   * @return The resulting match if it was found, else null
+   */
+  fun simulate(editor: VimEditor, startIndex : Int = 0, currentIndex : Int = startIndex, currentState: NFAState = startState) : VimMatchResult {
+    if (currentState.isAccept) return VimMatchResult.Success(Pair(Offset(startIndex), Offset(currentIndex)))
     for (transition in currentState.transitions) {
       val matcher = transition.first
-      if (matcher.matches(input, stringPointer)) {
-        val newStringPointer = if (matcher.isEpsilon()) stringPointer else stringPointer + 1
-        if (simulate(input, newStringPointer, transition.second)) return true
+      val newIndex = if (matcher.isEpsilon()) currentIndex else currentIndex + 1
+      if (matcher.matches(editor, currentIndex)) {
+        val result = simulate(editor, startIndex, newIndex, transition.second)
+        if (result is VimMatchResult.Success) return result
       }
     }
-    return false
+    return VimMatchResult.Failure
   }
 
   companion object {
