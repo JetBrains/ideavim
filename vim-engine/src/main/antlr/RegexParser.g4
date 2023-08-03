@@ -45,8 +45,8 @@ piece : atom multi?
  * capture group.
  */
 atom : ordinary_atom                                 #OrdinaryAtom
-     | LEFT_PAREN sub_pattern? RIGHT_PAREN           #Grouping
-     | LEFT_PAREN_NOCAPTURE sub_pattern? RIGHT_PAREN #Grouping
+     | LEFT_PAREN sub_pattern? RIGHT_PAREN           #GroupingCapture
+     | LEFT_PAREN_NOCAPTURE sub_pattern? RIGHT_PAREN #GroupingNoCapture
      ;
 
 /**

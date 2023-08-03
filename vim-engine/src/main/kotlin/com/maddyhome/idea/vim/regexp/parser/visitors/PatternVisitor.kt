@@ -36,6 +36,14 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return nfa.loop(range.first, range.second)
   }
 
+  override fun visitGroupingCapture(ctx: RegexParser.GroupingCaptureContext): NFA {
+    return visit(ctx.sub_pattern())
+  }
+
+  override fun visitGroupingNoCapture(ctx: RegexParser.GroupingNoCaptureContext): NFA {
+    return visit(ctx.sub_pattern())
+  }
+
   override fun visitLiteralChar(ctx: RegexParser.LiteralCharContext): NFA {
     return NFA.fromMatcher(CharacterMatcher(cleanLiteralChar(ctx.text)))
   }
