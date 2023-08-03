@@ -37,6 +37,7 @@ usual beta standards.
 ### Merged PRs:
 * [666](https://github.com/JetBrains/ideavim/pull/666) by [Matt Ellis](https://github.com/citizenmatt): Improve formatting of `:set` command output
 * [667](https://github.com/JetBrains/ideavim/pull/667) by [Matt Ellis](https://github.com/citizenmatt): Eagerly initialise local options and introduce option scope
+* [672](https://github.com/JetBrains/ideavim/pull/672) by [Matt Ellis](https://github.com/citizenmatt): Fix issue adding back hidden status bar widget
 
 ## 2.4.0, 2023-07-18
 
