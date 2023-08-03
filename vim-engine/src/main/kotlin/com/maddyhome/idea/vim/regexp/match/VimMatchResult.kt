@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.regexp.match
 import com.maddyhome.idea.vim.common.Offset
 
 public sealed class VimMatchResult {
-  public data class Success(public val offsets: Pair<Offset, Offset>) : VimMatchResult()
+  public data class Success(
+    public val range: IntRange
+  ) : VimMatchResult()
   public object Failure : VimMatchResult()
 }

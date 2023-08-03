@@ -63,7 +63,7 @@ class NFATest {
       "Sed in orci mauris.\n" +
       "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      VimMatchResult.Success(Pair(Offset(0), Offset(5)))
+      VimMatchResult.Success(IntRange(0, 5))
     )
   }
 
@@ -77,7 +77,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      VimMatchResult.Success(Pair(Offset(13), Offset(18))),
+      VimMatchResult.Success(IntRange(13, 18)),
       13
     )
   }
@@ -87,7 +87,7 @@ class NFATest {
     doTest(
       "a*bcd",
       "a\\*",
-      VimMatchResult.Success(Pair(Offset(0), Offset(2))),
+      VimMatchResult.Success(IntRange(0, 2)),
     )
   }
 
@@ -96,7 +96,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a*",
-      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+      VimMatchResult.Success(IntRange(0, 5)),
     )
   }
 
@@ -105,7 +105,7 @@ class NFATest {
     doTest(
       "bcd",
       "a*",
-      VimMatchResult.Success(Pair(Offset(0), Offset(0))),
+      VimMatchResult.Success(IntRange(0, 0)),
     )
   }
 
@@ -114,7 +114,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a\\+",
-      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+      VimMatchResult.Success(IntRange(0, 5)),
     )
   }
 
@@ -132,7 +132,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a\\{0,3}",
-      VimMatchResult.Success(Pair(Offset(0), Offset(3))),
+      VimMatchResult.Success(IntRange(0, 3)),
     )
   }
 
@@ -141,7 +141,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a\\{2,}",
-      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+      VimMatchResult.Success(IntRange(0, 5)),
     )
   }
 
@@ -150,7 +150,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a\\{,2}",
-      VimMatchResult.Success(Pair(Offset(0), Offset(2))),
+      VimMatchResult.Success(IntRange(0, 2)),
     )
   }
 
@@ -159,7 +159,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a\\{}",
-      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+      VimMatchResult.Success(IntRange(0, 5)),
     )
   }
 
@@ -168,7 +168,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a\\{,}",
-      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+      VimMatchResult.Success(IntRange(0, 5)),
     )
   }
 
@@ -177,7 +177,7 @@ class NFATest {
     doTest(
       "aaaaabcd",
       "a\\{2}",
-      VimMatchResult.Success(Pair(Offset(0), Offset(2))),
+      VimMatchResult.Success(IntRange(0, 2)),
     )
   }
 
@@ -200,7 +200,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem)",
-      VimMatchResult.Success(Pair(Offset(0), Offset(5)))
+      VimMatchResult.Success(IntRange(0, 5))
     )
   }
 
@@ -214,7 +214,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem) Ipsum",
-      VimMatchResult.Success(Pair(Offset(0), Offset(11)))
+      VimMatchResult.Success(IntRange(0, 11))
     )
   }
 
@@ -228,7 +228,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v()",
-      VimMatchResult.Success(Pair(Offset(0), Offset(0)))
+      VimMatchResult.Success(IntRange(0, 0))
     )
   }
 

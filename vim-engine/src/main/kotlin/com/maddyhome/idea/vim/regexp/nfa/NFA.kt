@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.regexp.nfa
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.LoopMatcher
@@ -136,7 +135,7 @@ internal class NFA private constructor(
    * @return The resulting match if it was found, else null
    */
   fun simulate(editor: VimEditor, startIndex : Int = 0, currentIndex : Int = startIndex, currentState: NFAState = startState) : VimMatchResult {
-    if (currentState.isAccept) return VimMatchResult.Success(Pair(Offset(startIndex), Offset(currentIndex)))
+    if (currentState.isAccept) return VimMatchResult.Success(IntRange(startIndex, currentIndex))
     for (transition in currentState.transitions) {
       val newIndex = currentIndex + transition.consumes()
       if (transition.canTake(editor, currentIndex, currentState)) {
