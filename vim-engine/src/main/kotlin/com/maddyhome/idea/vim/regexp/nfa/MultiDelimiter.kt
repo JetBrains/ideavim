@@ -6,9 +6,9 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.parser.visitors
+package com.maddyhome.idea.vim.regexp.nfa
 
 internal sealed class MultiDelimiter {
-  data class IntMultiDelimiter(val int: Int) : MultiDelimiter()
+  data class IntMultiDelimiter(val i: Int) : MultiDelimiter()
   object InfiniteMultiDelimiter : MultiDelimiter()
 }

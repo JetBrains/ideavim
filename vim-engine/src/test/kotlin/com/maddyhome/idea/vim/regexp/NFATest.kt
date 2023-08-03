@@ -54,7 +54,7 @@ class NFATest {
   }
 
   @Test
-  fun `test simple concatenation from start`() {
+  fun `test concatenation from start`() {
     doTest(
       "Lorem Ipsum\n" +
       "\n" +
@@ -68,7 +68,7 @@ class NFATest {
   }
 
   @Test
-  fun `test simple concatenation from offset`() {
+  fun `test concatenation from offset`() {
     doTest(
       "Lorem Ipsum\n" +
         "\n" +
@@ -79,6 +79,105 @@ class NFATest {
       "Lorem",
       VimMatchResult.Success(Pair(Offset(13), Offset(18))),
       13
+    )
+  }
+
+  @Test
+  fun `test star multi`() {
+    doTest(
+      "aaaaabcd",
+      "a*",
+      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+    )
+  }
+
+  @Test
+  fun `test star multi empty match`() {
+    doTest(
+      "bcd",
+      "a*",
+      VimMatchResult.Success(Pair(Offset(0), Offset(0))),
+    )
+  }
+
+  @Test
+  fun `test plus multi`() {
+    doTest(
+      "aaaaabcd",
+      "a\\+",
+      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+    )
+  }
+
+  @Test
+  fun `test plus multi should fail`() {
+    doTest(
+      "bcd",
+      "a\\+",
+      VimMatchResult.Failure
+    )
+  }
+
+  @Test
+  fun `test range multi both bounds`() {
+    doTest(
+      "aaaaabcd",
+      "a\\{0,3}",
+      VimMatchResult.Success(Pair(Offset(0), Offset(3))),
+    )
+  }
+
+  @Test
+  fun `test range multi lower bound`() {
+    doTest(
+      "aaaaabcd",
+      "a\\{2,}",
+      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+    )
+  }
+
+  @Test
+  fun `test range multi upper bound`() {
+    doTest(
+      "aaaaabcd",
+      "a\\{,2}",
+      VimMatchResult.Success(Pair(Offset(0), Offset(2))),
+    )
+  }
+
+  @Test
+  fun `test range unbounded`() {
+    doTest(
+      "aaaaabcd",
+      "a\\{}",
+      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+    )
+  }
+
+  @Test
+  fun `test range unbounded with comma`() {
+    doTest(
+      "aaaaabcd",
+      "a\\{,}",
+      VimMatchResult.Success(Pair(Offset(0), Offset(5))),
+    )
+  }
+
+  @Test
+  fun `test range absolute bound`() {
+    doTest(
+      "aaaaabcd",
+      "a\\{2}",
+      VimMatchResult.Success(Pair(Offset(0), Offset(2))),
+    )
+  }
+
+  @Test
+  fun `test range should fail`() {
+    doTest(
+      "aaaaabcd",
+      "a\\{6,}",
+      VimMatchResult.Failure,
     )
   }
 

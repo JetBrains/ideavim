@@ -9,11 +9,12 @@
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.nfa.NFAState
 
 /**
  * A matcher is used to decide if a transition can be taken,
  * depending on what character is next in the input as well
- * as other information contained in the editor.
+ * as other information contained in the editor or in a NFA state
  */
 internal interface Matcher {
   /**
@@ -21,8 +22,9 @@ internal interface Matcher {
    *
    * @param editor The editor in its current state
    * @param index  The current index in the text of the editor
+   * @param
    */
-  fun matches(editor: VimEditor, index : Int) : Boolean
+  fun matches(editor: VimEditor, index : Int, state: NFAState) : Boolean
 
   /**
    * Determines whether the matcher should consume

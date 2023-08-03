@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.LoopMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
 
 /**
@@ -62,12 +63,12 @@ internal class NFA private constructor(
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
-    newStart.addTransition(this.startState, EpsilonMatcher())
-    newStart.addTransition(other.startState, EpsilonMatcher())
+    newStart.addTransition(NFATransition(EpsilonMatcher(), this.startState))
+    newStart.addTransition(NFATransition(EpsilonMatcher(), other.startState))
 
-    this.acceptState.addTransition(newEnd, EpsilonMatcher())
+    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     this.acceptState.isAccept = false
-    other.acceptState.addTransition(newEnd, EpsilonMatcher())
+    other.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     other.acceptState.isAccept = false
 
     this.startState = newStart
@@ -77,22 +78,47 @@ internal class NFA private constructor(
   }
 
   /**
-   * Applies Kleene closure to the NFA. The new NFA accepts inputs
-   * that are accepted by the old NFA 0 or more times.
+   * Loops the NFA. The NFA must be transversed at least n times
+   * but no more than m. m can be infinite.
    *
-   * @return The new NFA representing the closure
+   * @param n The lowest amount of times that the NFA must be transversed
+   * @param m The highest amount of times the NFA can be transversed
    */
-  fun closure() : NFA {
+  fun loop(n: MultiDelimiter.IntMultiDelimiter, m: MultiDelimiter) : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
-    newStart.addTransition(newEnd, EpsilonMatcher())
-    newStart.addTransition(this.startState, EpsilonMatcher())
+    /**
+     * This transition indicates the beginning of a loop.
+     * It initializes the loop counter variable of the first
+     * state in the loop.
+     */
+    val initLoopTransition = NFATransition(
+      EpsilonMatcher(),
+      this.startState
+    ) { state -> state.i = 0 }
+    newStart.addTransition(initLoopTransition)
 
-    this.acceptState.addTransition(newEnd, EpsilonMatcher())
+    /**
+     * This transition indicates that the NFA is looping back
+     * to its start. Increments the loop counter variable.
+     */
+    val incLoopTransition = NFATransition(
+      EpsilonMatcher(),
+      this.startState
+    ) { state -> state.i = state.i + 1 }
+    this.acceptState.addTransition(incLoopTransition)
+
+    /**
+     * This transition is used to exit out of the loop.
+     */
+    val exitLoopTransition = NFATransition(
+      LoopMatcher(n, m),
+      newEnd
+    )
+    this.startState.addTransition(exitLoopTransition)
+
     this.acceptState.isAccept = false
-    this.acceptState.addTransition(this.startState, EpsilonMatcher())
-
     this.startState = newStart
     this.acceptState = newEnd
 
@@ -112,11 +138,12 @@ internal class NFA private constructor(
   fun simulate(editor: VimEditor, startIndex : Int = 0, currentIndex : Int = startIndex, currentState: NFAState = startState) : VimMatchResult {
     if (currentState.isAccept) return VimMatchResult.Success(Pair(Offset(startIndex), Offset(currentIndex)))
     for (transition in currentState.transitions) {
-      val matcher = transition.first
-      val newIndex = if (matcher.isEpsilon()) currentIndex else currentIndex + 1
-      if (matcher.matches(editor, currentIndex)) {
-        val result = simulate(editor, startIndex, newIndex, transition.second)
+      val newIndex = currentIndex + transition.consumes()
+      if (transition.canTake(editor, currentIndex, currentState)) {
+        transition.takeAction()
+        val result = simulate(editor, startIndex, newIndex, transition.destState)
         if (result is VimMatchResult.Success) return result
+        currentState.i--
       }
     }
     return VimMatchResult.Failure
@@ -150,7 +177,7 @@ internal class NFA private constructor(
       val startState = NFAState(false)
       val acceptState = NFAState(true)
 
-      startState.addTransition(acceptState, matcher)
+      startState.addTransition(NFATransition(matcher, acceptState))
       return NFA(startState, acceptState)
     }
   }

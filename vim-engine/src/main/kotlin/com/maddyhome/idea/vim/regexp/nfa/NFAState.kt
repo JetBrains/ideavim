@@ -8,8 +8,6 @@
 
 package com.maddyhome.idea.vim.regexp.nfa
 
-import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
-
 /**
  * Represents a single state of a NFA.
  */
@@ -25,18 +23,18 @@ internal class NFAState (
    * indexes. This is relevant for the implementation of
    * lazy quantifiers.
    */
-  var transitions: ArrayList<Pair<Matcher, NFAState>> = ArrayList()
+  var transitions: ArrayList<NFATransition> = ArrayList(),
+
+  var i: Int = 0
 ) {
 
   /**
-   * Adds a new transition from the state to another,
-   * that can be taken if the given matcher matches.
+   * Adds a new transition from this state
    *
-   * @param dest    The destination state of the new transition
-   * @param matcher The matcher used to check if the new transition can be taken
+   * @param transition The transition that is to be added
    */
-  fun addTransition(dest: NFAState, matcher: Matcher) {
-    transitions.add(Pair(matcher, dest))
+  fun addTransition(transition: NFATransition) {
+    transitions.add(transition)
   }
 
 }
