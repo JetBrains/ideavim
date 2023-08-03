@@ -44,7 +44,7 @@
     <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
-  
+
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.group.JumpsListener"
               topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
@@ -69,8 +69,8 @@
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
-    <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory"/>
-    <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
+    <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory"/>
+    <statusBarWidgetFactory id="IdeaVim::ShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
