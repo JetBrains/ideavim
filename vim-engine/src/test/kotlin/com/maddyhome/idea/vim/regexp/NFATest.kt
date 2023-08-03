@@ -190,6 +190,34 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test group`() {
+    doTest(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\v(Lorem)",
+      VimMatchResult.Success(Pair(Offset(0), Offset(5)))
+    )
+  }
+
+  @Test
+  fun `test group followed by word`() {
+    doTest(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\v(Lorem) Ipsum",
+      VimMatchResult.Success(Pair(Offset(0), Offset(11)))
+    )
+  }
+
   private fun doTest(text: CharSequence, pattern: String, expectedMatchResult: VimMatchResult, offset: Int = 0) {
     val editor = buildEditor(text)
     val nfa = buildNFA(pattern)
