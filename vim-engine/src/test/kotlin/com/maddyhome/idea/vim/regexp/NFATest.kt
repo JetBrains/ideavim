@@ -83,6 +83,15 @@ class NFATest {
   }
 
   @Test
+  fun `test concatenation with escaped char`() {
+    doTest(
+      "a*bcd",
+      "a\\*",
+      VimMatchResult.Success(Pair(Offset(0), Offset(2))),
+    )
+  }
+
+  @Test
   fun `test star multi`() {
     doTest(
       "aaaaabcd",
