@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
+import java.awt.GraphicsEnvironment
 import javax.swing.KeyStroke
 
 public abstract class VimRegisterGroupBase : VimRegisterGroup {
@@ -377,7 +378,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   private fun isPrimaryRegisterSupported(): Boolean {
-    return injector.systemInfoService.isXWindow
+    return !GraphicsEnvironment.isHeadless() && injector.systemInfoService.isXWindow
   }
 
   private fun setSystemPrimaryRegisterText(text: String, rawText: String, transferableData: List<Any>) {

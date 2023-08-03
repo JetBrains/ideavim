@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.testFramework.SkipInHeadlessEnvironment
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
@@ -24,14 +25,6 @@ class RegistersCommandTest : VimTestCase() {
     configureByText("")
     enterCommand("registers")
     assertExOutput("Type Name Content\n")
-  }
-
-  @Test
-  @EnabledOnOs(OS.LINUX)
-  fun `test list empty registers linux`() {
-    configureByText("")
-    enterCommand("registers")
-    assertExOutput("Type Name Content\n  c  \"+   ")
   }
 
   @Test
@@ -118,22 +111,6 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput(
       """Type Name Content
                      |  c  "a   ^IHello World^J^[
-      """.trimMargin(),
-    )
-  }
-
-  @Test
-  @EnabledOnOs(OS.LINUX)
-  fun `test correctly encodes non printable characters linux`() {
-    configureByText("")
-
-    VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
-
-    enterCommand("registers")
-    assertExOutput(
-      """Type Name Content
-                     |  c  "a   ^IHello World^J^[
-                     |  c  "+   
       """.trimMargin(),
     )
   }
@@ -250,6 +227,110 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "*   clipboard content
       |  c  ":   ascii
       |  c  "/   search pattern
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test clipboard registers are not duplicated`() {
+    configureByText("<caret>line 0 ")
+
+    injector.registerGroup.saveRegister('+', Register('+', SelectionType.LINE_WISE, "Lorem ipsum dolor", mutableListOf()))
+    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+    typeText("V<Esc>")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  "*   clipboard content
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test registers after yank with unnamed and unnamedplus`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamed,unnamedplus")
+
+    typeText("ye")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "0   line
+      |  c  "*   line
+      |  c  ":   set clipboard=unnamed,unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test registers after delete with unnamed and unnamedplus`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamed,unnamedplus")
+
+    typeText("de")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "-   line
+      |  c  "*   line
+      |  c  ":   set clipboard=unnamed,unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test registers for nonlinux with unnamedplus`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamedplus")
+
+    typeText("de")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "-   line
+      |  c  "*   line
+      |  c  ":   set clipboard=unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
+}
+
+@SkipInHeadlessEnvironment
+class RegistersCommandLinuxTest : VimTestCase() {
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test list empty registers linux`() {
+    configureByText("")
+    enterCommand("registers")
+    assertExOutput("Type Name Content\n  c  \"+   ")
+  }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test correctly encodes non printable characters linux`() {
+    configureByText("")
+
+    VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+                     |  c  "a   ^IHello World^J^[
+                     |  c  "+   
       """.trimMargin(),
     )
   }
@@ -372,23 +453,6 @@ class RegistersCommandTest : VimTestCase() {
   }
 
   @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
-  fun `test clipboard registers are not duplicated`() {
-    configureByText("<caret>line 0 ")
-
-    injector.registerGroup.saveRegister('+', Register('+', SelectionType.LINE_WISE, "Lorem ipsum dolor", mutableListOf()))
-    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
-    typeText("V<Esc>")
-
-    enterCommand("registers")
-    assertExOutput(
-      """Type Name Content
-      |  c  "*   clipboard content
-      """.trimMargin(),
-    )
-  }
-
-  @Test
   @EnabledOnOs(OS.LINUX)
   fun `test registers after yank with unnamed and unnamedplus linux`() {
     configureByText("<caret>line 0 ")
@@ -410,26 +474,6 @@ class RegistersCommandTest : VimTestCase() {
   }
 
   @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
-  fun `test registers after yank with unnamed and unnamedplus`() {
-    configureByText("<caret>line 0 ")
-    enterCommand("set clipboard=unnamed,unnamedplus")
-
-    typeText("ye")
-
-    enterCommand("registers")
-    assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "0   line
-      |  c  "*   line
-      |  c  ":   set clipboard=unnamed,unnamedplus
-      """.trimMargin(),
-    )
-    enterCommand("set clipboard&")
-  }
-
-  @Test
   @EnabledOnOs(OS.LINUX)
   fun `test registers after delete with unnamed and unnamedplus linux`() {
     configureByText("<caret>line 0 ")
@@ -444,46 +488,6 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "-   line
       |  c  "+   line
       |  c  ":   set clipboard=unnamed,unnamedplus
-      """.trimMargin(),
-    )
-    enterCommand("set clipboard&")
-  }
-
-  @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
-  fun `test registers after delete with unnamed and unnamedplus`() {
-    configureByText("<caret>line 0 ")
-    enterCommand("set clipboard=unnamed,unnamedplus")
-
-    typeText("de")
-
-    enterCommand("registers")
-    assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "-   line
-      |  c  "*   line
-      |  c  ":   set clipboard=unnamed,unnamedplus
-      """.trimMargin(),
-    )
-    enterCommand("set clipboard&")
-  }
-
-  @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
-  fun `test registers for nonlinux with unnamedplus`() {
-    configureByText("<caret>line 0 ")
-    enterCommand("set clipboard=unnamedplus")
-
-    typeText("de")
-
-    enterCommand("registers")
-    assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "-   line
-      |  c  "*   line
-      |  c  ":   set clipboard=unnamedplus
       """.trimMargin(),
     )
     enterCommand("set clipboard&")

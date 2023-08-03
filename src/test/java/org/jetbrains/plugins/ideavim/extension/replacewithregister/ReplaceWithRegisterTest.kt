@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
+import com.intellij.testFramework.SkipInHeadlessEnvironment
 import com.intellij.testFramework.UsefulTestCase.assertContainsElements
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -522,20 +523,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
   }
 
   @Test
-  @EnabledOnOs(OS.LINUX)
-  fun `test replace in visual with clipboard unnamedplus linux`() {
-    VimPlugin.getRegister().resetRegisters()
-
-    configureByText("one ${c}two three")
-    enterCommand("set clipboard+=unnamedplus")
-    injector.registerGroup.storeText('+', "four")
-
-    typeText(injector.parser.parseKeys("vegr"))
-    assertState("one two three")
-    enterCommand("set clipboard&")
-  }
-
-  @Test
   fun `test replace in visual with clipboard unnamed`() {
     VimPlugin.getRegister().resetRegisters()
 
@@ -562,6 +549,23 @@ class ReplaceWithRegisterTest : VimTestCase() {
       test
     """.trimIndent())
 
+    enterCommand("set clipboard&")
+  }
+}
+
+@SkipInHeadlessEnvironment
+class ReplaceWithRegisterLinuxTest : VimTestCase() {
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  fun `test replace in visual with clipboard unnamedplus linux`() {
+    VimPlugin.getRegister().resetRegisters()
+
+    configureByText("one ${c}two three")
+    enterCommand("set clipboard+=unnamedplus")
+    injector.registerGroup.storeText('+', "four")
+
+    typeText(injector.parser.parseKeys("vegr"))
+    assertState("one two three")
     enterCommand("set clipboard&")
   }
 }
