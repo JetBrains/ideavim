@@ -37,25 +37,26 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class NFATest {
   @Test
   fun `test match not found`() {
-    doTest(
+    assertFailure(
       "Lorem Ipsum\n" +
         "\n" +
         "Lorem ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
-      "VIM",
-      VimMatchResult.Failure
+      "VIM"
     )
   }
 
   @Test
   fun `test concatenation from start`() {
-    doTest(
+    assertCorrectRange(
       "Lorem Ipsum\n" +
       "\n" +
       "Lorem ipsum dolor sit amet,\n" +
@@ -63,13 +64,13 @@ class NFATest {
       "Sed in orci mauris.\n" +
       "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      VimMatchResult.Success(IntRange(0, 5))
+      IntRange(0, 5)
     )
   }
 
   @Test
   fun `test concatenation from offset`() {
-    doTest(
+    assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
         "Lorem ipsum dolor sit amet,\n" +
@@ -77,122 +78,120 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      VimMatchResult.Success(IntRange(13, 18)),
+      IntRange(13, 18),
       13
     )
   }
 
   @Test
   fun `test concatenation with escaped char`() {
-    doTest(
+    assertCorrectRange(
       "a*bcd",
       "a\\*",
-      VimMatchResult.Success(IntRange(0, 2)),
+      IntRange(0, 2),
     )
   }
 
   @Test
   fun `test star multi`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a*",
-      VimMatchResult.Success(IntRange(0, 5)),
+      IntRange(0, 5),
     )
   }
 
   @Test
   fun `test star multi empty match`() {
-    doTest(
+    assertCorrectRange(
       "bcd",
       "a*",
-      VimMatchResult.Success(IntRange(0, 0)),
+      IntRange(0, 0),
     )
   }
 
   @Test
   fun `test plus multi`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a\\+",
-      VimMatchResult.Success(IntRange(0, 5)),
+      IntRange(0, 5),
     )
   }
 
   @Test
   fun `test plus multi should fail`() {
-    doTest(
+    assertFailure(
       "bcd",
-      "a\\+",
-      VimMatchResult.Failure
+      "a\\+"
     )
   }
 
   @Test
   fun `test range multi both bounds`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a\\{0,3}",
-      VimMatchResult.Success(IntRange(0, 3)),
+      IntRange(0, 3),
     )
   }
 
   @Test
   fun `test range multi lower bound`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a\\{2,}",
-      VimMatchResult.Success(IntRange(0, 5)),
+      IntRange(0, 5),
     )
   }
 
   @Test
   fun `test range multi upper bound`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a\\{,2}",
-      VimMatchResult.Success(IntRange(0, 2)),
+      IntRange(0, 2),
     )
   }
 
   @Test
   fun `test range unbounded`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a\\{}",
-      VimMatchResult.Success(IntRange(0, 5)),
+      IntRange(0, 5),
     )
   }
 
   @Test
   fun `test range unbounded with comma`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a\\{,}",
-      VimMatchResult.Success(IntRange(0, 5)),
+      IntRange(0, 5),
     )
   }
 
   @Test
   fun `test range absolute bound`() {
-    doTest(
+    assertCorrectRange(
       "aaaaabcd",
       "a\\{2}",
-      VimMatchResult.Success(IntRange(0, 2)),
+      IntRange(0, 2),
     )
   }
 
   @Test
   fun `test range should fail`() {
-    doTest(
+    assertFailure(
       "aaaaabcd",
-      "a\\{6,}",
-      VimMatchResult.Failure,
+      "a\\{6,}"
     )
   }
 
   @Test
   fun `test group`() {
-    doTest(
+    assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
         "Lorem ipsum dolor sit amet,\n" +
@@ -200,13 +199,13 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem)",
-      VimMatchResult.Success(IntRange(0, 5))
+      IntRange(0, 5)
     )
   }
 
   @Test
   fun `test group followed by word`() {
-    doTest(
+    assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
         "Lorem ipsum dolor sit amet,\n" +
@@ -214,13 +213,13 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem) Ipsum",
-      VimMatchResult.Success(IntRange(0, 11))
+      IntRange(0, 11)
     )
   }
 
   @Test
   fun `test empty group`() {
-    doTest(
+    assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
         "Lorem ipsum dolor sit amet,\n" +
@@ -228,14 +227,24 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v()",
-      VimMatchResult.Success(IntRange(0, 0))
+      IntRange(0, 0)
     )
   }
 
-  private fun doTest(text: CharSequence, pattern: String, expectedMatchResult: VimMatchResult, offset: Int = 0) {
+  private fun assertCorrectRange(text: CharSequence, pattern: String, expectedResultRange: IntRange, offset: Int = 0) {
     val editor = buildEditor(text)
     val nfa = buildNFA(pattern)
-    assertEquals(expectedMatchResult, nfa.simulate(editor, offset))
+    val result = nfa.simulate(editor, offset)
+    when (result) {
+      is VimMatchResult.Failure -> fail("Expected to find match")
+      is VimMatchResult.Success -> assertEquals(expectedResultRange, result.range)
+    }
+  }
+
+  private fun assertFailure(text: CharSequence, pattern: String, offset: Int = 0) {
+    val editor = buildEditor(text)
+    val nfa = buildNFA(pattern)
+    assertTrue(nfa.simulate(editor, offset) is VimMatchResult.Failure)
   }
 
   private fun buildEditor(text: CharSequence) : VimEditor {

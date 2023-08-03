@@ -135,7 +135,10 @@ internal class NFA private constructor(
    * @return The resulting match if it was found, else null
    */
   fun simulate(editor: VimEditor, startIndex : Int = 0, currentIndex : Int = startIndex, currentState: NFAState = startState) : VimMatchResult {
-    if (currentState.isAccept) return VimMatchResult.Success(IntRange(startIndex, currentIndex))
+    if (currentState.isAccept) {
+      val matchRange = IntRange(startIndex, currentIndex)
+      return VimMatchResult.Success(matchRange, editor.text().substring(matchRange))
+    }
     for (transition in currentState.transitions) {
       val newIndex = currentIndex + transition.consumes()
       if (transition.canTake(editor, currentIndex, currentState)) {
