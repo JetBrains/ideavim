@@ -11,20 +11,52 @@ package com.maddyhome.idea.vim.regexp.nfa
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
 
+/**
+ * Represents a transition of the NFA
+ */
 internal class NFATransition(
+  /**
+   * The matcher that determines if the transition can
+   * be made, as well as information on how many characters
+   * are consumed by the transition
+   */
   val matcher: Matcher,
+
+  /**
+   * The destination state of the transition
+   */
   val destState: NFAState,
+
+  /**
+   * The action that should be taken upon making the transition.
+   * It defaults to taking no action
+   */
   val action: (state: NFAState) -> Unit = {}
 ) {
 
+  /**
+   * Determines whether the transition can be made
+   *
+   * @param editor The editor in its current state
+   * @param index  The current index in the text of the editor
+   * @param state  The state to get information from
+   *
+   * @return Whether the transition can be made
+   */
   fun canTake(editor: VimEditor, index: Int, state: NFAState) : Boolean {
     return matcher.matches(editor, index, state)
   }
 
+  /**
+   * Takes the action on the destination state.
+   */
   fun takeAction() {
     action(destState)
   }
 
+  /**
+   * Determines how many characters are consumed by the transition
+   */
   fun consumes() : Int {
     return if (matcher.isEpsilon()) 0 else 1
   }
