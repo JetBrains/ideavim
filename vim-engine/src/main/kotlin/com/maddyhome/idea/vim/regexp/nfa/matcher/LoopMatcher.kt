@@ -10,15 +10,17 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.nfa.NFAState
+import com.maddyhome.idea.vim.regexp.nfa.MultiDelimiter
 
-/**
- * Matcher that always matches. It is used to represent
- * epsilon transitions. This transitions can always be
- * taken and without consuming any character.
- */
-internal class EpsilonMatcher : Matcher {
+internal class LoopMatcher(val n: MultiDelimiter.IntMultiDelimiter, val m: MultiDelimiter) : Matcher {
+
   override fun matches(editor: VimEditor, index: Int, state: NFAState): Boolean {
-    return true
+    if (state.i < n.i) return false
+
+    return when (m) {
+      is MultiDelimiter.InfiniteMultiDelimiter -> true
+      is MultiDelimiter.IntMultiDelimiter -> state.i!! <= m.i
+    }
   }
 
   override fun isEpsilon(): Boolean {

@@ -33,11 +33,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     val multiVisitor = MultiVisitor()
     val range = multiVisitor.visit(ctx.multi())
 
-    /**
-     * TODO: loop the nfa according to the range
-     */
-
-    return nfa
+    return nfa.loop(range.first, range.second)
   }
 
   override fun visitLiteralChar(ctx: RegexParser.LiteralCharContext): NFA {

@@ -9,13 +9,14 @@
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.nfa.NFAState
 
 /**
  * Matcher used to match against single characters
  */
 internal class CharacterMatcher(val char: Char) : Matcher {
-  override fun matches(editor: VimEditor, stringPointer: Int): Boolean {
-    return stringPointer < editor.text().length && editor.text()[stringPointer] == char
+  override fun matches(editor: VimEditor, index: Int, state: NFAState): Boolean {
+    return index < editor.text().length && editor.text()[index] == char
   }
 
   override fun isEpsilon(): Boolean {
