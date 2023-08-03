@@ -37,11 +37,13 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitGroupingCapture(ctx: RegexParser.GroupingCaptureContext): NFA {
-    return visit(ctx.sub_pattern())
+    return if (ctx.sub_pattern() == null) NFA.fromEpsilon()
+    else visit(ctx.sub_pattern())
   }
 
   override fun visitGroupingNoCapture(ctx: RegexParser.GroupingNoCaptureContext): NFA {
-    return visit(ctx.sub_pattern())
+    return if (ctx.sub_pattern() == null) NFA.fromEpsilon()
+    else visit(ctx.sub_pattern())
   }
 
   override fun visitLiteralChar(ctx: RegexParser.LiteralCharContext): NFA {
