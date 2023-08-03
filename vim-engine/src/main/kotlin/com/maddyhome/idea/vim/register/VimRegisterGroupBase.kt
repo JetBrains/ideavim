@@ -377,7 +377,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
   }
 
-  private fun isPrimaryRegisterSupported(): Boolean {
+  override fun isPrimaryRegisterSupported(): Boolean {
     return !GraphicsEnvironment.isHeadless() && injector.systemInfoService.isXWindow
   }
 

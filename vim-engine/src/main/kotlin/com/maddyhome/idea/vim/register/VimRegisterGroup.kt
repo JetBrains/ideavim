@@ -88,4 +88,5 @@ public interface VimRegisterGroup {
   public fun finishRecording(editor: VimEditor)
   public fun getCurrentRegisterForMulticaret(): Char // `set clipbaard+=unnamedplus` should not make system register the default one when working with multiple carets VIM-2804
   public fun isSystemClipboard(register: Char): Boolean
+  public fun isPrimaryRegisterSupported(): Boolean
 }

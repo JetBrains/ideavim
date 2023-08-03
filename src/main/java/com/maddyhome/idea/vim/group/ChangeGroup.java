@@ -357,7 +357,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     // Here we do selection, and it is not a good idea, because it updates primary selection in Linux
     // I'll leave here a dirty fix that restores primary selection, but it would be better to rewrite this method
     Pair<String, List<Object>> primaryTextAndTransferableData = null;
-    if (injector.getSystemInfoService().isXWindow()) {
+    if (injector.getRegisterGroup().isPrimaryRegisterSupported()) {
       primaryTextAndTransferableData = injector.getClipboardManager().getPrimaryTextAndTransferableData();
     }
     VisualModeHelperKt.vimSetSystemSelectionSilently(ijEditor.getSelectionModel(), startOffset, endOffset);
