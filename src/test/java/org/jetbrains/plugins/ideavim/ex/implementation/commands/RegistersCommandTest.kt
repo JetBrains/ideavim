@@ -468,4 +468,24 @@ class RegistersCommandTest : VimTestCase() {
     )
     enterCommand("set clipboard&")
   }
+
+  @Test
+  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  fun `test registers for nonlinux with unnamedplus`() {
+    configureByText("<caret>line 0 ")
+    enterCommand("set clipboard=unnamedplus")
+
+    typeText("de")
+
+    enterCommand("registers")
+    assertExOutput(
+      """Type Name Content
+      |  c  ""   line
+      |  c  "-   line
+      |  c  "*   line
+      |  c  ":   set clipboard=unnamedplus
+      """.trimMargin(),
+    )
+    enterCommand("set clipboard&")
+  }
 }
