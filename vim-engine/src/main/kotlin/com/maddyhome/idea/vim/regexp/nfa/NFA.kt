@@ -166,9 +166,9 @@ internal class NFA private constructor(
       if (transition.canTake(editor, currentIndex, currentState)) {
         transition.takeAction()
         if (simulate(editor, startIndex, newIndex, transition.destState)) return true
-        currentState.i--
       }
     }
+    currentState.i--
     return false
   }
 

@@ -271,6 +271,33 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test alternation with star multi`() {
+    assertCorrectRange(
+      "abc",
+      "\\v%(a|b)*c",
+      0 until 3
+    )
+  }
+
+  @Test
+  fun `test star multi has to backtrack`() {
+    assertCorrectRange(
+      "a",
+      "a*a",
+      0 until 1
+    )
+  }
+
+  @Test
+  fun `test multiple paths to loop`() {
+    assertCorrectRange(
+      "ababc",
+      "\\v(a|b)+c=",
+      0 until 5
+    )
+  }
+
   private fun assertCorrectRange(text: CharSequence, pattern: String, expectedResultRange: IntRange, offset: Int = 0) {
     val editor = buildEditor(text)
     val nfa = buildNFA(pattern)
