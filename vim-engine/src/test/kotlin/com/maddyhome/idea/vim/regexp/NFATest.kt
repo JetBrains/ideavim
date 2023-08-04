@@ -248,6 +248,16 @@ class NFATest {
   }
 
   @Test
+  fun `test group updates range`() {
+    assertCorrectGroupRange(
+      "abababc",
+      "\\v(ab)*c",
+      4 until 6,
+      1
+    )
+  }
+
+  @Test
   fun `test empty group`() {
     assertCorrectRange(
       "Lorem Ipsum\n" +
