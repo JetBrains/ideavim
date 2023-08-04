@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.regexp.nfa
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.LoopMatcher
@@ -29,21 +30,19 @@ internal class NFA private constructor(
 ) {
 
   /**
+   * Memory used to store capture groups
+   */
+  private val groups: VimMatchGroupCollection = VimMatchGroupCollection()
+
+  /**
    * Concatenates the NFA with another NFA. The new NFA accepts inputs
    * that are accepted by the old NFA followed the other.
    *
    * @param other The NFA to concatenate with
    * @return The new NFA representing the concatenation
    */
-  fun concatenate(other: NFA) : NFA {
-    /**
-     * The acceptState is guaranteed to not have any transitions, so
-     * to concatenate the two NFAs together, make the acceptState of
-     * the first NFA transition to everything that the startState of
-     * the second transitions two, essentially merging the two states
-     * together.
-     */
-    this.acceptState.transitions = other.startState.transitions
+  internal fun concatenate(other: NFA) : NFA {
+    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), other.startState))
 
     this.acceptState.isAccept = false
     this.acceptState = other.acceptState
@@ -58,7 +57,7 @@ internal class NFA private constructor(
    * @param other The NFA to unify with
    * @return The new NFA representing the union
    */
-  fun unify(other: NFA) : NFA {
+  internal fun unify(other: NFA) : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
@@ -83,7 +82,7 @@ internal class NFA private constructor(
    * @param n The lowest amount of times that the NFA must be transversed
    * @param m The highest amount of times the NFA can be transversed
    */
-  fun loop(n: MultiDelimiter.IntMultiDelimiter, m: MultiDelimiter) : NFA {
+  internal fun loop(n: MultiDelimiter.IntMultiDelimiter, m: MultiDelimiter) : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
@@ -125,6 +124,31 @@ internal class NFA private constructor(
   }
 
   /**
+   * Marks the start and accept states of the NFA to start
+   * and end, respectfully, the capturing of a group.
+   *
+   * @param groupNumber The number of the capture group
+   */
+  internal fun capture(groupNumber: Int) {
+    this.startState.startCapture.add(groupNumber)
+    this.acceptState.endCapture.add(groupNumber)
+  }
+
+  internal fun simulate(editor: VimEditor, startIndex: Int = 0) : VimMatchResult {
+    groups.groupCount = 0
+    if (simulate(editor, startIndex, startIndex, startState)) {
+      return groups.get(0)?.let {
+        VimMatchResult.Success(
+          it.range,
+          it.value,
+          groups
+        )
+      } ?: run { VimMatchResult.Failure }
+    }
+    return VimMatchResult.Failure
+  }
+
+  /**
    * Simulates the NFA in a depth-first search fashion.
    *
    * @param editor       The editor that is used for the simulation
@@ -134,24 +158,26 @@ internal class NFA private constructor(
    *
    * @return The resulting match if it was found, else null
    */
-  fun simulate(editor: VimEditor, startIndex : Int = 0, currentIndex : Int = startIndex, currentState: NFAState = startState) : VimMatchResult {
-    if (currentState.isAccept) {
-      val matchRange = IntRange(startIndex, currentIndex)
-      return VimMatchResult.Success(matchRange, editor.text().substring(matchRange))
-    }
+  private fun simulate(editor: VimEditor, startIndex : Int = 0, currentIndex : Int = startIndex, currentState: NFAState = startState) : Boolean {
+    updateCaptureGroups(editor, currentIndex, currentState)
+    if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
       val newIndex = currentIndex + transition.consumes()
       if (transition.canTake(editor, currentIndex, currentState)) {
         transition.takeAction()
-        val result = simulate(editor, startIndex, newIndex, transition.destState)
-        if (result is VimMatchResult.Success) return result
+        if (simulate(editor, startIndex, newIndex, transition.destState)) return true
         currentState.i--
       }
     }
-    return VimMatchResult.Failure
+    return false
   }
 
-  companion object {
+  private fun updateCaptureGroups(editor: VimEditor, index: Int, state: NFAState) {
+    for (groupNumber in state.startCapture) groups.setGroupStart(groupNumber, index)
+    for (groupNumber in state.endCapture) groups.setGroupEnd(groupNumber, index, editor.text())
+  }
+
+  internal companion object {
 
     /**
      * Creates a new instance of a NFA, that has two states
@@ -161,7 +187,7 @@ internal class NFA private constructor(
      *
      * @return The new NFA instance
      */
-    fun fromEpsilon() : NFA {
+    internal fun fromEpsilon() : NFA {
       return fromMatcher(EpsilonMatcher())
     }
 
@@ -175,7 +201,7 @@ internal class NFA private constructor(
      * @param matcher The matcher used for the transition
      * @return The new NFA instance
      */
-    fun fromMatcher(matcher: Matcher) : NFA {
+    internal fun fromMatcher(matcher: Matcher) : NFA {
       val startState = NFAState(false)
       val acceptState = NFAState(true)
 

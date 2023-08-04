@@ -8,12 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.match
 
-public sealed class VimMatchResult {
-  public data class Success(
-    public val range: IntRange,
-    public val value: String,
-    public val groups: VimMatchGroupCollection
-  ) : VimMatchResult()
-
-  public object Failure : VimMatchResult()
-}
+public class VimMatchGroup(
+  public val range: IntRange,
+  public val value: String
+)

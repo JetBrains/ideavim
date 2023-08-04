@@ -15,8 +15,14 @@ import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
 internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
+  private var groupCount: Int = 0
+
   override fun visitPattern(ctx: RegexParser.PatternContext): NFA {
-    return visit(ctx.sub_pattern())
+    val groupNumber = groupCount
+    groupCount++
+    val nfa = visit(ctx.sub_pattern())
+    nfa.capture(groupNumber)
+    return nfa
   }
   override fun visitSub_pattern(ctx: RegexParser.Sub_patternContext): NFA {
     return ctx.branches.map { visitBranch(it) }.union()
@@ -37,8 +43,11 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitGroupingCapture(ctx: RegexParser.GroupingCaptureContext): NFA {
-    return if (ctx.sub_pattern() == null) NFA.fromEpsilon()
-    else visit(ctx.sub_pattern())
+    val groupNumber = groupCount
+    groupCount++
+    val nfa = if (ctx.sub_pattern() == null) NFA.fromEpsilon() else visit(ctx.sub_pattern())
+    nfa.capture(groupNumber)
+    return nfa
   }
 
   override fun visitGroupingNoCapture(ctx: RegexParser.GroupingNoCaptureContext): NFA {
