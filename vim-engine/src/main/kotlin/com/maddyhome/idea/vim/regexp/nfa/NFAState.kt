@@ -25,7 +25,10 @@ internal class NFAState (
    */
   var transitions: ArrayList<NFATransition> = ArrayList(),
 
-  var i: Int = 0
+  var i: Int = 0,
+
+  val startCapture: MutableList<Int> = ArrayList(),
+  val endCapture: MutableList<Int> = ArrayList()
 ) {
 
   /**

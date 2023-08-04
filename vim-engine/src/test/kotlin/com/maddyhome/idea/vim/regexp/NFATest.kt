@@ -64,7 +64,7 @@ class NFATest {
       "Sed in orci mauris.\n" +
       "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      IntRange(0, 5)
+      0 until 5
     )
   }
 
@@ -78,7 +78,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      IntRange(13, 18),
+      13 until 18,
       13
     )
   }
@@ -88,7 +88,7 @@ class NFATest {
     assertCorrectRange(
       "a*bcd",
       "a\\*",
-      IntRange(0, 2),
+      0 until 2,
     )
   }
 
@@ -97,7 +97,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a*",
-      IntRange(0, 5),
+      0 until 5,
     )
   }
 
@@ -106,7 +106,7 @@ class NFATest {
     assertCorrectRange(
       "bcd",
       "a*",
-      IntRange(0, 0),
+      IntRange.EMPTY
     )
   }
 
@@ -115,7 +115,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\+",
-      IntRange(0, 5),
+      0 until 5,
     )
   }
 
@@ -132,7 +132,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{0,3}",
-      IntRange(0, 3),
+      0 until 3,
     )
   }
 
@@ -141,7 +141,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{2,}",
-      IntRange(0, 5),
+      0 until 5,
     )
   }
 
@@ -150,7 +150,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{,2}",
-      IntRange(0, 2),
+      0 until 2,
     )
   }
 
@@ -159,7 +159,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{}",
-      IntRange(0, 5),
+      0 until 5,
     )
   }
 
@@ -168,7 +168,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{,}",
-      IntRange(0, 5),
+      0 until 5,
     )
   }
 
@@ -177,7 +177,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{2}",
-      IntRange(0, 2),
+      0 until 2,
     )
   }
 
@@ -199,7 +199,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem)",
-      IntRange(0, 5)
+      0 until 5
     )
   }
 
@@ -213,7 +213,37 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem) Ipsum",
-      IntRange(0, 11)
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `test capture group 1`() {
+    assertCorrectGroupRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\v(Lorem) Ipsum",
+      0 until 5,
+      1
+    )
+  }
+
+  @Test
+  fun `test capture group 2`() {
+    assertCorrectGroupRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\v(Lorem) (Ipsum)",
+      6 until 11,
+      2
     )
   }
 
@@ -227,7 +257,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v()",
-      IntRange(0, 0)
+        IntRange.EMPTY
     )
   }
 
@@ -238,6 +268,16 @@ class NFATest {
     when (result) {
       is VimMatchResult.Failure -> fail("Expected to find match")
       is VimMatchResult.Success -> assertEquals(expectedResultRange, result.range)
+    }
+  }
+
+  private fun assertCorrectGroupRange(text: CharSequence, pattern: String, expectedResultRange: IntRange, groupNumber: Int, offset: Int = 0) {
+    val editor = buildEditor(text)
+    val nfa = buildNFA(pattern)
+    val result = nfa.simulate(editor, offset)
+    when (result) {
+      is VimMatchResult.Failure -> fail("Expected to find match")
+      is VimMatchResult.Success -> assertEquals(expectedResultRange, result.groups.get(groupNumber)?.range)
     }
   }
 
