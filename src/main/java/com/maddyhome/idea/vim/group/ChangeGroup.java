@@ -354,11 +354,16 @@ public class ChangeGroup extends VimChangeGroupBase {
 
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
 
-    // Here we do selection, and it is not a good idea, because it updates primary selection in Linux
-    // I'll leave here a dirty fix that restores primary selection, but it would be better to rewrite this method
+    // FIXME: Here we do selection, and it is not a good idea, because it updates primary selection in Linux
+    // FIXME: I'll leave here a dirty fix that restores primary selection, but it would be better to rewrite this method
     Pair<String, List<Object>> primaryTextAndTransferableData = null;
-    if (injector.getRegisterGroup().isPrimaryRegisterSupported()) {
-      primaryTextAndTransferableData = injector.getClipboardManager().getPrimaryTextAndTransferableData();
+    try {
+      if (injector.getRegisterGroup().isPrimaryRegisterSupported()) {
+        primaryTextAndTransferableData = injector.getClipboardManager().getPrimaryTextAndTransferableData();
+      }
+    } catch (Exception e) {
+      // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
+      logger.warn("False positive X11 primary selection support");
     }
     VisualModeHelperKt.vimSetSystemSelectionSilently(ijEditor.getSelectionModel(), startOffset, endOffset);
 
@@ -385,8 +390,12 @@ public class ChangeGroup extends VimChangeGroupBase {
       afterAction.invoke();
     }
 
-    if (primaryTextAndTransferableData != null) {
-      injector.getClipboardManager().setPrimaryText(primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getSecond());
+    try {
+      if (primaryTextAndTransferableData != null) {
+        injector.getClipboardManager().setPrimaryText(primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getSecond());
+      }
+    } catch (Exception e) {
+      // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
     }
   }
 

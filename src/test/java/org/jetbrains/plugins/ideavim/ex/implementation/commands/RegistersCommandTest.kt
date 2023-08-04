@@ -307,10 +307,7 @@ class RegistersCommandTest : VimTestCase() {
     )
     enterCommand("set clipboard&")
   }
-}
 
-@SkipInHeadlessEnvironment
-class RegistersCommandLinuxTest : VimTestCase() {
   @Test
   @EnabledOnOs(OS.LINUX)
   fun `test list empty registers linux`() {

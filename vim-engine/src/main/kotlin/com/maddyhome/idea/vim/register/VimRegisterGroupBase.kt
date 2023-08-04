@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
-import java.awt.GraphicsEnvironment
 import javax.swing.KeyStroke
 
 public abstract class VimRegisterGroupBase : VimRegisterGroup {
@@ -378,14 +377,22 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   override fun isPrimaryRegisterSupported(): Boolean {
-    return !GraphicsEnvironment.isHeadless() && injector.systemInfoService.isXWindow
+    return System.getenv("DISPLAY") != null && injector.systemInfoService.isXWindow
   }
 
   private fun setSystemPrimaryRegisterText(text: String, rawText: String, transferableData: List<Any>) {
-    if (!isPrimaryRegisterSupported()) {
-      setSystemClipboardRegisterText(text, rawText, transferableData)
+    logger.trace("Setting text: $text to primary selection...")
+    if (isPrimaryRegisterSupported()) {
+      try {
+        injector.clipboardManager.setPrimaryText(text, rawText, transferableData)
+      } catch (e: Exception) {
+        logger.warn("False positive X11 primary selection support")
+        logger.trace("Setting text to primary selection failed. Setting it to clipboard selection instead")
+        setSystemClipboardRegisterText(text, rawText, transferableData)
+      }
     } else {
-      injector.clipboardManager.setPrimaryText(text, rawText, transferableData)
+      logger.trace("X11 primary selection is not supporting. Setting clipboard selection instead")
+      setSystemClipboardRegisterText(text, rawText, transferableData)
     }
   }
 
@@ -394,15 +401,25 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   private fun refreshPrimaryRegister(): Register? {
-    if (!isPrimaryRegisterSupported()) return refreshClipboardRegister()
-    val clipboardData = injector.clipboardManager.getPrimaryTextAndTransferableData() ?: return null
-    val currentRegister = myRegisters[PRIMARY_REGISTER]
-    val text = clipboardData.first
-    val transferableData = clipboardData.second?.toMutableList()
-    if (currentRegister != null && text == currentRegister.text) {
-      return currentRegister
+    logger.trace("Syncing cached primary selection value..")
+    if (!isPrimaryRegisterSupported()) {
+      logger.trace("X11 primary selection is not supported. Syncing clipboard selection..")
+      return refreshClipboardRegister()
     }
-    return transferableData?.let { Register(PRIMARY_REGISTER, guessSelectionType(text), text, it) }
+    try {
+      val clipboardData = injector.clipboardManager.getPrimaryTextAndTransferableData() ?: return null
+      val currentRegister = myRegisters[PRIMARY_REGISTER]
+      val text = clipboardData.first
+      val transferableData = clipboardData.second?.toMutableList()
+      if (currentRegister != null && text == currentRegister.text) {
+        return currentRegister
+      }
+      return transferableData?.let { Register(PRIMARY_REGISTER, guessSelectionType(text), text, it) }
+    } catch (e: Exception) {
+      logger.warn("False positive X11 primary selection support")
+      logger.trace("Syncing primary selection failed. Syncing clipboard selection instead")
+      return refreshClipboardRegister()
+    }
   }
 
   private fun refreshClipboardRegister(): Register? {

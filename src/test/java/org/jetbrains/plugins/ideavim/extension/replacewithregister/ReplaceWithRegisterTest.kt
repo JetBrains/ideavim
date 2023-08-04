@@ -551,10 +551,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     enterCommand("set clipboard&")
   }
-}
 
-@SkipInHeadlessEnvironment
-class ReplaceWithRegisterLinuxTest : VimTestCase() {
   @Test
   @EnabledOnOs(OS.LINUX)
   fun `test replace in visual with clipboard unnamedplus linux`() {
