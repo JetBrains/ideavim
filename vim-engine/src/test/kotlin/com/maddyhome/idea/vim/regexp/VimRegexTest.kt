@@ -73,6 +73,35 @@ class VimRegexTest {
     )
   }
 
+  @Test
+  fun `test find all occurrences of word`() {
+    assertFindAll(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem",
+      setOf(0 until 5, 13 until 18)
+    )
+  }
+
+  @Test
+  fun `test find all occurrences of word from offset`() {
+    assertFindAll(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem",
+      setOf(13 until 18),
+      10
+    )
+  }
+
   private fun assertContainsMatchIn(text: CharSequence, pattern: String, expectedResult : Boolean) {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
@@ -88,6 +117,16 @@ class VimRegexTest {
       is VimMatchResult.Failure -> fail("Expected to find match")
       is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
     }
+  }
+
+  private fun assertFindAll(text: CharSequence, pattern: String, expectedResult: Set<IntRange>, startIndex: Int = 0) {
+    val editor = buildEditor(text)
+    val regex = VimRegex(pattern)
+    val matchResults = regex.findAll(editor, startIndex)
+    assertEquals(expectedResult, matchResults
+      .map { it.range }
+      .toSet()
+    )
   }
 
   private fun buildEditor(text: CharSequence) : VimEditor {
