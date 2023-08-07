@@ -67,4 +67,36 @@ public class VimRegex(pattern: String) {
      */
     return false
   }
+
+  /**
+   * Returns the first match of a regular expression in the editor, beginning at the specified index.
+   *
+   * @param editor     The editor where to look for the match in
+   * @param startIndex The index to start the find
+   */
+  public fun find(
+    editor: VimEditor,
+    startIndex: Int = 0
+  ): VimMatchResult {
+    var index = startIndex
+    while (index <= editor.text().length) {
+      val result = nfa.simulate(editor, index)
+      when (result) {
+        /**
+         * A match was found
+         */
+        is VimMatchResult.Success -> return result
+
+        /**
+         * No match found yet, try searching on next index
+         */
+        is VimMatchResult.Failure -> index++
+      }
+    }
+
+    /**
+     * Entire editor was searched, but no match found
+     */
+    return VimMatchResult.Failure
+  }
 }
