@@ -42,11 +42,18 @@ internal class NFATransition(
 
   /**
    * Determines how many characters are consumed by the transition
+   *
+   * @return The number of characters that are consumed
    */
   fun consumes() : Int {
     return if (matcher.isEpsilon()) 0 else 1
   }
 
+  /**
+   * Determines if the transition consumes any input
+   *
+   * @return True if input is consumed, false otherwise
+   */
   fun isEpsilon() : Boolean {
     return consumes() == 0
   }

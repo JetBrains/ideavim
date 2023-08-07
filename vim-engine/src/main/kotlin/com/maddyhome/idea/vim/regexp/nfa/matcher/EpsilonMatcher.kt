@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.regexp.nfa.NFAState
 
 /**
  * Matcher that always matches. It is used to represent

@@ -8,8 +8,12 @@
 
 package com.maddyhome.idea.vim.regexp.match
 
+/**
+ * A collection of match results of capture groups
+ */
 public class VimMatchGroupCollection(
   /**
+   * The maximum amount of capture groups.
    * There can only be a maximum of 10 capture groups.
    * Index 0 is for the entire match and the other 9 for explicit
    * capture groups.
@@ -33,15 +37,35 @@ public class VimMatchGroupCollection(
    */
   internal var groupCount: Int = 0
 
+  /**
+   * Gets a single capture group match
+   *
+   * @param index The number of the capture group to get
+   *
+   * @return The capture group with the desired number, or null if the number is too big
+   */
   public fun get(index: Int): VimMatchGroup? {
     return if (index < groupCount && index < groups.size && index >= 0) groups[index]
     else null
   }
 
+  /**
+   * Sets the start index of a certain capture group
+   *
+   * @param groupNumber The number of the capture group
+   * @param startIndex  The index where the capture group match starts
+   */
   internal fun setGroupStart(groupNumber: Int, startIndex: Int) {
     groupStarts[groupNumber] = startIndex
   }
 
+  /**
+   * Sets the end index of a certain capture group
+   *
+   * @param groupNumber The number of the capture group
+   * @param endIndex    The index where the capture group match end
+   * @param text        The text used to extract the matched string
+   */
   internal fun setGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
     val range = groupStarts[groupNumber] until endIndex
     groups[groupNumber] = VimMatchGroup(range, text.substring(range))
@@ -61,7 +85,10 @@ public class VimMatchGroupCollection(
   }
 
   override fun iterator(): Iterator<VimMatchGroup> {
-    TODO()
+    return groups.subList(0, groupCount)
+      .filterNotNull()
+      .iterator()
   }
+
 
 }
