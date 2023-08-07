@@ -8,7 +8,7 @@ tokens {
   CLASS_OCTAL, CLASS_NOT_OCTAL, CLASS_WORD, CLASS_NOT_WORD, CLASS_HEADWORD, CLASS_NOT_HEADWORD,
   CLASS_ALPHA, CLASS_NOT_ALPHA, CLASS_LCASE, CLASS_NOT_LCASE, CLASS_UCASE, CLASS_NOT_UCASE,
   CLASS_ESC, CLASS_TAB, CLASS_CR, CLASS_BS, CLASS_NL, COLLECTION_LITERAL_CHAR, CURSOR,
-  LEFT_PAREN_NOCAPTURE, START_MATCH, END_MATCH
+  LEFT_PAREN_NOCAPTURE, START_MATCH, END_MATCH, DOTNL
 }
 
 // ------------------------------------------------------------------------------------------------ //
@@ -24,6 +24,7 @@ LEFT_PAREN_MAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_MAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_MAGIC: '\\)' -> type(RIGHT_PAREN);
 DOT_MAGIC: '.' -> type(DOT);
+DOTNL_MAGIC: '\\_.' -> type(DOTNL);
 STAR_MAGIC: '*' -> type(STAR);
 PLUS_MAGIC: '\\+' -> type(PLUS);
 OPTIONAL_MAGIC: ('\\=' | '\\?') -> type(OPTIONAL);
@@ -91,6 +92,7 @@ LEFT_PAREN_NOMAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_NOMAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_NOMAGIC: '\\)' -> type(RIGHT_PAREN);
 DOT_NOMAGIC: '\\.' -> type(DOT);
+DOTNL_NOMAGIC: '\\_.' -> type(DOTNL);
 STAR_NOMAGIC: '\\*' -> type(STAR);
 PLUS_NOMAGIC: '\\+' -> type(PLUS);
 OPTIONAL_NOMAGIC: ('\\=' | '\\?') -> type(OPTIONAL);
@@ -159,6 +161,7 @@ LEFT_PAREN_VMAGIC: '(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_VMAGIC: '%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_VMAGIC: ')' -> type(RIGHT_PAREN);
 DOT_VMAGIC: '.' -> type(DOT);
+DOTNL_VMAGIC: '\\_.' -> type(DOTNL);
 STAR_VMAGIC: '*' -> type(STAR);
 PLUS_VMAGIC: '+' -> type(PLUS);
 OPTIONAL_VMAGIC: ('=' | '?') -> type(OPTIONAL);
@@ -166,7 +169,7 @@ RANGE_START_VMAGIC: '{' -> pushMode(INSIDE_RANGE), type(RANGE_START);
 COLLECTION_START_VMAGIC: '[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION_START);
 
 // zero-width tokens
-CURSOR_VMAGIC: '\\%#' -> type(CURSOR);
+CURSOR_VMAGIC: '%#' -> type(CURSOR);
 START_MATCH_VMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_VMAGIC: '\\ze' -> type(END_MATCH);
 
@@ -226,6 +229,7 @@ LEFT_PAREN_VNOMAGIC: '\\(' -> type(LEFT_PAREN);
 LEFT_PAREN_NOCAPTURE_VNOMAGIC: '\\%(' -> type(LEFT_PAREN_NOCAPTURE);
 RIGHT_PAREN_VNOMAGIC: '\\)' -> type(RIGHT_PAREN);
 DOT_VNOMAGIC: '\\.' -> type(DOT);
+DOTNL_VNOMAGIC: '\\_.' -> type(DOTNL);
 STAR_VNOMAGIC: '\\*' -> type(STAR);
 PLUS_VNOMAGIC: '\\+' -> type(PLUS);
 OPTIONAL_VNOMAGIC: ('\\=' | '\\?') -> type(OPTIONAL);

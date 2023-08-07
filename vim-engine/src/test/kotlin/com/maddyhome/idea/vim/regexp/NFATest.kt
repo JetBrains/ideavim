@@ -307,6 +307,20 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       ".*",
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `text sequence of any characters with newline`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\_.*",
       0 until 128
     )
   }

@@ -74,7 +74,11 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitAnyChar(ctx: RegexParser.AnyCharContext?): NFA {
-    return NFA.fromMatcher(DotMatcher())
+    return NFA.fromMatcher(DotMatcher(false))
+  }
+
+  override fun visitAnyCharNL(ctx: RegexParser.AnyCharNLContext?): NFA {
+    return NFA.fromMatcher(DotMatcher(true))
   }
 
   private fun cleanLiteralChar(str : String) : Char {
