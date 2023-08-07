@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
-import com.maddyhome.idea.vim.regexp.nfa.matcher.LoopMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
 
 /**
@@ -82,44 +81,25 @@ internal class NFA private constructor(
    * @param n The lowest amount of times that the NFA must be transversed
    * @param m The highest amount of times the NFA can be transversed
    */
-  internal fun loop(n: MultiDelimiter.IntMultiDelimiter, m: MultiDelimiter) : NFA {
+  internal fun closure() : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
-    /**
-     * This transition indicates the beginning of a loop.
-     * It initializes the loop counter variable of the first
-     * state in the loop.
-     */
-    val initLoopTransition = NFATransition(
-      EpsilonMatcher(),
-      this.startState
-    ) { state -> state.i = 0 }
-    newStart.addTransition(initLoopTransition)
+    newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
+    newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
 
-    /**
-     * This transition indicates that the NFA is looping back
-     * to its start. Increments the loop counter variable.
-     */
-    val incLoopTransition = NFATransition(
-      EpsilonMatcher(),
-      this.startState
-    ) { state -> state.i = state.i + 1 }
-    this.acceptState.addTransition(incLoopTransition)
+    acceptState.addTransition(NFATransition(EpsilonMatcher(), startState))
+    acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
 
-    /**
-     * This transition is used to exit out of the loop.
-     */
-    val exitLoopTransition = NFATransition(
-      LoopMatcher(n, m),
-      newEnd
-    )
-    this.startState.addTransition(exitLoopTransition)
+    acceptState.isAccept = false
+    startState = newStart
+    acceptState = newEnd
 
-    this.acceptState.isAccept = false
-    this.startState = newStart
-    this.acceptState = newEnd
+    return this
+  }
 
+  internal fun optional() : NFA {
+    startState.addTransition(NFATransition(EpsilonMatcher(), acceptState))
     return this
   }
 
@@ -136,7 +116,7 @@ internal class NFA private constructor(
 
   internal fun simulate(editor: VimEditor, startIndex: Int = 0) : VimMatchResult {
     groups.groupCount = 0
-    if (simulate(editor, startIndex, startIndex, startState)) {
+    if (simulate(editor, startIndex, startState)) {
       return groups.get(0)?.let {
         VimMatchResult.Success(
           it.range,
@@ -158,17 +138,15 @@ internal class NFA private constructor(
    *
    * @return The resulting match if it was found, else null
    */
-  private fun simulate(editor: VimEditor, startIndex : Int = 0, currentIndex : Int = startIndex, currentState: NFAState = startState) : Boolean {
+  private fun simulate(editor: VimEditor, currentIndex : Int = 0, currentState: NFAState = startState) : Boolean {
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
       val newIndex = currentIndex + transition.consumes()
-      if (transition.canTake(editor, currentIndex, currentState)) {
-        transition.takeAction()
-        if (simulate(editor, startIndex, newIndex, transition.destState)) return true
+      if (transition.canTake(editor, currentIndex)) {
+        if (simulate(editor, newIndex, transition.destState)) return true
       }
     }
-    currentState.i--
     return false
   }
 

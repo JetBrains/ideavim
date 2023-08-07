@@ -26,12 +26,6 @@ internal class NFATransition(
    * The destination state of the transition
    */
   val destState: NFAState,
-
-  /**
-   * The action that should be taken upon making the transition.
-   * It defaults to taking no action
-   */
-  val action: (state: NFAState) -> Unit = {}
 ) {
 
   /**
@@ -39,19 +33,11 @@ internal class NFATransition(
    *
    * @param editor The editor in its current state
    * @param index  The current index in the text of the editor
-   * @param state  The state to get information from
    *
    * @return Whether the transition can be made
    */
-  fun canTake(editor: VimEditor, index: Int, state: NFAState) : Boolean {
-    return matcher.matches(editor, index, state)
-  }
-
-  /**
-   * Takes the action on the destination state.
-   */
-  fun takeAction() {
-    action(destState)
+  fun canTake(editor: VimEditor, index: Int) : Boolean {
+    return matcher.matches(editor, index)
   }
 
   /**

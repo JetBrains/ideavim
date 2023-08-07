@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.regexp.nfa.NFAState
  * taken and without consuming any character.
  */
 internal class EpsilonMatcher : Matcher {
-  override fun matches(editor: VimEditor, index: Int, state: NFAState): Boolean {
+  override fun matches(editor: VimEditor, index: Int): Boolean {
     return true
   }
 

@@ -298,6 +298,15 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test nested multi`() {
+    assertCorrectRange(
+      "aaaa",
+      "\\v(a=)*",
+      0 until 4
+    )
+  }
+
   private fun assertCorrectRange(text: CharSequence, pattern: String, expectedResultRange: IntRange, offset: Int = 0) {
     val editor = buildEditor(text)
     val nfa = buildNFA(pattern)
