@@ -132,19 +132,25 @@ internal class NFA private constructor(
    * Simulates the NFA in a depth-first search fashion.
    *
    * @param editor       The editor that is used for the simulation
-   * @param startIndex   The index of the text in the editor where the simulation should start at
    * @param currentIndex The current index of the text in the simulation
    * @param currentState The current NFA state in the simulation
    *
    * @return The resulting match if it was found, else null
    */
-  private fun simulate(editor: VimEditor, currentIndex : Int = 0, currentState: NFAState = startState) : Boolean {
+  private fun simulate(editor: VimEditor, currentIndex : Int = 0, currentState: NFAState = startState, epsilonVisited: HashSet<NFAState> = HashSet()) : Boolean {
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
       val newIndex = currentIndex + transition.consumes()
+      var epsilonVisitedCopy = HashSet(epsilonVisited)
+      if (transition.isEpsilon()) {
+        if (epsilonVisited.contains(transition.destState)) continue
+        epsilonVisitedCopy.add(currentState)
+      } else {
+        epsilonVisitedCopy = HashSet()
+      }
       if (transition.canTake(editor, currentIndex)) {
-        if (simulate(editor, newIndex, transition.destState)) return true
+        if (simulate(editor, newIndex, transition.destState, epsilonVisitedCopy)) return true
       }
     }
     return false
