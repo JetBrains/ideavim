@@ -358,6 +358,24 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test sequence of digits`() {
+    assertCorrectRange(
+      "45135abc235",
+      "\\d\\+",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test sequence of not digits`() {
+    assertCorrectRange(
+      "abcd123efg",
+      "\\D\\+",
+      0 until 4
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
