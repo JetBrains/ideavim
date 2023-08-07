@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.regexp.parser.visitors
 import com.maddyhome.idea.vim.regexp.nfa.MultiDelimiter
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.CursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
@@ -79,6 +80,10 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitAnyCharNL(ctx: RegexParser.AnyCharNLContext?): NFA {
     return NFA.fromMatcher(DotMatcher(true))
+  }
+
+  override fun visitCursor(ctx: RegexParser.CursorContext?): NFA {
+    return NFA.fromMatcher(CursorMatcher())
   }
 
   private fun cleanLiteralChar(str : String) : Char {

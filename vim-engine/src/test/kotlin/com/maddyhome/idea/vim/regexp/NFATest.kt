@@ -8,7 +8,9 @@
 
 package com.maddyhome.idea.vim.regexp
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.parser.RegexParser
@@ -17,6 +19,8 @@ import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -312,7 +316,7 @@ class NFATest {
   }
 
   @Test
-  fun `text sequence of any characters with newline`() {
+  fun `test sequence of any characters with newline`() {
     assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
@@ -325,8 +329,44 @@ class NFATest {
     )
   }
 
-  private fun assertCorrectRange(text: CharSequence, pattern: String, expectedResultRange: IntRange, offset: Int = 0) {
-    val editor = buildEditor(text)
+  @Test
+  fun `test single cursor`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lo\\%#rem",
+      0 until 5,
+      carets = listOf(2)
+    )
+  }
+
+  @Test
+  fun `test single cursor should fail`() {
+    assertFailure(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%#Lorem",
+      carets = listOf(2)
+    )
+  }
+
+  private fun assertCorrectRange(
+    text: CharSequence,
+    pattern: String,
+    expectedResultRange:
+    IntRange,
+    offset: Int = 0,
+    carets: List<Int> = emptyList()
+  ) {
+    val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
     val result = nfa.simulate(editor, offset)
     when (result) {
@@ -335,8 +375,15 @@ class NFATest {
     }
   }
 
-  private fun assertCorrectGroupRange(text: CharSequence, pattern: String, expectedResultRange: IntRange, groupNumber: Int, offset: Int = 0) {
-    val editor = buildEditor(text)
+  private fun assertCorrectGroupRange(
+    text: CharSequence,
+    pattern: String,
+    expectedResultRange: IntRange,
+    groupNumber: Int,
+    offset: Int = 0,
+    carets: List<Int> = emptyList()
+  ) {
+    val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
     val result = nfa.simulate(editor, offset)
     when (result) {
@@ -345,14 +392,24 @@ class NFATest {
     }
   }
 
-  private fun assertFailure(text: CharSequence, pattern: String, offset: Int = 0) {
-    val editor = buildEditor(text)
+  private fun assertFailure(text: CharSequence, pattern: String, offset: Int = 0, carets: List<Int> = emptyList()) {
+    val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
     assertTrue(nfa.simulate(editor, offset) is VimMatchResult.Failure)
   }
 
-  private fun buildEditor(text: CharSequence) : VimEditor {
-    return VimEditorMock(text)
+  private fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
+    val editorMock = mock<VimEditor>()
+    whenever(editorMock.text()).thenReturn(text)
+
+    val trueCarets = ArrayList<VimCaret>()
+    for (caret in carets) {
+      val caretMock = mock<VimCaret>()
+      whenever(caretMock.offset).thenReturn(Offset(caret))
+      trueCarets.add(caretMock)
+    }
+    whenever(editorMock.carets()).thenReturn(trueCarets)
+    return editorMock
   }
 
   private fun buildNFA(pattern: String) : NFA {
