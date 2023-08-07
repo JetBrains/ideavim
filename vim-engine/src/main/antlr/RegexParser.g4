@@ -80,6 +80,7 @@ range : RANGE_START lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END
  */
 ordinary_atom : LITERAL_CHAR #LiteralChar
               | DOT          #AnyChar
+              | DOTNL        #AnyCharNL
               | zero_width   #ZeroWidth
               | char_class   #CharClass
               | collection   #Collec

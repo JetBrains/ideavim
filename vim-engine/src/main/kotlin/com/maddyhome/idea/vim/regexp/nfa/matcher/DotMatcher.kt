@@ -13,9 +13,10 @@ import com.maddyhome.idea.vim.api.VimEditor
 /**
  * Matcher that matches with any character
  */
-internal class DotMatcher : Matcher {
+internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
   override fun matches(editor: VimEditor, index: Int): Boolean {
-    return index < editor.text().length
+    return if (includeNewLine) index < editor.text().length
+    else index < editor.text().length && editor.text()[index] != '\n'
   }
 
   override fun isEpsilon(): Boolean {
