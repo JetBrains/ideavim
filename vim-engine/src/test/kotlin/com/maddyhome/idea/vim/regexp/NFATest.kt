@@ -8,26 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp
 
-import com.maddyhome.idea.vim.api.BufferPosition
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.LineDeleteShift
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimCaretListener
-import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimScrollingModel
-import com.maddyhome.idea.vim.api.VimSelectionModel
-import com.maddyhome.idea.vim.api.VimVisualPosition
-import com.maddyhome.idea.vim.api.VirtualFile
-import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.common.ChangesListener
-import com.maddyhome.idea.vim.common.EditorLine
-import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.parser.RegexParser
@@ -313,6 +294,20 @@ class NFATest {
       "acabcdabcacd",
       "\\v((ab=c+)+d)*",
       0 until 12
+    )
+  }
+
+  @Test
+  fun `text sequence of any characters`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      ".*",
+      0 until 128
     )
   }
 
