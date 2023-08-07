@@ -99,4 +99,32 @@ public class VimRegex(pattern: String) {
      */
     return VimMatchResult.Failure
   }
+
+  public fun findAll(
+    editor: VimEditor,
+    startIndex: Int = 0
+  ): Sequence<VimMatchResult.Success> {
+    var index = startIndex
+    val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
+    while (index <= editor.text().length) {
+      val result = nfa.simulate(editor, index)
+      when (result) {
+        /**
+         * A match was found, add it to foundMatches and increment
+         * next index accordingly
+         */
+        is VimMatchResult.Success -> {
+          foundMatches.add(result)
+          if (result.range.isEmpty()) index++
+          else index = result.range.last + 1
+        }
+
+        /**
+         * No match found yet, try searching on next index
+         */
+        is VimMatchResult.Failure -> index++
+      }
+    }
+    return foundMatches.asSequence()
+  }
 }
