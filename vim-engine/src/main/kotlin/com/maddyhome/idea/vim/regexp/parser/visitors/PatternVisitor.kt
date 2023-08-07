@@ -39,11 +39,11 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     val multiVisitor = MultiVisitor()
     val range = multiVisitor.visit(ctx.multi())
 
-    val prefixNFA = NFA.fromEpsilon()
+    val prefixNFA = NFA.fromSingleState()
     for (i in 0 until range.first.i)
       prefixNFA.concatenate(visit(ctx.atom()))
 
-    var suffixNFA = NFA.fromEpsilon()
+    var suffixNFA = NFA.fromSingleState()
     if (range.second is MultiDelimiter.InfiniteMultiDelimiter) suffixNFA = visit(ctx.atom()).closure()
     else {
       for (i in range.first.i until (range.second as MultiDelimiter.IntMultiDelimiter).i) {
@@ -58,13 +58,13 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitGroupingCapture(ctx: RegexParser.GroupingCaptureContext): NFA {
     val groupNumber = groupCount
     groupCount++
-    val nfa = if (ctx.sub_pattern() == null) NFA.fromEpsilon() else visit(ctx.sub_pattern())
+    val nfa = if (ctx.sub_pattern() == null) NFA.fromSingleState() else visit(ctx.sub_pattern())
     nfa.capture(groupNumber)
     return nfa
   }
 
   override fun visitGroupingNoCapture(ctx: RegexParser.GroupingNoCaptureContext): NFA {
-    return if (ctx.sub_pattern() == null) NFA.fromEpsilon()
+    return if (ctx.sub_pattern() == null) NFA.fromSingleState()
     else visit(ctx.sub_pattern())
   }
 
@@ -81,13 +81,13 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return this.foldIndexed(null as NFA?) { index, acc, elem ->
       if (index == 0) elem
       else acc?.unify(elem) ?: elem
-    } ?: NFA.fromEpsilon()
+    } ?: NFA.fromSingleState()
   }
 
   private fun List<NFA>.concatenate(): NFA {
     return this.foldIndexed(null as NFA?) { index, acc, elem ->
       if (index == 0) elem
       else acc?.concatenate(elem) ?: elem
-    } ?: NFA.fromEpsilon()
+    } ?: NFA.fromSingleState()
   }
 }

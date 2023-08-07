@@ -25,7 +25,16 @@ internal class NFAState (
    */
   val transitions: ArrayList<NFATransition> = ArrayList(),
 
+  /**
+   * Stores the numbers of the capture groups that start
+   * being captured on this state
+   */
   val startCapture: MutableList<Int> = ArrayList(),
+
+  /**
+   *  Stores the number of the capture groups that stop
+   *  being captured on this state
+   */
   val endCapture: MutableList<Int> = ArrayList()
 ) {
 

@@ -38,6 +38,7 @@ internal class NFA private constructor(
    * that are accepted by the old NFA followed the other.
    *
    * @param other The NFA to concatenate with
+   *
    * @return The new NFA representing the concatenation
    */
   internal fun concatenate(other: NFA) : NFA {
@@ -54,6 +55,7 @@ internal class NFA private constructor(
    * that are accepted by either the old NFA or the other.
    *
    * @param other The NFA to unify with
+   *
    * @return The new NFA representing the union
    */
   internal fun unify(other: NFA) : NFA {
@@ -75,11 +77,9 @@ internal class NFA private constructor(
   }
 
   /**
-   * Loops the NFA. The NFA must be transversed at least n times
-   * but no more than m. m can be infinite.
+   * Kleene's closure of the NFA. Allows the NFA to "loop" any amount of times.
    *
-   * @param n The lowest amount of times that the NFA must be transversed
-   * @param m The highest amount of times the NFA can be transversed
+   * @return The new NFA representing the closure
    */
   internal fun closure() : NFA {
     val newStart = NFAState(false)
@@ -98,9 +98,12 @@ internal class NFA private constructor(
     return this
   }
 
-  internal fun optional() : NFA {
+  /**
+   * Gives the NFA the choice to jump directly from its start to
+   * accept state, without taking any of the inner transitions.
+   */
+  internal fun optional() {
     startState.addTransition(NFATransition(EpsilonMatcher(), acceptState))
-    return this
   }
 
   /**
@@ -114,6 +117,14 @@ internal class NFA private constructor(
     this.acceptState.endCapture.add(groupNumber)
   }
 
+  /**
+   * Simulates the nfa in depth-first search fashion.
+   *
+   * @param editor       The editor that is used for the simulation
+   * @param startIndex   The index where the simulation should start
+   *
+   * @return The resulting match result
+   */
   internal fun simulate(editor: VimEditor, startIndex: Int = 0) : VimMatchResult {
     groups.groupCount = 0
     if (simulate(editor, startIndex, startState)) {
@@ -131,11 +142,12 @@ internal class NFA private constructor(
   /**
    * Simulates the NFA in a depth-first search fashion.
    *
-   * @param editor       The editor that is used for the simulation
-   * @param currentIndex The current index of the text in the simulation
-   * @param currentState The current NFA state in the simulation
+   * @param editor         The editor that is used for the simulation
+   * @param currentIndex   The current index of the text in the simulation
+   * @param currentState   The current NFA state in the simulation
+   * @param epsilonVisited Records the states that have been visited up to this point without consuming any input
    *
-   * @return The resulting match if it was found, else null
+   * @return True if matching was successful, false otherwise
    */
   private fun simulate(editor: VimEditor, currentIndex : Int = 0, currentState: NFAState = startState, epsilonVisited: HashSet<NFAState> = HashSet()) : Boolean {
     updateCaptureGroups(editor, currentIndex, currentState)
@@ -156,6 +168,13 @@ internal class NFA private constructor(
     return false
   }
 
+  /**
+   * Updates the results of capture groups' matches
+   *
+   * @param editor The editor that is used for the simulation
+   * @param index  The current index of the text in the simulation
+   * @param state  The current state in the simulation
+   */
   private fun updateCaptureGroups(editor: VimEditor, index: Int, state: NFAState) {
     for (groupNumber in state.startCapture) groups.setGroupStart(groupNumber, index)
     for (groupNumber in state.endCapture) groups.setGroupEnd(groupNumber, index, editor.text())
@@ -164,15 +183,14 @@ internal class NFA private constructor(
   internal companion object {
 
     /**
-     * Creates a new instance of a NFA, that has two states
-     * with an epsilon transition from one to the other.
+     * Creates a new instance of a NFA, that has a single
+     * state.
      *
-     * start --ε-> end
-     *
-     * @return The new NFA instance
+     * @return THe new NFA instance
      */
-    internal fun fromEpsilon() : NFA {
-      return fromMatcher(EpsilonMatcher())
+    internal fun fromSingleState() : NFA {
+      val state = NFAState(true)
+      return NFA(state, state)
     }
 
     /**
