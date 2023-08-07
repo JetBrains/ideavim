@@ -22,9 +22,8 @@ internal interface Matcher {
    *
    * @param editor The editor in its current state
    * @param index  The current index in the text of the editor
-   * @param state  The state to get information from
    */
-  fun matches(editor: VimEditor, index : Int, state: NFAState) : Boolean
+  fun matches(editor: VimEditor, index : Int) : Boolean
 
   /**
    * Determines whether the matcher should consume

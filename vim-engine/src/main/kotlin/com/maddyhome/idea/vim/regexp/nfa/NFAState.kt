@@ -23,9 +23,7 @@ internal class NFAState (
    * indexes. This is relevant for the implementation of
    * lazy quantifiers.
    */
-  var transitions: ArrayList<NFATransition> = ArrayList(),
-
-  var i: Int = 0,
+  val transitions: ArrayList<NFATransition> = ArrayList(),
 
   val startCapture: MutableList<Int> = ArrayList(),
   val endCapture: MutableList<Int> = ArrayList()

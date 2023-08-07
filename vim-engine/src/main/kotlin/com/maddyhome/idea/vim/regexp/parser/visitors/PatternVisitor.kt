@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
+import com.maddyhome.idea.vim.regexp.nfa.MultiDelimiter
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
@@ -33,13 +34,25 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitPiece(ctx: RegexParser.PieceContext): NFA {
-    val nfa = visit(ctx.atom())
-    if (ctx.multi() == null) return nfa
+    if (ctx.multi() == null) return visit(ctx.atom())
 
     val multiVisitor = MultiVisitor()
     val range = multiVisitor.visit(ctx.multi())
 
-    return nfa.loop(range.first, range.second)
+    val prefixNFA = NFA.fromEpsilon()
+    for (i in 0 until range.first.i)
+      prefixNFA.concatenate(visit(ctx.atom()))
+
+    var suffixNFA = NFA.fromEpsilon()
+    if (range.second is MultiDelimiter.InfiniteMultiDelimiter) suffixNFA = visit(ctx.atom()).closure()
+    else {
+      for (i in range.first.i until (range.second as MultiDelimiter.IntMultiDelimiter).i) {
+        suffixNFA.concatenate(visit(ctx.atom()))
+        suffixNFA.optional()
+      }
+    }
+
+    return prefixNFA.concatenate(suffixNFA)
   }
 
   override fun visitGroupingCapture(ctx: RegexParser.GroupingCaptureContext): NFA {
