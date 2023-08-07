@@ -8,9 +8,13 @@
 
 package com.maddyhome.idea.vim.regexp
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
+import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
@@ -129,7 +133,17 @@ class VimRegexTest {
     )
   }
 
-  private fun buildEditor(text: CharSequence) : VimEditor {
-    return VimEditorMock(text)
+  private fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
+    val editorMock = Mockito.mock<VimEditor>()
+    whenever(editorMock.text()).thenReturn(text)
+
+    val trueCarets = ArrayList<VimCaret>()
+    for (caret in carets) {
+      val caretMock = Mockito.mock<VimCaret>()
+      whenever(caretMock.offset).thenReturn(Offset(caret))
+      trueCarets.add(caretMock)
+    }
+    whenever(editorMock.carets()).thenReturn(trueCarets)
+    return editorMock
   }
 }
