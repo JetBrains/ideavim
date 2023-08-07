@@ -46,4 +46,8 @@ internal class NFATransition(
   fun consumes() : Int {
     return if (matcher.isEpsilon()) 0 else 1
   }
+
+  fun isEpsilon() : Boolean {
+    return consumes() == 0
+  }
 }
