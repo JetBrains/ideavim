@@ -100,6 +100,13 @@ public class VimRegex(pattern: String) {
     return VimMatchResult.Failure
   }
 
+  /**
+   * Returns a sequence of all occurrences of a regular expression within
+   * the editor, beginning at the specified index
+   *
+   * @param editor     The editor where to look for the match in
+   * @param startIndex The index to start the find
+   */
   public fun findAll(
     editor: VimEditor,
     startIndex: Int = 0
@@ -120,7 +127,7 @@ public class VimRegex(pattern: String) {
         }
 
         /**
-         * No match found yet, try searching on next index
+         * No match found starting on this index, try searching on next index
          */
         is VimMatchResult.Failure -> index++
       }
