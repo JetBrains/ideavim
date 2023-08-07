@@ -364,6 +364,9 @@ is the full list of synonyms.
 
 - Vim script doesn't skip white space before comma. `F(a ,b)` => E475.
 
+- Fancy constants for [undolevels](https://vimhelp.org/options.txt.html#%27undolevels%27):
+  > The local value is set to -123456 when the global value is to be used.
+
 License
 -------
 
