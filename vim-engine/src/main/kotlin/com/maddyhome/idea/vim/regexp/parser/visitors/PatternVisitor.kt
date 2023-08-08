@@ -297,6 +297,46 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     )
   }
 
+  override fun visitCollectionPos(ctx: RegexParser.CollectionPosContext): NFA {
+    return visitCollection(ctx.collection_elems, false)
+  }
+
+  override fun visitCollectionNeg(ctx: RegexParser.CollectionNegContext): NFA {
+    return visitCollection(ctx.collection_elems, true)
+  }
+
+  private fun visitCollection(collectionElements: List<RegexParser.Collection_elemContext>, isNegated: Boolean) : NFA {
+    val individualChars: ArrayList<Char> = ArrayList()
+    val ranges: ArrayList<CollectionRange> = ArrayList()
+    val collectionElementVisitor = CollectionElementVisitor()
+
+    for (elem in collectionElements) {
+      val element = collectionElementVisitor.visit(elem)
+      when (element) {
+        is CollectionElement.SingleCharacter -> individualChars.add(element.char)
+        is CollectionElement.CharacterRange -> ranges.add(CollectionRange(element.start, element.end))
+      }
+    }
+
+    /**
+     * If the collection is empty, match literally with '[]', or '[^]' if negated
+     */
+    if (individualChars.isEmpty() && ranges.isEmpty())
+      return if (isNegated) NFA.fromMatcher(CharacterMatcher('['))
+        .concatenate(NFA.fromMatcher(CharacterMatcher('^')))
+        .concatenate(NFA.fromMatcher(CharacterMatcher(']')))
+      else NFA.fromMatcher(CharacterMatcher('['))
+        .concatenate(NFA.fromMatcher(CharacterMatcher(']')))
+
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        individualChars,
+        ranges,
+        isNegated
+      )
+    )
+  }
+
   private fun cleanLiteralChar(str : String) : Char {
     return if (str.length == 2 && str[0] == '\\') str[1]
     else str[0]

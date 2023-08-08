@@ -132,12 +132,12 @@ char_class : CLASS_IDENTIFIER   #Identifier
  * "[0-9]" matches any digit from 0 to 9;
  * "[a-zA-Z]" matches any alphabetic character.
  */
-collection : COLLECTION_START CARET collection_elem* COLLECTION_END #CollectionNeg
-           | COLLECTION_START collection_elem* COLLECTION_END       #CollectionPos
+collection : COLLECTION_START CARET collection_elems+=collection_elem* COLLECTION_END #CollectionNeg
+           | COLLECTION_START collection_elems+=collection_elem* COLLECTION_END       #CollectionPos
            ;
 
-collection_elem : (COLLECTION_LITERAL_CHAR | DASH | CARET) DASH (COLLECTION_LITERAL_CHAR | DASH | CARET) #RangeColElem
-                | (COLLECTION_LITERAL_CHAR | DASH | CARET)                                               #SingleColElem
+collection_elem : start=(COLLECTION_LITERAL_CHAR | DASH | CARET) DASH end=(COLLECTION_LITERAL_CHAR | DASH | CARET) #RangeColElem
+                | (COLLECTION_LITERAL_CHAR | DASH | CARET)                                                         #SingleColElem
                 ;
 
 /**
