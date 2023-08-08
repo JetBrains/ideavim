@@ -359,6 +359,82 @@ class NFATest {
   }
 
   @Test
+  fun `test words separated by spaces`() {
+    assertCorrectRange(
+      "Lorem   \t   Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\v\\w+\\s+\\w+",
+      0 until 17
+    )
+  }
+
+  @Test
+  fun `test date format 1`() {
+    assertCorrectRange(
+      "08-08-2023",
+      "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
+      0 until 10
+    )
+  }
+
+  @Test
+  fun `test date format 2`() {
+    assertCorrectRange(
+      "08/08/2023",
+      "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
+      0 until 10
+    )
+  }
+
+  @Test
+  fun `test date format 3`() {
+    assertCorrectRange(
+      "08/08/23",
+      "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
+      0 until 8
+    )
+  }
+
+  @Test
+  fun `test hexadecimal number 1`() {
+    assertCorrectRange(
+      "0x193ab3f is a hexadecimal number",
+      "\\v%(0x)?\\x+",
+      0 until 9
+    )
+  }
+
+  @Test
+  fun `test hexadecimal number 2`() {
+    assertCorrectRange(
+      "abcdef23901a is also a hexadecimal number",
+      "\\v%(0x)?\\x+",
+      0 until 12
+    )
+  }
+
+  @Test
+  fun `test name surname`() {
+    assertCorrectRange(
+      "Emanuel Gestosa",
+      "\\v\\u\\l+\\s+\\u\\l+",
+      0 until 15
+    )
+  }
+
+  @Test
+  fun `test name surname invalid`() {
+    assertFailure(
+      "EmaNuel Gestosa",
+      "\\v\\u\\l+\\s+\\u\\l+"
+    )
+  }
+
+  @Test
   fun `test sequence of digits`() {
     assertCorrectRange(
       "45135abc235",

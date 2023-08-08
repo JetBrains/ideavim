@@ -28,8 +28,8 @@ internal class CollectionMatcher(
   }
 }
 
-internal data class CollectionRange(val start: Int, val end: Int) {
+internal data class CollectionRange(val start: Char, val end: Char) {
   internal fun inRange(char: Char) : Boolean {
-    return char.code in start..end
+    return char.code in start.code..end.code
   }
 }
