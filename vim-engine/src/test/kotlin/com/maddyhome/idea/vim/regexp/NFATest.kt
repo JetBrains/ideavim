@@ -506,6 +506,15 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test collection backslash and a`() {
+    assertCorrectRange(
+      "\\aa\\bc",
+      "[\\a]\\+",
+      0 until 4
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
