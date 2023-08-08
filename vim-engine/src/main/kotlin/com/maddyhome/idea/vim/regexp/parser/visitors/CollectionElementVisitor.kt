@@ -21,8 +21,9 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<CollectionEleme
     return CollectionElement.CharacterRange(cleanLiteralChar(ctx.start.text), cleanLiteralChar(ctx.end.text))
   }
 
-  private fun cleanLiteralChar(str : String) : Char {
-    return if (str.length == 2 && str[0] == '\\') str[1]
+  private fun cleanLiteralChar(str: String) : Char {
+    return if (str.length > 2 && str[0] == '\\' && str[1] == 'u') Char(str.substring(2).toInt(16))
+    else if (str.length == 2 && str[0] == '\\') str[1]
     else str[0]
   }
 }

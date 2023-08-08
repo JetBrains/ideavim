@@ -515,6 +515,24 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test collection unicode a to unicode z`() {
+    assertCorrectRange(
+      "abcdf123",
+      "[\\u61-\\u007a]\\+",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test collection backslash, u and z`() {
+    assertCorrectRange(
+      "uz\\zuabc",
+      "[\\uz]\\+",
+      0 until 5
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
