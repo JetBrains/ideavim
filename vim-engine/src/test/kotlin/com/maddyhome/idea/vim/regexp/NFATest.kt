@@ -452,6 +452,60 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test empty collection`() {
+    assertCorrectRange(
+      "[]abc",
+      "[]",
+      0 until 2
+    )
+  }
+
+  @Test
+  fun `test empty negated collection`() {
+    assertCorrectRange(
+      "[^]abc",
+      "[^]",
+      0 until 3
+    )
+  }
+
+  @Test
+  fun `test collection a to z and 0`() {
+    assertCorrectRange(
+      "abcd0efg1hij",
+      "[a-z0]\\+",
+      0 until 8
+    )
+  }
+
+  @Test
+  fun `test collection a to z and 0 negated`() {
+    assertCorrectRange(
+      "ABCD0EFG1HIJ",
+      "[^a-z0]\\+",
+      0 until 4
+    )
+  }
+
+  @Test
+  fun `test collection dash and a to z`() {
+    assertCorrectRange(
+      "a-b-c-d_f-g",
+      "[-a-z]\\+",
+      0 until 7
+    )
+  }
+
+  @Test
+  fun `test collection a, dash and z`() {
+    assertCorrectRange(
+      "az-e",
+      "[a\\-z]\\+",
+      0 until 3
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
