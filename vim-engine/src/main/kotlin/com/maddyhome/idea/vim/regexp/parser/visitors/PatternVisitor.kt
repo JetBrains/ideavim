@@ -88,10 +88,27 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(CursorMatcher())
   }
 
+  override fun visitWhitespace(ctx: RegexParser.WhitespaceContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        listOf(' ', '\t')
+      )
+    )
+  }
+
+  override fun visitNotWhitespace(ctx: RegexParser.NotWhitespaceContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        listOf(' ', '\t'),
+        isNegated = true
+      )
+    )
+  }
+
   override fun visitDigit(ctx: RegexParser.DigitContext?): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        ranges = listOf(CollectionRange('0'.code, '9'.code))
+        ranges = listOf(CollectionRange('0', '9'))
       )
     )
   }
@@ -99,9 +116,184 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitNotDigit(ctx: RegexParser.NotDigitContext?): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        ranges = listOf(CollectionRange('0'.code, '9'.code)),
+        ranges = listOf(CollectionRange('0', '9')),
         isNegated = true
       )
+    )
+  }
+
+  override fun visitHex(ctx: RegexParser.HexContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(
+          CollectionRange('0', '9'),
+          CollectionRange('A', 'F'),
+          CollectionRange('a', 'f'),
+        )
+      )
+    )
+  }
+
+  override fun visitNotHex(ctx: RegexParser.NotHexContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(
+          CollectionRange('0', '9'),
+          CollectionRange('A', 'F'),
+          CollectionRange('a', 'f'),
+        ),
+        isNegated = true
+      )
+    )
+  }
+
+  override fun visitOctal(ctx: RegexParser.OctalContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('0', '7'))
+      )
+    )
+  }
+
+  override fun visitNotOctal(ctx: RegexParser.NotOctalContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('0', '7')),
+        isNegated = true
+      )
+    )
+  }
+
+  override fun visitWordchar(ctx: RegexParser.WordcharContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        chars = listOf('_'),
+        ranges = listOf(
+          CollectionRange('0', '9'),
+          CollectionRange('A', 'Z'),
+          CollectionRange('a', 'z'),
+        )
+      )
+    )
+  }
+
+  override fun visitNotwordchar(ctx: RegexParser.NotwordcharContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        chars = listOf('_'),
+        ranges = listOf(
+          CollectionRange('0', '9'),
+          CollectionRange('A', 'Z'),
+          CollectionRange('a', 'z'),
+        ),
+        isNegated = true
+      )
+    )
+  }
+
+  override fun visitHeadofword(ctx: RegexParser.HeadofwordContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        chars = listOf('_'),
+        ranges = listOf(
+          CollectionRange('A', 'Z'),
+          CollectionRange('a', 'z'),
+        )
+      )
+    )
+  }
+
+  override fun visitNotHeadOfWord(ctx: RegexParser.NotHeadOfWordContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        chars = listOf('_'),
+        ranges = listOf(
+          CollectionRange('A', 'Z'),
+          CollectionRange('a', 'z'),
+        ),
+        isNegated = true
+      )
+    )
+  }
+
+  override fun visitAlpha(ctx: RegexParser.AlphaContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(
+          CollectionRange('A', 'Z'),
+          CollectionRange('a', 'z'),
+        )
+      )
+    )
+  }
+
+  override fun visitNotAlpha(ctx: RegexParser.NotAlphaContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(
+          CollectionRange('A', 'Z'),
+          CollectionRange('a', 'z'),
+        ),
+        isNegated = true
+      )
+    )
+  }
+
+  override fun visitLcase(ctx: RegexParser.LcaseContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('a', 'z'))
+      )
+    )
+  }
+
+  override fun visitNotLcase(ctx: RegexParser.NotLcaseContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('a', 'z')),
+        isNegated = true
+      )
+    )
+  }
+
+  override fun visitUcase(ctx: RegexParser.UcaseContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('A', 'Z'))
+      )
+    )
+  }
+
+  override fun visitNotUcase(ctx: RegexParser.NotUcaseContext?): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('A', 'Z')),
+        isNegated = true
+      )
+    )
+  }
+
+  override fun visitEsc(ctx: RegexParser.EscContext?): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher('')
+    )
+  }
+
+  override fun visitTab(ctx: RegexParser.TabContext?): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher('\t')
+    )
+  }
+
+  override fun visitCR(ctx: RegexParser.CRContext?): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher('\r')
+    )
+  }
+
+  override fun visitNL(ctx: RegexParser.NLContext?): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher('\n')
     )
   }
 
