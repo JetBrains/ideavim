@@ -14,12 +14,12 @@ import com.maddyhome.idea.vim.api.VimEditor
  * Matcher that matches with any character
  */
 internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
-  override fun matches(editor: VimEditor, index: Int): Boolean {
-    return if (includeNewLine) index < editor.text().length
-    else index < editor.text().length && editor.text()[index] != '\n'
-  }
-
-  override fun isEpsilon(): Boolean {
-    return false
+  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+    return if (includeNewLine)
+      if (index < editor.text().length) MatcherResult.Success(1)
+      else MatcherResult.Failure
+    else
+      if (index < editor.text().length && editor.text()[index] != '\n') MatcherResult.Success(1)
+      else MatcherResult.Failure
   }
 }

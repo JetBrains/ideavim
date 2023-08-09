@@ -15,16 +15,13 @@ internal class CollectionMatcher(
   private val ranges: List<CollectionRange> = emptyList(),
   private val isNegated: Boolean = false
 ) : Matcher {
-  override fun matches(editor: VimEditor, index: Int): Boolean {
-    if (index >= editor.text().length) return false
+  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+    if (index >= editor.text().length) return MatcherResult.Failure
 
     val char = editor.text()[index]
-    val result = chars.contains(char) || ranges.any { it.inRange(char) }
-    return if (isNegated) !result else result
-  }
-
-  override fun isEpsilon(): Boolean {
-    return false
+    val result = (chars.contains(char) || ranges.any { it.inRange(char) }) == !isNegated
+    return if (result) MatcherResult.Success(1)
+    else MatcherResult.Failure
   }
 }
 

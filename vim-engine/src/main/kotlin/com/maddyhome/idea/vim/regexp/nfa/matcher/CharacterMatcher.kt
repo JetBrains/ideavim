@@ -14,12 +14,8 @@ import com.maddyhome.idea.vim.api.VimEditor
  * Matcher used to match against single characters
  */
 internal class CharacterMatcher(val char: Char) : Matcher {
-  override fun matches(editor: VimEditor, index: Int): Boolean {
-    return index < editor.text().length && editor.text()[index] == char
+  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+    return if (index < editor.text().length && editor.text()[index] == char) MatcherResult.Success(1)
+    else MatcherResult.Failure
   }
-
-  override fun isEpsilon(): Boolean {
-    return false
-  }
-
 }

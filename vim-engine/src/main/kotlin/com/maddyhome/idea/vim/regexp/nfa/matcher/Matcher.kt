@@ -22,11 +22,5 @@ internal interface Matcher {
    * @param editor The editor in its current state
    * @param index  The current index in the text of the editor
    */
-  fun matches(editor: VimEditor, index : Int) : Boolean
-
-  /**
-   * Determines whether the matcher should consume
-   * the character that is next in the input.
-   */
-  fun isEpsilon() : Boolean
+  fun matches(editor: VimEditor, index : Int): MatcherResult
 }
