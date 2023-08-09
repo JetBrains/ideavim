@@ -89,101 +89,137 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(CursorMatcher())
   }
 
-  override fun visitIdentifier(ctx: RegexParser.IdentifierContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> char.isJavaIdentifierPart() }
-    )
-  }
-
-  override fun visitIdentifierNotDigit(ctx: RegexParser.IdentifierNotDigitContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> !char.isDigit() && char.isJavaIdentifierPart() }
-    )
-  }
-
-  override fun visitKeyword(ctx: RegexParser.KeywordContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> char.isLetterOrDigit() || char == '_' }
-    )
-  }
-
-  override fun visitKeywordNotDigit(ctx: RegexParser.KeywordNotDigitContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> char.isLetter() || char == '_' }
-    )
-  }
-
-  override fun visitFilename(ctx: RegexParser.FilenameContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> char.isLetterOrDigit() || "_/.-+,#$%~=".contains(char) }
-    )
-  }
-
-  override fun visitFilenameNotDigit(ctx: RegexParser.FilenameNotDigitContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> char.isLetter() || "_/.-+,#$%~=".contains(char) }
-    )
-  }
-
-  override fun visitPrintable(ctx: RegexParser.PrintableContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> !char.isISOControl() }
-    )
-  }
-
-  override fun visitPrintableNotDigit(ctx: RegexParser.PrintableNotDigitContext?): NFA {
-    return NFA.fromMatcher(
-      PredicateMatcher { char -> !char.isDigit() && !char.isISOControl() }
-    )
-  }
-
-  override fun visitWhitespace(ctx: RegexParser.WhitespaceContext?): NFA {
-    return NFA.fromMatcher(
-      CollectionMatcher(
-        listOf(' ', '\t')
+  override fun visitIdentifier(ctx: RegexParser.IdentifierContext): NFA {
+    val base = { char: Char -> char.isJavaIdentifierPart() }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
       )
-    )
-  }
-
-  override fun visitNotWhitespace(ctx: RegexParser.NotWhitespaceContext?): NFA {
-    return NFA.fromMatcher(
-      CollectionMatcher(
-        listOf(' ', '\t'),
-        isNegated = true
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
       )
-    )
   }
 
-  override fun visitDigit(ctx: RegexParser.DigitContext?): NFA {
-    return NFA.fromMatcher(
-      CollectionMatcher(
-        ranges = listOf(CollectionRange('0', '9'))
+  override fun visitIdentifierNotDigit(ctx: RegexParser.IdentifierNotDigitContext): NFA {
+    val base = { char: Char -> !char.isDigit() && char.isJavaIdentifierPart() }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
       )
-    )
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
+      )
   }
 
-  override fun visitNotDigit(ctx: RegexParser.NotDigitContext?): NFA {
+  override fun visitKeyword(ctx: RegexParser.KeywordContext): NFA {
+    val base = { char: Char -> char.isLetterOrDigit() || char == '_' }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
+      )
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
+      )
+  }
+
+  override fun visitKeywordNotDigit(ctx: RegexParser.KeywordNotDigitContext): NFA {
+    val base = { char: Char -> char.isLetter() || char == '_' }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
+      )
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
+      )
+  }
+
+  override fun visitFilename(ctx: RegexParser.FilenameContext): NFA {
+    val base = { char: Char -> char.isLetterOrDigit() || "_/.-+,#$%~=".contains(char) }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
+      )
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
+      )
+  }
+
+  override fun visitFilenameNotDigit(ctx: RegexParser.FilenameNotDigitContext): NFA {
+    val base = { char: Char -> char.isLetter() || "_/.-+,#$%~=".contains(char) }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
+      )
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
+      )
+  }
+
+  override fun visitPrintable(ctx: RegexParser.PrintableContext): NFA {
+    val base = { char: Char -> !char.isISOControl() }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
+      )
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
+      )
+  }
+
+  override fun visitPrintableNotDigit(ctx: RegexParser.PrintableNotDigitContext): NFA {
+    val base = { char: Char -> !char.isDigit() && !char.isISOControl() }
+    return if (ctx.text.contains('_'))
+      NFA.fromMatcher(
+        PredicateMatcher { char -> char == '\n' || base(char) }
+      )
+    else
+      NFA.fromMatcher(
+        PredicateMatcher { char -> base(char) }
+      )
+  }
+
+  override fun visitWhitespace(ctx: RegexParser.WhitespaceContext): NFA {
+    return NFA.fromMatcher(CollectionMatcher(
+      listOf(' ', '\t'),
+      includesEOL = ctx.text.contains('_')
+    ))
+  }
+
+  override fun visitNotWhitespace(ctx: RegexParser.NotWhitespaceContext): NFA {
+    return NFA.fromMatcher(CollectionMatcher(
+      listOf(' ', '\t'),
+      isNegated = true,
+      includesEOL = ctx.text.contains('_')
+    ))
+  }
+
+  override fun visitDigit(ctx: RegexParser.DigitContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('0', '9')),
-        isNegated = true
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitHex(ctx: RegexParser.HexContext?): NFA {
+  override fun visitNotDigit(ctx: RegexParser.NotDigitContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        ranges = listOf(
-          CollectionRange('0', '9'),
-          CollectionRange('A', 'F'),
-          CollectionRange('a', 'f'),
-        )
+        ranges = listOf(CollectionRange('0', '9')),
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitNotHex(ctx: RegexParser.NotHexContext?): NFA {
+  override fun visitHex(ctx: RegexParser.HexContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(
@@ -191,29 +227,45 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('A', 'F'),
           CollectionRange('a', 'f'),
         ),
-        isNegated = true
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitOctal(ctx: RegexParser.OctalContext?): NFA {
+  override fun visitNotHex(ctx: RegexParser.NotHexContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        ranges = listOf(CollectionRange('0', '7'))
+        ranges = listOf(
+          CollectionRange('0', '9'),
+          CollectionRange('A', 'F'),
+          CollectionRange('a', 'f'),
+        ),
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitNotOctal(ctx: RegexParser.NotOctalContext?): NFA {
+  override fun visitOctal(ctx: RegexParser.OctalContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('0', '7')),
-        isNegated = true
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitWordchar(ctx: RegexParser.WordcharContext?): NFA {
+  override fun visitNotOctal(ctx: RegexParser.NotOctalContext): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('0', '7')),
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
+      )
+    )
+  }
+
+  override fun visitWordchar(ctx: RegexParser.WordcharContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         chars = listOf('_'),
@@ -221,12 +273,13 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('0', '9'),
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
-        )
+        ),
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitNotwordchar(ctx: RegexParser.NotwordcharContext?): NFA {
+  override fun visitNotwordchar(ctx: RegexParser.NotwordcharContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         chars = listOf('_'),
@@ -235,24 +288,13 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
         ),
-        isNegated = true
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitHeadofword(ctx: RegexParser.HeadofwordContext?): NFA {
-    return NFA.fromMatcher(
-      CollectionMatcher(
-        chars = listOf('_'),
-        ranges = listOf(
-          CollectionRange('A', 'Z'),
-          CollectionRange('a', 'z'),
-        )
-      )
-    )
-  }
-
-  override fun visitNotHeadOfWord(ctx: RegexParser.NotHeadOfWordContext?): NFA {
+  override fun visitHeadofword(ctx: RegexParser.HeadofwordContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         chars = listOf('_'),
@@ -260,64 +302,84 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
         ),
-        isNegated = true
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitAlpha(ctx: RegexParser.AlphaContext?): NFA {
+  override fun visitNotHeadOfWord(ctx: RegexParser.NotHeadOfWordContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
+        chars = listOf('_'),
         ranges = listOf(
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
-        )
+        ),
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitNotAlpha(ctx: RegexParser.NotAlphaContext?): NFA {
+  override fun visitAlpha(ctx: RegexParser.AlphaContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
         ),
-        isNegated = true
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitLcase(ctx: RegexParser.LcaseContext?): NFA {
+  override fun visitNotAlpha(ctx: RegexParser.NotAlphaContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        ranges = listOf(CollectionRange('a', 'z'))
+        ranges = listOf(
+          CollectionRange('A', 'Z'),
+          CollectionRange('a', 'z'),
+        ),
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitNotLcase(ctx: RegexParser.NotLcaseContext?): NFA {
+  override fun visitLcase(ctx: RegexParser.LcaseContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('a', 'z')),
-        isNegated = true
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitUcase(ctx: RegexParser.UcaseContext?): NFA {
+  override fun visitNotLcase(ctx: RegexParser.NotLcaseContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        ranges = listOf(CollectionRange('A', 'Z'))
+        ranges = listOf(CollectionRange('a', 'z')),
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
 
-  override fun visitNotUcase(ctx: RegexParser.NotUcaseContext?): NFA {
+  override fun visitUcase(ctx: RegexParser.UcaseContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('A', 'Z')),
-        isNegated = true
+        includesEOL = ctx.text.contains('_')
+      )
+    )
+  }
+
+  override fun visitNotUcase(ctx: RegexParser.NotUcaseContext): NFA {
+    return NFA.fromMatcher(
+      CollectionMatcher(
+        ranges = listOf(CollectionRange('A', 'Z')),
+        isNegated = true,
+        includesEOL = ctx.text.contains('_')
       )
     )
   }
