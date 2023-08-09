@@ -18,9 +18,6 @@ public interface VimscriptExecutor {
 
   public fun execute(script: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean = true, vimContext: VimLContext? = null): ExecutionResult
 
-  // TODO: Remove this? Only used by tests, and should have proper editor context
-  public fun execute(script: String, skipHistory: Boolean = true)
-
   public fun executeFile(file: File, editor: VimEditor, indicateErrors: Boolean = false)
 
   public fun executeLastCommand(editor: VimEditor, context: ExecutionContext): Boolean

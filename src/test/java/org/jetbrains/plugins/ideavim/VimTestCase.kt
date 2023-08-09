@@ -15,6 +15,7 @@ import com.intellij.json.JsonFileType
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
@@ -49,7 +50,6 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
@@ -60,8 +60,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
-import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -74,7 +72,11 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.assertj.core.api.Assertions
@@ -364,6 +366,19 @@ abstract class VimTestCase {
       fixture.editor.document.setText(text)
     }
   }
+
+  protected fun executeVimscript(script: String, skipHistory: Boolean = true) {
+    val context = DataContext.EMPTY_CONTEXT.vim
+    injector.vimscriptExecutor.execute(
+      script,
+      fixture.editor.vim,
+      context,
+      skipHistory,
+      indicateErrors = true,
+      CommandLineVimLContext
+    )
+  }
+
 
   /**
    * Gets an accessor for effective option value

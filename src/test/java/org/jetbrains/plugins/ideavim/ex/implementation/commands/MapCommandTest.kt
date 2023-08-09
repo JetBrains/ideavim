@@ -284,7 +284,7 @@ n  ,f            <Plug>Foo
   @Test
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
-    injector.vimscriptExecutor.execute("inoremap # X\u0008#\n")
+    executeVimscript("inoremap # X\u0008#\n")
     typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
     assertState("#\n")
     assertMode(Mode.NORMAL())
@@ -303,7 +303,7 @@ n  ,f            <Plug>Foo
   
       """.trimIndent(),
     )
-    injector.vimscriptExecutor.execute("map \u0018i dd\n", true)
+    executeVimscript("map \u0018i dd\n", true)
     typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
     assertState(
       """
@@ -324,7 +324,7 @@ n  ,f            <Plug>Foo
   @Test
   fun testBarCtrlVEscaped() {
     configureByText("${c}foo\n")
-    injector.vimscriptExecutor.execute("imap a b \u0016|\u0016| c |\n")
+    executeVimscript("imap a b \u0016|\u0016| c |\n")
     typeText(injector.parser.parseKeys("ia"))
     assertState("b || c foo\n")
   }
@@ -334,7 +334,7 @@ n  ,f            <Plug>Foo
   @Test
   fun testCtrlMCtrlLAsNewLine() {
     configureByText("${c}foo\n")
-    injector.vimscriptExecutor.execute("map A :%s/foo/bar/g\r\u000C\n")
+    executeVimscript("map A :%s/foo/bar/g\r\u000C\n")
     typeText(injector.parser.parseKeys("A"))
     assertState("bar\n")
   }
@@ -353,7 +353,7 @@ n  ,f            <Plug>Foo
   @Test
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
-    injector.vimscriptExecutor.execute("map 0 ^")
+    executeVimscript("map 0 ^")
     typeText(injector.parser.parseKeys("10~"))
     assertState("aBCDEFGHIJKlmnop\n")
   }

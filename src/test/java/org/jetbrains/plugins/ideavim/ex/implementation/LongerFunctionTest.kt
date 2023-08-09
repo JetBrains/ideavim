@@ -122,7 +122,7 @@ class LongerFunctionTest : VimTestCase() {
       const val ${c}VERY_IMPORTANT_VALUE = 42
       """.trimIndent(),
     )
-    injector.vimscriptExecutor.execute(script)
+    executeVimscript(script)
     typeText(injector.parser.parseKeys("veu"))
     assertState(
       """
@@ -138,7 +138,7 @@ class LongerFunctionTest : VimTestCase() {
       val ${c}myCamelCaseValue = "Hi, I'm a simple value"
       """.trimIndent(),
     )
-    injector.vimscriptExecutor.execute(script)
+    executeVimscript(script)
     typeText(injector.parser.parseKeys("veU"))
     assertState(
       """
@@ -154,7 +154,7 @@ class LongerFunctionTest : VimTestCase() {
       val myValue = t${c}rue
       """,
     )
-    injector.vimscriptExecutor.execute(invert)
+    executeVimscript(invert)
     typeText("!")
     assertState(
       """
@@ -170,7 +170,7 @@ class LongerFunctionTest : VimTestCase() {
       val my${c}StartOffset = 10
       """,
     )
-    injector.vimscriptExecutor.execute(invert)
+    executeVimscript(invert)
     typeText("vtO!")
     assertState(
       """

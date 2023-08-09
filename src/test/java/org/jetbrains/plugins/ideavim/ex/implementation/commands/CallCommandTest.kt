@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -26,7 +25,7 @@ class CallCommandTest : VimTestCase() {
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
     """.trimIndent())
-    injector.vimscriptExecutor.execute(function)
+    executeVimscript(function)
 
     enterCommand("call DeleteLine()")
 

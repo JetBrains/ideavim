@@ -8,10 +8,9 @@
 package org.jetbrains.plugins.ideavim.extension.argtextobj
 
 import com.google.common.collect.Lists
-import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,11 +23,12 @@ class VimArgTextObjExtensionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
+    configureByText("\n")
     enableExtensions("argtextobj")
   }
 
   private fun setArgTextObjPairsVariable(value: String) {
-    injector.vimscriptExecutor.execute("let argtextobj_pairs='$value'", true)
+    executeVimscript("let argtextobj_pairs='$value'", true)
   }
 
   @Test

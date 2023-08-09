@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.vimscript
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -30,7 +29,6 @@ import com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import java.io.File
 import java.io.IOException
-import javax.swing.JTextArea
 
 @Service
 internal class Executor : VimScriptExecutorBase() {
@@ -85,13 +83,6 @@ internal class Executor : VimScriptExecutorBase() {
       }
     }
     return finalResult
-  }
-
-  // TODO: Remove this? Only used by tests, and should have proper editor context
-  override fun execute(script: String, skipHistory: Boolean) {
-    val editor = TextComponentEditorImpl(null, JTextArea()).vim
-    val context = DataContext.EMPTY_CONTEXT.vim
-    execute(script, editor, context, skipHistory, indicateErrors = true, CommandLineVimLContext)
   }
 
   override fun executeFile(file: File, editor: VimEditor, indicateErrors: Boolean) {
