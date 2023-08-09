@@ -44,13 +44,13 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     val range = multiVisitor.visit(ctx.multi())
 
     val prefixNFA = NFA.fromSingleState()
-    for (i in 0 until range.first.i)
+    for (i in 0 until range.lowerBoundary.i)
       prefixNFA.concatenate(visit(ctx.atom()))
 
     var suffixNFA = NFA.fromSingleState()
-    if (range.second is MultiDelimiter.InfiniteMultiDelimiter) suffixNFA = visit(ctx.atom()).closure()
+    if (range.upperBoundary is MultiBoundary.InfiniteMultiBoundary) suffixNFA = visit(ctx.atom()).closure()
     else {
-      for (i in range.first.i until (range.second as MultiDelimiter.IntMultiDelimiter).i) {
+      for (i in range.lowerBoundary.i until (range.upperBoundary as MultiBoundary.IntMultiBoundary).i) {
         suffixNFA.concatenate(visit(ctx.atom()))
         suffixNFA.optional()
       }

@@ -39,6 +39,11 @@ class RegexParserTest {
   }
 
   @Test
+  fun `range lazy`() {
+    assertSuccess("\\{-,5}", RANGE)
+  }
+
+  @Test
   fun `range missing right bracket`() {
     assertFailure("\\{5", RANGE)
   }
@@ -56,6 +61,11 @@ class RegexParserTest {
   @Test
   fun `range non integer bound`() {
     assertFailure("\\{2,g}", RANGE)
+  }
+
+  @Test
+  fun `range lazy with extra dash`() {
+    assertFailure("\\{--2,5}", RANGE)
   }
 
   @Test

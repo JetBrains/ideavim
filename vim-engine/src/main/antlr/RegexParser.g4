@@ -71,7 +71,8 @@ multi : STAR     #ZeroOrMore
  * "a\{4}" matches a sequence of exactly 4 "a" characters;
  * "a\{}" matches any sequence of "a" characters.
  */
-range : RANGE_START lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END
+range : RANGE_START lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END      #RangeGreedy
+      | RANGE_START_LAZY lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END #RangeLazy
       ;
 
 /**

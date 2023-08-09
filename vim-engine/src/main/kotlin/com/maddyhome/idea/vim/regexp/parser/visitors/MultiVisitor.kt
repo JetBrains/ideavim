@@ -10,26 +10,36 @@ package com.maddyhome.idea.vim.regexp.parser.visitors
 
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
+import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.tree.TerminalNode
 
-internal class MultiVisitor : RegexParserBaseVisitor<Pair<MultiDelimiter.IntMultiDelimiter, MultiDelimiter>>() {
+internal class MultiVisitor : RegexParserBaseVisitor<MultiDelimiter>() {
 
-  override fun visitZeroOrMore(ctx: RegexParser.ZeroOrMoreContext): Pair<MultiDelimiter.IntMultiDelimiter, MultiDelimiter> {
-    return Pair(MultiDelimiter.IntMultiDelimiter(0), MultiDelimiter.InfiniteMultiDelimiter)
+  override fun visitZeroOrMore(ctx: RegexParser.ZeroOrMoreContext): MultiDelimiter {
+    return MultiDelimiter(MultiBoundary.IntMultiBoundary(0), MultiBoundary.InfiniteMultiBoundary, true)
   }
 
-  override fun visitOneOrMore(ctx: RegexParser.OneOrMoreContext): Pair<MultiDelimiter.IntMultiDelimiter, MultiDelimiter> {
-    return Pair(MultiDelimiter.IntMultiDelimiter(1), MultiDelimiter.InfiniteMultiDelimiter)
+  override fun visitOneOrMore(ctx: RegexParser.OneOrMoreContext): MultiDelimiter {
+    return MultiDelimiter(MultiBoundary.IntMultiBoundary(1), MultiBoundary.InfiniteMultiBoundary, true)
   }
 
-  override fun visitZeroOrOne(ctx: RegexParser.ZeroOrOneContext?): Pair<MultiDelimiter.IntMultiDelimiter, MultiDelimiter> {
-    return Pair(MultiDelimiter.IntMultiDelimiter(0), MultiDelimiter.IntMultiDelimiter(1))
+  override fun visitZeroOrOne(ctx: RegexParser.ZeroOrOneContext?): MultiDelimiter {
+    return MultiDelimiter(MultiBoundary.IntMultiBoundary(0), MultiBoundary.IntMultiBoundary(1), true)
   }
 
-  override fun visitRange(ctx: RegexParser.RangeContext): Pair<MultiDelimiter.IntMultiDelimiter, MultiDelimiter> {
-    val lowerDelimiter = if (ctx.lower_bound == null) MultiDelimiter.IntMultiDelimiter(0) else MultiDelimiter.IntMultiDelimiter(ctx.lower_bound.text.toInt())
-    val upperDelimiter = if (ctx.COMMA() != null) if (ctx.upper_bound == null) MultiDelimiter.InfiniteMultiDelimiter else MultiDelimiter.IntMultiDelimiter(ctx.upper_bound.text.toInt())
-    else if (ctx.lower_bound == null) MultiDelimiter.InfiniteMultiDelimiter else lowerDelimiter
-    return Pair(lowerDelimiter, upperDelimiter)
+  override fun visitRangeGreedy(ctx: RegexParser.RangeGreedyContext): MultiDelimiter {
+    return visitRange(ctx.lower_bound, ctx.upper_bound, ctx.COMMA(), true)
+  }
+
+  override fun visitRangeLazy(ctx: RegexParser.RangeLazyContext): MultiDelimiter {
+    return visitRange(ctx.lower_bound, ctx.upper_bound, ctx.COMMA(), false)
+  }
+
+  private fun visitRange(lowerBoundToken: Token?, upperBoundToken: Token?, comma: TerminalNode?, isGreedy: Boolean): MultiDelimiter {
+    val lowerDelimiter = if (lowerBoundToken == null) MultiBoundary.IntMultiBoundary(0) else MultiBoundary.IntMultiBoundary(lowerBoundToken.text.toInt())
+    val upperDelimiter = if (comma != null) if (upperBoundToken == null) MultiBoundary.InfiniteMultiBoundary else MultiBoundary.IntMultiBoundary(upperBoundToken.text.toInt())
+    else if (lowerBoundToken == null) MultiBoundary.InfiniteMultiBoundary else lowerDelimiter
+    return MultiDelimiter(lowerDelimiter, upperDelimiter, isGreedy)
   }
 }
 
@@ -37,16 +47,22 @@ internal class MultiVisitor : RegexParserBaseVisitor<Pair<MultiDelimiter.IntMult
  * Delimits the number of times that a multi should
  * make a certain atom repeat itself
  */
-internal sealed class MultiDelimiter {
+internal data class MultiDelimiter(
+  val lowerBoundary: MultiBoundary.IntMultiBoundary,
+  val upperBoundary: MultiBoundary,
+  val isGreedy: Boolean
+)
+
+internal sealed class MultiBoundary {
   /**
    * Represents an integer boundary
    *
    * @param i The boundary of the multi
    */
-  data class IntMultiDelimiter(val i: Int) : MultiDelimiter()
+  data class IntMultiBoundary(val i: Int) : MultiBoundary()
 
   /**
    * Represents an infinite boundary
    */
-  object InfiniteMultiDelimiter : MultiDelimiter()
+  object InfiniteMultiBoundary : MultiBoundary()
 }
