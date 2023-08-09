@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionRange
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.PredicateMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
@@ -85,6 +86,54 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitCursor(ctx: RegexParser.CursorContext?): NFA {
     return NFA.fromMatcher(CursorMatcher())
+  }
+
+  override fun visitIdentifier(ctx: RegexParser.IdentifierContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> char.isJavaIdentifierPart() }
+    )
+  }
+
+  override fun visitIdentifierNotDigit(ctx: RegexParser.IdentifierNotDigitContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> !char.isDigit() && char.isJavaIdentifierPart() }
+    )
+  }
+
+  override fun visitKeyword(ctx: RegexParser.KeywordContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> char.isLetterOrDigit() || char == '_' }
+    )
+  }
+
+  override fun visitKeywordNotDigit(ctx: RegexParser.KeywordNotDigitContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> char.isLetter() || char == '_' }
+    )
+  }
+
+  override fun visitFilename(ctx: RegexParser.FilenameContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> char.isLetterOrDigit() || "_/.-+,#$%~=".contains(char) }
+    )
+  }
+
+  override fun visitFilenameNotDigit(ctx: RegexParser.FilenameNotDigitContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> char.isLetter() || "_/.-+,#$%~=".contains(char) }
+    )
+  }
+
+  override fun visitPrintable(ctx: RegexParser.PrintableContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> !char.isISOControl() }
+    )
+  }
+
+  override fun visitPrintableNotDigit(ctx: RegexParser.PrintableNotDigitContext?): NFA {
+    return NFA.fromMatcher(
+      PredicateMatcher { char -> !char.isDigit() && !char.isISOControl() }
+    )
   }
 
   override fun visitWhitespace(ctx: RegexParser.WhitespaceContext?): NFA {
