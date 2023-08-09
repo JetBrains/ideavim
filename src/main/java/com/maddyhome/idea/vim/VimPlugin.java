@@ -24,6 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.SystemInfo;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimKeyGroup;
 import com.maddyhome.idea.vim.api.VimOptionGroup;
@@ -280,12 +281,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     LOG.debug("done");
   }
 
-  private void registerIdeavimrc() {
+  private void registerIdeavimrc(VimEditor editor) {
     if (ideavimrcRegistered) return;
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      executeIdeaVimRc();
+      executeIdeaVimRc(editor);
     }
   }
 
@@ -339,7 +340,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // 4) ~/.ideavimrc execution
     // 4.1) Execute ~/.ideavimrc
-    registerIdeavimrc();
+    // Evaluate in the context of the fallback window, to capture local option state, to copy to the first editor window
+    registerIdeavimrc(VimInjectorKt.getInjector().getFallbackWindow());
 
     // 4.2) Initialize extensions. Always after 4.1
     VimExtensionRegistrar.enableDelayedExtensions();
