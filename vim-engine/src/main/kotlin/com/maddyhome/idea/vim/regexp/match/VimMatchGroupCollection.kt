@@ -32,6 +32,11 @@ public class VimMatchGroupCollection(
   private val groupStarts: IntArray = IntArray(size)
 
   /**
+   * Used to check if a certain group capture has started and ended
+   */
+  private val completedGroups: BooleanArray = BooleanArray(size) { false }
+
+  /**
    * Store the highest seen group number plus one, which
    * should correspond to the number of tracked groups
    */
@@ -57,6 +62,23 @@ public class VimMatchGroupCollection(
    */
   internal fun setGroupStart(groupNumber: Int, startIndex: Int) {
     groupStarts[groupNumber] = startIndex
+    completedGroups[groupNumber] = false
+  }
+
+  /**
+   * Sets the end index of a certain capture group if it wasn't previously set
+   *
+   * @param groupNumber The number of the capture group
+   * @param endIndex    The index where the capture group match end
+   * @param text        The text used to extract the matched string
+   */
+  internal fun setGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
+    if (completedGroups[groupNumber]) return
+
+    val range = groupStarts[groupNumber] until endIndex
+    groups[groupNumber] = VimMatchGroup(range, text.substring(range))
+    groupCount = maxOf(groupCount, groupNumber + 1)
+    completedGroups[groupNumber] = true
   }
 
   /**
@@ -66,10 +88,11 @@ public class VimMatchGroupCollection(
    * @param endIndex    The index where the capture group match end
    * @param text        The text used to extract the matched string
    */
-  internal fun setGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
+  internal fun setForceGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
     val range = groupStarts[groupNumber] until endIndex
     groups[groupNumber] = VimMatchGroup(range, text.substring(range))
     groupCount = maxOf(groupCount, groupNumber + 1)
+    completedGroups[groupNumber] = true
   }
 
   override fun contains(element: VimMatchGroup): Boolean {
