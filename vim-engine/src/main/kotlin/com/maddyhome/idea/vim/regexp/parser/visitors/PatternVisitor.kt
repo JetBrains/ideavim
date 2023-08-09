@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
-import com.maddyhome.idea.vim.regexp.nfa.MultiDelimiter
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
@@ -335,6 +334,18 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
         isNegated
       )
     )
+  }
+
+  override fun visitStartMatch(ctx: RegexParser.StartMatchContext?): NFA {
+    val nfa = NFA.fromSingleState()
+    nfa.startMatch()
+    return nfa
+  }
+
+  override fun visitEndMatch(ctx: RegexParser.EndMatchContext?): NFA {
+    val nfa = NFA.fromSingleState()
+    nfa.endMatch()
+    return nfa
   }
 
   private fun cleanLiteralChar(str : String) : Char {

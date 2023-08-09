@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
-import com.maddyhome.idea.vim.regexp.nfa.MultiDelimiter
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
@@ -32,4 +31,22 @@ internal class MultiVisitor : RegexParserBaseVisitor<Pair<MultiDelimiter.IntMult
     else if (ctx.lower_bound == null) MultiDelimiter.InfiniteMultiDelimiter else lowerDelimiter
     return Pair(lowerDelimiter, upperDelimiter)
   }
+}
+
+/**
+ * Delimits the number of times that a multi should
+ * make a certain atom repeat itself
+ */
+internal sealed class MultiDelimiter {
+  /**
+   * Represents an integer boundary
+   *
+   * @param i The boundary of the multi
+   */
+  data class IntMultiDelimiter(val i: Int) : MultiDelimiter()
+
+  /**
+   * Represents an infinite boundary
+   */
+  object InfiniteMultiDelimiter : MultiDelimiter()
 }

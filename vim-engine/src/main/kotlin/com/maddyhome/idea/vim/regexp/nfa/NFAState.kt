@@ -35,7 +35,14 @@ internal class NFAState (
    *  Stores the number of the capture groups that stop
    *  being captured on this state
    */
-  val endCapture: MutableList<Int> = ArrayList()
+  val endCapture: MutableList<Int> = ArrayList(),
+
+  /**
+   *  Stores the number of the capture groups that stop
+   *  being captured on this state, even if that group
+   *  had already been set to stop being captured
+   */
+  val forceEndCapture: MutableList<Int> = ArrayList()
 ) {
 
   /**

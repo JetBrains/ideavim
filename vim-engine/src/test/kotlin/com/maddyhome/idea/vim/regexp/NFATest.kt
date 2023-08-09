@@ -533,6 +533,51 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test set start of match`() {
+    assertCorrectRange(
+      "endif",
+      "end\\zsif",
+      3 until 5
+    )
+  }
+
+  @Test
+  fun `test set end of match`() {
+    assertCorrectRange(
+      "endif",
+      "end\\zeif",
+      0 until 3
+    )
+  }
+
+  @Test
+  fun `test set multiple start of match`() {
+    assertCorrectRange(
+      "endif",
+      "\\zse\\zsn\\zsd\\zsif",
+      3 until 5
+    )
+  }
+
+  @Test
+  fun `test set multiple end of match`() {
+    assertCorrectRange(
+      "endif",
+      "\\zee\\zen\\zed\\zeif",
+      0 until 3
+    )
+  }
+
+  @Test
+  fun `test set match start after set match end`() {
+    assertCorrectRange(
+      "endif",
+      "\\zeend\\zsif",
+      3 until 5
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,

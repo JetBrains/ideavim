@@ -117,6 +117,14 @@ internal class NFA private constructor(
     this.acceptState.endCapture.add(groupNumber)
   }
 
+  internal fun startMatch() {
+    this.startState.startCapture.add(0)
+  }
+
+  internal fun endMatch() {
+    this.acceptState.forceEndCapture.add(0)
+  }
+
   /**
    * Simulates the nfa in depth-first search fashion.
    *
@@ -178,6 +186,7 @@ internal class NFA private constructor(
   private fun updateCaptureGroups(editor: VimEditor, index: Int, state: NFAState) {
     for (groupNumber in state.startCapture) groups.setGroupStart(groupNumber, index)
     for (groupNumber in state.endCapture) groups.setGroupEnd(groupNumber, index, editor.text())
+    for (groupNumber in state.forceEndCapture) groups.setForceGroupEnd(groupNumber, index, editor.text())
   }
 
   internal companion object {
