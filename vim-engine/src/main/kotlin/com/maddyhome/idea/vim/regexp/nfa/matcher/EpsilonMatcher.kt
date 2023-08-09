@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 
 /**
  * Matcher that always matches. It is used to represent
@@ -16,7 +18,7 @@ import com.maddyhome.idea.vim.api.VimEditor
  * taken and without consuming any character.
  */
 internal class EpsilonMatcher : Matcher {
-  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
     return MatcherResult.Success(0)
   }
 }

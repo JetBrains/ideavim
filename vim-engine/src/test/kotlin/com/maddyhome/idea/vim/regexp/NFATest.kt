@@ -605,6 +605,23 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test backreference to group 1`() {
+    assertCorrectRange(
+      "cat cat",
+      "\\v(dog|cat) \\1",
+      0 until 7
+    )
+  }
+
+  @Test
+  fun `test backreference should fail`() {
+    assertFailure(
+      "dog cat",
+      "\\v(dog|cat) \\1"
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,

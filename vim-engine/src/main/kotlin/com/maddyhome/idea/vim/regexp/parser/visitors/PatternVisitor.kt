@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
 import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.nfa.matcher.BackreferenceMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionRange
@@ -395,6 +396,12 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     val nfa = NFA.fromSingleState()
     nfa.endMatch()
     return nfa
+  }
+
+  override fun visitBackreference(ctx: RegexParser.BackreferenceContext): NFA {
+    return NFA.fromMatcher(
+      BackreferenceMatcher(ctx.text[1].digitToInt())
+    )
   }
 
   private fun cleanLiteralChar(str : String) : Char {

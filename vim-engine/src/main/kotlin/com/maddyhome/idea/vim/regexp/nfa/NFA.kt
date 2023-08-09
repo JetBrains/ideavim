@@ -171,9 +171,8 @@ internal class NFA private constructor(
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
-      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex)
+      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups)
       if (transitionMatcherResult is MatcherResult.Success) {
-        val newIndex = currentIndex + transitionMatcherResult.consumed
         var epsilonVisitedCopy = HashSet(epsilonVisited)
         if (transitionMatcherResult.consumed == 0) {
           if (epsilonVisited.contains(transition.destState)) continue
@@ -181,7 +180,7 @@ internal class NFA private constructor(
         } else {
           epsilonVisitedCopy = HashSet()
         }
-        if (simulate(editor, newIndex, transition.destState, epsilonVisitedCopy)) return true
+        if (simulate(editor, currentIndex + transitionMatcherResult.consumed, transition.destState, epsilonVisitedCopy)) return true
       }
     }
     return false
