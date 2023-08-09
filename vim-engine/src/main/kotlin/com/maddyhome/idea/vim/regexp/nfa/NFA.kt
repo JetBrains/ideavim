@@ -42,7 +42,7 @@ internal class NFA private constructor(
    * @return The new NFA representing the concatenation
    */
   internal fun concatenate(other: NFA) : NFA {
-    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), other.startState))
+    this.acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), other.startState))
 
     this.acceptState.isAccept = false
     this.acceptState = other.acceptState
@@ -62,12 +62,12 @@ internal class NFA private constructor(
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
-    newStart.addTransition(NFATransition(EpsilonMatcher(), this.startState))
-    newStart.addTransition(NFATransition(EpsilonMatcher(), other.startState))
+    newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), this.startState))
+    newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), other.startState))
 
-    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+    this.acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
     this.acceptState.isAccept = false
-    other.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+    other.acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
     other.acceptState.isAccept = false
 
     this.startState = newStart
@@ -81,15 +81,23 @@ internal class NFA private constructor(
    *
    * @return The new NFA representing the closure
    */
-  internal fun closure() : NFA {
+  internal fun closure(isGreedy: Boolean) : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
-    newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
-    newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+    if (isGreedy){
+      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
+      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
 
-    acceptState.addTransition(NFATransition(EpsilonMatcher(), startState))
-    acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+      acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
+      acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+    } else {
+      newStart.addTransitionToStart(NFATransition(EpsilonMatcher(), startState))
+      newStart.addTransitionToStart(NFATransition(EpsilonMatcher(), newEnd))
+
+      acceptState.addTransitionToStart(NFATransition(EpsilonMatcher(), startState))
+      acceptState.addTransitionToStart(NFATransition(EpsilonMatcher(), newEnd))
+    }
 
     acceptState.isAccept = false
     startState = newStart
@@ -102,8 +110,9 @@ internal class NFA private constructor(
    * Gives the NFA the choice to jump directly from its start to
    * accept state, without taking any of the inner transitions.
    */
-  internal fun optional() {
-    startState.addTransition(NFATransition(EpsilonMatcher(), acceptState))
+  internal fun optional(isGreedy: Boolean) {
+    if (isGreedy) startState.addTransitionToEnd(NFATransition(EpsilonMatcher(), acceptState))
+    else startState.addTransitionToStart(NFATransition(EpsilonMatcher(), acceptState))
   }
 
   /**
@@ -216,7 +225,7 @@ internal class NFA private constructor(
       val startState = NFAState(false)
       val acceptState = NFAState(true)
 
-      startState.addTransition(NFATransition(matcher, acceptState))
+      startState.addTransitionToEnd(NFATransition(matcher, acceptState))
       return NFA(startState, acceptState)
     }
   }

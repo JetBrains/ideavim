@@ -302,6 +302,33 @@ class NFATest {
   }
 
   @Test
+  fun `test lazy multi doesn't consume anything`() {
+    assertCorrectRange(
+      "aaaaa",
+      "a\\{-}",
+      IntRange.EMPTY
+    )
+  }
+
+  @Test
+  fun `test closest matching quotes`() {
+    assertCorrectRange(
+      "\"Lorem\" \"Ipsum\"",
+      "\".\\{-}\"",
+      0 until 7
+    )
+  }
+
+  @Test
+  fun `test farthest matching quotes`() {
+    assertCorrectRange(
+      "\"Lorem\" \"Ipsum\"",
+      "\".\\{}\"",
+      0 until 15
+    )
+  }
+
+  @Test
   fun `text sequence of any characters`() {
     assertCorrectRange(
       "Lorem Ipsum\n" +
