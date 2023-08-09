@@ -273,6 +273,11 @@ class RegexParserTest {
   }
 
   @Test
+  fun `backreference to group 1`() {
+    assertSuccess("\\v(cat|dog)\\1", PATTERN)
+  }
+
+  @Test
   fun `unclosed group`() {
     assertFailure("\\(ab", PATTERN)
   }

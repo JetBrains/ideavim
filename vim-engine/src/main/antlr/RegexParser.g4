@@ -79,12 +79,13 @@ range : RANGE_START lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END      #R
  * An ordinary_atom can be a single character that matches itself, a token with
  * a special meaning, or a collection of characters.
  */
-ordinary_atom : LITERAL_CHAR #LiteralChar
-              | DOT          #AnyChar
-              | DOTNL        #AnyCharNL
-              | zero_width   #ZeroWidth
-              | char_class   #CharClass
-              | collection   #Collec
+ordinary_atom : LITERAL_CHAR  #LiteralChar
+              | DOT           #AnyChar
+              | DOTNL         #AnyCharNL
+              | BACKREFERENCE #Backreference
+              | zero_width    #ZeroWidth
+              | char_class    #CharClass
+              | collection    #Collec
               ;
 
 /**
