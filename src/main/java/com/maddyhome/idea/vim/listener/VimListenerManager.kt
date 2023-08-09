@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
+import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
@@ -72,6 +73,7 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.mode
@@ -156,9 +158,16 @@ internal object VimListenerManager {
       Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
 
       // Initialise the local options. We MUST do this before anything has the chance to query options
-      val sourceEditor = getOpeningEditor(editor)
-      val isSplit = editor.document == sourceEditor?.document
-      VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, sourceEditor?.vim, isSplit)
+      val sourceEditor = getOpeningEditor(editor)?.vim
+
+      // Note that IdeaVim implements `:edit {file}` as `:new {file}` and doesn't implement `:new`, so the only scenario
+      // we can handle here is NEW
+      val scenario = when {
+        sourceEditor == null -> LocalOptionInitialisationScenario.FALLBACK
+        editor.document == sourceEditor.ij.document -> LocalOptionInitialisationScenario.SPLIT
+        else -> LocalOptionInitialisationScenario.NEW
+      }
+      VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, sourceEditor ?: injector.fallbackWindow, scenario)
 
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler, disposable)

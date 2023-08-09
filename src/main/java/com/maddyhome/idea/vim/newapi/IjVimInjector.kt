@@ -12,9 +12,11 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExEntryPanel
 import com.maddyhome.idea.vim.api.ExecutionContextManager
+import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.SystemInfoService
 import com.maddyhome.idea.vim.api.VimActionExecutor
@@ -90,9 +92,16 @@ import com.maddyhome.idea.vim.vimscript.services.PatternService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 import com.maddyhome.idea.vim.yank.YankGroupBase
+import javax.swing.JTextArea
 
 internal class IjVimInjector : VimInjectorBase() {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz))
+
+  override val fallbackWindow: VimEditor by lazy {
+    TextComponentEditorImpl(null, JTextArea()).vim.also {
+      optionGroup.initialiseLocalOptions(it, null, LocalOptionInitialisationScenario.DEFAULTS)
+    }
+  }
 
   override val actionExecutor: VimActionExecutor
     get() = service<IjActionExecutor>()
