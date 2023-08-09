@@ -9,13 +9,15 @@
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 
 internal class CollectionMatcher(
   private val chars: List<Char> = emptyList(),
   private val ranges: List<CollectionRange> = emptyList(),
   private val isNegated: Boolean = false
 ) : Matcher {
-  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
 
     val char = editor.text()[index]

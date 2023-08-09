@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 
 /**
  * A matcher is used to decide if a transition can be taken,
@@ -21,6 +23,7 @@ internal interface Matcher {
    *
    * @param editor The editor in its current state
    * @param index  The current index in the text of the editor
+   * @param groups The groups captured so far
    */
-  fun matches(editor: VimEditor, index : Int): MatcherResult
+  fun matches(editor: VimEditor, index : Int, groups: VimMatchGroupCollection): MatcherResult
 }
