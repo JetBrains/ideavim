@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.troubleshooting.Troubleshooter
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -151,7 +152,9 @@ internal class ReloadVimRc : DumbAwareAction() {
     FileDocumentManager.getInstance().saveDocumentAsIs(editor.document)
     injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
     Troubleshooter.instance.removeByType("old-action-notation-in-mappings")
-    executeIdeaVimRc()
+
+    // Reload the ideavimrc in the context of the current window, as though we had called `:source ~/.ideavimrc`
+    executeIdeaVimRc(editor.vim)
   }
 }
 

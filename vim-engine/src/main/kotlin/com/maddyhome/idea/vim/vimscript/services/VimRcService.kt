@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import org.jetbrains.annotations.NonNls
@@ -129,13 +130,13 @@ public object VimRcService {
   }
 
   @JvmStatic
-  public fun executeIdeaVimRc() {
+  public fun executeIdeaVimRc(editor: VimEditor) {
     try {
       injector.vimscriptExecutor.executingVimscript = true
       val ideaVimRc = findIdeaVimRc()
       if (ideaVimRc != null) {
         logger.info("Execute ideavimrc file: " + ideaVimRc.absolutePath)
-        injector.vimscriptExecutor.executeFile(ideaVimRc)
+        injector.vimscriptExecutor.executeFile(ideaVimRc, editor)
         injector.vimrcFileState.saveFileState(ideaVimRc.absolutePath)
       } else {
         logger.info("ideavimrc file isn't found")

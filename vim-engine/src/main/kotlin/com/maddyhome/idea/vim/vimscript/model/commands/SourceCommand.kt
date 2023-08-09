@@ -27,7 +27,11 @@ public data class SourceCommand(val ranges: Ranges, val argument: String) : Comm
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val path = expandUser(argument.trim())
-    injector.vimscriptExecutor.executeFile(File(path), vimContext.getFirstParentContext() is CommandLineVimLContext)
+    injector.vimscriptExecutor.executeFile(
+      File(path),
+      editor,
+      vimContext.getFirstParentContext() is CommandLineVimLContext
+    )
 
     injector.statisticsService.addSourcedFile(path)
     return ExecutionResult.Success

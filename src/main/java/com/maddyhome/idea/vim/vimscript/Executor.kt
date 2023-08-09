@@ -87,14 +87,14 @@ internal class Executor : VimScriptExecutorBase() {
     return finalResult
   }
 
+  // TODO: Remove this? Only used by tests, and should have proper editor context
   override fun execute(script: String, skipHistory: Boolean) {
     val editor = TextComponentEditorImpl(null, JTextArea()).vim
     val context = DataContext.EMPTY_CONTEXT.vim
     execute(script, editor, context, skipHistory, indicateErrors = true, CommandLineVimLContext)
   }
 
-  override fun executeFile(file: File, indicateErrors: Boolean) {
-    val editor = TextComponentEditorImpl(null, JTextArea()).vim
+  override fun executeFile(file: File, editor: VimEditor, indicateErrors: Boolean) {
     val context = DataContext.EMPTY_CONTEXT.vim
     try {
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
