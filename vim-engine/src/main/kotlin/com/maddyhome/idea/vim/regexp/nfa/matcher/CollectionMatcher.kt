@@ -10,15 +10,18 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
-import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 
 internal class CollectionMatcher(
   private val chars: List<Char> = emptyList(),
   private val ranges: List<CollectionRange> = emptyList(),
-  private val isNegated: Boolean = false
+  private val isNegated: Boolean = false,
+  private val includesEOL: Boolean = false
 ) : Matcher {
   override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
+
+    if (!includesEOL && editor.text()[index] == '\n') return MatcherResult.Failure
+    if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
 
     val char = editor.text()[index]
     val result = (chars.contains(char) || ranges.any { it.inRange(char) }) == !isNegated
