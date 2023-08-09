@@ -45,7 +45,7 @@ public class VimRegex(pattern: String) {
    *
    * @return True if any match was found, false otherwise
    */
-  public fun containsMatchIn(editor: VimEditor) : Boolean {
+  public fun containsMatchIn(editor: VimEditor): Boolean {
     var startIndex = 0
     while (startIndex <= editor.text().length) {
       val result = nfa.simulate(editor, startIndex)
@@ -133,5 +133,19 @@ public class VimRegex(pattern: String) {
       }
     }
     return foundMatches.asSequence()
+  }
+
+  /**
+   * Attempts to match a regular expression exactly at the specified
+   * index in the editor text.
+   *
+   * @param editor The editor where to look for the match in
+   * @param index  The index to start the match
+   */
+  public fun matchAt(
+    editor: VimEditor,
+    index: Int
+  ): VimMatchResult {
+    return nfa.simulate(editor, index)
   }
 }

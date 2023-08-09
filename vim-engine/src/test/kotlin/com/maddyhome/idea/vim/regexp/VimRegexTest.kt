@@ -106,6 +106,36 @@ class VimRegexTest {
     )
   }
 
+  @Test
+  fun `test word matches at index`() {
+    assertMatchAt(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem",
+      13,
+      13 until 18
+    )
+  }
+
+  @Test
+  fun `test word does not match at index`() {
+    assertMatchAt(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem",
+      12,
+      null
+    )
+  }
+
   private fun assertContainsMatchIn(text: CharSequence, pattern: String, expectedResult : Boolean) {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
@@ -131,6 +161,16 @@ class VimRegexTest {
       .map { it.range }
       .toSet()
     )
+  }
+
+  private fun assertMatchAt(text: CharSequence, pattern: String, index: Int, expectedResult: IntRange? = null) {
+    val editor = buildEditor(text)
+    val regex = VimRegex(pattern)
+    val matchResult = regex.matchAt(editor, index)
+    when (matchResult) {
+      is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
+      is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+    }
   }
 
   private fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
