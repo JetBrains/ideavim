@@ -205,6 +205,7 @@ class PlugExtensionsTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
+    configureByText("\n")
 
     extension = TestExtension.createBean()
     VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
@@ -219,22 +220,22 @@ class PlugExtensionsTest : VimTestCase() {
 
   @Test
   fun `test enable via plug`() {
-    injector.vimscriptExecutor.execute("Plug 'MyTest'", false)
+    executeVimscript("Plug 'MyTest'", false)
 
     assertTrue(extension.ext.initialized)
   }
 
   @Test
   fun `test enable via plugin`() {
-    injector.vimscriptExecutor.execute("Plugin 'MyTest'", false)
+    executeVimscript("Plugin 'MyTest'", false)
 
     assertTrue(extension.ext.initialized)
   }
 
   @Test
   fun `test enable via plug and disable via set`() {
-    injector.vimscriptExecutor.execute("Plug 'MyTest'")
-    injector.vimscriptExecutor.execute("set noTestExtension")
+    executeVimscript("Plug 'MyTest'")
+    executeVimscript("set noTestExtension")
     assertTrue(extension.ext.initialized)
     assertTrue(extension.ext.disposed)
   }
@@ -247,6 +248,7 @@ class PlugMissingKeysTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
+    configureByText("\n")
 
     extension = TestExtension.createBean()
     VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
@@ -317,7 +319,7 @@ class PlugMissingKeysTest : VimTestCase() {
 
   private fun executeLikeVimrc(vararg text: String) {
     injector.vimscriptExecutor.executingVimscript = true
-    injector.vimscriptExecutor.execute(text.joinToString("\n"), false)
+    executeVimscript(text.joinToString("\n"), false)
     injector.vimscriptExecutor.executingVimscript = false
     VimExtensionRegistrar.enableDelayedExtensions()
   }

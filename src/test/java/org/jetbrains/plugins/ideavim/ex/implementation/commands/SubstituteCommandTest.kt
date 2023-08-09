@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
@@ -1073,7 +1072,7 @@ class SubstituteCommandTest : VimTestCase() {
       val ch1 = tree.getChild(0)
       """.trimIndent(),
     )
-    injector.vimscriptExecutor.execute(
+    executeVimscript(
       """
       function! IncrementWholeLine() range|
         execute ":" .. a:firstline .. "," .. a:lastline .. "s/\\d\\+/\\=submatch(0)+line('.')-a:firstline+1/g"|
