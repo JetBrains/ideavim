@@ -12,6 +12,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.ActionEvent
@@ -231,12 +232,15 @@ internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrev
     val caret = target.caret
     val project = target.editor.project
 
-    // Note that we need an editor when searching because we need per-editor options (i.e. 'iskeyword'). We initialise
-    // it based on the owning editor, and treat it like a split, so we get a full copy of the local-to-window options
-    // TODO: Over time, we should migrate ex actions to be based on VimEditor
-    // This will give us an editor we can use for options, etc. and we can reuse the actions for other implementations
+    // Create a VimEditor instance on the Swing text field which we can pass to the search helpers. We need an editor
+    // rather than just working on a buffer because the search helpers need local options (specifically the local to
+    // buffer 'iskeyword'). We use the CMD_LINE scenario to initialise local options from the main editor. The options
+    // service will copy all local-to-buffer and local-to-window options, effectively cloning the options.
+    // TODO: Over time, we should migrate all ex actions to be based on VimEditor
+    // This will mean we always have an editor that has been initialised for options, etc. But also means that we can
+    // share the command line entry actions between IdeaVim implementations
     val editor = TextComponentEditorImpl(project, target).vim
-    injector.optionGroup.initialiseLocalOptions(editor, target.editor.vim, true)
+    injector.optionGroup.initialiseLocalOptions(editor, target.editor.vim, LocalOptionInitialisationScenario.CMD_LINE)
 
     val offset = injector.searchHelper.findNextWord(editor, caret.dot, -1, bigWord = false, spaceWords = false)
     if (logger.isDebugEnabled) logger.debug("offset=$offset")

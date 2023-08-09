@@ -11,8 +11,8 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -30,22 +30,20 @@ public interface VimOptionGroup {
   /**
    * Initialise the local to buffer and local to window options for this editor
    *
-   * Local to buffer options are copied from the current global values, while local to window options should be copied
-   * from the per-window "global" values of the editor that caused this editor to open. Both of these global values are
-   * updated by the `:set` or `:setglobal` commands.
-   *
-   * Note that global-local options are not copied from the source window. They are global values that are overridden
-   * locally, and local values are never copied.
+   * Depending on the initialisation scenario, the local-to-buffer, local-to-window and/or global-local options are
+   * initialised. The scenario dictates where the local options get their values from. Typically, local-to-buffer
+   * options are copied from the global values. Local-to-window options are either initialised from the per-window
+   * "global" value or copied directly from the opening window. Global-local options are usually not initialised.
    *
    * TODO: IdeaVim currently does not support per-window "global" values
    *
    * @param editor  The editor to initialise
    * @param sourceEditor  The editor which is opening the new editor. This source editor is used to get the per-window
    *                      "global" values to initialise the new editor. If null, there is no source editor (e.g. all
-   *                      editor windows are closed), and the options should be initialised to some other value.
-   * @param isSplit True if the new editor is a split view of the source editor
+   *                      editor windows are closed), and the options should be initialised to default values.
+   * @param scenario  The scenario for initialising the local options
    */
-  public fun initialiseLocalOptions(editor: VimEditor, sourceEditor: VimEditor?, isSplit: Boolean)
+  public fun initialiseLocalOptions(editor: VimEditor, sourceEditor: VimEditor?, scenario: LocalOptionInitialisationScenario)
 
   /**
    * Get the [Option] by its name or abbreviation
@@ -259,4 +257,78 @@ public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: Option
 public fun VimOptionGroup.hasValue(option: StringListOption, scope: OptionAccessScope, value: String): Boolean {
   val optionValue = getOptionValue(option, scope)
   return option.split(optionValue.asString()).contains(value)
+}
+
+/**
+ * The scenario for initialising local options
+ */
+public enum class LocalOptionInitialisationScenario {
+  /**
+   * Set the local options to default (global) values.
+   */
+  DEFAULTS,
+
+  /**
+   * The new window is being initialised with the values of the fallback window
+   *
+   * Vim always has at least one buffer and window open, and the `vimrc` files are evaluated in this context. Any
+   * options set during evaluation are applied to the first open window and buffer, as if the user had interactively
+   * typed them in. IdeaVim does not always have an open window (and therefore buffer), so we evaluate `~/.ideavimrc` in
+   * a special, hidden "fallback" window, that is always available even if there are no editor windows. This fallback
+   * window is used to initialise the first editor window.
+   *
+   * Since Vim will evaluate `vimrc` in the context of the first window, any local-to-buffer options are set against the
+   * first window's buffer. Therefore, this scenario will copy buffer and window local values, including global-local
+   * values, and the per-window "global" values of local-to-window options.
+   */
+  FALLBACK,
+
+  /**
+   * The new window is a split of the opening/current window
+   *
+   * In this scenario, Vim is trying to make the new window behave exactly like the opening window, so will copy both
+   * local and per-window "global" values of local-to-window and global-local (to window) options from the opening
+   * window to the new window. Local-to-buffer windows are obviously already initialised and not modified.
+   */
+  SPLIT,
+
+  /**
+   * The user has opened a new buffer in the current window
+   *
+   * This scenario is not currently supported by IdeaVim.
+   *
+   * This is the `:edit {file}` command, where the current window is reused to edit a new or previously edited buffer.
+   * Vim will reset any explicitly set local-to-window values. The local-to-buffer options are initialised for a new
+   * buffer, by copying from the global values. Local-to-window values are reset to the existing per-window "global"
+   * values.
+   */
+  EDIT,
+
+  /**
+   * The user has opened a new window
+   *
+   * This is Vim's `:new {file}` command, which will open a new or existing buffer in a new window. Vim treats this as
+   * a split followed by `:edit`, which means copying local and per-window "global" local-to-window option values from
+   * the opening window and then resetting any explicitly set local-to-window options to the per-window "global" values.
+   *
+   * Note that this scenario is used for IdeaVim's current implementation of the `:edit {file}` command.
+   */
+  NEW,
+
+  /**
+   * Initialise the [VimEditor] used for the `ex` command line text field
+   *
+   * Vim doesn't really have the concept of "editor". It has a window, which is a view on a buffer, and which can edit
+   * the text of the buffer. The `ex` command line and search text entry are implemented as part of this window, and
+   * therefore automatically uses the window's local options (e.g. search requires `'iskeyword'`)
+   *
+   * For IdeaVim, the `ex`/search text entry is a separate UI component to the main editor, implements [VimEditor] and
+   * so needs its own copy of the local options. This scenario makes a full copy of the local to buffer and local to
+   * window options, so has the same effect as [FALLBACK].
+   *
+   * We need to migrate more of the command line text handling to work with a [VimEditor]-based implementation (it's
+   * currently very heavily based on Swing). As part of the implementation detail, we could look at sharing options
+   * instead of copying them.
+   */
+  CMD_LINE
 }

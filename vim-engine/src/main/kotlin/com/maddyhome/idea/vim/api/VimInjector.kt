@@ -23,6 +23,20 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
 public interface VimInjector {
+  /**
+   * The window used when we need a window but there are no editor windows available.
+   *
+   * This is primarily used to capture state for local options, either at startup, or when all editor windows are
+   * closed.
+   *
+   * Vim always has at least one buffer and window. During startup, Vim will evaluate the appropriate `vimrc` files, and
+   * any local or global-local options are set against this initial buffer and window. IdeaVim does not always have an
+   * open buffer or window, so we create a hidden window, with a private buffer that can be used when evaluating the
+   * `~/.ideavimrc` file, and updated with the last set local options of the current window. This window (and buffer) is
+   * then used to initialise the local options of the first window that is subsequently opened or initialised.
+   */
+  public val fallbackWindow: VimEditor
+
   // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
   public val parser: VimStringParser
 
