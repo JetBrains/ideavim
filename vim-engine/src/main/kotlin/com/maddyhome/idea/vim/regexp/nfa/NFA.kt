@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.MatcherResult
 
 /**
  * Represents a non-deterministic finite automaton.
@@ -170,15 +171,16 @@ internal class NFA private constructor(
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
-      val newIndex = currentIndex + transition.consumes()
-      var epsilonVisitedCopy = HashSet(epsilonVisited)
-      if (transition.isEpsilon()) {
-        if (epsilonVisited.contains(transition.destState)) continue
-        epsilonVisitedCopy.add(currentState)
-      } else {
-        epsilonVisitedCopy = HashSet()
-      }
-      if (transition.canTake(editor, currentIndex)) {
+      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex)
+      if (transitionMatcherResult is MatcherResult.Success) {
+        val newIndex = currentIndex + transitionMatcherResult.consumed
+        var epsilonVisitedCopy = HashSet(epsilonVisited)
+        if (transitionMatcherResult.consumed == 0) {
+          if (epsilonVisited.contains(transition.destState)) continue
+          epsilonVisitedCopy.add(currentState)
+        } else {
+          epsilonVisitedCopy = HashSet()
+        }
         if (simulate(editor, newIndex, transition.destState, epsilonVisitedCopy)) return true
       }
     }

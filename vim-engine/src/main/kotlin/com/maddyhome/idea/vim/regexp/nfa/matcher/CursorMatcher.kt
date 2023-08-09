@@ -11,12 +11,9 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
 
-public class CursorMatcher : Matcher {
-  override fun matches(editor: VimEditor, index: Int): Boolean {
-    return editor.carets().map { it.offset }.contains(Offset(index))
-  }
-
-  override fun isEpsilon(): Boolean {
-    return true
+internal class CursorMatcher : Matcher {
+  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+    return if (editor.carets().map { it.offset }.contains(Offset(index))) MatcherResult.Success(0)
+    else MatcherResult.Failure
   }
 }

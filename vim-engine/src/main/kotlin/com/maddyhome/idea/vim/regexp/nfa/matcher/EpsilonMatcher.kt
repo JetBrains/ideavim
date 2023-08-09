@@ -16,11 +16,7 @@ import com.maddyhome.idea.vim.api.VimEditor
  * taken and without consuming any character.
  */
 internal class EpsilonMatcher : Matcher {
-  override fun matches(editor: VimEditor, index: Int): Boolean {
-    return true
-  }
-
-  override fun isEpsilon(): Boolean {
-    return true
+  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+    return MatcherResult.Success(0)
   }
 }

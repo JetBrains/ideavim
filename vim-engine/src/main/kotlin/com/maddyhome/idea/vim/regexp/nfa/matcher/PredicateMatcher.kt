@@ -11,11 +11,8 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 import com.maddyhome.idea.vim.api.VimEditor
 
 internal class PredicateMatcher(val predicate: (Char) -> Boolean) : Matcher {
-  override fun matches(editor: VimEditor, index: Int): Boolean {
-    return index < editor.text().length && predicate(editor.text()[index])
-  }
-
-  override fun isEpsilon(): Boolean {
-    return false
+  override fun matches(editor: VimEditor, index: Int): MatcherResult {
+    return if (index < editor.text().length && predicate(editor.text()[index])) MatcherResult.Success(1)
+    else MatcherResult.Failure
   }
 }
