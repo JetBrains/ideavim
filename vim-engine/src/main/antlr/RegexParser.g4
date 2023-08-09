@@ -92,32 +92,32 @@ ordinary_atom : LITERAL_CHAR  #LiteralChar
  * A character class matches any character that is in that class. Example:
  * \d matches any digit from 0 to 9.
  */
-char_class : CLASS_IDENTIFIER   #Identifier
-           | CLASS_IDENTIFIER_D #IdentifierNotDigit
-           | CLASS_KEYWORD      #Keyword
-           | CLASS_KEYWORD_D    #KeywordNotDigit
-           | CLASS_FILENAME     #Filename
-           | CLASS_FILENAME_D   #FilenameNotDigit
-           | CLASS_PRINTABLE    #Printable
-           | CLASS_PRINTABLE_D  #PrintableNotDigit
-           | CLASS_WS           #Whitespace
-           | CLASS_NOT_WS       #NotWhitespace
-           | CLASS_DIGIT        #Digit
-           | CLASS_NOT_DIGIT    #NotDigit
-           | CLASS_HEX          #Hex
-           | CLASS_NOT_HEX      #NotHex
-           | CLASS_OCTAL        #Octal
-           | CLASS_NOT_OCTAL    #NotOctal
-           | CLASS_WORD         #Wordchar
-           | CLASS_NOT_WORD     #Notwordchar
-           | CLASS_HEADWORD     #Headofword
-           | CLASS_NOT_HEADWORD #NotHeadOfWord
-           | CLASS_ALPHA        #Alpha
-           | CLASS_NOT_ALPHA    #NotAlpha
-           | CLASS_LCASE        #Lcase
-           | CLASS_NOT_LCASE    #NotLcase
-           | CLASS_UCASE        #Ucase
-           | CLASS_NOT_UCASE    #NotUcase
+char_class : (CLASS_IDENTIFIER   | CLASS_IDENTIFIER_NL)   #Identifier
+           | (CLASS_IDENTIFIER_D | CLASS_IDENTIFIER_D_NL) #IdentifierNotDigit
+           | (CLASS_KEYWORD      | CLASS_KEYWORD_NL)      #Keyword
+           | (CLASS_KEYWORD_D    | CLASS_KEYWORD_D_NL)    #KeywordNotDigit
+           | (CLASS_FILENAME     | CLASS_FILENAME_NL)     #Filename
+           | (CLASS_FILENAME_D   | CLASS_FILENAME_D_NL)   #FilenameNotDigit
+           | (CLASS_PRINTABLE    | CLASS_PRINTABLE_NL)    #Printable
+           | (CLASS_PRINTABLE_D  | CLASS_PRINTABLE_D_NL)  #PrintableNotDigit
+           | (CLASS_WS           | CLASS_WS_NL)           #Whitespace
+           | (CLASS_NOT_WS       | CLASS_NOT_WS_NL)       #NotWhitespace
+           | (CLASS_DIGIT        | CLASS_DIGIT_NL)        #Digit
+           | (CLASS_NOT_DIGIT    | CLASS_NOT_DIGIT_NL)    #NotDigit
+           | (CLASS_HEX          | CLASS_HEX_NL)          #Hex
+           | (CLASS_NOT_HEX      | CLASS_NOT_HEX_NL)      #NotHex
+           | (CLASS_OCTAL        | CLASS_OCTAL_NL)        #Octal
+           | (CLASS_NOT_OCTAL    | CLASS_NOT_OCTAL_NL)    #NotOctal
+           | (CLASS_WORD         | CLASS_WORD_NL)         #Wordchar
+           | (CLASS_NOT_WORD     | CLASS_NOT_WORD_NL)     #Notwordchar
+           | (CLASS_HEADWORD     | CLASS_HEADWORD_NL)     #Headofword
+           | (CLASS_NOT_HEADWORD | CLASS_NOT_HEADWORD_NL) #NotHeadOfWord
+           | (CLASS_ALPHA        | CLASS_ALPHA_NL)        #Alpha
+           | (CLASS_NOT_ALPHA    | CLASS_NOT_ALPHA_NL)    #NotAlpha
+           | (CLASS_LCASE        | CLASS_LCASE_NL)        #Lcase
+           | (CLASS_NOT_LCASE    | CLASS_NOT_LCASE_NL)    #NotLcase
+           | (CLASS_UCASE        | CLASS_UCASE_NL)        #Ucase
+           | (CLASS_NOT_UCASE    | CLASS_NOT_UCASE_NL)    #NotUcase
            | CLASS_ESC          #Esc
            | CLASS_TAB          #Tab
            | CLASS_CR           #CR
