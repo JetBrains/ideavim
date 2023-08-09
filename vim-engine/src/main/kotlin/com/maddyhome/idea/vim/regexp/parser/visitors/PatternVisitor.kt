@@ -48,11 +48,11 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
       prefixNFA.concatenate(visit(ctx.atom()))
 
     var suffixNFA = NFA.fromSingleState()
-    if (range.upperBoundary is MultiBoundary.InfiniteMultiBoundary) suffixNFA = visit(ctx.atom()).closure()
+    if (range.upperBoundary is MultiBoundary.InfiniteMultiBoundary) suffixNFA = visit(ctx.atom()).closure(range.isGreedy)
     else {
       for (i in range.lowerBoundary.i until (range.upperBoundary as MultiBoundary.IntMultiBoundary).i) {
         suffixNFA.concatenate(visit(ctx.atom()))
-        suffixNFA.optional()
+        suffixNFA.optional(range.isGreedy)
       }
     }
 
