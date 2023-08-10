@@ -58,19 +58,18 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
       }
     }
 
-    return prefixNFA.concatenate(suffixNFA)
+    prefixNFA.concatenate(suffixNFA)
+    if (ctx.atom() is RegexParser.GroupingCaptureContext)
+      groupNumbers[ctx.atom()]?.let { prefixNFA.capture(it, false) }
+    return prefixNFA
   }
 
   override fun visitGroupingCapture(ctx: RegexParser.GroupingCaptureContext): NFA {
+    val groupNumber = groupNumbers[ctx] ?: groupCount.also { groupNumbers[ctx] = it; groupCount++ }
+
     val nfa = if (ctx.sub_pattern() == null) NFA.fromSingleState() else visit(ctx.sub_pattern())
-    val groupNumber = groupNumbers[ctx]
-    if (groupNumber !== null) {
-      nfa.capture(groupNumber)
-    } else {
-      nfa.capture(groupCount)
-      groupNumbers[ctx] = groupCount
-      groupCount++
-    }
+    nfa.capture(groupNumber)
+
     return nfa
   }
 

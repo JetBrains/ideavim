@@ -62,7 +62,7 @@ public class VimMatchGroupCollection(
    */
   internal fun setGroupStart(groupNumber: Int, startIndex: Int) {
     groupStarts[groupNumber] = startIndex
-    completedGroups[groupNumber] = false
+    if (groupNumber == 0) completedGroups[groupNumber] = false
   }
 
   /**
