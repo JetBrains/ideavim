@@ -11,8 +11,11 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
-import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 
+/**
+ * Matcher that matches if there is a cursor
+ * on the given index
+ */
 internal class CursorMatcher : Matcher {
   override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
     return if (editor.carets().map { it.offset }.contains(Offset(index))) MatcherResult.Success(0)

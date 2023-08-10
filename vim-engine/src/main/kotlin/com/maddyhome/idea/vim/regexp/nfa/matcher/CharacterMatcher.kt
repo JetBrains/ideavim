@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
-import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 
 /**
  * Matcher used to match against single characters
