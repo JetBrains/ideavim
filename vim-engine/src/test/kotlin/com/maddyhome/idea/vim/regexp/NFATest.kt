@@ -631,6 +631,15 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test back-referenced group value updates`() {
+    assertCorrectRange(
+      "aaabb",
+      "\\v(a|b){1,100}\\1",
+      0 until 5
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
