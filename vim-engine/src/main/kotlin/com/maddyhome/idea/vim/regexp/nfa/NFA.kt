@@ -112,8 +112,22 @@ internal class NFA private constructor(
    * accept state, without taking any of the inner transitions.
    */
   internal fun optional(isGreedy: Boolean) {
-    if (isGreedy) startState.addTransitionToEnd(NFATransition(EpsilonMatcher(), acceptState))
-    else startState.addTransitionToStart(NFATransition(EpsilonMatcher(), acceptState))
+    val newStart = NFAState(false)
+    val newEnd = NFAState(true)
+
+    if (isGreedy) {
+      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
+      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+    }
+    else {
+      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
+    }
+
+    acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+    acceptState.isAccept = false
+    startState = newStart
+    acceptState = newEnd
   }
 
   /**
@@ -122,9 +136,10 @@ internal class NFA private constructor(
    *
    * @param groupNumber The number of the capture group
    */
-  internal fun capture(groupNumber: Int) {
+  internal fun capture(groupNumber: Int, force: Boolean = true) {
     this.startState.startCapture.add(groupNumber)
-    this.acceptState.endCapture.add(groupNumber)
+    if (force) this.acceptState.forceEndCapture.add(groupNumber)
+    else this.acceptState.endCapture.add(groupNumber)
   }
 
   internal fun startMatch() {
@@ -194,9 +209,18 @@ internal class NFA private constructor(
    * @param state  The current state in the simulation
    */
   private fun updateCaptureGroups(editor: VimEditor, index: Int, state: NFAState) {
-    for (groupNumber in state.startCapture) groups.setGroupStart(groupNumber, index)
-    for (groupNumber in state.endCapture) groups.setGroupEnd(groupNumber, index, editor.text())
-    for (groupNumber in state.forceEndCapture) groups.setForceGroupEnd(groupNumber, index, editor.text())
+    for (groupNumber in state.startCapture) {
+      println("index $index: starts capturing group $groupNumber")
+      groups.setGroupStart(groupNumber, index)
+    }
+    for (groupNumber in state.endCapture) {
+      println("index $index: ends capturing group $groupNumber")
+      groups.setGroupEnd(groupNumber, index, editor.text())
+    }
+    for (groupNumber in state.forceEndCapture) {
+      println("index $index: force ends capturing group $groupNumber")
+      groups.setForceGroupEnd(groupNumber, index, editor.text())
+    }
   }
 
   internal companion object {

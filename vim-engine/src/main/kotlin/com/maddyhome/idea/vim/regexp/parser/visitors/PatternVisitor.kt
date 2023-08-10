@@ -22,12 +22,13 @@ import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   private var groupCount: Int = 0
+  private val groupNumbers: HashMap<RegexParser.GroupingCaptureContext, Int> = HashMap()
 
   override fun visitPattern(ctx: RegexParser.PatternContext): NFA {
     val groupNumber = groupCount
     groupCount++
     val nfa = visit(ctx.sub_pattern())
-    nfa.capture(groupNumber)
+    nfa.capture(groupNumber, false)
     return nfa
   }
   override fun visitSub_pattern(ctx: RegexParser.Sub_patternContext): NFA {
@@ -61,10 +62,15 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitGroupingCapture(ctx: RegexParser.GroupingCaptureContext): NFA {
-    val groupNumber = groupCount
-    groupCount++
     val nfa = if (ctx.sub_pattern() == null) NFA.fromSingleState() else visit(ctx.sub_pattern())
-    nfa.capture(groupNumber)
+    val groupNumber = groupNumbers[ctx]
+    if (groupNumber !== null) {
+      nfa.capture(groupNumber)
+    } else {
+      nfa.capture(groupCount)
+      groupNumbers[ctx] = groupCount
+      groupCount++
+    }
     return nfa
   }
 
