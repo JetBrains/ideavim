@@ -43,7 +43,7 @@ internal class NFA private constructor(
    * @return The new NFA representing the concatenation
    */
   internal fun concatenate(other: NFA) : NFA {
-    this.acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), other.startState))
+    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), other.startState))
 
     this.acceptState.isAccept = false
     this.acceptState = other.acceptState
@@ -63,12 +63,12 @@ internal class NFA private constructor(
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
 
-    newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), this.startState))
-    newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), other.startState))
+    newStart.addTransition(NFATransition(EpsilonMatcher(), this.startState))
+    newStart.addTransition(NFATransition(EpsilonMatcher(), other.startState))
 
-    this.acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     this.acceptState.isAccept = false
-    other.acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+    other.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     other.acceptState.isAccept = false
 
     this.startState = newStart
@@ -87,17 +87,17 @@ internal class NFA private constructor(
     val newEnd = NFAState(true)
 
     if (isGreedy){
-      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
-      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
 
-      acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
-      acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+      acceptState.addTransition(NFATransition(EpsilonMatcher(), startState))
+      acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     } else {
-      newStart.addTransitionToStart(NFATransition(EpsilonMatcher(), startState))
-      newStart.addTransitionToStart(NFATransition(EpsilonMatcher(), newEnd))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
 
-      acceptState.addTransitionToStart(NFATransition(EpsilonMatcher(), startState))
-      acceptState.addTransitionToStart(NFATransition(EpsilonMatcher(), newEnd))
+      acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+      acceptState.addTransition(NFATransition(EpsilonMatcher(), startState))
     }
 
     acceptState.isAccept = false
@@ -116,15 +116,15 @@ internal class NFA private constructor(
     val newEnd = NFAState(true)
 
     if (isGreedy) {
-      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
-      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     }
     else {
-      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
-      newStart.addTransitionToEnd(NFATransition(EpsilonMatcher(), startState))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
     }
 
-    acceptState.addTransitionToEnd(NFATransition(EpsilonMatcher(), newEnd))
+    acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     acceptState.isAccept = false
     startState = newStart
     acceptState = newEnd
@@ -250,7 +250,7 @@ internal class NFA private constructor(
       val startState = NFAState(false)
       val acceptState = NFAState(true)
 
-      startState.addTransitionToEnd(NFATransition(matcher, acceptState))
+      startState.addTransition(NFATransition(matcher, acceptState))
       return NFA(startState, acceptState)
     }
   }

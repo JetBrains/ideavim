@@ -23,7 +23,7 @@ internal class NFAState (
    * indexes. This is relevant for the implementation of
    * lazy quantifiers.
    */
-  val transitions: ArrayDeque<NFATransition> = ArrayDeque(),
+  val transitions: ArrayList<NFATransition> = ArrayList(),
 
   /**
    * Stores the numbers of the capture groups that start
@@ -51,18 +51,7 @@ internal class NFAState (
    *
    * @param transition The transition that is to be added
    */
-  fun addTransitionToEnd(transition: NFATransition) {
-    transitions.addLast(transition)
+  fun addTransition(transition: NFATransition) {
+    transitions.add(transition)
   }
-
-  /**
-   * Adds a new transition from this state. This transition
-   * has the highest priority so far.
-   *
-   * @param transition The transition that is to be added
-   */
-  fun addTransitionToStart(transition: NFATransition) {
-    transitions.addFirst(transition)
-  }
-
 }
