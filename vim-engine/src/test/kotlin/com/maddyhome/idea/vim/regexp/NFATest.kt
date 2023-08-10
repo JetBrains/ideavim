@@ -640,6 +640,16 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test capturing inner nested group`() {
+    assertCorrectGroupRange(
+      "abaabb",
+      "\\v(a(b)?)+",
+      4 until 5,
+      2
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
