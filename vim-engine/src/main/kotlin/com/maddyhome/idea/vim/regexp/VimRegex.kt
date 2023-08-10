@@ -181,4 +181,21 @@ public class VimRegex(pattern: String) {
       is VimMatchResult.Success -> result.range.last + 1 == editor.text().length
     }
   }
+
+  /**
+   * Checks if a regular expression matches a part of the editor
+   * starting exactly at the specified index.
+   *
+   * @param editor The editor where to look for the match in
+   */
+  public fun matchesAt(
+    editor: VimEditor,
+    index: Int
+  ): Boolean {
+    val result = nfa.simulate(editor, index)
+    return when (result) {
+      is VimMatchResult.Failure -> false
+      is VimMatchResult.Success -> true
+    }
+  }
 }
