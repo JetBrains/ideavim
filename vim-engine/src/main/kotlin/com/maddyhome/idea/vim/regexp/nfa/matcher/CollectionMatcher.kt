@@ -11,6 +11,14 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
+/**
+ * Matcher used to match against a character collection.
+ *
+ * @param chars       The individual characters in the collection
+ * @param ranges      The ranges of characters in the collection
+ * @param isNegated   Whether the Matcher should accept or refuse characters that are in the collection
+ * @param includesEOL Whether the collection includes the end-of-line
+ */
 internal class CollectionMatcher(
   private val chars: List<Char> = emptyList(),
   private val ranges: List<CollectionRange> = emptyList(),
@@ -30,7 +38,21 @@ internal class CollectionMatcher(
   }
 }
 
+/**
+ * Represents a range of characters in a collection
+ *
+ * @param start The starting character of the range (inclusive)
+ * @param end   The ending character of the range (inclusive)
+ */
 internal data class CollectionRange(val start: Char, val end: Char) {
+
+  /**
+   * Determines whether a character is inside the range
+   *
+   * @param char The character to verify
+   *
+   * @return whether char is inside the range
+   */
   internal fun inRange(char: Char) : Boolean {
     return char.code in start.code..end.code
   }

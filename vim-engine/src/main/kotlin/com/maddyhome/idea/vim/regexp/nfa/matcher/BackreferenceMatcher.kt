@@ -11,7 +11,12 @@ package com.maddyhome.idea.vim.regexp.nfa.matcher
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
-internal class BackreferenceMatcher(val groupNumber: Int) : Matcher {
+/**
+ * Matcher used to match against a previously captured group
+ *
+ * @param groupNumber The number of the back-referenced captured group
+ */
+internal class BackreferenceMatcher(private val groupNumber: Int) : Matcher {
   override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
     if (groups.get(groupNumber) == null) {
       // TODO: throw illegal backreference error
