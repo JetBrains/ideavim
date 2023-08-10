@@ -166,4 +166,19 @@ public class VimRegex(pattern: String) {
       }
     }
   }
+
+  /**
+   * Indicates whether the regular expression matches the entire editor.
+   *
+   * @param editor The editor where to look for the match in
+   */
+  public fun matches(
+    editor: VimEditor
+  ): Boolean {
+    val result = nfa.simulate(editor)
+    return when (result) {
+      is VimMatchResult.Failure -> false
+      is VimMatchResult.Success -> result.range.last + 1 == editor.text().length
+    }
+  }
 }
