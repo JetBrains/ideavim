@@ -148,4 +148,22 @@ public class VimRegex(pattern: String) {
   ): VimMatchResult {
     return nfa.simulate(editor, index)
   }
+
+  /**
+   * Attempts to match the entire editor against the pattern.
+   *
+   * @param editor The editor where to look for the match in
+   */
+  public fun matchEntire(
+    editor: VimEditor
+  ): VimMatchResult {
+    val result = nfa.simulate(editor)
+    return when (result) {
+      is VimMatchResult.Failure -> result
+      is VimMatchResult.Success -> {
+        if (result.range.last + 1 == editor.text().length) result
+        else VimMatchResult.Failure
+      }
+    }
+  }
 }
