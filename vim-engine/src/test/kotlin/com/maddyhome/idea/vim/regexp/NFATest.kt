@@ -622,6 +622,15 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test backreference to uncaptured group`() {
+    assertCorrectRange(
+      "aaa",
+      "\\v(b)*\\1",
+      IntRange.EMPTY
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
