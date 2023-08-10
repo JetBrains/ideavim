@@ -136,6 +136,37 @@ class VimRegexTest {
     )
   }
 
+  @Test
+  fun `test pattern matches entire editor`() {
+    val text =
+      "Lorem Ipsum\n" +
+      "\n" +
+      "Lorem ipsum dolor sit amet,\n" +
+      "consectetur adipiscing elit\n" +
+      "Sed in orci mauris.\n" +
+      "Cras id tellus in ex imperdiet egestas."
+
+    assertMatchEntire(
+        text,
+      "\\_.*",
+      text.indices,
+    )
+  }
+
+  @Test
+  fun `test pattern matches string only partially`() {
+    assertMatchEntire(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem",
+      null
+      )
+  }
+
   private fun assertContainsMatchIn(text: CharSequence, pattern: String, expectedResult : Boolean) {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
@@ -167,6 +198,16 @@ class VimRegexTest {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.matchAt(editor, index)
+    when (matchResult) {
+      is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
+      is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+    }
+  }
+
+  private fun assertMatchEntire(text: CharSequence, pattern: String, expectedResult: IntRange? = null) {
+    val editor = buildEditor(text)
+    val regex = VimRegex(pattern)
+    val matchResult = regex.matchEntire(editor)
     when (matchResult) {
       is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
       is VimMatchResult.Failure -> assertEquals(expectedResult, null)
