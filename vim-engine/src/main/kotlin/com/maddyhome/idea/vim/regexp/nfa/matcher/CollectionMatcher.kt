@@ -25,14 +25,15 @@ internal class CollectionMatcher(
   private val isNegated: Boolean = false,
   private val includesEOL: Boolean = false
 ) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
 
     if (!includesEOL && editor.text()[index] == '\n') return MatcherResult.Failure
     if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
 
     val char = editor.text()[index]
-    val result = (chars.contains(char) || ranges.any { it.inRange(char) }) == !isNegated
+    val result = if (isCaseInsensitive) (chars.map { it.lowercaseChar() }.contains(char.lowercaseChar()) || ranges.any { it.inRange(char, true) }) == !isNegated
+                 else (chars.contains(char) || ranges.any { it.inRange(char) }) == !isNegated
     return if (result) MatcherResult.Success(1)
     else MatcherResult.Failure
   }
@@ -49,11 +50,13 @@ internal data class CollectionRange(val start: Char, val end: Char) {
   /**
    * Determines whether a character is inside the range
    *
-   * @param char The character to verify
+   * @param char              The character to verify
+   * @param isCaseInsensitive Whether case should be ignored
    *
    * @return whether char is inside the range
    */
-  internal fun inRange(char: Char) : Boolean {
-    return char.code in start.code..end.code
+  internal fun inRange(char: Char, isCaseInsensitive: Boolean = false) : Boolean {
+    return if (isCaseInsensitive) char.lowercaseChar().code in start.lowercaseChar().code..end.lowercaseChar().code
+    else char.code in start.code..end.code
   }
 }

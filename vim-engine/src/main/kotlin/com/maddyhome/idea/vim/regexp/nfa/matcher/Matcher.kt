@@ -20,11 +20,12 @@ internal interface Matcher {
   /**
    * Determines whether the matcher should match.
    *
-   * @param editor The editor in its current state
-   * @param index  The current index in the text of the editor
-   * @param groups The groups captured so far
+   * @param editor            The editor in its current state
+   * @param index             The current index in the text of the editor
+   * @param groups            The groups captured so far
+   * @param isCaseInsensitive Whether the matcher should ignore case
    *
    * @return A result indicating either a failure to match, or success with the number of consumed characters
    */
-  fun matches(editor: VimEditor, index : Int, groups: VimMatchGroupCollection): MatcherResult
+  fun matches(editor: VimEditor, index : Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult
 }

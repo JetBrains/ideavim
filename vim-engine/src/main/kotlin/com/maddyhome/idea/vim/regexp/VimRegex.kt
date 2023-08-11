@@ -23,6 +23,9 @@ import org.antlr.v4.runtime.CommonTokenStream
  * To learn about Vim's pattern syntax see :help pattern
  */
 public class VimRegex(pattern: String) {
+  private enum class CaseSensitivity { SMART_CASE, IGNORE_CASE, NO_IGNORE_CASE }
+  // TODO: check ignorecase options
+  private var caseSensitivity = CaseSensitivity.NO_IGNORE_CASE
 
   /**
    * The NFA representing the compiled regular expression
@@ -35,6 +38,7 @@ public class VimRegex(pattern: String) {
     val parser = RegexParser(tokens)
     val tree = parser.pattern()
     val patternVisitor = PatternVisitor()
+    this.caseSensitivity = if (regexLexer.ignoreCase == true) CaseSensitivity.IGNORE_CASE else CaseSensitivity.NO_IGNORE_CASE
     this.nfa = patternVisitor.visit(tree)
   }
 
@@ -48,7 +52,7 @@ public class VimRegex(pattern: String) {
   public fun containsMatchIn(editor: VimEditor): Boolean {
     var startIndex = 0
     while (startIndex <= editor.text().length) {
-      val result = nfa.simulate(editor, startIndex)
+      val result = simulateNFA(editor, startIndex)
       when (result) {
         /**
          * A match was found
@@ -80,7 +84,7 @@ public class VimRegex(pattern: String) {
   ): VimMatchResult {
     var index = startIndex
     while (index <= editor.text().length) {
-      val result = nfa.simulate(editor, index)
+      val result = simulateNFA(editor, index)
       when (result) {
         /**
          * A match was found
@@ -114,7 +118,7 @@ public class VimRegex(pattern: String) {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
     while (index <= editor.text().length) {
-      val result = nfa.simulate(editor, index)
+      val result = simulateNFA(editor, index)
       when (result) {
         /**
          * A match was found, add it to foundMatches and increment
@@ -146,7 +150,7 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     index: Int
   ): VimMatchResult {
-    return nfa.simulate(editor, index)
+    return simulateNFA(editor, index)
   }
 
   /**
@@ -157,7 +161,7 @@ public class VimRegex(pattern: String) {
   public fun matchEntire(
     editor: VimEditor
   ): VimMatchResult {
-    val result = nfa.simulate(editor)
+    val result = simulateNFA(editor)
     return when (result) {
       is VimMatchResult.Failure -> result
       is VimMatchResult.Success -> {
@@ -175,7 +179,7 @@ public class VimRegex(pattern: String) {
   public fun matches(
     editor: VimEditor
   ): Boolean {
-    val result = nfa.simulate(editor)
+    val result = simulateNFA(editor)
     return when (result) {
       is VimMatchResult.Failure -> false
       is VimMatchResult.Success -> result.range.last + 1 == editor.text().length
@@ -192,10 +196,19 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     index: Int
   ): Boolean {
-    val result = nfa.simulate(editor, index)
+    val result = simulateNFA(editor, index)
     return when (result) {
       is VimMatchResult.Failure -> false
       is VimMatchResult.Success -> true
     }
+  }
+
+  private fun simulateNFA(editor: VimEditor, index: Int = 0) : VimMatchResult {
+    val ignoreCase = when (caseSensitivity) {
+      CaseSensitivity.NO_IGNORE_CASE -> false
+      CaseSensitivity.IGNORE_CASE -> true
+      CaseSensitivity.SMART_CASE -> false // TODO
+    }
+    return nfa.simulate(editor, index, ignoreCase)
   }
 }

@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import org.antlr.v4.runtime.BailErrorStrategy
 import org.antlr.v4.runtime.TokenStream
 
-public class RegexParser(input: TokenStream?) : RegexParser(input) {
+internal class RegexParser(input: TokenStream?) : RegexParser(input) {
 
   /**
    * Override default error handling strategy

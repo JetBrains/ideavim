@@ -158,9 +158,9 @@ internal class NFA private constructor(
    *
    * @return The resulting match result
    */
-  internal fun simulate(editor: VimEditor, startIndex: Int = 0) : VimMatchResult {
+  internal fun simulate(editor: VimEditor, startIndex: Int = 0, isCaseInsensitive: Boolean = false) : VimMatchResult {
     groups.groupCount = 0
-    if (simulate(editor, startIndex, startState)) {
+    if (simulate(editor, startIndex, startState, isCaseInsensitive)) {
       return groups.get(0)?.let {
         VimMatchResult.Success(
           it.range,
@@ -175,18 +175,19 @@ internal class NFA private constructor(
   /**
    * Simulates the NFA in a depth-first search fashion.
    *
-   * @param editor         The editor that is used for the simulation
-   * @param currentIndex   The current index of the text in the simulation
-   * @param currentState   The current NFA state in the simulation
-   * @param epsilonVisited Records the states that have been visited up to this point without consuming any input
+   * @param editor            The editor that is used for the simulation
+   * @param currentIndex      The current index of the text in the simulation
+   * @param currentState      The current NFA state in the simulation
+   * @param isCaseInsensitive Whether the simulation should ignore case
+   * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
    *
    * @return True if matching was successful, false otherwise
    */
-  private fun simulate(editor: VimEditor, currentIndex : Int = 0, currentState: NFAState = startState, epsilonVisited: HashSet<NFAState> = HashSet()) : Boolean {
+  private fun simulate(editor: VimEditor, currentIndex: Int, currentState: NFAState, isCaseInsensitive: Boolean, epsilonVisited: HashSet<NFAState> = HashSet()) : Boolean {
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
-      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups)
+      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
       if (transitionMatcherResult is MatcherResult.Success) {
         var epsilonVisitedCopy = HashSet(epsilonVisited)
         if (transitionMatcherResult.consumed == 0) {
@@ -195,7 +196,7 @@ internal class NFA private constructor(
         } else {
           epsilonVisitedCopy = HashSet()
         }
-        if (simulate(editor, currentIndex + transitionMatcherResult.consumed, transition.destState, epsilonVisitedCopy)) return true
+        if (simulate(editor, currentIndex + transitionMatcherResult.consumed, transition.destState, isCaseInsensitive, epsilonVisitedCopy)) return true
       }
     }
     return false
@@ -209,18 +210,9 @@ internal class NFA private constructor(
    * @param state  The current state in the simulation
    */
   private fun updateCaptureGroups(editor: VimEditor, index: Int, state: NFAState) {
-    for (groupNumber in state.startCapture) {
-      println("index $index: starts capturing group $groupNumber")
-      groups.setGroupStart(groupNumber, index)
-    }
-    for (groupNumber in state.endCapture) {
-      println("index $index: ends capturing group $groupNumber")
-      groups.setGroupEnd(groupNumber, index, editor.text())
-    }
-    for (groupNumber in state.forceEndCapture) {
-      println("index $index: force ends capturing group $groupNumber")
-      groups.setForceGroupEnd(groupNumber, index, editor.text())
-    }
+    for (groupNumber in state.startCapture) groups.setGroupStart(groupNumber, index)
+    for (groupNumber in state.endCapture) groups.setGroupEnd(groupNumber, index, editor.text())
+    for (groupNumber in state.forceEndCapture) groups.setForceGroupEnd(groupNumber, index, editor.text())
   }
 
   internal companion object {

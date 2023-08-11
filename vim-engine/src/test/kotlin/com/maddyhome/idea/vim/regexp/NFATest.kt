@@ -650,17 +650,38 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test case insensitive word`() {
+    assertCorrectRange(
+      "IdeaVim",
+      "ideavim",
+      0 until 7,
+      ignoreCase = true
+    )
+  }
+
+  @Test
+  fun `test case insensitive collection`() {
+    assertCorrectRange(
+      "IdeaVim",
+      "[a-z]*",
+      0 until 7,
+      ignoreCase = true
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
     expectedResultRange:
     IntRange,
     offset: Int = 0,
-    carets: List<Int> = emptyList()
+    carets: List<Int> = emptyList(),
+    ignoreCase: Boolean = false
   ) {
     val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
-    val result = nfa.simulate(editor, offset)
+    val result = nfa.simulate(editor, offset, isCaseInsensitive = ignoreCase)
     when (result) {
       is VimMatchResult.Failure -> fail("Expected to find match")
       is VimMatchResult.Success -> assertEquals(expectedResultRange, result.range)

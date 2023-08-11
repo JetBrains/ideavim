@@ -17,6 +17,13 @@ tokens {
   CLASS_NOT_LCASE_NL, CLASS_UCASE_NL, CLASS_NOT_UCASE_NL
 }
 
+@members {
+    public Boolean ignoreCase = null;
+
+    void setIgnoreCase() { ignoreCase = true; }
+    void setNoIgnoreCase() { ignoreCase = false; }
+}
+
 // ------------------------------------------------------------------------------------------------ //
 //                                                                                                  //
 //                                                                                                  //
@@ -44,6 +51,10 @@ COLLECTION_START_MAGIC: '[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION_STAR
 CURSOR_MAGIC: '\\%#' -> type(CURSOR);
 START_MATCH_MAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_MAGIC: '\\ze' -> type(END_MATCH);
+
+// case-related tokens
+IGNORE_CASE_MAGIC: '\\c' { setIgnoreCase(); } -> skip;
+NO_IGNORE_CASE_MAGIC: '\\C' { setNoIgnoreCase(); } -> skip;
 
 // character classes
 CLASS_IDENTIFIER_MAGIC: '\\i' -> type(CLASS_IDENTIFIER);
@@ -143,6 +154,10 @@ COLLECTION_START_NOMAGIC: '\\[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION_
 CURSOR_NOMAGIC: '\\%#' -> type(CURSOR);
 START_MATCH_NOMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_NOMAGIC: '\\ze' -> type(END_MATCH);
+
+// case-related tokens
+IGNORE_CASE_NOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
+NO_IGNORE_CASE_NOMAGIC: '\\C' { setNoIgnoreCase(); } -> skip;
 
 // character classes
 CLASS_IDENTIFIER_NOMAGIC: '\\i' -> type(CLASS_IDENTIFIER);
@@ -244,6 +259,10 @@ CURSOR_VMAGIC: '%#' -> type(CURSOR);
 START_MATCH_VMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_VMAGIC: '\\ze' -> type(END_MATCH);
 
+// case-related tokens
+IGNORE_CASE_VMAGIC: '\\c' { setIgnoreCase(); } -> skip;
+NO_IGNORE_CASE_VMAGIC: '\\C' { setNoIgnoreCase(); } -> skip;
+
 // character classes
 CLASS_IDENTIFIER_VMAGIC: '\\i' -> type(CLASS_IDENTIFIER);
 CLASS_IDENTIFIER_D_VMAGIC: '\\I' -> type(CLASS_IDENTIFIER_D);
@@ -342,6 +361,10 @@ COLLECTION_START_VNOMAGIC: '\\[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION
 CURSOR_VNOMAGIC: '\\%#' -> type(CURSOR);
 START_MATCH_VNOMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_VNOMAGIC: '\\ze' -> type(END_MATCH);
+
+// case-related tokens
+IGNORE_CASE_VNOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
+OT_IGNORE_CASE_VNOMAGIC: '\\C' { setNoIgnoreCase(); } -> skip;
 
 // character classes
 CLASS_IDENTIFIER_VNOMAGIC: '\\i' -> type(CLASS_IDENTIFIER);
