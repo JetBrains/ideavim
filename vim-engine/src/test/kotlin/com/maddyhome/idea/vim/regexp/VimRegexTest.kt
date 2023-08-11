@@ -107,6 +107,20 @@ class VimRegexTest {
   }
 
   @Test
+  fun `test find all occurrences of word case insensitive`() {
+    assertFindAll(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "lorem\\c",
+      setOf(0 until 5, 13 until 18)
+    )
+  }
+
+  @Test
   fun `test word matches at index`() {
     assertMatchAt(
       "Lorem Ipsum\n" +
