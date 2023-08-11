@@ -193,7 +193,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitWhitespace(ctx: RegexParser.WhitespaceContext): NFA {
     return NFA.fromMatcher(CollectionMatcher(
       listOf(' ', '\t'),
-      includesEOL = ctx.text.contains('_')
+      includesEOL = ctx.text.contains('_'),
+      forceNoIgnoreCase = true
     ))
   }
 
@@ -201,7 +202,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(CollectionMatcher(
       listOf(' ', '\t'),
       isNegated = true,
-      includesEOL = ctx.text.contains('_')
+      includesEOL = ctx.text.contains('_'),
+      forceNoIgnoreCase = true
     ))
   }
 
@@ -209,7 +211,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('0', '9')),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -219,7 +222,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
       CollectionMatcher(
         ranges = listOf(CollectionRange('0', '9')),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -232,7 +236,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('A', 'F'),
           CollectionRange('a', 'f'),
         ),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -246,7 +251,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('a', 'f'),
         ),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -255,7 +261,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('0', '7')),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -265,7 +272,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
       CollectionMatcher(
         ranges = listOf(CollectionRange('0', '7')),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -279,7 +287,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
         ),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -294,7 +303,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('a', 'z'),
         ),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -307,7 +317,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
         ),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -321,7 +332,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('a', 'z'),
         ),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -333,7 +345,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
         ),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -346,7 +359,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
           CollectionRange('a', 'z'),
         ),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -355,7 +369,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('a', 'z')),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -365,7 +380,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
       CollectionMatcher(
         ranges = listOf(CollectionRange('a', 'z')),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -374,7 +390,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(
       CollectionMatcher(
         ranges = listOf(CollectionRange('A', 'Z')),
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }
@@ -384,7 +401,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
       CollectionMatcher(
         ranges = listOf(CollectionRange('A', 'Z')),
         isNegated = true,
-        includesEOL = ctx.text.contains('_')
+        includesEOL = ctx.text.contains('_'),
+        forceNoIgnoreCase = true
       )
     )
   }

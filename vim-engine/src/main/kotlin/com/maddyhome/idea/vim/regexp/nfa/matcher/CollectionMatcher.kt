@@ -14,16 +14,18 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 /**
  * Matcher used to match against a character collection.
  *
- * @param chars       The individual characters in the collection
- * @param ranges      The ranges of characters in the collection
- * @param isNegated   Whether the Matcher should accept or refuse characters that are in the collection
- * @param includesEOL Whether the collection includes the end-of-line
+ * @param chars             The individual characters in the collection
+ * @param ranges            The ranges of characters in the collection
+ * @param isNegated         Whether the Matcher should accept or refuse characters that are in the collection
+ * @param includesEOL       Whether the collection includes the end-of-line
+ * @param forceNoIgnoreCase If this is set, matching is always case-sensitive
  */
 internal class CollectionMatcher(
   private val chars: List<Char> = emptyList(),
   private val ranges: List<CollectionRange> = emptyList(),
   private val isNegated: Boolean = false,
-  private val includesEOL: Boolean = false
+  private val includesEOL: Boolean = false,
+  private val forceNoIgnoreCase: Boolean = false
 ) : Matcher {
   override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
@@ -32,7 +34,7 @@ internal class CollectionMatcher(
     if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
 
     val char = editor.text()[index]
-    val result = if (isCaseInsensitive) (chars.map { it.lowercaseChar() }.contains(char.lowercaseChar()) || ranges.any { it.inRange(char, true) }) == !isNegated
+    val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }.contains(char.lowercaseChar()) || ranges.any { it.inRange(char, true) }) == !isNegated
                  else (chars.contains(char) || ranges.any { it.inRange(char) }) == !isNegated
     return if (result) MatcherResult.Success(1)
     else MatcherResult.Failure
