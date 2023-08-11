@@ -1,13 +1,53 @@
 package com.maddyhome.idea.vim.common
 
+//
+// RATIONALE:
+//
+// As an alternative to implementing this ourselves, we could make use of the ICU4J — the implementation
+// of the unicode related properties and algorithms maintained by the unicode organisation.
+//
+// The reason why it wasn't done so is twofold:
+//   1. ICU4J is a fairly big library, that provides the complete support for the Unicode specification,
+//      while at this moment all we need is a small subset of that functionality, namely the grapheme
+//      cluster boundaries search.
+//
+//   2. The exposed API is a little awkward to use and would require adapters to be efficient.
+//      To iterate over the grapheme cluster boundaries using ICU4J, one could employ the implementation
+//      of the `java.text.BreakIterator` provided by the library.
+//
+//      Given the specifics of the memory access patterns in the vim-engine with respect to grapheme
+//      cluster boundaries search (random access, only certain commands will ever care about the boundaries),
+//      using the sequential `BreakIterator` isn't very efficient. It also does quite a bit of extra
+//      work to enable faster random access of the areas that were visited before by maintaining a partial
+//      index.
+//
+//      JDK21 exposes a similar implementation of the `java.text.BreakIterator` interface, except it's
+//      even less efficent: upon the iterator creation, the full traversal of the given text is performed
+//      to build a full index over all the grapheme cluster boundaries, making the use of the said iterator
+//      O(n) both by time and memory.
+//
+//      We could still consider that option just for the sake of reducing the amount of code that we have
+//      to maintain, once JDK21 is released. The ineffiency can be reduced by taking a small fragment of
+//      the text and increase the size if no boundaries were found, although the amount of extra work
+//      is still substantial.
+//
+//      Ironically, one of the packages of the JDK21 has almost exactly what we need (a very similar API
+//      to the one implemented here), but it is an internal package (`jdk.internal.util.regex`).
+//
+
 /**
  * Move over unicode extended grapheme cluster boundaries.
  *
  * https://www.unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries
  */
 public object Graphemes {
+  /**
+   * Returns the next extended grapheme cluster boundary or `null` if the end of text has been reached.
+   */
   public fun next(charSeq: CharSequence, start: Int): Int? {
-    if (start < 0 || start >= charSeq.length) return null
+    require(start >= 0) { "'start' is out of bounds." }
+
+    if (start >= charSeq.length) return null
 
     return charSeq.nextBoundary(
       start,
@@ -18,16 +58,20 @@ public object Graphemes {
     )
   }
 
+  /**
+   * Returns the previous extended grapheme cluster boundary or `null` if the start of text has been reached.
+   */
   public fun prev(charSeq: CharSequence, start: Int): Int? {
-    if (start <= 0 || start > charSeq.length) return null
+    require(start <= charSeq.length) { "'start' is out of bounds" }
+
+    if (start <= 0) return null
 
     return charSeq.nextBoundary(
       start,
       next = Int::minus,
       nextCode = { if (it > 0) Character.codePointBefore(this, it) else null },
       prevCode = { current, charCount ->
-        if (current - charCount > 0)
-          Character.codePointBefore(this, current - charCount)
+        if (current - charCount > 0) Character.codePointBefore(this, current - charCount)
         else null
       },
       swap = true,
@@ -68,12 +112,14 @@ private inline fun CharSequence.nextBoundary(
     }
 
     // GB4 - break after Control, CR or LF.
-    if (type in arrayOf(CodePointType.CONTROL, CodePointType.CR, CodePointType.LF))
+    if (type in arrayOf(CodePointType.CONTROL, CodePointType.CR, CodePointType.LF)) {
       return next(current, charCount)
+    }
 
     // GB5 - break before Control, CR or LF.
-    if (nextType in arrayOf(CodePointType.CONTROL, CodePointType.CR, CodePointType.LF))
+    if (nextType in arrayOf(CodePointType.CONTROL, CodePointType.CR, CodePointType.LF)) {
       return next(current, charCount)
+    }
 
     // GB6 - do not break Hangul syllable sequence.
     if (type == CodePointType.L && nextType in arrayOf(
@@ -157,8 +203,9 @@ private inline fun CharSequence.countPrev(start: Int, crossinline pred: (Int) ->
   var count = 0
   while (current > 0) {
     val codePoint = Character.codePointBefore(this, current)
-    if (!pred(codePoint))
+    if (!pred(codePoint)) {
       break
+    }
     current -= Character.charCount(codePoint)
     count++
   }
@@ -178,8 +225,9 @@ private fun classify(codePoint: Int): CodePointType {
     in 0 until 0x80 -> return CodePointType.OTHER
   }
 
-  if (isExtendedPictographic(codePoint))
+  if (isExtendedPictographic(codePoint)) {
     return CodePointType.EXTENDED_PICTOGRAPHIC
+  }
 
   val type = Character.getType(codePoint).toByte()
   return when (type) {
