@@ -146,7 +146,9 @@ collection_elem : start=(COLLECTION_LITERAL_CHAR | DASH | CARET) DASH end=(COLLE
  * When using zero-width tokens, no characters are
  * included in the match.
  */
-zero_width : CURSOR      #Cursor
-           | START_MATCH #StartMatch
-           | END_MATCH   #EndMatch
+zero_width : CURSOR        #Cursor
+           | START_MATCH   #StartMatch
+           | END_MATCH     #EndMatch
+           | START_OF_FILE #StartOfFile
+           | END_OF_FILE   #EndOfFile
            ;

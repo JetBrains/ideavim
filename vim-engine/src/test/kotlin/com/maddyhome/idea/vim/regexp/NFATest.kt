@@ -679,6 +679,50 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test start of file`() {
+    assertCorrectRange(
+      "IdeaVim",
+      "\\%^Idea",
+      0 until 4
+    )
+  }
+  @Test
+  fun `test start of file should fail`() {
+    assertFailure(
+      "IdeaVim",
+      "\\%^Vim",
+      4
+    )
+  }
+
+  @Test
+  fun `test end of file`()  {
+    assertCorrectRange(
+      "IdeaVim",
+      "Vim\\%$",
+      4 until 7,
+      4
+    )
+  }
+
+  @Test
+  fun `test end of file should fail`() {
+    assertFailure(
+      "IdeaVim",
+      "Idea\\%$"
+    )
+  }
+
+  @Test
+  fun `test start and end of file`() {
+    assertCorrectRange(
+      "IdeaVim",
+      "\\%^IdeaVim\\%$",
+      0 until 7
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,

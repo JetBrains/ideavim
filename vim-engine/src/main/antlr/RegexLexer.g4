@@ -14,7 +14,7 @@ tokens {
   CLASS_WS_NL, CLASS_NOT_WS_NL, CLASS_DIGIT_NL, CLASS_NOT_DIGIT_NL, CLASS_HEX_NL,
   CLASS_NOT_HEX_NL, CLASS_OCTAL_NL, CLASS_NOT_OCTAL_NL, CLASS_WORD_NL, CLASS_NOT_WORD_NL,
   CLASS_HEADWORD_NL, CLASS_NOT_HEADWORD_NL, CLASS_ALPHA_NL, CLASS_NOT_ALPHA_NL, CLASS_LCASE_NL,
-  CLASS_NOT_LCASE_NL, CLASS_UCASE_NL, CLASS_NOT_UCASE_NL
+  CLASS_NOT_LCASE_NL, CLASS_UCASE_NL, CLASS_NOT_UCASE_NL, START_OF_FILE, END_OF_FILE
 }
 
 @members {
@@ -51,6 +51,8 @@ COLLECTION_START_MAGIC: '[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION_STAR
 CURSOR_MAGIC: '\\%#' -> type(CURSOR);
 START_MATCH_MAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_MAGIC: '\\ze' -> type(END_MATCH);
+START_OF_FILE_MAGIC: '\\%^' -> type(START_OF_FILE);
+END_OF_FILE_MAGIC: '\\%$' -> type(END_OF_FILE);
 
 // case-related tokens
 IGNORE_CASE_MAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -154,6 +156,8 @@ COLLECTION_START_NOMAGIC: '\\[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION_
 CURSOR_NOMAGIC: '\\%#' -> type(CURSOR);
 START_MATCH_NOMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_NOMAGIC: '\\ze' -> type(END_MATCH);
+START_OF_FILE_NOMAGIC: '\\%^' -> type(START_OF_FILE);
+END_OF_FILE_NOMAGIC: '\\%$' -> type(END_OF_FILE);
 
 // case-related tokens
 IGNORE_CASE_NOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -262,6 +266,8 @@ END_MATCH_VMAGIC: '\\ze' -> type(END_MATCH);
 // case-related tokens
 IGNORE_CASE_VMAGIC: '\\c' { setIgnoreCase(); } -> skip;
 NO_IGNORE_CASE_VMAGIC: '\\C' { setNoIgnoreCase(); } -> skip;
+START_OF_FILE_VMAGIC: '%^' -> type(START_OF_FILE);
+END_OF_FILE_VMAGIC: '%$' -> type(END_OF_FILE);
 
 // character classes
 CLASS_IDENTIFIER_VMAGIC: '\\i' -> type(CLASS_IDENTIFIER);
@@ -361,6 +367,8 @@ COLLECTION_START_VNOMAGIC: '\\[' -> pushMode(INSIDE_COLLECTION), type(COLLECTION
 CURSOR_VNOMAGIC: '\\%#' -> type(CURSOR);
 START_MATCH_VNOMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_VNOMAGIC: '\\ze' -> type(END_MATCH);
+START_OF_FILE_VNOMAGIC: '\\%^' -> type(START_OF_FILE);
+END_OF_FILE_VNOMAGIC: '\\%$' -> type(END_OF_FILE);
 
 // case-related tokens
 IGNORE_CASE_VNOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
