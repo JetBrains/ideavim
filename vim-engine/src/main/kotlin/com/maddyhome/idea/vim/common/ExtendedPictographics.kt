@@ -19,6 +19,9 @@ internal fun isExtendedPictographic(codePoint: Int): Boolean {
 // A bitmap that maps a code point into whether it has the Extended_Pictographic property.
 // The code points go in increasing order by index and in reverse order by bit in a specific long.
 // This way a simple divmod is enough to compute both indices.
+//
+// The bitmap is generated from the emoji-data.txt of the Unicode Character Database:
+// https://www.unicode.org/Public/15.0.0/ucd/emoji/emoji-data.txt
 private val bitmap = longArrayOf(
   0, 0, 72567767433216, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -78,4 +81,5 @@ private val bitmap = longArrayOf(
   274877906943, -577445914654736386, -512, -1, -1, -1, -1, -1, 576460752303423487, -1, -1, -1, -1,
   4611686018427387903, -64, -1, -1, -1, 65535, -1, -1, 0, -4503599627370496, 0, -2097152, 61440, 4227923712,
   -70368744112384, -1, -576460752303427584, -65, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1,
-  -1, -1, -1, -1, -1, -1, -1, 4611686018427387903)
+  -1, -1, -1, -1, -1, -1, -1, 4611686018427387903
+)
