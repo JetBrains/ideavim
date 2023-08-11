@@ -15,7 +15,9 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionRange
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.EndOfFileMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.PredicateMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfFileMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
@@ -487,6 +489,14 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(
       BackreferenceMatcher(ctx.text[1].digitToInt())
     )
+  }
+
+  override fun visitStartOfFile(ctx: RegexParser.StartOfFileContext?): NFA {
+    return NFA.fromMatcher(StartOfFileMatcher())
+  }
+
+  override fun visitEndOfFile(ctx: RegexParser.EndOfFileContext?): NFA {
+    return NFA.fromMatcher(EndOfFileMatcher())
   }
 
   private fun cleanLiteralChar(str : String) : Char {
