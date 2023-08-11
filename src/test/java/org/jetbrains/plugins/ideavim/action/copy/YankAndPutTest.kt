@@ -12,11 +12,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
-import org.junit.jupiter.api.condition.EnabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 @TraceOptions(TestOptionConstants.clipboard)
 class YankAndPutTest : VimTestCase() {
@@ -43,7 +42,7 @@ class YankAndPutTest : VimTestCase() {
   }
 
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamedplus]))
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test yank to number register with unnamedplus`() {
     val before = """
             I ${c}found it in a legendary land
@@ -88,7 +87,7 @@ class YankAndPutTest : VimTestCase() {
   }
 
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]))
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """
             I ${c}found it in a legendary land

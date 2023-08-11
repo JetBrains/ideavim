@@ -13,14 +13,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.register.Register
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.annotations.TestForLinux
+import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
+import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 class RegistersCommandTest : VimTestCase() {
-  @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  @TestWithoutPrimaryClipboard
   fun `test list empty registers`() {
     configureByText("")
     enterCommand("registers")
@@ -100,8 +98,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test correctly encodes non printable characters`() {
     configureByText("")
 
@@ -134,8 +131,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test list all registers in correct order`() {
     configureByText(
       """"<caret>line 0
@@ -231,8 +227,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
-  @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  @TestWithoutPrimaryClipboard
   fun `test clipboard registers are not duplicated`() {
     configureByText("<caret>line 0 ")
 
@@ -248,8 +243,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
-  @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  @TestWithoutPrimaryClipboard
   fun `test registers after yank with unnamed and unnamedplus`() {
     configureByText("<caret>line 0 ")
     enterCommand("set clipboard=unnamed,unnamedplus")
@@ -268,8 +262,7 @@ class RegistersCommandTest : VimTestCase() {
     enterCommand("set clipboard&")
   }
 
-  @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  @TestWithoutPrimaryClipboard
   fun `test registers after delete with unnamed and unnamedplus`() {
     configureByText("<caret>line 0 ")
     enterCommand("set clipboard=unnamed,unnamedplus")
@@ -288,8 +281,7 @@ class RegistersCommandTest : VimTestCase() {
     enterCommand("set clipboard&")
   }
 
-  @Test
-  @EnabledOnOs(OS.WINDOWS, OS.MAC)
+  @TestWithoutPrimaryClipboard
   fun `test registers for nonlinux with unnamedplus`() {
     configureByText("<caret>line 0 ")
     enterCommand("set clipboard=unnamedplus")
@@ -308,14 +300,14 @@ class RegistersCommandTest : VimTestCase() {
     enterCommand("set clipboard&")
   }
 
-  @TestForLinux
+  @TestWithPrimaryClipboard
   fun `test list empty registers linux`() {
     configureByText("")
     enterCommand("registers")
     assertExOutput("Type Name Content\n  c  \"+   ")
   }
 
-  @TestForLinux
+  @TestWithPrimaryClipboard
   fun `test correctly encodes non printable characters linux`() {
     configureByText("")
 
@@ -330,7 +322,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
-  @TestForLinux
+  @TestWithPrimaryClipboard
   fun `test list all registers in correct order linux`() {
     configureByText(
       """"<caret>line 0
@@ -428,7 +420,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
-  @TestForLinux
+  @TestWithPrimaryClipboard
   fun `test clipboard registers are not duplicated linux`() {
     configureByText("<caret>line 0 ")
 
@@ -445,7 +437,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
-  @TestForLinux
+  @TestWithPrimaryClipboard
   fun `test registers after yank with unnamed and unnamedplus linux`() {
     configureByText("<caret>line 0 ")
     enterCommand("set clipboard=unnamed,unnamedplus")
@@ -465,7 +457,7 @@ class RegistersCommandTest : VimTestCase() {
     enterCommand("set clipboard&")
   }
 
-  @TestForLinux
+  @TestWithPrimaryClipboard
   fun `test registers after delete with unnamed and unnamedplus linux`() {
     configureByText("<caret>line 0 ")
     enterCommand("set clipboard=unnamed,unnamedplus")

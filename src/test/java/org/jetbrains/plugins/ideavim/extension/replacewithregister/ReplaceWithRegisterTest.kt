@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.annotations.TestForLinux
+import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -550,7 +550,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     enterCommand("set clipboard&")
   }
 
-  @TestForLinux
+  @TestWithPrimaryClipboard
   fun `test replace in visual with clipboard unnamedplus linux`() {
     VimPlugin.getRegister().resetRegisters()
 

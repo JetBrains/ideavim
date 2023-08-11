@@ -17,11 +17,10 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.junit.Ignore
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 /**
  * @author Alex Plate
@@ -208,8 +207,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
   // Legacy tests
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text linewise multicaret`() {
     val before = """
             q${c}werty

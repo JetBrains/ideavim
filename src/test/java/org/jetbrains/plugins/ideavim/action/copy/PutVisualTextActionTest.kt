@@ -18,10 +18,9 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 /**
  * @author Alex Plate
@@ -107,8 +106,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text multicaret`() {
     val before = "${c}I found ${c}it in a ${c}legendary land"
     configureByText(before)
@@ -256,8 +254,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text linewise multicaret`() {
     val before = """
             A Discovery
@@ -319,8 +316,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text linewise multicaret on same line`() {
     val before = """
             A Discovery
@@ -378,8 +374,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text linewise multicaret on same line twice`() {
     val before = """
             A Discovery
@@ -555,8 +550,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text blockwise multicaret`() {
     val before = """
             A Discovery
@@ -734,8 +728,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text character to line multicaret`() {
     val before = """
             A Discovery
@@ -807,8 +800,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text character to line multicaret on same line`() {
     val before = """
             A Discovery
@@ -972,8 +964,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text line to line multicaret`() {
     val before = """
             A Discovery
@@ -1045,8 +1036,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text line to line multicaret on same line`() {
     val before = """
             A Discovery
@@ -1286,8 +1276,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  @EnabledOnOs(OS.MAC, OS.WINDOWS)
+  @TestWithoutPrimaryClipboard
   fun `test put visual text blockwise multicaret to line`() {
     val before = """
             A Discovery
