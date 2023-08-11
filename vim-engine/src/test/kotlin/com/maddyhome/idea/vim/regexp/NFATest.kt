@@ -664,8 +664,17 @@ class NFATest {
   fun `test case insensitive collection`() {
     assertCorrectRange(
       "IdeaVim",
-      "[a-z]*",
+      "[a-z]\\+",
       0 until 7,
+      ignoreCase = true
+    )
+  }
+
+  @Test
+  fun `test character classes never ignore case`() {
+    assertFailure(
+      "IdeaVim",
+      "\\l\\+",
       ignoreCase = true
     )
   }
@@ -705,10 +714,10 @@ class NFATest {
     }
   }
 
-  private fun assertFailure(text: CharSequence, pattern: String, offset: Int = 0, carets: List<Int> = emptyList()) {
+  private fun assertFailure(text: CharSequence, pattern: String, offset: Int = 0, carets: List<Int> = emptyList(), ignoreCase: Boolean = false) {
     val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
-    assertTrue(nfa.simulate(editor, offset) is VimMatchResult.Failure)
+    assertTrue(nfa.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
   }
 
   private fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
