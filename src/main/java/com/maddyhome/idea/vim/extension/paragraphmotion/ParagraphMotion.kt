@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.extension.paragraphmotion
 
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector

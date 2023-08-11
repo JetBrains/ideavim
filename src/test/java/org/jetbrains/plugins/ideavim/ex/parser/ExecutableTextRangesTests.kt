@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.ex.parser
 
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand
 import com.maddyhome.idea.vim.vimscript.model.statements.IfStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase

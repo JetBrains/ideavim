@@ -8,7 +8,6 @@
 
 package scripts
 
-import org.eclipse.jgit.api.Git
 import scripts.release.checkoutBranch
 import scripts.release.getGit
 import scripts.release.getRepo

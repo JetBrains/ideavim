@@ -9,7 +9,10 @@
 package com.maddyhome.idea.vim.extension.textobjindent;
 
 import com.intellij.openapi.editor.Caret;
-import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.ImmutableVimCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;

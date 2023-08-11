@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
 @VimscriptFunction(name = "submatch")
 internal class SubmatchFunctionHandler : FunctionHandler() {

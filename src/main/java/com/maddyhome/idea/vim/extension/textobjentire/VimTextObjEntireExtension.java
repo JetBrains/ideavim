@@ -9,12 +9,14 @@
 package com.maddyhome.idea.vim.extension.textobjentire;
 
 import com.intellij.openapi.editor.Caret;
-import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.ImmutableVimCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
+import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;

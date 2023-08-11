@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 import org.jetbrains.annotations.NonNls
-import java.util.*
 import javax.swing.KeyStroke
 
 public interface VimStringParser {

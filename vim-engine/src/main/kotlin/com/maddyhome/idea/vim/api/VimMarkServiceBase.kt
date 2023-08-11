@@ -34,11 +34,9 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
-import java.lang.IllegalArgumentException
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.util.*
-import kotlin.collections.HashMap
 
 public abstract class VimMarkServiceBase : VimMarkService {
   public companion object {

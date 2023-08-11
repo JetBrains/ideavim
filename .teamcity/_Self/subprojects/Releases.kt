@@ -1,7 +1,6 @@
 package _Self.subprojects
 
 import _Self.buildTypes.PublishVimEngine
-import _Self.buildTypes.Release
 import _Self.buildTypes.ReleaseDev
 import _Self.buildTypes.ReleaseEap
 import _Self.buildTypes.ReleaseMajor

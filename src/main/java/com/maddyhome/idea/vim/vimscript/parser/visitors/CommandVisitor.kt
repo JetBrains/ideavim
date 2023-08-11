@@ -70,8 +70,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SelectFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SelectFirstFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SelectLastFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.SetglobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SetglobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetlocalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShellCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShiftLeftCommand

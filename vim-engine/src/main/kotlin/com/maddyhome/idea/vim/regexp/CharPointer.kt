@@ -7,7 +7,6 @@
  */
 package com.maddyhome.idea.vim.regexp
 
-import java.lang.StringBuffer
 import java.nio.CharBuffer
 import java.util.*
 
