@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * @param forceNoIgnoreCase If this is set, matching is always case-sensitive
  */
 internal class CollectionMatcher(
-  private val chars: List<Char> = emptyList(),
+  private val chars: Set<Char> = emptySet(),
   private val ranges: List<CollectionRange> = emptyList(),
   private val isNegated: Boolean = false,
   private val includesEOL: Boolean = false,

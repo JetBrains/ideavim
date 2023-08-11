@@ -194,7 +194,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitWhitespace(ctx: RegexParser.WhitespaceContext): NFA {
     return NFA.fromMatcher(CollectionMatcher(
-      listOf(' ', '\t'),
+      setOf(' ', '\t'),
       includesEOL = ctx.text.contains('_'),
       forceNoIgnoreCase = true
     ))
@@ -202,7 +202,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitNotWhitespace(ctx: RegexParser.NotWhitespaceContext): NFA {
     return NFA.fromMatcher(CollectionMatcher(
-      listOf(' ', '\t'),
+      setOf(' ', '\t'),
       isNegated = true,
       includesEOL = ctx.text.contains('_'),
       forceNoIgnoreCase = true
@@ -283,7 +283,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitWordchar(ctx: RegexParser.WordcharContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        chars = listOf('_'),
+        chars = setOf('_'),
         ranges = listOf(
           CollectionRange('0', '9'),
           CollectionRange('A', 'Z'),
@@ -298,7 +298,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitNotwordchar(ctx: RegexParser.NotwordcharContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        chars = listOf('_'),
+        chars = setOf('_'),
         ranges = listOf(
           CollectionRange('0', '9'),
           CollectionRange('A', 'Z'),
@@ -314,7 +314,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitHeadofword(ctx: RegexParser.HeadofwordContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        chars = listOf('_'),
+        chars = setOf('_'),
         ranges = listOf(
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
@@ -328,7 +328,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitNotHeadOfWord(ctx: RegexParser.NotHeadOfWordContext): NFA {
     return NFA.fromMatcher(
       CollectionMatcher(
-        chars = listOf('_'),
+        chars = setOf('_'),
         ranges = listOf(
           CollectionRange('A', 'Z'),
           CollectionRange('a', 'z'),
@@ -442,7 +442,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   private fun visitCollection(collectionElements: List<RegexParser.Collection_elemContext>, isNegated: Boolean) : NFA {
-    val individualChars: ArrayList<Char> = ArrayList()
+    val individualChars: HashSet<Char> = HashSet()
     val ranges: ArrayList<CollectionRange> = ArrayList()
     val collectionElementVisitor = CollectionElementVisitor()
 
