@@ -17,15 +17,20 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * @param groupNumber The number of the back-referenced captured group
  */
 internal class BackreferenceMatcher(private val groupNumber: Int) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
     if (groups.get(groupNumber) == null) {
       // TODO: throw illegal backreference error
       return MatcherResult.Failure
     }
-    val capturedString = groups.get(groupNumber)!!.value
+    val capturedString = if (isCaseInsensitive) groups.get(groupNumber)!!.value.lowercase()
+                         else groups.get(groupNumber)!!.value
 
     if (editor.text().length - index < capturedString.length) return MatcherResult.Failure
-    return if (editor.text().substring(index until index + capturedString.length) == capturedString)
+
+    val editorString = if (isCaseInsensitive) editor.text().substring(index until index + capturedString.length).lowercase()
+                       else editor.text().substring(index until index + capturedString.length)
+
+    return if (capturedString == editorString)
       MatcherResult.Success(capturedString.length)
     else
       MatcherResult.Failure

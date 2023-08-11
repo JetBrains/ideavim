@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * Matcher that matches with any character
  */
 internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
     return if (includeNewLine)
       if (index < editor.text().length) MatcherResult.Success(1)
       else MatcherResult.Failure

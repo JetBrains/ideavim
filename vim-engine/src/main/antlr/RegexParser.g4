@@ -118,11 +118,11 @@ char_class : (CLASS_IDENTIFIER   | CLASS_IDENTIFIER_NL)   #Identifier
            | (CLASS_NOT_LCASE    | CLASS_NOT_LCASE_NL)    #NotLcase
            | (CLASS_UCASE        | CLASS_UCASE_NL)        #Ucase
            | (CLASS_NOT_UCASE    | CLASS_NOT_UCASE_NL)    #NotUcase
-           | CLASS_ESC          #Esc
-           | CLASS_TAB          #Tab
-           | CLASS_CR           #CR
-           | CLASS_BS           #BS
-           | CLASS_NL           #NL
+           | CLASS_ESC                                    #Esc
+           | CLASS_TAB                                    #Tab
+           | CLASS_CR                                     #CR
+           | CLASS_BS                                     #BS
+           | CLASS_NL                                     #NL
            ;
 
 /**

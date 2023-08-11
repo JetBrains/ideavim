@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * on the given index
  */
 internal class CursorMatcher : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
     return if (editor.carets().map { it.offset }.contains(Offset(index))) MatcherResult.Success(0)
     else MatcherResult.Failure
   }

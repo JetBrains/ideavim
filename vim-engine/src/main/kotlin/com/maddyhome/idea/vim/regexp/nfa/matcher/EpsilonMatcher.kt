@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * taken and without consuming any character.
  */
 internal class EpsilonMatcher : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
     return MatcherResult.Success(0)
   }
 }

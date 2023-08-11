@@ -15,8 +15,13 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * Matcher used to match against single characters
  */
 internal class CharacterMatcher(val char: Char) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection): MatcherResult {
-    return if (index < editor.text().length && editor.text()[index] == char) MatcherResult.Success(1)
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
+    if (index >= editor.text().length) return MatcherResult.Failure
+
+    val targetChar = if (isCaseInsensitive) char.lowercaseChar() else char
+    val editorChar = if (isCaseInsensitive) editor.text()[index].lowercaseChar() else editor.text()[index]
+
+    return if (targetChar == editorChar) MatcherResult.Success(1)
     else MatcherResult.Failure
   }
 }

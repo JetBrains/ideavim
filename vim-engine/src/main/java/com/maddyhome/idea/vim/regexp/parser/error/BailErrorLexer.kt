@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.regexp.parser.generated.RegexLexer
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.LexerNoViableAltException
 
-public class BailErrorLexer(input: CharStream?) : RegexLexer(input) {
+internal class BailErrorLexer(input: CharStream) : RegexLexer(input) {
   override fun recover(e: LexerNoViableAltException?) {
     throw RuntimeException(e)
   }
