@@ -723,6 +723,23 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test for empty file`() {
+    assertCorrectRange(
+      "",
+      "\\v%^%$",
+      IntRange.EMPTY
+    )
+  }
+
+  @Test
+  fun `test for empty file should fail`() {
+    assertFailure(
+      "IdeaVim",
+      "\\v%^%$"
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
