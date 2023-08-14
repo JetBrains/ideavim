@@ -454,7 +454,7 @@ $c  tw${c}o
   }
 
   @Test
-  @Disabled("Temporally disabled")
+//  @Disabled("Temporally disabled")
   fun testMotionInnerParagraphAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "3ip"),
