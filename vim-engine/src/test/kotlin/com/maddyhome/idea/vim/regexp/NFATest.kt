@@ -890,6 +890,24 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test atomic group`() {
+    assertCorrectRange(
+      "aaab",
+      "\\(a*\\)\\@>b",
+      0 until 4
+
+    )
+  }
+
+  @Test
+  fun `test atomic group should fail`() {
+    assertFailure(
+      "aaa",
+      "\\(a*\\)\\@>a"
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
