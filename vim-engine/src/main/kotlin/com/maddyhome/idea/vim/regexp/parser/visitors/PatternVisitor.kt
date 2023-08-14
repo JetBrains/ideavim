@@ -510,6 +510,14 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(EndOfFileMatcher())
   }
 
+  override fun visitStartOfLine(ctx: RegexParser.StartOfLineContext?): NFA {
+    return NFA.fromMatcher(StartOfLineMatcher())
+  }
+
+  override fun visitEndOfLine(ctx: RegexParser.EndOfLineContext?): NFA {
+    return NFA.fromMatcher(EndOfLineMatcher())
+  }
+
   private fun cleanLiteralChar(str : String) : Char {
     return if (str.length == 2 && str[0] == '\\') str[1]
     else str[0]
