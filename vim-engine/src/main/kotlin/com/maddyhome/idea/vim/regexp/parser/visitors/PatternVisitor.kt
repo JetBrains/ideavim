@@ -55,25 +55,30 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   override fun visitPiece(ctx: RegexParser.PieceContext): NFA {
     if (ctx.multi() == null) return visit(ctx.atom())
 
-    val multiVisitor = MultiVisitor()
-    val range = multiVisitor.visit(ctx.multi())
+    val multi = MultiVisitor().visit(ctx.multi())
 
+    return when (multi) {
+      is Multi.RangeMulti -> buildQuantifiedNFA(ctx.atom(), multi)
+    }
+  }
+
+  private fun buildQuantifiedNFA(atom: RegexParser.AtomContext, range: Multi.RangeMulti) : NFA {
     val prefixNFA = NFA.fromSingleState()
     for (i in 0 until range.lowerBoundary.i)
-      prefixNFA.concatenate(visit(ctx.atom()))
+      prefixNFA.concatenate(visit(atom))
 
     var suffixNFA = NFA.fromSingleState()
-    if (range.upperBoundary is MultiBoundary.InfiniteMultiBoundary) suffixNFA = visit(ctx.atom()).closure(range.isGreedy)
+    if (range.upperBoundary is MultiBoundary.InfiniteMultiBoundary) suffixNFA = visit(atom).closure(range.isGreedy)
     else {
       for (i in range.lowerBoundary.i until (range.upperBoundary as MultiBoundary.IntMultiBoundary).i) {
-        suffixNFA.concatenate(visit(ctx.atom()))
+        suffixNFA.concatenate(visit(atom))
         suffixNFA.optional(range.isGreedy)
       }
     }
 
     prefixNFA.concatenate(suffixNFA)
-    if (ctx.atom() is RegexParser.GroupingCaptureContext)
-      groupNumbers[ctx.atom()]?.let { prefixNFA.capture(it, false) }
+    if (atom is RegexParser.GroupingCaptureContext)
+      groupNumbers[atom]?.let { prefixNFA.capture(it, false) }
     return prefixNFA
   }
 
