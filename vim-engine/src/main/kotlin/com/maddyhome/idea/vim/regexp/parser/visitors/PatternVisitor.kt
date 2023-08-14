@@ -16,8 +16,10 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionRange
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EndOfFileMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.EndOfLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.PredicateMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfFileMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfLineMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
@@ -35,6 +37,15 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
   override fun visitSub_pattern(ctx: RegexParser.Sub_patternContext): NFA {
     return ctx.branches.map { visitBranch(it) }.union()
+  }
+
+  override fun visitBranch(ctx: RegexParser.BranchContext): NFA {
+    val nfaStart = if (ctx.CARET() != null) NFA.fromMatcher(StartOfLineMatcher()) else NFA.fromSingleState()
+    val nfaEnd = if (ctx.DOLLAR() != null) NFA.fromMatcher(EndOfLineMatcher()) else NFA.fromSingleState()
+
+    // TODO: handle multiple concats
+
+    return nfaStart.concatenate(visit(ctx.concat)).concatenate(nfaEnd)
   }
 
   override fun visitConcat(ctx: RegexParser.ConcatContext): NFA {
