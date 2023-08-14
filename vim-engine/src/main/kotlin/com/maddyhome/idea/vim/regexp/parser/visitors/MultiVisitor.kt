@@ -16,15 +16,15 @@ import org.antlr.v4.runtime.tree.TerminalNode
 internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
 
   override fun visitZeroOrMore(ctx: RegexParser.ZeroOrMoreContext): Multi {
-    return Multi.RangeMulti(MultiBoundary.IntMultiBoundary(0), MultiBoundary.InfiniteMultiBoundary, true)
+    return Multi.RangeMulti(RangeBoundary.IntRangeBoundary(0), RangeBoundary.InfiniteRangeBoundary, true)
   }
 
   override fun visitOneOrMore(ctx: RegexParser.OneOrMoreContext): Multi {
-    return Multi.RangeMulti(MultiBoundary.IntMultiBoundary(1), MultiBoundary.InfiniteMultiBoundary, true)
+    return Multi.RangeMulti(RangeBoundary.IntRangeBoundary(1), RangeBoundary.InfiniteRangeBoundary, true)
   }
 
   override fun visitZeroOrOne(ctx: RegexParser.ZeroOrOneContext?): Multi {
-    return Multi.RangeMulti(MultiBoundary.IntMultiBoundary(0), MultiBoundary.IntMultiBoundary(1), true)
+    return Multi.RangeMulti(RangeBoundary.IntRangeBoundary(0), RangeBoundary.IntRangeBoundary(1), true)
   }
 
   override fun visitRangeGreedy(ctx: RegexParser.RangeGreedyContext): Multi {
@@ -36,9 +36,9 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
   }
 
   private fun visitRange(lowerBoundToken: Token?, upperBoundToken: Token?, comma: TerminalNode?, isGreedy: Boolean): Multi {
-    val lowerDelimiter = if (lowerBoundToken == null) MultiBoundary.IntMultiBoundary(0) else MultiBoundary.IntMultiBoundary(lowerBoundToken.text.toInt())
-    val upperDelimiter = if (comma != null) if (upperBoundToken == null) MultiBoundary.InfiniteMultiBoundary else MultiBoundary.IntMultiBoundary(upperBoundToken.text.toInt())
-    else if (lowerBoundToken == null) MultiBoundary.InfiniteMultiBoundary else lowerDelimiter
+    val lowerDelimiter = if (lowerBoundToken == null) RangeBoundary.IntRangeBoundary(0) else RangeBoundary.IntRangeBoundary(lowerBoundToken.text.toInt())
+    val upperDelimiter = if (comma != null) if (upperBoundToken == null) RangeBoundary.InfiniteRangeBoundary else RangeBoundary.IntRangeBoundary(upperBoundToken.text.toInt())
+    else if (lowerBoundToken == null) RangeBoundary.InfiniteRangeBoundary else lowerDelimiter
     return Multi.RangeMulti(lowerDelimiter, upperDelimiter, isGreedy)
   }
 }
@@ -50,22 +50,22 @@ internal sealed class Multi {
    * make a certain atom repeat itself
    */
   internal data class RangeMulti(
-    val lowerBoundary: MultiBoundary.IntMultiBoundary,
-    val upperBoundary: MultiBoundary,
+    val lowerBoundary: RangeBoundary.IntRangeBoundary,
+    val upperBoundary: RangeBoundary,
     val isGreedy: Boolean
     ) : Multi()
 }
 
-internal sealed class MultiBoundary {
+internal sealed class RangeBoundary {
   /**
    * Represents an integer boundary
    *
    * @param i The boundary of the multi
    */
-  data class IntMultiBoundary(val i: Int) : MultiBoundary()
+  data class IntRangeBoundary(val i: Int) : RangeBoundary()
 
   /**
    * Represents an infinite boundary
    */
-  object InfiniteMultiBoundary : MultiBoundary()
+  object InfiniteRangeBoundary : RangeBoundary()
 }
