@@ -740,6 +740,128 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test start of line`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "^Lorem",
+      13 until 18,
+      13
+    )
+  }
+
+  @Test
+  fun `test start of line should fail`() {
+    assertFailure(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "^Ipsum",
+      6
+    )
+  }
+
+  @Test
+  fun `test end of line`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Ipsum$",
+      6 until 11,
+      6
+    )
+  }
+
+  @Test
+  fun `test end of line should fail`() {
+    assertFailure(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem$"
+    )
+  }
+
+  @Test
+  fun `test start of line after alternation`() {
+    assertCorrectRange(
+      "dog barks",
+      "^cat\\|^dog",
+      0 until 3
+    )
+  }
+
+  @Test
+  fun `test end of line before alternation`() {
+    assertCorrectRange(
+      "cat\n" +
+      "meows",
+      "cat$\\|dog$",
+      0 until 3
+    )
+  }
+
+  @Test
+  fun `test start and end of line inside parenthesis`() {
+    assertCorrectRange(
+      "cat meows",
+      "\\v(^(cat|dog)) ((meows|barks)$)",
+      0 until 9
+    )
+  }
+
+  @Test
+  fun `test caret is taken literally`() {
+    assertCorrectRange(
+      "the symbol ^ is known as caret.",
+      "^.\\+^.\\+$",
+      0 until 31
+    )
+  }
+
+  @Test
+  fun `test dollar sign is taken literally`() {
+    assertCorrectRange(
+      "the symbol for the dollar is $.",
+      "^.\\+$.\\+$",
+      0 until 31
+    )
+  }
+
+  @Test
+  fun `test caret is taken literally at the start of pattern`() {
+    assertCorrectRange(
+      "^ is known as caret.",
+      "\\^ is known",
+      0 until 10
+    )
+  }
+
+  @Test
+  fun `test dollar sign is taken literally at the end of pattern`() {
+    assertCorrectRange(
+      "the symbol for the dollar is $.",
+      "dollar is \\$",
+      19 until 30,
+      19
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,

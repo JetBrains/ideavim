@@ -20,7 +20,8 @@ sub_pattern : (branches+=branch ALTERNATION)* branches+=branch
  * concat, but only if all the preceding concats also match at the same
  * position. Example: "IdeaVim\&Idea matches "Idea" in "IdeaVim".
  */
-branch : (concats+=concat AND)* concats+=concat
+branch : CARET? (concats+=concat AND)* concats+=concat DOLLAR
+       | CARET? (concats+=concat AND)* concats+=concat
        ;
 
 /**
@@ -79,13 +80,13 @@ range : RANGE_START lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END      #R
  * An ordinary_atom can be a single character that matches itself, a token with
  * a special meaning, or a collection of characters.
  */
-ordinary_atom : LITERAL_CHAR  #LiteralChar
-              | DOT           #AnyChar
-              | DOTNL         #AnyCharNL
-              | BACKREFERENCE #Backreference
-              | zero_width    #ZeroWidth
-              | char_class    #CharClass
-              | collection    #Collec
+ordinary_atom : (LITERAL_CHAR | CARET | DOLLAR)  #LiteralChar
+              | DOT                              #AnyChar
+              | DOTNL                            #AnyCharNL
+              | BACKREFERENCE                    #Backreference
+              | zero_width                       #ZeroWidth
+              | char_class                       #CharClass
+              | collection                       #Collec
               ;
 
 /**
