@@ -51,8 +51,8 @@ buildscript {
 
         classpath("io.ktor:ktor-client-core:2.2.4")
         classpath("io.ktor:ktor-client-cio:2.2.4")
-        classpath("io.ktor:ktor-client-auth:2.2.4")
-        classpath("io.ktor:ktor-client-content-negotiation:2.2.4")
+        classpath("io.ktor:ktor-client-auth:2.3.3")
+        classpath("io.ktor:ktor-client-content-negotiation:2.3.3")
         classpath("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
 
         // This comes from the changelog plugin
@@ -137,9 +137,9 @@ dependencies {
 
     testApi("com.squareup.okhttp3:okhttp:4.10.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
 }
 
 configurations {

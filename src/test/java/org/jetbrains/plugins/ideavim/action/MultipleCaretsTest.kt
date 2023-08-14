@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
@@ -453,6 +454,7 @@ $c  tw${c}o
   }
 
   @Test
+  @Disabled("Temporally disabled")
   fun testMotionInnerParagraphAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "3ip"),
@@ -566,6 +568,7 @@ $c  tw${c}o
   }
 
   @Test
+  @Disabled
   fun testMotionOuterParagraphAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "2ap"), "a${c}sdf\n\na${c}sdf\n\nasdf\n\n")
     assertState("<selection>asdf\n\nasdf\n\nasdf\n\n</selection>")

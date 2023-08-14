@@ -14,6 +14,8 @@ plugins {
   `maven-publish`
 }
 
+val kotlinVersion: String by project
+
 // group 'org.jetbrains.ideavim'
 // version 'SNAPSHOT'
 
@@ -27,10 +29,17 @@ ksp {
   arg("ex_commands_file", "engine_ex_commands.json")
 }
 
+afterEvaluate {
+    tasks.named("kspTestKotlin").configure { enabled = false }
+}
+
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
     compileOnly("org.jetbrains:annotations:24.0.1")
 

@@ -102,4 +102,20 @@ class MotionLeftActionTest : VimTestCase() {
       enterCommand("set whichwrap=h")
     }
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
+  @Test
+  fun `test simple motion multiple code point grapheme cluster`() {
+    doTest(
+      "h",
+      """
+          Oh, hi Mark
+          You are my👩‍👩‍👧‍👧${c} favourite customer
+      """.trimIndent(),
+      """
+          Oh, hi Mark
+          You are my${c}👩‍👩‍👧‍👧 favourite customer
+      """.trimIndent(),
+    )
+  }
 }

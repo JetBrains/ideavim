@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.common.TextRange
 import java.nio.CharBuffer
 
@@ -146,7 +147,12 @@ public fun VimEditor.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
   } else {
     val startOffset: Int = getLineStartOffset(line)
     val endOffset: Int = getLineEndOffset(line)
-    endOffset - if (startOffset == endOffset || allowEnd) 0 else 1
+
+    if (startOffset == endOffset || allowEnd) {
+      endOffset
+    } else {
+      Graphemes.prev(text(), endOffset) ?: endOffset
+    }
   }
 }
 

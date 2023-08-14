@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
@@ -23,6 +24,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.helper.mode
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.sign
 
@@ -108,21 +110,16 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
     allowPastEnd: Boolean,
     allowWrap: Boolean,
   ): Motion {
-    val oldOffset = caret.offset.point
-    var diff = 0
     val text = editor.text()
-    val sign = sign(count.toFloat()).toInt()
-    for (pointer in IntProgression.fromClosedRange(0, count - sign, sign)) {
-      val textPointer = oldOffset + pointer
-      diff += if (textPointer < text.length && textPointer >= 0) {
-        // Actual char size can differ from 1 if unicode characters are used (like 🐔)
-        Character.charCount(Character.codePointAt(text, textPointer))
-      } else {
-        1
-      }
+    val oldOffset = caret.offset.point
+    var current = oldOffset
+    for (i in 0 until count.absoluteValue) {
+      val newOffset = if (count > 0) Graphemes.next(text, current) else Graphemes.prev(text, current)
+      current = newOffset ?: break
     }
+
     val offset = if (allowWrap) {
-      var newOffset = oldOffset + sign * diff
+      var newOffset = current
       val oldLine = editor.offsetToBufferPosition(oldOffset).line
       val newLine = editor.offsetToBufferPosition(newOffset).line
       if (!allowPastEnd && count > 0 && oldLine == newLine && newOffset == editor.getLineEndForOffset(newOffset)) {
@@ -130,7 +127,7 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
       }
       editor.normalizeOffset(newOffset, allowPastEnd)
     } else {
-      editor.normalizeOffset(caret.getLine().line, oldOffset + (sign * diff), allowPastEnd)
+      editor.normalizeOffset(caret.getLine().line, current, allowPastEnd)
     }
 
     return offset.toMotionOrError()
