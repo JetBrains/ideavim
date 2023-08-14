@@ -75,7 +75,8 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
 
     // Update visual subMode with new sub subMode
     editor.subMode = subMode
-    editor.forEachCaret { caret ->
+    for (caret in editor.carets()) {
+      if (!caret.isValid) continue
       caret.vimUpdateEditorSelection()
     }
 
