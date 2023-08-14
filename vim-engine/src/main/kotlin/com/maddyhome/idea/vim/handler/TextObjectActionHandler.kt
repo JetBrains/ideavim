@@ -39,6 +39,9 @@ public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
    * Visual mode that works for this text object.
    * E.g. In visual line-wise mode, `aw` will switch to character mode.
    *   In visual character mode, `ip` will switch to line-wise mode.
+   *
+   * See `:h ip` for example, the last line.
+   * This "visual type" is noted in lines like "When used in Visual mode it is made linewise."
    */
   public abstract val visualType: TextObjectVisualType
 
