@@ -142,6 +142,13 @@ internal class NFA private constructor(
     else this.acceptState.endCapture.add(groupNumber)
   }
 
+  internal fun atomic() : NFA {
+    this.startState.startsAtomic = true
+    this.acceptState.endsAtomic = true
+
+    return this
+  }
+
   internal fun startMatch() {
     this.startState.startCapture.add(0)
   }
@@ -183,7 +190,13 @@ internal class NFA private constructor(
    *
    * @return True if matching was successful, false otherwise
    */
-  private fun simulate(editor: VimEditor, currentIndex: Int, currentState: NFAState, isCaseInsensitive: Boolean, epsilonVisited: HashSet<NFAState> = HashSet()) : Boolean {
+  private fun simulate(
+    editor: VimEditor,
+    currentIndex: Int,
+    currentState: NFAState,
+    isCaseInsensitive: Boolean,
+    epsilonVisited: HashSet<NFAState> = HashSet(),
+  ) : Boolean {
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
