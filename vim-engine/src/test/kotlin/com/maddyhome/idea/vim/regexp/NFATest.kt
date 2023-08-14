@@ -862,6 +862,34 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test start of line anywhere in pattern`() {
+    assertCorrectRange(
+      "Lorem Ipsum Lorem\n" + // added an extra 'Lorem' that isn't at start of line
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\_.\\+\\_^Lorem",
+      0 until 24
+    )
+  }
+
+  @Test
+  fun `test end of line anywhere in pattern`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet, Lorem\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem Ipsum\\_$\\_s*",
+      0 until 13
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
