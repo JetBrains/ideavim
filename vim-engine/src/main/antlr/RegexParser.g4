@@ -60,6 +60,7 @@ multi : STAR     #ZeroOrMore
       | PLUS     #OneOrMore
       | OPTIONAL #ZeroOrOne
       | range    #RangeQuantifier
+      | ATOMIC   #Atomic
       ;
 
 /**
