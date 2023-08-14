@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.yaml.YAMLFileType
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
@@ -169,7 +168,6 @@ class CommentaryExtensionTest : VimTestCase() {
 
   /* Visual mode */ // |gc| |ip|
   @Test
-  @Disabled
   fun testLineCommentVisualInnerParagraph() {
     doTest(
       "vipgc",
@@ -184,7 +182,6 @@ class CommentaryExtensionTest : VimTestCase() {
 
   // |gc| |ip|
   @Test
-  @Disabled
   fun testLineUncommentVisualInnerParagraph() {
     doTest(
       "vipgc",
