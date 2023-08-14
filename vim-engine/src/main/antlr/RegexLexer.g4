@@ -15,7 +15,7 @@ tokens {
   CLASS_NOT_HEX_NL, CLASS_OCTAL_NL, CLASS_NOT_OCTAL_NL, CLASS_WORD_NL, CLASS_NOT_WORD_NL,
   CLASS_HEADWORD_NL, CLASS_NOT_HEADWORD_NL, CLASS_ALPHA_NL, CLASS_NOT_ALPHA_NL, CLASS_LCASE_NL,
   CLASS_NOT_LCASE_NL, CLASS_UCASE_NL, CLASS_NOT_UCASE_NL, START_OF_FILE, END_OF_FILE,
-  CARET, DOLLAR
+  CARET, DOLLAR, START_OF_LINE, END_OF_LINE
 }
 
 @members {
@@ -54,8 +54,8 @@ START_MATCH_MAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_MAGIC: '\\ze' -> type(END_MATCH);
 START_OF_FILE_MAGIC: '\\%^' -> type(START_OF_FILE);
 END_OF_FILE_MAGIC: '\\%$' -> type(END_OF_FILE);
-
-// caret and dollar sign
+START_OF_LINE_MAGIC: '\\_^' -> type(START_OF_LINE);
+END_OF_LINE_MAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_MAGIC: '^' -> type(CARET);
 DOLLAR_MAGIC: '$' -> type(DOLLAR);
 
@@ -163,8 +163,8 @@ START_MATCH_NOMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_NOMAGIC: '\\ze' -> type(END_MATCH);
 START_OF_FILE_NOMAGIC: '\\%^' -> type(START_OF_FILE);
 END_OF_FILE_NOMAGIC: '\\%$' -> type(END_OF_FILE);
-
-// caret and dollar sign
+START_OF_LINE_NOMAGIC: '\\_^' -> type(START_OF_LINE);
+END_OF_LINE_NOMAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_NOMAGIC: '^' -> type(CARET);
 DOLLAR_NOMAGIC: '$' -> type(DOLLAR);
 
@@ -273,8 +273,8 @@ START_MATCH_VMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_VMAGIC: '\\ze' -> type(END_MATCH);
 START_OF_FILE_VMAGIC: '%^' -> type(START_OF_FILE);
 END_OF_FILE_VMAGIC: '%$' -> type(END_OF_FILE);
-
-// caret and dollar sign
+START_OF_LINE_VMAGIC: '\\_^' -> type(START_OF_LINE);
+END_OF_LINE_VMAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_VMAGIC: '^' -> type(CARET);
 DOLLAR_VMAGIC: '$' -> type(DOLLAR);
 
@@ -382,8 +382,8 @@ START_MATCH_VNOMAGIC: '\\zs' -> type(START_MATCH);
 END_MATCH_VNOMAGIC: '\\ze' -> type(END_MATCH);
 START_OF_FILE_VNOMAGIC: '\\%^' -> type(START_OF_FILE);
 END_OF_FILE_VNOMAGIC: '\\%$' -> type(END_OF_FILE);
-
-// caret and dollar sign
+START_OF_LINE_VNOMAGIC: '\\_^' -> type(START_OF_LINE);
+END_OF_LINE_VNOMAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_VNOMAGIC: '\\^' -> type(CARET);
 DOLLAR_VNOMAGIC: '\\$' -> type(DOLLAR);
 
