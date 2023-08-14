@@ -41,6 +41,10 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
     else if (lowerBoundToken == null) RangeBoundary.InfiniteRangeBoundary else lowerDelimiter
     return Multi.RangeMulti(lowerDelimiter, upperDelimiter, isGreedy)
   }
+
+  override fun visitAtomic(ctx: RegexParser.AtomicContext?): Multi {
+    return Multi.AtomicMulti
+  }
 }
 
 internal sealed class Multi {
@@ -54,6 +58,11 @@ internal sealed class Multi {
     val upperBoundary: RangeBoundary,
     val isGreedy: Boolean
     ) : Multi()
+
+  /**
+   * Used to represent an atomic group.
+   */
+  object AtomicMulti : Multi()
 }
 
 internal sealed class RangeBoundary {

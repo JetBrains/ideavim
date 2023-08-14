@@ -59,6 +59,7 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
     return when (multi) {
       is Multi.RangeMulti -> buildQuantifiedNFA(ctx.atom(), multi)
+      is Multi.AtomicMulti -> return visit(ctx.atom()).atomic()
     }
   }
 

@@ -42,7 +42,10 @@ internal class NFAState (
    *  being captured on this state, even if that group
    *  had already been set to stop being captured
    */
-  val forceEndCapture: MutableList<Int> = ArrayList()
+  val forceEndCapture: MutableList<Int> = ArrayList(),
+
+  var startsAtomic: Boolean = false,
+  var endsAtomic: Boolean = false
 ) {
 
   /**
