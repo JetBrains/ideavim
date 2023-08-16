@@ -45,6 +45,10 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
   override fun visitAtomic(ctx: RegexParser.AtomicContext?): Multi {
     return Multi.AtomicMulti
   }
+
+  override fun visitPositiveLookahead(ctx: RegexParser.PositiveLookaheadContext?): Multi {
+    return Multi.AssertionMulti(isPositive = true, isAhead = true)
+  }
 }
 
 internal sealed class Multi {
@@ -63,6 +67,14 @@ internal sealed class Multi {
    * Used to represent an atomic group.
    */
   object AtomicMulti : Multi()
+
+  /**
+   * Used to represent a assertion multi
+   */
+  internal data class AssertionMulti(
+    val isPositive: Boolean,
+    val isAhead: Boolean
+  ) : Multi()
 }
 
 internal sealed class RangeBoundary {
