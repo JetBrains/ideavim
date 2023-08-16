@@ -995,6 +995,51 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test collection decimal range`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "[\\d65-\\d122]*",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test collection octal range`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "[\\o101-\\o172]*",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test collection hex range`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "[\\x41-\\x7a]*",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test collection unicode range`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "[\\u0041-\\u007a]*",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test collection wide unicode range`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "[\\U00000041-\\U007a]*",
+      0 until 5
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,

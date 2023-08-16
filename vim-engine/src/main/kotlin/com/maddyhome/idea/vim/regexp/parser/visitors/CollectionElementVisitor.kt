@@ -22,7 +22,11 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<CollectionEleme
   }
 
   private fun cleanLiteralChar(str: String) : Char {
-    return if (str.length > 2 && str[0] == '\\' && str[1] == 'u') Char(str.substring(2).toInt(16))
+    return  if (str.length > 2 && str[0] == '\\' && str[1] == 'd') Char(str.substring(2).toInt())
+    else if (str.length > 2 && str[0] == '\\' && str[1] == 'o') Char(str.substring(2).toInt(8))
+    else if (str.length > 2 && str[0] == '\\' && str[1] == 'x') Char(str.substring(2).toInt(16))
+    else if (str.length > 2 && str[0] == '\\' && str[1] == 'u') Char(str.substring(2).toInt(16))
+    else if (str.length > 2 && str[0] == '\\' && str[1] == 'U') Char(str.substring(2).toInt(16))
     else if (str.length == 2 && str[0] == '\\') str[1]
     else str[0]
   }
