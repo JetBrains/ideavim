@@ -891,12 +891,21 @@ class NFATest {
   }
 
   @Test
-  fun `test atomic group`() {
+  fun `test atomic group 1`() {
     assertCorrectRange(
       "aaab",
       "\\(a*\\)\\@>b",
       0 until 4
 
+    )
+  }
+
+  @Test
+  fun `test atomic group 2`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\v.*(Lorem)@>",
+      0 until 5
     )
   }
 
