@@ -80,6 +80,8 @@ internal class NFA private constructor(
   /**
    * Kleene's closure of the NFA. Allows the NFA to "loop" any amount of times.
    *
+   * @param isGreedy Whether the NFA should give priority to consuming as much input as possible
+   *
    * @return The new NFA representing the closure
    */
   internal fun closure(isGreedy: Boolean) : NFA {
@@ -110,6 +112,10 @@ internal class NFA private constructor(
   /**
    * Gives the NFA the choice to jump directly from its start to
    * accept state, without taking any of the inner transitions.
+   *
+   * @param isGreedy Whether the NFA should give priority to consuming as much input as possible
+   *
+   * @return The new NFA, that can be matched optionally
    */
   internal fun optional(isGreedy: Boolean) {
     val newStart = NFAState(false)
@@ -142,6 +148,12 @@ internal class NFA private constructor(
     else this.acceptState.endCapture.add(groupNumber)
   }
 
+  /**
+   * Marks the start and accept states of the NFA to start
+   * and end, respectfully, the limits of an atomic group.
+   *
+   * @return The new NFA representing an atomic group
+   */
   internal fun atomic() : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
@@ -160,10 +172,16 @@ internal class NFA private constructor(
     return this
   }
 
+  /**
+   * Sets the start state of the NFA to mark where the whole match should begin.
+   */
   internal fun startMatch() {
     this.startState.startCapture.add(0)
   }
 
+  /**
+   * Sets the accept state of the NFA to mark where the whole match should end.
+   */
   internal fun endMatch() {
     this.acceptState.forceEndCapture.add(0)
   }
@@ -208,7 +226,6 @@ internal class NFA private constructor(
     isCaseInsensitive: Boolean,
     epsilonVisited: HashSet<NFAState> = HashSet(),
   ) : Boolean {
-    println("Outside atomic: index: $currentIndex, state: $currentState")
     if (currentState.startsAtomic) return simulateAtomicGroup(editor, currentIndex, currentState, isCaseInsensitive)
 
     updateCaptureGroups(editor, currentIndex, currentState)
@@ -229,6 +246,17 @@ internal class NFA private constructor(
     return false
   }
 
+  /**
+   * Simulates part of the NFA in a depth-first fashion, using an explicit stack.
+   * This method is essentially the same as the recursive implementation above, but
+   * is used to obtain a more fine-grained control of the "recursion" stack.
+   * For instance, when we find the state that ends the atomic group, we immediately
+   * return to the normal recursive simulation, disregarding everything left on the stack.
+   * This way, if matching eventually fails further down the simulation and backtracks back
+   * to the end of the atomic group simulation, there is no backtracking inside the
+   * atomic group simulation itself, since the stack has been cleared. This way,
+   * we achieve the desired functionality of not retrying shorter sub-matches or anything.
+   */
   private fun simulateAtomicGroup(
     editor: VimEditor,
     currentIndex: Int,
@@ -239,7 +267,12 @@ internal class NFA private constructor(
 
     while (stack.isNotEmpty()) {
       val top = stack.removeLast()
-      println("Inside atomic: index: ${top.index}, state: ${top.state}")
+
+      /**
+       * Once a path to the end of the atomic group has been found, immediately resume with normal
+       * simulation, disregarding the current state of the stack, preventing backtracking inside
+       * the atomic group.
+       */
       if (top.state.endsAtomic) return simulate(editor, top.index, top.state, isCaseInsensitive, top.epsilonVisited)
 
       updateCaptureGroups(editor, top.index, top.state)

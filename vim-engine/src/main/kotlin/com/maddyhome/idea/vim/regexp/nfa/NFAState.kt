@@ -44,7 +44,14 @@ internal class NFAState (
    */
   val forceEndCapture: MutableList<Int> = ArrayList(),
 
+  /**
+   * Whether this state marks the start of an atomic group
+   */
   var startsAtomic: Boolean = false,
+
+  /**
+   * Whether this state marks the end of an atomic group
+   */
   var endsAtomic: Boolean = false
 ) {
 
