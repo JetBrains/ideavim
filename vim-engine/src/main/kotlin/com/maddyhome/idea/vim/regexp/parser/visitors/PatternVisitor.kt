@@ -453,14 +453,14 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitCollectionPos(ctx: RegexParser.CollectionPosContext): NFA {
-    return visitCollection(ctx.collection_elems, false)
+    return visitCollection(ctx.collection_elems, false, ctx.COLLECTION_START().text.contains('_'))
   }
 
   override fun visitCollectionNeg(ctx: RegexParser.CollectionNegContext): NFA {
-    return visitCollection(ctx.collection_elems, true)
+    return visitCollection(ctx.collection_elems, true, ctx.COLLECTION_START().text.contains('_'))
   }
 
-  private fun visitCollection(collectionElements: List<RegexParser.Collection_elemContext>, isNegated: Boolean) : NFA {
+  private fun visitCollection(collectionElements: List<RegexParser.Collection_elemContext>, isNegated: Boolean, includesEOL: Boolean) : NFA {
     val individualChars: HashSet<Char> = HashSet()
     val ranges: ArrayList<CollectionRange> = ArrayList()
     val collectionElementVisitor = CollectionElementVisitor()
@@ -487,7 +487,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
       CollectionMatcher(
         individualChars,
         ranges,
-        isNegated
+        isNegated,
+        includesEOL
       )
     )
   }

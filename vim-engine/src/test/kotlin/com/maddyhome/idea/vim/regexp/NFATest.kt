@@ -981,6 +981,20 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test collection with EOL`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "123Lorem ipsum dolor sit amet, Lorem\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\_[a-z A-Z]\\+",
+      0 until 13
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
