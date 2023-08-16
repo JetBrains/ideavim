@@ -143,8 +143,19 @@ internal class NFA private constructor(
   }
 
   internal fun atomic() : NFA {
-    this.startState.startsAtomic = true
-    this.acceptState.endsAtomic = true
+    val newStart = NFAState(false)
+    val newEnd = NFAState(true)
+    newStart.startsAtomic = true
+    newEnd.endsAtomic = true
+
+    newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
+    acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+
+    acceptState.isAccept = false
+    newEnd.isAccept = true
+
+    startState = newStart
+    acceptState = newEnd
 
     return this
   }
@@ -197,6 +208,9 @@ internal class NFA private constructor(
     isCaseInsensitive: Boolean,
     epsilonVisited: HashSet<NFAState> = HashSet(),
   ) : Boolean {
+    println("Outside atomic: index: $currentIndex, state: $currentState")
+    if (currentState.startsAtomic) return simulateAtomicGroup(editor, currentIndex, currentState, isCaseInsensitive)
+
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
     for (transition in currentState.transitions) {
@@ -210,6 +224,45 @@ internal class NFA private constructor(
           epsilonVisitedCopy = HashSet()
         }
         if (simulate(editor, currentIndex + transitionMatcherResult.consumed, transition.destState, isCaseInsensitive, epsilonVisitedCopy)) return true
+      }
+    }
+    return false
+  }
+
+  private fun simulateAtomicGroup(
+    editor: VimEditor,
+    currentIndex: Int,
+    currentState: NFAState,
+    isCaseInsensitive: Boolean,
+  ) : Boolean {
+    val stack = mutableListOf(SimulationStackFrame(currentIndex, currentState, HashSet()))
+
+    while (stack.isNotEmpty()) {
+      val top = stack.removeLast()
+      println("Inside atomic: index: ${top.index}, state: ${top.state}")
+      if (top.state.endsAtomic) return simulate(editor, top.index, top.state, isCaseInsensitive, top.epsilonVisited)
+
+      updateCaptureGroups(editor, top.index, top.state)
+      if (top.state.isAccept) return true
+
+      for (transition in top.state.transitions.reversed()) {
+        val transitionMatcherResult = transition.matcher.matches(editor, top.index, groups, isCaseInsensitive)
+        if (transitionMatcherResult is MatcherResult.Success) {
+          var epsilonVisitedCopy = HashSet(top.epsilonVisited)
+          if (transitionMatcherResult.consumed == 0) {
+            if (top.epsilonVisited.contains(transition.destState)) continue
+            epsilonVisitedCopy.add(top.state)
+          } else {
+            epsilonVisitedCopy = HashSet()
+          }
+          stack.add(
+            SimulationStackFrame(
+              top.index + transitionMatcherResult.consumed,
+              transition.destState,
+              epsilonVisitedCopy
+            )
+          )
+        }
       }
     }
     return false
@@ -260,3 +313,5 @@ internal class NFA private constructor(
     }
   }
 }
+
+private data class SimulationStackFrame(val index: Int, val state: NFAState, val epsilonVisited: HashSet<NFAState>)
