@@ -135,7 +135,7 @@ dependencies {
     ksp(project(":annotation-processors"))
     compileOnly(project(":annotation-processors"))
 
-    testApi("com.squareup.okhttp3:okhttp:4.10.0")
+    testApi("com.squareup.okhttp3:okhttp:4.11.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.0")
