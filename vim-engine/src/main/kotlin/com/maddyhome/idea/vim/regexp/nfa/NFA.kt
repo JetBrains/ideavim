@@ -226,7 +226,12 @@ internal class NFA private constructor(
     isCaseInsensitive: Boolean,
     epsilonVisited: HashSet<NFAState> = HashSet(),
   ) : Boolean {
-    if (currentState.startsAtomic) return simulateAtomicGroup(editor, currentIndex, currentState, isCaseInsensitive)
+
+    if (currentState.startsAtomic) {
+      val result = simulateAtomic(editor, currentIndex, currentState, isCaseInsensitive)
+      return if (result.first) simulate(editor, result.third, result.second, isCaseInsensitive)
+      else false
+    }
 
     updateCaptureGroups(editor, currentIndex, currentState)
     if (currentState.isAccept) return true
@@ -246,59 +251,30 @@ internal class NFA private constructor(
     return false
   }
 
-  /**
-   * Simulates part of the NFA in a depth-first fashion, using an explicit stack.
-   * This method is essentially the same as the recursive implementation above, but
-   * is used to obtain a more fine-grained control of the "recursion" stack.
-   * For instance, when we find the state that ends the atomic group, we immediately
-   * return to the normal recursive simulation, disregarding everything left on the stack.
-   * This way, if matching eventually fails further down the simulation and backtracks back
-   * to the end of the atomic group simulation, there is no backtracking inside the
-   * atomic group simulation itself, since the stack has been cleared. This way,
-   * we achieve the desired functionality of not retrying shorter sub-matches or anything.
-   */
-  private fun simulateAtomicGroup(
+  private fun simulateAtomic(
     editor: VimEditor,
     currentIndex: Int,
     currentState: NFAState,
     isCaseInsensitive: Boolean,
-  ) : Boolean {
-    val stack = mutableListOf(SimulationStackFrame(currentIndex, currentState, HashSet()))
-
-    while (stack.isNotEmpty()) {
-      val top = stack.removeLast()
-
-      /**
-       * Once a path to the end of the atomic group has been found, immediately resume with normal
-       * simulation, disregarding the current state of the stack, preventing backtracking inside
-       * the atomic group.
-       */
-      if (top.state.endsAtomic) return simulate(editor, top.index, top.state, isCaseInsensitive, top.epsilonVisited)
-
-      updateCaptureGroups(editor, top.index, top.state)
-      if (top.state.isAccept) return true
-
-      for (transition in top.state.transitions.reversed()) {
-        val transitionMatcherResult = transition.matcher.matches(editor, top.index, groups, isCaseInsensitive)
-        if (transitionMatcherResult is MatcherResult.Success) {
-          var epsilonVisitedCopy = HashSet(top.epsilonVisited)
-          if (transitionMatcherResult.consumed == 0) {
-            if (top.epsilonVisited.contains(transition.destState)) continue
-            epsilonVisitedCopy.add(top.state)
-          } else {
-            epsilonVisitedCopy = HashSet()
-          }
-          stack.add(
-            SimulationStackFrame(
-              top.index + transitionMatcherResult.consumed,
-              transition.destState,
-              epsilonVisitedCopy
-            )
-          )
+    epsilonVisited: HashSet<NFAState> = HashSet(),
+  ) : Triple<Boolean, NFAState, Int> {
+    updateCaptureGroups(editor, currentIndex, currentState)
+    if (currentState.isAccept || currentState.endsAtomic) return Triple(true, currentState, currentIndex)
+    for (transition in currentState.transitions) {
+      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
+      if (transitionMatcherResult is MatcherResult.Success) {
+        var epsilonVisitedCopy = HashSet(epsilonVisited)
+        if (transitionMatcherResult.consumed == 0) {
+          if (epsilonVisited.contains(transition.destState)) continue
+          epsilonVisitedCopy.add(currentState)
+        } else {
+          epsilonVisitedCopy = HashSet()
         }
+        val result = simulateAtomic(editor, currentIndex + transitionMatcherResult.consumed, transition.destState, isCaseInsensitive, epsilonVisitedCopy)
+        if (result.first) return result
       }
     }
-    return false
+    return Triple(false, currentState, currentIndex)
   }
 
   /**
