@@ -996,6 +996,20 @@ class NFATest {
   }
 
   @Test
+  fun `test negated collection with EOL includes EOL anyway`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "123Lorem ipsum dolor sit amet, Lorem\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\_[^0-9]\\+",
+      0 until 13
+    )
+  }
+
+  @Test
   fun `test collection decimal range`() {
     assertCorrectRange(
       "Lorem Ipsum",
@@ -1037,6 +1051,16 @@ class NFATest {
       "Lorem Ipsum",
       "[\\U00000041-\\U007a]*",
       0 until 5
+    )
+  }
+
+  @Test
+  fun `test collection with escaped new line`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+      "Lorem 123",
+      "[\\n a-zA-Z]*",
+      0 until 18
     )
   }
 
