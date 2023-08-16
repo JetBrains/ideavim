@@ -1064,6 +1064,40 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test positive lookahead 1`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "Lorem\\( Ipsum\\)\\@=",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test positive lookahead 2`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "Lorem\\( Ipsum\\)\\@= Ipsum",
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `test positive lookahead should fail 1`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "Lorem\\( Lorem\\)\\@="
+    )
+  }
+
+  @Test
+  fun `test positive lookahead should fail 2`() {
+    assertFailure(
+      "Lorem Ipsum Lorem",
+      "Lorem\\( Ipsum\\)\\@= Lorem"
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,

@@ -52,7 +52,11 @@ internal class NFAState (
   /**
    * Whether this state marks the end of an atomic group
    */
-  var endsAtomic: Boolean = false
+  var endsAtomic: Boolean = false,
+
+  var consume: Boolean = false,
+  var isAhead: Boolean = false,
+  var isPositive: Boolean = false,
 ) {
 
   /**

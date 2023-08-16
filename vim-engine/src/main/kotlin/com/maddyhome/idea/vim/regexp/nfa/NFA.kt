@@ -154,10 +154,13 @@ internal class NFA private constructor(
    *
    * @return The new NFA representing an atomic group
    */
-  internal fun atomic() : NFA {
+  internal fun atomic(consume: Boolean = true, isAhead: Boolean = true, isPositive: Boolean = false) : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
     newStart.startsAtomic = true
+    newStart.consume = consume
+    newStart.isAhead = isAhead
+    newStart.isPositive = isPositive
     newEnd.endsAtomic = true
 
     newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
@@ -228,9 +231,13 @@ internal class NFA private constructor(
   ) : Boolean {
 
     if (currentState.startsAtomic) {
+      // TODO: check if simulation should go forwards or backwards
       val result = simulateAtomic(editor, currentIndex, currentState, isCaseInsensitive)
-      return if (result.first) simulate(editor, result.third, result.second, isCaseInsensitive)
-      else false
+      if (result.first) {
+        if (currentState.consume) return simulate(editor, result.third, result.second, isCaseInsensitive)
+        if (currentState.isPositive) return simulate(editor, currentIndex, result.second, isCaseInsensitive)
+      }
+      else return false
     }
 
     updateCaptureGroups(editor, currentIndex, currentState)
