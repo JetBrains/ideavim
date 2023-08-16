@@ -911,6 +911,16 @@ class NFATest {
 
   @Test
   fun `test atomic group should fail`() {
+    /**
+     * This pattern should fail because the "a*" consumes
+     * all three 'a's, then the last "a" in the pattern
+     * fails to match since all 'a's have been consumed.
+     * Normally, it would try to backtrack and the "a*"
+     * would only consume two 'a's, leaving the last one to
+     * match with "a", but since the "a*" is atomic, it can't
+     * try matching with shorter or longer sub-matches,
+     * therefore the simulation immediately fails.
+     */
     assertFailure(
       "aaa",
       "\\(a*\\)\\@>a"
