@@ -15,7 +15,7 @@ tokens {
   CLASS_NOT_HEX_NL, CLASS_OCTAL_NL, CLASS_NOT_OCTAL_NL, CLASS_WORD_NL, CLASS_NOT_WORD_NL,
   CLASS_HEADWORD_NL, CLASS_NOT_HEADWORD_NL, CLASS_ALPHA_NL, CLASS_NOT_ALPHA_NL, CLASS_LCASE_NL,
   CLASS_NOT_LCASE_NL, CLASS_UCASE_NL, CLASS_NOT_UCASE_NL, START_OF_FILE, END_OF_FILE,
-  CARET, DOLLAR, START_OF_LINE, END_OF_LINE, ATOMIC
+  CARET, DOLLAR, START_OF_LINE, END_OF_LINE, ATOMIC, START_OF_WORD, END_OF_WORD
 }
 
 @members {
@@ -59,6 +59,8 @@ START_OF_LINE_MAGIC: '\\_^' -> type(START_OF_LINE);
 END_OF_LINE_MAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_MAGIC: '^' -> type(CARET);
 DOLLAR_MAGIC: '$' -> type(DOLLAR);
+START_OF_WORD_MAGIC: '\\<' -> type(START_OF_WORD);
+END_OF_WORD_MAGIC: '\\>' -> type(END_OF_WORD);
 
 // case-related tokens
 IGNORE_CASE_MAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -169,6 +171,8 @@ START_OF_LINE_NOMAGIC: '\\_^' -> type(START_OF_LINE);
 END_OF_LINE_NOMAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_NOMAGIC: '^' -> type(CARET);
 DOLLAR_NOMAGIC: '$' -> type(DOLLAR);
+START_OF_WORD_NOMAGIC: '\\<' -> type(START_OF_WORD);
+END_OF_WORD_NOMAGIC: '\\>' -> type(END_OF_WORD);
 
 // case-related tokens
 IGNORE_CASE_NOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -280,6 +284,8 @@ START_OF_LINE_VMAGIC: '\\_^' -> type(START_OF_LINE);
 END_OF_LINE_VMAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_VMAGIC: '^' -> type(CARET);
 DOLLAR_VMAGIC: '$' -> type(DOLLAR);
+START_OF_WORD_VMAGIC: '<' -> type(START_OF_WORD);
+END_OF_WORD_VMAGIC: '>' -> type(END_OF_WORD);
 
 // case-related tokens
 IGNORE_CASE_VMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -390,6 +396,8 @@ START_OF_LINE_VNOMAGIC: '\\_^' -> type(START_OF_LINE);
 END_OF_LINE_VNOMAGIC: '\\_$' -> type(END_OF_LINE);
 CARET_VNOMAGIC: '\\^' -> type(CARET);
 DOLLAR_VNOMAGIC: '\\$' -> type(DOLLAR);
+START_OF_WORD_VNOMAGIC: '\\<' -> type(START_OF_WORD);
+END_OF_WORD_VNOMAGIC: '\\>' -> type(END_OF_WORD);
 
 // case-related tokens
 IGNORE_CASE_VNOMAGIC: '\\c' { setIgnoreCase(); } -> skip;

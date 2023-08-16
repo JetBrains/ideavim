@@ -155,4 +155,6 @@ zero_width : CURSOR        #Cursor
            | END_OF_FILE   #EndOfFile
            | START_OF_LINE #StartOfLine
            | END_OF_LINE   #EndOfLine
+           | START_OF_WORD #StartOfWord
+           | END_OF_WORD   #EndOfWord
            ;
