@@ -927,6 +927,60 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test start of word at start of text`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\<Lorem",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test start of word at offset`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\<Ipsum",
+      6 until 11,
+      6
+    )
+  }
+
+  @Test
+  fun `test start of word should fail`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "Lo\\<rem"
+    )
+  }
+
+  @Test
+  fun `test end of word at end of text`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "Ipsum\\>",
+      6 until 11,
+      6
+    )
+  }
+
+  @Test
+  fun `test end of word at middle of text`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "Lorem\\>",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test end of word should fail`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "Lo\\>rem"
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,

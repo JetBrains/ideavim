@@ -17,9 +17,11 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.CursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EndOfFileMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EndOfLineMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.EndOfWordMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.PredicateMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfFileMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfLineMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfWordMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
@@ -522,6 +524,14 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitEndOfLine(ctx: RegexParser.EndOfLineContext?): NFA {
     return NFA.fromMatcher(EndOfLineMatcher())
+  }
+
+  override fun visitStartOfWord(ctx: RegexParser.StartOfWordContext?): NFA {
+    return NFA.fromMatcher(StartOfWordMatcher())
+  }
+
+  override fun visitEndOfWord(ctx: RegexParser.EndOfWordContext?): NFA {
+    return NFA.fromMatcher(EndOfWordMatcher())
   }
 
   private fun cleanLiteralChar(str : String) : Char {
