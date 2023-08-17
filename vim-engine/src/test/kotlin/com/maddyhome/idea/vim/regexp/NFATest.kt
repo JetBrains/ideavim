@@ -1083,6 +1083,15 @@ class NFATest {
   }
 
   @Test
+  fun `test positive lookahead 3`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=",
+      0 until 5
+    )
+  }
+
+  @Test
   fun `test positive lookahead should fail 1`() {
     assertFailure(
       "Lorem Ipsum",
@@ -1117,10 +1126,27 @@ class NFATest {
   }
 
   @Test
-  fun `test negative lookahead should fail`() {
+  fun `test negative lookahead 3`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test negative lookahead should fail 1`() {
     assertFailure(
       "Lorem Ipsum",
       "Lorem\\( Ipsum\\)\\@!"
+    )
+  }
+
+  @Test
+  fun `test negative lookahead should fail 2`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "\\vLorem( Lorem)@!( Lorem)@!( Lorem)@!( Ipsum)@!( Lorem)@!"
     )
   }
 
