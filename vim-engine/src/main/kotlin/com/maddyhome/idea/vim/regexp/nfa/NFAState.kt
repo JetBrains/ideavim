@@ -25,6 +25,8 @@ internal class NFAState (
    */
   val transitions: ArrayList<NFATransition> = ArrayList(),
 
+  var assertion: NFAAssertion? = null,
+
   /**
    * Stores the numbers of the capture groups that start
    * being captured on this state
@@ -43,20 +45,6 @@ internal class NFAState (
    *  had already been set to stop being captured
    */
   val forceEndCapture: MutableList<Int> = ArrayList(),
-
-  /**
-   * Whether this state marks the start of an atomic group
-   */
-  var startsAtomic: Boolean = false,
-
-  /**
-   * Whether this state marks the end of an atomic group
-   */
-  var endsAtomic: Boolean = false,
-
-  var consume: Boolean = false,
-  var isAhead: Boolean = false,
-  var isPositive: Boolean = false,
 ) {
 
   /**
