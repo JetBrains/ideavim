@@ -219,32 +219,62 @@ internal class NFA private constructor(
     currentIndex: Int,
     currentState: NFAState,
     isCaseInsensitive: Boolean,
-    epsilonVisited: HashSet<NFAState> = HashSet(),
-  ) : Boolean {
-    if (currentState.assertion != null) {
-      val assertionResult = currentState.assertion!!.assert(editor, currentIndex, isCaseInsensitive, groups)
-      if (assertionResult.assertionSuccess != currentState.assertion!!.isPositive) return false
-      return if (currentState.assertion!!.shouldConsume)
-        simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, isCaseInsensitive)
-      else simulate(editor, currentIndex, currentState.assertion!!.jumpTo, isCaseInsensitive)
-    }
+    epsilonVisited: Set<NFAState> = HashSet()
+  ): Boolean {
+    if (handleAssertion(editor, currentIndex, currentState, isCaseInsensitive)) return true
 
     updateCaptureGroups(editor, currentIndex, currentState)
+
     if (currentState.isAccept) return true
+
     for (transition in currentState.transitions) {
-      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
-      if (transitionMatcherResult is MatcherResult.Success) {
-        var epsilonVisitedCopy = HashSet(epsilonVisited)
-        if (transitionMatcherResult.consumed == 0) {
-          if (epsilonVisited.contains(transition.destState)) continue
-          epsilonVisitedCopy.add(currentState)
-        } else {
-          epsilonVisitedCopy = HashSet()
-        }
-        if (simulate(editor, currentIndex + transitionMatcherResult.consumed, transition.destState, isCaseInsensitive, epsilonVisitedCopy)) return true
+      if (handleTransition(editor, currentIndex, currentState, isCaseInsensitive, transition, epsilonVisited)) {
+        return true
       }
     }
+
     return false
+  }
+
+  private fun handleAssertion(
+    editor: VimEditor,
+    currentIndex: Int,
+    currentState: NFAState,
+    isCaseInsensitive: Boolean
+  ): Boolean {
+    val assertion = currentState.assertion ?: return false
+
+    val assertionResult = assertion.assert(editor, currentIndex, isCaseInsensitive, groups)
+    if (assertionResult.assertionSuccess != assertion.isPositive) return false
+
+    val newIndex = if (assertion.shouldConsume) assertionResult.index else currentIndex
+    return simulate(editor, newIndex, assertion.jumpTo, isCaseInsensitive)
+  }
+
+  private fun handleTransition(
+    editor: VimEditor,
+    currentIndex: Int,
+    currentState: NFAState,
+    isCaseInsensitive: Boolean,
+    transition: NFATransition,
+    epsilonVisited: Set<NFAState>
+  ): Boolean {
+    val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
+    if (transitionMatcherResult !is MatcherResult.Success) return false
+
+    val nextIndex = currentIndex + transitionMatcherResult.consumed
+    val destState = transition.destState
+
+    if (transitionMatcherResult.consumed == 0 && epsilonVisited.contains(destState)) {
+      return false
+    }
+
+    val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !epsilonVisited.contains(destState)) {
+      epsilonVisited.plusElement(currentState)
+    } else {
+      HashSet()
+    }
+    return simulate(editor, nextIndex, destState, isCaseInsensitive, epsilonVisitedCopy)
   }
 
   /**
