@@ -191,7 +191,7 @@ internal class NFA private constructor(
    */
   internal fun simulate(editor: VimEditor, startIndex: Int = 0, isCaseInsensitive: Boolean = false) : VimMatchResult {
     groups.groupCount = 0
-    if (simulate(editor, startIndex, startState, isCaseInsensitive)) {
+    if (simulate(editor, startIndex, startState, acceptState, isCaseInsensitive).simulationResult) {
       return groups.get(0)?.let {
         VimMatchResult.Success(
           it.range,
@@ -218,22 +218,22 @@ internal class NFA private constructor(
     editor: VimEditor,
     currentIndex: Int,
     currentState: NFAState,
+    targetState: NFAState,
     isCaseInsensitive: Boolean,
     epsilonVisited: Set<NFAState> = HashSet()
-  ): Boolean {
-    if (handleAssertion(editor, currentIndex, currentState, isCaseInsensitive)) return true
+  ): NFASimulationResult {
+    val assertionResult = handleAssertion(editor, currentIndex, currentState, isCaseInsensitive)
+    if (assertionResult.simulationResult) return assertionResult
 
     updateCaptureGroups(editor, currentIndex, currentState)
 
-    if (currentState.isAccept) return true
+    if (currentState === targetState) return NFASimulationResult(true, currentIndex)
 
     for (transition in currentState.transitions) {
-      if (handleTransition(editor, currentIndex, currentState, isCaseInsensitive, transition, epsilonVisited)) {
-        return true
-      }
+      val transitionResult = handleTransition(editor, currentIndex, currentState, targetState, isCaseInsensitive, transition, epsilonVisited)
+      if (transitionResult.simulationResult) return transitionResult
     }
-
-    return false
+    return NFASimulationResult(false, currentIndex)
   }
 
   private fun handleAssertion(
@@ -241,32 +241,33 @@ internal class NFA private constructor(
     currentIndex: Int,
     currentState: NFAState,
     isCaseInsensitive: Boolean
-  ): Boolean {
-    val assertion = currentState.assertion ?: return false
+  ): NFASimulationResult {
+    val assertion = currentState.assertion ?: return NFASimulationResult(false, currentIndex)
 
-    val assertionResult = assertion.assert(editor, currentIndex, isCaseInsensitive, groups)
-    if (assertionResult.assertionSuccess != assertion.isPositive) return false
+    val assertionResult = simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive)
+    if (assertionResult.simulationResult != assertion.isPositive) return NFASimulationResult(false, currentIndex)
 
     val newIndex = if (assertion.shouldConsume) assertionResult.index else currentIndex
-    return simulate(editor, newIndex, assertion.jumpTo, isCaseInsensitive)
+    return simulate(editor, newIndex, assertion.jumpTo, acceptState, isCaseInsensitive)
   }
 
   private fun handleTransition(
     editor: VimEditor,
     currentIndex: Int,
     currentState: NFAState,
+    targetState: NFAState,
     isCaseInsensitive: Boolean,
     transition: NFATransition,
     epsilonVisited: Set<NFAState>
-  ): Boolean {
+  ): NFASimulationResult {
     val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
-    if (transitionMatcherResult !is MatcherResult.Success) return false
+    if (transitionMatcherResult !is MatcherResult.Success) return NFASimulationResult(false, currentIndex)
 
     val nextIndex = currentIndex + transitionMatcherResult.consumed
     val destState = transition.destState
 
     if (transitionMatcherResult.consumed == 0 && epsilonVisited.contains(destState)) {
-      return false
+      return NFASimulationResult(false, currentIndex)
     }
 
     val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !epsilonVisited.contains(destState)) {
@@ -274,7 +275,7 @@ internal class NFA private constructor(
     } else {
       HashSet()
     }
-    return simulate(editor, nextIndex, destState, isCaseInsensitive, epsilonVisitedCopy)
+    return simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, epsilonVisitedCopy)
   }
 
   /**
@@ -323,4 +324,7 @@ internal class NFA private constructor(
   }
 }
 
-private data class SimulationStackFrame(val index: Int, val state: NFAState, val epsilonVisited: HashSet<NFAState>)
+private data class NFASimulationResult (
+  val simulationResult: Boolean,
+  val index: Int
+)
