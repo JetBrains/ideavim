@@ -235,9 +235,13 @@ internal class NFA private constructor(
       val result = simulateAtomic(editor, currentIndex, currentState, isCaseInsensitive)
       if (result.first) {
         if (currentState.consume) return simulate(editor, result.third, result.second, isCaseInsensitive)
-        if (currentState.isPositive) return simulate(editor, currentIndex, result.second, isCaseInsensitive)
+        return if (currentState.isPositive) simulate(editor, currentIndex, result.second, isCaseInsensitive)
+        else false
+      } else {
+        if (currentState.consume) return false
+        return if (!currentState.isPositive) simulate(editor, currentIndex, result.second, isCaseInsensitive)
+        else false
       }
-      else return false
     }
 
     updateCaptureGroups(editor, currentIndex, currentState)
