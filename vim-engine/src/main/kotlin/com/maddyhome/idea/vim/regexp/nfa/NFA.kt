@@ -148,29 +148,21 @@ internal class NFA private constructor(
     else this.acceptState.endCapture.add(groupNumber)
   }
 
-  /**
-   * Marks the start and accept states of the NFA to start
-   * and end, respectfully, the limits of an atomic group.
-   *
-   * @return The new NFA representing an atomic group
-   */
-  internal fun atomic(consume: Boolean = true, isAhead: Boolean = true, isPositive: Boolean = false) : NFA {
+  internal fun assert(shouldConsume: Boolean, isPositive: Boolean = false) : NFA {
     val newStart = NFAState(false)
     val newEnd = NFAState(true)
-    newStart.startsAtomic = true
-    newStart.consume = consume
-    newStart.isAhead = isAhead
-    newStart.isPositive = isPositive
-    newEnd.endsAtomic = true
 
-    newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
-    acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
+    newStart.assertion = NFAAssertion(
+      shouldConsume,
+      isPositive,
+      startState,
+      acceptState,
+      newEnd
+    )
 
     acceptState.isAccept = false
-    newEnd.isAccept = true
-
-    startState = newStart
     acceptState = newEnd
+    startState = newStart
 
     return this
   }
@@ -229,19 +221,12 @@ internal class NFA private constructor(
     isCaseInsensitive: Boolean,
     epsilonVisited: HashSet<NFAState> = HashSet(),
   ) : Boolean {
-
-    if (currentState.startsAtomic) {
-      // TODO: check if simulation should go forwards or backwards
-      val result = simulateAtomic(editor, currentIndex, currentState, isCaseInsensitive)
-      if (result.first) {
-        if (currentState.consume) return simulate(editor, result.third, result.second, isCaseInsensitive)
-        return if (currentState.isPositive) simulate(editor, currentIndex, result.second, isCaseInsensitive)
-        else false
-      } else {
-        if (currentState.consume) return false
-        return if (!currentState.isPositive) simulate(editor, currentIndex, result.second, isCaseInsensitive)
-        else false
-      }
+    if (currentState.assertion != null) {
+      val assertionResult = currentState.assertion!!.assert(editor, currentIndex, isCaseInsensitive, groups)
+      if (assertionResult.assertionSuccess != currentState.assertion!!.isPositive) return false
+      return if (currentState.assertion!!.shouldConsume)
+        simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, isCaseInsensitive)
+      else simulate(editor, currentIndex, currentState.assertion!!.jumpTo, isCaseInsensitive)
     }
 
     updateCaptureGroups(editor, currentIndex, currentState)
@@ -260,32 +245,6 @@ internal class NFA private constructor(
       }
     }
     return false
-  }
-
-  private fun simulateAtomic(
-    editor: VimEditor,
-    currentIndex: Int,
-    currentState: NFAState,
-    isCaseInsensitive: Boolean,
-    epsilonVisited: HashSet<NFAState> = HashSet(),
-  ) : Triple<Boolean, NFAState, Int> {
-    updateCaptureGroups(editor, currentIndex, currentState)
-    if (currentState.isAccept || currentState.endsAtomic) return Triple(true, currentState, currentIndex)
-    for (transition in currentState.transitions) {
-      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
-      if (transitionMatcherResult is MatcherResult.Success) {
-        var epsilonVisitedCopy = HashSet(epsilonVisited)
-        if (transitionMatcherResult.consumed == 0) {
-          if (epsilonVisited.contains(transition.destState)) continue
-          epsilonVisitedCopy.add(currentState)
-        } else {
-          epsilonVisitedCopy = HashSet()
-        }
-        val result = simulateAtomic(editor, currentIndex + transitionMatcherResult.consumed, transition.destState, isCaseInsensitive, epsilonVisitedCopy)
-        if (result.first) return result
-      }
-    }
-    return Triple(false, currentState, currentIndex)
   }
 
   /**
