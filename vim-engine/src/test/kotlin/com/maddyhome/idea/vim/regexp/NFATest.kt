@@ -1098,6 +1098,32 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test negative lookahead 1`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "Lorem\\( Lorem\\)\\@!",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test negative lookahead 2`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "Lorem\\( Lorem\\)\\@! Ipsum",
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `test negative lookahead should fail`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "Lorem\\( Ipsum\\)\\@!"
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
