@@ -45,7 +45,6 @@ internal class NFA private constructor(
   internal fun concatenate(other: NFA) : NFA {
     this.acceptState.addTransition(NFATransition(EpsilonMatcher(), other.startState))
 
-    this.acceptState.isAccept = false
     this.acceptState = other.acceptState
 
     return this
@@ -60,16 +59,14 @@ internal class NFA private constructor(
    * @return The new NFA representing the union
    */
   internal fun unify(other: NFA) : NFA {
-    val newStart = NFAState(false)
-    val newEnd = NFAState(true)
+    val newStart = NFAState()
+    val newEnd = NFAState()
 
     newStart.addTransition(NFATransition(EpsilonMatcher(), this.startState))
     newStart.addTransition(NFATransition(EpsilonMatcher(), other.startState))
 
     this.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    this.acceptState.isAccept = false
     other.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    other.acceptState.isAccept = false
 
     this.startState = newStart
     this.acceptState = newEnd
@@ -85,8 +82,8 @@ internal class NFA private constructor(
    * @return The new NFA representing the closure
    */
   internal fun closure(isGreedy: Boolean) : NFA {
-    val newStart = NFAState(false)
-    val newEnd = NFAState(true)
+    val newStart = NFAState()
+    val newEnd = NFAState()
 
     if (isGreedy){
       newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
@@ -102,7 +99,6 @@ internal class NFA private constructor(
       acceptState.addTransition(NFATransition(EpsilonMatcher(), startState))
     }
 
-    acceptState.isAccept = false
     startState = newStart
     acceptState = newEnd
 
@@ -118,8 +114,8 @@ internal class NFA private constructor(
    * @return The new NFA, that can be matched optionally
    */
   internal fun optional(isGreedy: Boolean) {
-    val newStart = NFAState(false)
-    val newEnd = NFAState(true)
+    val newStart = NFAState()
+    val newEnd = NFAState()
 
     if (isGreedy) {
       newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
@@ -131,7 +127,6 @@ internal class NFA private constructor(
     }
 
     acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    acceptState.isAccept = false
     startState = newStart
     acceptState = newEnd
   }
@@ -148,9 +143,19 @@ internal class NFA private constructor(
     else this.acceptState.endCapture.add(groupNumber)
   }
 
+  /**
+   * Marks the NFA to be asserted during simulation. The simulation
+   * may or may not consume input, and can be positive (simulation must
+   * succeed) or negative (simulation must fail).
+   *
+   * @param shouldConsume Whether the assertion should consume input
+   * @param isPositive Whether the assertion is positive or negative
+   *
+   * @return The NFA instance marked for assertion
+   */
   internal fun assert(shouldConsume: Boolean, isPositive: Boolean = false) : NFA {
-    val newStart = NFAState(false)
-    val newEnd = NFAState(true)
+    val newStart = NFAState()
+    val newEnd = NFAState()
 
     newStart.assertion = NFAAssertion(
       shouldConsume,
@@ -160,7 +165,6 @@ internal class NFA private constructor(
       newEnd
     )
 
-    acceptState.isAccept = false
     acceptState = newEnd
     startState = newStart
 
@@ -209,10 +213,11 @@ internal class NFA private constructor(
    * @param editor            The editor that is used for the simulation
    * @param currentIndex      The current index of the text in the simulation
    * @param currentState      The current NFA state in the simulation
+   * @param targetState       The NFA state that needs to be found for a successful match
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
    *
-   * @return True if matching was successful, false otherwise
+   * @return The result of the simulation. It tells whether it was successful, and at what index it stopped.
    */
   private fun simulate(
     editor: VimEditor,
@@ -236,6 +241,17 @@ internal class NFA private constructor(
     return NFASimulationResult(false, currentIndex)
   }
 
+  /**
+   * Handles a state of the NFA that has an assertion. Determines if the assertion
+   * was successful or not, and where the normal simulation should resume.
+   *
+   * @param editor            The editor that is used for the simulation
+   * @param currentIndex      The current index of the text in the simulation
+   * @param currentState      The current NFA state in the simulation
+   * @param isCaseInsensitive Whether the simulation should ignore case
+   *
+   * @return The result of the assertion. It tells whether it was successful, and at what index it stopped.
+   */
   private fun handleAssertion(
     editor: VimEditor,
     currentIndex: Int,
@@ -247,10 +263,28 @@ internal class NFA private constructor(
     val assertionResult = simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive)
     if (assertionResult.simulationResult != assertion.isPositive) return NFASimulationResult(false, currentIndex)
 
+    /**
+     * If the assertion should consume input, the normal simulation resumes at the index where the
+     * assertion stopped, else it resumes at the index that the simulation was at before the assertion.
+     */
     val newIndex = if (assertion.shouldConsume) assertionResult.index else currentIndex
     return simulate(editor, newIndex, assertion.jumpTo, acceptState, isCaseInsensitive)
   }
 
+  /**
+   * Tries to take a transition, and continues the simulation from the destination state
+   * of said transition.
+   *
+   * @param editor            The editor that is used for the simulation
+   * @param currentIndex      The current index of the text in the simulation
+   * @param currentState      The current NFA state in the simulation
+   * @param targetState       The NFA state that needs to be found for a successful match
+   * @param isCaseInsensitive Whether the simulation should ignore case
+   * @param transition        The transition that is to be handled
+   * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
+   *
+   * @return The result of taking the transition. It tells whether it was successful, and at what index it stopped.
+   */
   private fun handleTransition(
     editor: VimEditor,
     currentIndex: Int,
@@ -300,7 +334,7 @@ internal class NFA private constructor(
      * @return THe new NFA instance
      */
     internal fun fromSingleState() : NFA {
-      val state = NFAState(true)
+      val state = NFAState()
       return NFA(state, state)
     }
 
@@ -315,8 +349,8 @@ internal class NFA private constructor(
      * @return The new NFA instance
      */
     internal fun fromMatcher(matcher: Matcher) : NFA {
-      val startState = NFAState(false)
-      val acceptState = NFAState(true)
+      val startState = NFAState()
+      val acceptState = NFAState()
 
       startState.addTransition(NFATransition(matcher, acceptState))
       return NFA(startState, acceptState)
@@ -324,7 +358,17 @@ internal class NFA private constructor(
   }
 }
 
+/**
+ * Represents the result of simulating a NFA
+ */
 private data class NFASimulationResult (
+  /**
+   * Whether the simulation reached a target state successfully
+   */
   val simulationResult: Boolean,
+
+  /**
+   * The index of the input editor text at which the simulation stopped
+   */
   val index: Int
 )

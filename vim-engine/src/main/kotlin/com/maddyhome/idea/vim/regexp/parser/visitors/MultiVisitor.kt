@@ -73,7 +73,7 @@ internal sealed class Multi {
   object AtomicMulti : Multi()
 
   /**
-   * Used to represent a assertion multi
+   * Used to represent an assertion multi
    */
   internal data class AssertionMulti(
     val isPositive: Boolean,
