@@ -13,11 +13,6 @@ package com.maddyhome.idea.vim.regexp.nfa
  */
 internal class NFAState (
   /**
-   * Tells whether the state is an accept state or not
-   */
-  var isAccept: Boolean = false,
-
-  /**
    * All the transitions from this state. Order matters.
    * Transitions with higher priority should be in lower
    * indexes. This is relevant for the implementation of
@@ -25,6 +20,9 @@ internal class NFAState (
    */
   val transitions: ArrayList<NFATransition> = ArrayList(),
 
+  /**
+   *
+   */
   var assertion: NFAAssertion? = null,
 
   /**
