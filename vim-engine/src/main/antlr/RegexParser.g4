@@ -62,6 +62,7 @@ multi : STAR               #ZeroOrMore
       | range              #RangeQuantifier
       | ATOMIC             #Atomic
       | POSITIVE_LOOKAHEAD #PositiveLookahead
+      | NEGATIVE_LOOKAHEAD #NegativeLookahead
       ;
 
 /**
