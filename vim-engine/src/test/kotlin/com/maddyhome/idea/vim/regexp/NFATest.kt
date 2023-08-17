@@ -1150,6 +1150,32 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test double negative lookahead equals a positive`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem(( Ipsum)@!)@!",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test double positive lookahead equals a positive`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem(( Ipsum)@=)@=",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test positive and negative lookahead equals a negative`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "\\vLorem(( Ipsum)@!)@="
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
