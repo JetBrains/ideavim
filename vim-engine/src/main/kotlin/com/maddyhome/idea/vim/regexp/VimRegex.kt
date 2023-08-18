@@ -11,7 +11,9 @@ package com.maddyhome.idea.vim.regexp
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.parser.CaseSensitivitySettings
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
+import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
 
 /**
@@ -30,16 +32,22 @@ public class VimRegex(pattern: String) {
 
   init {
     val parser = VimRegexParser(pattern)
-    val tree = parser.parse()
-    nfa = PatternVisitor().visit(tree)
+    val parseResult = parser.parse()
 
-    caseSensitivity = when (parser.caseSensitivity) {
-      // TODO: check ignorecase options
-      VimRegexParser.CaseSensitivity.DEFAULT -> CaseSensitivity.NO_IGNORE_CASE
-      VimRegexParser.CaseSensitivity.IGNORE_CASE -> CaseSensitivity.IGNORE_CASE
-      VimRegexParser.CaseSensitivity.NO_IGNORE_CASE -> CaseSensitivity.NO_IGNORE_CASE
+    when (parseResult) {
+      is VimRegexParserResult.Failure -> throw RuntimeException() // TODO: show actual error message
+      is VimRegexParserResult.Success -> {
+        nfa = PatternVisitor().visit(parseResult.tree)
+        caseSensitivity = when (parseResult.caseSensitivitySettings) {
+          // TODO: check ignorecase options
+          CaseSensitivitySettings.DEFAULT-> CaseSensitivity.NO_IGNORE_CASE
+          CaseSensitivitySettings.IGNORE_CASE -> CaseSensitivity.IGNORE_CASE
+          CaseSensitivitySettings.NO_IGNORE_CASE -> CaseSensitivity.NO_IGNORE_CASE
+        }
+      }
+      }
     }
-  }
+
 
   /**
    * Indicates whether the regular expression can find at least one match in the specified editor

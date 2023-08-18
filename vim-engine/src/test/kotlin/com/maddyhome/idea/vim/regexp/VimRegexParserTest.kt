@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
-import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserException
+import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import org.junit.jupiter.api.Test
 import kotlin.test.fail
 
@@ -291,16 +291,16 @@ class VimRegexParserTest {
 
   private fun assertSuccess(pattern: String) {
     val parser = VimRegexParser(pattern)
-    parser.parse()
+    val result = parser.parse()
+    if (parser.parse() is VimRegexParserResult.Failure) {
+      fail("Expecting successful parsing for pattern $pattern but got ${(result as VimRegexParserResult.Failure).message}")
+    }
   }
 
   private fun assertFailure(pattern: String) {
-    try {
-      val parser = VimRegexParser(pattern)
-      parser.parse()
-    } catch (exception: VimRegexParserException) {
-      return
+    val parser = VimRegexParser(pattern)
+    if (parser.parse() is VimRegexParserResult.Success) {
+      fail("Expecting unsuccessful parsing for pattern $pattern")
     }
-    fail("Pattern $pattern should fail with VimRegexParserException!")
   }
 }

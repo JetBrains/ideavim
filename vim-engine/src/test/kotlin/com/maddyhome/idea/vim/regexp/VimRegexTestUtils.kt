@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
+import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
 import org.mockito.Mockito
 import org.mockito.kotlin.whenever
@@ -32,8 +33,11 @@ internal object VimRegexTestUtils {
     return editorMock
   }
 
-  fun buildNFA(pattern: String) : NFA {
-    val tree = VimRegexParser(pattern).parse()
-    return PatternVisitor().visit(tree)
+  fun buildNFA(pattern: String) : NFA? {
+    val parserResult = VimRegexParser(pattern).parse()
+    return when (parserResult) {
+      is VimRegexParserResult.Failure -> null
+      is VimRegexParserResult.Success -> PatternVisitor().visit(parserResult.tree)
+    }
   }
 }

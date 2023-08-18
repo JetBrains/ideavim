@@ -1196,10 +1196,10 @@ class NFATest {
   ) {
     val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
-    val result = nfa.simulate(editor, offset, isCaseInsensitive = ignoreCase)
+    val result = nfa?.simulate(editor, offset, isCaseInsensitive = ignoreCase)
     when (result) {
-      is VimMatchResult.Failure -> fail("Expected to find match")
       is VimMatchResult.Success -> assertEquals(expectedResultRange, result.range)
+      else -> fail("Expected to find match")
     }
   }
 
@@ -1213,16 +1213,16 @@ class NFATest {
   ) {
     val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
-    val result = nfa.simulate(editor, offset)
+    val result = nfa?.simulate(editor, offset)
     when (result) {
-      is VimMatchResult.Failure -> fail("Expected to find match")
       is VimMatchResult.Success -> assertEquals(expectedResultRange, result.groups.get(groupNumber)?.range)
+      else -> fail("Expected to find match")
     }
   }
 
   private fun assertFailure(text: CharSequence, pattern: String, offset: Int = 0, carets: List<Int> = emptyList(), ignoreCase: Boolean = false) {
     val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
-    assertTrue(nfa.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
+    assertTrue(nfa?.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
   }
 }
