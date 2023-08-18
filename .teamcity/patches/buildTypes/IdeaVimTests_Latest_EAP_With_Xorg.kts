@@ -13,5 +13,8 @@ changeBuildType(RelativeId("IdeaVimTests_Latest_EAP_With_Xorg")) {
         add {
             matches("teamcity.agent.jvm.os.family", "Linux")
         }
+        add {
+            exists("env.DISPLAY")
+        }
     }
 }
