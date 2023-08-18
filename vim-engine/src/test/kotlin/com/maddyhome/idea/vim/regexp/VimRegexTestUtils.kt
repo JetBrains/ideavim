@@ -34,7 +34,7 @@ internal object VimRegexTestUtils {
   }
 
   fun buildNFA(pattern: String) : NFA? {
-    val parserResult = VimRegexParser(pattern).parse()
+    val parserResult = VimRegexParser.parse(pattern)
     return when (parserResult) {
       is VimRegexParserResult.Failure -> null
       is VimRegexParserResult.Success -> PatternVisitor().visit(parserResult.tree)
