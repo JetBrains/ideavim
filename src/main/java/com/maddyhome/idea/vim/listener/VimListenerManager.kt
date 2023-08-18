@@ -8,11 +8,14 @@
 
 package com.maddyhome.idea.vim.listener
 
+import com.intellij.ide.ui.UISettings
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
@@ -30,10 +33,19 @@ import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.fileEditor.FileOpenedSyncListener
+import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileEditor.ex.FileEditorWithProvider
+import com.intellij.openapi.fileEditor.impl.EditorComposite
+import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.rd.createLifetime
 import com.intellij.openapi.rd.createNestedDisposable
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.removeUserData
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ExceptionUtil
 import com.jetbrains.rd.util.lifetime.intersect
 import com.maddyhome.idea.vim.EventFacade
@@ -139,6 +151,8 @@ internal object VimListenerManager {
       optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
+      val busConnection = ApplicationManager.getApplication().messageBus.connect(VimPlugin.getInstance().onOffDisposable)
+      busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
 
       EditorFactory.getInstance().eventMulticaster.addCaretListener(VimCaretListener, VimPlugin.getInstance().onOffDisposable)
     }
@@ -245,25 +259,110 @@ internal object VimListenerManager {
     }
   }
 
-  private object VimEditorFactoryListener : EditorFactoryListener {
-    override fun editorCreated(event: EditorFactoryEvent) {
-      // We are initialising a newly opened editor, based on
-      val sourceEditor = getOpeningEditor(event.editor)
+  private object VimEditorFactoryListener : EditorFactoryListener, FileOpenedSyncListener {
+    private data class OpeningEditor(
+      val editor: Editor,
+      val owningEditorWindow: EditorWindow?,
+      val isPreview: Boolean,
+      val canBeReused: Boolean,
+    )
 
-      // Note that IdeaVim currently implements `:edit {file}` as `:new {file}` and doesn't implement `:new`. This is
-      // why the default scenario is NEW. At some point we should implement `:edit` to edit in place, and figure out
-      // how to recognise that scenario (e.g. store a flag in the virtual file's user data before opening)
-      val scenario = when {
-        sourceEditor == null -> LocalOptionInitialisationScenario.FALLBACK
-        event.editor.document == sourceEditor.document -> LocalOptionInitialisationScenario.SPLIT
-        else -> LocalOptionInitialisationScenario.NEW
+    private val openingEditorKey: Key<OpeningEditor> = Key("IdeaVim::OpeningEditor")
+
+    override fun editorCreated(event: EditorFactoryEvent) {
+      // This callback is called when an editor is created, but we cannot completely rely on it to initialise options.
+      // We can find the currently selected editor, which we can use as the opening editor, and we're given the new
+      // editor, but we don't know enough about it - this function is called before the new editor is added to an
+      // EditorComposite and before that is added to an EditorWindow's tabbed container and finally an EditorsSplitter.
+      // If it's a main file editor, the `FileOpenedSyncListener.fileOpenedSync` callback will allow us to find out, but
+      // by that point, the opening editor might have been closed (i.e. if it's a preview tab or if the user has
+      // selected to reuse unmodified tabs). If it's not a main editor, or backed by a real file, then that callback
+      // isn't called, so we need to initialise early.
+      val openingEditor = getOpeningEditor(event.editor)
+
+      if (event.editor.virtualFile == null || event.editor.editorKind != EditorKind.MAIN_EDITOR || openingEditor == null) {
+        val scenario =
+          if (openingEditor == null) LocalOptionInitialisationScenario.FALLBACK else LocalOptionInitialisationScenario.NEW
+        add(event.editor, openingEditor, scenario)
       }
-      add(event.editor, sourceEditor?.vim ?: injector.fallbackWindow, scenario)
+      else {
+        // We've got a virtual file, so FileOpenedSyncListener will be called. Save data
+        val project = openingEditor.project ?: return
+        val virtualFile = openingEditor.virtualFile ?: return
+        val manager = FileEditorManager.getInstance(project)
+
+        // If the opening tab is a preview tab, and the new editor is in the same split, the preview tab will be
+        // replaced, and we should use EDIT. If the new editor is in a different split, then it would be NEW
+        val isPreview = manager.getComposite(virtualFile)?.isPreview ?: false
+
+        // If the user has enabled "Open declaration source in the same tab", the opening editor will be replaced as
+        // long as it's not pinned, and it's not modified, and we're in the same split
+        val canBeReused = UISettings.getInstance().reuseNotModifiedTabs &&
+                (manager.getComposite(virtualFile) as? EditorComposite)?.let { composite ->
+                  !composite.isPinned && !composite.isModified
+                } ?: false
+
+        // Keep a track of the owner of the opening editor, so we can compare later, potentially after the opening
+        // editor has been closed. This is nullable, but should always have a value
+        val owningEditorWindow = getOwningEditorWindow(openingEditor)
+
+        event.editor.putUserData(openingEditorKey, OpeningEditor(openingEditor, owningEditorWindow, isPreview, canBeReused))
+      }
+
       VimStandalonePluginUpdateChecker.instance.pluginUsed()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
       injector.markService.editorReleased(event.editor.vim)
+    }
+
+    override fun fileOpenedSync(
+      source: FileEditorManager,
+      file: VirtualFile,
+      editorsWithProviders: List<FileEditorWithProvider>
+    ) {
+      // This callback is called once all editors are created for a file being opened. The EditorComposite has been
+      // created (and the list of editors and providers is passed here) and added to an EditorWindow tab, inside a
+      // splitter. We now know where the new editor is located, and we have stored the details of the opening editor
+      // (which might no longer be open). It is still safe to use the editor itself because we're still synchronous to
+      // where it's been removed, and we only need its user data, but make sure not to hold on to it and leak it
+      // Note that the default scenario is NEW, because IdeaVim does not currently implement `:edit {file}` correctly.
+      // It does not edit in place, in the current window, but opens a new window, so behaves like `:new {file}`. At
+      // some point we should implement `:edit` like we do preview tabs, or reusing tabs, by opening a new editor and
+      // closing the old one. We could identify this by adding user data to the virtual file in EditFileCommand, or
+      // possibly by temporarily enabling the "reuse unmodified tabs" setting. We would also need to handle if the
+      // editor is modified
+      editorsWithProviders.forEach {
+        (it.fileEditor as? TextEditor)?.editor?.let { editor ->
+          val openingEditor = editor.removeUserData(openingEditorKey)
+          val owningEditorWindow = getOwningEditorWindow(editor)
+          val isInSameSplit = owningEditorWindow == openingEditor?.owningEditorWindow
+
+          // Sometimes the platform will not reuse a tab when you expect it to, e.g. when reuse tabs is enabled and
+          // navigating to derived class. We'll confirm our heuristics by checking to see if the editor is still around
+          val openingEditorIsClosed = editor.project?.let { p ->
+            FileEditorManagerEx.getInstanceEx(p).allEditors.filterIsInstance(TextEditor::class.java).all { textEditor ->
+              textEditor.editor != openingEditor?.editor
+            }
+          } ?: false
+
+          val scenario = when {
+            openingEditor == null -> LocalOptionInitialisationScenario.FALLBACK
+            editor.document == openingEditor.editor.document -> LocalOptionInitialisationScenario.SPLIT
+            (openingEditor.canBeReused || openingEditor.isPreview) && isInSameSplit && openingEditorIsClosed -> LocalOptionInitialisationScenario.EDIT
+            else -> LocalOptionInitialisationScenario.NEW
+          }
+          add(editor, openingEditor?.editor, scenario)
+        }
+      }
+    }
+
+    private fun getOwningEditorWindow(editor: Editor) = editor.project?.let { p ->
+      FileEditorManagerEx.getInstanceEx(p).windows.find { editorWindow ->
+        editorWindow.allComposites.any { composite ->
+          composite.allEditors.filterIsInstance(TextEditor::class.java).any { it.editor == editor }
+        }
+      }
     }
   }
 
