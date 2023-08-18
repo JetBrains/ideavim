@@ -8,93 +8,85 @@
 
 package com.maddyhome.idea.vim.regexp
 
-import com.maddyhome.idea.vim.regexp.parser.error.BailErrorLexer
-import com.maddyhome.idea.vim.regexp.parser.RegexParser
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
+import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
+import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserException
 import org.junit.jupiter.api.Test
-import java.lang.reflect.InvocationTargetException
 import kotlin.test.fail
 
 
-class RegexParserTest {
+class VimRegexParserTest {
   @Test
   fun `range both bounds`() {
-    assertSuccess("\\{2,5}", RANGE)
+    assertSuccess("a\\{2,5}")
   }
 
   @Test
   fun `range left bound`() {
-    assertSuccess("\\{6,}", RANGE)
+    assertSuccess("a\\{6,}")
   }
 
   @Test
   fun `range right bound`() {
-    assertSuccess("\\{,10}", RANGE)
+    assertSuccess("a\\{,10}")
   }
 
   @Test
   fun `range absolute bound`() {
-    assertSuccess("\\{5}", RANGE)
+    assertSuccess("a\\{5}")
   }
 
   @Test
   fun `range lazy`() {
-    assertSuccess("\\{-,5}", RANGE)
+    assertSuccess("a\\{-,5}")
   }
 
   @Test
   fun `range missing right bracket`() {
-    assertFailure("\\{5", RANGE)
-  }
-
-  @Test
-  fun `range missing left bracket`() {
-    assertFailure("2,5}", RANGE)
+    assertFailure("a\\{5")
   }
 
   @Test
   fun `range two commas`() {
-    assertFailure("\\{2,5,}", RANGE)
+    assertFailure("a\\{2,5,}")
   }
 
   @Test
   fun `range non integer bound`() {
-    assertFailure("\\{2,g}", RANGE)
+    assertFailure("a\\{2,g}")
   }
 
   @Test
   fun `range lazy with extra dash`() {
-    assertFailure("\\{--2,5}", RANGE)
+    assertFailure("a\\{--2,5}")
   }
 
   @Test
   fun `collection a to z`() {
-    assertSuccess("[a-z]", COLLECTION)
+    assertSuccess("[a-z]")
   }
 
   @Test
   fun `collection 0 to 9`() {
-    assertSuccess("[0-9]", COLLECTION)
+    assertSuccess("[0-9]")
   }
   @Test
   fun `collection single element`() {
-    assertSuccess("[f]", COLLECTION)
+    assertSuccess("[f]")
   }
 
   @Test
   fun `collection a to z and A`() {
-    assertSuccess("[a-zA]", COLLECTION)
+    assertSuccess("[a-zA]")
   }
 
   @Test
   fun `collection a to z and A to Z`() {
-    assertSuccess("[a-zA-Z]", COLLECTION)
+    assertSuccess("[a-zA-Z]")
   }
 
   @Test
   fun `collection a to z, 9 and A to Z`() {
-    assertSuccess("[a-z9A-Z]", COLLECTION)
+    assertSuccess("[a-z9A-Z]")
   }
 
   @Test
@@ -105,42 +97,42 @@ class RegexParserTest {
      * matches the characters 'a' to 'z', a
      * literal dash '-' and a 'Z'
      */
-    assertSuccess("[a-z-Z]", COLLECTION)
+    assertSuccess("[a-z-Z]")
   }
 
   @Test
   fun `collection with single dash`() {
-    assertSuccess("[-]", COLLECTION)
+    assertSuccess("[-]")
   }
 
   @Test
   fun `collection dash to 0`() {
-    assertSuccess("[--0]", COLLECTION)
+    assertSuccess("[--0]")
   }
 
   @Test
   fun `collection literal dash and a to z`() {
-    assertSuccess("[-a-z]", COLLECTION)
+    assertSuccess("[-a-z]")
   }
 
   @Test
   fun `collection a to z and literal dash`() {
-    assertSuccess("[a-z-]", COLLECTION)
+    assertSuccess("[a-z-]")
   }
 
   @Test
   fun `collection a, literal dash and b`() {
-    assertSuccess("[a\\-b]", COLLECTION)
+    assertSuccess("[a\\-b]")
   }
 
   @Test
   fun `collection escaped backslash`() {
-    assertSuccess("[\\\\]", COLLECTION)
+    assertSuccess("[\\\\]")
   }
 
   @Test
   fun `collection a to z negated`() {
-    assertSuccess("[^a-z]", COLLECTION)
+    assertSuccess("[^a-z]")
   }
 
   @Test
@@ -153,12 +145,12 @@ class RegexParserTest {
      * taken literally when not immediately
      * after the "["
      */
-    assertSuccess("[^^]", COLLECTION)
+    assertSuccess("[^^]")
   }
 
   @Test
   fun `collection with escaped caret`() {
-    assertSuccess("[\\^]", COLLECTION)
+    assertSuccess("[\\^]")
   }
 
   @Test
@@ -169,160 +161,146 @@ class RegexParserTest {
      * the "\" is taken literally.
      * Equivalent to "[\\a]]"
      */
-    assertSuccess("[\\a]", COLLECTION)
+    assertSuccess("[\\a]")
   }
 
   @Test
   fun `collection unicode code range`() {
-    assertSuccess("[\\u0-\\uFFFF]", COLLECTION)
+    assertSuccess("[\\u0-\\uFFFF]")
   }
 
   @Test
   fun `collection russian alphabet`() {
-    assertSuccess("[А-яЁё]", COLLECTION)
+    assertSuccess("[А-яЁё]")
   }
 
   @Test
   fun `unclosed collection`() {
-    assertFailure("[a-z", COLLECTION)
+    assertFailure("[a-z")
   }
 
   @Test
   fun `collection unescaped backslash at end`() {
-    assertFailure("[abc\\]", COLLECTION)
+    assertFailure("[abc\\]")
   }
 
   @Test
   fun `unicode character`() {
-    assertSuccess("\u03b5", ATOM)
+    assertSuccess("\u03b5")
   }
 
   @Test
   fun `unicode character in nomagic mode`() {
-    assertSuccess("\\M\u03b5", ATOM)
+    assertSuccess("\\M\u03b5")
   }
 
   @Test
   fun `wider unicode character`() {
-    assertSuccess("\uD83E\uDE24", ATOM)
+    assertSuccess("\uD83E\uDE24")
   }
 
   @Test
   fun `'ab'`() {
-    assertSuccess("ab", PATTERN)
+    assertSuccess("ab")
   }
 
   @Test
   fun `'ab' after cursor`() {
-    assertSuccess("\\%#ab", PATTERN);
+    assertSuccess("\\%#ab")
   }
 
   @Test
   fun `sequence of 0 or more 'ab'`() {
-    assertSuccess("\\(ab\\)*", PATTERN)
+    assertSuccess("\\(ab\\)*")
   }
 
   @Test
   fun `sequence of 0 or more 'ab' no magic`() {
-    assertSuccess("\\M\\(ab\\)\\*", PATTERN)
+    assertSuccess("\\M\\(ab\\)\\*")
   }
 
   @Test
   fun `sequence of 1 or more 'ab'`() {
-    assertSuccess("\\(ab\\)\\+", PATTERN)
+    assertSuccess("\\(ab\\)\\+")
   }
 
   @Test
   fun `0 or 1 'ab' with equals`() {
-    assertSuccess("\\(ab\\)\\=", PATTERN)
+    assertSuccess("\\(ab\\)\\=")
   }
 
   @Test
   fun `0 or 1 'ab' with question mark`() {
-    assertSuccess("\\(ab\\)\\?", PATTERN)
+    assertSuccess("\\(ab\\)\\?")
   }
 
   @Test
   fun `nested groups with multi`() {
-    assertSuccess("\\(\\(a\\)*b\\)\\+", PATTERN)
+    assertSuccess("\\(\\(a\\)*b\\)\\+")
   }
 
   @Test
   fun `non-capture group`() {
-    assertSuccess("\\%(a\\)", PATTERN)
+    assertSuccess("\\%(a\\)")
   }
 
   @Test
   fun `very nomagic characters`() {
-    assertSuccess("\\V%(", PATTERN)
+    assertSuccess("\\V%(")
   }
 
   @Test
   fun `date format`() {
-    assertSuccess("\\(\\d\\{2}\\)\\{2}\\d\\{4}", PATTERN)
+    assertSuccess("\\(\\d\\{2}\\)\\{2}\\d\\{4}")
   }
 
   @Test
   fun `switching to nomagic`() {
-    assertSuccess("a*\\Ma*", PATTERN)
+    assertSuccess("a*\\Ma*")
   }
 
   @Test
   fun `switching to all magic modes`() {
-    assertSuccess("\\m.*\\M\\.\\*\\v.*\\V\\.\\*", PATTERN)
+    assertSuccess("\\m.*\\M\\.\\*\\v.*\\V\\.\\*")
   }
 
   @Test
   fun `backreference to group 1`() {
-    assertSuccess("\\v(cat|dog)\\1", PATTERN)
+    assertSuccess("\\v(cat|dog)\\1")
   }
 
   @Test
   fun `unclosed group`() {
-    assertFailure("\\(ab", PATTERN)
+    assertFailure("\\(ab")
   }
 
   @Test
   fun `unmatched closing )`() {
-    assertFailure("ab\\)", PATTERN)
+    assertFailure("ab\\)")
   }
 
   @Test
   fun `unclosed non-capture group`() {
-    assertFailure("\\%(a", PATTERN)
+    assertFailure("\\%(a")
   }
 
   @Test
   fun `unescaped group close`() {
-    assertFailure("\\(a)", PATTERN)
+    assertFailure("\\(a)")
   }
 
-  private fun generateParser(pattern: String): RegexParser {
-    val regexLexer = BailErrorLexer(CharStreams.fromString(pattern))
-    val tokens = CommonTokenStream(regexLexer)
-    return RegexParser(tokens)
+  private fun assertSuccess(pattern: String) {
+    val parser = VimRegexParser(pattern)
+    parser.parse()
   }
 
-  private fun assertSuccess(pattern: String, startSymbol : String) {
-    val parser = generateParser(pattern)
-    parser.javaClass.getMethod(startSymbol).invoke(parser)
-  }
-
-  private fun assertFailure(pattern: String, startSymbol: String) {
+  private fun assertFailure(pattern: String) {
     try {
-      val parser = generateParser(pattern)
-      parser.javaClass.getMethod(startSymbol).invoke(parser)
-    } catch (exception: InvocationTargetException) {
-      exception.printStackTrace()
+      val parser = VimRegexParser(pattern)
+      parser.parse()
+    } catch (exception: VimRegexParserException) {
       return
     }
-    fail("Pattern $pattern should fail for rule $startSymbol")
-  }
-
-  companion object {
-    private const val PATTERN = "pattern"
-    private const val COLLECTION = "collection"
-    private const val RANGE = "range"
-    private const val ATOM = "atom"
+    fail("Pattern $pattern should fail with VimRegexParserException!")
   }
 }
