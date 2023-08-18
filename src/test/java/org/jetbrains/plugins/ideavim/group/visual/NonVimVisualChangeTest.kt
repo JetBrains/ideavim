@@ -12,13 +12,11 @@ import com.intellij.codeInsight.editorActions.BackspaceHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.LogicalPosition
-import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.state.mode.mode
-import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -27,6 +25,7 @@ import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 /**
  * @author Alex Plate
@@ -47,8 +46,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    VimListenerManager.EditorListeners.add(fixture.editor)
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertMode(Mode.INSERT)
     ApplicationManager.getApplication().runWriteAction {
       CommandProcessor.getInstance().runUndoTransparentAction {
@@ -81,8 +79,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    VimListenerManager.EditorListeners.add(fixture.editor)
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertMode(Mode.INSERT)
 
     // Fast add and remove selection
@@ -105,8 +102,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    VimListenerManager.EditorListeners.add(fixture.editor)
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertMode(Mode.INSERT)
 
     // Fast add and remove selection
@@ -129,14 +125,13 @@ class NonVimVisualChangeTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(text)
-    VimListenerManager.EditorListeners.add(fixture.editor)
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertMode(Mode.INSERT)
 
     val range = text.rangeOf("Discovery")
     fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
-    kotlin.test.assertEquals(SelectionType.CHARACTER_WISE, fixture.editor.vim.mode.selectionType)
+    assertEquals(SelectionType.CHARACTER_WISE, fixture.editor.vim.mode.selectionType)
 
     val rangeLine = text.rangeOf("A Discovery\n")
     fixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
