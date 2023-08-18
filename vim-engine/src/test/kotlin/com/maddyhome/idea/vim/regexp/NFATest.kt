@@ -1170,6 +1170,24 @@ class NFATest {
 
   @Test
   fun `test positive and negative lookahead equals a negative`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem(( Lorem)@=)@!",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test negative and positive lookahead equals a negative`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem(( Lorem)@!)@=",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test negative and positive lookahead equals a negative and fails`() {
     assertFailure(
       "Lorem Ipsum",
       "\\vLorem(( Ipsum)@!)@="

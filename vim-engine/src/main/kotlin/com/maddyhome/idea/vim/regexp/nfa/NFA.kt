@@ -227,11 +227,10 @@ internal class NFA private constructor(
     isCaseInsensitive: Boolean,
     epsilonVisited: Set<NFAState> = HashSet()
   ): NFASimulationResult {
-    val assertionResult = handleAssertion(editor, currentIndex, currentState, isCaseInsensitive)
-    if (assertionResult.simulationResult) return assertionResult
-
     updateCaptureGroups(editor, currentIndex, currentState)
-
+    currentState.assertion?.let {
+      return handleAssertion(editor, currentIndex, isCaseInsensitive, it)
+    }
     if (currentState === targetState) return NFASimulationResult(true, currentIndex)
 
     for (transition in currentState.transitions) {
@@ -247,21 +246,21 @@ internal class NFA private constructor(
    *
    * @param editor            The editor that is used for the simulation
    * @param currentIndex      The current index of the text in the simulation
-   * @param currentState      The current NFA state in the simulation
    * @param isCaseInsensitive Whether the simulation should ignore case
+   * @param assertion         The assertion that is to be handled
    *
    * @return The result of the assertion. It tells whether it was successful, and at what index it stopped.
    */
   private fun handleAssertion(
     editor: VimEditor,
     currentIndex: Int,
-    currentState: NFAState,
-    isCaseInsensitive: Boolean
+    isCaseInsensitive: Boolean,
+    assertion: NFAAssertion
   ): NFASimulationResult {
-    val assertion = currentState.assertion ?: return NFASimulationResult(false, currentIndex)
-
     val assertionResult = simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive)
-    if (assertionResult.simulationResult != assertion.isPositive) return NFASimulationResult(false, currentIndex)
+    if (assertionResult.simulationResult != assertion.isPositive) {
+      return NFASimulationResult(false, currentIndex)
+    }
 
     /**
      * If the assertion should consume input, the normal simulation resumes at the index where the
