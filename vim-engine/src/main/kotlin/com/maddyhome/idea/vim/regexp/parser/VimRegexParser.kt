@@ -16,8 +16,8 @@ import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
-internal class VimRegexParser(private val pattern: String) {
-  fun parse() : VimRegexParserResult {
+internal object VimRegexParser {
+  fun parse(pattern: String) : VimRegexParserResult {
     return try {
       val regexLexer = BailErrorLexer(CharStreams.fromString(pattern))
       val tokens = CommonTokenStream(regexLexer)

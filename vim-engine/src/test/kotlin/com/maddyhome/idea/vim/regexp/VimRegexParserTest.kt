@@ -290,16 +290,14 @@ class VimRegexParserTest {
   }
 
   private fun assertSuccess(pattern: String) {
-    val parser = VimRegexParser(pattern)
-    val result = parser.parse()
-    if (parser.parse() is VimRegexParserResult.Failure) {
-      fail("Expecting successful parsing for pattern $pattern but got ${(result as VimRegexParserResult.Failure).message}")
+    val result = VimRegexParser.parse(pattern)
+    if (result is VimRegexParserResult.Failure) {
+      fail("Expecting successful parsing for pattern $pattern but got ${result.message}")
     }
   }
 
   private fun assertFailure(pattern: String) {
-    val parser = VimRegexParser(pattern)
-    if (parser.parse() is VimRegexParserResult.Success) {
+    if (VimRegexParser.parse(pattern) is VimRegexParserResult.Success) {
       fail("Expecting unsuccessful parsing for pattern $pattern")
     }
   }

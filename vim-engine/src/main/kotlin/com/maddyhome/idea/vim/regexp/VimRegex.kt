@@ -31,8 +31,7 @@ public class VimRegex(pattern: String) {
   private val nfa: NFA
 
   init {
-    val parser = VimRegexParser(pattern)
-    val parseResult = parser.parse()
+    val parseResult = VimRegexParser.parse(pattern)
 
     when (parseResult) {
       is VimRegexParserResult.Failure -> throw RuntimeException() // TODO: show actual error message
