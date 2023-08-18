@@ -16,8 +16,5 @@ changeBuildType(RelativeId("IdeaVimTests_Latest_EAP_With_Xorg")) {
         add {
             exists("env.DISPLAY")
         }
-        add {
-            exists("env.PATH")
-        }
     }
 }
