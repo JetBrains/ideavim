@@ -8,19 +8,10 @@
 
 package com.maddyhome.idea.vim.regexp
 
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.common.Offset
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildEditor
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildNFA
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
-import com.maddyhome.idea.vim.regexp.nfa.NFA
-import com.maddyhome.idea.vim.regexp.parser.RegexParser
-import com.maddyhome.idea.vim.regexp.parser.error.BailErrorLexer
-import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -1233,27 +1224,5 @@ class NFATest {
     val editor = buildEditor(text, carets)
     val nfa = buildNFA(pattern)
     assertTrue(nfa.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
-  }
-
-  private fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
-    val editorMock = mock<VimEditor>()
-    whenever(editorMock.text()).thenReturn(text)
-
-    val trueCarets = ArrayList<VimCaret>()
-    for (caret in carets) {
-      val caretMock = mock<VimCaret>()
-      whenever(caretMock.offset).thenReturn(Offset(caret))
-      trueCarets.add(caretMock)
-    }
-    whenever(editorMock.carets()).thenReturn(trueCarets)
-    return editorMock
-  }
-
-  private fun buildNFA(pattern: String) : NFA {
-    val regexLexer = BailErrorLexer(CharStreams.fromString(pattern))
-    val tokens = CommonTokenStream(regexLexer)
-    val parser = RegexParser(tokens)
-    val tree = parser.pattern()
-    return PatternVisitor().visit(tree)
   }
 }

@@ -11,11 +11,8 @@ package com.maddyhome.idea.vim.regexp
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
-import com.maddyhome.idea.vim.regexp.parser.RegexParser
-import com.maddyhome.idea.vim.regexp.parser.error.BailErrorLexer
+import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
 
 /**
  * Represents a compiled Vim regular expression. Provides methods to
@@ -24,8 +21,7 @@ import org.antlr.v4.runtime.CommonTokenStream
  */
 public class VimRegex(pattern: String) {
   private enum class CaseSensitivity { SMART_CASE, IGNORE_CASE, NO_IGNORE_CASE }
-  // TODO: check ignorecase options
-  private var caseSensitivity = CaseSensitivity.NO_IGNORE_CASE
+  private val caseSensitivity: CaseSensitivity
 
   /**
    * The NFA representing the compiled regular expression
@@ -33,13 +29,16 @@ public class VimRegex(pattern: String) {
   private val nfa: NFA
 
   init {
-    val regexLexer = BailErrorLexer(CharStreams.fromString(pattern))
-    val tokens = CommonTokenStream(regexLexer)
-    val parser = RegexParser(tokens)
-    val tree = parser.pattern()
-    val patternVisitor = PatternVisitor()
-    this.caseSensitivity = if (regexLexer.ignoreCase == true) CaseSensitivity.IGNORE_CASE else CaseSensitivity.NO_IGNORE_CASE
-    this.nfa = patternVisitor.visit(tree)
+    val parser = VimRegexParser(pattern)
+    val tree = parser.parse()
+    nfa = PatternVisitor().visit(tree)
+
+    caseSensitivity = when (parser.caseSensitivity) {
+      // TODO: check ignorecase options
+      VimRegexParser.CaseSensitivity.DEFAULT -> CaseSensitivity.NO_IGNORE_CASE
+      VimRegexParser.CaseSensitivity.IGNORE_CASE -> CaseSensitivity.IGNORE_CASE
+      VimRegexParser.CaseSensitivity.NO_IGNORE_CASE -> CaseSensitivity.NO_IGNORE_CASE
+    }
   }
 
   /**

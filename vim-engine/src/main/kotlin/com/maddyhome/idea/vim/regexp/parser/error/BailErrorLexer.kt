@@ -14,6 +14,6 @@ import org.antlr.v4.runtime.LexerNoViableAltException
 
 internal class BailErrorLexer(input: CharStream) : RegexLexer(input) {
   override fun recover(e: LexerNoViableAltException?) {
-    throw RuntimeException(e)
+    throw VimRegexParserException()
   }
 }
