@@ -30,6 +30,7 @@ import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.rd.createLifetime
 import com.intellij.openapi.rd.createNestedDisposable
 import com.intellij.openapi.util.Disposer
@@ -42,6 +43,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
@@ -73,7 +75,6 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.mode
@@ -87,6 +88,24 @@ import javax.swing.SwingUtilities
 /**
  * @author Alex Plate
  */
+
+
+/**
+ * Get the editor that was in use when the new editor was opened
+ *
+ * We need this to copy its window local options. This will be the editor that hosted the command line for
+ * `:edit {file}` or was the source of a ctrl+click navigation.
+ *
+ * Unfortunately, we're not given enough context to know what caused the new editor to open (and we might be
+ * initialising already open editors after disabling/enabling the plugin). So we'll use the currently selected editor.
+ * This will be the last focused editor, so will work for Vim command line commands, ctrl+click, etc. It also works for
+ * opening a file from Search Everywhere or a tool window such as the Project view or Find Usages results.
+ *
+ * Make sure the selected editor isn't the new editor, which can happen if there are no other editors open.
+ */
+private fun getOpeningEditor(newEditor: Editor) = newEditor.project?.let { project ->
+  FileEditorManager.getInstance(project).selectedTextEditor?.takeUnless { it == newEditor }
+}
 
 internal object VimListenerManager {
 
@@ -138,18 +157,31 @@ internal object VimListenerManager {
 
   object EditorListeners {
     fun addAll() {
+      // We are initialising all currently open editors. We treat the currently selected editor (per-project) as the
+      // opening editor for all other editors. Make sure it's initialised first, and with FALLBACK to get the settings
+      // from `~/.ideavimrc`. All other editors will be initialised as NEW from the project's selected editor
+      ProjectManager.getInstanceIfCreated()?.let { projectManager ->
+        projectManager.openProjects.forEach {  project ->
+          FileEditorManager.getInstance(project).selectedTextEditor?.let { editor ->
+            add(editor, injector.fallbackWindow, LocalOptionInitialisationScenario.FALLBACK)
+          }
+        }
+      }
+
+      // We could have a split window in this list, but since they're all being initialised from the same opening editor
+      // there's no need to use the SPLIT scenario
       localEditors().forEach { editor ->
-        this.add(editor)
+        getOpeningEditor(editor)?.let { add(editor, it.vim, LocalOptionInitialisationScenario.NEW) }
       }
     }
 
     fun removeAll() {
       localEditors().forEach { editor ->
-        this.remove(editor, false)
+        remove(editor, false)
       }
     }
 
-    fun add(editor: Editor) {
+    fun add(editor: Editor, openingEditor: VimEditor, scenario: LocalOptionInitialisationScenario) {
       val pluginLifetime = VimPlugin.getInstance().createLifetime()
       val editorLifetime = (editor as EditorImpl).disposable.createLifetime()
       val disposable = editorLifetime.intersect(pluginLifetime).createNestedDisposable("MyLifetimedDisposable")
@@ -158,16 +190,7 @@ internal object VimListenerManager {
       Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
 
       // Initialise the local options. We MUST do this before anything has the chance to query options
-      val sourceEditor = getOpeningEditor(editor)?.vim
-
-      // Note that IdeaVim implements `:edit {file}` as `:new {file}` and doesn't implement `:new`, so the only scenario
-      // we can handle here is NEW
-      val scenario = when {
-        sourceEditor == null -> LocalOptionInitialisationScenario.FALLBACK
-        editor.document == sourceEditor.ij.document -> LocalOptionInitialisationScenario.SPLIT
-        else -> LocalOptionInitialisationScenario.NEW
-      }
-      VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, sourceEditor ?: injector.fallbackWindow, scenario)
+      VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, openingEditor, scenario)
 
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler, disposable)
@@ -199,16 +222,6 @@ internal object VimListenerManager {
       VimPlugin.getChange().editorReleased(editor)
     }
 
-    // We need the editor that was in use when the new editor was opened, so we can copy its window local options (e.g.
-    // which window hosted the command line for `:e {file}` or was the source of a ctrl+click navigation).
-    // Unfortunately, we're not given enough context to know what caused the new editor to open (and we might be
-    // initialising already open editors after disabling/enabling the plugin). So we'll use the currently selected
-    // editor. It should be the last focused editor, so will work for Vim command line commands, ctrl+click, etc. but
-    // also for opening a file from Shift+Shift or a tool window such as Project view or Find Usages.
-    // Make sure the current editor is not the new editor, which can happen if there are no other editors open
-    private fun getOpeningEditor(newEditor: Editor) = newEditor.project?.let { project ->
-      FileEditorManager.getInstance(project).selectedTextEditor?.takeUnless { it == newEditor }
-    }
   }
 
   object VimCaretListener : CaretListener {
@@ -234,7 +247,18 @@ internal object VimListenerManager {
 
   private object VimEditorFactoryListener : EditorFactoryListener {
     override fun editorCreated(event: EditorFactoryEvent) {
-      add(event.editor)
+      // We are initialising a newly opened editor, based on
+      val sourceEditor = getOpeningEditor(event.editor)
+
+      // Note that IdeaVim currently implements `:edit {file}` as `:new {file}` and doesn't implement `:new`. This is
+      // why the default scenario is NEW. At some point we should implement `:edit` to edit in place, and figure out
+      // how to recognise that scenario (e.g. store a flag in the virtual file's user data before opening)
+      val scenario = when {
+        sourceEditor == null -> LocalOptionInitialisationScenario.FALLBACK
+        event.editor.document == sourceEditor.document -> LocalOptionInitialisationScenario.SPLIT
+        else -> LocalOptionInitialisationScenario.NEW
+      }
+      add(event.editor, sourceEditor?.vim ?: injector.fallbackWindow, scenario)
       VimStandalonePluginUpdateChecker.instance.pluginUsed()
     }
 
