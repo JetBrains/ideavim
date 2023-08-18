@@ -24,11 +24,8 @@ import com.maddyhome.idea.vim.ex.NoRangeAllowedException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -64,8 +61,9 @@ public sealed class Command(public var commandRanges: Ranges, public val command
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     checkRanges(editor)
     checkArgument(editor)
-    if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
-      editor.exitVisualMode()
+    if (editor.nativeCarets().any { it.hasSelection() } && Flag.SAVE_VISUAL !in argFlags.flags) {
+      editor.removeSelection()
+      editor.removeSecondaryCarets()
     }
     if (argFlags.access == Access.WRITABLE && !editor.isDocumentWritable()) {
       logger.info("Trying to modify readonly document")
@@ -76,7 +74,6 @@ public sealed class Command(public var commandRanges: Ranges, public val command
       editor.vimStateMachine.isOperatorPending,
       0,
       editor.mode,
-      editor.subMode,
     )
 
     val runCommand = { runCommand(editor, context, operatorArguments) }

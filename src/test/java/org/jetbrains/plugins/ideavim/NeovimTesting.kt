@@ -15,7 +15,6 @@ import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -28,6 +27,8 @@ import com.maddyhome.idea.vim.register.RegisterConstants.EXPRESSION_BUFFER_REGIS
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.toVimNotation
 import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.TestInfo
 
@@ -159,9 +160,11 @@ internal object NeovimTesting {
     assertEquals(neovimContent, editor.document.text)
   }
 
+  public fun vimMode() = neovimApi.mode.get().mode
+
   private fun assertMode(editor: Editor) {
-    val ideavimState = editor.vim.vimStateMachine.toVimNotation()
-    val neovimState = neovimApi.mode.get().mode
+    val ideavimState = editor.vim.vimStateMachine.mode.toVimNotation()
+    val neovimState = vimMode()
     assertEquals(neovimState, ideavimState)
   }
 
@@ -178,7 +181,7 @@ internal object NeovimTesting {
     for (register in VALID_REGISTERS) {
       if (register in nonCheckingRegisters) continue
       if (register in VimTestCase.Checks.neoVim.ignoredRegisters) continue
-      val neovimRegister = neovimApi.callFunction("getreg", listOf(register)).get().toString()
+      val neovimRegister = getRegister(register)
       val vimPluginRegister = VimPlugin.getRegister().getRegister(register)
       val ideavimRegister = vimPluginRegister?.text ?: ""
       assertEquals("Register '$register'", neovimRegister, ideavimRegister)
@@ -198,6 +201,9 @@ internal object NeovimTesting {
       }
     }
   }
+
+  public fun getRegister(register: Char) = neovimApi.callFunction("getreg", listOf(register)).get().toString()
+  public fun getMark(register: String) = neovimApi.callFunction("getpos", listOf(register)).get().toString()
 }
 
 annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description: String = "")

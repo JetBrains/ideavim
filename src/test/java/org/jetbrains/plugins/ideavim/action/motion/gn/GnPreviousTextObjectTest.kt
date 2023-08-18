@@ -12,7 +12,7 @@ package org.jetbrains.plugins.ideavim.action.motion.gn
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.common.Direction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -57,8 +57,7 @@ class GnPreviousTextObjectTest : VimTestCase() {
       listOf("/is<CR>", ":s/test/tester/<CR>", "$", "dgN"),
       "Hello, ${c}this is a test here",
       "Hello, this is a ${c}er here",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -67,6 +66,6 @@ class GnPreviousTextObjectTest : VimTestCase() {
     VimPlugin.getSearch().setLastSearchState(fixture.editor, "test", "", Direction.FORWARDS)
     typeText(keys)
     assertState(after)
-    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    assertState(Mode.NORMAL())
   }
 }

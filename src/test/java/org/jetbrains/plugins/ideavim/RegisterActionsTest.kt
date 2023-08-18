@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
@@ -29,7 +29,7 @@ class RegisterActionsTest : VimTestCase() {
   fun `test simple action`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("l", before, after, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
@@ -41,7 +41,7 @@ class RegisterActionsTest : VimTestCase() {
       }
       val before = "I ${c}found it in a legendary land"
       val after = "I jklwB${c}found it in a legendary land"
-      doTest("jklwB", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+      doTest("jklwB", before, after, Mode.NORMAL()) {
         VimPlugin.setEnabled(false)
       }
     } finally {
@@ -57,7 +57,7 @@ class RegisterActionsTest : VimTestCase() {
   fun `test turn plugin off and on`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest("l", before, after, Mode.NORMAL()) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
@@ -71,7 +71,7 @@ class RegisterActionsTest : VimTestCase() {
   fun `test enable twice`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest("l", before, after, Mode.NORMAL()) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
@@ -87,7 +87,7 @@ class RegisterActionsTest : VimTestCase() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null
-    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest("l", before, after, Mode.NORMAL()) {
       motionRightAction =
         VIM_ACTIONS_EP.getExtensionList(null).first { it.actionId == "VimPreviousTabAction" }
 

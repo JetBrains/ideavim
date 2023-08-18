@@ -13,9 +13,10 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.selectionType
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -48,7 +49,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     )
     VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
-    assertMode(VimStateMachine.Mode.INSERT)
+    assertMode(Mode.INSERT)
     ApplicationManager.getApplication().runWriteAction {
       CommandProcessor.getInstance().runUndoTransparentAction {
         BackspaceHandler.deleteToTargetPosition(fixture.editor, LogicalPosition(2, 0))
@@ -64,7 +65,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.INSERT)
+    assertMode(Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -82,13 +83,13 @@ class NonVimVisualChangeTest : VimTestCase() {
     )
     VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
-    assertMode(VimStateMachine.Mode.INSERT)
+    assertMode(Mode.INSERT)
 
     // Fast add and remove selection
     fixture.editor.selectionModel.setSelection(0, 10)
     fixture.editor.selectionModel.removeSelection()
 
-    assertDoesntChange { fixture.editor.vim.mode == VimStateMachine.Mode.INSERT }
+    assertDoesntChange { fixture.editor.vim.mode == Mode.INSERT }
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -106,14 +107,14 @@ class NonVimVisualChangeTest : VimTestCase() {
     )
     VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
-    assertMode(VimStateMachine.Mode.INSERT)
+    assertMode(Mode.INSERT)
 
     // Fast add and remove selection
     fixture.editor.selectionModel.setSelection(0, 10)
     fixture.editor.selectionModel.removeSelection()
     fixture.editor.selectionModel.setSelection(0, 10)
 
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -130,15 +131,15 @@ class NonVimVisualChangeTest : VimTestCase() {
     configureByText(text)
     VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
-    assertMode(VimStateMachine.Mode.INSERT)
+    assertMode(Mode.INSERT)
 
     val range = text.rangeOf("Discovery")
     fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    kotlin.test.assertEquals(VimStateMachine.SubMode.VISUAL_CHARACTER, fixture.editor.vim.subMode)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    kotlin.test.assertEquals(SelectionType.CHARACTER_WISE, fixture.editor.vim.mode.selectionType)
 
     val rangeLine = text.rangeOf("A Discovery\n")
     fixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
-    waitAndAssert { fixture.editor.vim.subMode == VimStateMachine.SubMode.VISUAL_LINE }
+    waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.LINE_WISE }
   }
 }

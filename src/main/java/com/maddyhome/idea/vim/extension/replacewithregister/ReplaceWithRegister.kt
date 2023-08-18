@@ -16,10 +16,12 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.command.isLine
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.isLine
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -29,8 +31,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -56,7 +57,7 @@ internal class ReplaceWithRegister : VimExtension {
 
   private class RwrVisual : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val typeInEditor = SelectionType.fromSubMode(editor.subMode)
+      val typeInEditor = editor.mode.selectionType ?: CHARACTER_WISE
       editor.sortedCarets().forEach { caret ->
         val selectionStart = caret.selectionStart
         val selectionEnd = caret.selectionEnd
@@ -103,7 +104,7 @@ internal class ReplaceWithRegister : VimExtension {
   }
 
   private class Operator : OperatorFunction {
-    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val ijEditor = (editor as IjVimEditor).editor
       val range = getRange(ijEditor) ?: return false
       val visualSelection = PutData.VisualSelection(
@@ -111,11 +112,11 @@ internal class ReplaceWithRegister : VimExtension {
           editor.primaryCaret() to VimSelection.create(
             range.startOffset,
             range.endOffset - 1,
-            selectionType,
+            selectionType ?: CHARACTER_WISE,
             editor,
           ),
         ),
-        selectionType,
+        selectionType ?: CHARACTER_WISE,
       )
       // todo multicaret
       doReplace(ijEditor, editor.primaryCaret(), visualSelection)
@@ -124,8 +125,8 @@ internal class ReplaceWithRegister : VimExtension {
 
     // todo make it work with multiple carets
     private fun getRange(editor: Editor): TextRange? = when (editor.vim.mode) {
-      VimStateMachine.Mode.COMMAND -> injector.markService.getChangeMarks(editor.caretModel.primaryCaret.vim)
-      VimStateMachine.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
+      is Mode.NORMAL -> injector.markService.getChangeMarks(editor.caretModel.primaryCaret.vim)
+      is Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
       else -> null
     }
   }
@@ -173,7 +174,6 @@ internal class ReplaceWithRegister : VimExtension {
             editor.vimStateMachine?.isOperatorPending ?: false,
             0,
             editor.vim.mode,
-            editor.vim.subMode,
           ),
           saveToRegister = false
         )

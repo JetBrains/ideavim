@@ -13,7 +13,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.command.engine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -22,11 +22,11 @@ import com.maddyhome.idea.vim.newapi.vim
  * @author Alex Plate
  */
 internal class VisualMotionGroup : VimVisualMotionGroupBase() {
-  override fun autodetectVisualSubmode(editor: VimEditor): VimStateMachine.SubMode {
+  override fun autodetectVisualSubmode(editor: VimEditor): SelectionType {
     // IJ specific. See https://youtrack.jetbrains.com/issue/VIM-1924.
     val project = editor.ij.project
     if (project != null && FindManager.getInstance(project).selectNextOccurrenceWasPerformed()) {
-      return VimStateMachine.SubMode.VISUAL_CHARACTER
+      return SelectionType.CHARACTER_WISE
     }
 
     return super.autodetectVisualSubmode(editor)

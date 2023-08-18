@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.put
 
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.VimSelection
 
 /**

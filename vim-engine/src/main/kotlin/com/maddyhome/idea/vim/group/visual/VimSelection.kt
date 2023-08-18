@@ -11,11 +11,11 @@ package com.maddyhome.idea.vim.group.visual
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
-import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
-import com.maddyhome.idea.vim.command.SelectionType.LINE_WISE
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.BLOCK_WISE
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.SelectionType.LINE_WISE
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
 import org.jetbrains.annotations.NonNls
@@ -49,7 +49,7 @@ public sealed class VimSelection {
   public companion object {
     public fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor): VimSelection = when (type) {
       CHARACTER_WISE -> {
-        val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL)
+        val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(SelectionType.CHARACTER_WISE))
         VimCharacterSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
       }
       LINE_WISE -> {
@@ -153,7 +153,8 @@ public class VimBlockSelection(
   override val editor: VimEditor,
   private val toLineEnd: Boolean,
 ) : VimSelection() {
-  override fun getNativeStartAndEnd(): Pair<Int, Int> = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL).let {
+  override fun getNativeStartAndEnd(): Pair<Int, Int> = blockToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(
+    SelectionType.CHARACTER_WISE)).let {
     editor.bufferPositionToOffset(it.first) to editor.bufferPositionToOffset(it.second)
   }
 
@@ -170,7 +171,7 @@ public class VimBlockSelection(
   }
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
-    val (startPosition, endPosition) = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL)
+    val (startPosition, endPosition) = blockToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(SelectionType.CHARACTER_WISE))
     val lineRange =
       if (startPosition.line > endPosition.line) endPosition.line..startPosition.line else startPosition.line..endPosition.line
     lineRange.map { line ->

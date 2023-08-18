@@ -23,8 +23,9 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -35,9 +36,9 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMarkConstants
@@ -86,7 +87,7 @@ internal class VimExchangeExtension : VimExtension {
     val EXCHANGE_KEY = Key<Exchange>("exchange")
 
     // End mark has always greater of eq offset than start mark
-    class Exchange(val type: VimStateMachine.SubMode, val start: Mark, val end: Mark, val text: String) {
+    class Exchange(val type: SelectionType, val start: Mark, val end: Mark, val text: String) {
       private var myHighlighter: RangeHighlighter? = null
       fun setHighlighter(highlighter: RangeHighlighter) {
         myHighlighter = highlighter
@@ -121,33 +122,32 @@ internal class VimExchangeExtension : VimExtension {
   private class VExchangeHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       runWriteAction {
-        val subMode = editor.subMode
+        val mode = editor.mode
         // Leave visual mode to create selection marks
         executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
-        Operator(true).apply(editor, context, SelectionType.fromSubMode(subMode))
+        Operator(true).apply(editor, context, mode.selectionType ?: CHARACTER_WISE)
       }
     }
   }
 
   private class Operator(private val isVisual: Boolean) : OperatorFunction {
     fun Editor.getMarkOffset(mark: Mark) = IjVimEditor(this).getOffset(mark.line, mark.col)
-    fun VimStateMachine.SubMode.getString() = when (this) {
-      VimStateMachine.SubMode.VISUAL_CHARACTER -> "v"
-      VimStateMachine.SubMode.VISUAL_LINE -> "V"
-      VimStateMachine.SubMode.VISUAL_BLOCK -> "\\<C-V>"
-      else -> error("Invalid SubMode: $this")
+    fun SelectionType.getString() = when (this) {
+      SelectionType.CHARACTER_WISE -> "v"
+      SelectionType.LINE_WISE -> "V"
+      SelectionType.BLOCK_WISE -> "\\<C-V>"
     }
 
-    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val ijEditor = editor.ij
       fun highlightExchange(ex: Exchange): RangeHighlighter {
         val attributes = ijEditor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
         val hlArea = when (ex.type) {
-          VimStateMachine.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
+          SelectionType.LINE_WISE -> HighlighterTargetArea.LINES_IN_RANGE
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
         }
-        val isVisualLine = ex.type == VimStateMachine.SubMode.VISUAL_LINE
+        val isVisualLine = ex.type == SelectionType.LINE_WISE
         val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || (isVisual))) 1 else 0
         return ijEditor.markupModel.addRangeHighlighter(
           ijEditor.getMarkOffset(ex.start),
@@ -158,7 +158,7 @@ internal class VimExchangeExtension : VimExtension {
         )
       }
 
-      val currentExchange = getExchange(ijEditor, isVisual, selectionType)
+      val currentExchange = getExchange(ijEditor, isVisual, selectionType ?: CHARACTER_WISE)
       val exchange1 = ijEditor.getUserData(EXCHANGE_KEY)
       if (exchange1 == null) {
         val highlighter = highlightExchange(currentExchange)
@@ -203,7 +203,7 @@ internal class VimExchangeExtension : VimExtension {
           TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1),
         )
         // do this instead of direct text manipulation to set change marks
-        setRegister('z', injector.parser.stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
+        setRegister('z', injector.parser.stringToKeys(sourceExchange.text), sourceExchange.type)
         executeNormalWithoutMapping(injector.parser.stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
       }
 
@@ -269,7 +269,7 @@ internal class VimExchangeExtension : VimExtension {
           x.line - y.line
         }
 
-      return if (x.type == VimStateMachine.SubMode.VISUAL_BLOCK && y.type == VimStateMachine.SubMode.VISUAL_BLOCK) {
+      return if (x.type == SelectionType.BLOCK_WISE && y.type == SelectionType.BLOCK_WISE) {
         when {
           intersects(x, y) -> {
             ExchangeCompareResult.OVERLAP
@@ -348,9 +348,9 @@ internal class VimExchangeExtension : VimExtension {
       setRegister('+', plusRegText)
 
       return if (selectionStart.offset(editor.vim) <= selectionEnd.offset(editor.vim)) {
-        Exchange(selectionType.toSubMode(), selectionStart, selectionEnd, text)
+        Exchange(selectionType, selectionStart, selectionEnd, text)
       } else {
-        Exchange(selectionType.toSubMode(), selectionEnd, selectionStart, text)
+        Exchange(selectionType, selectionEnd, selectionStart, text)
       }
     }
   }

@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -44,7 +44,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
   // |c| |ae|
   @Test
   fun testChangeEntireBuffer() {
-    doTest("cae", poem, "<caret>", VimStateMachine.Mode.INSERT)
+    doTest("cae", poem, "<caret>", Mode.INSERT)
   }
 
   // |d| |ae|
@@ -86,7 +86,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
       "cie",
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>\n\n  \n \n",
-      VimStateMachine.Mode.INSERT,
+      Mode.INSERT,
     ) // additional \n because poem ends with a \n
   }
 

@@ -10,7 +10,9 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -29,8 +31,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "a", "123", "<Esc>", "x"),
       "abc${c}d\n",
       "abcd12\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -41,8 +42,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "o", "123", "<Esc>", "x"),
       "abc${c}d\n",
       "abcd\n12\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -53,8 +53,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "v"),
       "12${c}345",
       "12${s}${c}3${se}45",
-      VimStateMachine.Mode.INSERT_VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE, ReturnTo.INSERT)
     )
   }
 
@@ -65,8 +64,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "v", "<esc>"),
       "12${c}345",
       "12${c}345",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -77,8 +75,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "v", "d"),
       "12${c}345",
       "12${c}45",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -90,8 +87,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "v", "<C-G>"),
       "12${c}345",
       "12${s}3${c}${se}45",
-      VimStateMachine.Mode.INSERT_SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE, ReturnTo.INSERT),
     )
   }
 
@@ -103,8 +99,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "gh"),
       "12${c}345",
       "12${s}3${c}${se}45",
-      VimStateMachine.Mode.INSERT_SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE, ReturnTo.INSERT),
     )
   }
 
@@ -116,8 +111,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "gh", "<esc>"),
       "12${c}345",
       "123${c}45",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -130,8 +124,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "gh", "d"),
       "12${c}345",
       "12d${c}45",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -142,32 +135,31 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "def", "<C-O>", "d2h", "x"),
       "abc$c.\n",
       "abcdx.\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
   // VIM-321 |d| |count|
   @Test
   fun testDeleteEmptyRange() {
-    doTest("d0", "${c}hello\n", "hello\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("d0", "${c}hello\n", "hello\n", Mode.NORMAL())
   }
 
   // VIM-157 |~|
   @Test
   fun testToggleCharCase() {
-    doTest("~~", "${c}hello world\n", "HEllo world\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("~~", "${c}hello world\n", "HEllo world\n", Mode.NORMAL())
   }
 
   // VIM-157 |~|
   @Test
   fun testToggleCharCaseLineEnd() {
-    doTest("~~", "hello wor${c}ld\n", "hello worLD\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("~~", "hello wor${c}ld\n", "hello worLD\n", Mode.NORMAL())
   }
 
   @Test
   fun testToggleCaseMotion() {
-    doTest("g~w", "${c}FooBar Baz\n", "fOObAR Baz\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("g~w", "${c}FooBar Baz\n", "fOObAR Baz\n", Mode.NORMAL())
   }
 
   @Test
@@ -176,14 +168,13 @@ class ChangeActionTest : VimTestCase() {
       "gUw",
       "${c}FooBar Baz\n",
       "FOOBAR Baz\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
   @Test
   fun testChangeLowerCase() {
-    doTest("guw", "${c}FooBar Baz\n", "foobar Baz\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("guw", "${c}FooBar Baz\n", "foobar Baz\n", Mode.NORMAL())
   }
 
   @Test
@@ -192,8 +183,7 @@ class ChangeActionTest : VimTestCase() {
       "ve~",
       "${c}FooBar Baz\n",
       "fOObAR Baz\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -203,8 +193,7 @@ class ChangeActionTest : VimTestCase() {
       "veU",
       "${c}FooBar Baz\n",
       "FOOBAR Baz\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -214,8 +203,7 @@ class ChangeActionTest : VimTestCase() {
       "veu",
       "${c}FooBar Baz\n",
       "foobar Baz\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -236,8 +224,7 @@ class ChangeActionTest : VimTestCase() {
    four
    
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -256,8 +243,7 @@ class ChangeActionTest : VimTestCase() {
         
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertOffset(4)
   }
@@ -277,8 +263,7 @@ class ChangeActionTest : VimTestCase() {
    three
    
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -299,8 +284,7 @@ class ChangeActionTest : VimTestCase() {
    three
    
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -315,8 +299,7 @@ class ChangeActionTest : VimTestCase() {
       """one 
  three
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertOffset(3)
   }
@@ -332,8 +315,7 @@ class ChangeActionTest : VimTestCase() {
    
       """.trimIndent(),
       "one four\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -344,8 +326,7 @@ class ChangeActionTest : VimTestCase() {
       "d2w",
       "on${c}e two three\n",
       "on${c}three\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -360,8 +341,7 @@ class ChangeActionTest : VimTestCase() {
       """foo
   , baz
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -380,8 +360,7 @@ class ChangeActionTest : VimTestCase() {
    baz
    
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -400,8 +379,7 @@ class ChangeActionTest : VimTestCase() {
         bar
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertOffset(1)
   }
@@ -417,8 +395,7 @@ class ChangeActionTest : VimTestCase() {
    
       """.trimIndent(),
       "two\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -430,8 +407,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("A", ", ", "<C-R>", "a", "!"),
       "${c}Hello\n",
       "Hello, World!\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -442,8 +418,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("O", "bar"),
       "fo${c}o\n",
       "bar\nfoo\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -454,8 +429,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("v", "k\$d"),
       "foo\n${c}bar\n",
       "fooar\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -478,8 +452,7 @@ class ChangeActionTest : VimTestCase() {
         quux
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -501,8 +474,7 @@ class ChangeActionTest : VimTestCase() {
         quux
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -518,8 +490,7 @@ quux
       """    a 1 b 2 c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -535,8 +506,7 @@ quux
       """    a 1    b 2    c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -551,8 +521,7 @@ quux
         bar
       """.dotToSpace().trimIndent(),
       "foo bar",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -565,8 +534,7 @@ quux
         bar
       """.dotToSpace().trimIndent(),
       "foo  bar",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -582,8 +550,7 @@ quux
       """    a 1 b 2 c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -599,8 +566,7 @@ quux
       """    a 1    b 2    c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -610,8 +576,7 @@ quux
       listOf("<C-V>", "x"),
       "fo${c}o\n",
       "fo\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -624,8 +589,7 @@ quux
       listOf("<C-V>", "j", "x"),
       "\n\n",
       "\n\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -646,8 +610,7 @@ quux
         br
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -669,8 +632,7 @@ quux
         br
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -697,20 +659,20 @@ quux
   // |r|
   @Test
   fun testReplaceOneChar() {
-    doTest("rx", "b${c}ar\n", "b${c}xr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("rx", "b${c}ar\n", "b${c}xr\n", Mode.NORMAL())
   }
 
   // |r|
   @VimBehaviorDiffers(originalVimAfter = "foXX${c}Xr\n")
   @Test
   fun testReplaceMultipleCharsWithCount() {
-    doTest("3rX", "fo${c}obar\n", "fo${c}XXXr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("3rX", "fo${c}obar\n", "fo${c}XXXr\n", Mode.NORMAL())
   }
 
   // |r|
   @Test
   fun testReplaceMultipleCharsWithCountPastEndOfLine() {
-    doTest("6rX", "fo${c}obar\n", "fo${c}obar\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("6rX", "fo${c}obar\n", "fo${c}obar\n", Mode.NORMAL())
   }
 
   // |r|
@@ -729,8 +691,7 @@ quux
         ZZZZZz
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -746,8 +707,7 @@ foobaz
     bar
 foobaz
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -764,15 +724,14 @@ foobaz
     r
 foobaz
 """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
   // |s|
   @Test
   fun testReplaceOneCharWithText() {
-    doTest("sxy<Esc>", "b${c}ar\n", "bx${c}yr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("sxy<Esc>", "b${c}ar\n", "bx${c}yr\n", Mode.NORMAL())
   }
 
   // |s|
@@ -782,8 +741,7 @@ foobaz
       "3sxy<Esc>",
       "fo${c}obar\n",
       "fox${c}yr\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -802,15 +760,14 @@ foobaz
         biff
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
   // |R|
   @Test
   fun testReplaceMode() {
-    doTest("Rbaz<Esc>", "foo${c}bar\n", "fooba${c}z\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("Rbaz<Esc>", "foo${c}bar\n", "fooba${c}z\n", Mode.NORMAL())
   }
 
   // |R| |i_<Insert>|
@@ -821,8 +778,7 @@ foobaz
       "RXXX<Ins>YYY<Ins>ZZZ<Esc>",
       "aaa${c}bbbcccddd\n",
       "aaaXXXYYYZZ${c}Zddd\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -834,8 +790,7 @@ foobaz
       "iXXX<Ins>YYY<Ins>ZZZ<Esc>",
       "aaa${c}bbbcccddd\n",
       "aaaXXXYYYZZ${c}Zcccddd\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -855,8 +810,7 @@ foobaz
         fo${c}o quux
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1074,8 +1028,7 @@ and some text after""",
       "fXcfYPATATA<Esc>fX.;.",
       "${c}aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n",
       "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1083,10 +1036,10 @@ and some text after""",
   fun testRepeatReplace() {
     configureByText("${c}foobarbaz spam\n")
     typeText(injector.parser.parseKeys("R"))
-    assertMode(VimStateMachine.Mode.REPLACE)
+    assertMode(Mode.REPLACE)
     typeText(injector.parser.parseKeys("FOO" + "<Esc>" + "l" + "2."))
     assertState("FOOFOOFO${c}O spam\n")
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @Test
@@ -1101,8 +1054,7 @@ and some text after""",
         psum dolor sit amet
         ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1118,8 +1070,7 @@ and some text after""",
         ipsum dolor sit amet
         ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1135,8 +1086,7 @@ and some text after""",
         ipsum dolor sit amet
         ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1152,8 +1102,7 @@ and some text after""",
         ipsum dolor sit amet
         ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1169,8 +1118,7 @@ and some text after""",
         ${c}Lorem Ipsumm dolor sit amet
         psum dolor sit amet
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1186,8 +1134,7 @@ and some text after""",
         ${c}Lorem Ipsumm dolor sit amet
         ipsum dolor sit amet
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1206,8 +1153,7 @@ and some text after""",
         ${c}lorem ipsum dolor sit amet
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1227,8 +1173,7 @@ and some text after""",
         gaganis ${c}gaganis gaganis
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -1245,8 +1190,7 @@ and some text after""",
         line 1
         ${c}line 3
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 }

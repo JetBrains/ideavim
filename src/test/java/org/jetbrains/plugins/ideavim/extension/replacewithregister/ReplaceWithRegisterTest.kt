@@ -11,8 +11,8 @@ package org.jetbrains.plugins.ideavim.extension.replacewithregister
 import com.intellij.testFramework.UsefulTestCase.assertContainsElements
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -395,7 +395,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       """.trimIndent(),
     )
     assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @Test
@@ -417,7 +417,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @Test
@@ -440,7 +440,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @Test
@@ -465,7 +465,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @Test
@@ -487,7 +487,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   //  https://youtrack.jetbrains.com/issue/VIM-2881/ReplaceRegister-does-no-longer-worker-with-MultiCursor
@@ -517,7 +517,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
         copyMe
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @Test

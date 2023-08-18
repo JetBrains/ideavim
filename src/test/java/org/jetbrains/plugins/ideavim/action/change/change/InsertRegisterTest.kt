@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -38,6 +38,6 @@ class InsertRegisterTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             $c
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 }

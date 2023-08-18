@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 
 public class SelectEscapeAction : VimActionHandler.SingleExecution() {
 
@@ -25,7 +25,7 @@ public class SelectEscapeAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val blockMode = editor.inBlockSubMode
+    val blockMode = editor.inBlockSelection
     editor.exitSelectModeNative(true)
     if (blockMode) editor.removeSecondaryCarets()
     return true

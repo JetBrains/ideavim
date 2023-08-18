@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
@@ -38,6 +38,6 @@ public class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
       vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
       moveToInlayAwareOffset((offset.point + 1).coerceAtMost(lineEnd))
     }
-    return injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_BLOCK)
+    return injector.visualMotionGroup.enterSelectMode(editor, SelectionType.BLOCK_WISE)
   }
 }

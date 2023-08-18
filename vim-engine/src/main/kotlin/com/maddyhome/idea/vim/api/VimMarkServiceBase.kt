@@ -24,12 +24,14 @@ import com.maddyhome.idea.vim.api.VimMarkService.Companion.SENTENCE_END_MARK
 import com.maddyhome.idea.vim.api.VimMarkService.Companion.SENTENCE_START_MARK
 import com.maddyhome.idea.vim.api.VimMarkService.Companion.UPPERCASE_MARKS
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.Mark
@@ -233,7 +235,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
 
   override fun setVisualSelectionMarks(editor: VimEditor) {
     if (!editor.inVisualMode) return
-    val selectionType = SelectionType.fromSubMode(editor.subMode)
+    val selectionType = editor.mode.selectionType ?: CHARACTER_WISE
     editor.carets()
       .forEach {
         val start = editor.offsetToBufferPosition(it.vimSelectionStart)

@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -25,7 +25,7 @@ class ActionCommandTest : VimTestCase() {
   fun testEditorRightAction() {
     configureByText("<caret>foo\n" + "bar\n")
     enterCommand("action EditorRight")
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     assertState("f<caret>oo\n" + "bar\n")
   }
 
@@ -41,7 +41,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText("vjl")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState(
       "-----\n" +
         "1/*2345\n" +
@@ -63,7 +63,7 @@ class ActionCommandTest : VimTestCase() {
     enterCommand("set incsearch")
     typeText("vjl")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState(
       "-----\n" +
         "1/*2345\n" +
@@ -79,7 +79,7 @@ class ActionCommandTest : VimTestCase() {
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText("vl")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState("1/*23*/45\n" + "abcde\n")
   }
 
@@ -90,7 +90,7 @@ class ActionCommandTest : VimTestCase() {
     enterCommand("set incsearch")
     typeText("vl")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState("1/*23*/45\n" + "abcde\n")
   }
 
@@ -106,7 +106,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText("Vj")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState(
       "-----\n" +
         "/*\n" +
@@ -129,7 +129,7 @@ class ActionCommandTest : VimTestCase() {
     enterCommand("incsearch")
     typeText("Vj")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState(
       "-----\n" +
         "/*\n" +
@@ -152,7 +152,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText("<C-V>lj")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState(
       "-----\n" +
         "1/*23*/45\n" +
@@ -173,7 +173,7 @@ class ActionCommandTest : VimTestCase() {
     enterCommand("set incsearch")
     typeText("<C-V>lj")
     enterCommand("'<,'>action CommentByBlockComment")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.NORMAL())
     assertState(
       "-----\n" +
         "1/*23*/45\n" +

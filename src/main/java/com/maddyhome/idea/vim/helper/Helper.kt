@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import java.util.stream.Collectors
 
 /**
@@ -63,7 +64,7 @@ internal fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to 
 
 // TODO Should be replaced with VimEditor.carets()
 internal inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
-  if (this.vim.inBlockSubMode) {
+  if (this.vim.inBlockSelection) {
     action(this.caretModel.primaryCaret)
   } else {
     this.caretModel.allCarets.forEach(action)

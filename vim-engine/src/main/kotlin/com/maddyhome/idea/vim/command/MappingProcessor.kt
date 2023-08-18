@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.KeyMappingLayer
+import com.maddyhome.idea.vim.state.VimStateMachine
 import javax.swing.KeyStroke
 
 public object MappingProcessor {

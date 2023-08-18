@@ -20,11 +20,13 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 
 public val VimEditor.isIdeaRefactorModeKeep: Boolean
   get() = injector.ijOptions(this).idearefactormode.contains(IjOptionConstants.idearefactormode_keep)
@@ -36,16 +38,22 @@ internal object IdeaRefactorModeHelper {
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {
-      if (!editor.vim.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+      val mode = editor.vim.mode
+      if (!mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
         SelectionVimListenerSuppressor.lock().use {
           editor.selectionModel.removeSelection()
         }
       }
-      if (editor.vim.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+      if (mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
         val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim)
-        if (editor.vim.subMode != autodetectedSubmode) {
+        if (mode.selectionType != autodetectedSubmode) {
           // Update the submode
-          editor.vim.subMode = autodetectedSubmode
+          val newMode = when (mode) {
+            is Mode.SELECT -> mode.copy(selectionType = autodetectedSubmode)
+            is Mode.VISUAL -> mode.copy(selectionType = autodetectedSubmode)
+            else -> error("IdeaVim should be either in visual or select modes")
+          }
+          editor.vim.vimStateMachine.mode = newMode
         }
       }
 

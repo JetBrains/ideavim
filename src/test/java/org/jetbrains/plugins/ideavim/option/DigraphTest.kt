@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.option
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -40,8 +40,7 @@ class DigraphTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -68,8 +67,7 @@ class DigraphTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -96,8 +94,7 @@ class DigraphTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -124,8 +121,7 @@ class DigraphTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }

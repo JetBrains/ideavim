@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.register.RegisterConstants

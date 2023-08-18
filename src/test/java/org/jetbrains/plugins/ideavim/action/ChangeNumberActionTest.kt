@@ -8,7 +8,7 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.google.common.collect.Lists
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
@@ -18,27 +18,27 @@ import org.junit.jupiter.api.Test
 class ChangeNumberActionTest : VimTestCase() {
   @Test
   fun testIncrementDecimalZero() {
-    doTest("<C-A>", "0", "1", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "0", "1", Mode.NORMAL())
   }
 
   @Test
   fun testIncrementHexZero() {
-    doTest("<C-A>", "0x0", "0x1", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "0x0", "0x1", Mode.NORMAL())
   }
 
   @Test
   fun testDecrementZero() {
-    doTest("<C-X>", "0", "-1", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-X>", "0", "-1", Mode.NORMAL())
   }
 
   @Test
   fun testIncrementDecimal() {
-    doTest("<C-A>", "199", "200", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "199", "200", Mode.NORMAL())
   }
 
   @Test
   fun testDecrementDecimal() {
-    doTest("<C-X>", "1000", "999", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-X>", "1000", "999", Mode.NORMAL())
   }
 
   @Test
@@ -47,8 +47,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"),
       "0477",
       "0500",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -58,29 +57,28 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"),
       "010",
       "007",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
   @Test
   fun testIncrementHex() {
-    doTest("<C-A>", "0xff", "0x100", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "0xff", "0x100", Mode.NORMAL())
   }
 
   @Test
   fun testDecrementHex() {
-    doTest("<C-X>", "0xa100", "0xa0ff", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-X>", "0xa100", "0xa0ff", Mode.NORMAL())
   }
 
   @Test
   fun testIncrementNegativeDecimal() {
-    doTest("<C-A>", "-199", "-198", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "-199", "-198", Mode.NORMAL())
   }
 
   @Test
   fun testDecrementNegativeDecimal() {
-    doTest("<C-X>", "-1000", "-1001", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-X>", "-1000", "-1001", Mode.NORMAL())
   }
 
   @Test
@@ -90,8 +88,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"),
       "-0477",
       "-0500",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -102,34 +99,33 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"),
       "-010",
       "-007",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
   @Test
   fun testIncrementNegativeHex() {
-    doTest("<C-A>", "-0xff", "-0x100", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "-0xff", "-0x100", Mode.NORMAL())
   }
 
   @Test
   fun testDecrementNegativeHex() {
-    doTest("<C-X>", "-0xa100", "-0xa0ff", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-X>", "-0xa100", "-0xa0ff", Mode.NORMAL())
   }
 
   @Test
   fun testIncrementWithCount() {
-    doTest("123<C-A>", "456", "579", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("123<C-A>", "456", "579", Mode.NORMAL())
   }
 
   @Test
   fun testDecrementWithCount() {
-    doTest("200<C-X>", "100", "-100", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("200<C-X>", "100", "-100", Mode.NORMAL())
   }
 
   @Test
   fun testIncrementAlphaWithoutNumberFormatAlpha() {
-    doTest("<C-A>", "foo", "foo", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "foo", "foo", Mode.NORMAL())
   }
 
   @Test
@@ -138,8 +134,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"),
       "foo",
       "goo",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -149,8 +144,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"),
       "zzz",
       "zzz",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -160,8 +154,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"),
       "0<caret>x1",
       "0y1",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -171,8 +164,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=alpha,hex<Enter>", "<C-A>"),
       "0<caret>x1",
       "0x2",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -182,8 +174,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"),
       "0x42",
       "1x42",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -193,8 +184,7 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"),
       "077",
       "078",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -204,19 +194,18 @@ class ChangeNumberActionTest : VimTestCase() {
       Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"),
       "-077",
       "-076",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
   @Test
   fun testIncrementHexPreservesCaseOfX() {
-    doTest("<C-A>", "0X88", "0X89", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "0X88", "0X89", Mode.NORMAL())
   }
 
   @Test
   fun testIncrementHexTakesCaseFromLastLetter() {
-    doTest("<C-A>", "0xaB0", "0xAB1", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("<C-A>", "0xaB0", "0xAB1", Mode.NORMAL())
   }
 
   @Test
@@ -225,8 +214,7 @@ class ChangeNumberActionTest : VimTestCase() {
       "<C-A>",
       "foo ->* bar 123\n",
       "foo ->* bar 12<caret>4\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 }

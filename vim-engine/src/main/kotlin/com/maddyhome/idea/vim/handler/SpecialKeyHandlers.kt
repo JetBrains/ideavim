@@ -17,11 +17,13 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 /**
  * @author Alex Plate
@@ -58,10 +60,10 @@ public abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMul
     val startSel = injector.globalOptions().keymodel.contains(OptionConstants.keymodel_startsel)
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
       if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
-        injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+        injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
       } else {
         injector.visualMotionGroup
-          .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
+          .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
       }
     }
     return true
@@ -93,10 +95,15 @@ public abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMultic
     if (withKey) {
       if (!inVisualMode && !inSelectMode) {
         if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
-          injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+          injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
         } else {
-          injector.visualMotionGroup
-            .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
+          if (editor.isInsertionAllowed) {
+            injector.visualMotionGroup
+              .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE, ReturnTo.INSERT)
+          } else {
+            injector.visualMotionGroup
+              .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
+          }
         }
       }
       return true

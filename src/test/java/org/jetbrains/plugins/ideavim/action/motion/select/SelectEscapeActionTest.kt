@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.intellij.openapi.editor.Caret
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -37,10 +37,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -64,10 +63,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -91,10 +89,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -118,10 +115,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -145,10 +141,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -172,10 +167,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -199,10 +193,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -226,10 +219,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -253,10 +245,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -280,10 +271,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -307,10 +297,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -334,13 +323,12 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -364,13 +352,12 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -394,13 +381,12 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -424,12 +410,11 @@ class SelectEscapeActionTest : VimTestCase() {
                 where it was settled on some sodden sand12${c}3
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 }

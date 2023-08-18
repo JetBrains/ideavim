@@ -14,11 +14,11 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
 import kotlin.math.max
@@ -60,7 +60,7 @@ private fun selectNextSearch(editor: VimEditor, count: Int, forwards: Boolean): 
   if (!editor.inVisualMode) {
     val startOffset = if (forwards) range.startOffset else max(range.endOffset - adj, 0)
     caret.moveToOffset(startOffset)
-    injector.visualMotionGroup.enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE)
   }
   return if (forwards) max(range.endOffset - adj, 0) else range.startOffset
 }

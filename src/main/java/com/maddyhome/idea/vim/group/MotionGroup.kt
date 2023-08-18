@@ -46,8 +46,9 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.handler.Motion
@@ -460,7 +461,7 @@ internal class MotionGroup : VimMotionGroupBase() {
         val editor = fileEditor.editor
         ExOutputModel.getInstance(editor).clear()
         editor.vim.let { vimEditor ->
-          if (VimStateMachine.getInstance(vimEditor).mode === VimStateMachine.Mode.VISUAL) {
+          if (VimStateMachine.getInstance(vimEditor).mode is Mode.VISUAL) {
             vimEditor.exitVisualMode()
             KeyHandler.getInstance().reset(vimEditor)
           }

@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
@@ -126,7 +126,7 @@ import com.maddyhome.idea.vim.common.TextRange
 public interface VimEditor {
 
   public val lfMakesNewLine: Boolean
-  public var vimChangeActionSwitchMode: VimStateMachine.Mode?
+  public var vimChangeActionSwitchMode: Mode?
   public var vimKeepingVisualOperatorAction: Boolean
 
   public fun fileSize(): Long

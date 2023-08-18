@@ -12,7 +12,7 @@ import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -200,8 +200,7 @@ Xbar
       listOf("<C-V>", "lll", "I"),
       before.trimIndent(),
       before.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 }

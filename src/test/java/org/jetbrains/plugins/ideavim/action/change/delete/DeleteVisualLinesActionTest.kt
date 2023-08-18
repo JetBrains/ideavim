@@ -10,7 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -30,8 +30,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -50,8 +49,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 consectetur adipiscing elit
                 ${c}Sed in orci mauris.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -70,8 +68,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -90,8 +87,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 consectetur adipiscing elit
                 ${c}Sed in orci mauris.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -114,7 +110,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
             consectetur adipiscing elit
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -138,6 +134,6 @@ class DeleteVisualLinesActionTest : VimTestCase() {
             
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 }

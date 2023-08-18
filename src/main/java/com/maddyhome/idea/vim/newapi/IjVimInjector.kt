@@ -53,7 +53,6 @@ import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.VimscriptExecutor
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.api.VimscriptParser
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
@@ -82,6 +81,8 @@ import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.ui.VimRcFileState
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor
@@ -197,7 +198,7 @@ internal class IjVimInjector : VimInjectorBase() {
   override fun commandStateFor(editor: VimEditor): VimStateMachine {
     var res = editor.ij.vimStateMachine
     if (res == null) {
-      res = VimStateMachine(editor)
+      res = VimStateMachineImpl(editor)
       editor.ij.vimStateMachine = res
     }
     return res

@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 public class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
@@ -26,7 +26,7 @@ public class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
   override fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret) {
     var allow = false
-    if (editor.inInsertMode) {
+    if (editor.isInsertionAllowed) {
       allow = true
     } else if (editor.inVisualMode || editor.inSelectMode) {
       allow = injector.options(editor).selection != "old"

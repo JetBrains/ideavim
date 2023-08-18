@@ -30,7 +30,8 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.command.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
+import com.maddyhome.idea.vim.state.VimStateMachine;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.EditorHelperRt;
@@ -296,7 +297,7 @@ public class FileGroup extends VimFileBase {
     StringBuilder msg = new StringBuilder();
     Document doc = editor.getDocument();
 
-    if (VimStateMachine.getInstance(new IjVimEditor(editor)).getMode() != VimStateMachine.Mode.VISUAL) {
+    if (!(VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode() instanceof Mode.VISUAL)) {
       LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
       int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lp.line);
       int endoff = doc.getLineEndOffset(lp.line);

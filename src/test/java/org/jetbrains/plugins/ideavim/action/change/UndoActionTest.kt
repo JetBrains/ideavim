@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -25,7 +25,7 @@ class UndoActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = before
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     val editor = fixture.editor
     kotlin.test.assertFalse(editor.caretModel.primaryCaret.hasSelection())
   }
@@ -42,7 +42,7 @@ class UndoActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = before
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(hasSelection())
   }
 
@@ -65,7 +65,7 @@ class UndoActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(hasSelection())
   }
 
@@ -89,7 +89,7 @@ class UndoActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent()
-      doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+      doTest(keys, before, after, Mode.NORMAL())
       kotlin.test.assertFalse(hasSelection())
     }
   }

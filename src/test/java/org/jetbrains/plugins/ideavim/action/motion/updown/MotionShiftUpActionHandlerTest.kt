@@ -10,7 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
@@ -46,8 +47,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -75,8 +75,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 whe${se}re it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -104,8 +103,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.[addition${se}al chars]
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -133,8 +131,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -162,8 +159,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 wh${se}ere it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -191,8 +187,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -220,8 +215,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -249,8 +243,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -278,8 +271,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -307,8 +299,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was ${se}settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -336,8 +327,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -365,8 +355,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -394,8 +383,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -423,8 +411,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -452,8 +439,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -481,8 +467,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -510,8 +495,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -539,8 +523,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -568,8 +551,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 }

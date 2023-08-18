@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 
@@ -27,10 +27,10 @@ public class VisualToggleCharacterModeAction : VimActionHandler.SingleExecution(
     operatorArguments: OperatorArguments,
   ): Boolean {
     return if (injector.options(editor).selectmode.contains(OptionConstants.selectmode_cmd)) {
-      injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+      injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
     } else {
       injector.visualMotionGroup
-        .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_CHARACTER)
+        .toggleVisual(editor, cmd.count, cmd.rawCount, SelectionType.CHARACTER_WISE)
     }
   }
 }

@@ -10,7 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -37,7 +38,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -59,7 +60,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -81,7 +82,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden sand${c}${se}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
   }
 
   @Test
@@ -136,7 +137,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
   }
 
   @Test
@@ -158,7 +159,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
@@ -181,6 +182,6 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 }

@@ -18,9 +18,10 @@ import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -32,8 +33,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -122,7 +122,7 @@ internal class VimSurroundExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
-      if (!Operator().apply(editor, context, SelectionType.fromSubMode(editor.subMode))) {
+      if (!Operator().apply(editor, context, editor.mode.selectionType)) {
         return
       }
       runWriteAction {
@@ -256,7 +256,7 @@ internal class VimSurroundExtension : VimExtension {
   }
 
   private class Operator : OperatorFunction {
-    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val ijEditor = editor.ij
       val c = getChar(ijEditor)
       if (c.code == 0) return true
@@ -274,8 +274,8 @@ internal class VimSurroundExtension : VimExtension {
       val editor = caret.editor
       val ijEditor = editor.ij
       return when (ijEditor.vim.mode) {
-        VimStateMachine.Mode.COMMAND -> injector.markService.getChangeMarks(caret)
-        VimStateMachine.Mode.VISUAL -> caret.run { TextRange(selectionStart, selectionEnd) }
+        is Mode.NORMAL -> injector.markService.getChangeMarks(caret)
+        is Mode.VISUAL -> caret.run { TextRange(selectionStart, selectionEnd) }
         else -> null
       }
     }

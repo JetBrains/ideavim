@@ -33,14 +33,13 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.NotificationService
-import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
 import org.jetbrains.annotations.NonNls
@@ -125,9 +124,7 @@ internal object IdeaSpecifics {
       ) {
         editor?.let {
           val commandState = it.vim.vimStateMachine
-          while (commandState.mode != VimStateMachine.Mode.COMMAND) {
-            commandState.popModes()
-          }
+          commandState.mode = Mode.NORMAL()
           VimPlugin.getChange().insertBeforeCursor(it.vim, event.dataContext.vim)
           KeyHandler.getInstance().reset(it.vim)
         }
@@ -163,7 +160,7 @@ internal object IdeaSpecifics {
         if (!editor.selectionModel.hasSelection()) {
           // Enable insert mode if there is no selection in template
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
-          if (editor.vim.mode.inNormalMode) {
+          if (editor.vim.inNormalMode) {
             VimPlugin.getChange().insertBeforeCursor(
               editor.vim,
               injector.executionContextManager.onEditor(editor.vim),

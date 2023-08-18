@@ -8,7 +8,8 @@
 package org.jetbrains.plugins.ideavim.helper
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.checkInString
 import com.maddyhome.idea.vim.newapi.vim
@@ -108,8 +109,7 @@ class SearchHelperTest : VimTestCase() {
       "va(",
       "((int) nu<caret>m)",
       "<selection>((int) num)</selection>",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 

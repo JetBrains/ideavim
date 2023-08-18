@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 
@@ -41,7 +41,7 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
       unique = nonEmptyArg && "u" in arg,
     )
     val lineComparator = LineComparator(sortOption.ignoreCase, sortOption.numeric, sortOption.reverse)
-    if (editor.inBlockSubMode) {
+    if (editor.inBlockSelection) {
       val primaryCaret = editor.primaryCaret()
       val range = getSortLineRange(editor, primaryCaret)
       val worked = injector.changeGroup.sortRange(editor, primaryCaret, range, lineComparator, sortOption)
@@ -52,7 +52,7 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
     }
 
     var worked = true
-    for (caret in editor.nativeCarets()) {
+    for (caret in editor.carets()) {
       val range = getSortLineRange(editor, caret)
       if (!injector.changeGroup.sortRange(editor, caret, range, lineComparator, sortOption)) {
         worked = false

@@ -11,7 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -35,7 +35,7 @@ class ChangeVisualActionTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -56,7 +56,7 @@ class ChangeVisualActionTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 
   @VimBehaviorDiffers(
@@ -89,7 +89,7 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
             
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 
   @Test
@@ -116,7 +116,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
             
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
@@ -139,7 +139,7 @@ class ChangeVisualActionTest : VimTestCase() {
             wh|Hello
             ha|Hello
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -147,7 +147,7 @@ class ChangeVisualActionTest : VimTestCase() {
     val keys = "VcHello<esc>"
     val before = "${c}Lorem Ipsum"
     val after = "Hello"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -156,7 +156,7 @@ class ChangeVisualActionTest : VimTestCase() {
       injector.parser.parseKeys("v2lc" + "aaa" + "<ESC>"),
       "abcd${c}ffffff${c}abcde${c}aaaa\n",
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
   }
 
@@ -178,8 +178,7 @@ class ChangeVisualActionTest : VimTestCase() {
         ba_quux_bar
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -201,8 +200,7 @@ class ChangeVisualActionTest : VimTestCase() {
         ba_quux_bar
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 }

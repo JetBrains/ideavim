@@ -48,6 +48,8 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContextKt;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.state.mode.Mode;
+import com.maddyhome.idea.vim.state.mode.SelectionType;
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption;
 import kotlin.Pair;
 import kotlin.Unit;
@@ -177,8 +179,8 @@ public class ChangeGroup extends VimChangeGroupBase {
     final int lines = VimChangeGroupBase.Companion.getLinesCountInVisualBlock(editor, range);
     final BufferPosition startPosition = editor.offsetToBufferPosition(range.getStartOffset());
 
-    boolean visualBlockMode = operatorArguments.getMode() == VimStateMachine.Mode.VISUAL &&
-                              operatorArguments.getSubMode() == VimStateMachine.SubMode.VISUAL_BLOCK;
+    boolean visualBlockMode =
+      operatorArguments.getMode() instanceof Mode.VISUAL mode && mode.getSelectionType() == SelectionType.BLOCK_WISE;
     for (VimCaret caret : editor.carets()) {
       final int line = startPosition.getLine();
       int column = startPosition.getColumn();

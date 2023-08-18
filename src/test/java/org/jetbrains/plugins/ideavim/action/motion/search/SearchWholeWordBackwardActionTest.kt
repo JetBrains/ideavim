@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.search
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 class SearchWholeWordBackwardActionTest : VimTestCase() {
   @Test
   fun `test backward search on empty string`() {
-    doTest("#", "", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("#", "", "", Mode.NORMAL())
     assertPluginError(false)
   }
 }

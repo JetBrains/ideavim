@@ -8,7 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -36,8 +37,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -62,8 +62,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass$s.$c$se
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -87,8 +86,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -113,8 +111,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 where it was ${s}s$c${se}ettled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 }

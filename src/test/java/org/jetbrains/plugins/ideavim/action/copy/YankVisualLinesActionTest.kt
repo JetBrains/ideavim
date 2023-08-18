@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -57,7 +57,7 @@ class YankVisualLinesActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest("vjY", text, textAfter, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("vjY", text, textAfter, Mode.NORMAL())
     val yankedTest = """
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.

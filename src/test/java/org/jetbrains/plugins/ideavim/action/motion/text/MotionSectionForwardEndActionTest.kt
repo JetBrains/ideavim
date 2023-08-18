@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -26,8 +26,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       "$c.",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -44,8 +43,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           
       """.trimIndent(),
       "$c.\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -83,8 +81,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -122,8 +119,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -161,8 +157,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 }

@@ -10,7 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
@@ -43,8 +44,7 @@ class SelectMotionRightActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -69,8 +69,7 @@ class SelectMotionRightActionTest : VimTestCase() {
                 where it was settled on some sodden san${c}d
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -95,8 +94,7 @@ class SelectMotionRightActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 }

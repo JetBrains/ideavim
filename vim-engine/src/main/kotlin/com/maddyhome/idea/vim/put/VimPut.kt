@@ -12,8 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.RWLockLabel
 
 public interface VimPut {
@@ -49,7 +48,7 @@ public interface VimPut {
     vimEditor: VimEditor,
     vimContext: ExecutionContext,
     text: ProcessedTextData,
-    subMode: VimStateMachine.SubMode,
+    subMode: SelectionType,
     data: PutData,
     additionalData: Map<String, Any>,
   )

@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -188,6 +189,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     configureByText("I ${c}found it in a legendary land")
     enterCommand("set keymodel=startsel,stopsel")
     typeText("i", "<S-Right><S-Right><S-Right>", "<Esc>")
+    assertMode(Mode.INSERT)
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
   }
 

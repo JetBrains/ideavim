@@ -10,7 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -39,8 +40,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -65,8 +65,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -91,8 +90,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -117,8 +115,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -143,8 +140,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -169,8 +165,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was ${s}settled$c$se on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
@@ -195,8 +190,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -221,8 +215,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -247,8 +240,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -273,8 +265,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -299,8 +290,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -335,8 +325,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -371,8 +360,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -397,8 +385,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was ${s}sett${c}l${se}ed on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -423,8 +410,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -449,8 +435,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -475,8 +460,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -501,8 +485,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}where it was settle${c}d on some sodden sand
                 ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -527,8 +510,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
@@ -553,8 +535,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
@@ -579,8 +560,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}where it was ${c}settled on some sodden sand$se
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
@@ -605,8 +585,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 wh${s}ere i$c${se}t was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -631,8 +610,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 wh${s}${c}ere it${se} was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -657,8 +635,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 wh${s}ere ${c}i${se}t was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -683,8 +660,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where$s${c} it${se} was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 }

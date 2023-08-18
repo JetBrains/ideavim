@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -28,7 +28,7 @@ class InsertEnterActionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest(listOf("i", "<Enter>"), before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(listOf("i", "<Enter>"), before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
@@ -45,7 +45,7 @@ class InsertEnterActionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest(listOf("i", "<C-M>"), before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(listOf("i", "<C-M>"), before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

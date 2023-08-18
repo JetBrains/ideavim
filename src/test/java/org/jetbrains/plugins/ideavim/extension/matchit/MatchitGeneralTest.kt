@@ -10,7 +10,8 @@ package org.jetbrains.plugins.ideavim.extension.matchit
 
 import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.ide.highlighter.JavaFileType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
@@ -91,8 +92,7 @@ class MatchitGeneralTest : VimTestCase() {
       "v$%",
       """foo(${c}bar)""",
       """foo${s}$c(b${se}ar)""",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
       HtmlFileType.INSTANCE,
     )
   }
@@ -103,8 +103,7 @@ class MatchitGeneralTest : VimTestCase() {
       "v$%%",
       """foo(${c}bar)""",
       """foo(${s}bar$c)$se""",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
       HtmlFileType.INSTANCE,
     )
   }
@@ -125,8 +124,7 @@ class MatchitGeneralTest : VimTestCase() {
       "d%",
       "(x == 123$c)",
       "",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       HtmlFileType.INSTANCE,
     )
   }
@@ -137,8 +135,7 @@ class MatchitGeneralTest : VimTestCase() {
       "d%",
       "$c{ foo: 123 }",
       "",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       HtmlFileType.INSTANCE,
     )
   }
@@ -149,8 +146,7 @@ class MatchitGeneralTest : VimTestCase() {
       "d%",
       "{ foo: 123 $c}",
       "",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       HtmlFileType.INSTANCE,
     )
   }
@@ -161,8 +157,7 @@ class MatchitGeneralTest : VimTestCase() {
       "d%",
       "$c[1, 2, 3]",
       "",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       HtmlFileType.INSTANCE,
     )
   }
@@ -173,8 +168,7 @@ class MatchitGeneralTest : VimTestCase() {
       "d%",
       "[1, 2, 3$c]",
       "",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       HtmlFileType.INSTANCE,
     )
   }
@@ -188,8 +182,7 @@ class MatchitGeneralTest : VimTestCase() {
       "v$%",
       """</h${c}tml>""",
       """${s}$c</ht${se}ml>""",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
       HtmlFileType.INSTANCE,
     )
   }
@@ -208,8 +201,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts n
         en${se}d
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
       fileName = "ruby.rb",
     )
   }

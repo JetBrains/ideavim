@@ -21,12 +21,11 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.isEndAllowedIgnoringOnemore
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
+import com.maddyhome.idea.vim.state.mode.mode
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.min
-import kotlin.math.sign
 
 public abstract class VimMotionGroupBase : VimMotionGroup {
   override var lastFTCmd: TillCharacterMotionType = TillCharacterMotionType.LAST_SMALL_T

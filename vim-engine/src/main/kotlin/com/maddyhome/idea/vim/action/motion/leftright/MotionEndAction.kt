@@ -19,9 +19,9 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 public class MotionEndAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.INCLUSIVE
@@ -34,7 +34,7 @@ public class MotionEndAction : NonShiftedSpecialKeyHandler() {
     operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
-    if (editor.inInsertMode) {
+    if (editor.isInsertionAllowed) {
       allow = true
     } else if (editor.inVisualMode || editor.inSelectMode) {
       allow = injector.options(editor).selection != "old"

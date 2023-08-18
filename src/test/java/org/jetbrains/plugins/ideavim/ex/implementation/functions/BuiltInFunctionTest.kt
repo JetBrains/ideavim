@@ -69,7 +69,7 @@ class BuiltInFunctionTest : VimTestCase() {
     // Remove selection and check again
     typeText(injector.parser.parseKeys("<esc>"))
     typeText(commandToKeys("""echo line("v")"""))
-    assertExOutput("4\n")
+    assertExOutput("3\n")
 
     typeText(commandToKeys("""echo line("abs") line(1) line([])"""))
     assertExOutput("0 0 0\n")
@@ -113,7 +113,7 @@ class BuiltInFunctionTest : VimTestCase() {
     // Remove selection and check again
     typeText(injector.parser.parseKeys("<esc>"))
     typeText(commandToKeys("""echo col("v")"""))
-    assertExOutput("7\n")
+    assertExOutput("5\n")
 
     typeText(commandToKeys("echo col('$')"))
     assertExOutput("10\n")

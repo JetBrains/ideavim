@@ -8,8 +8,8 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.mode
 import org.jetbrains.annotations.NonNls
 
 public sealed class ShortcutOwnerInfo {
@@ -73,16 +73,13 @@ public sealed class ShortcutOwnerInfo {
     return when (this) {
       is AllModes -> this.owner
       is PerMode -> when (editor.mode) {
-        VimStateMachine.Mode.COMMAND -> this.normal
-        VimStateMachine.Mode.VISUAL -> this.visual
-        VimStateMachine.Mode.SELECT -> this.visual
-        VimStateMachine.Mode.INSERT -> this.insert
-        VimStateMachine.Mode.CMD_LINE -> this.normal
-        VimStateMachine.Mode.OP_PENDING -> this.normal
-        VimStateMachine.Mode.REPLACE -> this.insert
-        VimStateMachine.Mode.INSERT_NORMAL -> this.normal
-        VimStateMachine.Mode.INSERT_VISUAL -> this.visual
-        VimStateMachine.Mode.INSERT_SELECT -> this.select
+        is Mode.NORMAL -> this.normal
+        is Mode.VISUAL -> this.visual
+        is Mode.SELECT -> this.visual
+        Mode.INSERT -> this.insert
+        Mode.CMD_LINE -> this.normal
+        is Mode.OP_PENDING -> this.normal
+        Mode.REPLACE -> this.insert
       }
     }
   }

@@ -9,9 +9,9 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
@@ -34,13 +34,13 @@ public interface VimChangeGroup {
 
   public fun insertPreviousInsert(editor: VimEditor, context: ExecutionContext, exit: Boolean, operatorArguments: OperatorArguments)
 
-  public fun initInsert(editor: VimEditor, context: ExecutionContext, mode: VimStateMachine.Mode)
+  public fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode)
 
   public fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
 
   public fun processEnter(editor: VimEditor, context: ExecutionContext)
 
-  public fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: VimStateMachine.Mode)
+  public fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: Mode)
 
   public fun processCommand(editor: VimEditor, cmd: Command)
 

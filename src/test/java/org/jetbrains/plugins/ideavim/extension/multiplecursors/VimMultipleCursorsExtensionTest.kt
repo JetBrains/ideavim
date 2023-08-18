@@ -9,7 +9,8 @@
 package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
@@ -269,7 +270,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.vim.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    editor.vim.vimStateMachine.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-p>"))
 
@@ -402,11 +403,11 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |}
     """.trimMargin()
 
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     assertState(afterEscape)
 
     typeText(injector.parser.parseKeys("I" + "@NotNull " + "<Esc>"))
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     val afterInsert = """public class Main {
       |  public static void main(String[] args) {
       |    final Integer a = 0;
@@ -420,7 +421,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |}
     """.trimMargin()
 
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     assertState(afterInsert)
   }
 
@@ -435,9 +436,9 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     configureByText(before)
 
     typeText(injector.parser.parseKeys("<A-n>".repeat(3)))
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     typeText(injector.parser.parseKeys("<A-p>".repeat(3)))
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     typeText(injector.parser.parseKeys("<A-n>".repeat(2)))
 
     val after = """${s}qwe$se
@@ -478,10 +479,10 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.vim.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    editor.vim.vimStateMachine.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-x>"))
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertState(before)
   }
 
@@ -550,7 +551,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   ...${s}al${c}l$se it was settled on some sodden sand
   ...${s}al${c}l$se by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test
@@ -568,7 +569,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   fun `test ignores regex in search pattern`() {
     val before = "test ${s}t.*st${c}$se toast tallest t.*st"
     val editor = configureByText(before)
-    editor.vim.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    editor.vim.vimStateMachine.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-n><A-n>"))
     val after = "test ${s}t.*st$se toast tallest ${s}t.*st$se"

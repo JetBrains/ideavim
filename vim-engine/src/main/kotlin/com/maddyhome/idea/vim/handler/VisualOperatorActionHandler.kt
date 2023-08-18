@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimBlockSelection
@@ -26,10 +25,13 @@ import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inRepeatMode
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.selectionType
 
 /**
  * @author Alex Plate
@@ -198,7 +200,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
           carets.toMap()
         }
       }
-      this.inBlockSubMode -> {
+      this.inBlockSelection -> {
         val primaryCaret = primaryCaret()
         mapOf(
           primaryCaret to VimBlockSelection(
@@ -210,13 +212,13 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
         )
       }
       else -> this.nativeCarets().associateWith { caret ->
-        val subMode = this.vimStateMachine.subMode
+        val mode = this.vimStateMachine.mode
         VimSimpleSelection.createWithNative(
           caret.vimSelectionStart,
           caret.offset.point,
           caret.selectionStart,
           caret.selectionEnd,
-          SelectionType.fromSubMode(subMode),
+          mode.selectionType ?: CHARACTER_WISE,
           this,
         )
       }

@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.extension.highlightedyank
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertHappened
@@ -28,7 +28,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @Test
   fun `test highlighting whole line when whole line is yanked`() {
-    doTest("yy", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yy", code, code, Mode.NORMAL())
 
     assertAllHighlightersCount(1)
     assertHighlighterRange(1, 40, getFirstHighlighter())
@@ -36,7 +36,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @Test
   fun `test highlighting single word when single word is yanked`() {
-    doTest("yiw", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yiw", code, code, Mode.NORMAL())
 
     assertAllHighlightersCount(1)
     assertHighlighterRange(5, 8, getFirstHighlighter())
@@ -53,7 +53,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @Test
   fun `test removing previous highlight when entering insert mode`() {
-    doTest("yyi", code, code, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("yyi", code, code, Mode.INSERT)
 
     assertAllHighlightersCount(0)
   }
@@ -112,8 +112,7 @@ class VimHighlightedYankTest : VimTestCase() {
       "yiw",
       codeWithMultipleCurors,
       codeWithMultipleCurors,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
 
     val highlighters = fixture.editor.markupModel.allHighlighters
@@ -129,8 +128,7 @@ class VimHighlightedYankTest : VimTestCase() {
       "yiwi",
       codeWithMultipleCurors,
       codeWithMultipleCurors,
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
 
     assertAllHighlightersCount(0)
@@ -138,7 +136,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @Test
   fun `test highlighting for a correct default amount of time`() {
-    doTest("yiw", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yiw", code, code, Mode.NORMAL())
 
     assertHappened(DEFAULT_HIGHLIGHT_DURATION.toInt(), 200) {
       getAllHighlightersCount() == 0

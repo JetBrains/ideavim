@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.extension.exchange
 
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -33,8 +33,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("cxe", "w", "cxe"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -45,8 +44,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("cxiw", "w", "."),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -57,8 +55,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("cxe", "b", "cxe"),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -69,8 +66,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -81,8 +77,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("veX", "w", "veX"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -97,8 +92,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("veX", "b", "v3e", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -113,8 +107,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("v3e", "X", "w", "veX"),
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -142,8 +135,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          the lazy dog
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -171,8 +163,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          the lazy dog
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -198,8 +189,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          catch over
          fox lazy dog
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -230,8 +220,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -381,8 +370,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("vb", "X", "bevb", "X"),
       "The quick brow${c}n fox catch over the lazy dog",
       "The ${c}brown quick fox catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -392,8 +380,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("vb", "X", "wve", "X"),
       "The quick brow${c}n fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -403,8 +390,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       listOf("ve", "X", "wevb", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 

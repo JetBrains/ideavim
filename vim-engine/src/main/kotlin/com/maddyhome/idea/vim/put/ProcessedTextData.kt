@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.put
 
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 public data class ProcessedTextData(
   val text: String,

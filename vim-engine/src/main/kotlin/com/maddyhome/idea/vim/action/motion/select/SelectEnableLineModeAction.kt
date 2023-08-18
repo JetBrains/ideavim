@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
@@ -38,6 +38,6 @@ public class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
       val lineStart = editor.getLineStartForOffset(caret.offset.point)
       caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
     }
-    return injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
+    return injector.visualMotionGroup.enterSelectMode(editor, SelectionType.LINE_WISE)
   }
 }

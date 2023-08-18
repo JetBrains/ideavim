@@ -13,9 +13,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.command.VimStateMachine.Companion.getInstance
+import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.OperatedRange
@@ -28,8 +26,6 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inSingleCommandMode
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -37,6 +33,9 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import java.util.*
@@ -169,15 +168,20 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
         return false
       }
     }
+    val mode = operatorArguments.mode
     if (type == null ||
-      operatorArguments.mode.inInsertMode ||
+      (mode == Mode.INSERT || mode == Mode.REPLACE) ||
       !saveToRegister ||
       caret.registerStorage.storeText(editor, updatedRange, type, true)
     ) {
       val startOffsets = updatedRange.startOffsets
       val endOffsets = updatedRange.endOffsets
       for (i in updatedRange.size() - 1 downTo 0) {
-        val (newRange, _) = editor.search(startOffsets[i].offset to endOffsets[i].offset, editor, LineDeleteShift.NL_ON_END) ?: continue
+        val (newRange, _) = editor.search(
+          startOffsets[i].offset to endOffsets[i].offset,
+          editor,
+          LineDeleteShift.NL_ON_END
+        ) ?: continue
         editor.deleteString(TextRange(newRange.first.point, newRange.second.point))
       }
       if (type != null) {
@@ -369,14 +373,14 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param context The data context
    */
   override fun insertBeforeCursor(editor: VimEditor, context: ExecutionContext) {
-    initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    initInsert(editor, context, Mode.INSERT)
   }
 
   override fun insertAfterLineEnd(editor: VimEditor, context: ExecutionContext) {
     for (caret in editor.nativeCarets()) {
       caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
     }
-    initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    initInsert(editor, context, Mode.INSERT)
   }
 
   /**
@@ -388,7 +392,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     for (caret in editor.nativeCarets()) {
       caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
     }
-    initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    initInsert(editor, context, Mode.INSERT)
   }
 
   /**
@@ -400,7 +404,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     for (caret in editor.nativeCarets()) {
       caret.moveToOffset(injector.motion.moveCaretToCurrentLineStart(editor, caret))
     }
-    initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    initInsert(editor, context, Mode.INSERT)
   }
 
   /**
@@ -412,7 +416,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     for (caret in editor.nativeCarets()) {
       caret.moveToOffset(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
     }
-    initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    initInsert(editor, context, Mode.INSERT)
   }
 
   /**
@@ -421,7 +425,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param context The data context
    * @param mode    The mode - indicate insert or replace
    */
-  override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: VimStateMachine.Mode) {
+  override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
     val state = getInstance(editor)
     for (caret in editor.nativeCarets()) {
       caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
@@ -429,8 +433,8 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val cmd = state.executingCommand
     if (cmd != null && state.isDotRepeatInProgress) {
-      state.pushModes(mode, VimStateMachine.SubMode.NONE)
-      if (mode === VimStateMachine.Mode.REPLACE) {
+      state.mode = mode
+      if (mode == Mode.REPLACE) {
         editor.insertMode = false
       }
       if (cmd.flags.contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
@@ -440,7 +444,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
           context,
           1,
           false,
-          OperatorArguments(false, 1, commandState.mode, commandState.subMode),
+          OperatorArguments(false, 1, commandState.mode),
         )
       } else {
         val commandState = getInstance(editor)
@@ -449,13 +453,13 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
           context,
           cmd.count,
           false,
-          OperatorArguments(false, cmd.count, commandState.mode, commandState.subMode),
+          OperatorArguments(false, cmd.count, commandState.mode),
         )
       }
-      if (mode === VimStateMachine.Mode.REPLACE) {
+      if (mode == Mode.REPLACE) {
         editor.insertMode = true
       }
-      state.popModes()
+      state.mode = Mode.NORMAL()
     } else {
       lastInsert = cmd
       strokes.clear()
@@ -469,8 +473,8 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       vimDocumentListener = myChangeListener
       vimDocument!!.addChangeListener(myChangeListener)
       oldOffset = editor.currentCaret().offset.point
-      editor.insertMode = mode === VimStateMachine.Mode.INSERT
-      state.pushModes(mode, VimStateMachine.SubMode.NONE)
+      editor.insertMode = mode == Mode.INSERT
+      state.mode = mode
     }
     notifyListeners(editor)
   }
@@ -529,7 +533,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     val markGroup = injector.markService
     markGroup.setMark(editor, VimMarkService.INSERT_EXIT_MARK)
     markGroup.setMark(editor, MARK_CHANGE_END)
-    if (getInstance(editor).mode === VimStateMachine.Mode.REPLACE) {
+    if (getInstance(editor).mode is Mode.REPLACE) {
       editor.insertMode = true
     }
     var cnt = if (lastInsert != null) lastInsert!!.count else 0
@@ -544,14 +548,14 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     if (context != null) {
       injector.changeGroup.repeatInsert(editor, context, if (cnt == 0) 0 else cnt - 1, true, operatorArguments)
     }
-    if (getInstance(editor).mode === VimStateMachine.Mode.INSERT) {
+    if (getInstance(editor).mode is Mode.INSERT) {
       updateLastInsertedTextRegister()
     }
 
     // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
     markGroup.setMark(editor, MARK_CHANGE_POS)
-    getInstance(editor).popModes()
-    exitAllSingleCommandInsertModes(editor)
+    getInstance(editor).mode = Mode.NORMAL()
+    editor.vimStateMachine.mode = Mode.NORMAL()
   }
 
   private fun updateLastInsertedTextRegister() {
@@ -566,15 +570,6 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     injector.registerGroup.storeTextSpecial(LAST_INSERTED_TEXT_REGISTER, textToPutRegister.toString())
   }
 
-  private fun exitAllSingleCommandInsertModes(editor: VimEditor) {
-    while (editor.inSingleCommandMode) {
-      editor.vimStateMachine.popModes()
-      if (editor.inInsertMode) {
-        editor.vimStateMachine.popModes()
-      }
-    }
-  }
-
   /**
    * Processes the Enter key by running the first successful action registered for "ENTER" keystroke.
    *
@@ -586,7 +581,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param context The data context
    */
   override fun processEnter(editor: VimEditor, context: ExecutionContext) {
-    if (editor.vimStateMachine.mode === VimStateMachine.Mode.REPLACE) {
+    if (editor.vimStateMachine.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
@@ -596,7 +591,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
         break
       }
     }
-    if (editor.vimStateMachine.mode === VimStateMachine.Mode.REPLACE) {
+    if (editor.vimStateMachine.mode is Mode.REPLACE) {
       editor.insertMode = false
     }
   }
@@ -610,10 +605,10 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
   override fun processPostChangeModeSwitch(
     editor: VimEditor,
     context: ExecutionContext,
-    toSwitch: VimStateMachine.Mode,
+    toSwitch: Mode,
   ) {
-    if (toSwitch === VimStateMachine.Mode.INSERT) {
-      initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    if (toSwitch == Mode.INSERT) {
+      initInsert(editor, context, Mode.INSERT)
     }
   }
 
@@ -640,7 +635,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   override fun processSingleCommand(editor: VimEditor) {
-    getInstance(editor).pushModes(VimStateMachine.Mode.INSERT_NORMAL, VimStateMachine.SubMode.NONE)
+    getInstance(editor).mode = Mode.NORMAL(returnTo = ReturnTo.INSERT)
     clearStrokes(editor)
   }
 
@@ -972,7 +967,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     val res = deleteEndOfLine(editor, caret, count, operatorArguments)
     if (res) {
       caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
-      editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+      editor.vimChangeActionSwitchMode = Mode.INSERT
     }
     return res
   }
@@ -994,7 +989,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val res = deleteCharacter(editor, caret, count, true, operatorArguments)
     if (res) {
-      editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+      editor.vimChangeActionSwitchMode = Mode.INSERT
     }
     return res
   }
@@ -1113,7 +1108,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       val updated = caret.moveToOffset((motion as AbsoluteOffset).offset)
       updated.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, updated))
     }
-    editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+    editor.vimChangeActionSwitchMode = Mode.INSERT
     newCaret = insertText(
       editor,
       newCaret,
@@ -1150,7 +1145,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
         if (wordMotions.contains(id) && lastWordChar && motion.count == 1) {
           val res = deleteCharacter(editor, caret, 1, true, operatorArguments)
           if (res) {
-            editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+            editor.vimChangeActionSwitchMode = Mode.INSERT
           }
           return res
         }
@@ -1221,7 +1216,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
   private fun insertNewLineBelow(editor: VimEditor, caret: VimCaret, col: Int) {
     if (editor.isOneLineMode()) return
     val newCaret = caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
-    editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+    editor.vimChangeActionSwitchMode = Mode.INSERT
     insertText(editor, newCaret, "\n${editor.createIndentBySize(col)}")
   }
 
@@ -1270,7 +1265,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
         if (type === SelectionType.BLOCK_WISE) {
           setInsertRepeat(lines, col, false)
         }
-        editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+        editor.vimChangeActionSwitchMode = Mode.INSERT
       }
     } else {
       insertBeforeCursor(editor, context)
@@ -1308,7 +1303,8 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     public const val VIM_MOTION_BIG_WORD_END_RIGHT: String = "VimMotionBigWordEndRightAction"
     public const val VIM_MOTION_CAMEL_END_RIGHT: String = "VimMotionCamelEndRightAction"
     public const val MAX_HEX_INTEGER: @NonNls String = "ffffffffffffffff"
-    public val wordMotions: Set<String> = setOf(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT)
+    public val wordMotions: Set<String> =
+      setOf(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT)
   }
 }
 

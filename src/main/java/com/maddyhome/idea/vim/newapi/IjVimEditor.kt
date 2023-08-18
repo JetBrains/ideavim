@@ -34,9 +34,9 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
@@ -50,7 +50,8 @@ import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
-import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
@@ -70,7 +71,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   val originalEditor = editor
 
   override val lfMakesNewLine: Boolean = true
-  override var vimChangeActionSwitchMode: VimStateMachine.Mode?
+  override var vimChangeActionSwitchMode: Mode?
     get() = editor.vimChangeActionSwitchMode
     set(value) {
       editor.vimChangeActionSwitchMode = value
@@ -139,7 +140,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 
   override fun carets(): List<VimCaret> {
-    return if (editor.vim.inBlockSubMode) {
+    return if (editor.vim.inBlockSelection || (editor.inExMode && editor.vim.vimLastSelectionType == SelectionType.BLOCK_WISE)) {
       listOf(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
       editor.caretModel.allCarets.map { IjVimCaret(it) }
@@ -152,7 +153,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   @Suppress("ideavimRunForEachCaret")
   override fun forEachCaret(action: (VimCaret) -> Unit) {
-    if (editor.vim.inBlockSubMode) {
+    if (editor.vim.inBlockSelection) {
       action(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
       editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, false)

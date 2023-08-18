@@ -30,7 +30,8 @@ import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimProcessGroupBase;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
+import com.maddyhome.idea.vim.state.VimStateMachine;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -81,7 +82,8 @@ public class ProcessGroup extends VimProcessGroupBase {
     if (editor.isOneLineMode()) return;
 
     String initText = getRange(((IjVimEditor) editor).getEditor(), cmd);
-    VimStateMachine.getInstance(editor).pushModes(VimStateMachine.Mode.CMD_LINE, VimStateMachine.SubMode.NONE);
+    injector.getMarkService().setVisualSelectionMarks(editor);
+    VimStateMachine.Companion.getInstance(editor).setMode(Mode.CMD_LINE.INSTANCE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext(), ":", initText, 1);
   }
@@ -99,7 +101,7 @@ public class ProcessGroup extends VimProcessGroupBase {
       return true;
     }
     else {
-      VimStateMachine.getInstance(editor).popModes();
+      VimStateMachine.Companion.getInstance(editor).setMode(new Mode.NORMAL());
       KeyHandler.getInstance().reset(editor);
       return false;
     }
@@ -110,7 +112,7 @@ public class ProcessGroup extends VimProcessGroupBase {
     panel.deactivate(true);
     boolean res = true;
     try {
-      VimStateMachine.getInstance(editor).popModes();
+      VimStateMachine.Companion.getInstance(editor).setMode(new Mode.NORMAL());
 
       logger.debug("processing command");
 
@@ -143,11 +145,11 @@ public class ProcessGroup extends VimProcessGroupBase {
 
   // commands executed from map command / macro should not be added to history
   private boolean skipHistory(VimEditor editor) {
-    return VimStateMachine.getInstance(editor).getMappingState().isExecutingMap() || injector.getMacro().isExecutingMacro();
+    return VimStateMachine.Companion.getInstance(editor).getMappingState().isExecutingMap() || injector.getMacro().isExecutingMacro();
   }
 
   public void cancelExEntry(final @NotNull VimEditor editor, boolean resetCaret) {
-    VimStateMachine.getInstance(editor).popModes();
+    VimStateMachine.Companion.getInstance(editor).setMode(new Mode.NORMAL());
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true, resetCaret);
@@ -156,14 +158,14 @@ public class ProcessGroup extends VimProcessGroupBase {
   @Override
   public void startFilterCommand(@NotNull VimEditor editor, ExecutionContext context, @NotNull Command cmd) {
     String initText = getRange(((IjVimEditor) editor).getEditor(), cmd) + "!";
-    VimStateMachine.getInstance(editor).pushModes(VimStateMachine.Mode.CMD_LINE, VimStateMachine.SubMode.NONE);
+    VimStateMachine.Companion.getInstance(editor).setMode(Mode.CMD_LINE.INSTANCE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext(), ":", initText, 1);
   }
 
   private @NotNull String getRange(Editor editor, @NotNull Command cmd) {
     String initText = "";
-    if (VimStateMachine.getInstance(new IjVimEditor(editor)).getMode() == VimStateMachine.Mode.VISUAL) {
+    if (VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode() instanceof Mode.VISUAL) {
       initText = "'<,'>";
     }
     else if (cmd.getRawCount() > 0) {

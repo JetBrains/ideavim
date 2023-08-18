@@ -11,7 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -28,8 +28,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             I found it in a i${c}t land
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -43,8 +42,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             I ${c} it in a legendary land
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -58,8 +56,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             I ${c} in a legendary land
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -75,8 +72,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             Lorem Ipsum${c} found it in a legendary land
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -106,8 +102,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
                   legendary
                ${c}
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -118,8 +113,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       listOf("a", "<C-W>"),
       "this is a sentence<caret>.\n",
       "this is a sentence<caret>\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -130,8 +124,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       listOf("A", "<C-W>"),
       "<caret>this is a sentence\n",
       "this is a <caret>\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -142,8 +135,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       listOf("A", "<C-W>"),
       "<caret>\$variable\n",
       "$<caret>\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 

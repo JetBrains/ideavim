@@ -16,10 +16,12 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.common.offset
@@ -28,7 +30,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
@@ -177,7 +179,7 @@ public class ToHandlerMappingInfo(
       }
     }
 
-    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending, vimStateMachine.commandBuilder.count, vimStateMachine.mode, vimStateMachine.subMode)
+    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending, vimStateMachine.commandBuilder.count, vimStateMachine.mode)
     injector.actionExecutor.executeCommand(
       editor,
       { extensionHandler.execute(editor, context, operatorArguments) },
@@ -210,9 +212,10 @@ public class ToHandlerMappingInfo(
         for (caret in editor.carets()) {
           var startOffset = startOffsets[caret]
           if (caret.hasSelection()) {
-            val vimSelection = create(caret.vimSelectionStart, caret.offset.point, fromSubMode(editor.subMode), editor)
+            val vimSelection =
+              create(caret.vimSelectionStart, caret.offset.point, editor.mode.selectionType ?: CHARACTER_WISE, editor)
             offsets[caret] = vimSelection
-            commandState.popModes()
+            commandState.mode = Mode.NORMAL()
           } else if (startOffset != null && startOffset.point != caret.offset.point) {
             // Command line motions are always characterwise exclusive
             var endOffset = caret.offset

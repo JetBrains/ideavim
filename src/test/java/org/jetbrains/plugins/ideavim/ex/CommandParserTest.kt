@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.ex
 import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
@@ -39,7 +39,7 @@ class CommandParserTest : VimTestCase() {
     val keys = ">>"
     val before = "I ${c}found it in a legendary land"
     val after = "    ${c}I found it in a legendary land"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)

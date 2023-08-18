@@ -8,7 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -19,8 +20,7 @@ class MotionInnerWordActionTest : VimTestCase() {
       "viw",
       "",
       "",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 }

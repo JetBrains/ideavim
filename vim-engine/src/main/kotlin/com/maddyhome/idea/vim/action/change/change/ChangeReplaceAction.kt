@@ -13,8 +13,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -41,5 +41,5 @@ public class ChangeReplaceAction : ChangeEditorActionHandler.SingleExecution() {
  * @param context The data context
  */
 private fun changeReplace(editor: VimEditor, context: ExecutionContext) {
-  injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.REPLACE)
+  injector.changeGroup.initInsert(editor, context, Mode.REPLACE)
 }

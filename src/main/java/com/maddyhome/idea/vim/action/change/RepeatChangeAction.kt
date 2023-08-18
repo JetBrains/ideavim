@@ -63,7 +63,7 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
             mot.count = 0
           }
         }
-        state.setExecutingCommand(lastCommand)
+        state.executingCommand = lastCommand
 
         val arguments = operatorArguments.copy(count0 = lastCommand.rawCount)
         injector.actionExecutor.executeVimAction(editor, lastCommand.action, context, arguments)
@@ -76,7 +76,7 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
     state.isDotRepeatInProgress = false
 
     // Restore state
-    if (save != null) state.setExecutingCommand(save)
+    if (save != null) state.executingCommand = save
     VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar)
     if (lastHandler != null) Extension.lastExtensionHandler = lastHandler
     VimRepeater.repeatHandler = repeatHandler

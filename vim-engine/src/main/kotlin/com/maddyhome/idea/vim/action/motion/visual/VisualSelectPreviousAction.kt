@@ -11,8 +11,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -35,7 +35,7 @@ public class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
 
     if (caretToSelectionInfo.any { it.second.start == null || it.second.end == null }) return false
 
-    editor.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, selectionType.toSubMode())
+    editor.vimStateMachine.mode = Mode.VISUAL(selectionType)
 
     for ((caret, selectionInfo) in caretToSelectionInfo) {
       val startOffset = editor.bufferPositionToOffset(selectionInfo.start!!)

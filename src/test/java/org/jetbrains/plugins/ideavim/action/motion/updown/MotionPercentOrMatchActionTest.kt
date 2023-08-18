@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -191,8 +191,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
              }
             $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -216,8 +215,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
             ""${'"'}
             )
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -227,8 +225,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ "I found ${c}it in a (legendary) land" """,
       """ "I found it in a (legendary$c) land" """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -238,8 +235,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ "I found ${c}it in \"a (legendary) land" """,
       """ "I found it in \"a (legendary$c) land" """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -249,8 +245,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ $c "I found it in \"a (legendary) land" """,
       """  "I found it in \"a (legendary$c) land" """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -260,8 +255,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ "I found ${c}it in \\\"a (legendary) land" """,
       """ "I found it in \\\"a (legendary$c) land" """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -271,8 +265,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ debugPrint$c(\(var)) """,
       """ debugPrint(\(var)$c) """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -282,8 +275,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ debugPrint(\(var)$c) """,
       """ debugPrint$c(\(var)) """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -293,8 +285,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ debugPrint(\$c(var)) """,
       """ debugPrint(\(var$c)) """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -304,8 +295,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ debugPrint(\$c(var)) """,
       """ debugPrint(\(var$c)) """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -315,21 +305,20 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       "%",
       """ "I found ${c}it in a \(legendary\) land" """,
       """ "I found it in a \(legendary\$c) land" """,
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   @Test
   fun `test deleting with percent motion backward`() {
-    doTest("d%", "(foo bar$c)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("d%", "(foo bar$c)", c, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   @Test
   fun `test deleting with percent motion`() {
-    doTest("d%", "$c(foo bar)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("d%", "$c(foo bar)", c, Mode.NORMAL())
   }
 
   @Test

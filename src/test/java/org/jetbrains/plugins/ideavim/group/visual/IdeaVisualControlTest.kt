@@ -14,11 +14,13 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.ConstantNode
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -47,10 +49,9 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSubMode(VimStateMachine.SubMode.NONE)
+    assertMode(Mode.NORMAL())
     assertCaretsVisualAttributes()
   }
 
@@ -67,11 +68,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -85,8 +85,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -113,11 +112,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -131,8 +129,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -149,11 +146,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -167,8 +163,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -185,11 +180,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -203,8 +197,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -221,11 +214,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -239,8 +231,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -257,11 +248,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -275,8 +265,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -293,11 +282,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -311,8 +299,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -329,11 +316,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain ${s}pass.$c$se
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -347,8 +333,7 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain ${s}pass.$c$se
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -365,11 +350,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -383,8 +367,7 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -398,8 +381,7 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -416,11 +398,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -434,8 +415,7 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -452,11 +432,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -470,8 +449,7 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent o${c}f a mountain pass.$se
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -488,11 +466,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -506,8 +483,7 @@ class IdeaVisualControlTest : VimTestCase() {
             ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -524,11 +500,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.$se
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -542,8 +517,7 @@ class IdeaVisualControlTest : VimTestCase() {
             ${s}hard by the torrent o${c}f a mountain pass.$se
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -560,11 +534,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("k"))
@@ -578,8 +551,7 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -596,11 +568,10 @@ class IdeaVisualControlTest : VimTestCase() {
             ha${s}rd by $c${se}the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -617,11 +588,10 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.BLOCK_WISE))
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -635,8 +605,7 @@ class IdeaVisualControlTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -653,11 +622,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.BLOCK_WISE))
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -671,8 +639,7 @@ class IdeaVisualControlTest : VimTestCase() {
             ha${s}rd by the torrent of a mountain pass.${c}$se
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -689,11 +656,10 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.BLOCK_WISE))
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -707,8 +673,7 @@ class IdeaVisualControlTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -724,11 +689,11 @@ class IdeaVisualControlTest : VimTestCase() {
       """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
 
     fixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
   }
 
   @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
@@ -743,11 +708,11 @@ class IdeaVisualControlTest : VimTestCase() {
       """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
 
     fixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
@@ -762,15 +727,13 @@ class IdeaVisualControlTest : VimTestCase() {
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("V"))
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
 
     fixture.editor.selectionModel.setSelection(2, 5)
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { fixture.editor.vim.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
@@ -791,15 +754,13 @@ class IdeaVisualControlTest : VimTestCase() {
     VimVisualTimer.doNow()
 
     typeText(injector.parser.parseKeys("<esc>V"))
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
 
     fixture.editor.selectionModel.setSelection(2, 5)
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { fixture.editor.vim.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 

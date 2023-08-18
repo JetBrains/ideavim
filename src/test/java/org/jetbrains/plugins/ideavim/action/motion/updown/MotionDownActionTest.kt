@@ -13,9 +13,11 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -42,7 +44,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}e${se}re i|t was settled on some sodden sand
             ha|${s}r${se}d by| the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
   }
 
   @Test
@@ -64,7 +66,65 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
+  }
+
+  @Test
+  @Disabled
+  fun `test motion down in visual block mode with dollar motion2`() {
+    val keys = "i<C-O>d<ESC>"
+    val before = """
+            A Discovery
+
+            I |${c}found it in a legendary land
+            al|l rocks and lavender and tufted grass,
+            wh|ere it was settled on some sodden sand[additional Chars]
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val after = """
+            A Discovery
+
+            I |${s}found it in a legendary lan${c}d${se}
+            al|${s}l rocks and lavender and tufted grass${c},${se}
+            wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByTextX("aa.txt", before)
+    typeText(keys)
+//    println("Mode: " + mode())
+//    doTest(keys, before, after, MyMode.VISUAL(SelectionType.BLOCK_WISE))
+  }
+
+  @Test
+  @Disabled
+  fun `test motion down in visual block mode with dollar motion3`() {
+    val keys = "v"
+    val before = """
+            A Discovery
+
+            I |${c}found it in a legendary land
+            al|l rocks and lavender and tufted grass,
+            wh|ere it was settled on some sodden sand[additional Chars]
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val after = """
+            A Discovery
+
+            I |${s}found it in a legendary lan${c}d${se}
+            al|${s}l rocks and lavender and tufted grass${c},${se}
+            wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByTextX("aa.txt", before)
+    typeText(keys)
+    println("register " + this.register("'<"))
+    println("Mode: " + mode())
+    typeText("h")
+    println("register " + this.register("'<"))
+    typeText(":")
+    println("register " + this.register("'<"))
+//    println("Mode: " + mode())
+//    doTest(keys, before, after, MyMode.VISUAL(SelectionType.BLOCK_WISE))
   }
 
   @Test
@@ -79,7 +139,7 @@ class MotionDownActionTest : VimTestCase() {
             
             ${c}all rocks and lavender and tufted grass,
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -250,8 +310,7 @@ class MotionDownActionTest : VimTestCase() {
             I found it in a legendary land
             ${c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -267,8 +326,7 @@ class MotionDownActionTest : VimTestCase() {
             |
             |${c}
       """.trimMargin(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 

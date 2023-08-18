@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.getOrPutBufferData
 import com.maddyhome.idea.vim.api.getOrPutTabData
 import com.maddyhome.idea.vim.api.getOrPutWindowData
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext

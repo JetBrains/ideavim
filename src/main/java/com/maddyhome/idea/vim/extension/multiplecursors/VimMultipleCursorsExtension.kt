@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -42,6 +41,7 @@ import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import kotlin.math.max
 import kotlin.math.min
 
@@ -312,7 +312,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
 
   private fun enterVisualMode(editor: VimEditor) {
     // We need to reset the key handler to make sure we pick up the fact that we're in visual mode
-    VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    VimPlugin.getVisualMotion().enterVisualMode(editor, SelectionType.CHARACTER_WISE)
     KeyHandler.getInstance().reset(editor)
   }
 

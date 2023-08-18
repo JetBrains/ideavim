@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -34,8 +34,7 @@ class MotionParagraphNextActionTest : VimTestCase() {
         void baz() {
         }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 }

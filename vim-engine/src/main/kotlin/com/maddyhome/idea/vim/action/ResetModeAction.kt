@@ -14,13 +14,13 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.state.mode.mode
 
 public class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
-  private lateinit var modeBeforeReset: VimStateMachine.Mode
+  private lateinit var modeBeforeReset: Mode
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
   override fun runAsMulticaret(
     editor: VimEditor,
@@ -40,7 +40,7 @@ public class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (modeBeforeReset == VimStateMachine.Mode.INSERT) {
+    if (modeBeforeReset == Mode.INSERT) {
       val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
       caret.moveToMotion(position)
     }

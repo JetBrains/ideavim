@@ -18,8 +18,8 @@ import com.intellij.testFramework.ExtensionTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -49,8 +49,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       "\"4p",
       "This is my$c text",
       "This is my XXX$c text",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     kotlin.test.assertEquals(1, extension.calledExtractTransferableData)
   }
@@ -62,8 +61,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       "\"4p",
       "This is my$c text",
       "This is my XXX$c text",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 

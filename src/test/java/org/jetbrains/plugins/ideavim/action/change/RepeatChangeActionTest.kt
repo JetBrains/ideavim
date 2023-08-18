@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import com.intellij.idea.TestFor
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -36,7 +36,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -58,7 +58,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -80,7 +80,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
@@ -103,7 +103,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 whe${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXX by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -125,7 +125,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -147,7 +147,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where XXXXXX settled on some sodden sand
                 ${c}XXXXXXy the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -169,7 +169,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
@@ -192,7 +192,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 Sed in orci mauris.
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
@@ -215,7 +215,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 |Sed in orci mauris.
                 |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
@@ -238,7 +238,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 wherXXXt was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @VimBehaviorDiffers(
@@ -273,7 +273,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXX${c}Xy the torrent of a mountain pass.
 
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
@@ -296,7 +296,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -318,7 +318,7 @@ class RepeatChangeActionTest : VimTestCase() {
               Sed in orci mauris.
               Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @VimBehaviorDiffers(
@@ -344,8 +344,7 @@ class RepeatChangeActionTest : VimTestCase() {
         One
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 

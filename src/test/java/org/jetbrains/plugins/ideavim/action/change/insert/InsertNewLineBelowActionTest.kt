@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -28,7 +28,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
     """.trimMargin()
-    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("o", before, after, Mode.INSERT)
   }
 
   @Test
@@ -44,7 +44,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
     """.trimMargin()
-    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("o", before, after, Mode.INSERT)
   }
 
   @Test
@@ -60,7 +60,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |    where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.
     """.trimMargin()
-    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("o", before, after, Mode.INSERT)
   }
 
   @Test
@@ -76,7 +76,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |    where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.
     """.trimMargin()
-    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("o", before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
@@ -133,7 +133,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |    hard by the torrent of a mountain pass.
         |    $c
     """.trimMargin()
-    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("o", before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -160,7 +160,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
     """.trimMargin()
-    doTest("5o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("5o", before, after, Mode.INSERT)
   }
 
   @Test
@@ -199,7 +199,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
     configureAndFold(before, "")
 
-    performTest("o", after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    performTest("o", after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.FOLDING, "Neovim doesn't support arbitrary folds")
@@ -219,7 +219,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
     configureAndFold(before, "")
 
-    performTest("o", after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    performTest("o", after, Mode.INSERT)
   }
 
   @Test
@@ -238,6 +238,6 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
     configureAndFold(before, "")
 
-    performTest("o", after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    performTest("o", after, Mode.INSERT)
   }
 }

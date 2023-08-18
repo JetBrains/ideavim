@@ -15,9 +15,9 @@ import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import org.junit.jupiter.params.provider.Arguments
@@ -68,7 +68,7 @@ inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
 
 fun waitAndAssertMode(
   fixture: CodeInsightTestFixture,
-  mode: VimStateMachine.Mode,
+  mode: Mode,
   timeInMillis: Int? = null,
 ) {
   val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + 1000)

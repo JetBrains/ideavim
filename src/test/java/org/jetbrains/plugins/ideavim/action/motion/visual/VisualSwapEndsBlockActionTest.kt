@@ -12,7 +12,8 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -39,7 +40,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}${c}|ere i|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
     kotlin.test.assertEquals(LogicalPosition(4, 2), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -63,7 +64,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}|ere i${c}|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
     kotlin.test.assertEquals(LogicalPosition(4, 8), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -87,7 +88,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}${c}|ere i|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
     kotlin.test.assertEquals(LogicalPosition(2, 2), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -111,7 +112,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}|ere i${c}|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
     kotlin.test.assertEquals(LogicalPosition(2, 8), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -135,7 +136,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             where it was settled on so${s}${c}me sodden sand{some${se} new symbols}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
     kotlin.test.assertEquals(LogicalPosition(4, 26), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -159,7 +160,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
     kotlin.test.assertEquals(LogicalPosition(3, 26), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 

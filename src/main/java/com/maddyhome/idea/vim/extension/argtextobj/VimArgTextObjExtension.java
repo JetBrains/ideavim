@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.state.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -244,7 +246,7 @@ public class VimArgTextObjExtension implements VimExtension {
     public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
 
       IjVimEditor vimEditor = (IjVimEditor) editor;
-      @NotNull VimStateMachine vimStateMachine = VimStateMachine.getInstance(vimEditor);
+      @NotNull VimStateMachine vimStateMachine = VimStateMachine.Companion.getInstance(vimEditor);
       int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());
 
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
@@ -254,7 +256,7 @@ public class VimArgTextObjExtension implements VimExtension {
           final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {
+              if (vimStateMachine.getMode() instanceof Mode.VISUAL) {
                 com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt.vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
                 InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret)caret).getCaret(), range.getStartOffset());

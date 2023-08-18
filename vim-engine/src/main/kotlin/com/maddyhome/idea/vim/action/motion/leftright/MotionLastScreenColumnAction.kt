@@ -18,8 +18,8 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 public class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
@@ -30,7 +30,7 @@ public class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
-    if (editor.inInsertMode) {
+    if (editor.isInsertionAllowed) {
       allow = true
     } else if (editor.inVisualMode) {
       allow = injector.options(editor).selection != "old"

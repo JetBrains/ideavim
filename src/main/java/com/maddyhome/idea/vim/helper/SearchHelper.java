@@ -23,7 +23,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.command.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
+import com.maddyhome.idea.vim.state.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -858,8 +859,8 @@ public class SearchHelper {
         selectionEndWithoutNewline++;
       }
 
-      final VimStateMachine.Mode mode = VimStateMachine.getInstance(new IjVimEditor(editor)).getMode();
-      if (mode == VimStateMachine.Mode.VISUAL) {
+      final Mode mode = VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode();
+      if (mode instanceof Mode.VISUAL) {
         if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline &&
           openingTag.getEndOffset() == selectionStart) {
           // Special case: if the inner tag is already selected we should like isOuter is active

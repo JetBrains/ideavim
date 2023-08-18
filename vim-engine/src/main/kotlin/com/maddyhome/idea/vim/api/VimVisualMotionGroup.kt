@@ -8,7 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 public interface VimVisualMotionGroup {
   public val exclusiveSelection: Boolean
@@ -18,11 +19,11 @@ public interface VimVisualMotionGroup {
    * This function toggles visual mode.
    *
    * If visual mode is disabled, enable it
-   * If visual mode is enabled, but [subMode] differs, update visual according to new [subMode]
-   * If visual mode is enabled with the same [subMode], disable it
+   * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
+   * If visual mode is enabled with the same [selectionType], disable it
    */
-  public fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: VimStateMachine.SubMode): Boolean
-  public fun enterSelectMode(editor: VimEditor, subMode: VimStateMachine.SubMode): Boolean
+  public fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: ReturnTo? = null): Boolean
+  public fun enterSelectMode(editor: VimEditor, subMode: SelectionType): Boolean
 
   /**
    * Enters visual mode based on current editor state.
@@ -38,6 +39,6 @@ public interface VimVisualMotionGroup {
    * - DOES NOT move caret
    * - DOES NOT check if carets actually have any selection
    */
-  public fun enterVisualMode(editor: VimEditor, subMode: VimStateMachine.SubMode? = null): Boolean
-  public fun autodetectVisualSubmode(editor: VimEditor): VimStateMachine.SubMode
+  public fun enterVisualMode(editor: VimEditor, subMode: SelectionType? = null): Boolean
+  public fun autodetectVisualSubmode(editor: VimEditor): SelectionType
 }

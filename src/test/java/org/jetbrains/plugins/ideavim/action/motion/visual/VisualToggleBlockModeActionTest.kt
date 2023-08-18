@@ -10,7 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -35,8 +36,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     Sed in orci mauris.
                     Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -60,8 +60,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     Sed in orci mauris.
                     Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -85,8 +84,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     Sed in orci mauris.
                     Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -96,8 +94,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
       "<C-V>",
       "",
       "",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK,
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
@@ -115,6 +112,6 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     )
     enterCommand("set selectmode=cmd")
     typeText("<C-V>")
-    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertState(Mode.SELECT(SelectionType.BLOCK_WISE))
   }
 }

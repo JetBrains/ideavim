@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.textobjindent
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -231,7 +231,7 @@ class VimIndentObjectTest : VimTestCase() {
         five
       """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     assertSelection(null)
   }
 

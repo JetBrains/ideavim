@@ -12,11 +12,11 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.TextObjectVisualType
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.state.mode.mode
 
 public class MotionInnerBigWordAction : TextObjectActionHandler() {
 
@@ -87,7 +87,7 @@ private fun getWordRange(
 ): TextRange {
   var dir = 1
   var selection = false
-  if (editor.mode == VimStateMachine.Mode.VISUAL) {
+  if (editor.mode is Mode.VISUAL) {
     if (caret.vimSelectionStart > caret.offset.point) {
       dir = -1
     }

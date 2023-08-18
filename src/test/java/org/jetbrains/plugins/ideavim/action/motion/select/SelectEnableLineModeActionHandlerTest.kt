@@ -8,7 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -35,8 +36,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -60,8 +60,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 Sed in orci mauris.
                 ${s}hard by the torrent of a mountain pass$c.$se
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -85,8 +84,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
@@ -111,8 +109,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 ${s}where it was ${c}settled on some sodden sand$se
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 }

@@ -16,9 +16,11 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.selectionType
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.mode
 import java.util.*
 import kotlin.math.min
 
@@ -28,9 +30,9 @@ public object VisualOperation {
    */
   public fun getRange(editor: VimEditor, caret: ImmutableVimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
     var (start, end) = caret.run {
-      if (editor.inBlockSubMode) sort(vimSelectionStart, offset.point) else sort(selectionStart, selectionEnd)
+      if (editor.inBlockSelection) sort(vimSelectionStart, offset.point) else sort(selectionStart, selectionEnd)
     }
-    val type = SelectionType.fromSubMode(editor.subMode)
+    val type = editor.mode.selectionType ?: CHARACTER_WISE
 
     start = editor.normalizeOffset(start, false)
     end = editor.normalizeOffset(end, false)

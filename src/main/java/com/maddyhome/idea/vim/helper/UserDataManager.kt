@@ -21,8 +21,9 @@ import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
@@ -127,7 +128,7 @@ internal var Editor.vimTestInputModel: TestInputModel? by userData()
  * Checks whether a keeping visual mode visual operator action is performed on editor.
  */
 internal var Editor.vimKeepingVisualOperatorAction: Boolean by userDataOr { false }
-internal var Editor.vimChangeActionSwitchMode: VimStateMachine.Mode? by userData()
+internal var Editor.vimChangeActionSwitchMode: Mode? by userData()
 
 /**
  * Function for delegated properties.

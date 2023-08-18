@@ -9,24 +9,33 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.*
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.mode
 
 public fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) {
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
   val editor = caret.editor
-  val subMode = editor.subMode
+  val subMode = editor.mode.selectionType ?: CHARACTER_WISE
   val mode = editor.mode
   when (subMode) {
-    VimStateMachine.SubMode.VISUAL_CHARACTER -> {
+    SelectionType.CHARACTER_WISE -> {
       val (nativeStart, nativeEnd) = charToNativeSelection(editor, start, end, mode)
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
     }
-    VimStateMachine.SubMode.VISUAL_LINE -> {
+
+    SelectionType.LINE_WISE -> {
       val (nativeStart, nativeEnd) = lineToNativeSelection(editor, start, end)
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
     }
-    VimStateMachine.SubMode.VISUAL_BLOCK -> {
+
+    SelectionType.BLOCK_WISE -> {
       // This will invalidate any secondary carets, but we shouldn't have any of these cached in local variables, etc.
       editor.removeSecondaryCarets()
 
@@ -61,7 +70,7 @@ public fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Vim
           // Put right caret position for tab character
           aCaret.moveToVisualPosition(visualPosition)
         }
-        if (mode != VimStateMachine.Mode.SELECT &&
+        if (mode !is Mode.SELECT &&
           !editor.isLineEmpty(line, false) &&
           aCaret.offset.point == aCaret.selectionEnd &&
           aCaret.selectionEnd - 1 >= lineStartOffset &&
@@ -74,7 +83,6 @@ public fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Vim
 
       editor.primaryCaret().moveToInlayAwareOffset(selectionEnd)
     }
-    else -> Unit
   }
 }
 
@@ -86,7 +94,7 @@ public fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Vim
 public fun VimCaret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this)
-  if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToInlayAwareOffset(end)
+  if (moveCaretToSelectionEnd && !editor.inBlockSelection) moveToInlayAwareOffset(end)
 }
 
 /**
@@ -110,7 +118,7 @@ public fun vimMoveBlockSelectionToOffset(editor: VimEditor, offset: Int) {
  */
 public fun VimCaret.vimMoveSelectionToCaret(vimSelectionStart: Int = this.vimSelectionStart) {
   if (!editor.inVisualMode && !editor.inSelectMode) error("Attempt to extent selection in non-visual mode")
-  if (editor.inBlockSubMode) error("Move caret with [vimMoveBlockSelectionToOffset]")
+  if (editor.inBlockSelection) error("Move caret with [vimMoveBlockSelectionToOffset]")
 
   val startOffsetMark = vimSelectionStart
 
@@ -146,7 +154,7 @@ public val ImmutableVimCaret.vimLeadSelectionOffset: Int
         }
       }
 
-      return if (editor.subMode == VimStateMachine.SubMode.VISUAL_LINE) {
+      return if (editor.mode.selectionType == SelectionType.LINE_WISE) {
         val selectionStartLine = editor.offsetToBufferPosition(selectionStart).line
         val caretLine = editor.offsetToBufferPosition(this.offset.point).line
         if (caretLine == selectionStartLine) {
@@ -155,7 +163,7 @@ public val ImmutableVimCaret.vimLeadSelectionOffset: Int
         } else {
           selectionStart
         }
-      } else if (editor.inBlockSubMode) {
+      } else if (editor.inBlockSelection) {
         val selections = editor.nativeCarets().map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
         val pCaret = editor.primaryCaret()
         when (pCaret.offset.point) {

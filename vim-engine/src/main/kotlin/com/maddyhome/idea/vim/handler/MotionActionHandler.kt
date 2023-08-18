@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.StrictMode
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 
 /**
@@ -107,7 +107,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val blockSubmodeActive = editor.inBlockSubMode
+    val blockSubmodeActive = editor.inBlockSelection
 
     when (this) {
       is SingleExecution -> run {
@@ -175,7 +175,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     // Block selection mode is emulated with multiple carets. We should only be operating on the primary caret. Note
     // that moving the primary caret to modify the selection can cause IntelliJ to invalidate, replace or add a new
     // primary caret
-    if (editor.inBlockSubMode) {
+    if (editor.inBlockSelection) {
       StrictMode.assert(caret.isPrimary, "Block selection mode must only operate on primary caret")
     }
 
@@ -192,7 +192,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     // We've moved the caret, so reset the intended column. Visual block movement can replace the primary caret when
     // moving the selection up, so make sure we've got a valid caret
-    val validCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caretAfterMove
+    val validCaret = if (editor.inBlockSelection) editor.primaryCaret() else caretAfterMove
     validCaret.vimLastColumn = offset.intendedColumn
   }
 

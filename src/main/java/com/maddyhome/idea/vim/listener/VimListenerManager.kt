@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
@@ -61,14 +60,12 @@ import com.maddyhome.idea.vim.helper.VimStandalonePluginUpdateChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.forceBarCursor
-import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
-import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
@@ -76,6 +73,9 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.MouseAdapter
@@ -447,7 +447,7 @@ internal object VimListenerManager {
         ExOutputModel.getInstance(editor).clear()
 
         val caretModel = editor.caretModel
-        if (editor.vim.subMode != VimStateMachine.SubMode.NONE) {
+        if (editor.vim.mode.selectionType != null) {
           caretModel.removeSecondaryCarets()
         }
 

@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.action
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -26,7 +26,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = "<C-\\><C-N>"
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -35,7 +35,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("i", "<C-\\><C-N>")
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -44,7 +44,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("i", "<C-\\><C-N>")
     val before = "A Disc${c}overy"
     val after = "A Dis${c}covery"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -53,7 +53,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("i", "<C-\\><C-N>", "3l")
     val before = "${c}Lorem Ipsum"
     val after = "Lorem Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -62,7 +62,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("V", "<C-\\><C-N>")
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -71,7 +71,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("gH", "<C-\\><C-N>")
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -80,7 +80,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-\\><C-N>")
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -89,7 +89,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = "d<Esc>dw"
     val before = "Lorem Ipsum"
     val after = "Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -98,7 +98,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-\\><C-N>", "dw")
     val before = "Lorem Ipsum"
     val after = "Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -107,7 +107,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<Esc>", "dw")
     val before = "Lorem Ipsum"
     val after = "Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -117,7 +117,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-[>", "dw")
     val before = "Lorem Ipsum"
     val after = "Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -136,7 +136,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-D>", "dw")
     val before = "Lorem Ipsum"
     val after = "Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -145,7 +145,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("c", "<C-\\><C-N>", "another")
     val before = "Lorem Ipsum"
     val after = "Lnotherorem Ipsum"
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 
@@ -154,7 +154,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = "dt<esc>D"
     val before = "A ${c}Discovery"
     val after = "A "
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
 }

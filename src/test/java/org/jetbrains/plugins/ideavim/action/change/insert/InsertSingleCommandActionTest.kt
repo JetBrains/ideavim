@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -19,8 +19,7 @@ class InsertSingleCommandActionTest : VimTestCase() {
       listOf("i", "<C-O>", "vlll", "<Esc>"),
       "I found ${c}it in a legendary land",
       "I found it ${c}in a legendary land",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 }

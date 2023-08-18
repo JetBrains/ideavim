@@ -10,7 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
@@ -674,7 +674,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
+      Mode.INSERT,
     )
   }
 }

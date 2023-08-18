@@ -8,7 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.extension.paragraphmotion
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,7 +37,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("}", before, after, Mode.NORMAL())
   }
 
   @Test
@@ -53,7 +54,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("}", before, after, Mode.NORMAL())
   }
 
   @Test
@@ -70,7 +71,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    doTest("v}", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest("v}", before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test
@@ -87,7 +88,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    doTest("d}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("d}", before, after, Mode.NORMAL())
   }
 
   @Test
@@ -104,7 +105,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("{", before, after, Mode.NORMAL())
   }
 
   @Test
@@ -121,7 +122,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("{", before, after, Mode.NORMAL())
   }
 
   @Test
@@ -138,7 +139,7 @@ class ParagraphMotionTest : VimTestCase() {
         |w${se}here it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
     """.trimMargin().dotToSpace()
-    doTest("v{", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest("v{", before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test
@@ -155,7 +156,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    doTest("d{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("d{", before, after, Mode.NORMAL())
   }
 
   @Test
@@ -172,6 +173,6 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas${c}.
     """.trimMargin()
-    doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("}", before, after, Mode.NORMAL())
   }
 }

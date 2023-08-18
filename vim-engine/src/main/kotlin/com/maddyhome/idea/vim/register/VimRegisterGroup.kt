@@ -9,7 +9,7 @@ package com.maddyhome.idea.vim.register
 
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke

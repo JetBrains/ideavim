@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,8 +28,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "$c<h1>Heading</h1>",
       "<h1$c>Heading</h1>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -40,8 +39,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<${c}h1>Heading</h1>",
       "<h1>Heading<$c/h1>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -52,8 +50,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "$c<?php \$n=1 ?>",
       "<?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -64,8 +61,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "$c  <?php \$n=1 ?>",
       "  <?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -76,8 +72,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<?php \$n=1 ?$c>",
       "$c<?php \$n=1 ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -88,8 +83,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<$c?php \$n=1 ?>",
       "<?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -100,8 +94,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<?php \$n=1 $c?>",
       "$c<?php \$n=1 ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -112,8 +105,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<?ph${c}p \$n=1 ?>",
       "<?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -124,8 +116,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "$c<?= func(123) ?>",
       "<?= func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -136,8 +127,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<$c?= func(123) ?>",
       "<?= func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -148,8 +138,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<?$c= func(123) ?>",
       "<?= func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -160,8 +149,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<?= ${c}func(123) ?>",
       "<?= func(123$c) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -172,8 +160,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<?= func(123)$c ?>",
       "$c<?= func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -184,8 +171,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<?= func(123) ?$c>",
       "$c<?= func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -196,8 +182,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "$c<? func(123) ?>",
       "<? func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -208,8 +193,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<$c? func(123) ?>",
       "<? func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -220,8 +204,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<? ${c}func(123) ?>",
       "<? func(123$c) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -232,8 +215,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<? func(123)$c ?>",
       "$c<? func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -244,8 +226,7 @@ class MatchitPhpTest : VimTestCase() {
       "%",
       "<? func(123) ?$c>",
       "$c<? func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1394,8 +1375,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "$c<?php \$n=1 ?>",
       "<?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1406,8 +1386,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "$c  <?php \$n=1 ?>",
       "  <?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1418,8 +1397,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<?php \$n=1 ?$c>",
       "$c<?php \$n=1 ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1430,8 +1408,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<$c?php \$n=1 ?>",
       "<?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1442,8 +1419,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<?php \$n=1 $c?>",
       "$c<?php \$n=1 ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1454,8 +1430,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<?ph${c}p \$n=1 ?>",
       "<?php \$n=1 $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1466,8 +1441,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "$c<?= func(123) ?>",
       "<?= func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1478,8 +1452,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<$c?= func(123) ?>",
       "<?= func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1490,8 +1463,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<?$c= func(123) ?>",
       "<?= func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1502,8 +1474,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<?= ${c}func(123) ?>",
       "<?= func(123$c) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1514,8 +1485,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<?= func(123)$c ?>",
       "$c<?= func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1526,8 +1496,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<?= func(123) ?$c>",
       "$c<?= func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1538,8 +1507,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "$c<? func(123) ?>",
       "<? func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1550,8 +1518,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<$c? func(123) ?>",
       "<? func(123) $c?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1562,8 +1529,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<? ${c}func(123) ?>",
       "<? func(123$c) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1574,8 +1540,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<? func(123)$c ?>",
       "$c<? func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }
@@ -1586,8 +1551,7 @@ class MatchitPhpTest : VimTestCase() {
       "g%",
       "<? func(123) ?$c>",
       "$c<? func(123) ?>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
       fileName = "file.php",
     )
   }

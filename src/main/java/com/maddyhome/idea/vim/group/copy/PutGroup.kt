@@ -27,11 +27,10 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.command.isBlock
-import com.maddyhome.idea.vim.command.isChar
-import com.maddyhome.idea.vim.command.isLine
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.isBlock
+import com.maddyhome.idea.vim.state.mode.isChar
+import com.maddyhome.idea.vim.state.mode.isLine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -74,7 +73,7 @@ internal class PutGroup : VimPutBase() {
     vimEditor: VimEditor,
     vimContext: ExecutionContext,
     text: ProcessedTextData,
-    subMode: VimStateMachine.SubMode,
+    subMode: SelectionType,
     data: PutData,
     additionalData: Map<String, Any>,
   ) {

@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -26,7 +26,7 @@ class MotionLeftInsertTest : VimTestCase() {
       """
           Oh, hi M${c}ark
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set whichwrap=[")
     }
@@ -43,7 +43,7 @@ class MotionLeftInsertTest : VimTestCase() {
       """
           ${c}Oh, hi Mark
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set whichwrap=[")
     }
@@ -62,7 +62,7 @@ class MotionLeftInsertTest : VimTestCase() {
           Oh, hi Mark$c
           You are my favourite customer
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set whichwrap=[")
     }
@@ -85,7 +85,7 @@ class MotionLeftInsertTest : VimTestCase() {
           
           You are my favourite customer
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set whichwrap=[")
     }

@@ -22,8 +22,8 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import java.util.*
 
 public class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
@@ -39,7 +39,7 @@ public class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
-    if (editor.inInsertMode) {
+    if (editor.isInsertionAllowed) {
       allow = true
     } else if (editor.inVisualMode) {
       allow = injector.options(editor).selection != "old"
@@ -62,7 +62,7 @@ public class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCare
     operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
-    if (editor.inInsertMode) {
+    if (editor.isInsertionAllowed) {
       allow = true
     } else if (editor.inVisualMode) {
       allow = injector.options(editor).selection != "old"

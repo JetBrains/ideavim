@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -23,8 +23,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
       "V<C-A>",
       "${c}12345",
       "${c}12346",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -34,8 +33,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
       "v10w<C-A>",
       "11 <- should not be incremented |${c}11| should not be incremented -> 12",
       "11 <- should not be incremented |${c}12| should not be incremented -> 12",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -45,8 +43,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
       "v4l<C-A>",
       "11111${c}22222111111",
       "11111${c}22223111111",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -74,8 +71,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
                     no inc 1
 
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -93,8 +89,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
                     1000
                     1000
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -104,8 +99,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
       "V<C-A>",
       "1 should$c not be incremented -> 2",
       "${c}2 should not be incremented -> 2",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -138,8 +132,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
       "v$<C-A>",
       "1 <- should$c not be incremented 2",
       "1 <- should$c not be incremented 3",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -153,8 +146,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
       """1 <- should$c not be incremented 3
         |2 should not be incremented -> 2
       """.trimMargin(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -170,8 +162,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
         |2 should not be incremented -> 2
         |2 should not be incremented -> 2
       """.trimMargin(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -189,8 +180,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
         |1 <- should not be incremented -> 2
         |1 <- should not be incremented -> 2
       """.trimMargin(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -208,8 +198,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
         |1 <- should not be incremented 3
         |1 <- should not be incremented 3
       """.trimMargin(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 }

@@ -11,7 +11,8 @@ import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.Direction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -26,7 +27,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("*" + "b" + "gn"), "h<caret>ello world\nhello world hello world")
     assertOffset(16)
     assertSelection("hello")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -37,7 +38,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
       "h<caret>ello world\nh<caret>ello world hello world",
     )
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -49,7 +50,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     )
     assertOffset(0)
     assertSelection("h")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
@@ -60,7 +61,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     typeText(injector.parser.parseKeys("gn"))
     assertOffset(7)
     assertSelection("test")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -69,7 +70,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("*" + "gn"), "h<caret>ello world\nhello world hello world")
     assertOffset(16)
     assertSelection("hello")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -97,7 +98,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("*" + "gn" + "gn"), "h<caret>ello world\nhello world hello, hello")
     assertOffset(28)
     assertSelection("hello world hello")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -109,7 +110,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     )
     assertOffset(28)
     assertSelection(null)
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 
   @Test
@@ -125,7 +126,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("*0e" + "gn"), "h<caret>ello hello")
     assertOffset(4)
     assertSelection("hello")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -134,7 +135,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("*0llv" + "gn"), "h<caret>ello hello")
     assertOffset(4)
     assertSelection("llo")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -143,7 +144,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("*0ev" + "gn"), "h<caret>ello hello")
     assertOffset(10)
     assertSelection("o hello")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -155,7 +156,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     )
     assertOffset(28)
     assertSelection("hello world hello")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -167,7 +168,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
     )
     assertOffset(28)
     assertSelection("hello world hello")
-    assertMode(VimStateMachine.Mode.VISUAL)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])

@@ -10,7 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -35,7 +35,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             Sed in orci mauris.
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 
   @Test
@@ -59,7 +59,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 
   @VimBehaviorDiffers(
@@ -93,6 +93,6 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             ${c}
             
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 }

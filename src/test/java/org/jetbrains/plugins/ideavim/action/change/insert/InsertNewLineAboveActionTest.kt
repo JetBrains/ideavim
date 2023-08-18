@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -28,7 +28,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("O", before, after, Mode.INSERT)
   }
 
   @Test
@@ -44,7 +44,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
     """.trimMargin()
-    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("O", before, after, Mode.INSERT)
   }
 
   @Test
@@ -60,7 +60,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |    Sed in orci mauris.
         |    Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("O", before, after, Mode.INSERT)
   }
 
   @Test
@@ -76,7 +76,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |    Sed in orci mauris.
         |    Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("O", before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
@@ -114,7 +114,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |    $c
         |    hard by the torrent of a mountain pass.
     """.trimMargin()
-    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("O", before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -142,6 +142,6 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("O", before, after, Mode.INSERT)
   }
 }

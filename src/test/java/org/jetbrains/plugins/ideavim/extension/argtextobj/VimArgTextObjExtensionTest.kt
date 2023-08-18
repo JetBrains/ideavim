@@ -9,7 +9,8 @@ package org.jetbrains.plugins.ideavim.extension.argtextobj
 
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
@@ -36,15 +37,13 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("daa"),
       "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
       "function(int arg1<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function(int arg1<caret>)",
       "function(<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -54,8 +53,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("cia"),
       "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
       "function(int arg1,    <caret>)",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -65,15 +63,13 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("dia"),
       "function(1, (20<caret>*30)+40, somefunc2(3, 4))",
       "function(1, <caret>, somefunc2(3, 4))",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function(1, (20*30)+40, somefunc2(<caret>3, 4))",
       "function(1, (20*30)+40, somefunc2(<caret>4))",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -83,29 +79,25 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("daa"),
       "function(int arg1,    char* arg2=a,b,c(<caret>arg,e))",
       "function(int arg1,    char* arg2=a,b,c(<caret>e))",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function(int arg1,    char* arg2=\"a,b,c(<caret>arg,e)\")",
       "function(int arg1<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function(int arg1,    char* arg2=\"a,b,c(arg,e\"<caret>)",
       "function(int arg1<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function(int arg1,    char* a<caret>rg2={\"a,b},c(arg,e\"})",
       "function(int arg1<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -115,43 +107,37 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("d2aa"),
       "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\")",
       "function(<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("d2ia"),
       "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\")",
       "function(<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("d2aa"),
       "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\", bool arg3)",
       "function(<caret>bool arg3)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("d2ia"),
       "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\", bool arg3)",
       "function(<caret>, bool arg3)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("d2aa"),
       "function(int arg1,    char* arg<caret>2=\"a,b,c(d,e)\", bool arg3)",
       "function(int arg1<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("d2ia"),
       "function(int arg1,    char* arg<caret>2=\"a,b,c(d,e)\", bool arg3)",
       "function(int arg1,    <caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -161,15 +147,13 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("v2aa"),
       "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\", bool arg3)",
       "function(<selection>int arg1,    char* arg2=\"a,b,c(d,e)\", </selection>bool arg3)",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
     doTest(
       Lists.newArrayList("v2ia"),
       "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\", bool arg3)",
       "function(<selection>int arg1,    char* arg2=\"a,b,c(d,e)\"</selection>, bool arg3)",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -180,8 +164,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("dia"),
       "std::vector<int, std::unique_p<caret>tr<bool>> v{};",
       "std::vector<int, <caret>> v{};",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -192,15 +175,13 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("dia"),
       "namespace foo { void foo(int arg1, bool arg2<caret> { body }\n}",
       "namespace foo { void foo(int arg1, <caret>}",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("dia"),
       "namespace foo { void foo(int <caret>arg1, bool arg2 { body }\n}",
       "namespace foo { <caret>, bool arg2 { body }\n}",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -210,22 +191,19 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("dia"),
       "foo(30 << 10, 20 << <caret>3) >> 17",
       "foo(30 << 10, <caret>) >> 17",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("dia"),
       "foo(30 << <caret>10, 20 * 3) >> 17",
       "foo(<caret>, 20 * 3) >> 17",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("dia"),
       "foo(<caret>30 >> 10, 20 * 3) << 17",
       "foo(<caret>, 20 * 3) << 17",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -236,16 +214,14 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("daa"),
       "<caret>",
       "<caret>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     doTest(
       Lists.newArrayList("dia"),
       "<caret>",
       "<caret>",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
   }
@@ -257,16 +233,14 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("daa"),
       "<caret>\n",
       "<caret>\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     doTest(
       Lists.newArrayList("dia"),
       "<caret>\n",
       "<caret>\n",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
   }
@@ -278,16 +252,14 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("daa"),
       "foo(<caret>)",
       "foo(<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     doTest(
       Lists.newArrayList("dia"),
       "foo(<caret>)",
       "foo(<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
   }
@@ -298,7 +270,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
 {   methodCall(arg1, "{ arg1 , 2");
    otherMeth<caret>odcall(arg, 3);
 }"""
-    doTest(Lists.newArrayList("dia"), before, before, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(Lists.newArrayList("dia"), before, before, Mode.NORMAL())
     assertPluginError(true)
   }
 
@@ -308,8 +280,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("dia"),
       "foo(arg1, arr<caret>ay[someexpr(Class{arg1 << 3, arg2})] + 3)\n{",
       "foo(arg1, <caret>)\n{",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -319,8 +290,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("dia"),
       "foo((20*<caret>30))",
       "foo(<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -330,32 +300,28 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("dia"),
       "foo(arg1, ba<caret>r(not-an-arg{body",
       "foo(arg1, ba<caret>r(not-an-arg{body",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     doTest(
       Lists.newArrayList("dia"),
       "foo(arg1, ba<caret>r ( x > 3 )",
       "foo(arg1, ba<caret>r ( x > 3 )",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     doTest(
       Lists.newArrayList("dia"),
       "foo(arg1, ba<caret>r + x >",
       "foo(arg1, ba<caret>r + x >",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     doTest(
       Lists.newArrayList("dia"),
       "<arg1, ba<caret>r + x)",
       "<arg1, ba<caret>r + x)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
   }
@@ -364,7 +330,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
   fun testArgumentBoundsSearchIsLimitedByLineCount() {
     val before = """foo(
 ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>Arg)"""
-    doTest(Lists.newArrayList("dia"), before, before, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(Lists.newArrayList("dia"), before, before, Mode.NORMAL())
     assertPluginError(true)
   }
 
@@ -374,15 +340,13 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("vllia"),
       "function(int arg1,    ch<caret>ar* arg2=\"a,b,c(d,e)\")",
       "function(int arg1,    <selection>char* arg2=\"a,b,c(d,e)\"</selection>)",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
     doTest(
       Lists.newArrayList("vhhia"),
       "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
       "function(int arg1,    <selection>char* arg2=\"a,b,c(d,e)\"</selection>)",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -392,8 +356,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("vllia"),
       "fu<caret>n(arg)",
       "fun(<selection>arg</selection>)",
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -404,15 +367,13 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("dia"),
       "function(int a, String[<caret>] b)",
       "function(int a, <caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function(int a, String[<caret>] b)",
       "function(int a)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -422,15 +383,13 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("dia"),
       "class MyClass{ public int myFun() { some<caret>Call(); } }",
       "class MyClass{ public int myFun() { some<caret>Call(); } }",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "class MyClass{ public int myFun() { some<caret>Call(); } }",
       "class MyClass{ public int myFun() { some<caret>Call(); } }",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -440,15 +399,13 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("dia"),
       "function (int <caret>a)",
       "function (int <caret>a)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function (int <caret>a)",
       "function (int <caret>a)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -462,15 +419,13 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("dia"),
       "function (int <caret>a, int b)",
       "function (, int b)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "function (int <caret>a, int b)",
       "function (int b)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -480,15 +435,13 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("dia"),
       "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
       "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
       "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 
@@ -500,8 +453,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "f(a<caret>)",
       "f(a<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("expecting ':', but got '(' instead")
@@ -510,8 +462,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "f(a<caret>)",
       "f(a<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("expecting ',', but got '(' instead")
@@ -520,8 +471,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "f(a<caret>)",
       "f(a<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("open and close brackets must be different")
@@ -530,8 +480,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "f(a<caret>)",
       "f(a<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("list of pairs is incomplete")
@@ -540,8 +489,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "f(a<caret>)",
       "f(a<caret>)",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("list of pairs is incomplete")
@@ -550,8 +498,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "f[a<caret>]",
       "f[<caret>]",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(false)
     setArgTextObjPairsVariable("::;")
@@ -559,8 +506,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "f: a<caret> ;",
       "f:<caret>;",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     assertPluginError(false)
   }
@@ -572,22 +518,19 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Lists.newArrayList("daa"),
       "[capture1, c = <caret>capture2] { return Clazz<int, bool>{ctorParam1, ctorParam2}; }",
       "[capture1] { return Clazz<int, bool>{ctorParam1, ctorParam2}; }",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "[capture1, c = capture2] { return Clazz<int,<caret> bool>{ctorParam1, ctorParam2}; }",
       "[capture1, c = capture2] { return Clazz<int>{ctorParam1, ctorParam2}; }",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
     doTest(
       Lists.newArrayList("daa"),
       "[capture1, c = capture2] { return Clazz<int, bool>{ctorPar<caret>am1, ctorParam2}; }",
       "[capture1, c = capture2] { return Clazz<int, bool>{ctorParam2}; }",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 }

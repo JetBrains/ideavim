@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.options.helpers
 
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -156,26 +156,26 @@ public enum class GuiCursorMode(public val token: String) {
   public companion object {
     public fun fromString(s: String): GuiCursorMode? = values().firstOrNull { it.token == s }
 
-    // Used in FleetVim
-    @Suppress("unused")
-    public fun fromMode(mode: VimStateMachine.Mode, isReplaceCharacter: Boolean): GuiCursorMode {
+    // Also used in FleetVim as direct call
+    public fun fromMode(mode: Mode, isReplaceCharacter: Boolean): GuiCursorMode {
       if (isReplaceCharacter) {
         // Can be true for NORMAL and VISUAL
-        return REPLACE
+        return GuiCursorMode.REPLACE
       }
 
+      // Note that Vim does not change the caret for SELECT mode and continues to use VISUAL or VISUAL_EXCLUSIVE. IdeaVim
+      // makes much more use of SELECT than Vim does (e.g. it's the default for idearefactormode) so it makes sense for us
+      // to more visually distinguish VISUAL and SELECT. So we use INSERT; a selection and the insert caret is intuitively
+      // the same as SELECT
       return when (mode) {
-        VimStateMachine.Mode.COMMAND -> NORMAL
-        VimStateMachine.Mode.VISUAL -> VISUAL // TODO: VISUAL_EXCLUSIVE
-        VimStateMachine.Mode.SELECT -> VISUAL
-        VimStateMachine.Mode.INSERT -> INSERT
-        VimStateMachine.Mode.OP_PENDING -> OP_PENDING
-        VimStateMachine.Mode.REPLACE -> REPLACE
-        // TODO: ci and cr
-        VimStateMachine.Mode.CMD_LINE -> CMD_LINE
-        VimStateMachine.Mode.INSERT_NORMAL -> NORMAL
-        VimStateMachine.Mode.INSERT_VISUAL -> VISUAL
-        VimStateMachine.Mode.INSERT_SELECT -> INSERT
+        is Mode.NORMAL -> GuiCursorMode.NORMAL
+        is Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
+        Mode.INSERT -> GuiCursorMode.INSERT
+        Mode.REPLACE -> GuiCursorMode.REPLACE
+        is Mode.SELECT -> GuiCursorMode.INSERT
+        is Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
+        // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
+        Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
       }
     }
   }

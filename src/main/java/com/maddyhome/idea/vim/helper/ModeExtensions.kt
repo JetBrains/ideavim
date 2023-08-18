@@ -17,28 +17,34 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-
-/**
- * Pop all modes, but leave editor state. E.g. editor selection is not removed.
- */
-internal fun Editor.popAllModes() {
-  val commandState = this.vim.vimStateMachine
-  while (commandState.mode != VimStateMachine.Mode.COMMAND) {
-    commandState.popModes()
-  }
-}
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.returnTo
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
 internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.vim.inSelectMode) return
 
-  this.vim.vimStateMachine.popModes()
+  val returnTo = this.vim.vimStateMachine.mode.returnTo
+  when (returnTo) {
+    ReturnTo.INSERT -> {
+      this.vim.vimStateMachine.mode = Mode.INSERT
+    }
+
+    ReturnTo.REPLACE -> {
+      this.vim.vimStateMachine.mode = Mode.REPLACE
+    }
+
+    null -> {
+      this.vim.vimStateMachine.mode = Mode.NORMAL()
+    }
+  }
   SelectionVimListenerSuppressor.lock().use {
     this.caretModel.allCarets.forEach {
       it.removeSelection()
@@ -58,7 +64,20 @@ internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
 internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
-  this.vimStateMachine.popModes()
+  val returnTo = this.vimStateMachine.mode.returnTo
+  when (returnTo) {
+    ReturnTo.INSERT -> {
+      this.vimStateMachine.mode = Mode.INSERT
+    }
+
+    ReturnTo.REPLACE -> {
+      this.vimStateMachine.mode = Mode.REPLACE
+    }
+
+    null -> {
+      this.vimStateMachine.mode = Mode.NORMAL()
+    }
+  }
   SelectionVimListenerSuppressor.lock().use {
     this.carets().forEach { vimCaret ->
       val caret = (vimCaret as IjVimCaret).caret

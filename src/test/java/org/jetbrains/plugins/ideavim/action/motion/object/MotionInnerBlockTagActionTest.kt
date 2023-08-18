@@ -9,7 +9,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -27,7 +28,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
       "</template>\n"
 
     val after = "<template name=\"hello\"></template>\n"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -41,7 +42,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
       "</template>\n"
 
     val after = "<template name=\"hello\"></template>\n"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -54,7 +55,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
       "</template>\n"
 
     val after = "<template name=\"hello\"></template>\n"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -63,7 +64,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abc${c}de<tag>fg</tag>hi"
     val after = "abcde<tag>fg</tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -72,7 +73,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g>fg</tag>hi"
     val after = "abcde<tag></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -81,7 +82,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g>fg</tag>"
     val after = "abcde<tag></tag>"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -90,7 +91,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "<ta${c}g>fg</tag>hi"
     val after = "<tag></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -99,7 +100,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g name = \"name\">fg</tag>hi"
     val after = "abcde<tag name = \"name\"></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -108,7 +109,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag>f${c}g</tag>hi"
     val after = "abcde<tag></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -118,7 +119,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<[abc]*>af${c}gbc</[abc]*>hi"
     val after = "abcde<[abc]*></[abc]*>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -127,7 +128,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tAg>f${c}g</tag>hi"
     val after = "abcde<tAg></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -136,7 +137,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag>f${c}g</TAG>hi"
     val after = "abcde<tag></TAG>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -145,7 +146,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde< tag>f${c}g</ tag>hi"
     val after = "abcde< tag>fg</ tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -154,7 +155,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag >f${c}g</tag>hi"
     val after = "abcde<tag ></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -163,7 +164,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag name = \"name\">f${c}g</tag>hi"
     val after = "abcde<tag name = \"name\"></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -172,7 +173,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag>fg</ta${c}g>hi"
     val after = "abcde<tag></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -181,7 +182,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag>fg</tag>h${c}i"
     val after = "abcde<tag>fg</tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -190,7 +191,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g>fghi"
     val after = "abcde<tag>fghi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -199,7 +200,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abc${c}de"
     val after = "abcde"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -208,7 +209,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abc${c}defg</tag>hi"
     val after = "abcdefg</tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -217,7 +218,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcdefg</ta${c}g>hi"
     val after = "abcdefg</tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -226,7 +227,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcdefg</tag>h${c}i"
     val after = "abcdefg</tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -235,7 +236,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abc${c}defg<tag>hi"
     val after = "abcdefg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -244,7 +245,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcdefg<ta${c}g>hi"
     val after = "abcdefg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -253,7 +254,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcdefg<tag>h${c}i"
     val after = "abcdefg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -262,7 +263,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abc${c}de</tag>fg<tag>hi"
     val after = "abcde</tag>fg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -271,7 +272,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde</ta${c}g>fg<tag>hi"
     val after = "abcde</tag>fg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -280,7 +281,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde</tag>f${c}g<tag>hi"
     val after = "abcde</tag>fg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -289,7 +290,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde</tag>fg<ta${c}g>hi"
     val after = "abcde</tag>fg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -299,7 +300,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "<foo><html>t${c}ext</foo></html>"
     val after = "<foo></foo></html>"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -309,7 +310,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "<foo><html>text</foo></htm${c}l>"
     val after = "<foo><html></html>"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -318,7 +319,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde</tag>fg<tag>h${c}i"
     val after = "abcde</tag>fg<tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -327,7 +328,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag>f$c<>g</tag>hi"
     val after = "abcde<tag></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -336,7 +337,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "abcde<tag>f${c}\"<>\"g</tag>hi"
     val after = "abcde<tag></tag>hi"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -345,7 +346,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "<a> <as${c}df> </A>"
     val after = "<a></A>"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |d| |v_it|
@@ -354,7 +355,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "<a href=\"https://isitchristmas.com\" class=\"button\">Bing ${c}Bing bing</a>"
     val after = "<a href=\"https://isitchristmas.com\" class=\"button\"></a>"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // VIM-1090 |d| |v_it|
@@ -364,7 +365,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val keys = listOf("dit")
     val before = "<b>as${c}d<i>as<b />df</i>asdf</b>"
     val after = "<b></b>"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // |v_it|
@@ -383,7 +384,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
       
     """.trimIndent()
     val keys = listOf("vit")
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertPluginError(true)
   }
 
@@ -394,7 +395,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val after = "$s<a></a$c>$se"
     configureByText(before)
     val keys = listOf("vit")
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test
@@ -403,7 +404,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     val before = "<a>${c}a</a>"
     val after = "$s<a>a</a$c>$se"
     val keys = listOf("vit")
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test

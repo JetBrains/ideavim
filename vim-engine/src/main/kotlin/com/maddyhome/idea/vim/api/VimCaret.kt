@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
@@ -19,9 +19,9 @@ import com.maddyhome.idea.vim.group.visual.vimMoveSelectionToCaret
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.register.Register
 import javax.swing.KeyStroke
 
@@ -83,7 +83,7 @@ per-caret marks.
 
   public fun moveToOffset(offset: Int): VimCaret {
     if (offset < 0 || offset > editor.text().length || !isValid) return this
-    if (editor.inBlockSubMode) {
+    if (editor.inBlockSelection) {
       StrictMode.assert(this == editor.primaryCaret(), "Block selection can only be moved with primary caret!")
 
       // Note that this call replaces ALL carets, so any local caret instances will be invalid!

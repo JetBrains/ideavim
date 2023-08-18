@@ -14,8 +14,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -93,7 +93,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
     for ((first, second) in moves) {
       first.moveToOffsetNative(second)
     }
-    injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    injector.changeGroup.initInsert(editor, context, Mode.INSERT)
     injector.changeGroup.runEnterAction(editor, context)
     for (caret in editor.nativeCarets()) {
       if (firstLiners.contains(caret)) {
@@ -102,7 +102,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
       }
     }
   } else {
-    injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    injector.changeGroup.initInsert(editor, context, Mode.INSERT)
     injector.changeGroup.runEnterAboveAction(editor, context)
   }
   injector.scroll.scrollCaretIntoView(editor)
@@ -120,7 +120,7 @@ private fun insertNewLineBelow(editor: VimEditor, context: ExecutionContext) {
     caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
   }
 
-  injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
+  injector.changeGroup.initInsert(editor, context, Mode.INSERT)
   injector.changeGroup.runEnterAction(editor, context)
   injector.scroll.scrollCaretIntoView(editor)
 }

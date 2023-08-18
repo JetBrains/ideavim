@@ -10,7 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -35,8 +36,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     Sed in orci mauris.
                     Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
@@ -60,8 +60,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     ${s}where it ${c}was settled on some sodden sand
                     ${se}Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
@@ -85,8 +84,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     wh${c}ere it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
@@ -110,8 +108,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     ha${c}rd by the torrent of a mountain pass.${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE,
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
@@ -129,7 +126,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     )
     enterCommand("set selectmode=cmd")
     typeText("V")
-    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.SELECT(SelectionType.LINE_WISE))
   }
 
   @Test
@@ -152,7 +149,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
         Sed in orci mauris.
         ${se}Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE)
     )
   }
 }

@@ -48,8 +48,7 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.GlobalIjOptions
@@ -59,9 +58,8 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -263,6 +261,13 @@ abstract class VimTestCase {
     return fixture.editor
   }
 
+  public fun configureByTextX(fileName: String, content: String): Editor {
+    fixture.configureByText(fileName, content)
+    NeovimTesting.setupEditor(fixture.editor, testInfo)
+    setEditorVisibleSize(screenWidth, screenHeight)
+    return fixture.editor
+  }
+
   protected fun configureByFileName(fileName: String): Editor {
     fixture.configureByText(fileName, "\n")
     NeovimTesting.setupEditor(fixture.editor, testInfo)
@@ -393,9 +398,16 @@ abstract class VimTestCase {
     NeovimTesting.assertState(fixture.editor, testInfo)
   }
 
-  protected fun assertState(modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
+  fun mode(): String? {
+    return NeovimTesting.vimMode()
+  }
+
+  fun register(char: String): String? {
+    return NeovimTesting.getMark(char)
+  }
+
+  protected fun assertState(modeAfter: Mode) {
     assertMode(modeAfter)
-    assertSubMode(subModeAfter)
     assertCaretsVisualAttributes()
   }
 
@@ -517,14 +529,9 @@ abstract class VimTestCase {
     }
   }
 
-  fun assertMode(expectedMode: VimStateMachine.Mode) {
+  fun assertMode(expectedMode: Mode) {
     val mode = fixture.editor.vim.mode
     assertEquals(expectedMode, mode)
-  }
-
-  fun assertSubMode(expectedSubMode: SubMode) {
-    val subMode = fixture.editor.vim.subMode
-    assertEquals(expectedSubMode, subMode)
   }
 
   fun assertSelection(expected: String?) {
@@ -565,7 +572,7 @@ abstract class VimTestCase {
 
     editor.caretModel.allCarets.forEach { caret ->
       // All carets should be the same except when in block sub mode, where we "hide" them (by drawing a zero width bar)
-      if (caret !== editor.caretModel.primaryCaret && editor.vim.inBlockSubMode) {
+      if (caret !== editor.caretModel.primaryCaret && editor.vim.inBlockSelection) {
         assertEquals(CaretVisualAttributes.Shape.BAR, caret.visualAttributes.shape)
         assertEquals(0F, caret.visualAttributes.thickness)
       } else {
@@ -591,8 +598,7 @@ abstract class VimTestCase {
     keys: List<String>,
     before: String,
     after: String,
-    modeAfter: VimStateMachine.Mode = VimStateMachine.Mode.COMMAND,
-    subModeAfter: SubMode = SubMode.NONE,
+    modeAfter: Mode = Mode.NORMAL(),
     fileType: FileType? = null,
     fileName: String? = null,
     afterEditorInitialized: ((Editor) -> Unit)? = null,
@@ -602,7 +608,6 @@ abstract class VimTestCase {
       before,
       after,
       modeAfter,
-      subModeAfter,
       fileType,
       fileName,
       afterEditorInitialized,
@@ -614,8 +619,7 @@ abstract class VimTestCase {
     keys: String,
     before: String,
     after: String,
-    modeAfter: VimStateMachine.Mode = VimStateMachine.Mode.COMMAND,
-    subModeAfter: SubMode = SubMode.NONE,
+    modeAfter: Mode = Mode.NORMAL(),
     fileType: FileType? = null,
     fileName: String? = null,
     afterEditorInitialized: ((Editor) -> Unit)? = null,
@@ -628,14 +632,14 @@ abstract class VimTestCase {
       configureByText(before)
     }
     afterEditorInitialized?.invoke(fixture.editor)
-    performTest(keys, after, modeAfter, subModeAfter)
+    performTest(keys, after, modeAfter)
   }
 
-  protected fun performTest(keys: String, after: String, modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
+  protected fun performTest(keys: String, after: String, modeAfter: Mode) {
     typeText(keys)
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState(after)
-    assertState(modeAfter, subModeAfter)
+    assertState(modeAfter)
   }
 
   protected fun setRegister(register: Char, keys: String) {

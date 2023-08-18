@@ -12,16 +12,16 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 
-internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimStateMachine.Mode) {
-  if (predictedMode != VimStateMachine.Mode.VISUAL) {
+internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: Mode) {
+  if (predictedMode !is Mode.VISUAL) {
     if (!editor.vim.isEndAllowed(predictedMode)) {
       editor.caretModel.allCarets.forEach { caret ->
         val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
@@ -49,5 +49,5 @@ internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode:
 internal fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this.vim)
-  if (moveCaretToSelectionEnd && !editor.vim.inBlockSubMode) moveToInlayAwareOffset(end)
+  if (moveCaretToSelectionEnd && !editor.vim.inBlockSelection) moveToInlayAwareOffset(end)
 }

@@ -16,13 +16,14 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.mode
 
 /**
  * @author Alex Plate
@@ -75,10 +76,10 @@ public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
       caret.vimSetSelection(newstart, newstart, false)
     }
 
-    if (visualType == TextObjectVisualType.LINE_WISE && editor.subMode != VimStateMachine.SubMode.VISUAL_LINE) {
-      injector.visualMotionGroup.toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_LINE)
-    } else if (visualType != TextObjectVisualType.LINE_WISE && editor.subMode == VimStateMachine.SubMode.VISUAL_LINE) {
-      injector.visualMotionGroup.toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    if (visualType == TextObjectVisualType.LINE_WISE && editor.mode.selectionType != SelectionType.LINE_WISE) {
+      injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.LINE_WISE)
+    } else if (visualType != TextObjectVisualType.LINE_WISE && editor.mode.selectionType == SelectionType.LINE_WISE) {
+      injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
     }
 
     caret.moveToOffset(newend)

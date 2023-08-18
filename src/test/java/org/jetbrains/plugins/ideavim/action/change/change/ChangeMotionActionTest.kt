@@ -10,7 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -19,13 +19,13 @@ class ChangeMotionActionTest : VimTestCase() {
   // VIM-515 |c| |W|
   @Test
   fun `test change big word with punctuation and alpha`() {
-    doTest("cW", "foo${c}(bar baz\n", "foo baz\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("cW", "foo${c}(bar baz\n", "foo baz\n", Mode.INSERT)
   }
 
   // VIM-300 |c| |w|
   @Test
   fun testChangeWordTwoWordsWithoutWhitespace() {
-    doTest("cw", "${c}\$value\n", "value\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("cw", "${c}\$value\n", "value\n", Mode.INSERT)
   }
 
   // VIM-296 |cc|
@@ -35,8 +35,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "cc",
       "foo\n" + "${c}bar\n",
       "foo\n${c}" + "\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -55,8 +54,7 @@ class ChangeMotionActionTest : VimTestCase() {
         ....${c}
         }
       """.trimIndent().dotToSpace(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -67,8 +65,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "ccbaz",
       "${c}foo\n" + "bar\n",
       "baz\n" + "bar\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -86,8 +83,7 @@ class ChangeMotionActionTest : VimTestCase() {
         ${c}
         
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -97,8 +93,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "c_baz",
       "${c}foo\n" + "bar\n",
       "baz\n" + "bar\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -109,8 +104,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "cw",
       "on${c}e two three\n",
       "on${c} two three\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -121,8 +115,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "c2w",
       "on${c}e two three\n",
       "on${c} three\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -141,8 +134,7 @@ class ChangeMotionActionTest : VimTestCase() {
    }
    
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -153,8 +145,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "cT(",
       "if (condition) ${c}{\n" + "}\n",
       "if ({\n" + "}\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -167,8 +158,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "cFc",
       "if (condition) {${c}\n" + "}\n",
       "if (\n" + "}\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -179,8 +169,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "cw",
       "ab.${c}cd\n",
       "ab.${c}\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -191,19 +180,18 @@ class ChangeMotionActionTest : VimTestCase() {
       listOf("c", "iw", "baz"),
       "foo bar bo${c}o\n",
       "foo bar baz\n",
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
   // VIM-421 |c| |w|
   @Test
   fun testChangeLastCharInLine() {
-    doTest("cw", "fo${c}o\n", "fo${c}\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("cw", "fo${c}o\n", "fo${c}\n", Mode.INSERT)
   }
 
   @Test
   fun testLastSymbolInWord() {
-    doTest("cw", "fo${c}o", "fo${c}", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("cw", "fo${c}o", "fo${c}", Mode.INSERT)
   }
 }

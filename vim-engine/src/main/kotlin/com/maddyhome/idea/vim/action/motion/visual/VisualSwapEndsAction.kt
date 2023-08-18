@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 
 /**
  * @author vlan
@@ -46,7 +46,7 @@ public class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (editor.inBlockSubMode) {
+    if (editor.inBlockSelection) {
       return swapVisualEndsBigO(editor)
     }
 

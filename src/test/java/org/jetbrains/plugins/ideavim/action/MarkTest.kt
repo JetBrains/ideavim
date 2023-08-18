@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -293,8 +293,7 @@ class MarkTest : VimTestCase() {
                 four five
                 
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE,
+      Mode.NORMAL(),
     )
   }
 

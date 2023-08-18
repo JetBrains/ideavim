@@ -26,10 +26,10 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
@@ -61,7 +61,7 @@ internal class CommentaryExtension : VimExtension {
       resetCaret: Boolean,
     ): Boolean {
       val mode = editor.vimStateMachine.mode
-      if (mode !== VimStateMachine.Mode.VISUAL) {
+      if (mode !is Mode.VISUAL) {
         editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
 
@@ -88,13 +88,13 @@ internal class CommentaryExtension : VimExtension {
     }
 
     private fun afterCommenting(
-      mode: VimStateMachine.Mode,
+      mode: Mode,
       editor: VimEditor,
       resetCaret: Boolean,
       range: TextRange,
     ) {
       // Remove the selection, if we added it
-      if (mode !== VimStateMachine.Mode.VISUAL) {
+      if (mode !is Mode.VISUAL) {
         editor.removeSelection()
       }
 
@@ -159,9 +159,9 @@ internal class CommentaryExtension : VimExtension {
     }
 
     // todo make it multicaret
-    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val range = injector.markService.getChangeMarks(editor.primaryCaret()) ?: return false
-      return doCommentary(editor, context, range, selectionType, true)
+      return doCommentary(editor, context, range, selectionType ?: SelectionType.CHARACTER_WISE, true)
     }
   }
 

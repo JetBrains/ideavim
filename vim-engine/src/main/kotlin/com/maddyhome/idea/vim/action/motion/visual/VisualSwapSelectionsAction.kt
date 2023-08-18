@@ -13,11 +13,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setVisualSelectionMarks
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.mode
 
 /**
  * @author vlan
@@ -37,6 +38,9 @@ public class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
 }
 
 private fun swapVisualSelections(editor: VimEditor): Boolean {
+  val mode = editor.mode
+  check(mode is Mode.VISUAL)
+
   val lastSelectionType = editor.vimLastSelectionType ?: return false
 
   val primaryCaret = editor.primaryCaret()
@@ -44,10 +48,10 @@ private fun swapVisualSelections(editor: VimEditor): Boolean {
   editor.removeSecondaryCarets()
   val vimSelectionStart = primaryCaret.vimSelectionStart
 
-  editor.vimLastSelectionType = SelectionType.fromSubMode(editor.subMode)
+  editor.vimLastSelectionType = mode.selectionType
   injector.markService.setVisualSelectionMarks(primaryCaret, TextRange(vimSelectionStart, primaryCaret.offset.point))
 
-  editor.subMode = lastSelectionType.toSubMode()
+  editor.vimStateMachine.mode = mode.copy(selectionType = lastSelectionType)
   primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
 
   injector.scroll.scrollCaretIntoView(editor)

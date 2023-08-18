@@ -15,13 +15,13 @@ import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 
-public fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: VimStateMachine.Mode): Pair<Int, Int> {
+public fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineEnd = editor.getLineEndForOffset(nativeEnd)
   val adj =
-    if (isExclusiveSelection() || nativeEnd == lineEnd || mode == VimStateMachine.Mode.SELECT) 0 else 1
+    if (isExclusiveSelection() || nativeEnd == lineEnd || mode is Mode.SELECT) 0 else 1
   val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize().toInt())
   return nativeStart to adjEnd
 }
@@ -47,11 +47,11 @@ public fun blockToNativeSelection(
   editor: VimEditor,
   start: Int,
   end: Int,
-  mode: VimStateMachine.Mode,
+  mode: Mode,
 ): Pair<BufferPosition, BufferPosition> {
   var blockStart = editor.offsetToBufferPosition(start)
   var blockEnd = editor.offsetToBufferPosition(end)
-  if (!isExclusiveSelection() && mode != VimStateMachine.Mode.SELECT) {
+  if (!isExclusiveSelection() && mode !is Mode.SELECT) {
     if (blockStart.column > blockEnd.column) {
       if (blockStart.column < editor.lineLength(blockStart.line)) {
         blockStart = BufferPosition(blockStart.line, blockStart.column + 1)

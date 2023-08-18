@@ -9,7 +9,8 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -40,7 +41,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -62,7 +63,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -84,7 +85,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @Test
@@ -106,7 +107,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -125,7 +126,7 @@ class DeleteVisualActionTest : VimTestCase() {
       """.trimIndent(),
     )
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
-    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
     typeText(injector.parser.parseKeys("d"))
     assertState(
       """
@@ -134,7 +135,7 @@ class DeleteVisualActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    assertState(Mode.NORMAL())
   }
 
   @Test
@@ -156,6 +157,6 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|
             ha|
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 }

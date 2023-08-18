@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -18,7 +18,7 @@ class ChangeLineActionTest : VimTestCase() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf('1', '"')
     }
-    doTest("cc", "", "", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("cc", "", "", Mode.INSERT)
   }
 
   @Test
@@ -26,7 +26,7 @@ class ChangeLineActionTest : VimTestCase() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf('1', '"')
     }
-    doTest("S", "", "", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest("S", "", "", Mode.INSERT)
   }
 
   @Test
@@ -41,8 +41,7 @@ class ChangeLineActionTest : VimTestCase() {
             Lorem ipsum dolor sit amet,
             $c
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -60,8 +59,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -77,8 +75,7 @@ class ChangeLineActionTest : VimTestCase() {
             Lorem ipsum dolor sit amet,
             $c
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -96,8 +93,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -113,8 +109,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             consectetur adipiscing elit
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -132,8 +127,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -151,8 +145,7 @@ class ChangeLineActionTest : VimTestCase() {
             consectetur adipiscing elit
             $c
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 
@@ -190,8 +183,7 @@ class ChangeLineActionTest : VimTestCase() {
             that priceless mote now dimpling the convex
             and limpid teardrop on a lighted slide.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE,
+Mode.INSERT,
     )
   }
 }
