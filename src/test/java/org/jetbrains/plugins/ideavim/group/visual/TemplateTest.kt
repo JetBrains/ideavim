@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -570,7 +569,6 @@ class TemplateTest : VimTestCase() {
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
     val editor = if (fixture.editor is EditorWindow) (fixture.editor as EditorWindow).delegate else fixture.editor
-    VimListenerManager.EditorListeners.add(editor)
 
     handler.doRename(fixture.elementAtCaret, editor, dataContext)
     return editor
