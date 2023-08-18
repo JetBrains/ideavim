@@ -14,9 +14,10 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -87,7 +88,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     fixture.editor.selectionModel.setSelection(0, 10)
     fixture.editor.selectionModel.removeSelection()
 
-    assertDoesntChange { fixture.editor.editorMode == VimStateMachine.Mode.INSERT }
+    assertDoesntChange { fixture.editor.vim.mode == VimStateMachine.Mode.INSERT }
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -134,10 +135,10 @@ class NonVimVisualChangeTest : VimTestCase() {
     val range = text.rangeOf("Discovery")
     fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
     waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
-    kotlin.test.assertEquals(VimStateMachine.SubMode.VISUAL_CHARACTER, fixture.editor.subMode)
+    kotlin.test.assertEquals(VimStateMachine.SubMode.VISUAL_CHARACTER, fixture.editor.vim.subMode)
 
     val rangeLine = text.rangeOf("A Discovery\n")
     fixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
-    waitAndAssert { fixture.editor.subMode == VimStateMachine.SubMode.VISUAL_LINE }
+    waitAndAssert { fixture.editor.vim.subMode == VimStateMachine.SubMode.VISUAL_LINE }
   }
 }

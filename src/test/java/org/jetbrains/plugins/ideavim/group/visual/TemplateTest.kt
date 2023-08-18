@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -324,7 +325,7 @@ class TemplateTest : VimTestCase() {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.inNormalMode }
+    assertDoesntChange { fixture.editor.vim.inNormalMode }
   }
 
   @OptionTest(
@@ -437,7 +438,7 @@ class TemplateTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.inSelectMode }
+    assertDoesntChange { fixture.editor.vim.inSelectMode }
   }
 
   @OptionTest(
@@ -512,7 +513,7 @@ class TemplateTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.inSelectMode }
+    assertDoesntChange { fixture.editor.vim.inSelectMode }
   }
 
   @OptionTest(

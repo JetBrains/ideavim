@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
@@ -767,7 +768,7 @@ class IdeaVisualControlTest : VimTestCase() {
     fixture.editor.selectionModel.setSelection(2, 5)
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { fixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
+    waitAndAssert { fixture.editor.vim.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -796,7 +797,7 @@ class IdeaVisualControlTest : VimTestCase() {
     fixture.editor.selectionModel.setSelection(2, 5)
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { fixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
+    waitAndAssert { fixture.editor.vim.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()

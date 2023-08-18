@@ -36,7 +36,7 @@ internal fun Editor.popAllModes() {
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
 internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
-  if (!this.inSelectMode) return
+  if (!this.vim.inSelectMode) return
 
   this.vim.vimStateMachine.popModes()
   SelectionVimListenerSuppressor.lock().use {

@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
@@ -26,6 +25,7 @@ import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.VimListenerManager
@@ -48,7 +48,7 @@ internal object IdeaSelectionControl {
     editor: Editor,
     selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER,
   ) {
-    VimVisualTimer.singleTask(editor.editorMode) { initialMode ->
+    VimVisualTimer.singleTask(editor.vim.mode) { initialMode ->
 
       if (editor.isIdeaVimDisabledHere) return@singleTask
 
@@ -77,16 +77,16 @@ internal object IdeaSelectionControl {
         activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {
         logger.debug("None of carets have selection. State before adjustment: ${editor.vim.vimStateMachine.toSimpleString()}")
-        if (editor.inVisualMode) editor.vim.exitVisualMode()
-        if (editor.inSelectMode) editor.exitSelectMode(false)
+        if (editor.vim.inVisualMode) editor.vim.exitVisualMode()
+        if (editor.vim.inSelectMode) editor.exitSelectMode(false)
 
-        if (editor.inNormalMode) {
+        if (editor.vim.mode.inNormalMode) {
           activateMode(editor, chooseNonSelectionMode(editor))
         }
       }
 
       KeyHandler.getInstance().reset(editor.vim)
-      logger.debug("${editor.editorMode} is enabled")
+      logger.debug("${editor.vim.mode} is enabled")
     }
   }
 
@@ -102,7 +102,7 @@ internal object IdeaSelectionControl {
    */
   fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): VimStateMachine.Mode {
     if (editor.selectionModel.hasSelection(true)) {
-      if (dontChangeMode(editor)) return editor.editorMode
+      if (dontChangeMode(editor)) return editor.vim.mode
       return chooseSelectionMode(editor, selectionSource, false)
     } else {
       return chooseNonSelectionMode(editor)
@@ -125,11 +125,11 @@ internal object IdeaSelectionControl {
   }
 
   private fun dontChangeMode(editor: Editor): Boolean =
-    editor.isTemplateActive() && (editor.vim.isIdeaRefactorModeKeep || editor.editorMode.hasVisualSelection)
+    editor.isTemplateActive() && (editor.vim.isIdeaRefactorModeKeep || editor.vim.mode.hasVisualSelection)
 
   private fun chooseNonSelectionMode(editor: Editor): VimStateMachine.Mode {
     val templateActive = editor.isTemplateActive()
-    if (templateActive && editor.inNormalMode || editor.inInsertMode) {
+    if (templateActive && editor.vim.mode.inNormalMode || editor.inInsertMode) {
       return VimStateMachine.Mode.INSERT
     }
     return VimStateMachine.Mode.COMMAND

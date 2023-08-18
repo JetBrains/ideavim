@@ -17,8 +17,9 @@ import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.vim
 import org.junit.jupiter.params.provider.Arguments
 import kotlin.test.fail
 
@@ -71,7 +72,7 @@ fun waitAndAssertMode(
   timeInMillis: Int? = null,
 ) {
   val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + 1000)
-  waitAndAssert(timeout) { fixture.editor.editorMode == mode }
+  waitAndAssert(timeout) { fixture.editor.vim.mode == mode }
 }
 
 fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {

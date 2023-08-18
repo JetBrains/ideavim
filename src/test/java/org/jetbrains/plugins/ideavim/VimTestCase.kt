@@ -58,9 +58,9 @@ import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.TestInputModel
-import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
@@ -518,12 +518,12 @@ abstract class VimTestCase {
   }
 
   fun assertMode(expectedMode: VimStateMachine.Mode) {
-    val mode = fixture.editor.editorMode
+    val mode = fixture.editor.vim.mode
     assertEquals(expectedMode, mode)
   }
 
   fun assertSubMode(expectedSubMode: SubMode) {
-    val subMode = fixture.editor.subMode
+    val subMode = fixture.editor.vim.subMode
     assertEquals(expectedSubMode, subMode)
   }
 
@@ -565,7 +565,7 @@ abstract class VimTestCase {
 
     editor.caretModel.allCarets.forEach { caret ->
       // All carets should be the same except when in block sub mode, where we "hide" them (by drawing a zero width bar)
-      if (caret !== editor.caretModel.primaryCaret && editor.inBlockSubMode) {
+      if (caret !== editor.caretModel.primaryCaret && editor.vim.inBlockSubMode) {
         assertEquals(CaretVisualAttributes.Shape.BAR, caret.visualAttributes.shape)
         assertEquals(0F, caret.visualAttributes.thickness)
       } else {

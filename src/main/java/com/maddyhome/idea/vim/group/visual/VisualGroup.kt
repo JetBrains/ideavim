@@ -49,5 +49,5 @@ internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode:
 internal fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this.vim)
-  if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToInlayAwareOffset(end)
+  if (moveCaretToSelectionEnd && !editor.vim.inBlockSubMode) moveToInlayAwareOffset(end)
 }

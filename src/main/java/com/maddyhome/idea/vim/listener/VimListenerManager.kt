@@ -447,7 +447,7 @@ internal object VimListenerManager {
         ExOutputModel.getInstance(editor).clear()
 
         val caretModel = editor.caretModel
-        if (editor.subMode != VimStateMachine.SubMode.NONE) {
+        if (editor.vim.subMode != VimStateMachine.SubMode.NONE) {
           caretModel.removeSecondaryCarets()
         }
 
@@ -461,7 +461,7 @@ internal object VimListenerManager {
         if (event.mouseEvent.clickCount == 1 && !SwingUtilities.isRightMouseButton(event.mouseEvent)) {
           if (editor.inVisualMode) {
             editor.vim.exitVisualMode()
-          } else if (editor.inSelectMode) {
+          } else if (editor.vim.inSelectMode) {
             editor.exitSelectMode(false)
             KeyHandler.getInstance().reset(editor.vim)
           }

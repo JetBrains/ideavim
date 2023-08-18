@@ -75,7 +75,7 @@ private fun Editor.guicursorMode(): GuiCursorMode {
   // makes much more use of SELECT than Vim does (e.g. it's the default for idearefactormode) so it makes sense for us
   // to more visually distinguish VISUAL and SELECT. So we use INSERT; a selection and the insert caret is intuitively
   // the same as SELECT
-  return when (editorMode) {
+  return when (vim.mode) {
     VimStateMachine.Mode.COMMAND -> GuiCursorMode.NORMAL
     VimStateMachine.Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
     VimStateMachine.Mode.SELECT -> GuiCursorMode.INSERT
@@ -107,7 +107,7 @@ private fun Editor.updatePrimaryCaretVisualAttributes() {
 
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
   // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
-  val attributes = if (inBlockSubMode) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
+  val attributes = if (this.vim.inBlockSubMode) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
   this.caretModel.allCarets.forEach {
     if (it != this.caretModel.primaryCaret) {
       it.visualAttributes = attributes

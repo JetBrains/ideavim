@@ -139,7 +139,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 
   override fun carets(): List<VimCaret> {
-    return if (editor.inBlockSubMode) {
+    return if (editor.vim.inBlockSubMode) {
       listOf(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
       editor.caretModel.allCarets.map { IjVimCaret(it) }
@@ -152,7 +152,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   @Suppress("ideavimRunForEachCaret")
   override fun forEachCaret(action: (VimCaret) -> Unit) {
-    if (editor.inBlockSubMode) {
+    if (editor.vim.inBlockSubMode) {
       action(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
       editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, false)

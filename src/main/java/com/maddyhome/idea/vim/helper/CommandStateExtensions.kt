@@ -31,9 +31,6 @@ internal val VimStateMachine.Mode.hasVisualSelection
     VimStateMachine.Mode.INSERT_SELECT -> true
   }
 
-internal val Editor.editorMode
-  get() = this.vim.vimStateMachine.mode
-
 /**
  * COMPATIBILITY-LAYER: New method
  * Please see: https://jb.gg/zo8n0r
@@ -61,32 +58,14 @@ public val CommandState.Mode.isEndAllowed: Boolean
     }
   }
 
-internal var Editor.subMode
-  get() = this.vim.vimStateMachine.subMode
-  set(value) {
-    this.vim.vimStateMachine.subMode = value
-  }
-
-@get:JvmName("inNormalMode")
-internal val Editor.inNormalMode
-  get() = this.editorMode.inNormalMode
-
 @get:JvmName("inNormalMode")
 public val VimStateMachine.Mode.inNormalMode: Boolean
   get() = this == VimStateMachine.Mode.COMMAND || this == VimStateMachine.Mode.INSERT_NORMAL
 
 @get:JvmName("inInsertMode")
 public val Editor.inInsertMode: Boolean
-  get() = this.editorMode == VimStateMachine.Mode.INSERT || this.editorMode == VimStateMachine.Mode.REPLACE
+  get() = this.vim.mode == VimStateMachine.Mode.INSERT || this.vim.mode == VimStateMachine.Mode.REPLACE
 
 @get:JvmName("inVisualMode")
 public val Editor.inVisualMode: Boolean
-  get() = this.editorMode.inVisualMode
-
-@get:JvmName("inSelectMode")
-internal val Editor.inSelectMode
-  get() = this.editorMode == VimStateMachine.Mode.SELECT || this.editorMode == VimStateMachine.Mode.INSERT_SELECT
-
-@get:JvmName("inBlockSubMode")
-internal val Editor.inBlockSubMode
-  get() = this.subMode == VimStateMachine.SubMode.VISUAL_BLOCK
+  get() = this.vim.mode.inVisualMode

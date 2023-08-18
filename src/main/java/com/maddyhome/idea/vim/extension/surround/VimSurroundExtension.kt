@@ -32,10 +32,11 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
-import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
 import org.jetbrains.annotations.NonNls
@@ -272,7 +273,7 @@ internal class VimSurroundExtension : VimExtension {
     private fun getSurroundRange(caret: VimCaret): TextRange? {
       val editor = caret.editor
       val ijEditor = editor.ij
-      return when (ijEditor.editorMode) {
+      return when (ijEditor.vim.mode) {
         VimStateMachine.Mode.COMMAND -> injector.markService.getChangeMarks(caret)
         VimStateMachine.Mode.VISUAL -> caret.run { TextRange(selectionStart, selectionEnd) }
         else -> null

@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutM
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
@@ -173,8 +172,8 @@ internal class ReplaceWithRegister : VimExtension {
           operatorArguments = OperatorArguments(
             editor.vimStateMachine?.isOperatorPending ?: false,
             0,
-            editor.editorMode,
-            editor.subMode,
+            editor.vim.mode,
+            editor.vim.subMode,
           ),
           saveToRegister = false
         )

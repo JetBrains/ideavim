@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -213,8 +214,8 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
   private fun isEnabledForEscape(editor: Editor): Boolean {
     val ideaVimSupportDialog = injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
     return editor.isPrimaryEditor() ||
-      EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
-      ideaVimSupportDialog && !editor.inNormalMode
+      EditorHelper.isFileEditor(editor) && !editor.vim.mode.inNormalMode ||
+      ideaVimSupportDialog && !editor.vim.mode.inNormalMode
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {

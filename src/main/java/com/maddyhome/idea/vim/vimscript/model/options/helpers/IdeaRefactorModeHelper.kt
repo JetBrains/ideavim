@@ -18,9 +18,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
-import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ijOptions
@@ -36,16 +36,16 @@ internal object IdeaRefactorModeHelper {
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {
-      if (!editor.editorMode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+      if (!editor.vim.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
         SelectionVimListenerSuppressor.lock().use {
           editor.selectionModel.removeSelection()
         }
       }
-      if (editor.editorMode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+      if (editor.vim.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
         val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim)
-        if (editor.subMode != autodetectedSubmode) {
+        if (editor.vim.subMode != autodetectedSubmode) {
           // Update the submode
-          editor.subMode = autodetectedSubmode
+          editor.vim.subMode = autodetectedSubmode
         }
       }
 

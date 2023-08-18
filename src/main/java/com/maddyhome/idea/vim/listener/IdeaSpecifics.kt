@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
@@ -162,7 +163,7 @@ internal object IdeaSpecifics {
         if (!editor.selectionModel.hasSelection()) {
           // Enable insert mode if there is no selection in template
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
-          if (editor.inNormalMode) {
+          if (editor.vim.mode.inNormalMode) {
             VimPlugin.getChange().insertBeforeCursor(
               editor.vim,
               injector.executionContextManager.onEditor(editor.vim),
