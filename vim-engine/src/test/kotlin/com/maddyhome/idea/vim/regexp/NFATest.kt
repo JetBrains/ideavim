@@ -1185,6 +1185,52 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test positive lookahead with nested capturing groups`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\v(Lorem( Ipsum)@=)",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test positive lookahead with multiple conditions`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem( Ipsum)@=( XYZ| Ipsum)",
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `test negative lookahead with nested capturing groups`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\v(Lorem( XYZ)@!)",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test negative lookahead with multiple conditions`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem( XYZ)@!( XYZ| Ipsum)",
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `test combination of positive and negative lookahead`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\vLorem( Ipsum)@=( Ipsum( Lorem)@!)",
+      0 until 11
+    )
+  }
+
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
