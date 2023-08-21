@@ -16,7 +16,19 @@ import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
+/**
+ * Represents a parser of Vim's patterns.
+ * This is a singleton.
+ */
 internal object VimRegexParser {
+
+  /**
+   * Tries to parse a given pattern
+   *
+   * @param pattern The Vim pattern that is to be parsed
+   *
+   * @return The result, either successful or not, of trying to parse the pattern
+   */
   fun parse(pattern: String) : VimRegexParserResult {
     return try {
       val regexLexer = BailErrorLexer(CharStreams.fromString(pattern))
@@ -30,6 +42,12 @@ internal object VimRegexParser {
     }
   }
 
+  /**
+   * Auxiliary function used to get the case sensitivity settings from the lexer.
+   * The lexer has an internal flag, ignoreCase, that is initially null; if it
+   * then comes across a \c, it sets this flag to true, and if it comes across a
+   * \C, sets it to false.
+   */
   private fun getCaseSensitivitySettings(lexer: RegexLexer) : CaseSensitivitySettings {
     return when (lexer.ignoreCase) {
       // explicitly compare with true and false, since it might be null

@@ -10,11 +10,35 @@ package com.maddyhome.idea.vim.regexp.parser
 
 import org.antlr.v4.runtime.tree.ParseTree
 
+/**
+ * The result of trying to parse a string representing a Vim
+ * regular expression into a parse tree
+ */
 internal sealed class VimRegexParserResult {
+
+  /**
+   * Represents a successful parse
+   *
+   * @param tree                    The parse tree of the parsed regular expression
+   * @param caseSensitivitySettings The value of the case sensitivity flag in the regular expression
+   */
   data class Success(val tree: ParseTree, val caseSensitivitySettings: CaseSensitivitySettings) : VimRegexParserResult()
+
+  /**
+   * Represents an unsuccessful parse
+   *
+   * @param message A message giving output on why parsing failed
+   */
   data class Failure(val message: String = "Invalid pattern") : VimRegexParserResult()
 }
 
+/**
+ * Represents the case sensitivity setting of a regular expression
+ * IGNORE_CASE is for \c, NO_IGNORE_CASE for \C, and DEFAULT when
+ * none of these tokens are present.
+ *
+ * @see :help /ignorecase
+ */
 internal enum class CaseSensitivitySettings {
   DEFAULT,
   IGNORE_CASE,

@@ -11,39 +11,39 @@ package com.maddyhome.idea.vim.regexp.nfa
 /**
  * Represents a single state of a NFA.
  */
-internal class NFAState (
+internal class NFAState {
   /**
    * All the transitions from this state. Order matters.
    * Transitions with higher priority should be in lower
    * indexes. This is relevant for the implementation of
    * lazy quantifiers.
    */
-  val transitions: ArrayList<NFATransition> = ArrayList(),
+  internal val transitions: ArrayList<NFATransition> = ArrayList()
 
   /**
-   *
+   * If this is not null, then when simulation reaches this state,
+   * it has to check if this assertion is successful to continue.
    */
-  var assertion: NFAAssertion? = null,
+  internal var assertion: NFAAssertion? = null
 
   /**
    * Stores the numbers of the capture groups that start
    * being captured on this state
    */
-  val startCapture: MutableList<Int> = ArrayList(),
+  internal val startCapture: MutableList<Int> = ArrayList()
 
   /**
    *  Stores the number of the capture groups that stop
    *  being captured on this state
    */
-  val endCapture: MutableList<Int> = ArrayList(),
+  internal val endCapture: MutableList<Int> = ArrayList()
 
   /**
    *  Stores the number of the capture groups that stop
    *  being captured on this state, even if that group
    *  had already been set to stop being captured
    */
-  val forceEndCapture: MutableList<Int> = ArrayList(),
-) {
+  internal val forceEndCapture: MutableList<Int> = ArrayList()
 
   /**
    * Adds a new transition from this state. This transition

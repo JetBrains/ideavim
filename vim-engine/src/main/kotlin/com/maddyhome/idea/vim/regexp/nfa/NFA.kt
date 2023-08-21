@@ -136,6 +136,7 @@ internal class NFA private constructor(
    * and end, respectfully, the capturing of a group.
    *
    * @param groupNumber The number of the capture group
+   * @param force       Whether the state should force-end the capturing of the group
    */
   internal fun capture(groupNumber: Int, force: Boolean = true) {
     this.startState.startCapture.add(groupNumber)
@@ -148,10 +149,10 @@ internal class NFA private constructor(
    * may or may not consume input, and can be positive (simulation must
    * succeed) or negative (simulation must fail).
    *
-   * @param shouldConsume Whether the assertion should consume input
-   * @param isPositive Whether the assertion is positive or negative
+   * @param shouldConsume Whether the assertion should consume input.
+   * @param isPositive Whether the assertion is positive or negative.
    *
-   * @return The NFA instance marked for assertion
+   * @return The NFA instance marked for assertion.
    */
   internal fun assert(shouldConsume: Boolean, isPositive: Boolean = false) : NFA {
     val newStart = NFAState()

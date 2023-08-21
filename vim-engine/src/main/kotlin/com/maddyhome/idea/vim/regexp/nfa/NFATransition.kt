@@ -11,18 +11,15 @@ package com.maddyhome.idea.vim.regexp.nfa
 import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
 
 /**
- * Represents a transition of the NFA
+ * Represents a transition of the NFA.
+ *
+ * @param matcher The matcher that determines if the transition can
+ * be made, as well as information on how many characters
+ * are consumed by the transition.
+ *
+ * @param destState The destination state of the transition.
  */
 internal data class NFATransition(
-  /**
-   * The matcher that determines if the transition can
-   * be made, as well as information on how many characters
-   * are consumed by the transition
-   */
   val matcher: Matcher,
-
-  /**
-   * The destination state of the transition
-   */
   val destState: NFAState,
 )
