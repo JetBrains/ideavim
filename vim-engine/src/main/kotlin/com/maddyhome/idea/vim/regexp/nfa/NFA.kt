@@ -229,7 +229,9 @@ internal class NFA private constructor(
   ): NFASimulationResult {
     updateCaptureGroups(editor, currentIndex, currentState)
     currentState.assertion?.let {
-      return handleAssertion(editor, currentIndex, isCaseInsensitive, it)
+      val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it)
+      if (!assertionResult.simulationResult) return NFASimulationResult(false, currentIndex)
+      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive)
     }
     if (currentState === targetState) return NFASimulationResult(true, currentIndex)
 
@@ -267,7 +269,7 @@ internal class NFA private constructor(
      * assertion stopped, else it resumes at the index that the simulation was at before the assertion.
      */
     val newIndex = if (assertion.shouldConsume) assertionResult.index else currentIndex
-    return simulate(editor, newIndex, assertion.jumpTo, acceptState, isCaseInsensitive)
+    return NFASimulationResult(true, newIndex)
   }
 
   /**
