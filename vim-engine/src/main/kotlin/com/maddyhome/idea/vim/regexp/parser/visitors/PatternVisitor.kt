@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfWordMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
-internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
+internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   private var groupCount: Int = 0
   private val groupNumbers: HashMap<RegexParser.GroupingCaptureContext, Int> = HashMap()
@@ -35,6 +35,8 @@ internal class PatternVisitor : RegexParserBaseVisitor<NFA>() {
     groupCount++
     val nfa = visit(ctx.sub_pattern())
     nfa.capture(groupNumber, false)
+    groupCount = 0
+    groupNumbers.clear()
     return nfa
   }
   override fun visitSub_pattern(ctx: RegexParser.Sub_patternContext): NFA {

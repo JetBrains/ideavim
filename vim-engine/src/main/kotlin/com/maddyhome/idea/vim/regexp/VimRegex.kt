@@ -36,7 +36,7 @@ public class VimRegex(pattern: String) {
     when (parseResult) {
       is VimRegexParserResult.Failure -> throw RuntimeException() // TODO: show actual error message
       is VimRegexParserResult.Success -> {
-        nfa = PatternVisitor().visit(parseResult.tree)
+        nfa = PatternVisitor.visit(parseResult.tree)
         caseSensitivity = when (parseResult.caseSensitivitySettings) {
           // TODO: check ignorecase options
           CaseSensitivitySettings.DEFAULT-> CaseSensitivity.NO_IGNORE_CASE

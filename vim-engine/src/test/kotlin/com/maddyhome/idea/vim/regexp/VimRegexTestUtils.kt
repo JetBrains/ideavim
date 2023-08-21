@@ -37,7 +37,7 @@ internal object VimRegexTestUtils {
     val parserResult = VimRegexParser.parse(pattern)
     return when (parserResult) {
       is VimRegexParserResult.Failure -> null
-      is VimRegexParserResult.Success -> PatternVisitor().visit(parserResult.tree)
+      is VimRegexParserResult.Success -> PatternVisitor.visit(parserResult.tree)
     }
   }
 }
