@@ -154,6 +154,7 @@ collection_elem : start=(COLLECTION_LITERAL_CHAR | DASH | CARET) DASH end=(COLLE
  * included in the match.
  */
 zero_width : CURSOR        #Cursor
+           | VISUAL        #Visual
            | START_MATCH   #StartMatch
            | END_MATCH     #EndMatch
            | START_OF_FILE #StartOfFile
