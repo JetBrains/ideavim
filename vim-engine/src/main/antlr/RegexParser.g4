@@ -87,6 +87,7 @@ ordinary_atom : (LITERAL_CHAR | CARET | DOLLAR)  #LiteralChar
               | DOT                              #AnyChar
               | DOTNL                            #AnyCharNL
               | BACKREFERENCE                    #Backreference
+              | LAST_SUBSTITUTE                  #LastSubstitute
               | zero_width                       #ZeroWidth
               | char_class                       #CharClass
               | collection                       #Collec
