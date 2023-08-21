@@ -11,6 +11,11 @@ package com.maddyhome.idea.vim.regexp.parser.visitors
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
+/**
+ * A tree visitor for visiting nodes representing a collection.
+ *
+ * @see :help /collection
+ */
 internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<CollectionElement, Boolean>>() {
 
   override fun visitSingleColElem(ctx: RegexParser.SingleColElemContext): Pair<CollectionElement, Boolean> {
@@ -41,7 +46,23 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
   }
 }
 
+/**
+ * Represents a single element in a collection. This element can be
+ * a single character, or a range of characters.
+ */
 internal sealed class CollectionElement {
+  /**
+   * Represents a single character collection element.
+   *
+   * @param char The character element.
+   */
   data class SingleCharacter(val char: Char) : CollectionElement()
+
+  /**
+   * Represents a range of characters collection element.
+   *
+   * @param start The starting character of the range.
+   * @param end   The ending character of the range.
+   */
   data class CharacterRange(val start: Char, val end: Char) : CollectionElement()
 }

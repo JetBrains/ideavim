@@ -12,8 +12,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
- * Matcher used to check if index is at the
- * start of a file
+ * Matcher used to check if index is at the start of a file.
  */
 internal class StartOfFileMatcher : Matcher{
   override fun matches(

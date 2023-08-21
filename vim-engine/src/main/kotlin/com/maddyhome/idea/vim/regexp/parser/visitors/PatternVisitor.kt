@@ -25,9 +25,22 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfWordMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
+/**
+ * A tree visitor for converting a parsed Vim pattern into an internal
+ * NFA, that is then used to then find matches in an editor.
+ * This is a singleton.
+ */
 internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
+  /**
+   * Tracks the number of capture groups visited
+   */
   private var groupCount: Int = 0
+
+  /**
+   * Maps tree nodes representing capture groups to their respective group number
+   *
+   */
   private val groupNumbers: HashMap<RegexParser.GroupingCaptureContext, Int> = HashMap()
 
   override fun visitPattern(ctx: RegexParser.PatternContext): NFA {

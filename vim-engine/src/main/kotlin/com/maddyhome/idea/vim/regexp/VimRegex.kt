@@ -17,16 +17,17 @@ import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
 
 /**
- * Represents a compiled Vim regular expression. Provides methods to
+ * Represents a compiled Vim pattern. Provides methods to
  * match, replace and split strings in the editor with a pattern.
- * To learn about Vim's pattern syntax see :help pattern
+ *
+ * @see :help /pattern
  */
 public class VimRegex(pattern: String) {
   private enum class CaseSensitivity { SMART_CASE, IGNORE_CASE, NO_IGNORE_CASE }
   private val caseSensitivity: CaseSensitivity
 
   /**
-   * The NFA representing the compiled regular expression
+   * The NFA representing the compiled pattern
    */
   private val nfa: NFA
 
@@ -49,7 +50,7 @@ public class VimRegex(pattern: String) {
 
 
   /**
-   * Indicates whether the regular expression can find at least one match in the specified editor
+   * Indicates whether the pattern can find at least one match in the specified editor
    *
    * @param editor The editor where to look for the match in
    *
@@ -79,10 +80,12 @@ public class VimRegex(pattern: String) {
   }
 
   /**
-   * Returns the first match of a regular expression in the editor, beginning at the specified index.
+   * Returns the first match of a pattern in the editor, beginning at the specified index.
    *
    * @param editor     The editor where to look for the match in
    * @param startIndex The index to start the find
+   *
+   * @return The first match found in the editor
    */
   public fun find(
     editor: VimEditor,
@@ -111,11 +114,13 @@ public class VimRegex(pattern: String) {
   }
 
   /**
-   * Returns a sequence of all occurrences of a regular expression within
+   * Returns a sequence of all occurrences of a pattern within
    * the editor, beginning at the specified index
    *
    * @param editor     The editor where to look for the match in
    * @param startIndex The index to start the find
+   *
+   * @return All the matches found in the editor
    */
   public fun findAll(
     editor: VimEditor,
@@ -146,11 +151,13 @@ public class VimRegex(pattern: String) {
   }
 
   /**
-   * Attempts to match a regular expression exactly at the specified
+   * Attempts to match a pattern exactly at the specified
    * index in the editor text.
    *
    * @param editor The editor where to look for the match in
    * @param index  The index to start the match
+   *
+   * @return The match, either successful or not, found at the specified index
    */
   public fun matchAt(
     editor: VimEditor,
@@ -163,6 +170,8 @@ public class VimRegex(pattern: String) {
    * Attempts to match the entire editor against the pattern.
    *
    * @param editor The editor where to look for the match in
+   *
+   * @return The match, either successful or not, when matching against the entire editor
    */
   public fun matchEntire(
     editor: VimEditor
@@ -178,9 +187,11 @@ public class VimRegex(pattern: String) {
   }
 
   /**
-   * Indicates whether the regular expression matches the entire editor.
+   * Indicates whether the pattern matches the entire editor.
    *
    * @param editor The editor where to look for the match in
+   *
+   * @return True if the entire editor matches, false otherwise
    */
   public fun matches(
     editor: VimEditor
@@ -193,10 +204,12 @@ public class VimRegex(pattern: String) {
   }
 
   /**
-   * Checks if a regular expression matches a part of the editor
+   * Checks if a pattern matches a part of the editor
    * starting exactly at the specified index.
    *
    * @param editor The editor where to look for the match in
+   *
+   * @return True if there is a successful match starting at the specified index, false otherwise
    */
   public fun matchesAt(
     editor: VimEditor,
@@ -209,6 +222,15 @@ public class VimRegex(pattern: String) {
     }
   }
 
+  /**
+   * Simulates the internal NFA with the determined flags,
+   * started on a given index.
+   *
+   * @param editor The editor that is used for the simulation
+   * @param index  The index where the simulation should start
+   *
+   * @return The resulting match result
+   */
   private fun simulateNFA(editor: VimEditor, index: Int = 0) : VimMatchResult {
     val ignoreCase = when (caseSensitivity) {
       CaseSensitivity.NO_IGNORE_CASE -> false

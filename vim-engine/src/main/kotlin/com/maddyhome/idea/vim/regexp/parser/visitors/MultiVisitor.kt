@@ -13,6 +13,12 @@ import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 
+/**
+ * A tree visitor for visiting nodes representing a multi. It is used to identify
+ * what type of multi is being visited.
+ *
+ * @see :help /multi
+ */
 internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
 
   override fun visitZeroOrMore(ctx: RegexParser.ZeroOrMoreContext): Multi {
@@ -55,11 +61,22 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
   }
 }
 
+/**
+ * Represents a multi.
+ *
+ * @see :help multi
+ */
 internal sealed class Multi {
 
   /**
    * Delimits the number of times that a multi should
    * make a certain atom repeat itself
+   *
+   * @param lowerBoundary The minimum number of times that the atom can repeat itself.
+   * @param upperBoundary The maximum number of times that the atom can repeat itself. This number can be infinite.
+   * @param isGreedy Whether this multi is greedy. A greedy multi always consumes as much input
+   * it can, while a non-greedy, or lazy multi, consumes the least amount of input
+   * it can.
    */
   internal data class RangeMulti(
     val lowerBoundary: RangeBoundary.IntRangeBoundary,
@@ -68,12 +85,21 @@ internal sealed class Multi {
     ) : Multi()
 
   /**
-   * Used to represent an atomic group.
+   * Used to represent an atomic atom. Atoms that are atomic, match
+   * as if they were a whole pattern.
+   *
+   * @see :help /\@>
    */
   object AtomicMulti : Multi()
 
   /**
-   * Used to represent an assertion multi
+   * Used to represent an assertion multi. These
+   * are also known as look-ahead and look-behind.
+   * They can be positive, meaning that they must match,
+   * or negative, meaning that they must not match.
+   *
+   * @param isPositive Whether the assertion is positive
+   * @param isAhead    Whether it is a look-ahead
    */
   internal data class AssertionMulti(
     val isPositive: Boolean,
@@ -81,6 +107,9 @@ internal sealed class Multi {
   ) : Multi()
 }
 
+/**
+ * Used to represent a boundary of a range multi
+ */
 internal sealed class RangeBoundary {
   /**
    * Represents an integer boundary
