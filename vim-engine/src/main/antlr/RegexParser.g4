@@ -145,9 +145,30 @@ collection : COLLECTION_START CARET collection_elems+=collection_elem* COLLECTIO
            | COLLECTION_START collection_elems+=collection_elem* COLLECTION_END       #CollectionPos
            ;
 
-collection_elem : start=(COLLECTION_LITERAL_CHAR | DASH | CARET) DASH end=(COLLECTION_LITERAL_CHAR | DASH | CARET) #RangeColElem
+collection_elem : collection_char_class_expression                                                                 #CharClassColElem
+                | start=(COLLECTION_LITERAL_CHAR | DASH | CARET) DASH end=(COLLECTION_LITERAL_CHAR | DASH | CARET) #RangeColElem
                 | (COLLECTION_LITERAL_CHAR | DASH | CARET)                                                         #SingleColElem
                 ;
+
+collection_char_class_expression : ALPHA_CLASS     #AlphaClass
+                                 | BLANK_CLASS     #BlankClass
+                                 | CNTRL_CLASS     #CntrlClass
+                                 | DIGIT_CLASS     #DigitClass
+                                 | GRAPH_CLASS     #GraphClass
+                                 | LOWER_CLASS     #LowerClass
+                                 | PRINT_CLASS     #PrintClass
+                                 | PUNCT_CLASS     #PunctClass
+                                 | SPACE_CLASS     #SpaceClass
+                                 | UPPER_CLASS     #UpperClass
+                                 | XDIGIT_CLASS    #XdigitClass
+                                 | RETURN_CLASS    #ReturnClass
+                                 | TAB_CLASS       #TabClass
+                                 | ESCAPE_CLASS    #EscapeClass
+                                 | BACKSPACE_CLASS #BackspaceClass
+                                 | IDENT_CLASS     #IdentClass
+                                 | KEYWORD_CLASS   #KeywordClass
+                                 | FNAME_CLASS     #FnameClass
+                                 ;
 
 /**
  * When using zero-width tokens, no characters are
