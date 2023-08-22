@@ -158,13 +158,13 @@ internal class NFA private constructor(
     val newStart = NFAState()
     val newEnd = NFAState()
 
-    newStart.assertion = NFAAssertion(
+    newStart.assertions.add(NFAAssertion(
       shouldConsume,
       isPositive,
       startState,
       acceptState,
       newEnd
-    )
+    ))
 
     acceptState = newEnd
     startState = newStart
@@ -229,10 +229,10 @@ internal class NFA private constructor(
     epsilonVisited: Set<NFAState> = HashSet()
   ): NFASimulationResult {
     updateCaptureGroups(editor, currentIndex, currentState)
-    currentState.assertion?.let {
-      val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it)
-      if (!assertionResult.simulationResult) return NFASimulationResult(false, currentIndex)
-      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive)
+    for (assertion in currentState.assertions) {
+      val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, assertion)
+      return if (!assertionResult.simulationResult) NFASimulationResult(false, currentIndex)
+      else simulate(editor, assertionResult.index, assertion.jumpTo, targetState, isCaseInsensitive)
     }
     if (currentState === targetState) return NFASimulationResult(true, currentIndex)
 
