@@ -46,6 +46,10 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
     return Pair(CollectionElement.CharacterClassExpression{it.isISOControl()}, false)
   }
 
+  override fun visitDigitClass(ctx: RegexParser.DigitClassContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{it.isDigit()}, false)
+  }
+
   private fun cleanLiteralChar(str: String) : Pair<Char, Boolean> {
     return  if (str.length > 2 && str[0] == '\\' && str[1] == 'd') Pair(Char(str.substring(2).toInt()), false)
     else if (str.length > 2 && str[0] == '\\' && str[1] == 'o') Pair(Char(str.substring(2).toInt(8)), false)
