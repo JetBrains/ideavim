@@ -30,6 +30,10 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
     return Pair(CollectionElement.CharacterRange(rangeStart.first, rangeEnd.first), includesEOL)
   }
 
+  override fun visitAlnumClass(ctx: RegexParser.AlnumClassContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{it.isLetterOrDigit()}, false)
+  }
+
   override fun visitAlphaClass(ctx: RegexParser.AlphaClassContext?): Pair<CollectionElement, Boolean> {
     return Pair(CollectionElement.CharacterClassExpression{it.isLetter()}, false)
   }
