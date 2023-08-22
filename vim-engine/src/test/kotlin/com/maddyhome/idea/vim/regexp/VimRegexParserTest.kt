@@ -16,81 +16,81 @@ import kotlin.test.fail
 
 class VimRegexParserTest {
   @Test
-  fun `range both bounds`() {
+  fun `test range both bounds`() {
     assertSuccess("a\\{2,5}")
   }
 
   @Test
-  fun `range left bound`() {
+  fun `test range left bound`() {
     assertSuccess("a\\{6,}")
   }
 
   @Test
-  fun `range right bound`() {
+  fun `test range right bound`() {
     assertSuccess("a\\{,10}")
   }
 
   @Test
-  fun `range absolute bound`() {
+  fun `test range absolute bound`() {
     assertSuccess("a\\{5}")
   }
 
   @Test
-  fun `range lazy`() {
+  fun `test range lazy`() {
     assertSuccess("a\\{-,5}")
   }
 
   @Test
-  fun `range missing right bracket`() {
+  fun `test range missing right bracket`() {
     assertFailure("a\\{5")
   }
 
   @Test
-  fun `range two commas`() {
+  fun `test range two commas`() {
     assertFailure("a\\{2,5,}")
   }
 
   @Test
-  fun `range non integer bound`() {
+  fun `test range non integer bound`() {
     assertFailure("a\\{2,g}")
   }
 
   @Test
-  fun `range lazy with extra dash`() {
+  fun `test range lazy with extra dash`() {
     assertFailure("a\\{--2,5}")
   }
 
   @Test
-  fun `collection a to z`() {
+  fun `test collection a to z`() {
     assertSuccess("[a-z]")
   }
 
   @Test
-  fun `collection 0 to 9`() {
+  fun `test collection 0 to 9`() {
     assertSuccess("[0-9]")
   }
   @Test
-  fun `collection single element`() {
+  fun `test collection single element`() {
     assertSuccess("[f]")
   }
 
   @Test
-  fun `collection a to z and A`() {
+  fun `test collection a to z and A`() {
     assertSuccess("[a-zA]")
   }
 
   @Test
-  fun `collection a to z and A to Z`() {
+  fun `test collection a to z and A to Z`() {
     assertSuccess("[a-zA-Z]")
   }
 
   @Test
-  fun `collection a to z, 9 and A to Z`() {
+  fun `test collection a to z, 9 and A to Z`() {
     assertSuccess("[a-z9A-Z]")
   }
 
   @Test
-  fun `collection a to z, dash and Z`() {
+  fun `test collection a to z, dash and Z`() {
     /**
      * This pattern looks like it should
      * be illegal, but Vim allows it and
@@ -101,42 +101,42 @@ class VimRegexParserTest {
   }
 
   @Test
-  fun `collection with single dash`() {
+  fun `test collection with single dash`() {
     assertSuccess("[-]")
   }
 
   @Test
-  fun `collection dash to 0`() {
+  fun `test collection dash to 0`() {
     assertSuccess("[--0]")
   }
 
   @Test
-  fun `collection literal dash and a to z`() {
+  fun `test collection literal dash and a to z`() {
     assertSuccess("[-a-z]")
   }
 
   @Test
-  fun `collection a to z and literal dash`() {
+  fun `test collection a to z and literal dash`() {
     assertSuccess("[a-z-]")
   }
 
   @Test
-  fun `collection a, literal dash and b`() {
+  fun `test collection a, literal dash and b`() {
     assertSuccess("[a\\-b]")
   }
 
   @Test
-  fun `collection escaped backslash`() {
+  fun `test collection escaped backslash`() {
     assertSuccess("[\\\\]")
   }
 
   @Test
-  fun `collection a to z negated`() {
+  fun `test collection a to z negated`() {
     assertSuccess("[^a-z]")
   }
 
   @Test
-  fun `collection with negated unescaped caret`() {
+  fun `test collection with negated unescaped caret`() {
     /**
      * Matches everything except "^".
      * It's more correct to write it as
@@ -149,143 +149,179 @@ class VimRegexParserTest {
   }
 
   @Test
-  fun `collection with escaped caret`() {
+  fun `test collection with escaped caret`() {
     assertSuccess("[\\^]")
   }
 
   @Test
-  fun `collection unescaped backslash not at end`() {
+  fun `test collection unescaped backslash not at end`() {
     /**
      * Matches a "\" or "a".
      * Since "\a" isn't an escape sequence,
      * the "\" is taken literally.
-     * Equivalent to "[\\a]]"
+     * Equivalent to "[\\a]"
      */
     assertSuccess("[\\a]")
   }
 
   @Test
-  fun `collection unicode code range`() {
+  fun `test collection unicode code range`() {
     assertSuccess("[\\u0-\\uFFFF]")
   }
 
   @Test
-  fun `collection russian alphabet`() {
+  fun `test collection russian alphabet`() {
     assertSuccess("[А-яЁё]")
   }
 
   @Test
-  fun `unclosed collection`() {
+  fun `test unclosed collection`() {
     assertFailure("[a-z")
   }
 
   @Test
-  fun `collection unescaped backslash at end`() {
+  fun `test collection unescaped backslash at end`() {
     assertFailure("[abc\\]")
   }
 
   @Test
-  fun `unicode character`() {
+  fun `test collection with character class expression`() {
+    assertSuccess("[[:alpha:]]")
+  }
+
+  @Test
+  fun `test collection with invalid character class expression`() {
+    /**
+     * Although "[:invalid:]" doesn't correspond to any character
+     * class expression, this pattern is still valid and means:
+     * Any of these characters: '[' ':' 'i' 'n' 'v' 'a' 'l' 'd',
+     * followed by a ']'
+     */
+    assertSuccess("[[:invalid:]]")
+  }
+
+  @Test
+  fun `test collection with character class expression missing closing bracket`() {
+    assertFailure("[[:alnum:]")
+  }
+
+  @Test
+  fun `test collection with character class expression and other elements`() {
+    assertSuccess("[a-z[:digit:]-Z]")
+  }
+
+  @Test
+  fun `test opening bracket followed by collection`() {
+    assertSuccess("\\[[a-z]")
+  }
+
+  @Test
+  fun `test collection with opening bracket`() {
+    assertSuccess("[[a-z]")
+  }
+
+  @Test
+  fun `test unicode character`() {
     assertSuccess("\u03b5")
   }
 
   @Test
-  fun `unicode character in nomagic mode`() {
+  fun `test unicode character in nomagic mode`() {
     assertSuccess("\\M\u03b5")
   }
 
   @Test
-  fun `wider unicode character`() {
+  fun `test wider unicode character`() {
     assertSuccess("\uD83E\uDE24")
   }
 
   @Test
-  fun `'ab'`() {
+  fun `test 'ab'`() {
     assertSuccess("ab")
   }
 
   @Test
-  fun `'ab' after cursor`() {
+  fun `test 'ab' after cursor`() {
     assertSuccess("\\%#ab")
   }
 
   @Test
-  fun `sequence of 0 or more 'ab'`() {
+  fun `test sequence of 0 or more 'ab'`() {
     assertSuccess("\\(ab\\)*")
   }
 
   @Test
-  fun `sequence of 0 or more 'ab' no magic`() {
+  fun `test sequence of 0 or more 'ab' no magic`() {
     assertSuccess("\\M\\(ab\\)\\*")
   }
 
   @Test
-  fun `sequence of 1 or more 'ab'`() {
+  fun `test sequence of 1 or more 'ab'`() {
     assertSuccess("\\(ab\\)\\+")
   }
 
   @Test
-  fun `0 or 1 'ab' with equals`() {
+  fun `test 0 or 1 'ab' with equals`() {
     assertSuccess("\\(ab\\)\\=")
   }
 
   @Test
-  fun `0 or 1 'ab' with question mark`() {
+  fun `test 0 or 1 'ab' with question mark`() {
     assertSuccess("\\(ab\\)\\?")
   }
 
   @Test
-  fun `nested groups with multi`() {
+  fun `test nested groups with multi`() {
     assertSuccess("\\(\\(a\\)*b\\)\\+")
   }
 
   @Test
-  fun `non-capture group`() {
+  fun `test non-capture group`() {
     assertSuccess("\\%(a\\)")
   }
 
   @Test
-  fun `very nomagic characters`() {
+  fun `test very nomagic characters`() {
     assertSuccess("\\V%(")
   }
 
   @Test
-  fun `date format`() {
+  fun `test date format`() {
     assertSuccess("\\(\\d\\{2}\\)\\{2}\\d\\{4}")
   }
 
   @Test
-  fun `switching to nomagic`() {
+  fun `test switching to nomagic`() {
     assertSuccess("a*\\Ma*")
   }
 
   @Test
-  fun `switching to all magic modes`() {
+  fun `test switching to all magic modes`() {
     assertSuccess("\\m.*\\M\\.\\*\\v.*\\V\\.\\*")
   }
 
   @Test
-  fun `backreference to group 1`() {
+  fun `test backreference to group 1`() {
     assertSuccess("\\v(cat|dog)\\1")
   }
 
   @Test
-  fun `unclosed group`() {
+  fun `test unclosed group`() {
     assertFailure("\\(ab")
   }
 
   @Test
-  fun `unmatched closing )`() {
+  fun `test unmatched closing )`() {
     assertFailure("ab\\)")
   }
 
   @Test
-  fun `unclosed non-capture group`() {
+  fun `test unclosed non-capture group`() {
     assertFailure("\\%(a")
   }
 
   @Test
-  fun `unescaped group close`() {
+  fun `test unescaped group close`() {
     assertFailure("\\(a)")
   }
 
