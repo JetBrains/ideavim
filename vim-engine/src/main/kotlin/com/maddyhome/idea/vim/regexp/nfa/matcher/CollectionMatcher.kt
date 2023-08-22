@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 internal class CollectionMatcher(
   private val chars: Set<Char> = emptySet(),
   private val ranges: List<CollectionRange> = emptyList(),
+  private val charClasses: List<(Char) -> Boolean> = emptyList(),
   private val isNegated: Boolean = false,
   private val includesEOL: Boolean = false,
   private val forceNoIgnoreCase: Boolean = false
@@ -34,8 +35,8 @@ internal class CollectionMatcher(
     if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
 
     val char = editor.text()[index]
-    val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }.contains(char.lowercaseChar()) || ranges.any { it.inRange(char, true) }) == !isNegated
-                 else (chars.contains(char) || ranges.any { it.inRange(char) }) == !isNegated
+    val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }.contains(char.lowercaseChar()) || ranges.any { it.inRange(char, true) } || charClasses.any { it(char.lowercaseChar()) || it(char.uppercaseChar()) }) == !isNegated
+                 else (chars.contains(char) || ranges.any { it.inRange(char) } || charClasses.any { it(char) }) == !isNegated
     return if (result) MatcherResult.Success(1)
     else MatcherResult.Failure
   }

@@ -479,6 +479,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
   private fun visitCollection(collectionElements: List<RegexParser.Collection_elemContext>, isNegated: Boolean, includesEOL: Boolean) : NFA {
     val individualChars: HashSet<Char> = HashSet()
     val ranges: ArrayList<CollectionRange> = ArrayList()
+    val charClasses: ArrayList<(Char) -> Boolean> = ArrayList()
     val collectionElementVisitor = CollectionElementVisitor()
     var containsEOL = false
 
@@ -489,6 +490,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
       when (element) {
         is CollectionElement.SingleCharacter -> individualChars.add(element.char)
         is CollectionElement.CharacterRange -> ranges.add(CollectionRange(element.start, element.end))
+        is CollectionElement.CharacterClassExpression -> charClasses.add(element.predicate)
       }
     }
 
@@ -506,6 +508,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
       CollectionMatcher(
         individualChars,
         ranges,
+        charClasses,
         isNegated,
         includesEOL || containsEOL
       )

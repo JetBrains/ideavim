@@ -48,7 +48,8 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
 
 /**
  * Represents a single element in a collection. This element can be
- * a single character, or a range of characters.
+ * a single character, a range of characters, or a character class
+ * expression.
  */
 internal sealed class CollectionElement {
   /**
@@ -65,4 +66,11 @@ internal sealed class CollectionElement {
    * @param end   The ending character of the range.
    */
   data class CharacterRange(val start: Char, val end: Char) : CollectionElement()
+
+  /**
+   * Represents a character class expression element. e.g. [:digit:].
+   *
+   * @param predicate The condition that a character has to meet to belong in the character class.
+   */
+  data class CharacterClassExpression(val predicate: (Char) -> Boolean) : CollectionElement()
 }
