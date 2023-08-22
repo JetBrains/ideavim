@@ -462,6 +462,12 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     )
   }
 
+  override fun visitBS(ctx: RegexParser.BSContext?): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher('\b')
+    )
+  }
+
   override fun visitNL(ctx: RegexParser.NLContext?): NFA {
     return NFA.fromMatcher(
       CharacterMatcher('\n')
