@@ -151,6 +151,7 @@ collection_elem : collection_char_class_expression                              
                 ;
 
 collection_char_class_expression : ALPHA_CLASS     #AlphaClass
+                                 | ALNUM_CLASS     #AlnumClass
                                  | BLANK_CLASS     #BlankClass
                                  | CNTRL_CLASS     #CntrlClass
                                  | DIGIT_CLASS     #DigitClass
