@@ -54,6 +54,10 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
     return Pair(CollectionElement.CharacterClassExpression{it in '!'..'~'}, false)
   }
 
+  override fun visitLowerClass(ctx: RegexParser.LowerClassContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{it.isLowerCase()}, false)
+  }
+
   private fun cleanLiteralChar(str: String) : Pair<Char, Boolean> {
     return  if (str.length > 2 && str[0] == '\\' && str[1] == 'd') Pair(Char(str.substring(2).toInt()), false)
     else if (str.length > 2 && str[0] == '\\' && str[1] == 'o') Pair(Char(str.substring(2).toInt(8)), false)
