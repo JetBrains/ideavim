@@ -44,12 +44,12 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
   private val groupNumbers: HashMap<RegexParser.GroupingCaptureContext, Int> = HashMap()
 
   override fun visitPattern(ctx: RegexParser.PatternContext): NFA {
+    groupCount = 0
+    groupNumbers.clear()
     val groupNumber = groupCount
     groupCount++
     val nfa = visit(ctx.sub_pattern())
     nfa.capture(groupNumber, false)
-    groupCount = 0
-    groupNumbers.clear()
     return nfa
   }
   override fun visitSub_pattern(ctx: RegexParser.Sub_patternContext): NFA {
