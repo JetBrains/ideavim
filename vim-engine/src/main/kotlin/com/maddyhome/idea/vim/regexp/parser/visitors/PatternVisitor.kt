@@ -503,7 +503,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     /**
      * If the collection is empty, match literally with '[]', or '[^]' if negated
      */
-    if (individualChars.isEmpty() && ranges.isEmpty())
+    if (individualChars.isEmpty() && ranges.isEmpty() && charClasses.isEmpty())
       return if (isNegated) NFA.fromMatcher(CharacterMatcher('['))
         .concatenate(NFA.fromMatcher(CharacterMatcher('^')))
         .concatenate(NFA.fromMatcher(CharacterMatcher(']')))
