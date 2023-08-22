@@ -87,6 +87,22 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
     }, false)
   }
 
+  override fun visitReturnClass(ctx: RegexParser.ReturnClassContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{it == '\r'}, false)
+  }
+
+  override fun visitTab(ctx: RegexParser.TabContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{it == '\t'}, false)
+  }
+
+  override fun visitEsc(ctx: RegexParser.EscContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{it == ''}, false)
+  }
+
+  override fun visitBackspaceClass(ctx: RegexParser.BackspaceClassContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{it == '\b'}, false)
+  }
+
   private fun cleanLiteralChar(str: String) : Pair<Char, Boolean> {
     return  if (str.length > 2 && str[0] == '\\' && str[1] == 'd') Pair(Char(str.substring(2).toInt()), false)
     else if (str.length > 2 && str[0] == '\\' && str[1] == 'o') Pair(Char(str.substring(2).toInt(8)), false)
