@@ -1056,6 +1056,24 @@ class NFATest {
   }
 
   @Test
+  fun `test collection with character class expression`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "[[:upper:][:lower:]]*",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test collection with character class expression, range and single elements`() {
+    assertCorrectRange(
+      "/unix/file/path/../path/.",
+      "[-./[:alpha:]0-9_~]\\+",
+      0 until 25
+    )
+  }
+
+  @Test
   fun `test positive lookahead 1`() {
     assertCorrectRange(
       "Lorem Ipsum",
