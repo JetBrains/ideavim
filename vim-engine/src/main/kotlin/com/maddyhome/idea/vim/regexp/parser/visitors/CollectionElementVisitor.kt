@@ -79,6 +79,14 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
     return Pair(CollectionElement.CharacterClassExpression{it.isUpperCase()}, false)
   }
 
+  override fun visitXdigitClass(ctx: RegexParser.XdigitClassContext?): Pair<CollectionElement, Boolean> {
+    return Pair(CollectionElement.CharacterClassExpression{
+      it in '0'..'9' ||
+        it in 'a'..'f' ||
+        it in 'A'..'F'
+    }, false)
+  }
+
   private fun cleanLiteralChar(str: String) : Pair<Char, Boolean> {
     return  if (str.length > 2 && str[0] == '\\' && str[1] == 'd') Pair(Char(str.substring(2).toInt()), false)
     else if (str.length > 2 && str[0] == '\\' && str[1] == 'o') Pair(Char(str.substring(2).toInt(8)), false)
