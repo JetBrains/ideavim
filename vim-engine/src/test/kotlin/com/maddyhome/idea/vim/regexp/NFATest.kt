@@ -1248,6 +1248,41 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test AND operator 1`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "Lorem Ipsum\\&.....",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test AND operator 2`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      ".*Ip\\&.*sum",
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `test multiple AND operators`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      ".*Ip\\&.*sum\\&Lorem Ipsum\\&Lorem",
+      0 until 5
+    )
+  }
+
+  @Test
+  fun `test AND operator should fail`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "Ipsum\\&Lorem"
+    )
+  }
+
 
   private fun assertCorrectRange(
     text: CharSequence,
