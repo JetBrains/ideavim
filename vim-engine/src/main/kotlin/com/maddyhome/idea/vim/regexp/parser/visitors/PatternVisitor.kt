@@ -60,9 +60,12 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     val nfaStart = if (ctx.CARET() != null) NFA.fromMatcher(StartOfLineMatcher()) else NFA.fromSingleState()
     val nfaEnd = if (ctx.DOLLAR() != null) NFA.fromMatcher(EndOfLineMatcher()) else NFA.fromSingleState()
 
-    // TODO: handle multiple concats
-
-    return nfaStart.concatenate(visit(ctx.concat)).concatenate(nfaEnd)
+    for (concat in ctx.concats.dropLast(1)) {
+      val subNFA = visit(concat)
+      subNFA.assert(shouldConsume = false, isPositive = true)
+      nfaStart.concatenate(subNFA)
+    }
+    return nfaStart.concatenate(visit(ctx.concats.last())).concatenate(nfaEnd)
   }
 
   override fun visitConcat(ctx: RegexParser.ConcatContext): NFA {
