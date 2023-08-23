@@ -21,10 +21,10 @@ internal class NFAState {
   internal val transitions: ArrayList<NFATransition> = ArrayList()
 
   /**
-   * When a state has assertions, they have to be asserted
+   * When a state has an assertion, it has to be asserted
    * in order to continue with the simulation.
    */
-  internal var assertions: ArrayList<NFAAssertion> = ArrayList()
+  internal var assertion: NFAAssertion? = null
 
   /**
    * Stores the numbers of the capture groups that start
