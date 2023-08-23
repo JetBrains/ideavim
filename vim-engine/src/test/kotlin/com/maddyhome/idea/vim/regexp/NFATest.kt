@@ -1276,6 +1276,25 @@ class NFATest {
   }
 
   @Test
+  fun `test AND operator inside group followed by word`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\v(Lorem&.*) Ipsum",
+      0 until 11
+    )
+  }
+
+  @Test
+  fun `test AND operator inside group correct capture`() {
+    assertCorrectGroupRange(
+      "Lorem Ipsum",
+      "\\v(Lorem&.*) Ipsum",
+      0 until 5,
+      1
+    )
+  }
+
+  @Test
   fun `test AND operator should fail`() {
     assertFailure(
       "Lorem Ipsum",
