@@ -56,15 +56,17 @@ atom : ordinary_atom                                 #OrdinaryAtom
  * "\?" or "\=" for zero or one times, or a range for a more customizable
  * number of times.
  */
-multi : STAR                #ZeroOrMore
-      | PLUS                #OneOrMore
-      | OPTIONAL            #ZeroOrOne
-      | range               #RangeQuantifier
-      | ATOMIC              #Atomic
-      | POSITIVE_LOOKAHEAD  #PositiveLookahead
-      | NEGATIVE_LOOKAHEAD  #NegativeLookahead
-      | POSITIVE_LOOKBEHIND #PositiveLookbehind
-      | NEGATIVE_LOOKBEHIND #NegativeLookbehind
+multi : STAR                        #ZeroOrMore
+      | PLUS                        #OneOrMore
+      | OPTIONAL                    #ZeroOrOne
+      | range                       #RangeQuantifier
+      | ATOMIC                      #Atomic
+      | POSITIVE_LOOKAHEAD          #PositiveLookahead
+      | NEGATIVE_LOOKAHEAD          #NegativeLookahead
+      | POSITIVE_LOOKBEHIND         #PositiveLookbehind
+      | NEGATIVE_LOOKBEHIND         #NegativeLookbehind
+      | POSITIVE_LIMITED_LOOKBEHIND #PositiveLimitedLookbehind
+      | NEGATIVE_LIMITED_LOOKBEHIND #NegativeLimitedLookbehind
       ;
 
 /**
