@@ -62,7 +62,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
     for (concat in ctx.concats.dropLast(1)) {
       val subNFA = visit(concat)
-      subNFA.assert(shouldConsume = false, isPositive = true)
+      subNFA.assert(shouldConsume = false, isPositive = true, isAhead = true)
       nfaStart.concatenate(subNFA)
     }
     return nfaStart.concatenate(visit(ctx.concats.last())).concatenate(nfaEnd)
@@ -79,8 +79,8 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
     return when (multi) {
       is Multi.RangeMulti -> buildQuantifiedNFA(ctx.atom(), multi)
-      is Multi.AtomicMulti -> return visit(ctx.atom()).assert(shouldConsume = true, isPositive = true)
-      is Multi.AssertionMulti -> return visit(ctx.atom()).assert(shouldConsume = false, isPositive = multi.isPositive)
+      is Multi.AtomicMulti -> return visit(ctx.atom()).assert(shouldConsume = true, isPositive = true, isAhead = true)
+      is Multi.AssertionMulti -> return visit(ctx.atom()).assert(shouldConsume = false, isPositive = multi.isPositive, isAhead = multi.isAhead)
     }
   }
 
