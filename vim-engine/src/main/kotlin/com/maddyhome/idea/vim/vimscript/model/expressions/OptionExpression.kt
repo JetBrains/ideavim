@@ -22,7 +22,7 @@ public data class OptionExpression(val scope: Scope?, val optionName: String) : 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", originalString)
     return when (scope) {
-      Scope.GLOBAL_VARIABLE -> injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL)
+      Scope.GLOBAL_VARIABLE -> injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(editor))
       Scope.LOCAL_VARIABLE -> injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(editor))
       null -> injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(editor))
       else -> throw ExException("Invalid option scope")

@@ -22,8 +22,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -116,7 +116,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all editors when global option changes`() {
     val option = addOption(OptionDeclaredScope.GLOBAL)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -140,7 +140,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener not called when local-to-buffer option changes at global scope`() {
     val option = addOption(OptionDeclaredScope.LOCAL_TO_BUFFER)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), VimString("newValue"))
 
     assertNotifiedEditors()
   }
@@ -164,7 +164,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener not called when local-to-window option changes at global scope`() {
     val option = addOption(OptionDeclaredScope.LOCAL_TO_WINDOW)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), VimString("newValue"))
 
     assertNotifiedEditors()
   }
@@ -188,7 +188,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all editors when unset global-local local-to-buffer option changes at global scope`() {
     val option = addOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -226,7 +226,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(otherBufferWindow.vim), VimString("localValue"))
     Listener.notifiedEditors.clear()
 
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow)
   }
@@ -234,7 +234,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all editors when unset global-local local-to-window option changes at global scope`() {
     val option = addOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -272,7 +272,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(otherBufferWindow.vim), VimString("localValue"))
     Listener.notifiedEditors.clear()
 
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), VimString("newValue"))
 
     assertNotifiedEditors(originalEditor, splitWindow)
   }

@@ -16,8 +16,8 @@ import com.maddyhome.idea.vim.api.hasValue
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.mode
@@ -55,8 +55,10 @@ public val Editor.mode: CommandState.Mode
 public val CommandState.Mode.isEndAllowed: Boolean
   get() {
     fun possiblyUsesVirtualSpace(): Boolean {
-      // virtualedit is GLOBAL_OR_LOCAL_TO_WINDOW. We should NOT be using the global value!
-      return injector.optionGroup.hasValue(Options.virtualedit, OptionAccessScope.GLOBAL, OptionConstants.virtualedit_onemore)
+      // virtualedit is GLOBAL_OR_LOCAL_TO_WINDOW. We should be using EFFECTIVE, but we don't have a valid editor (which
+      // is why this property is deprecated). Fetch the global value, passing in the fallback window to avoid asserts
+      // DO NOT COPY THIS APPROACH - ALWAYS USE A REAL WINDOW FOR NON-GLOBAL OPTIONS!
+      return injector.optionGroup.hasValue(Options.virtualedit, OptionAccessScope.GLOBAL(injector.fallbackWindow), OptionConstants.virtualedit_onemore)
     }
 
     return when (this) {

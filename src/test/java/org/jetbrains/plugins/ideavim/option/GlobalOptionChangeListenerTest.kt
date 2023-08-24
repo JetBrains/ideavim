@@ -11,8 +11,8 @@ package org.jetbrains.plugins.ideavim.option
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -48,7 +48,8 @@ class GlobalOptionChangeListenerTest: VimTestCase() {
       injector.optionGroup.addOption(option)
       injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
 
-      injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, VimString("newValue"))
+      // Global value of a global option, we can pass null
+      injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(null), VimString("newValue"))
 
       assertTrue(Listener.called)
     }

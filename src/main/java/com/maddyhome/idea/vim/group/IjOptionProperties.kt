@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
  * options
  */
 @Suppress("SpellCheckingInspection")
-public open class GlobalIjOptions(scope: OptionAccessScope = OptionAccessScope.GLOBAL) : OptionsPropertiesBase(scope) {
+public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope) {
   public var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
   public var ide: String by optionProperty(IjOptions.ide)
   public var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)

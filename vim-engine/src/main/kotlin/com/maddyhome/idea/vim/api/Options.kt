@@ -13,13 +13,13 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
-import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -265,8 +265,8 @@ public object Options {
   public val shellcmdflag: StringOption = addOption(object : StringOption("shellcmdflag", GLOBAL, "shcf", "") {
     override val defaultValue: VimString
       get() {
-        // Default value depends on the "shell" option
-        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL).asString()
+        // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).asString()
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
@@ -280,8 +280,8 @@ public object Options {
   public val shellxquote: StringOption = addOption(object : StringOption("shellxquote", GLOBAL, "sxq", "") {
     override val defaultValue: VimString
       get() {
-        // Default value depends on the "shell" option
-        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL).asString()
+        // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).asString()
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("

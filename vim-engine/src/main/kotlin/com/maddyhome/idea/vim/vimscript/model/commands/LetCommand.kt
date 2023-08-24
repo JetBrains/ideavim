@@ -183,7 +183,7 @@ public data class LetCommand(
             ?: throw exExceptionMessage("E518", variable.originalString)
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
-            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, newValue)
+            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(editor), newValue)
             Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(editor), newValue)
             null -> injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(editor), newValue)
             else -> throw ExException("Invalid option scope")
