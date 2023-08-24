@@ -220,6 +220,7 @@ internal class NFA private constructor(
    * @param targetState       The NFA state that needs to be found for a successful match
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
+   * @param maxIndex          The maximum index of the text that the simulation is allowed to go to
    *
    * @return The result of the simulation. It tells whether it was successful, and at what index it stopped.
    */
@@ -238,12 +239,12 @@ internal class NFA private constructor(
     currentState.assertion?.let {
       val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it)
       if (!assertionResult.simulationResult) return NFASimulationResult(false, currentIndex)
-      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive)
+      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive, maxIndex=maxIndex)
     }
     if (currentState === targetState) return NFASimulationResult(true, currentIndex)
 
     for (transition in currentState.transitions) {
-      val transitionResult = handleTransition(editor, currentIndex, currentState, targetState, isCaseInsensitive, transition, epsilonVisited)
+      val transitionResult = handleTransition(editor, currentIndex, currentState, targetState, isCaseInsensitive, transition, epsilonVisited, maxIndex)
       if (transitionResult.simulationResult) return transitionResult
     }
     return NFASimulationResult(false, currentIndex)
@@ -302,8 +303,8 @@ internal class NFA private constructor(
       // the lookbehind is allowed to look back as far as to the start of the previous line
       if (editor.text()[lookBehindStartIndex] == '\n') seenNewLine = true
 
-      val result = simulate(editor, lookBehindStartIndex, assertion.startState, assertion.endState, isCaseInsensitive, maxIndex = currentIndex - 1)
-      // found a match that ends in the "currentIndex"
+      val result = simulate(editor, lookBehindStartIndex, assertion.startState, assertion.endState, isCaseInsensitive, maxIndex = currentIndex)
+      // found a match that ends before the "currentIndex"
       if (result.simulationResult && result.index == currentIndex) {
         return if (assertion.isPositive) NFASimulationResult(true, currentIndex)
         else NFASimulationResult(false, currentIndex)
@@ -325,6 +326,7 @@ internal class NFA private constructor(
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param transition        The transition that is to be handled
    * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
+   * @param maxIndex          The maximum index of the text that the simulation is allowed to go to
    *
    * @return The result of taking the transition. It tells whether it was successful, and at what index it stopped.
    */
@@ -335,7 +337,8 @@ internal class NFA private constructor(
     targetState: NFAState,
     isCaseInsensitive: Boolean,
     transition: NFATransition,
-    epsilonVisited: Set<NFAState>
+    epsilonVisited: Set<NFAState>,
+    maxIndex: Int
   ): NFASimulationResult {
     val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
     if (transitionMatcherResult !is MatcherResult.Success) return NFASimulationResult(false, currentIndex)
@@ -352,7 +355,7 @@ internal class NFA private constructor(
     } else {
       HashSet()
     }
-    return simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, epsilonVisitedCopy)
+    return simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, epsilonVisitedCopy, maxIndex)
   }
 
   /**
