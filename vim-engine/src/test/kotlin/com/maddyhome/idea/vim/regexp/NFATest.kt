@@ -1326,7 +1326,7 @@ class NFATest {
   fun `test positive lookbehind should fail 1`() {
     assertFailure(
       "Lorem Ipsum",
-      "\\v( Ipsum)@<=Lorem"
+      "\\v(Lorem)@<=Lorem"
     )
   }
 
