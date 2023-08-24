@@ -51,9 +51,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimInt(100)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -67,7 +67,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val setValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), setValue)
 
-    assertEquals(setValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(setValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(setValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(setValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -80,7 +80,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -94,9 +94,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimInt(100)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -110,7 +110,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -124,7 +124,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -138,9 +138,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimInt(100)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -154,7 +154,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -168,7 +168,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -203,9 +203,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimInt(100)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -219,7 +219,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -233,7 +233,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -250,7 +250,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val newValue = VimInt(200)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), newValue)
 
-    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -263,9 +263,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimInt.ZERO
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -279,7 +279,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimInt.ZERO
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -293,7 +293,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimInt.ZERO
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -310,7 +310,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val newValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), newValue)
 
-    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -323,9 +323,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimString("lorem ipsum")
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -339,7 +339,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimString("lorem ipsum")
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -353,7 +353,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimString("lorem ipsum")
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -371,7 +371,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val newValue = VimString("dolor sit amet")
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), newValue)
 
-    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -386,9 +386,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimInt(100)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -402,7 +402,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -416,7 +416,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -433,7 +433,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val newValue = VimInt(200)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), newValue)
 
-    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -448,9 +448,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimInt.ZERO
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -464,7 +464,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimInt.ZERO
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -478,7 +478,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimInt.ZERO
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -495,7 +495,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val newValue = VimInt(100)
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), newValue)
 
-    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -508,9 +508,9 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val globalValue = VimString("lorem ipsum")
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, globalValue)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim), globalValue)
 
-    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(globalValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -524,7 +524,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val localValue = VimString("lorem ipsum")
     injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), localValue)
 
-    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(localValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -538,7 +538,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val effectiveValue = VimString("lorem ipsum")
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
-    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
@@ -556,7 +556,7 @@ class OptionAccessScopeTest: VimTestCase() {
     val newValue = VimString("dolor sit amet")
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), newValue)
 
-    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL))
+    assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
     assertEquals(option.unsetValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }

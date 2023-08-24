@@ -27,7 +27,7 @@ public class PackaddCommand(public val ranges: Ranges, public val argument: Stri
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (argument == "matchit" || (argument.startsWith("!") && argument.drop(1).trim() == "matchit")) {
       val option = injector.optionGroup.getOption("matchit") as ToggleOption
-      injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL)
+      injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL(editor))
     }
     return ExecutionResult.Success
   }

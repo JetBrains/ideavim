@@ -25,9 +25,10 @@ public sealed class OptionAccessScope {
    * "global" value is a per-window copy, and not a truly global value. See [OptionDeclaredScope.LOCAL_TO_WINDOW] for
    * more details.
    *
-   * TODO: Support per-window global options. This requires passing an editor to GLOBAL
+   * @param editor  The editor to access global option values from. This can only be `null` for global and global-local
+   * options.
    */
-  public object GLOBAL : OptionAccessScope()
+  public class GLOBAL(public val editor: VimEditor?) : OptionAccessScope()
 
   /**
    * Explicitly get or set the local value of the option, relative to the given editor

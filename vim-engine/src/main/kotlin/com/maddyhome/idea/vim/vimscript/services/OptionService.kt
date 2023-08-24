@@ -64,8 +64,9 @@ internal class OptionServiceImpl : OptionService {
   }
 
   override fun setOption(scope: OptionService.Scope, optionName: String, token: String) {
+    // Use the fallback window to avoid any possible asserts. Do not do this in non-deprecated code!
     val newScope = when (scope) {
-      is OptionService.Scope.GLOBAL -> OptionAccessScope.GLOBAL
+      is OptionService.Scope.GLOBAL -> OptionAccessScope.GLOBAL(injector.fallbackWindow)
       is OptionService.Scope.LOCAL -> OptionAccessScope.LOCAL(scope.editor)
     }
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)

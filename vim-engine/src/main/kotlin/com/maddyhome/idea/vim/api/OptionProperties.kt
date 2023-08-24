@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
  * buffer (document) or window (editor).
  */
 @Suppress("unused", "SpellCheckingInspection")
-public open class GlobalOptions(scope: OptionAccessScope = OptionAccessScope.GLOBAL): OptionsPropertiesBase(scope) {
+public open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase(scope) {
   public val clipboard: StringListOptionValue by optionProperty(Options.clipboard)
   public var digraph: Boolean by optionProperty(Options.digraph)
   public var gdefault: Boolean by optionProperty(Options.gdefault)

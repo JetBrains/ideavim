@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -46,7 +46,7 @@ public data class SetCommand(val ranges: Ranges, val argument: String) : SetComm
 
 @ExCommand(command = "setg[lobal]")
 public data class SetglobalCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
-  override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.GLOBAL
+  override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.GLOBAL(editor)
 }
 
 @ExCommand(command = "setl[ocal]")
@@ -153,7 +153,7 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessS
           // string global-local option to effective scope, Vim's behaviour matches setting that option at effective
           // scope. That is, it sets the global value (a no-op) and resets the local value.
           val option = getValidOption(token.dropLast(1), token)
-          val globalValue = optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL)
+          val globalValue = optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(editor))
           optionGroup.setOptionValue(option, scope, globalValue)
         }
         else -> {
@@ -258,7 +258,7 @@ private fun showOptions(
       when (scope) {
         is OptionAccessScope.EFFECTIVE -> appendLine("--- Options ---")
         is OptionAccessScope.LOCAL -> appendLine("--- Local option values ---")
-        OptionAccessScope.GLOBAL -> appendLine("--- Global option values ---")
+        is OptionAccessScope.GLOBAL -> appendLine("--- Global option values ---")
       }
     }
 

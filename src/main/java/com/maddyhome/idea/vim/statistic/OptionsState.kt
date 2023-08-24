@@ -19,8 +19,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionConstants
 
 internal class OptionsState : ApplicationUsagesCollector() {
 
@@ -33,10 +33,11 @@ internal class OptionsState : ApplicationUsagesCollector() {
     return setOf(
       // ideajoin and idearefactor area global-local. We're only interested in the global value, not the effective
       // value, which a) might be set at local scope and b) isn't accessible without an editor
+      // We don't need to pass a window, since the global values will only ever be global
       OPTIONS.metric(
-        IDEAJOIN with injector.optionGroup.getOptionValue(IjOptions.ideajoin, OptionAccessScope.GLOBAL).asBoolean(),
+        IDEAJOIN with injector.optionGroup.getOptionValue(IjOptions.ideajoin, OptionAccessScope.GLOBAL(null)).asBoolean(),
         IDEAMARKS with globalIjOptions.ideamarks,
-        IDEAREFACTOR with injector.optionGroup.getOptionValue(IjOptions.idearefactormode, OptionAccessScope.GLOBAL).asString(),
+        IDEAREFACTOR with injector.optionGroup.getOptionValue(IjOptions.idearefactormode, OptionAccessScope.GLOBAL(null)).asString(),
         IDEAPUT with globalOptions.clipboard.contains(OptionConstants.clipboard_ideaput),
         IDEASTATUSICON with globalIjOptions.ideastatusicon,
         IDEAWRITE with globalIjOptions.ideawrite,

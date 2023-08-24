@@ -309,12 +309,12 @@ class PlugMissingKeysTest : VimTestCase() {
 
   private fun assertOptionSet(name: String) {
     val option = injector.optionGroup.getOption(name)!!
-    assertTrue(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL).asBoolean())
+    assertTrue(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)).asBoolean())
   }
 
   private fun assertOptionUnset(name: String) {
     val option = injector.optionGroup.getOption(name)!!
-    assertFalse(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL).asBoolean())
+    assertFalse(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)).asBoolean())
   }
 
   private fun executeLikeVimrc(vararg text: String) {

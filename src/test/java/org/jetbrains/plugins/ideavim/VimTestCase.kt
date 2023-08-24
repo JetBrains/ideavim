@@ -178,7 +178,9 @@ abstract class VimTestCase {
   protected fun enableExtensions(vararg extensionNames: String) {
     for (name in extensionNames) {
       val option = injector.optionGroup.getOption(name) as ToggleOption
-      injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL)
+
+      // Global value of a global option. We can pass null
+      injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL(null))
     }
   }
 

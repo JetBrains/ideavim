@@ -26,15 +26,13 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 }
 
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
-  private val globalOptionsAccessor = GlobalIjOptions()
-
   override fun initialiseOptions() {
     // We MUST call super!
     super.initialiseOptions()
     IjOptions.initialise()
   }
 
-  override fun getGlobalIjOptions() = globalOptionsAccessor
+  override fun getGlobalIjOptions() = GlobalIjOptions(OptionAccessScope.GLOBAL(null))
   override fun getEffectiveIjOptions(editor: VimEditor) = EffectiveIjOptions(OptionAccessScope.EFFECTIVE(editor))
 }
 

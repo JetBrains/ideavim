@@ -23,5 +23,7 @@ public open class ToggleOption(private val option: com.maddyhome.idea.vim.option
    * COMPATIBILITY-LAYER: Method added
    * Please see: https://jb.gg/zo8n0r
    */
-  public fun isSet(): Boolean = injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL).asBoolean()
+  // We have to use the fallback window to avoid any possible asserts. This is not ideal and should not be replicated
+  // in non-deprecated code
+  public fun isSet(): Boolean = injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(injector.fallbackWindow)).asBoolean()
 }

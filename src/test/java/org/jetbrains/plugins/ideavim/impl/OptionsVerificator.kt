@@ -422,7 +422,10 @@ class OptionsSetup(private val options: List<Pair<Option<out VimDataType>, VimDa
         // compiler will treat the value as type `CapturedType(out VimDataType)`, which cannot be passed in (producer vs
         // consumer)
         @Suppress("UNCHECKED_CAST") val option = key as Option<VimDataType>
-        injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL, value)
+
+        // We don't have a window at this point, so we can only pass null. This means we can't set the global value of a
+        // local option (local-to-window's global options are per-window), or we will hit asserts
+        injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(null), value)
       }
     }
   }
