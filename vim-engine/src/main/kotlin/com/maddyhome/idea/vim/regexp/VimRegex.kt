@@ -57,26 +57,7 @@ public class VimRegex(pattern: String) {
    * @return True if any match was found, false otherwise
    */
   public fun containsMatchIn(editor: VimEditor): Boolean {
-    var startIndex = 0
-    while (startIndex <= editor.text().length) {
-      val result = simulateNFA(editor, startIndex)
-      when (result) {
-        /**
-         * A match was found
-         */
-        is VimMatchResult.Success -> return true
-
-        /**
-         * No match found yet, try searching on next index
-         */
-        is VimMatchResult.Failure -> startIndex++
-      }
-    }
-
-    /**
-     * Entire editor was searched, but no match found
-     */
-    return false
+    return simulateNFA(editor) is VimMatchResult.Success
   }
 
   /**
@@ -91,26 +72,7 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     startIndex: Int = 0
   ): VimMatchResult {
-    var index = startIndex
-    while (index <= editor.text().length) {
-      val result = simulateNFA(editor, index)
-      when (result) {
-        /**
-         * A match was found
-         */
-        is VimMatchResult.Success -> return result
-
-        /**
-         * No match found yet, try searching on next index
-         */
-        is VimMatchResult.Failure -> index++
-      }
-    }
-
-    /**
-     * Entire editor was searched, but no match found
-     */
-    return VimMatchResult.Failure
+    return simulateNFA(editor, startIndex)
   }
 
   /**
@@ -142,9 +104,9 @@ public class VimRegex(pattern: String) {
         }
 
         /**
-         * No match found starting on this index, try searching on next index
+         * No more matches found. Return.
          */
-        is VimMatchResult.Failure -> index++
+        is VimMatchResult.Failure -> return foundMatches.asSequence()
       }
     }
     return foundMatches.asSequence()
@@ -163,7 +125,12 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     index: Int
   ): VimMatchResult {
-    return simulateNFA(editor, index)
+    val result = simulateNFA(editor, index)
+    return when (result) {
+      is VimMatchResult.Failure -> result
+      // TODO: this can be made faster
+      is VimMatchResult.Success -> if (result.range.first == index) result else VimMatchResult.Failure
+    }
   }
 
   /**
@@ -180,7 +147,8 @@ public class VimRegex(pattern: String) {
     return when (result) {
       is VimMatchResult.Failure -> result
       is VimMatchResult.Success -> {
-        if (result.range.last + 1 == editor.text().length) result
+        // TODO: this can be made faster
+        if (result.range.last + 1 == editor.text().length && result.range.first == 0) result
         else VimMatchResult.Failure
       }
     }
@@ -199,7 +167,8 @@ public class VimRegex(pattern: String) {
     val result = simulateNFA(editor)
     return when (result) {
       is VimMatchResult.Failure -> false
-      is VimMatchResult.Success -> result.range.last + 1 == editor.text().length
+      // TODO: this can be made faster
+      is VimMatchResult.Success -> result.range.last + 1 == editor.text().length && result.range.first == 0
     }
   }
 
@@ -218,7 +187,8 @@ public class VimRegex(pattern: String) {
     val result = simulateNFA(editor, index)
     return when (result) {
       is VimMatchResult.Failure -> false
-      is VimMatchResult.Success -> true
+      // TODO: this can be made faster
+      is VimMatchResult.Success -> result.range.first == index
     }
   }
 
