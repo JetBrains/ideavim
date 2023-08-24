@@ -67,6 +67,11 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
   override fun visitNegativeLookbehind(ctx: RegexParser.NegativeLookbehindContext?): Multi {
     return Multi.AssertionMulti(isPositive = false, isAhead = false)
   }
+
+  override fun visitPositiveLimitedLookbehind(ctx: RegexParser.PositiveLimitedLookbehindContext): Multi {
+    val limit = (Regex("\\d+").find(ctx.text))?.value?.toInt() ?: run { 0 }
+    return Multi.AssertionMulti(isPositive = true, isAhead = false, limit)
+  }
 }
 
 /**
@@ -111,7 +116,8 @@ internal sealed class Multi {
    */
   internal data class AssertionMulti(
     val isPositive: Boolean,
-    val isAhead: Boolean
+    val isAhead: Boolean,
+    val limit: Int = 0
   ) : Multi()
 }
 

@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.MatcherResult
+import kotlin.math.max
 
 /**
  * Represents a non-deterministic finite automaton.
@@ -154,7 +155,7 @@ internal class NFA private constructor(
    *
    * @return The NFA instance marked for assertion.
    */
-  internal fun assert(shouldConsume: Boolean, isPositive: Boolean, isAhead: Boolean) : NFA {
+  internal fun assert(shouldConsume: Boolean, isPositive: Boolean, isAhead: Boolean, limit: Int = 0) : NFA {
     val newStart = NFAState()
     val newEnd = NFAState()
 
@@ -164,7 +165,8 @@ internal class NFA private constructor(
       isAhead,
       startState,
       acceptState,
-      newEnd
+      newEnd,
+      limit
     )
 
     acceptState = newEnd
@@ -294,8 +296,9 @@ internal class NFA private constructor(
     assertion: NFAAssertion
   ): NFASimulationResult {
     var lookBehindStartIndex = currentIndex - 1
+    val minIndex = if (assertion.limit == 0) 0 else max(0, currentIndex - assertion.limit)
     var seenNewLine = false
-    while (lookBehindStartIndex >= 0 && !(seenNewLine && editor.text()[lookBehindStartIndex] != '\n')) {
+    while (lookBehindStartIndex >= minIndex && !(seenNewLine && editor.text()[lookBehindStartIndex] != '\n')) {
       // the lookbehind is allowed to look back as far as to the start of the previous line
       if (editor.text()[lookBehindStartIndex] == '\n') seenNewLine = true
 
