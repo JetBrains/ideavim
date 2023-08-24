@@ -48,9 +48,9 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     groupNumbers.clear()
     val groupNumber = groupCount
     groupCount++
-    val nfa = visit(ctx.sub_pattern())
-    nfa.capture(groupNumber, false)
-    return nfa
+    val subnfa = visit(ctx.sub_pattern())
+    subnfa.capture(groupNumber, false)
+    return NFA.fromMatcher(DotMatcher(true)).closure(false).concatenate(subnfa)
   }
   override fun visitSub_pattern(ctx: RegexParser.Sub_patternContext): NFA {
     return ctx.branches.map { visitBranch(it) }.union()

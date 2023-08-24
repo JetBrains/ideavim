@@ -447,7 +447,7 @@ class NFATest {
   @Test
   fun `test name surname invalid`() {
     assertFailure(
-      "EmaNuel Gestosa",
+      "EmaNuel gestosa",
       "\\v\\u\\l+\\s+\\u\\l+"
     )
   }
@@ -664,7 +664,7 @@ class NFATest {
   @Test
   fun `test character classes never ignore case`() {
     assertFailure(
-      "IdeaVim",
+      "IDEAVIM",
       "\\l\\+",
       ignoreCase = true
     )
@@ -683,7 +683,6 @@ class NFATest {
     assertFailure(
       "IdeaVim",
       "\\%^Vim",
-      4
     )
   }
 
@@ -693,7 +692,6 @@ class NFATest {
       "IdeaVim",
       "Vim\\%$",
       4 until 7,
-      4
     )
   }
 
@@ -742,7 +740,7 @@ class NFATest {
         "Cras id tellus in ex imperdiet egestas.",
       "^Lorem",
       13 until 18,
-      13
+      1
     )
   }
 
@@ -756,7 +754,6 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "^Ipsum",
-      6
     )
   }
 
@@ -771,7 +768,6 @@ class NFATest {
         "Cras id tellus in ex imperdiet egestas.",
       "Ipsum$",
       6 until 11,
-      6
     )
   }
 
@@ -849,7 +845,6 @@ class NFATest {
       "the symbol for the dollar is $.",
       "dollar is \\$",
       19 until 30,
-      19
     )
   }
 
@@ -933,7 +928,6 @@ class NFATest {
       "Lorem Ipsum",
       "\\<Ipsum",
       6 until 11,
-      6
     )
   }
 
@@ -951,7 +945,6 @@ class NFATest {
       "Lorem Ipsum",
       "Ipsum\\>",
       6 until 11,
-      6
     )
   }
 
