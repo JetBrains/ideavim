@@ -1381,6 +1381,32 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test limited lookbehind doesn't go out of bounds`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\v(Lorem )@10000<=Ipsum",
+      6 until 11
+    )
+  }
+
+  @Test
+  fun `test limited lookbehind succeeds`() {
+    assertCorrectRange(
+      "abbcabc",
+      "\\v(a.*)@2<=c",
+      6 until 7
+    )
+  }
+
+  @Test
+  fun `test limited lookbehind fails because of small limit`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "\\v(Lorem )@1<=Ipsum"
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
