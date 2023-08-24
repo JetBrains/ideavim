@@ -154,13 +154,14 @@ internal class NFA private constructor(
    *
    * @return The NFA instance marked for assertion.
    */
-  internal fun assert(shouldConsume: Boolean, isPositive: Boolean = false) : NFA {
+  internal fun assert(shouldConsume: Boolean, isPositive: Boolean, isAhead: Boolean) : NFA {
     val newStart = NFAState()
     val newEnd = NFAState()
 
     newStart.assertion = NFAAssertion(
       shouldConsume,
       isPositive,
+      isAhead,
       startState,
       acceptState,
       newEnd
@@ -226,8 +227,11 @@ internal class NFA private constructor(
     currentState: NFAState,
     targetState: NFAState,
     isCaseInsensitive: Boolean,
-    epsilonVisited: Set<NFAState> = HashSet()
+    epsilonVisited: Set<NFAState> = HashSet(),
+    maxIndex: Int = editor.text().length
   ): NFASimulationResult {
+    if (currentIndex > maxIndex) return NFASimulationResult(false, currentIndex)
+
     updateCaptureGroups(editor, currentIndex, currentState)
     currentState.assertion?.let {
       val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it)
@@ -260,6 +264,16 @@ internal class NFA private constructor(
     isCaseInsensitive: Boolean,
     assertion: NFAAssertion
   ): NFASimulationResult {
+    return if (assertion.isAhead) handleAheadAssertion(editor, currentIndex, isCaseInsensitive, assertion)
+    else handleBehindAssertion(editor, currentIndex, isCaseInsensitive, assertion)
+  }
+
+  private fun handleAheadAssertion(
+    editor: VimEditor,
+    currentIndex: Int,
+    isCaseInsensitive: Boolean,
+    assertion: NFAAssertion
+  ): NFASimulationResult {
     val assertionResult = simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive)
     if (assertionResult.simulationResult != assertion.isPositive) {
       return NFASimulationResult(false, currentIndex)
@@ -271,6 +285,29 @@ internal class NFA private constructor(
      */
     val newIndex = if (assertion.shouldConsume) assertionResult.index else currentIndex
     return NFASimulationResult(true, newIndex)
+  }
+
+  private fun handleBehindAssertion(
+    editor: VimEditor,
+    currentIndex: Int,
+    isCaseInsensitive: Boolean,
+    assertion: NFAAssertion
+  ): NFASimulationResult {
+    var lookBehindStartIndex = currentIndex - 1
+    var seenNewLine = false
+    while (lookBehindStartIndex >= 0 && !(seenNewLine && editor.text()[lookBehindStartIndex] != '\n')) {
+      // the lookbehind is allowed to look back as far as to the start of the previous line
+      if (editor.text()[lookBehindStartIndex] == '\n') seenNewLine = true
+
+      val result = simulate(editor, lookBehindStartIndex, assertion.startState, assertion.endState, isCaseInsensitive, maxIndex = currentIndex - 1)
+      // found a match that ends in the "currentIndex"
+      if (result.simulationResult && result.index == currentIndex) {
+        return if (assertion.isPositive) NFASimulationResult(true, currentIndex)
+        else NFASimulationResult(false, currentIndex)
+      }
+      lookBehindStartIndex--
+    }
+    return NFASimulationResult(false, currentIndex)
   }
 
   /**

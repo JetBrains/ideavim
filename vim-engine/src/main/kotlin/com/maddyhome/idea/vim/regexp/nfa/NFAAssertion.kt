@@ -27,6 +27,7 @@ package com.maddyhome.idea.vim.regexp.nfa
 internal data class NFAAssertion(
   val shouldConsume: Boolean,
   val isPositive: Boolean,
+  val isAhead: Boolean,
   val startState: NFAState,
   val endState: NFAState,
   val jumpTo: NFAState
