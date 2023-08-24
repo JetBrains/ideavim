@@ -1295,6 +1295,48 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test positive lookbehind 1`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\v(Lorem )@<=Ipsum",
+      6 until 11
+    )
+  }
+
+  @Test
+  fun `test positive lookbehind 2`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\v(\\w{3})@<=\\w",
+      3 until 4
+    )
+  }
+
+  @Test
+  fun `test positive lookbehind 3`() {
+    assertCorrectRange(
+      "Lorem     Ipsum",
+      "\\v(\\s+)@<=\\w+",
+      10 until 15
+    )
+  }
+
+  @Test
+  fun `test positive lookbehind should fail 1`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "\\v( Ipsum)@<=Lorem"
+    )
+  }
+
+  @Test
+  fun `test positive lookbehind should fail 2`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "\\v(Lorem )@<=(Lorem )@<=(Ipsum )@<=(Lorem )@<=Ipsum"
+    )
+  }
 
   private fun assertCorrectRange(
     text: CharSequence,
