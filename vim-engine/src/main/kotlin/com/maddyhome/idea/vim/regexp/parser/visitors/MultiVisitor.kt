@@ -63,6 +63,10 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
   override fun visitPositiveLookbehind(ctx: RegexParser.PositiveLookbehindContext?): Multi {
     return Multi.AssertionMulti(isPositive = true, isAhead = false)
   }
+
+  override fun visitNegativeLookbehind(ctx: RegexParser.NegativeLookbehindContext?): Multi {
+    return Multi.AssertionMulti(isPositive = false, isAhead = false)
+  }
 }
 
 /**

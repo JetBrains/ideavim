@@ -307,7 +307,8 @@ internal class NFA private constructor(
       }
       lookBehindStartIndex--
     }
-    return NFASimulationResult(false, currentIndex)
+    return if (assertion.isPositive) NFASimulationResult(false, currentIndex)
+    else NFASimulationResult(true, currentIndex)
   }
 
   /**
