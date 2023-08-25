@@ -91,7 +91,7 @@ object ReleaseEap : IdeaVimBuildType({
     // These requirements define Linux-XLarge configuration.
     // Unfortunately, requirement by name (teamcity.agent.name) doesn't work
     //   IDK the reason for it, but on our agents this property is empty
-    equals("teamcity.agent.hardware.cpuCount", "16")
-    equals("teamcity.agent.os.family", "Linux")
+//    equals("teamcity.agent.hardware.cpuCount", "16")
+//    equals("teamcity.agent.os.family", "Linux")
   }
 })
