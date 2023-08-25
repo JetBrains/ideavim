@@ -1391,11 +1391,20 @@ class NFATest {
   }
 
   @Test
-  fun `test limited lookbehind succeeds`() {
+  fun `test limited positive lookbehind succeeds`() {
     assertCorrectRange(
       "abbcabc",
       "\\v(a.*)@2<=c",
       6 until 7
+    )
+  }
+
+  @Test
+  fun `test limited negative lookbehind succeeds`() {
+    assertCorrectRange(
+      "abbcabc",
+      "\\v(a.*)@2<!c",
+      3 until 4
     )
   }
 
