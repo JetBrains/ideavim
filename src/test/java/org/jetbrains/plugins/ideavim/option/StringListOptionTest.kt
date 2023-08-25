@@ -9,10 +9,8 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
-import com.maddyhome.idea.vim.options.OptionAccessScope
-import com.maddyhome.idea.vim.options.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -22,43 +20,105 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 
+@TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
 class StringListOptionTest : VimTestCase() {
-  private val optionName = "myOpt"
-  private val option = StringListOption(optionName, OptionDeclaredScope.GLOBAL, optionName, "", null)
-
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    injector.optionGroup.addOption(option)
     configureByText("\n")
   }
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
     super.tearDown(super.testInfo)
-    injector.optionGroup.removeOption(optionName)
   }
 
-  private fun getOptionValue() =
-    injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).value
+  private fun getOptionValue() = injector.options(fixture.editor.vim).virtualedit.value
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
-  fun `test append existing value`() {
-    enterCommand("set $optionName+=123")
-    enterCommand("set $optionName+=456")
-    enterCommand("set $optionName+=123")
-
-    assertEquals("123,456", getOptionValue())
+  fun `test set value`() {
+    enterCommand("set virtualedit=all")
+    assertEquals("all", getOptionValue())
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
-  fun `test prepend existing value`() {
-    enterCommand("set $optionName+=456")
-    enterCommand("set $optionName+=123")
-    enterCommand("set $optionName^=123")
+  fun `test set repeated value`() {
+    enterCommand("set virtualedit=all,all,all")
+    assertEquals("all,all,all", getOptionValue())
+  }
 
-    assertEquals("456,123", getOptionValue())
+  @Test
+  fun `test append value`() {
+    enterCommand("set virtualedit=all")
+    enterCommand("set virtualedit+=onemore")
+    assertEquals("all,onemore", getOptionValue())
+  }
+
+  @Test
+  fun `test append existing value does not modify`() {
+    enterCommand("set virtualedit=all")
+    enterCommand("set virtualedit+=all")
+
+    assertEquals("all", getOptionValue())
+  }
+
+  @Test
+  fun `test append matching sublist does not modify`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit+=all,onemore")
+
+    assertEquals("all,onemore,block", getOptionValue())
+  }
+
+  @Test
+  fun `test append matching sublist with different order will modify even if causes repeated items`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit+=onemore,all")
+
+    assertEquals("all,onemore,block,onemore,all", getOptionValue())
+  }
+
+  @Test
+  fun `test prepend value`() {
+    enterCommand("set virtualedit=all")
+    enterCommand("set virtualedit^=onemore")
+    assertEquals("onemore,all", getOptionValue())
+  }
+
+  @Test
+  fun `test prepend matching sublist does not modify`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit^=onemore,block")
+
+    assertEquals("all,onemore,block", getOptionValue())
+  }
+
+  @Test
+  fun `test prepend matching sublist with different order will modify even if causes repeated items`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit^=onemore,all")
+
+    assertEquals("onemore,all,all,onemore,block", getOptionValue())
+  }
+
+  @Test
+  fun `test remove value`() {
+    enterCommand("set virtualedit=all,onemore")
+    enterCommand("set virtualedit-=onemore")
+    assertEquals("all", getOptionValue())
+  }
+
+  @Test
+  fun `test remove matching sublist`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit-=onemore,block")
+    assertEquals("all", getOptionValue())
+  }
+
+  @Test
+  fun `test remove matching sublist with different order does not modify`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit-=block,onemore")
+    assertEquals("all,onemore,block", getOptionValue())
   }
 }
