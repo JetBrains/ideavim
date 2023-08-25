@@ -114,10 +114,8 @@ public open class StringOption(
   public fun prependValue(currentValue: VimString, value: VimString): VimString =
     VimString(value.value + currentValue.value)
 
-  public fun removeValue(currentValue: VimString, value: VimString): VimString {
-    // TODO: Not sure this is correct. Should replace just the first occurrence?
-    return VimString(currentValue.value.replace(value.value, ""))
-  }
+  public fun removeValue(currentValue: VimString, value: VimString): VimString =
+    VimString(currentValue.value.replaceFirst(value.value, ""))
 }
 
 /**
@@ -127,6 +125,10 @@ public open class StringOption(
  * [StringListOption] or a combined string option. While a string list option "is-a" string option, its operations
  * (append, prepend and remove) are implemented very differently to the string option. Unless there is a good reason to
  * do so, we do not expect this to change again.
+ *
+ * Some Vim options are a sequence of character flags, such as `'guioptions'`. These are not comma separated, and are
+ * not supported by [StringListOption]. Verify the behaviour of modifying sublists if/when flags are required.
+ * See `:help set-args` and `:help add-option-flags`.
  */
 public open class StringListOption(
   name: String,
@@ -162,14 +164,20 @@ public open class StringListOption(
     VimString(value).also { checkIfValueValid(it, token) }
 
   public fun appendValue(currentValue: VimString, value: VimString): VimString {
-    // TODO: What happens if we're trying to add a sublist that already exists?
-    if (split(currentValue.value).contains(value.value)) return currentValue
+    val valuesToAppend = split(value.value)
+    val elements = split(currentValue.value).toMutableList()
+    if (Collections.indexOfSubList(elements, valuesToAppend) != -1) {
+      return currentValue
+    }
     return VimString(joinValues(currentValue.value, value.value))
   }
 
   public fun prependValue(currentValue: VimString, value: VimString): VimString {
-    // TODO: What happens if we're trying to add a sublist that already exists?
-    if (split(currentValue.value).contains(value.value)) return currentValue
+    val valuesToPrepend = split(value.value)
+    val elements = split(currentValue.value).toMutableList()
+    if (Collections.indexOfSubList(elements, valuesToPrepend) != -1) {
+      return currentValue
+    }
     return VimString(joinValues(value.value, currentValue.value))
   }
 
@@ -177,10 +185,6 @@ public open class StringListOption(
     val valuesToRemove = split(value.value)
     val elements = split(currentValue.value).toMutableList()
     if (Collections.indexOfSubList(elements, valuesToRemove) != -1) {
-      // see `:help set`
-      // When the option is a list of flags, {value} must be
-      // exactly as they appear in the option.  Remove flags
-      // one by one to avoid problems.
       elements.removeAll(valuesToRemove)
     }
     return VimString(elements.joinToString(separator = ","))
