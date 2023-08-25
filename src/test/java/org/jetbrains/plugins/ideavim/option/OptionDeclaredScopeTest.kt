@@ -110,7 +110,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     injector.optionGroup.addOption(option)
 
     assertEquals(defaultValue, getLocalValue(option, originalEditor))
-    assertEquals(defaultValue, getGlobalValue(option))
+    assertEquals(defaultValue, getGlobalValue(option, originalEditor))
   }
 
   @Test
@@ -119,7 +119,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     injector.optionGroup.addOption(option)
 
     assertEquals(defaultValue, getLocalValue(option, originalEditor))
-    assertEquals(defaultValue, getGlobalValue(option))
+    assertEquals(defaultValue, getGlobalValue(option, originalEditor))
   }
 
   @Test
@@ -128,7 +128,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     injector.optionGroup.addOption(option)
 
     assertEquals(defaultValue, getLocalValue(option, originalEditor))
-    assertEquals(defaultValue, getGlobalValue(option))
+    assertEquals(defaultValue, getGlobalValue(option, originalEditor))
   }
 
 
@@ -162,6 +162,17 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
       assertEffectiveValueUnmodified(otherBufferWindow)
       assertEffectiveValueUnmodified(splitWindow)
+    }
+  }
+
+  @Test
+  fun `test local-to-window option at global scope does not affect other buffer window or split window`() {
+    withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
+      setGlobalValue(originalEditor)
+
+      assertGlobalValueChanged(originalEditor)
+      assertGlobalValueUnmodified(otherBufferWindow)
+      assertGlobalValueUnmodified(splitWindow)
     }
   }
 
@@ -212,12 +223,12 @@ class OptionDeclaredScopeTest : VimTestCase() {
   @Test
   fun `test initialise new buffer window with global copy of local-to-buffer option`() {
     withOption(OptionDeclaredScope.LOCAL_TO_BUFFER) {
-      setGlobalValue()
+      setGlobalValue(originalEditor)
 
       val newBuffer = openNewBufferWindow("ccc.txt")
 
       assertEffectiveValueChanged(newBuffer)
-      assertGlobalValueChanged()
+      assertGlobalValueChanged(newBuffer)
     }
   }
 
@@ -230,23 +241,23 @@ class OptionDeclaredScopeTest : VimTestCase() {
       val newBuffer = openNewBufferWindow("ccc.txt")
 
       assertEffectiveValueUnmodified(newBuffer)
-      assertGlobalValueUnmodified()
+      assertGlobalValueUnmodified(newBuffer)
     }
   }
 
   @Test
   fun `test initialise new split window by duplicating per-window global and local values of local-to-window option`() {
     withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
-      // TODO: This should be a per-window "global" value, but we currently have no way to set that value
       // Set the (per-window) "global" value, make sure the new split window gets this value
-      setGlobalValue()
+      setGlobalValue(originalEditor)
 
       // Note that opening a window split should get a copy of the local values, too
       val newWindow = openSplitWindow(originalEditor)
 
       // When we split a window, we copy both per-window global + local values, rather than initialising from global
       assertEffectiveValueUnmodified(newWindow)
-      assertGlobalValueChanged()
+      assertGlobalValueChanged(newWindow)
+      assertGlobalValueChanged(originalEditor)
     }
   }
 
@@ -260,25 +271,25 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
       // When we split a window, we copy both per-window global + local values, rather than initialising from global
       assertEffectiveValueChanged(newWindow)
-      assertGlobalValueUnmodified()
+      assertGlobalValueUnmodified(newWindow)
+      assertGlobalValueUnmodified(originalEditor)
     }
   }
 
   @Test
   fun `test initialise new split window by duplicating per-window global and local values of global-local local-to-window option`() {
     withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW) {
-      // TODO: This should be a per-window "global" value, but we currently have no way to set that value
-      // Set the (per-window) "global" value, make sure the new split window gets this value
-      setGlobalValue()
+      // Set the global value, make sure the new split window gets this value
+      setGlobalValue(originalEditor)
 
       // Note that opening a window split should get a copy of the local values, too
       val newWindow = openSplitWindow(originalEditor)
 
-      // When we split a window, we copy both per-window global + local values, rather than initialising from global
+      // When we split a window, we copy both global + local values, rather than initialising from global
       // The local value is unset, so the effective value is the same as the changed value, which is modified
       assertEffectiveValueChanged(newWindow)
       assertLocalValueUnset(newWindow)
-      assertGlobalValueChanged()
+      assertGlobalValueChanged(newWindow)
     }
   }
 
@@ -290,24 +301,23 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
       val newWindow = openSplitWindow(originalEditor)
 
-      // When we split a window, we copy both per-window global + local values, rather than initialising from global
+      // When we split a window, we copy both global + local values, rather than initialising from global
       assertEffectiveValueChanged(newWindow)
-      assertGlobalValueUnmodified()
+      assertGlobalValueUnmodified(newWindow)
     }
   }
 
   @Test
   fun `test initialise new buffer window with per-window global copy of local-to-window option`() {
     withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
-      // TODO: This should be a per-window "global" value, but we currently have no way to set that value
       // Set the (per-window) "global" value, make sure the new window gets this value
-      setGlobalValue()
+      setGlobalValue(originalEditor)
 
       // This is the same as `:new {file}`
       val newWindow = openNewBufferWindow("ccc.txt")
 
       assertEffectiveValueChanged(newWindow)
-      assertGlobalValueChanged()  // Assert per-window global?!
+      assertGlobalValueChanged(newWindow)
     }
   }
 
@@ -347,7 +357,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
       val newBufferWindow = fixture.editor
 
       assertEffectiveValueChanged(newBufferWindow)
-      assertGlobalValueUnmodified()
+      assertGlobalValueUnmodified(newBufferWindow)
     }
   }
 
@@ -363,7 +373,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
       val newBufferWindow = fixture.editor
 
       assertEffectiveValueChanged(newBufferWindow)
-      assertGlobalValueUnmodified()
+      assertGlobalValueUnmodified(newBufferWindow)
     }
 
     TODO("Not implemented. This is Vim behaviour, but this data is not saved by IdeaVim")
@@ -376,8 +386,8 @@ class OptionDeclaredScopeTest : VimTestCase() {
     }
   }
 
-  private fun Option<VimString>.setGlobalValue() =
-    injector.optionGroup.setOptionValue(this, OptionAccessScope.GLOBAL(fixture.editor.vim), setValue)
+  private fun Option<VimString>.setGlobalValue(editor: Editor) =
+    injector.optionGroup.setOptionValue(this, OptionAccessScope.GLOBAL(editor.vim), setValue)
 
   private fun Option<VimString>.setLocalValue(editor: Editor) =
     injector.optionGroup.setOptionValue(this, OptionAccessScope.LOCAL(editor.vim), setValue)
@@ -386,8 +396,8 @@ class OptionDeclaredScopeTest : VimTestCase() {
     injector.optionGroup.setOptionValue(this, OptionAccessScope.EFFECTIVE(editor.vim), setValue)
   }
 
-  private fun getGlobalValue(option: Option<VimString>) =
-    injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim))
+  private fun getGlobalValue(option: Option<VimString>, editor: Editor) =
+    injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(editor.vim))
 
   private fun getLocalValue(option: Option<VimString>, editor: Editor) =
     injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(editor.vim))
@@ -404,8 +414,11 @@ class OptionDeclaredScopeTest : VimTestCase() {
   private fun Option<VimString>.assertEffectiveValueChanged(editor: Editor) =
     assertValueChanged(getEffectiveValue(this, editor))
 
-  private fun Option<VimString>.assertGlobalValueUnmodified() = assertValueUnmodified(getGlobalValue(this))
-  private fun Option<VimString>.assertGlobalValueChanged() = assertValueChanged(getGlobalValue(this))
+  private fun Option<VimString>.assertGlobalValueUnmodified(editor: Editor) =
+    assertValueUnmodified(getGlobalValue(this, editor))
+
+  private fun Option<VimString>.assertGlobalValueChanged(editor: Editor) =
+    assertValueChanged(getGlobalValue(this, editor))
 
   private fun Option<VimString>.assertLocalValueUnset(editor: Editor) =
     assertEquals(this.unsetValue, getLocalValue(this, editor))
