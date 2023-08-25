@@ -271,6 +271,17 @@ internal class NFA private constructor(
     else handleBehindAssertion(editor, currentIndex, isCaseInsensitive, assertion)
   }
 
+  /**
+   * Handles a state of the NFA that has an assertion ahead. Determines if the assertion
+   * was successful or not, and where the normal simulation should resume.
+   *
+   * @param editor            The editor that is used for the simulation
+   * @param currentIndex      The current index of the text in the simulation
+   * @param isCaseInsensitive Whether the simulation should ignore case
+   * @param assertion         The assertion that is to be handled
+   *
+   * @return The result of the assertion. It tells whether it was successful, and at what index it stopped.
+   */
   private fun handleAheadAssertion(
     editor: VimEditor,
     currentIndex: Int,
@@ -290,6 +301,17 @@ internal class NFA private constructor(
     return NFASimulationResult(true, newIndex)
   }
 
+  /**
+   * Handles a state of the NFA that has an assertion behind. Determines if the assertion
+   * was successful or not, and where the normal simulation should resume.
+   *
+   * @param editor            The editor that is used for the simulation
+   * @param currentIndex      The current index of the text in the simulation
+   * @param isCaseInsensitive Whether the simulation should ignore case
+   * @param assertion         The assertion that is to be handled
+   *
+   * @return The result of the assertion. It tells whether it was successful, and at what index it stopped.
+   */
   private fun handleBehindAssertion(
     editor: VimEditor,
     currentIndex: Int,
