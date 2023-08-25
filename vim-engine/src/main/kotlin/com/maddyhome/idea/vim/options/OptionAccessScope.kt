@@ -50,8 +50,6 @@ public sealed class OptionAccessScope {
    *
    * Note that for local-to-window options, the "global" option is a per-window copy of the option. See
    * [OptionDeclaredScope.LOCAL_TO_WINDOW] for more details.
-   *
-   * TODO: Support per-window "global" options
    */
   public class EFFECTIVE(public val editor: VimEditor) : OptionAccessScope()
 }

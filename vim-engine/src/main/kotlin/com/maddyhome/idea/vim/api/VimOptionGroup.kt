@@ -33,14 +33,13 @@ public interface VimOptionGroup {
    * Depending on the initialisation scenario, the local-to-buffer, local-to-window and/or global-local options are
    * initialised. The scenario dictates where the local options get their values from. Typically, local-to-buffer
    * options are copied from the global values. Local-to-window options are either initialised from the per-window
-   * "global" value or copied directly from the opening window. Global-local options are usually not initialised.
-   *
-   * TODO: IdeaVim currently does not support per-window "global" values
+   * "global" value or copied directly from the opening window. Global-local options are usually initialised to the
+   * option's "unset" marker value.
    *
    * @param editor  The editor to initialise
    * @param sourceEditor  The editor which is opening the new editor. This source editor is used to get the per-window
-   *                      "global" values to initialise the new editor. If null, there is no source editor (e.g. all
-   *                      editor windows are closed), and the options should be initialised to default values.
+   * "global" values to initialise the new editor. It can only be null when [scenario] is
+   * [LocalOptionInitialisationScenario.DEFAULTS].
    * @param scenario  The scenario for initialising the local options
    */
   public fun initialiseLocalOptions(editor: VimEditor, sourceEditor: VimEditor?, scenario: LocalOptionInitialisationScenario)
@@ -295,12 +294,14 @@ public enum class LocalOptionInitialisationScenario {
   /**
    * The user has opened a new buffer in the current window
    *
-   * This scenario is not currently supported by IdeaVim.
-   *
    * This is the `:edit {file}` command, where the current window is reused to edit a new or previously edited buffer.
    * Vim will reset any explicitly set local-to-window values. The local-to-buffer options are initialised for a new
    * buffer, by copying from the global values. Local-to-window values are reset to the existing per-window "global"
    * values.
+   *
+   * Note that IdeaVim currently implements `:edit {file}` to behave like `:new {file}`, and therefore uses the [NEW]
+   * scenario when opening a file with `:edit`. However, it does use the [EDIT] scenario with preview tabs, or when an
+   * unmodified tab is reused.
    */
   EDIT,
 
@@ -322,9 +323,9 @@ public enum class LocalOptionInitialisationScenario {
    * the text of the buffer. The `ex` command line and search text entry are implemented as part of this window, and
    * therefore automatically uses the window's local options (e.g. search requires `'iskeyword'`)
    *
-   * For IdeaVim, the `ex`/search text entry is a separate UI component to the main editor, implements [VimEditor] and
-   * so needs its own copy of the local options. This scenario makes a full copy of the local to buffer and local to
-   * window options, so has the same effect as [FALLBACK].
+   * For IdeaVim, the `ex`/search text entry is a separate UI component to the main editor and implements [VimEditor].
+   * As such, it needs its own copy of the local options. This scenario makes a full copy of the local to buffer and
+   * local to window options, so has the same effect as [FALLBACK].
    *
    * We need to migrate more of the command line text handling to work with a [VimEditor]-based implementation (it's
    * currently very heavily based on Swing). As part of the implementation detail, we could look at sharing options
