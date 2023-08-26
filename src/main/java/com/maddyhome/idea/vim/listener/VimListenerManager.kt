@@ -63,6 +63,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollGroup
 import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
@@ -268,6 +269,7 @@ internal object VimListenerManager {
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
       SearchGroup.fileEditorManagerSelectionChangedCallback(event)
+      OptionGroup.fileEditorManagerSelectionChangedCallback(event)
     }
   }
 
