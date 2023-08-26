@@ -126,7 +126,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     }
   }
 
-  private fun copyPerWindowGlobalValues(targetEditor: VimEditor, sourceEditor: VimEditor) {
+  protected fun copyPerWindowGlobalValues(targetEditor: VimEditor, sourceEditor: VimEditor) {
     getAllOptions().forEach { option ->
       if (option.declaredScope == LOCAL_TO_WINDOW) {
         val localValue = getGlobalOptionValue(option, sourceEditor)
@@ -232,6 +232,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun resetAllOptionsForTesting() {
     // During testing, this collection is usually empty. Just in case, make sure all editors have default options
     injector.editorGroup.localEditors().forEach { resetAllOptions(it) }
+    resetAllOptions(injector.fallbackWindow)
 
     // Make sure we reset global options even if we don't have any editors. This fires listeners and clears caches
     Options.getAllOptions().filter { it.declaredScope == GLOBAL }.forEach { resetDefaultValue(it, OptionAccessScope.GLOBAL(null)) }
