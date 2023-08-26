@@ -122,6 +122,7 @@ private fun getOpeningEditor(newEditor: Editor) = newEditor.project?.let { proje
 internal object VimListenerManager {
 
   private val logger = Logger.getInstance(VimListenerManager::class.java)
+  private var firstEditorInitialised = false
 
   fun turnOn() {
     GlobalListeners.enable()
@@ -171,13 +172,22 @@ internal object VimListenerManager {
 
   object EditorListeners {
     fun addAll() {
+      val initialisedEditors = mutableSetOf<Editor>()
+
       // We are initialising all currently open editors. We treat the currently selected editor (per-project) as the
       // opening editor for all other editors. Make sure it's initialised first, and with FALLBACK to get the settings
       // from `~/.ideavimrc`. All other editors will be initialised as NEW from the project's selected editor
       ProjectManager.getInstanceIfCreated()?.let { projectManager ->
-        projectManager.openProjects.forEach {  project ->
+        projectManager.openProjects.forEach { project ->
           FileEditorManager.getInstance(project).selectedTextEditor?.let { editor ->
-            add(editor, injector.fallbackWindow, LocalOptionInitialisationScenario.FALLBACK)
+            val scenario = if (!firstEditorInitialised) {
+              LocalOptionInitialisationScenario.FALLBACK
+            } else {
+              LocalOptionInitialisationScenario.EDIT
+            }
+            add(editor, injector.fallbackWindow, scenario)
+            initialisedEditors.add(editor)
+            firstEditorInitialised = true
           }
         }
       }
@@ -185,7 +195,9 @@ internal object VimListenerManager {
       // We could have a split window in this list, but since they're all being initialised from the same opening editor
       // there's no need to use the SPLIT scenario
       localEditors().forEach { editor ->
-        getOpeningEditor(editor)?.let { add(editor, it.vim, LocalOptionInitialisationScenario.NEW) }
+        if (!initialisedEditors.contains(editor)) {
+          add(editor, getOpeningEditor(editor)?.vim ?: injector.fallbackWindow, LocalOptionInitialisationScenario.NEW)
+        }
       }
     }
 
@@ -281,9 +293,17 @@ internal object VimListenerManager {
       val openingEditor = getOpeningEditor(event.editor)
 
       if (event.editor.virtualFile == null || event.editor.editorKind != EditorKind.MAIN_EDITOR || openingEditor == null) {
-        val scenario =
-          if (openingEditor == null) LocalOptionInitialisationScenario.FALLBACK else LocalOptionInitialisationScenario.NEW
-        add(event.editor, openingEditor, scenario)
+        // If we don't have an opening editor, use the fallback window. If it's the first time, use the FALLBACK
+        // scenario and make a full copy to get everything set in `~/.ideavimrc`. If it's not, then use EDIT, as if we
+        // still had a current window and we are just replacing the buffer. If we do have an opening window, it's NEW.
+        // Preview and reused tabs are handled below
+        val scenario = when {
+          openingEditor == null && !firstEditorInitialised -> LocalOptionInitialisationScenario.FALLBACK
+          openingEditor == null -> LocalOptionInitialisationScenario.EDIT
+          else -> LocalOptionInitialisationScenario.NEW
+        }
+        add(event.editor, openingEditor?.vim ?: injector.fallbackWindow, scenario)
+        firstEditorInitialised = true
       }
       else {
         // We've got a virtual file, so FileOpenedSyncListener will be called. Save data
@@ -346,13 +366,16 @@ internal object VimListenerManager {
             }
           } ?: false
 
+          // Use fallback if there's no editor, but only once. Next time round, use the fallback window, but treat it as
+          // the EDIT scenario as though we hadn't closed the last window (Vim never does)
           val scenario = when {
-            openingEditor == null -> LocalOptionInitialisationScenario.FALLBACK
+            openingEditor == null -> if (!firstEditorInitialised) LocalOptionInitialisationScenario.FALLBACK else LocalOptionInitialisationScenario.EDIT
             editor.document == openingEditor.editor.document -> LocalOptionInitialisationScenario.SPLIT
             (openingEditor.canBeReused || openingEditor.isPreview) && isInSameSplit && openingEditorIsClosed -> LocalOptionInitialisationScenario.EDIT
             else -> LocalOptionInitialisationScenario.NEW
           }
-          add(editor, openingEditor?.editor, scenario)
+          add(editor, openingEditor?.editor?.vim ?: injector.fallbackWindow, scenario)
+          firstEditorInitialised = true
         }
       }
     }
