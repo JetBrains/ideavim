@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp
 
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Test
@@ -54,7 +55,7 @@ class VimRegexTest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -68,7 +69,7 @@ class VimRegexTest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      13 until 18,
+      TextRange(13, 18),
       1
     )
   }
@@ -83,7 +84,7 @@ class VimRegexTest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      setOf(0 until 5, 13 until 18)
+      setOf(TextRange(0, 5), TextRange(13, 18))
     )
   }
 
@@ -97,7 +98,7 @@ class VimRegexTest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      setOf(13 until 18),
+      setOf(TextRange(13, 18)),
       10
     )
   }
@@ -112,7 +113,7 @@ class VimRegexTest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "lorem\\c",
-      setOf(0 until 5, 13 until 18)
+      setOf(TextRange(0, 5), TextRange(13, 18))
     )
   }
 
@@ -127,7 +128,7 @@ class VimRegexTest {
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
       13,
-      13 until 18
+      TextRange(13, 18)
     )
   }
 
@@ -159,7 +160,7 @@ class VimRegexTest {
     assertMatchEntire(
         text,
       "\\_.*",
-      text.indices,
+      TextRange(0 , text.length)
     )
   }
 
@@ -184,7 +185,7 @@ class VimRegexTest {
     assertEquals(expectedResult, matchResult)
   }
 
-  private fun assertFind(text: CharSequence, pattern: String, expectedResult: IntRange, startIndex: Int = 0) {
+  private fun assertFind(text: CharSequence, pattern: String, expectedResult: TextRange, startIndex: Int = 0) {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.find(editor, startIndex)
@@ -194,7 +195,7 @@ class VimRegexTest {
     }
   }
 
-  private fun assertFindAll(text: CharSequence, pattern: String, expectedResult: Set<IntRange>, startIndex: Int = 0) {
+  private fun assertFindAll(text: CharSequence, pattern: String, expectedResult: Set<TextRange>, startIndex: Int = 0) {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
     val matchResults = regex.findAll(editor, startIndex)
@@ -204,7 +205,7 @@ class VimRegexTest {
     )
   }
 
-  private fun assertMatchAt(text: CharSequence, pattern: String, index: Int, expectedResult: IntRange? = null) {
+  private fun assertMatchAt(text: CharSequence, pattern: String, index: Int, expectedResult: TextRange? = null) {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.matchAt(editor, index)
@@ -214,7 +215,7 @@ class VimRegexTest {
     }
   }
 
-  private fun assertMatchEntire(text: CharSequence, pattern: String, expectedResult: IntRange? = null) {
+  private fun assertMatchEntire(text: CharSequence, pattern: String, expectedResult: TextRange? = null) {
     val editor = buildEditor(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.matchEntire(editor)
