@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp
 
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildEditor
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildNFA
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
@@ -40,7 +41,7 @@ class NFATest {
       "Sed in orci mauris.\n" +
       "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -54,7 +55,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem",
-      13 until 18,
+      TextRange(13, 18),
       13
     )
   }
@@ -64,7 +65,7 @@ class NFATest {
     assertCorrectRange(
       "a*bcd",
       "a\\*",
-      0 until 2,
+      TextRange(0, 2),
     )
   }
 
@@ -73,7 +74,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a*",
-      0 until 5,
+      TextRange(0, 5),
     )
   }
 
@@ -82,7 +83,7 @@ class NFATest {
     assertCorrectRange(
       "bcd",
       "a*",
-      IntRange.EMPTY
+      TextRange(0, 0)
     )
   }
 
@@ -91,7 +92,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\+",
-      0 until 5,
+      TextRange(0, 5),
     )
   }
 
@@ -108,7 +109,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{0,3}",
-      0 until 3,
+      TextRange(0, 3),
     )
   }
 
@@ -117,7 +118,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{2,}",
-      0 until 5,
+      TextRange(0, 5),
     )
   }
 
@@ -126,7 +127,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{,2}",
-      0 until 2,
+      TextRange(0, 2),
     )
   }
 
@@ -135,7 +136,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{}",
-      0 until 5,
+      TextRange(0, 5),
     )
   }
 
@@ -144,7 +145,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{,}",
-      0 until 5,
+      TextRange(0, 5),
     )
   }
 
@@ -153,7 +154,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaabcd",
       "a\\{2}",
-      0 until 2,
+      TextRange(0, 2),
     )
   }
 
@@ -175,7 +176,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem)",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -189,7 +190,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem) Ipsum",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -203,7 +204,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem) Ipsum",
-      0 until 5,
+      TextRange(0, 5),
       1
     )
   }
@@ -218,7 +219,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v(Lorem) (Ipsum)",
-      6 until 11,
+      TextRange(6, 11),
       2
     )
   }
@@ -228,7 +229,7 @@ class NFATest {
     assertCorrectGroupRange(
       "abababc",
       "\\v(ab)*c",
-      4 until 6,
+      TextRange(4, 6),
       1
     )
   }
@@ -243,7 +244,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v()",
-        IntRange.EMPTY
+        TextRange(0, 0)
     )
   }
 
@@ -252,7 +253,7 @@ class NFATest {
     assertCorrectRange(
       "abc",
       "\\v%(a|b)*c",
-      0 until 3
+      TextRange(0, 3)
     )
   }
 
@@ -261,7 +262,7 @@ class NFATest {
     assertCorrectRange(
       "a",
       "a*a",
-      0 until 1
+      TextRange(0, 1)
     )
   }
 
@@ -270,7 +271,7 @@ class NFATest {
     assertCorrectRange(
       "ababc",
       "\\v(a|b)+c=",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -279,7 +280,7 @@ class NFATest {
     assertCorrectRange(
       "aaaa",
       "\\v(a=)*",
-      0 until 4
+      TextRange(0, 4)
     )
   }
 
@@ -288,7 +289,7 @@ class NFATest {
     assertCorrectRange(
       "acabcdabcacd",
       "\\v((ab=c+)+d)*",
-      0 until 12
+      TextRange(0, 12)
     )
   }
 
@@ -297,7 +298,7 @@ class NFATest {
     assertCorrectRange(
       "aaaaa",
       "a\\{-}",
-      IntRange.EMPTY
+      TextRange(0, 0)
     )
   }
 
@@ -306,7 +307,7 @@ class NFATest {
     assertCorrectRange(
       "\"Lorem\" \"Ipsum\"",
       "\".\\{-}\"",
-      0 until 7
+      TextRange(0, 7)
     )
   }
 
@@ -315,7 +316,7 @@ class NFATest {
     assertCorrectRange(
       "\"Lorem\" \"Ipsum\"",
       "\".\\{}\"",
-      0 until 15
+      TextRange(0, 15)
     )
   }
 
@@ -329,7 +330,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       ".*",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -343,7 +344,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\_.*",
-      0 until 128
+      TextRange(0, 128)
     )
   }
 
@@ -357,7 +358,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lo\\%#rem",
-      0 until 5,
+      TextRange(0, 5),
       carets = listOf(2)
     )
   }
@@ -386,7 +387,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\v\\w+\\s+\\w+",
-      0 until 17
+      TextRange(0, 17)
     )
   }
 
@@ -395,7 +396,7 @@ class NFATest {
     assertCorrectRange(
       "08-08-2023",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
-      0 until 10
+      TextRange(0, 10)
     )
   }
 
@@ -404,7 +405,7 @@ class NFATest {
     assertCorrectRange(
       "08/08/2023",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
-      0 until 10
+      TextRange(0, 10)
     )
   }
 
@@ -413,7 +414,7 @@ class NFATest {
     assertCorrectRange(
       "08/08/23",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
-      0 until 8
+      TextRange(0, 8)
     )
   }
 
@@ -422,7 +423,7 @@ class NFATest {
     assertCorrectRange(
       "0x193ab3f is a hexadecimal number",
       "\\v%(0x)?\\x+",
-      0 until 9
+      TextRange(0, 9)
     )
   }
 
@@ -431,7 +432,7 @@ class NFATest {
     assertCorrectRange(
       "abcdef23901a is also a hexadecimal number",
       "\\v%(0x)?\\x+",
-      0 until 12
+      TextRange(0, 12)
     )
   }
 
@@ -440,7 +441,7 @@ class NFATest {
     assertCorrectRange(
       "Emanuel Gestosa",
       "\\v\\u\\l+\\s+\\u\\l+",
-      0 until 15
+      TextRange(0, 15)
     )
   }
 
@@ -457,7 +458,7 @@ class NFATest {
     assertCorrectRange(
       "45135abc235",
       "\\d\\+",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -466,7 +467,7 @@ class NFATest {
     assertCorrectRange(
       "abcd123efg",
       "\\D\\+",
-      0 until 4
+      TextRange(0, 4)
     )
   }
 
@@ -475,7 +476,7 @@ class NFATest {
     assertCorrectRange(
       "[]abc",
       "[]",
-      0 until 2
+      TextRange(0, 2)
     )
   }
 
@@ -484,7 +485,7 @@ class NFATest {
     assertCorrectRange(
       "[^]abc",
       "[^]",
-      0 until 3
+      TextRange(0, 3)
     )
   }
 
@@ -493,7 +494,7 @@ class NFATest {
     assertCorrectRange(
       "abcd0efg1hij",
       "[a-z0]\\+",
-      0 until 8
+      TextRange(0, 8)
     )
   }
 
@@ -502,7 +503,7 @@ class NFATest {
     assertCorrectRange(
       "ABCD0EFG1HIJ",
       "[^a-z0]\\+",
-      0 until 4
+      TextRange(0, 4)
     )
   }
 
@@ -511,7 +512,7 @@ class NFATest {
     assertCorrectRange(
       "a-b-c-d_f-g",
       "[-a-z]\\+",
-      0 until 7
+      TextRange(0, 7)
     )
   }
 
@@ -520,7 +521,7 @@ class NFATest {
     assertCorrectRange(
       "az-e",
       "[a\\-z]\\+",
-      0 until 3
+      TextRange(0, 3)
     )
   }
 
@@ -529,7 +530,7 @@ class NFATest {
     assertCorrectRange(
       "\\aa\\bc",
       "[\\a]\\+",
-      0 until 4
+      TextRange(0, 4)
     )
   }
 
@@ -538,7 +539,7 @@ class NFATest {
     assertCorrectRange(
       "abcdf123",
       "[\\u61-\\u007a]\\+",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -547,7 +548,7 @@ class NFATest {
     assertCorrectRange(
       "uz\\zuabc",
       "[\\uz]\\+",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -556,7 +557,7 @@ class NFATest {
     assertCorrectRange(
       "endif",
       "end\\zsif",
-      3 until 5
+      TextRange(3, 5)
     )
   }
 
@@ -565,7 +566,7 @@ class NFATest {
     assertCorrectRange(
       "endif",
       "end\\zeif",
-      0 until 3
+      TextRange(0, 3)
     )
   }
 
@@ -574,7 +575,7 @@ class NFATest {
     assertCorrectRange(
       "endif",
       "\\zse\\zsn\\zsd\\zsif",
-      3 until 5
+      TextRange(3, 5)
     )
   }
 
@@ -583,7 +584,7 @@ class NFATest {
     assertCorrectRange(
       "endif",
       "\\zee\\zen\\zed\\zeif",
-      0 until 3
+      TextRange(0, 3)
     )
   }
 
@@ -592,7 +593,7 @@ class NFATest {
     assertCorrectRange(
       "endif",
       "\\zeend\\zsif",
-      3 until 5
+      TextRange(3, 5)
     )
   }
 
@@ -601,7 +602,7 @@ class NFATest {
     assertCorrectRange(
       "cat cat",
       "\\v(dog|cat) \\1",
-      0 until 7
+      TextRange(0, 7)
     )
   }
 
@@ -618,7 +619,7 @@ class NFATest {
     assertCorrectRange(
       "aaa",
       "\\v(b)*\\1",
-      IntRange.EMPTY
+      TextRange(0, 0)
     )
   }
 
@@ -627,7 +628,7 @@ class NFATest {
     assertCorrectRange(
       "aaabb",
       "\\v(a|b){1,100}\\1",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -636,7 +637,7 @@ class NFATest {
     assertCorrectGroupRange(
       "abaabb",
       "\\v(a(b)?)+",
-      4 until 5,
+      TextRange(4, 5),
       2
     )
   }
@@ -646,7 +647,7 @@ class NFATest {
     assertCorrectRange(
       "IdeaVim",
       "ideavim",
-      0 until 7,
+      TextRange(0, 7),
       ignoreCase = true
     )
   }
@@ -656,7 +657,7 @@ class NFATest {
     assertCorrectRange(
       "IdeaVim",
       "[a-z]\\+",
-      0 until 7,
+      TextRange(0, 7),
       ignoreCase = true
     )
   }
@@ -675,7 +676,7 @@ class NFATest {
     assertCorrectRange(
       "IdeaVim",
       "\\%^Idea",
-      0 until 4
+      TextRange(0, 4)
     )
   }
   @Test
@@ -691,7 +692,7 @@ class NFATest {
     assertCorrectRange(
       "IdeaVim",
       "Vim\\%$",
-      4 until 7,
+      TextRange(4, 7),
     )
   }
 
@@ -708,7 +709,7 @@ class NFATest {
     assertCorrectRange(
       "IdeaVim",
       "\\%^IdeaVim\\%$",
-      0 until 7
+      TextRange(0, 7)
     )
   }
 
@@ -717,7 +718,7 @@ class NFATest {
     assertCorrectRange(
       "",
       "\\v%^%$",
-      IntRange.EMPTY
+      TextRange(0, 0)
     )
   }
 
@@ -739,7 +740,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "^Lorem",
-      13 until 18,
+      TextRange(13, 18),
       1
     )
   }
@@ -767,7 +768,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Ipsum$",
-      6 until 11,
+      TextRange(6, 11),
     )
   }
 
@@ -789,7 +790,7 @@ class NFATest {
     assertCorrectRange(
       "dog barks",
       "^cat\\|^dog",
-      0 until 3
+      TextRange(0, 3)
     )
   }
 
@@ -799,7 +800,7 @@ class NFATest {
       "cat\n" +
       "meows",
       "cat$\\|dog$",
-      0 until 3
+      TextRange(0, 3)
     )
   }
 
@@ -808,7 +809,7 @@ class NFATest {
     assertCorrectRange(
       "cat meows",
       "\\v(^(cat|dog)) ((meows|barks)$)",
-      0 until 9
+      TextRange(0, 9)
     )
   }
 
@@ -817,7 +818,7 @@ class NFATest {
     assertCorrectRange(
       "the symbol ^ is known as caret.",
       "^.\\+^.\\+$",
-      0 until 31
+      TextRange(0, 31)
     )
   }
 
@@ -826,7 +827,7 @@ class NFATest {
     assertCorrectRange(
       "the symbol for the dollar is $.",
       "^.\\+$.\\+$",
-      0 until 31
+      TextRange(0, 31)
     )
   }
 
@@ -835,7 +836,7 @@ class NFATest {
     assertCorrectRange(
       "^ is known as caret.",
       "\\^ is known",
-      0 until 10
+      TextRange(0, 10)
     )
   }
 
@@ -844,7 +845,7 @@ class NFATest {
     assertCorrectRange(
       "the symbol for the dollar is $.",
       "dollar is \\$",
-      19 until 30,
+      TextRange(19, 30),
     )
   }
 
@@ -858,7 +859,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\_.\\+\\_^Lorem",
-      0 until 24
+      TextRange(0, 24)
     )
   }
 
@@ -872,7 +873,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lorem Ipsum\\_$\\_s*",
-      0 until 13
+      TextRange(0, 13)
     )
   }
 
@@ -881,7 +882,7 @@ class NFATest {
     assertCorrectRange(
       "aaab",
       "\\(a*\\)\\@>b",
-      0 until 4
+      TextRange(0, 4)
 
     )
   }
@@ -891,7 +892,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v.*(Lorem)@>",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -918,7 +919,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\<Lorem",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -927,7 +928,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\<Ipsum",
-      6 until 11,
+      TextRange(6, 11),
     )
   }
 
@@ -944,7 +945,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "Ipsum\\>",
-      6 until 11,
+      TextRange(6, 11),
     )
   }
 
@@ -953,7 +954,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "Lorem\\>",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -975,7 +976,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\_[a-z A-Z]\\+",
-      0 until 13
+      TextRange(0, 13)
     )
   }
 
@@ -989,7 +990,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\_[^0-9]\\+",
-      0 until 13
+      TextRange(0, 13)
     )
   }
 
@@ -998,7 +999,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "[\\d65-\\d122]*",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1007,7 +1008,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "[\\o101-\\o172]*",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1016,7 +1017,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "[\\x41-\\x7a]*",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1025,7 +1026,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "[\\u0041-\\u007a]*",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1034,7 +1035,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "[\\U00000041-\\U007a]*",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1044,7 +1045,7 @@ class NFATest {
       "Lorem Ipsum\n" +
       "Lorem 123",
       "[\\n a-zA-Z]*",
-      0 until 18
+      TextRange(0, 18)
     )
   }
 
@@ -1053,7 +1054,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "[[:upper:][:lower:]]*",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1062,7 +1063,7 @@ class NFATest {
     assertCorrectRange(
       "/unix/file/path/../path/.",
       "[-./[:alpha:]0-9_~]\\+",
-      0 until 25
+      TextRange(0, 25)
     )
   }
 
@@ -1071,7 +1072,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "Lorem\\( Ipsum\\)\\@=",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1080,7 +1081,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "Lorem\\( Ipsum\\)\\@= Ipsum",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1089,7 +1090,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1114,7 +1115,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "Lorem\\( Lorem\\)\\@!",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1123,7 +1124,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "Lorem\\( Lorem\\)\\@! Ipsum",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1132,7 +1133,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1157,7 +1158,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem(( Ipsum)@!)@!",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1166,7 +1167,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem(( Ipsum)@=)@=",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1175,7 +1176,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem(( Lorem)@=)@!",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1184,7 +1185,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem(( Lorem)@!)@=",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1201,7 +1202,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v(Lorem( Ipsum)@=)",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1210,7 +1211,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem( Ipsum)@=( XYZ| Ipsum)",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1219,7 +1220,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v(Lorem( XYZ)@!)",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1228,7 +1229,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem( XYZ)@!( XYZ| Ipsum)",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1237,7 +1238,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem( Ipsum)@=( Ipsum( Lorem)@!)",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1246,7 +1247,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "Lorem Ipsum\\&.....",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1255,7 +1256,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       ".*Ip\\&.*sum",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1264,7 +1265,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       ".*Ip\\&.*sum\\&Lorem Ipsum\\&Lorem",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1273,7 +1274,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v(Lorem&.*) Ipsum",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1282,7 +1283,7 @@ class NFATest {
     assertCorrectGroupRange(
       "Lorem Ipsum",
       "\\v(Lorem&.*) Ipsum",
-      0 until 5,
+      TextRange(0, 5),
       1
     )
   }
@@ -1300,7 +1301,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v(Lorem )@<=Ipsum",
-      6 until 11
+      TextRange(6, 11)
     )
   }
 
@@ -1309,7 +1310,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v(\\w{3})@<=\\w",
-      3 until 4
+      TextRange(3, 4)
     )
   }
 
@@ -1318,7 +1319,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem     Ipsum",
       "\\v(\\s+)@<=\\w+",
-      10 until 15
+      TextRange(10, 15)
     )
   }
 
@@ -1343,7 +1344,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v(Ipsum)@<!Ipsum",
-      6 until 11
+      TextRange(6, 11)
     )
   }
 
@@ -1352,7 +1353,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\vLorem( Ipsum)@<! Ipsum",
-      0 until 11
+      TextRange(0, 11)
     )
   }
 
@@ -1361,7 +1362,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v( Lorem)@<!( Lorem)@<!( Lorem)@<!( Lorem)@<!( Lorem)@<!Lorem",
-      0 until 5
+      TextRange(0, 5)
     )
   }
 
@@ -1386,7 +1387,7 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum",
       "\\v(Lorem )@10000<=Ipsum",
-      6 until 11
+      TextRange(6, 11)
     )
   }
 
@@ -1395,7 +1396,7 @@ class NFATest {
     assertCorrectRange(
       "abbcabc",
       "\\v(a.*)@2<=c",
-      6 until 7
+      TextRange(6, 7)
     )
   }
 
@@ -1404,7 +1405,7 @@ class NFATest {
     assertCorrectRange(
       "abbcabc",
       "\\v(a.*)@2<!c",
-      3 until 4
+      TextRange(3, 4)
     )
   }
 
@@ -1419,8 +1420,7 @@ class NFATest {
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
-    expectedResultRange:
-    IntRange,
+    expectedResultRange: TextRange,
     offset: Int = 0,
     carets: List<Int> = emptyList(),
     ignoreCase: Boolean = false
@@ -1437,7 +1437,7 @@ class NFATest {
   private fun assertCorrectGroupRange(
     text: CharSequence,
     pattern: String,
-    expectedResultRange: IntRange,
+    expectedResultRange: TextRange,
     groupNumber: Int,
     offset: Int = 0,
     carets: List<Int> = emptyList()

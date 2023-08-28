@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.match
 
+import com.maddyhome.idea.vim.common.TextRange
+
 /**
  * A collection of match results of capture groups
  */
@@ -75,8 +77,8 @@ public class VimMatchGroupCollection(
   internal fun setGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
     if (completedGroups[groupNumber]) return
 
-    val range = groupStarts[groupNumber] until endIndex
-    groups[groupNumber] = VimMatchGroup(range, text.substring(range))
+    val range = TextRange(groupStarts[groupNumber], endIndex)
+    groups[groupNumber] = VimMatchGroup(range, text.substring(range.startOffset, range.endOffset))
     groupCount = maxOf(groupCount, groupNumber + 1)
     completedGroups[groupNumber] = true
   }
@@ -89,8 +91,8 @@ public class VimMatchGroupCollection(
    * @param text        The text used to extract the matched string
    */
   internal fun setForceGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
-    val range = groupStarts[groupNumber] until endIndex
-    groups[groupNumber] = VimMatchGroup(range, text.substring(range))
+    val range = TextRange(groupStarts[groupNumber], endIndex)
+    groups[groupNumber] = VimMatchGroup(range, text.substring(range.startOffset, range.endOffset))
     groupCount = maxOf(groupCount, groupNumber + 1)
     completedGroups[groupNumber] = true
   }

@@ -99,8 +99,8 @@ public class VimRegex(pattern: String) {
          */
         is VimMatchResult.Success -> {
           foundMatches.add(result)
-          if (result.range.isEmpty()) index++
-          else index = result.range.last + 1
+          if (result.range.startOffset == result.range.endOffset) index++
+          else index = result.range.endOffset
         }
 
         /**
@@ -129,7 +129,7 @@ public class VimRegex(pattern: String) {
     return when (result) {
       is VimMatchResult.Failure -> result
       // TODO: this can be made faster
-      is VimMatchResult.Success -> if (result.range.first == index) result else VimMatchResult.Failure
+      is VimMatchResult.Success -> if (result.range.startOffset == index) result else VimMatchResult.Failure
     }
   }
 
@@ -148,7 +148,7 @@ public class VimRegex(pattern: String) {
       is VimMatchResult.Failure -> result
       is VimMatchResult.Success -> {
         // TODO: this can be made faster
-        if (result.range.last + 1 == editor.text().length && result.range.first == 0) result
+        if (result.range.endOffset == editor.text().length && result.range.startOffset == 0) result
         else VimMatchResult.Failure
       }
     }
@@ -168,7 +168,7 @@ public class VimRegex(pattern: String) {
     return when (result) {
       is VimMatchResult.Failure -> false
       // TODO: this can be made faster
-      is VimMatchResult.Success -> result.range.last + 1 == editor.text().length && result.range.first == 0
+      is VimMatchResult.Success -> result.range.endOffset == editor.text().length && result.range.startOffset == 0
     }
   }
 
@@ -188,7 +188,7 @@ public class VimRegex(pattern: String) {
     return when (result) {
       is VimMatchResult.Failure -> false
       // TODO: this can be made faster
-      is VimMatchResult.Success -> result.range.first == index
+      is VimMatchResult.Success -> result.range.startOffset == index
     }
   }
 
