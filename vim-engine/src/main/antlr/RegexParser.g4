@@ -197,6 +197,6 @@ zero_width : CURSOR        #Cursor
 char_code : DECIMAL_CODE      #DecimalCode
           | OCTAL_CODE        #OctalCode
           | HEXADECIMAL_CODE  #HexCode
-          | UNICODE_CODE      #UnicodeCode
-          | WIDE_UNICODE_CODE #WideUnicodeCode
+          | UNICODE_CODE      #HexCode
+          | WIDE_UNICODE_CODE #HexCode
           ;
