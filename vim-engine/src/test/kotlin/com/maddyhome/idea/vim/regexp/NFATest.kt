@@ -1417,6 +1417,104 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test match character by decimal code`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\%d76orem",
+      TextRange(0, 5)
+    )
+  }
+
+  @Test
+  fun `test match character by non-ascii decimal code`() {
+    assertCorrectRange(
+      "Гorem Ipsum",
+      "\\%d1043orem",
+      TextRange(0, 5)
+    )
+  }
+
+  @Test
+  fun `test match character by decimal code should fail`() {
+    assertFailure(
+      "Lorem Ipsum",
+      "\\%d77orem"
+    )
+  }
+
+  @Test
+  fun `test match character by octal code`() {
+    assertCorrectRange(
+      "Lorem Ipsum",
+      "\\%o114orem",
+      TextRange(0, 5)
+    )
+  }
+
+  @Test
+  fun `test match character by large octal code`() {
+    /**
+     * Since octal codes can only go up to 377, the
+     * 400 in this pattern is actually not the code
+     * of the matched character; instead, it matches
+     * the character with octal code 40 (space) followed
+     * by a '0'
+     */
+    assertCorrectRange(
+      " 0123",
+      "\\%o400",
+      TextRange(0, 2)
+    )
+  }
+
+  @Test
+  fun `test match character by hexadecimal code`() {
+    /**
+     * Match character with code 0x31, followed by '23'
+     */
+    assertCorrectRange(
+      "123",
+      "\\%x3123",
+      TextRange(0, 3)
+    )
+  }
+
+  @Test
+  fun `test match character by 4 long hexadecimal code fails`() {
+    /**
+     * Match character with code 0x3123
+     */
+    assertFailure(
+      "123",
+      "\\%u3123"
+    )
+  }
+
+  @Test
+  fun `test match character by 4 long hexadecimal code`() {
+    /**
+     * Match character with code 0x31 followed by '23'
+     */
+    assertCorrectRange(
+      "123",
+      "\\%u003123",
+      TextRange(0, 3)
+    )
+  }
+
+  @Test
+  fun `test match character by 8 long hexadecimal code`() {
+    /**
+     * Match character with code 0x31 followed by '23'
+     */
+    assertCorrectRange(
+      "123",
+      "\\%U0000003123",
+      TextRange(0, 3)
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
