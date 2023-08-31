@@ -566,6 +566,30 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(EndOfWordMatcher())
   }
 
+  override fun visitDecimalCode(ctx: RegexParser.DecimalCodeContext): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher(
+        Char((if (ctx.text[0] == '\\') ctx.text.substring(3) else ctx.text.substring(2)).toInt())
+      )
+    )
+  }
+
+  override fun visitOctalCode(ctx: RegexParser.OctalCodeContext): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher(
+        Char((if (ctx.text[0] == '\\') ctx.text.substring(3) else ctx.text.substring(2)).toInt(8))
+      )
+    )
+  }
+
+  override fun visitHexCode(ctx: RegexParser.HexCodeContext): NFA {
+    return NFA.fromMatcher(
+      CharacterMatcher(
+        Char((if (ctx.text[0] == '\\') ctx.text.substring(3) else ctx.text.substring(2)).toInt(16))
+      )
+    )
+  }
+
   private fun cleanLiteralChar(str : String) : Char {
     return if (str.length == 2 && str[0] == '\\') str[1]
     else str[0]
