@@ -575,11 +575,29 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitOctalCode(ctx: RegexParser.OctalCodeContext): NFA {
-    return NFA.fromMatcher(
-      CharacterMatcher(
-        Char((if (ctx.text[0] == '\\') ctx.text.substring(3) else ctx.text.substring(2)).toInt(8))
+    val code = (if (ctx.text[0] == '\\') ctx.text.substring(3) else ctx.text.substring(2)).toInt(8)
+
+    /**
+     * An octal code can only go up to 0o377. But the parser still allows codes like 0o400. For these cases, the actual
+     * code should be 0o40, and that is followed by a literal '0'
+     */
+    return if (code > "377".toInt(8)) {
+      NFA.fromMatcher(
+        CharacterMatcher(
+          Char((if (ctx.text[0] == '\\') ctx.text.substring(3) else ctx.text.substring(2)).dropLast(1).toInt(8))
+        )
+      ).concatenate(
+        NFA.fromMatcher(
+          CharacterMatcher(ctx.text.last())
+        )
       )
-    )
+    } else {
+      NFA.fromMatcher(
+        CharacterMatcher(
+          Char(code)
+        )
+      )
+    }
   }
 
   override fun visitHexCode(ctx: RegexParser.HexCodeContext): NFA {
