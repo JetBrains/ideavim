@@ -95,6 +95,7 @@ ordinary_atom : (LITERAL_CHAR | CARET | DOLLAR)  #LiteralChar
               | zero_width                       #ZeroWidth
               | char_class                       #CharClass
               | collection                       #Collec
+              | char_code                        #CharCode
               ;
 
 /**
@@ -188,3 +189,14 @@ zero_width : CURSOR        #Cursor
            | START_OF_WORD #StartOfWord
            | END_OF_WORD   #EndOfWord
            ;
+
+/**
+ * Literal characters represented by their code.
+ * E.g. \%d97 matches with the character 'a'
+ */
+char_code : DECIMAL_CODE      #DecimalCode
+          | OCTAL_CODE        #OctalCode
+          | HEXADECIMAL_CODE  #HexCode
+          | UNICODE_CODE      #UnicodeCode
+          | WIDE_UNICODE_CODE #WideUnicodeCode
+          ;
