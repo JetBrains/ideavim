@@ -65,7 +65,7 @@ tasks {
     generateGrammarSource {
         maxHeapSize = "128m"
         arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.regexp.parser.generated", "-visitor"))
-        outputDirectory = file("src/main/kotlin/com/maddyhome/idea/vim/regexp/parser/generated")
+        outputDirectory = file("src/main/java/com/maddyhome/idea/vim/regexp/parser/generated")
     }
 
     named("compileKotlin") {
