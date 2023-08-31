@@ -46,9 +46,9 @@ BACKREFERENCE_MAGIC: '\\' [0-9] -> type(BACKREFERENCE);
 LAST_SUBSTITUTE_MAGIC: '~' -> type(LAST_SUBSTITUTE);
 DECIMAL_CODE_MAGIC: '\\%d' [0-9]+ -> type(DECIMAL_CODE);
 OCTAL_CODE_MAGIC: '\\%o' [0-7] [0-7]? [0-7]? -> type(OCTAL_CODE);
-HEXADECIMAL_CODE_MAGIC: '\\x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
-UNICODE_CODE_MAGIC: '\\u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
-WIDE_UNICODE_CODE_MAGIC: '\\U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
+HEXADECIMAL_CODE_MAGIC: '\\%x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
+UNICODE_CODE_MAGIC: '\\%u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
+WIDE_UNICODE_CODE_MAGIC: '\\%U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
 
 // multi
 STAR_MAGIC: '*' -> type(STAR);
@@ -173,9 +173,9 @@ BACKREFERENCE_NOMAGIC: '\\' [0-9] -> type(BACKREFERENCE);
 LAST_SUBSTITUTE_NOMAGIC: '\\~' -> type(LAST_SUBSTITUTE);
 DECIMAL_CODE_NOMAGIC: '\\%d' [0-9]+ -> type(DECIMAL_CODE);
 OCTAL_CODE_NOMAGIC: '\\%o' [0-7] [0-7]? [0-7]? -> type(OCTAL_CODE);
-HEXADECIMAL_CODE_NOMAGIC: '\\x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
-UNICODE_CODE_NOMAGIC: '\\u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
-WIDE_UNICODE_CODE_NOMAGIC: '\\U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
+HEXADECIMAL_CODE_NOMAGIC: '\\%x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
+UNICODE_CODE_NOMAGIC: '\\%u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
+WIDE_UNICODE_CODE_NOMAGIC: '\\%U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
 
 // multi
 STAR_NOMAGIC: '\\*' -> type(STAR);
@@ -302,9 +302,9 @@ BACKREFERENCE_VMAGIC: '\\' [0-9] -> type(BACKREFERENCE);
 LAST_SUBSTITUTE_VMAGIC: '~' -> type(LAST_SUBSTITUTE);
 DECIMAL_CODE_VMAGIC: '%d' [0-9]+ -> type(DECIMAL_CODE);
 OCTAL_CODE_VMAGIC: '%o' [0-7] [0-7]? [0-7]? -> type(OCTAL_CODE);
-HEXADECIMAL_CODE_VMAGIC: 'x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
-UNICODE_CODE_VMAGIC: 'u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
-WIDE_UNICODE_CODE_VMAGIC: 'U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
+HEXADECIMAL_CODE_VMAGIC: '%x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
+UNICODE_CODE_VMAGIC: '%u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
+WIDE_UNICODE_CODE_VMAGIC: '%U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
 
 // multi
 STAR_VMAGIC: '*' -> type(STAR);
@@ -430,9 +430,9 @@ BACKREFERENCE_VNOMAGIC: '\\' [0-9] -> type(BACKREFERENCE);
 LAST_SUBSTITUTE_VNOMAGIC: '\\~' -> type(LAST_SUBSTITUTE);
 DECIMAL_CODE_VNOMAGIC: '\\%d' [0-9]+ -> type(DECIMAL_CODE);
 OCTAL_CODE_VNOMAGIC: '\\%o' [0-7] [0-7]? [0-7]? -> type(OCTAL_CODE);
-HEXADECIMAL_CODE_VNOMAGIC: '\\x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
-UNICODE_CODE_VNOMAGIC: '\\u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
-WIDE_UNICODE_CODE_VNOMAGIC: '\\U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
+HEXADECIMAL_CODE_VNOMAGIC: '\\%x' [a-fA-F0-9] [a-fA-F0-9]? -> type(HEXADECIMAL_CODE);
+UNICODE_CODE_VNOMAGIC: '\\%u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(UNICODE_CODE);
+WIDE_UNICODE_CODE_VNOMAGIC: '\\%U' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(WIDE_UNICODE_CODE);
 
 // multi
 STAR_VNOMAGIC: '\\*' -> type(STAR);
