@@ -18,14 +18,18 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.assertThrows
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class GlobalOptionChangeListenerTest: VimTestCase() {
+  private val optionName = "test"
+  private val defaultValue = "defaultValue"
 
   private object Listener : GlobalOptionChangeListener {
     var called = false
@@ -38,66 +42,92 @@ class GlobalOptionChangeListenerTest: VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
+    configureByText("\n")
     Listener.called = false
+  }
+
+  @AfterEach
+  override fun tearDown(testInfo: TestInfo) {
+    injector.optionGroup.getOption(optionName)?.let {
+      injector.optionGroup.removeGlobalOptionChangeListener(it, Listener)
+      injector.optionGroup.removeOption(optionName)
+    }
+    super.tearDown(testInfo)
   }
 
   @Test
   fun `test listener called when global option changes`() {
-    val option = StringOption("test", OptionDeclaredScope.GLOBAL, "test", "defaultValue")
-    try {
-      injector.optionGroup.addOption(option)
-      injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
+    val option = StringOption(optionName, OptionDeclaredScope.GLOBAL, optionName, defaultValue)
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
 
-      // Global value of a global option, we can pass null
-      injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(null), VimString("newValue"))
+    // Global value of a global option, we can pass null
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(null), VimString("newValue"))
 
-      assertTrue(Listener.called)
-    }
-    finally {
-      injector.optionGroup.removeGlobalOptionChangeListener(option, Listener)
-      injector.optionGroup.removeOption(option.name)
-    }
+    assertTrue(Listener.called)
+  }
+
+  @Test
+  fun `test listener not called when global option set to current value`() {
+    val option = StringOption(optionName, OptionDeclaredScope.GLOBAL, optionName, defaultValue)
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
+
+    // Global value of a global option, we can pass null
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(null), VimString(defaultValue))
+
+    assertFalse(Listener.called)
   }
 
   @Test
   fun `test listener called when effective value of global option changes`() {
-    configureByText("\n")
-    val option = StringOption("test", OptionDeclaredScope.GLOBAL, "test", "defaultValue")
-    try {
-      injector.optionGroup.addOption(option)
-      injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
+    val option = StringOption(optionName, OptionDeclaredScope.GLOBAL, optionName, defaultValue)
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
 
-      injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), VimString("newValue"))
 
-      assertTrue(Listener.called)
-    }
-    finally {
-      injector.optionGroup.removeGlobalOptionChangeListener(option, Listener)
-      injector.optionGroup.removeOption(option.name)
-    }
+    assertTrue(Listener.called)
+  }
+
+  @Test
+  fun `test listener not called when effective value of global option set to current value`() {
+    val option = StringOption(optionName, OptionDeclaredScope.GLOBAL, optionName, defaultValue)
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
+
+    // Global value of a global option, we can pass null
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), VimString(defaultValue))
+
+    assertFalse(Listener.called)
   }
 
   @Test
   fun `test listener called when local value of global option changes`() {
-    configureByText("\n")
-    val option = StringOption("test", OptionDeclaredScope.GLOBAL, "test", "defaultValue")
-    try {
-      injector.optionGroup.addOption(option)
-      injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
+    val option = StringOption(optionName, OptionDeclaredScope.GLOBAL, optionName, defaultValue)
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
 
-      injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), VimString("newValue"))
 
-      assertTrue(Listener.called)
-    }
-    finally {
-      injector.optionGroup.removeGlobalOptionChangeListener(option, Listener)
-      injector.optionGroup.removeOption(option.name)
-    }
+    assertTrue(Listener.called)
+  }
+
+  @Test
+  fun `test listener not called when local value of global option set to current value`() {
+    val option = StringOption(optionName, OptionDeclaredScope.GLOBAL, optionName, defaultValue)
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
+
+    // Global value of a global option, we can pass null
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), VimString(defaultValue))
+
+    assertFalse(Listener.called)
   }
 
   @Test
   fun `test cannot register listener for local option`() {
-    val option = StringOption("test", OptionDeclaredScope.LOCAL_TO_BUFFER, "test", "defaultValue")
+    val option = StringOption("myOption", OptionDeclaredScope.LOCAL_TO_BUFFER, optionName, defaultValue)
     try {
       injector.optionGroup.addOption(option)
 
@@ -112,7 +142,7 @@ class GlobalOptionChangeListenerTest: VimTestCase() {
 
   @Test
   fun `test cannot register listener for global-local option`() {
-    val option = StringOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", "defaultValue")
+    val option = StringOption("myOption", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, optionName, defaultValue)
     try {
       injector.optionGroup.addOption(option)
 
