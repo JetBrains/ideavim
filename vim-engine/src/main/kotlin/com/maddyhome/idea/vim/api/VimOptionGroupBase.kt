@@ -326,7 +326,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     injector.vimStorageService.getOrPutWindowData(editor, perWindowGlobalOptionsKey) { mutableMapOf() }
 
   private fun <T : VimDataType> getGlobalOptionValue(option: Option<T>, editor: VimEditor?): T {
-    val options = if (option.declaredScope == LOCAL_TO_WINDOW) {
+    val values = if (option.declaredScope == LOCAL_TO_WINDOW) {
       check(editor != null) { "Editor must be provided for local options" }
       getPerWindowGlobalOptionStorage(editor)
     }
@@ -337,11 +337,11 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     // We set the value via Option<T> so it's safe to cast to T. But note that the value might be null because we don't
     // explicitly populate global option values in the same way we do local options
     @Suppress("UNCHECKED_CAST")
-    return options[option.name] as? T ?: option.defaultValue
+    return values[option.name] as? T ?: option.defaultValue
   }
 
   private fun <T : VimDataType> setGlobalOptionValue(option: Option<T>, editor: VimEditor?, value: T) {
-    if (option.declaredScope == LOCAL_TO_WINDOW) {
+    val changed = if (option.declaredScope == LOCAL_TO_WINDOW) {
       check(editor != null) { "Editor must be provided for local options" }
       doSetPerWindowGlobalOptionValue(option, editor, value)
     }
@@ -350,7 +350,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     }
 
     when (option.declaredScope) {
-      GLOBAL -> {
+      GLOBAL -> if (changed) {
         onGlobalOptionValueChanged(option)
         onGlobalOptionEffectiveValueChanged(option)
       }
@@ -360,14 +360,24 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     }
   }
 
-  private fun <T : VimDataType> doSetGlobalOptionValue(option: Option<T>, value: T) {
-    globalValues[option.name] = value
-    globalParsedValues.remove(option.name)
+  private fun <T : VimDataType> doSetGlobalOptionValue(option: Option<T>, value: T): Boolean {
+    val oldValue = globalValues[option.name]
+    if (oldValue != value) {
+      globalValues[option.name] = value
+      globalParsedValues.remove(option.name)
+      return true
+    }
+    return false
   }
 
-  private fun <T : VimDataType> doSetPerWindowGlobalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
-    val options = getPerWindowGlobalOptionStorage(editor)
-    options[option.name] = value
+  private fun <T : VimDataType> doSetPerWindowGlobalOptionValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
+    val values = getPerWindowGlobalOptionStorage(editor)
+    val oldValue = values[option.name]
+    if (oldValue != value) {
+      values[option.name] = value
+      return true
+    }
+    return false
   }
 
 
@@ -403,18 +413,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
    */
   private fun <T : VimDataType> setEffectiveOptionValue(option: Option<T>, editor: VimEditor, value: T) {
     when (option.declaredScope) {
-      GLOBAL -> {
-        doSetGlobalOptionValue(option, value)
+      GLOBAL -> if (doSetGlobalOptionValue(option, value)) {
         onGlobalOptionValueChanged(option)
         onGlobalOptionEffectiveValueChanged(option)
       }
-      LOCAL_TO_BUFFER -> {
-        doSetBufferLocalOptionValue(option, editor, value)
+      LOCAL_TO_BUFFER -> if (doSetBufferLocalOptionValue(option, editor, value)) {
         doSetGlobalOptionValue(option, value)
         onBufferLocalOptionEffectiveValueChanged(option, editor)
       }
-      LOCAL_TO_WINDOW -> {
-        doSetWindowLocalOptionValue(option, editor, value)
+      LOCAL_TO_WINDOW -> if (doSetWindowLocalOptionValue(option, editor, value)) {
         doSetPerWindowGlobalOptionValue(option, editor, value)
         onWindowLocalOptionEffectiveValueChanged(option, editor)
       }
@@ -471,17 +478,14 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
    */
   private fun <T : VimDataType> setLocalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
     when (option.declaredScope) {
-      GLOBAL -> {
-        doSetGlobalOptionValue(option, value)
+      GLOBAL -> if (doSetGlobalOptionValue(option, value)) {
         onGlobalOptionValueChanged(option)
         onGlobalOptionEffectiveValueChanged(option)
       }
-      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> {
-        doSetBufferLocalOptionValue(option, editor, value)
+      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> if (doSetBufferLocalOptionValue(option, editor, value)) {
         onBufferLocalOptionEffectiveValueChanged(option, editor)
       }
-      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> {
-        doSetWindowLocalOptionValue(option, editor, value)
+      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> if (doSetWindowLocalOptionValue(option, editor, value)) {
         onWindowLocalOptionEffectiveValueChanged(option, editor)
       }
     }
@@ -491,11 +495,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private fun getBufferLocalOptionStorage(editor: VimEditor) =
     injector.vimStorageService.getOrPutBufferData(editor, localOptionsKey) { mutableMapOf() }
 
-  private fun <T : VimDataType> doSetBufferLocalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
-    val options = getBufferLocalOptionStorage(editor)
-    options[option.name] = value
-
-    getParsedEffectiveOptionStorage(option, editor).remove(option.name)
+  private fun <T : VimDataType> doSetBufferLocalOptionValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
+    val values = getBufferLocalOptionStorage(editor)
+    val oldValue = values[option.name]
+    if (oldValue != value) {
+      values[option.name] = value
+      getParsedEffectiveOptionStorage(option, editor).remove(option.name)
+      return true
+    }
+    return false
   }
 
   private fun <T : VimDataType> getBufferLocalOptionValue(option: Option<T>, editor: VimEditor): T {
@@ -509,22 +517,26 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   private fun <T : VimDataType> tryGetBufferLocalOptionValue(option: Option<T>, editor: VimEditor): T? {
-    val options = getBufferLocalOptionStorage(editor)
+    val values = getBufferLocalOptionStorage(editor)
 
     // We set the value via Option<T> so it's safe to cast to T
     @Suppress("UNCHECKED_CAST")
-    return options[option.name] as? T
+    return values[option.name] as? T
   }
 
 
   private fun getWindowLocalOptionStorage(editor: VimEditor) =
     injector.vimStorageService.getOrPutWindowData(editor, localOptionsKey) { mutableMapOf() }
 
-  private fun <T : VimDataType> doSetWindowLocalOptionValue(option: Option<T>, editor: VimEditor, value: T) {
-    val options = getWindowLocalOptionStorage(editor)
-    options[option.name] = value
-
-    getParsedEffectiveOptionStorage(option, editor).remove(option.name)
+  private fun <T : VimDataType> doSetWindowLocalOptionValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
+    val values = getWindowLocalOptionStorage(editor)
+    val oldValue = values[option.name]
+    if (oldValue != value) {
+      values[option.name] = value
+      getParsedEffectiveOptionStorage(option, editor).remove(option.name)
+      return true
+    }
+    return false
   }
 
   private fun <T : VimDataType> getWindowLocalOptionValue(option: Option<T>, editor: VimEditor): T {
@@ -538,11 +550,11 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   private fun <T : VimDataType> tryGetWindowLocalOptionValue(option: Option<T>, editor: VimEditor): T? {
-    val options = getWindowLocalOptionStorage(editor)
+    val values = getWindowLocalOptionStorage(editor)
 
     // We set the value via Option<T> so it's safe to cast to T
     @Suppress("UNCHECKED_CAST")
-    return options[option.name] as? T
+    return values[option.name] as? T
   }
 
   private fun <T : VimDataType> onGlobalOptionValueChanged(option: Option<T>) {
@@ -593,6 +605,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
    * local value. This means we need to notify all editors that are using the global value that it has changed, and skip
    * any editors that have the value overridden. The editors associated with the current buffer are also notified (their
    * local value has been updated).
+   *
+   * Note that we make no effort to minimise change notifications for global-local, as the logic is complex enough.
    */
   private fun <T : VimDataType> onGlobalLocalToBufferOptionEffectiveValueChanged(option: Option<T>, editor: VimEditor) {
     onEffectiveValueChanged(option) {
@@ -614,6 +628,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
    * local value. This means we need to notify all editors that are using the global value that it has changed, and skip
    * any editors that have the value overridden. The editors associated with the current buffer are also notified (their
    * local value has been updated).
+   *
+   * Note that we make no effort to minimise change notifications for global-local, as the logic is complex enough.
    */
   private fun <T : VimDataType> onGlobalLocalToWindowOptionEffectiveValueChanged(option: Option<T>, editor: VimEditor) {
     onEffectiveValueChanged(option) {
