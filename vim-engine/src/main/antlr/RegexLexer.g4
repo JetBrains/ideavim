@@ -558,7 +558,7 @@ mode INSIDE_COLLECTION;
 COLLECTION_END: ']' -> popMode;
 CARET: '^';
 DASH: '-';
-DECIMAL_ESCAPE: '\\d' [0-9] [0-9]? [0-9]? -> type(COLLECTION_LITERAL_CHAR);
+DECIMAL_ESCAPE: '\\d' [0-9] [0-9]+ -> type(COLLECTION_LITERAL_CHAR);
 OCTAL_ESCAPE: '\\o' [0-7] [0-7]? [0-7]? -> type(COLLECTION_LITERAL_CHAR);
 HEXADECIMAL_ESCAPE: '\\x' [a-fA-F0-9] [a-fA-F0-9]? -> type(COLLECTION_LITERAL_CHAR);
 UNICODE_ESCAPE: '\\u' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]? -> type(COLLECTION_LITERAL_CHAR);
