@@ -99,7 +99,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     }
     gradle {
       name = "Push changes to the repo"
-      tasks = "scripts:pushChanges"
+      tasks = "scripts:pushChangesWithReleaseBranch"
     }
     gradle {
       name = "Run Integrations"

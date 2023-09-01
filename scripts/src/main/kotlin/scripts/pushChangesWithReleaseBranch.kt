@@ -14,7 +14,9 @@ import scripts.release.withRepo
 
 fun main(args: Array<String>) {
   val rootDir = args[0]
+  val releaseType = args[1]
   println("root dir: $rootDir")
+  println("releaseType: $releaseType")
 
   val currentBranch = withRepo(rootDir) { it.branch }
   println("Current branch is $currentBranch")
@@ -26,12 +28,25 @@ fun main(args: Array<String>) {
       println("Check out master branch")
     }
 
-    try {git.push()
+    git.push()
       .setPushTags()
-      .call()} catch (e: Throwable) {
-      e.printStackTrace()
-    }
+      .call()
     println("Master pushed with tags")
+
+    if (releaseType != "patch") {
+      git.checkoutBranch("release")
+      println("Checked out release")
+
+      git
+        .push()
+        .setForce(true)
+        .setPushTags()
+        .call()
+      println("Pushed release branch with tags")
+    }
+    else {
+      println("Do not push release branch because type of release is $releaseType")
+    }
 
     git.checkoutBranch(currentBranch)
     println("Checked out $currentBranch branch")
