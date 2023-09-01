@@ -74,25 +74,45 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     operatorArguments: OperatorArguments,
   ): Boolean
 
+  /**
+   * Post execute is executed only one time after the main execute method
+   */
+  public open fun postExecute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ) {}
+
   public fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
 
     // IJ platform has one issue - recursive `runForEachCaret` is not allowed. Strictly speaking, at this moment
     //   we don't know if we run this action inside of this run or not.
+    val currentCaret = editor.currentCaret()
+    val primaryCaret = editor.primaryCaret()
     if (editor.isInForEachCaretScope()) {
       if (myRunForEachCaret) {
-        action(editor.currentCaret())
+        action(currentCaret)
       } else {
-        if (editor.currentCaret() == editor.primaryCaret()) {
-          action(editor.primaryCaret())
+        if (currentCaret == primaryCaret) {
+          action(primaryCaret)
         }
       }
     } else {
       if (myRunForEachCaret) {
         editor.forEachCaret(action)
       } else {
-        action(editor.primaryCaret())
+        action(primaryCaret)
       }
+    }
+
+    if (currentCaret == primaryCaret) {
+      val cmd = VimStateMachine.getInstance(editor).executingCommand ?: run {
+        injector.messages.indicateError()
+        return
+      }
+      postExecute(editor, context, cmd, operatorArguments)
     }
   }
 
