@@ -26,11 +26,9 @@ fun main(args: Array<String>) {
       println("Check out master branch")
     }
 
-    try {git.push()
+    git.push()
       .setPushTags()
-      .call()} catch (e: Throwable) {
-      e.printStackTrace()
-    }
+      .call()
     println("Master pushed with tags")
 
     git.checkoutBranch(currentBranch)
