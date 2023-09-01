@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
-import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
@@ -110,10 +109,8 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
-      if (enableOctopus) {
-        if (isOctopusEnabled(keyStroke, editor)) {
-          return ActionEnableStatus.no("Octopus handler is enabled", LogLevel.DEBUG)
-        }
+      if (isOctopusEnabled(keyStroke, editor)) {
+        return ActionEnableStatus.no("Octopus handler is enabled", LogLevel.DEBUG)
       }
       if (editor.isIdeaVimDisabledHere) {
         return ActionEnableStatus.no("IdeaVim is disabled in this place", LogLevel.INFO)

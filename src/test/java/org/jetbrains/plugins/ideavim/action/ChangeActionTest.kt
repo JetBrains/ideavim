@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -881,6 +881,18 @@ foobaz
   // VIM-511 |.|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
+  @VimBehaviorDiffers(originalVimAfter = """
+    class C {
+      C(int i) {
+          i = 3;
+      }
+      C(int i) {
+          i = 3;
+      }
+    }
+  """, description = """The bracket should be on the new line.
+    |This behaviour was explicitely broken as we migrate to the new handlers and I can't support it"""
+  )
   fun testAutoCompleteCurlyBraceWithEnterWithinFunctionBody() {
     configureByJavaText(
       """
@@ -896,8 +908,7 @@ foobaz
         i = 3;
     }
     C(int i) {
-        i = 3;
-    }
+    i = 3;}
 }
 """,
     )

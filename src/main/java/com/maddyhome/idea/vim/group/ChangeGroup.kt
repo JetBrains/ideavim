@@ -16,12 +16,14 @@ import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
 import com.intellij.openapi.editor.impl.TextRangeInterval
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtilBase
@@ -52,6 +54,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
+import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.changeCase
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
@@ -69,8 +72,10 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.TestOnly
 import java.math.BigInteger
@@ -114,6 +119,35 @@ public class ChangeGroup : VimChangeGroupBase() {
       UndoConfirmationPolicy.DEFAULT, doc
     )
     injector.scroll.scrollCaretIntoView(vimEditor)
+  }
+
+  /**
+   * If this is REPLACE mode we need to turn off OVERWRITE before and then turn OVERWRITE back on after sending the
+   * "ENTER" key.
+   */
+  override fun processEnter(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+  ) {
+    if (editor.mode is Mode.REPLACE) {
+      editor.insertMode = true
+    }
+    try {
+      val continuation = (context.context as UserDataHolder).getUserData(commandContinuation)
+      val ijEditor = editor.ij
+      val ij = context.ij
+      val ijCaret = caret.ij
+      if (continuation != null) {
+        continuation.execute(ijEditor, ijCaret, ij)
+      } else {
+        EnterAction().handler.execute(ijEditor, ijCaret, ij)
+      }
+    } finally {
+      if (editor.mode is Mode.REPLACE) {
+        editor.insertMode = false
+      }
+    }
   }
 
   override fun getDeleteRangeAndType2(

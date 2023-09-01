@@ -31,7 +31,6 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
   public var visualdelay: Int by optionProperty(IjOptions.visualdelay)
 
   // Temporary options to control work-in-progress behaviour
-  public var octopushandler: Boolean by optionProperty(IjOptions.octopushandler)
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
   public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
   public var exCommandAnnotation: Boolean by optionProperty(IjOptions.exCommandAnnotation)

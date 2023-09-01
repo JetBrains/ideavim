@@ -11,9 +11,8 @@ package org.jetbrains.plugins.ideavim.ex
 import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
@@ -49,13 +48,9 @@ class CommandParserTest : VimTestCase() {
       caretShape = false
     }
     val before = "I ${c}found it in a legendary land"
-    val after = if (enableOctopus) {
-      """I :>>
-        |${c}found it in a legendary land
-      """.trimMargin()
-    } else {
-      "I :>>${c}found it in a legendary land"
-    }
+    val after = """I :>>
+      |${c}found it in a legendary land
+    """.trimMargin()
     doTest(exCommand(">>"), before, after) {
       VimPlugin.setEnabled(false)
     }

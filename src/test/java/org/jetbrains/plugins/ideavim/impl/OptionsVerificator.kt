@@ -161,7 +161,6 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
       TestIjOptionConstants.ideavimsupport,
       TestOptionConstants.maxmapdepth,
       TestOptionConstants.number,
-      TestIjOptionConstants.octopushandler,
       TestOptionConstants.relativenumber,
       TestOptionConstants.scrolljump,
       TestOptionConstants.scrolloff,

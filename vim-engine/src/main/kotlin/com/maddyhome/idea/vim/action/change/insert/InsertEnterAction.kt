@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.action.change.insert
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
@@ -17,13 +18,19 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-public class InsertEnterAction : VimActionHandler.SingleExecution() {
+public class InsertEnterAction : VimActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    injector.changeGroup.processEnter(editor, context)
+  override fun execute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    injector.changeGroup.processEnter(editor, caret, context)
     injector.scroll.scrollCaretIntoView(editor)
     return true
   }

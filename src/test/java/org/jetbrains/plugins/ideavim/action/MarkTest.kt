@@ -10,9 +10,8 @@ package org.jetbrains.plugins.ideavim.action
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -155,9 +154,7 @@ class MarkTest : VimTestCase() {
 
     // Currently broken, needs investigation
     // Because of some reason system mark is recreated. As we're on a different column at this moment, this breaks test
-    if (!enableOctopus) {
 //      assertEquals(2, mark.col)
-    }
   }
 
   // |m|
@@ -177,9 +174,7 @@ class MarkTest : VimTestCase() {
 
     // Currently broken, needs investigation
     // Because of some reason system mark is recreated. As we're on a different column at this moment, this breaks test
-    if (!enableOctopus) {
 //      assertEquals(6, mark.col)
-    }
   }
 
   // |m| |`|

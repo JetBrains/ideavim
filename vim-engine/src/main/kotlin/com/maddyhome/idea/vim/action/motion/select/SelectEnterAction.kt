@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.action.motion.select
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
@@ -19,17 +20,18 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-public class SelectEnterAction : VimActionHandler.SingleExecution() {
+public class SelectEnterAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
     editor: VimEditor,
+    caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.changeGroup.processEnter(editor, context)
+    injector.changeGroup.processEnter(editor, caret, context)
     return true
   }
 }

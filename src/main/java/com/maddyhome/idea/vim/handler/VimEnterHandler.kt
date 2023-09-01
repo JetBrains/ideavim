@@ -12,18 +12,20 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
+
+internal val commandContinuation = Key.create<EditorActionHandler>("commandContinuation")
 
 /**
  * This handler doesn't work in tests for ex commands
@@ -37,6 +39,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 
   final override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
     if (isThisHandlerEnabled(editor, caret, dataContext)) {
+      (dataContext as? UserDataHolder)?.putUserData(commandContinuation, nextHandler)
       executeHandler(editor, caret, dataContext)
     } else {
       nextHandler.execute(editor, caret, dataContext)
@@ -48,7 +51,6 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
     if (!VimPlugin.isEnabled()) return false
     if (!isHandlerEnabled(editor, dataContext)) return false
     if (dataContext?.actionStartedFromVim == true) return false
-    if (!enableOctopus) return false
     return true
   }
 
@@ -60,7 +62,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 /**
  * Known conflicts & solutions:
  * - Smart step into - set handler after
- * - Python notebooks - set handler before - test needed!
+ * - Python notebooks - set handler after
  * - Ace jump - set handler after
  * - Lookup - doesn't intersect with enter anymore
  * - App code - set handler after
@@ -68,13 +70,21 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
  */
 internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<CR>"
+
+  override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
+    // This is important for one-line editors, to turn off enter.
+    // Some one-line editors rely on the fact that there are no enter actions registered. For example, hash search in git
+    // See VIM-2974 for example where it was broken
+    return !editor.isOneLineMode
+  }
 }
 
 /**
  * Known conflicts & solutions:
  *
  * - Smart step into - set handler after
- * - Python notebooks - set handler before - test needed
+ * - Python notebooks - set handler before - yes, we have <CR> as "after" and <esc> as before. I'm not completely sure
+ *   why this combination is correct, but other versions don't work.
  * - Ace jump - set handler after
  * - Lookup - It disappears after putting our esc before templateEscape. But I'm not sure why it works like that
  * - App code - Need to review
@@ -82,16 +92,6 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler
  */
 internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<Esc>"
-
-  /**
-   * Also, we need to pass esc to IDE if we're in normal mode and there is nothing to cancel
-   * (e.g. we still can cancel numbers, or cancel the replace character mode)
-   */
-  override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
-    return editor.mode != CommandState.Mode.COMMAND ||
-      editor.vimStateMachine?.commandBuilder?.count != 0 ||
-      editor.vimStateMachine?.isReplaceCharacter == true
-  }
 }
 
 internal abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {
@@ -111,27 +111,19 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler) : Octopu
 }
 
 internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
-  if (!enableOctopus) return false
   when {
     s.keyCode == KeyEvent.VK_ENTER -> return editor.mode in listOf(
       CommandState.Mode.COMMAND,
       CommandState.Mode.INSERT,
       CommandState.Mode.VISUAL,
+      CommandState.Mode.REPLACE,
     )
     s.keyCode == KeyEvent.VK_ESCAPE -> return editor.mode in listOf(
       CommandState.Mode.COMMAND,
       CommandState.Mode.INSERT,
       CommandState.Mode.VISUAL,
+      CommandState.Mode.REPLACE,
     )
   }
   return false
 }
-
-/**
- * Experiment: At the moment, IdeaVim intersects all shortcuts and sends the to [KeyHandler]
- * However, this doesn't seem to be a good solution as other handlers are overridden by vim.
- * If this option is enabled, vim will connect to IDE via EditorActionHandler extension point
- *   what seems to be a way better solution as this is a correct way to override editor actions like enter, right, etc.
- */
-internal val enableOctopus: Boolean
-  get() = injector.globalIjOptions().octopushandler

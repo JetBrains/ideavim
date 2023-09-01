@@ -38,7 +38,7 @@ public interface VimChangeGroup {
 
   public fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
 
-  public fun processEnter(editor: VimEditor, context: ExecutionContext)
+  public fun processEnter(editor: VimEditor, caret: VimCaret, context: ExecutionContext)
 
   public fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: Mode)
 

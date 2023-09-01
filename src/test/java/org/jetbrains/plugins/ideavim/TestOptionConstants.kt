@@ -47,7 +47,6 @@ class TestIjOptionConstants {
     const val ideamarks = "ideamarks"
     const val idearefactormode = "idearefactormode"
     const val ideavimsupport = "ideavimsupport"
-    const val octopushandler = "octopushandler"
     const val trackactionids = "trackactionids"
     const val unifyjumps = "unifyjumps"
   }
