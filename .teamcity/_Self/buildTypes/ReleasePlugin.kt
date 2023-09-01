@@ -112,12 +112,14 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       fi
       
       git push origin --tags
+      git push origin
       
       if [ "patch" != $releaseType  ];
       then
         git checkout release
         echo checkout release branch
-        git push --force --tags
+        git push --tags
+        git push origin --force
       fi
       
       git checkout ${'$'}branch
