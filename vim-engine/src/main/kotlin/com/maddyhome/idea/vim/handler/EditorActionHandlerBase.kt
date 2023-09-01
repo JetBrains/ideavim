@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.state.VimStateMachine
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -76,10 +76,23 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
 
   public fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
-    if (myRunForEachCaret) {
-      editor.forEachCaret(action)
+
+    // IJ platform has one issue - recursive `runForEachCaret` is not allowed. Strictly speaking, at this moment
+    //   we don't know if we run this action inside of this run or not.
+    if (editor.isInForEachCaretScope()) {
+      if (myRunForEachCaret) {
+        action(editor.currentCaret())
+      } else {
+        if (editor.currentCaret() == editor.primaryCaret()) {
+          action(editor.primaryCaret())
+        }
+      }
     } else {
-      action(editor.primaryCaret())
+      if (myRunForEachCaret) {
+        editor.forEachCaret(action)
+      } else {
+        action(editor.primaryCaret())
+      }
     }
   }
 

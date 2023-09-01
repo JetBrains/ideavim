@@ -8,14 +8,14 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -173,6 +173,7 @@ public interface VimEditor {
 
   public fun forEachCaret(action: (VimCaret) -> Unit)
   public fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean = false)
+  public fun isInForEachCaretScope(): Boolean
 
   // --------------------------------------------------------------------
 

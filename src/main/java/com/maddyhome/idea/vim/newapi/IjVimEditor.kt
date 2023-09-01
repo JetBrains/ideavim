@@ -18,6 +18,7 @@ import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.ScrollingModelEx
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.openapi.editor.impl.CaretModelImpl
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.api.BufferPosition
@@ -34,9 +35,7 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
@@ -50,7 +49,6 @@ import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
-import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -58,6 +56,9 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import org.jetbrains.annotations.ApiStatus
 import java.lang.System.identityHashCode
 
@@ -162,6 +163,10 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean) {
     editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, reverse)
+  }
+
+  override fun isInForEachCaretScope(): Boolean {
+    return (editor.caretModel as CaretModelImpl).isIteratingOverCarets
   }
 
   override fun primaryCaret(): VimCaret {
