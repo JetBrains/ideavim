@@ -9,12 +9,12 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
@@ -127,7 +127,7 @@ public interface VimChangeGroup {
 
   public fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: Char, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
-  public fun reformatCodeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  public fun reformatCodeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
   public fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection)
 

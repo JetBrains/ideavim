@@ -1295,7 +1295,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       return lastStart.line - firstStart.line + 1
     }
 
-    protected const val HEX_START: @NonNls String = "0x"
+    public const val HEX_START: @NonNls String = "0x"
     public const val VIM_MOTION_BIG_WORD_RIGHT: String = "VimMotionBigWordRightAction"
     public const val VIM_MOTION_WORD_RIGHT: String = "VimMotionWordRightAction"
     public const val VIM_MOTION_CAMEL_RIGHT: String = "VimMotionCamelRightAction"

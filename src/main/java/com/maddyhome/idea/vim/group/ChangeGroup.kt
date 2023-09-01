@@ -5,145 +5,159 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
-package com.maddyhome.idea.vim.group;
+package com.maddyhome.idea.vim.group
 
-import com.google.common.base.Splitter;
-import com.intellij.codeInsight.actions.AsyncActionExecutionService;
-import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.IdeActions;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.command.UndoConfirmationPolicy;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.event.EditorMouseEvent;
-import com.intellij.openapi.editor.event.EditorMouseListener;
-import com.intellij.openapi.editor.impl.TextRangeInterval;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.util.PsiUtilBase;
-import com.intellij.util.containers.ContainerUtil;
-import com.maddyhome.idea.vim.EventFacade;
-import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.common.IndentConfig;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.ranges.LineRange;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
-import com.maddyhome.idea.vim.handler.Motion;
-import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.icons.VimIcons;
-import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
-import com.maddyhome.idea.vim.listener.VimInsertListener;
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContextKt;
-import com.maddyhome.idea.vim.newapi.IjVimCaret;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.state.mode.Mode;
-import com.maddyhome.idea.vim.state.mode.SelectionType;
-import com.maddyhome.idea.vim.vimscript.model.commands.SortOption;
-import kotlin.Pair;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
-import kotlin.text.StringsKt;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.TestOnly;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
+import com.intellij.codeInsight.actions.AsyncActionExecutionService.Companion.getInstance
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.command.UndoConfirmationPolicy
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.event.EditorMouseEvent
+import com.intellij.openapi.editor.event.EditorMouseListener
+import com.intellij.openapi.editor.impl.TextRangeInterval
+import com.intellij.openapi.ui.MessageType
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.psi.util.PsiUtilBase
+import com.intellij.util.containers.ContainerUtil
+import com.maddyhome.idea.vim.EventFacade
+import com.maddyhome.idea.vim.api.BufferPosition
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimChangeGroupBase
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.anyNonWhitespace
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.getText
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.normalizeOffset
+import com.maddyhome.idea.vim.api.options
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.IndentConfig.Companion.create
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.group.MotionGroup.Companion.getMotionRange2
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
+import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
+import com.maddyhome.idea.vim.helper.CharacterHelper
+import com.maddyhome.idea.vim.helper.CharacterHelper.changeCase
+import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.NumberType
+import com.maddyhome.idea.vim.helper.SearchHelper
+import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.icons.VimIcons
+import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
+import com.maddyhome.idea.vim.listener.VimInsertListener
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
+import org.jetbrains.annotations.TestOnly
+import java.math.BigInteger
+import java.util.*
+import java.util.function.Consumer
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Provides all the insert/replace related functionality
  */
-public class ChangeGroup extends VimChangeGroupBase {
-
-  private final List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
-
-  private long lastShownTime = 0L;
-
-
-  private final @NotNull EditorMouseListener listener = new EditorMouseListener() {
-    @Override
-    public void mouseClicked(@NotNull EditorMouseEvent event) {
-      Editor editor = event.getEditor();
-      if (CommandStateHelper.inInsertMode(editor)) {
-        clearStrokes(new IjVimEditor(editor));
+public class ChangeGroup : VimChangeGroupBase() {
+  private val insertListeners = ContainerUtil.createLockFreeCopyOnWriteList<VimInsertListener>()
+  private var lastShownTime = 0L
+  private val listener: EditorMouseListener = object : EditorMouseListener {
+    override fun mouseClicked(event: EditorMouseEvent) {
+      val editor = event.editor
+      if (editor.inInsertMode) {
+        clearStrokes(IjVimEditor(editor))
       }
     }
-  };
-
-  public void editorCreated(Editor editor, @NotNull Disposable disposable) {
-    EventFacade.getInstance().addEditorMouseListener(editor, listener, disposable);
   }
 
-  public void editorReleased(Editor editor) {
-    EventFacade.getInstance().removeEditorMouseListener(editor, listener);
+  public fun editorCreated(editor: Editor?, disposable: Disposable) {
+    EventFacade.getInstance().addEditorMouseListener(editor!!, listener, disposable)
   }
 
-  @Override
-  public void type(@NotNull VimEditor vimEditor, @NotNull ExecutionContext context, char key) {
-    Editor editor = ((IjVimEditor) vimEditor).getEditor();
-    DataContext ijContext = IjEditorExecutionContextKt.getIj(context);
-    final Document doc = ((IjVimEditor) vimEditor).getEditor().getDocument();
-    CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
-                                                    .runWriteAction(() -> KeyHandlerKeeper.getInstance().getOriginalHandler().execute(editor, key, ijContext)), "", doc,
-                                                  UndoConfirmationPolicy.DEFAULT, doc);
-    injector.getScroll().scrollCaretIntoView(vimEditor);
+  public fun editorReleased(editor: Editor?) {
+    EventFacade.getInstance().removeEditorMouseListener(editor!!, listener)
   }
 
+  override fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char) {
+    val editor = (vimEditor as IjVimEditor).editor
+    val ijContext = context.ij
+    val doc = vimEditor.editor.document
+    CommandProcessor.getInstance().executeCommand(
+      editor.project, {
+        ApplicationManager.getApplication()
+          .runWriteAction { getInstance().originalHandler.execute(editor, key, ijContext) }
+      }, "", doc,
+      UndoConfirmationPolicy.DEFAULT, doc
+    )
+    injector.scroll.scrollCaretIntoView(vimEditor)
+  }
 
-
-  @Override
-  public @Nullable Pair<@NotNull TextRange, @NotNull SelectionType> getDeleteRangeAndType2(@NotNull VimEditor editor,
-                                                                         @NotNull VimCaret caret,
-                                                                         @NotNull ExecutionContext context,
-                                                                         final @NotNull Argument argument,
-                                                                         boolean isChange,
-                                                                         @NotNull OperatorArguments operatorArguments) {
-    final TextRange range = MotionGroup.getMotionRange2(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), ((IjEditorExecutionContext) context).getContext(), argument, operatorArguments);
-    if (range == null) return null;
+  override fun getDeleteRangeAndType2(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments,
+  ): Pair<TextRange, SelectionType>? {
+    val range = getMotionRange2(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      (context as IjEditorExecutionContext).context,
+      argument,
+      operatorArguments
+    )
+      ?: return null
 
     // Delete motion commands that are not linewise become linewise if all the following are true:
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
-    SelectionType type;
-    if (argument.getMotion().isLinewiseMotion()) {
-      type = SelectionType.LINE_WISE;
+    var type: SelectionType
+    type = if (argument.motion.isLinewiseMotion()) {
+      SelectionType.LINE_WISE
+    } else {
+      SelectionType.CHARACTER_WISE
     }
-    else {
-      type = SelectionType.CHARACTER_WISE;
-    }
-    final Command motion = argument.getMotion();
+    val motion = argument.motion
     if (!isChange && !motion.isLinewiseMotion()) {
-      BufferPosition start = editor.offsetToBufferPosition(range.getStartOffset());
-      BufferPosition end = editor.offsetToBufferPosition(range.getEndOffset());
-      if (start.getLine() != end.getLine()) {
-        int offset1 = range.getStartOffset();
-        if (!EngineEditorHelperKt.anyNonWhitespace(editor, offset1, -1)) {
-          int offset = range.getEndOffset();
-          if (!EngineEditorHelperKt.anyNonWhitespace(editor, offset, 1)) {
-            type = SelectionType.LINE_WISE;
+      val start = editor.offsetToBufferPosition(range.startOffset)
+      val end = editor.offsetToBufferPosition(range.endOffset)
+      if (start.line != end.line) {
+        val offset1 = range.startOffset
+        if (!editor.anyNonWhitespace(offset1, -1)) {
+          val offset = range.endOffset
+          if (!editor.anyNonWhitespace(offset, 1)) {
+            type = SelectionType.LINE_WISE
           }
         }
       }
     }
-    return new Pair<>(range, type);
+    return Pair(range, type)
   }
 
   /**
@@ -154,69 +168,66 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param count  The number of characters to change
    * @return true if able to change count characters
    */
-  @Override
-  public boolean changeCaseToggleCharacter(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    boolean allowWrap = options(injector, editor).getWhichwrap().contains("~");
-
-    Motion motion = injector.getMotion().getHorizontalMotion(editor, caret, count, true, allowWrap);
-    if (motion instanceof Motion.Error) return false;
-
-    changeCase(editor, caret, caret.getOffset().getPoint(), ((Motion.AbsoluteOffset)motion).getOffset(), CharacterHelper.CASE_TOGGLE);
-
-    motion = injector.getMotion().getHorizontalMotion(editor, caret, count, false, allowWrap); // same but without allow end because we can change till end, but can't move caret there
-    if (motion instanceof Motion.AbsoluteOffset) {
-      caret.moveToOffset(EngineEditorHelperKt.normalizeOffset(editor, ((Motion.AbsoluteOffset)motion).getOffset(), false));
+  override fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+    val allowWrap = injector.options(editor).whichwrap.contains("~")
+    var motion = injector.motion.getHorizontalMotion(editor, caret, count, true, allowWrap)
+    if (motion is Motion.Error) return false
+    changeCase(editor, caret, caret.offset.point, (motion as AbsoluteOffset).offset, CharacterHelper.CASE_TOGGLE)
+    motion = injector.motion.getHorizontalMotion(
+      editor,
+      caret,
+      count,
+      false,
+      allowWrap
+    ) // same but without allow end because we can change till end, but can't move caret there
+    if (motion is AbsoluteOffset) {
+      caret.moveToOffset(editor.normalizeOffset(motion.offset, false))
     }
-    return true;
+    return true
   }
 
-  @Override
-  public boolean blockInsert(@NotNull VimEditor editor,
-                             @NotNull ExecutionContext context,
-                             @NotNull TextRange range,
-                             boolean append,
-                             @NotNull OperatorArguments operatorArguments) {
-    final int lines = VimChangeGroupBase.Companion.getLinesCountInVisualBlock(editor, range);
-    final BufferPosition startPosition = editor.offsetToBufferPosition(range.getStartOffset());
-
-    boolean visualBlockMode =
-      operatorArguments.getMode() instanceof Mode.VISUAL mode && mode.getSelectionType() == SelectionType.BLOCK_WISE;
-    for (VimCaret caret : editor.carets()) {
-      final int line = startPosition.getLine();
-      int column = startPosition.getColumn();
+  override fun blockInsert(
+    editor: VimEditor,
+    context: ExecutionContext,
+    range: TextRange,
+    append: Boolean,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val lines = getLinesCountInVisualBlock(editor, range)
+    val startPosition = editor.offsetToBufferPosition(range.startOffset)
+    val mode = operatorArguments.mode
+    val visualBlockMode = mode is VISUAL && mode.selectionType === SelectionType.BLOCK_WISE
+    for (caret in editor.carets()) {
+      val line = startPosition.line
+      var column = startPosition.column
       if (!visualBlockMode) {
-        column = 0;
-      }
-      else if (append) {
-        column += range.getMaxLength();
-        if (caret.getVimLastColumn() == VimMotionGroupBase.LAST_COLUMN) {
-          column = VimMotionGroupBase.LAST_COLUMN;
+        column = 0
+      } else if (append) {
+        column += range.maxLength
+        if (caret.vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
+          column = VimMotionGroupBase.LAST_COLUMN
         }
       }
-
-      final int lineLength = EngineEditorHelperKt.lineLength(editor, line);
+      val lineLength = editor.lineLength(line)
       if (column < VimMotionGroupBase.LAST_COLUMN && lineLength < column) {
-        final String pad = EditorHelper.pad(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext(), line, column);
-        final int offset = editor.getLineEndOffset(line);
-        insertText(editor, caret, offset, pad);
+        val pad =
+          EditorHelper.pad((editor as IjVimEditor).editor, (context as IjEditorExecutionContext).context, line, column)
+        val offset = editor.getLineEndOffset(line)
+        insertText(editor, caret, offset, pad)
       }
-
       if (visualBlockMode || !append) {
-        InlayHelperKt.moveToInlayAwareLogicalPosition(((IjVimCaret)caret).getCaret(), new LogicalPosition(line, column));
+        (caret as IjVimCaret).caret.moveToInlayAwareLogicalPosition(LogicalPosition(line, column))
       }
       if (visualBlockMode) {
-        setInsertRepeat(lines, column, append);
+        setInsertRepeat(lines, column, append)
       }
     }
-
     if (visualBlockMode || !append) {
-      insertBeforeCursor(editor, context);
+      insertBeforeCursor(editor, context)
+    } else {
+      insertAfterCursor(editor, context)
     }
-    else {
-      insertAfterCursor(editor, context);
-    }
-
-    return true;
+    return true
   }
 
   /**
@@ -228,15 +239,14 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param type   The case change type (TOGGLE, UPPER, LOWER)
    * @return true if able to delete the text, false if not
    */
-  @Override
-  public boolean changeCaseRange(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull TextRange range, char type) {
-    int[] starts = range.getStartOffsets();
-    int[] ends = range.getEndOffsets();
-    for (int i = ends.length - 1; i >= 0; i--) {
-      changeCase(editor, caret, starts[i], ends[i], type);
+  override fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: Char): Boolean {
+    val starts = range.startOffsets
+    val ends = range.endOffsets
+    for (i in ends.indices.reversed()) {
+      changeCase(editor, caret, starts[i], ends[i], type)
     }
-    caret.moveToOffset(range.getStartOffset());
-    return true;
+    caret.moveToOffset(range.startOffset)
+    return true
   }
 
   /**
@@ -247,26 +257,28 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param end    The end offset to change
    * @param type   The type of change (TOGGLE, UPPER, LOWER)
    */
-  private void changeCase(@NotNull VimEditor editor, @NotNull VimCaret caret, int start, int end, char type) {
+  private fun changeCase(editor: VimEditor, caret: VimCaret, start: Int, end: Int, type: Char) {
+    var start = start
+    var end = end
     if (start > end) {
-      int t = end;
-      end = start;
-      start = t;
+      val t = end
+      end = start
+      start = t
     }
-    end = EngineEditorHelperKt.normalizeOffset(editor, end, true);
-
-    CharSequence chars = editor.text();
-    StringBuilder sb = new StringBuilder();
-    for (int i = start; i < end; i++) {
-      sb.append(CharacterHelper.changeCase(chars.charAt(i), type));
+    end = editor.normalizeOffset(end, true)
+    val chars = editor.text()
+    val sb = StringBuilder()
+    for (i in start until end) {
+      sb.append(changeCase(chars[i], type))
     }
-    replaceText(editor, caret, start, end, sb.toString());
+    replaceText(editor, caret, start, end, sb.toString())
   }
 
-  private void restoreCursor(@NotNull VimEditor editor, @NotNull VimCaret caret, int startLine) {
-    if (!caret.equals(editor.primaryCaret())) {
-      ((IjVimEditor) editor).getEditor().getCaretModel().addCaret(
-        ((IjVimEditor) editor).getEditor().offsetToVisualPosition(injector.getMotion().moveCaretToLineStartSkipLeading(editor, startLine)), false);
+  private fun restoreCursor(editor: VimEditor, caret: VimCaret, startLine: Int) {
+    if (caret != editor.primaryCaret()) {
+      (editor as IjVimEditor).editor.caretModel.addCaret(
+        editor.editor.offsetToVisualPosition(injector.motion.moveCaretToLineStartSkipLeading(editor, startLine)), false
+      )
     }
   }
 
@@ -280,240 +292,244 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
-  @Override
-  public boolean changeCaseMotion(@NotNull VimEditor editor,
-                                  @NotNull VimCaret caret,
-                                  ExecutionContext context,
-                                  char type,
-                                  @NotNull Argument argument,
-                                  @NotNull OperatorArguments operatorArguments) {
-    final TextRange range = injector.getMotion().getMotionRange(editor, caret, context, argument,
-                                                       operatorArguments);
-    return range != null && changeCaseRange(editor, caret, range, type);
+  override fun changeCaseMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext?,
+    type: Char,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val range = injector.motion.getMotionRange(
+      editor, caret, context!!, argument,
+      operatorArguments
+    )
+    return range != null && changeCaseRange(editor, caret, range, type)
   }
 
-  @Override
-  public boolean reformatCodeMotion(@NotNull VimEditor editor,
-                                    @NotNull VimCaret caret,
-                                    ExecutionContext context,
-                                    @NotNull Argument argument,
-                                    @NotNull OperatorArguments operatorArguments) {
-    final TextRange range = injector.getMotion().getMotionRange(editor, caret, context, argument,
-                                                       operatorArguments);
-    return range != null && reformatCodeRange(editor, caret, range);
+  override fun reformatCodeMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val range = injector.motion.getMotionRange(
+      editor, caret, context, argument,
+      operatorArguments
+    )
+    return range != null && reformatCodeRange(editor, caret, range)
   }
 
-  @Override
-  public void reformatCodeSelection(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull VimSelection range) {
-    final TextRange textRange = range.toVimTextRange(true);
-    reformatCodeRange(editor, caret, textRange);
+  override fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection) {
+    val textRange = range.toVimTextRange(true)
+    reformatCodeRange(editor, caret, textRange)
   }
 
-  private boolean reformatCodeRange(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull TextRange range) {
-    int[] starts = range.getStartOffsets();
-    int[] ends = range.getEndOffsets();
-    final int firstLine = editor.offsetToBufferPosition(range.getStartOffset()).getLine();
-    for (int i = ends.length - 1; i >= 0; i--) {
-      final int startOffset = EngineEditorHelperKt.getLineStartForOffset(editor, starts[i]);
-      final int offset = ends[i] - (startOffset == ends[i] ? 0 : 1);
-      final int endOffset = EngineEditorHelperKt.getLineEndForOffset(editor, offset);
-      reformatCode(editor, startOffset, endOffset);
+  private fun reformatCodeRange(editor: VimEditor, caret: VimCaret, range: TextRange): Boolean {
+    val starts = range.startOffsets
+    val ends = range.endOffsets
+    val firstLine = editor.offsetToBufferPosition(range.startOffset).line
+    for (i in ends.indices.reversed()) {
+      val startOffset = editor.getLineStartForOffset(starts[i])
+      val offset = ends[i] - if (startOffset == ends[i]) 0 else 1
+      val endOffset = editor.getLineEndForOffset(offset)
+      reformatCode(editor, startOffset, endOffset)
     }
-    final int newOffset = injector.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
-    caret.moveToOffset(newOffset);
-    return true;
+    val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
+    caret.moveToOffset(newOffset)
+    return true
   }
 
-  private void reformatCode(@NotNull VimEditor editor, int start, int end) {
-    final Project project = ((IjVimEditor) editor).getEditor().getProject();
-    if (project == null) return;
-    final PsiFile file = PsiUtilBase.getPsiFileInEditor(((IjVimEditor) editor).getEditor(), project);
-    if (file == null) return;
-    final com.intellij.openapi.util.TextRange textRange = com.intellij.openapi.util.TextRange.create(start, end);
-    CodeStyleManager.getInstance(project).reformatText(file, Collections.singletonList(textRange));
+  private fun reformatCode(editor: VimEditor, start: Int, end: Int) {
+    val project = (editor as IjVimEditor).editor.project ?: return
+    val file = PsiUtilBase.getPsiFileInEditor(editor.editor, project) ?: return
+    val textRange = com.intellij.openapi.util.TextRange.create(start, end)
+    CodeStyleManager.getInstance(project).reformatText(file, listOf(textRange))
   }
 
-  @Override
-  public void autoIndentMotion(@NotNull VimEditor editor,
-                               @NotNull VimCaret caret,
-                               @NotNull ExecutionContext context,
-                               @NotNull Argument argument,
-                               @NotNull OperatorArguments operatorArguments) {
-    final TextRange range = injector.getMotion().getMotionRange(editor, caret, context, argument, operatorArguments);
+  override fun autoIndentMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ) {
+    val range = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
     if (range != null) {
-      autoIndentRange(editor, caret, context,
-                      new TextRange(range.getStartOffset(), EngineHelperKt.getEndOffsetInclusive(range)));
+      autoIndentRange(
+        editor, caret, context,
+        TextRange(range.startOffset, range.endOffsetInclusive)
+      )
     }
   }
 
-  @Override
-  public void autoIndentRange(@NotNull VimEditor editor,
-                              @NotNull VimCaret caret,
-                              @NotNull ExecutionContext context,
-                              @NotNull TextRange range) {
-    final int startOffset = EngineEditorHelperKt.getLineStartForOffset(editor, range.getStartOffset());
-    final int endOffset = EngineEditorHelperKt.getLineEndForOffset(editor, range.getEndOffset());
-
-    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+  override fun autoIndentRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    range: TextRange,
+  ) {
+    val startOffset = editor.getLineStartForOffset(range.startOffset)
+    val endOffset = editor.getLineEndForOffset(range.endOffset)
+    val ijEditor = (editor as IjVimEditor).editor
 
     // FIXME: Here we do selection, and it is not a good idea, because it updates primary selection in Linux
     // FIXME: I'll leave here a dirty fix that restores primary selection, but it would be better to rewrite this method
-    Pair<String, List<Object>> primaryTextAndTransferableData = null;
+    var primaryTextAndTransferableData: Pair<String, List<Any>?>? = null
     try {
-      if (injector.getRegisterGroup().isPrimaryRegisterSupported()) {
-        primaryTextAndTransferableData = injector.getClipboardManager().getPrimaryTextAndTransferableData();
+      if (injector.registerGroup.isPrimaryRegisterSupported()) {
+        primaryTextAndTransferableData = injector.clipboardManager.getPrimaryTextAndTransferableData()
       }
-    } catch (Exception e) {
+    } catch (e: Exception) {
       // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
-      logger.warn("False positive X11 primary selection support");
+      logger.warn("False positive X11 primary selection support")
     }
-    VisualModeHelperKt.vimSetSystemSelectionSilently(ijEditor.getSelectionModel(), startOffset, endOffset);
-
-    Project project = ijEditor.getProject();
-    Function0<Unit> actionExecution = () -> {
-      NativeAction joinLinesAction = VimInjectorKt.getInjector().getNativeActionManager().getIndentLines();
+    ijEditor.selectionModel.vimSetSystemSelectionSilently(startOffset, endOffset)
+    val project = ijEditor.project
+    val actionExecution = {
+      val joinLinesAction = injector.nativeActionManager.indentLines
       if (joinLinesAction != null) {
-        VimInjectorKt.getInjector().getActionExecutor().executeAction(editor, joinLinesAction, context);
+        injector.actionExecutor.executeAction(editor, joinLinesAction, context)
       }
-      return null;
-    };
-    Function0<Unit> afterAction = () -> {
-      final int firstLine = editor.offsetToBufferPosition(Math.min(startOffset, endOffset)).getLine();
-      final int newOffset = injector.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
-      caret.moveToOffset(newOffset);
-      restoreCursor(editor, caret, ((IjVimCaret)caret).getCaret().getLogicalPosition().line);
-      return null;
-    };
-    if (project != null) {
-      AsyncActionExecutionService.Companion.getInstance(project)
-        .withExecutionAfterAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, actionExecution, afterAction);
-    } else {
-      actionExecution.invoke();
-      afterAction.invoke();
     }
-
+    val afterAction = {
+      val firstLine = editor.offsetToBufferPosition(
+        min(startOffset.toDouble(), endOffset.toDouble()).toInt()
+      ).line
+      val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
+      caret.moveToOffset(newOffset)
+      restoreCursor(editor, caret, (caret as IjVimCaret).caret.logicalPosition.line)
+    }
+    if (project != null) {
+      getInstance(project)
+        .withExecutionAfterAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, actionExecution, afterAction)
+    } else {
+      actionExecution.invoke()
+      afterAction.invoke()
+    }
     try {
       if (primaryTextAndTransferableData != null) {
-        injector.getClipboardManager().setPrimaryText(primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getFirst(), primaryTextAndTransferableData.getSecond());
+        injector.clipboardManager.setPrimaryText(
+          primaryTextAndTransferableData.first,
+          primaryTextAndTransferableData.first,
+          primaryTextAndTransferableData.second ?: emptyList()
+        )
       }
-    } catch (Exception e) {
+    } catch (e: Exception) {
       // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
     }
   }
 
-  @Override
-  public void indentLines(@NotNull VimEditor editor,
-                          @NotNull VimCaret caret,
-                          @NotNull ExecutionContext context,
-                          int lines,
-                          int dir,
-                          @NotNull OperatorArguments operatorArguments) {
-    int start = caret.getOffset().getPoint();
-    int end = injector.getMotion().moveCaretToRelativeLineEnd(editor, caret, lines - 1, true);
-    indentRange(editor, caret, context, new TextRange(start, end), 1, dir, operatorArguments);
+  override fun indentLines(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    lines: Int,
+    dir: Int,
+    operatorArguments: OperatorArguments,
+  ) {
+    val start = caret.offset.point
+    val end = injector.motion.moveCaretToRelativeLineEnd(editor, caret, lines - 1, true)
+    indentRange(editor, caret, context, TextRange(start, end), 1, dir, operatorArguments)
   }
 
-  @Override
-  public void indentMotion(@NotNull VimEditor editor,
-                           @NotNull VimCaret caret,
-                           @NotNull ExecutionContext context,
-                           @NotNull Argument argument,
-                           int dir,
-                           @NotNull OperatorArguments operatorArguments) {
-    final TextRange range =
-      injector.getMotion().getMotionRange(editor, caret, context, argument, operatorArguments);
+  override fun indentMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    dir: Int,
+    operatorArguments: OperatorArguments,
+  ) {
+    val range = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
     if (range != null) {
-      indentRange(editor, caret, context, range, 1, dir, operatorArguments);
+      indentRange(editor, caret, context, range, 1, dir, operatorArguments)
     }
   }
 
-  @Override
-  public void indentRange(@NotNull VimEditor editor,
-                          @NotNull VimCaret caret,
-                          @NotNull ExecutionContext context,
-                          @NotNull TextRange range,
-                          int count,
-                          int dir,
-                          @NotNull OperatorArguments operatorArguments) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("count=" + count);
+  override fun indentRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    range: TextRange,
+    count: Int,
+    dir: Int,
+    operatorArguments: OperatorArguments,
+  ) {
+    if (logger.isDebugEnabled) {
+      logger.debug("count=$count")
     }
 
     // Remember the current caret column
-    final int intendedColumn = caret.getVimLastColumn();
-
-    IndentConfig indentConfig = IndentConfig.create(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext());
-
-    final int sline = editor.offsetToBufferPosition(range.getStartOffset()).getLine();
-    final BufferPosition endLogicalPosition = editor.offsetToBufferPosition(range.getEndOffset());
-    final int eline =
-      endLogicalPosition.getColumn() == 0 ? Math.max(endLogicalPosition.getLine() - 1, 0) : endLogicalPosition.getLine();
-
-    if (range.isMultiple()) {
-      final int from = editor.offsetToBufferPosition(range.getStartOffset()).getColumn();
+    val intendedColumn = caret.vimLastColumn
+    val indentConfig = create((editor as IjVimEditor).editor, (context as IjEditorExecutionContext).context)
+    val sline = editor.offsetToBufferPosition(range.startOffset).line
+    val endLogicalPosition = editor.offsetToBufferPosition(range.endOffset)
+    val eline = if (endLogicalPosition.column == 0) max((endLogicalPosition.line - 1).toDouble(), 0.0)
+      .toInt() else endLogicalPosition.line
+    if (range.isMultiple) {
+      val from = editor.offsetToBufferPosition(range.startOffset).column
       if (dir == 1) {
         // Right shift blockwise selection
-        final String indent = indentConfig.createIndentByCount(count);
-
-        for (int l = sline; l <= eline; l++) {
-          int len = EngineEditorHelperKt.lineLength(editor, l);
+        val indent = indentConfig.createIndentByCount(count)
+        for (l in sline..eline) {
+          val len = editor.lineLength(l)
           if (len > from) {
-            BufferPosition spos = new BufferPosition(l, from, false);
-            insertText(editor, caret, spos, indent);
+            val spos = BufferPosition(l, from, false)
+            insertText(editor, caret, spos, indent)
           }
         }
-      }
-      else {
+      } else {
         // Left shift blockwise selection
-        CharSequence chars = editor.text();
-        for (int l = sline; l <= eline; l++) {
-          int len = EngineEditorHelperKt.lineLength(editor, l);
+        val chars = editor.text()
+        for (l in sline..eline) {
+          val len = editor.lineLength(l)
           if (len > from) {
-            BufferPosition spos = new BufferPosition(l, from, false);
-            BufferPosition epos = new BufferPosition(l, from + indentConfig.getTotalIndent(count) - 1, false);
-            int wsoff = editor.bufferPositionToOffset(spos);
-            int weoff = editor.bufferPositionToOffset(epos);
-            int pos;
-            for (pos = wsoff; pos <= weoff; pos++) {
-              if (CharacterHelper.charType(editor, chars.charAt(pos), false) != CharacterHelper.CharacterType.WHITESPACE) {
-                break;
+            val spos = BufferPosition(l, from, false)
+            val epos = BufferPosition(l, from + indentConfig.getTotalIndent(count) - 1, false)
+            val wsoff = editor.bufferPositionToOffset(spos)
+            val weoff = editor.bufferPositionToOffset(epos)
+            var pos: Int
+            pos = wsoff
+            while (pos <= weoff) {
+              if (charType(editor, chars[pos], false) !== CharacterHelper.CharacterType.WHITESPACE) {
+                break
               }
+              pos++
             }
             if (pos > wsoff) {
-              deleteText(editor, new TextRange(wsoff, pos), null, caret, operatorArguments, true);
+              deleteText(editor, TextRange(wsoff, pos), null, caret, operatorArguments, true)
             }
           }
         }
       }
-    }
-    else {
+    } else {
       // Shift non-blockwise selection
-      for (int l = sline; l <= eline; l++) {
-        final int soff = editor.getLineStartOffset(l);
-        final int eoff = EngineEditorHelperKt.getLineEndOffset(editor, l, true);
-        final int woff = injector.getMotion().moveCaretToLineStartSkipLeading(editor, l);
-        final int col = editor.offsetToVisualPosition(woff).getColumn();
-        final int limit = Math.max(0, col + dir * indentConfig.getTotalIndent(count));
+      for (l in sline..eline) {
+        val soff = editor.getLineStartOffset(l)
+        val eoff = editor.getLineEndOffset(l, true)
+        val woff = injector.motion.moveCaretToLineStartSkipLeading(editor, l)
+        val col = editor.offsetToVisualPosition(woff).column
+        val limit = max(0.0, (col + dir * indentConfig.getTotalIndent(count)).toDouble())
+          .toInt()
         if (col > 0 || soff != eoff) {
-          final String indent = indentConfig.createIndentBySize(limit);
-          replaceText(editor, caret, soff, woff, indent);
+          val indent = indentConfig.createIndentBySize(limit)
+          replaceText(editor, caret, soff, woff, indent)
         }
       }
     }
-
-    if (!CommandStateHelper.inInsertMode(((IjVimEditor) editor).getEditor())) {
-      if (!range.isMultiple()) {
+    if (!editor.editor.inInsertMode) {
+      if (!range.isMultiple) {
         // The caret has moved, so reset the intended column before trying to get the expected offset
-        VimCaret newCaret = caret.setVimLastColumnAndGetCaret(intendedColumn);
-        final int offset = injector.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret);
-        newCaret.moveToOffset(offset);
-      }
-      else {
-        caret.moveToOffset(range.getStartOffset());
+        val newCaret = caret.setVimLastColumnAndGetCaret(intendedColumn)
+        val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, sline, caret)
+        newCaret.moveToOffset(offset)
+      } else {
+        caret.moveToOffset(range.startOffset)
       }
     }
   }
-
 
   /**
    * Sort range of text with a given comparator
@@ -521,22 +537,22 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param editor         The editor to replace text in
    * @param range          The range to sort
    * @param lineComparator The comparator to use to sort
-   * @param sortOption     The option to sort the range
+   * @param sortOptions     The option to sort the range
    * @return true if able to sort the text, false if not
    */
-  public boolean sortRange(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull LineRange range, @NotNull Comparator<String> lineComparator,
-                           @NotNull SortOption sortOption) {
-    final int startLine = range.startLine;
-    final int endLine = range.endLine;
-    final int count = endLine - startLine + 1;
+  override fun sortRange(
+    editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>,
+    sortOptions: SortOption,
+  ): Boolean {
+    val startLine = range.startLine
+    val endLine = range.endLine
+    val count = endLine - startLine + 1
     if (count < 2) {
-      return false;
+      return false
     }
-
-    final int startOffset = editor.getLineStartOffset(startLine);
-    final int endOffset = editor.getLineEndOffset(endLine);
-
-    return sortTextRange(editor, caret, startOffset, endOffset, lineComparator, sortOption);
+    val startOffset = editor.getLineStartOffset(startLine)
+    val endOffset = editor.getLineEndOffset(endLine)
+    return sortTextRange(editor, caret, startOffset, endOffset, lineComparator, sortOptions)
   }
 
   /**
@@ -549,244 +565,226 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param sortOption     The option to sort the range
    * @return true if able to sort the text, false if not
    */
-  private boolean sortTextRange(@NotNull VimEditor editor,
-                                @NotNull VimCaret caret,
-                                int start,
-                                int end,
-                                @NotNull Comparator<String> lineComparator,
-                                @NotNull SortOption sortOption) {
-    final String selectedText = ((IjVimEditor) editor).getEditor().getDocument().getText(new TextRangeInterval(start, end));
-    final List<String> lines = StreamSupport.stream(Splitter.on("\n").split(selectedText).spliterator(), false).sorted(lineComparator)
-      .collect(Collectors.toCollection(ArrayList::new));
-    if (sortOption.getUnique()) {
-      Iterator<String> iterator = lines.iterator();
-      String previous = null;
+  private fun sortTextRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    start: Int,
+    end: Int,
+    lineComparator: Comparator<String>,
+    sortOption: SortOption,
+  ): Boolean {
+    val selectedText = (editor as IjVimEditor).editor.document.getText(TextRangeInterval(start, end))
+    val lines: MutableList<String> = selectedText.split("\n").sortedWith(lineComparator).toMutableList()
+    if (sortOption.unique) {
+      val iterator = lines.iterator()
+      var previous: String? = null
       while (iterator.hasNext()) {
-        String current = iterator.next();
-        if (current.equals(previous) || sortOption.getIgnoreCase() && current.equalsIgnoreCase(previous)) {
-          iterator.remove();
-        }
-        else {
-          previous = current;
+        val current = iterator.next()
+        if (current == previous || sortOption.ignoreCase && current.equals(previous, ignoreCase = true)) {
+          iterator.remove()
+        } else {
+          previous = current
         }
       }
     }
-    if (lines.size() < 1) {
-      return false;
+    if (lines.size < 1) {
+      return false
     }
-    replaceText(editor, caret, start, end, StringUtil.join(lines, "\n"));
-    return true;
+    replaceText(editor, caret, start, end, StringUtil.join(lines, "\n"))
+    return true
   }
 
   /**
    * Perform increment and decrement for numbers in visual mode
-   * <p>
+   *
+   *
    * Flag [avalanche] marks if increment (or decrement) should be performed in avalanche mode
    * (for v_g_Ctrl-A and v_g_Ctrl-X commands)
    *
    * @return true
    */
-  @Override
-  public boolean changeNumberVisualMode(final @NotNull VimEditor editor,
-                                        @NotNull VimCaret caret,
-                                        @NotNull TextRange selectedRange,
-                                        final int count,
-                                        boolean avalanche) {
+  override fun changeNumberVisualMode(
+    editor: VimEditor,
+    caret: VimCaret,
+    selectedRange: TextRange,
+    count: Int,
+    avalanche: Boolean,
+  ): Boolean {
 
     // Just an easter egg
     if (avalanche) {
-      long currentTime = System.currentTimeMillis();
-      if (currentTime - lastShownTime > 60_000) {
-        lastShownTime = currentTime;
-        ApplicationManager.getApplication().invokeLater(() -> {
-          final Balloon balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("Wow, nice vim skills!", VimIcons.IDEAVIM,
-                                          MessageType.INFO.getTitleForeground(), MessageType.INFO.getPopupBackground(),
-                                          null).createBalloon();
-          balloon.show(JBPopupFactory.getInstance().guessBestPopupLocation(((IjVimEditor)editor).getEditor()),
-                       Balloon.Position.below);
-        });
+      val currentTime = System.currentTimeMillis()
+      if (currentTime - lastShownTime > 60000) {
+        lastShownTime = currentTime
+        ApplicationManager.getApplication().invokeLater {
+          val balloon = JBPopupFactory.getInstance()
+            .createHtmlTextBalloonBuilder(
+              "Wow, nice vim skills!", VimIcons.IDEAVIM,
+              MessageType.INFO.titleForeground, MessageType.INFO.popupBackground,
+              null
+            ).createBalloon()
+          balloon.show(
+            JBPopupFactory.getInstance().guessBestPopupLocation((editor as IjVimEditor).editor),
+            Balloon.Position.below
+          )
+        }
       }
     }
-
-    List<String> nf = options(injector, editor).getNrformats();
-    boolean alpha = nf.contains("alpha");
-    boolean hex = nf.contains("hex");
-    boolean octal = nf.contains("octal");
-
-    @NotNull List<Pair<TextRange, NumberType>> numberRanges =
-      SearchHelper.findNumbersInRange(((IjVimEditor) editor).getEditor(), selectedRange, alpha, hex, octal);
-
-    List<String> newNumbers = new ArrayList<>();
-    for (int i = 0; i < numberRanges.size(); i++) {
-      Pair<TextRange, NumberType> numberRange = numberRanges.get(i);
-      int iCount = avalanche ? (i + 1) * count : count;
-      String newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal);
-      newNumbers.add(newNumber);
+    val nf: List<String> = injector.options(editor).nrformats
+    val alpha = nf.contains("alpha")
+    val hex = nf.contains("hex")
+    val octal = nf.contains("octal")
+    val numberRanges = SearchHelper.findNumbersInRange((editor as IjVimEditor).editor, selectedRange, alpha, hex, octal)
+    val newNumbers: MutableList<String?> = ArrayList()
+    for (i in numberRanges.indices) {
+      val numberRange = numberRanges[i]
+      val iCount = if (avalanche) (i + 1) * count else count
+      val newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal)
+      newNumbers.add(newNumber)
     }
-
-    for (int i = newNumbers.size() - 1; i >= 0; i--) {
+    for (i in newNumbers.indices.reversed()) {
       // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
-      Pair<TextRange, NumberType> rangeToReplace = numberRanges.get(i);
-      String newNumber = newNumbers.get(i);
-      replaceText(editor, caret, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(), newNumber);
+      val (first) = numberRanges[i]
+      val newNumber = newNumbers[i]
+      replaceText(editor, caret, first.startOffset, first.endOffset, newNumber!!)
     }
-
-    InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret) caret).getCaret(), selectedRange.getStartOffset());
-    return true;
+    (caret as IjVimCaret).caret.moveToInlayAwareOffset(selectedRange.startOffset)
+    return true
   }
 
-
-  @Override
-  public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
-    final List<String> nf = options(injector, editor).getNrformats();
-    final boolean alpha = nf.contains("alpha");
-    final boolean hex = nf.contains("hex");
-    final boolean octal = nf.contains("octal");
-
-    @Nullable Pair<TextRange, NumberType> range =
-      SearchHelper.findNumberUnderCursor(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), alpha, hex, octal);
+  override fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+    val nf: List<String> = injector.options(editor).nrformats
+    val alpha = nf.contains("alpha")
+    val hex = nf.contains("hex")
+    val octal = nf.contains("octal")
+    val range =
+      SearchHelper.findNumberUnderCursor((editor as IjVimEditor).editor, (caret as IjVimCaret).caret, alpha, hex, octal)
     if (range == null) {
-      logger.debug("no number on line");
-      return false;
+      logger.debug("no number on line")
+      return false
     }
-
-    String newNumber = changeNumberInRange(editor, range, count, alpha, hex, octal);
-    if (newNumber == null) {
-      return false;
-    }
-    else {
-      replaceText(editor, caret, range.getFirst().getStartOffset(), range.getFirst().getEndOffset(), newNumber);
-      InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret) caret).getCaret(), range.getFirst().getStartOffset() + newNumber.length() - 1);
-      return true;
+    val newNumber = changeNumberInRange(editor, range, count, alpha, hex, octal)
+    return if (newNumber == null) {
+      false
+    } else {
+      replaceText(editor, caret, range.first.startOffset, range.first.endOffset, newNumber)
+      caret.caret.moveToInlayAwareOffset(range.first.startOffset + newNumber.length - 1)
+      true
     }
   }
 
-  @Override
-  public void reset() {
-    strokes.clear();
-    repeatCharsCount = 0;
+  override fun reset() {
+    strokes.clear()
+    repeatCharsCount = 0
     if (lastStrokes != null) {
-      lastStrokes.clear();
+      lastStrokes!!.clear()
     }
   }
 
-  @Override
-  public void saveStrokes(String newStrokes) {
-    char[] chars = newStrokes.toCharArray();
-    strokes.add(chars);
+  override fun saveStrokes(newStrokes: String?) {
+    val chars = newStrokes!!.toCharArray()
+    strokes.add(chars)
   }
 
-  private @Nullable String changeNumberInRange(final @NotNull VimEditor editor,
-                                              Pair<TextRange, NumberType> range,
-                                              final int count,
-                                              boolean alpha,
-                                              boolean hex,
-                                              boolean octal) {
-    String text = EngineEditorHelperKt.getText(editor, range.getFirst());
-    NumberType numberType = range.getSecond();
-    if (logger.isDebugEnabled()) {
-      logger.debug("found range " + range);
-      logger.debug("text=" + text);
+  private fun changeNumberInRange(
+    editor: VimEditor,
+    range: Pair<TextRange, NumberType>,
+    count: Int,
+    alpha: Boolean,
+    hex: Boolean,
+    octal: Boolean,
+  ): String? {
+    val text = editor.getText(range.first)
+    val numberType = range.second
+    if (logger.isDebugEnabled) {
+      logger.debug("found range $range")
+      logger.debug("text=$text")
     }
-    String number = text;
+    var number = text
     if (text.isEmpty()) {
-      return null;
+      return null
     }
-
-    char ch = text.charAt(0);
-    if (hex && NumberType.HEX.equals(numberType)) {
-      if (!text.toLowerCase().startsWith(HEX_START)) {
-        throw new RuntimeException("Hex number should start with 0x: " + text);
+    var ch = text[0]
+    if (hex && NumberType.HEX == numberType) {
+      if (!text.lowercase(Locale.getDefault()).startsWith(HEX_START)) {
+        throw RuntimeException("Hex number should start with 0x: $text")
       }
-      for (int i = text.length() - 1; i >= 2; i--) {
-        int index = "abcdefABCDEF".indexOf(text.charAt(i));
+      for (i in text.length - 1 downTo 2) {
+        val index = "abcdefABCDEF".indexOf(text[i])
         if (index >= 0) {
-          lastLower = index < 6;
-          break;
+          lastLower = index < 6
+          break
         }
       }
-
-      BigInteger num = new BigInteger(text.substring(2), 16);
-      num = num.add(BigInteger.valueOf(count));
+      var num = BigInteger(text.substring(2), 16)
+      num = num.add(BigInteger.valueOf(count.toLong()))
       if (num.compareTo(BigInteger.ZERO) < 0) {
-        num = new BigInteger(MAX_HEX_INTEGER, 16).add(BigInteger.ONE).add(num);
+        num = BigInteger(MAX_HEX_INTEGER, 16).add(BigInteger.ONE).add(num)
       }
-      number = num.toString(16);
-      number = StringsKt.padStart(number, text.length() - 2, '0');
-
+      number = num.toString(16)
+      number = number.padStart(text.length - 2, '0')
       if (!lastLower) {
-        number = number.toUpperCase();
+        number = number.uppercase(Locale.getDefault())
       }
-
-      number = text.substring(0, 2) + number;
-    }
-    else if (octal && NumberType.OCT.equals(numberType) && text.length() > 1) {
-      if (!text.startsWith("0")) throw new RuntimeException("Oct number should start with 0: " + text);
-      BigInteger num = new BigInteger(text, 8).add(BigInteger.valueOf(count));
-
+      number = text.substring(0, 2) + number
+    } else if (octal && NumberType.OCT == numberType && text.length > 1) {
+      if (!text.startsWith("0")) throw RuntimeException("Oct number should start with 0: $text")
+      var num = BigInteger(text, 8).add(BigInteger.valueOf(count.toLong()))
       if (num.compareTo(BigInteger.ZERO) < 0) {
-        num = new BigInteger("1777777777777777777777", 8).add(BigInteger.ONE).add(num);
+        num = BigInteger("1777777777777777777777", 8).add(BigInteger.ONE).add(num)
       }
-      number = num.toString(8);
-      number = "0" + StringsKt.padStart(number, text.length() - 1, '0');
-    }
-    else if (alpha && NumberType.ALPHA.equals(numberType)) {
-      if (!Character.isLetter(ch)) throw new RuntimeException("Not alpha number : " + text);
-      ch += (char)count;
+      number = num.toString(8)
+      number = "0" + number.padStart(text.length - 1, '0')
+    } else if (alpha && NumberType.ALPHA == numberType) {
+      if (!Character.isLetter(ch)) throw RuntimeException("Not alpha number : $text")
+      ch += count.toChar().code
       if (Character.isLetter(ch)) {
-        number = String.valueOf(ch);
+        number = ch.toString()
       }
-    }
-    else if (NumberType.DEC.equals(numberType)) {
-      if (ch != '-' && !Character.isDigit(ch)) throw new RuntimeException("Not dec number : " + text);
-      boolean pad = ch == '0';
-      int len = text.length();
-      if (ch == '-' && text.charAt(1) == '0') {
-        pad = true;
-        len--;
+    } else if (NumberType.DEC == numberType) {
+      if (ch != '-' && !Character.isDigit(ch)) throw RuntimeException("Not dec number : $text")
+      var pad = ch == '0'
+      var len = text.length
+      if (ch == '-' && text[1] == '0') {
+        pad = true
+        len--
       }
-
-      BigInteger num = new BigInteger(text);
-      num = num.add(BigInteger.valueOf(count));
-      number = num.toString();
-
+      var num = BigInteger(text)
+      num = num.add(BigInteger.valueOf(count.toLong()))
+      number = num.toString()
       if (!octal && pad) {
-        boolean neg = false;
-        if (number.charAt(0) == '-') {
-          neg = true;
-          number = number.substring(1);
+        var neg = false
+        if (number[0] == '-') {
+          neg = true
+          number = number.substring(1)
         }
-        number = StringsKt.padStart(number, len, '0');
+        number = number.padStart(len, '0')
         if (neg) {
-          number = "-" + number;
+          number = "-$number"
         }
       }
     }
-
-    return number;
+    return number
   }
 
-  public void addInsertListener(VimInsertListener listener) {
-    insertListeners.add(listener);
+  public fun addInsertListener(listener: VimInsertListener) {
+    insertListeners.add(listener)
   }
 
-  public void removeInsertListener(VimInsertListener listener) {
-    insertListeners.remove(listener);
+  public fun removeInsertListener(listener: VimInsertListener) {
+    insertListeners.remove(listener)
   }
 
-  @Override
-  public void notifyListeners(@NotNull VimEditor editor) {
-    insertListeners.forEach(listener -> listener.insertModeStarted(((IjVimEditor)editor).getEditor()));
+  override fun notifyListeners(editor: VimEditor) {
+    insertListeners.forEach(Consumer { listener: VimInsertListener -> listener.insertModeStarted((editor as IjVimEditor).editor) })
   }
 
-  @Override
   @TestOnly
-  public void resetRepeat() {
-    setInsertRepeat(0, 0, false);
+  override fun resetRepeat() {
+    setInsertRepeat(0, 0, false)
   }
 
-
-
-  private static final Logger logger = Logger.getInstance(ChangeGroup.class.getName());
+  private companion object {
+    private val logger = logger<ChangeGroup>()
+  }
 }
