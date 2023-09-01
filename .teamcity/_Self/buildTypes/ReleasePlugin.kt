@@ -97,9 +97,31 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Publish release"
       tasks = "publishPlugin"
     }
-    gradle {
+//    gradle {
+//      name = "Push changes to the repo"
+//      tasks = "scripts:pushChangesWithReleaseBranch"
+//    }
+    script {
       name = "Push changes to the repo"
-      tasks = "scripts:pushChangesWithReleaseBranch"
+      scriptContent = """
+      branch=$(git branch --show-current)  
+      echo current branch is ${'$'}branch
+      if [ "master" != "${'$'}branch" ];
+      then
+        git checkout master
+      fi
+      
+      git push origin --tags
+      
+      if [ "patch" != $releaseType  ];
+      then
+        git checkout release
+        echo checkout release branch
+        git push --force --tags
+      fi
+      
+      git checkout ${'$'}branch
+      """.trimIndent()
     }
     gradle {
       name = "Run Integrations"
