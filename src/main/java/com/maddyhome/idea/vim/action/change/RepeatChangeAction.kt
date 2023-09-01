@@ -45,32 +45,29 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
 
     injector.registerGroup.selectRegister(VimRepeater.lastChangeRegister)
 
-    try {
-      if (repeatHandler && lastHandler != null) {
-        val processor = CommandProcessor.getInstance()
-        processor.executeCommand(
-          editor.ij.project,
-          { lastHandler.execute(editor, context, operatorArguments) },
-          "Vim " + lastHandler.javaClass.simpleName,
-          null,
-        )
-      } else if (!repeatHandler && lastCommand != null) {
-        if (cmd.rawCount > 0) {
-          lastCommand.count = cmd.count
-          val arg = lastCommand.argument
-          if (arg != null) {
-            val mot = arg.motion
-            mot.count = 0
-          }
+    if (repeatHandler && lastHandler != null) {
+      val processor = CommandProcessor.getInstance()
+      processor.executeCommand(
+        editor.ij.project,
+        { lastHandler.execute(editor, context, operatorArguments) },
+        "Vim " + lastHandler.javaClass.simpleName,
+        null,
+      )
+    } else if (!repeatHandler && lastCommand != null) {
+      if (cmd.rawCount > 0) {
+        lastCommand.count = cmd.count
+        val arg = lastCommand.argument
+        if (arg != null) {
+          val mot = arg.motion
+          mot.count = 0
         }
-        state.executingCommand = lastCommand
-
-        val arguments = operatorArguments.copy(count0 = lastCommand.rawCount)
-        injector.actionExecutor.executeVimAction(editor, lastCommand.action, context, arguments)
-
-        VimRepeater.saveLastChange(lastCommand)
       }
-    } catch (ignored: Exception) {
+      state.executingCommand = lastCommand
+
+      val arguments = operatorArguments.copy(count0 = lastCommand.rawCount)
+      injector.actionExecutor.executeVimAction(editor, lastCommand.action, context, arguments)
+
+      VimRepeater.saveLastChange(lastCommand)
     }
 
     state.isDotRepeatInProgress = false
