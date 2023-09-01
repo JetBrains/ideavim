@@ -63,6 +63,7 @@ object ReleaseEap : IdeaVimBuildType({
     gradle {
       tasks = "publishPlugin"
     }
+    // Same as the script below. However, jgit can't find ssh keys on TeamCity
 //    gradle {
 //      name = "Push changes to the repo"
 //      tasks = "scripts:pushChanges"
