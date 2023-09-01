@@ -157,7 +157,11 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     if (editor.vim.inBlockSelection) {
       action(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
-      editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, false)
+      editor.caretModel.runForEachCaret({
+        if (it.isValid) {
+          action(IjVimCaret(it))
+        }
+      }, false)
     }
   }
 
