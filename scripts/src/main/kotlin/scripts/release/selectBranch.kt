@@ -13,19 +13,19 @@ fun main(args: Array<String>) {
 
   checkReleaseType(releaseType)
 
-  val git = getGit(rootDir)
+  withGit(rootDir) { git ->
+    val branchName = when (releaseType) {
+      "major", "minor" -> "master"
+      "patch" -> "release"
+      else -> error("Unsupported release type: $releaseType")
+    }
 
-  val branchName = when (releaseType) {
-    "major", "minor" -> "master"
-    "patch" -> "release"
-    else -> error("Unsupported release type: $releaseType")
+    git.checkoutBranch(branchName)
+
+    val currentBranch = withRepo(rootDir) { it.branch }
+    check(currentBranch == branchName) {
+      "Branch wasn't checked out. Current branch: $currentBranch"
+    }
+    println("Checked out $branchName branch")
   }
-
-  git.checkoutBranch(branchName)
-
-  val currentBranch = getRepo(rootDir).branch
-  check(currentBranch == branchName) {
-    "Branch wasn't checked out. Current branch: $currentBranch"
-  }
-  println("Checked out $branchName branch")
 }

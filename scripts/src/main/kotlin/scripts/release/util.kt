@@ -32,18 +32,22 @@ internal fun readArgs(args: Array<String>): Triple<String, String, String> {
   return Triple(newVersion, rootDir, releaseType)
 }
 
-internal fun getGit(rootDir: String): Git {
-  val repository = getRepo(rootDir)
-  return Git(repository)
+internal inline fun <T> withGit(rootDir: String, action: (Git) -> T): T {
+  withRepo(rootDir) { repository ->
+    Git(repository).use { git ->
+      return action(git)
+    }
+  }
 }
 
-internal fun getRepo(rootDir: String): Repository {
-  return RepositoryBuilder().setGitDir(File("$rootDir/.git")).build()
+internal inline fun <T> withRepo(rootDir: String, action: (Repository) -> T): T {
+  return RepositoryBuilder().setGitDir(File("$rootDir/.git")).build().use {
+    return@use action(it)
+  }
 }
 
 internal fun checkBranch(rootDir: String, releaseType: String) {
-  val repo = getRepo(rootDir)
-  val branch = repo.branch
+  val branch = withRepo(rootDir) { it.branch }
   check(
     releaseType in setOf("major", "minor") && branch == "master"
       || releaseType == "patch" && branch == "release"

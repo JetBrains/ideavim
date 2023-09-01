@@ -46,7 +46,10 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.21")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-        classpath("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r")
+        classpath("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
+
+        // This is needed for jgit to connect to ssh
+        implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.6.0.202305301015-r")
         classpath("org.kohsuke:github-api:1.305")
 
         classpath("io.ktor:ktor-client-core:2.3.3")

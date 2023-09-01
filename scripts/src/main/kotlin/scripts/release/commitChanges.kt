@@ -18,17 +18,16 @@ fun main(args: Array<String>) {
     return
   }
 
-  val git = getGit(rootDir)
+  withGit(rootDir) { git ->
+    git
+      .commit()
+      .setAll(true)
+      .setAuthor("IdeaVim Bot", "maintainers@ideavim.dev")
+      .setMessage("Preparation to $newVersion release")
+      .setSign(false)
+      .call()
 
-  git
-    .commit()
-    .setAll(true)
-    .setAuthor("IdeaVim Bot", "maintainers@ideavim.dev")
-    .setMessage("Preparation to $newVersion release")
-    .setSign(false)
-    .call()
-
-  val lastGitMessage = git.log().call().first().shortMessage
-  println("Changes committed. Last gitlog message: $lastGitMessage")
+    val lastGitMessage = git.log().call().first().shortMessage
+    println("Changes committed. Last gitlog message: $lastGitMessage")
+  }
 }
-

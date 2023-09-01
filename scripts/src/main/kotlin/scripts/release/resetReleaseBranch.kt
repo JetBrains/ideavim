@@ -20,19 +20,19 @@ fun main(args: Array<String>) {
     return
   }
 
-  val git = getGit(rootDir)
+  withGit(rootDir) { git ->
+    val currentCommit = git.log().setMaxCount(1).call().first()
+    println("Current commit id: ${currentCommit.id.name}")
 
-  val currentCommit = git.log().setMaxCount(1).call().first()
-  println("Current commit id: ${currentCommit.id.name}")
+    git.checkoutBranch("release")
+    println("Checked out release branch")
 
-  git.checkoutBranch("release")
-  println("Checked out release branch")
+    git.reset()
+      .setRef(currentCommit.id.name)
+      .call()
+    println("release branch reset")
 
-  git.reset()
-    .setRef(currentCommit.id.name)
-    .call()
-  println("release branch reset")
-
-  git.checkoutBranch("master")
-  println("Checked out master branch")
+    git.checkoutBranch("master")
+    println("Checked out master branch")
+  }
 }

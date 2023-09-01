@@ -11,17 +11,17 @@ package scripts.release
 fun main(args: Array<String>) {
   val (newVersion, rootDir, _) = readArgs(args)
 
-  val git = getGit(rootDir)
+  withGit(rootDir) { git ->
+    git
+      .tag()
+      .setName(newVersion)
+      .call()
 
-  git
-    .tag()
-    .setName(newVersion)
-    .call()
-
-  val tagFound = git.tagList().call()
-    .map { it.name }
-    .find { it == "refs/tags/$newVersion" }
-    .isNullOrBlank()
-    .not()
-  println("Tag added. New tag found: '$tagFound'")
+    val tagFound = git.tagList().call()
+      .map { it.name }
+      .find { it == "refs/tags/$newVersion" }
+      .isNullOrBlank()
+      .not()
+    println("Tag added. New tag found: '$tagFound'")
+  }
 }
