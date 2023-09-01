@@ -63,9 +63,22 @@ object ReleaseEap : IdeaVimBuildType({
     gradle {
       tasks = "publishPlugin"
     }
-    gradle {
+//    gradle {
+//      name = "Push changes to the repo"
+//      tasks = "scripts:pushChanges"
+//    }
+    script {
       name = "Push changes to the repo"
-      tasks = "scripts:pushChanges"
+      scriptContent = """
+      branch=$(git branch --show-current)  
+      echo current branch is ${'$'}branch
+      if [ "master" != "${'$'}branch" ];
+      then
+        exit 1
+      fi
+      
+      git push origin --tags
+      """.trimIndent()
     }
   }
 
