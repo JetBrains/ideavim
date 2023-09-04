@@ -19,7 +19,7 @@ tokens {
   POSITIVE_LOOKAHEAD, NEGATIVE_LOOKAHEAD, POSITIVE_LOOKBEHIND, NEGATIVE_LOOKBEHIND,
   POSITIVE_LIMITED_LOOKBEHIND, NEGATIVE_LIMITED_LOOKBEHIND, LAST_SUBSTITUTE, VISUAL,
   DECIMAL_CODE, OCTAL_CODE, HEXADECIMAL_CODE, UNICODE_CODE, WIDE_UNICODE_CODE,
-  LINE, BEFORE_LINE, AFTER_LINE
+  LINE, BEFORE_LINE, AFTER_LINE, COLUMN, BEFORE_COLUMN, AFTER_COLUMN
 }
 
 @members {
@@ -84,6 +84,9 @@ VISUAL_MAGIC: '\\%V' -> type(VISUAL);
 LINE_MAGIC: '\\%' [0-9]+ 'l' -> type(LINE);
 BEFORE_LINE_MAGIC: '\\%<' [0-9]+ 'l' -> type(LINE);
 AFTER_LINE_MAGIC: '\\%>' [0-9]+ 'l' -> type(LINE);
+COLUMN_MAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_MAGIC: '\\%<' [0-9]+ 'c' -> type(COLUMN);
+AFTER_COLUMN_MAGIC: '\\%>' [0-9]+ 'c' -> type(COLUMN);
 
 // case-related tokens
 IGNORE_CASE_MAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -215,6 +218,9 @@ VISUAL_NOMAGIC: '\\%V' -> type(VISUAL);
 LINE_NOMAGIC: '\\%' [0-9]+ 'l' -> type(LINE);
 BEFORE_LINE_NOMAGIC: '\\%<' [0-9]+ 'l' -> type(LINE);
 AFTER_LINE_NOMAGIC: '\\%>' [0-9]+ 'l' -> type(LINE);
+COLUMN_NOMAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_NOMAGIC: '\\%<' [0-9]+ 'c' -> type(COLUMN);
+AFTER_COLUMN_NOMAGIC: '\\%>' [0-9]+ 'c' -> type(COLUMN);
 
 // case-related tokens
 IGNORE_CASE_NOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -347,6 +353,9 @@ VISUAL_VMAGIC: '%V' -> type(VISUAL);
 LINE_VMAGIC: '%' [0-9]+ 'l' -> type(LINE);
 BEFORE_LINE_VMAGIC: '%<' [0-9]+ 'l' -> type(LINE);
 AFTER_LINE_VMAGIC: '%>' [0-9]+ 'l' -> type(LINE);
+COLUMN_VMAGIC: '%' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_VMAGIC: '%<' [0-9]+ 'c' -> type(COLUMN);
+AFTER_COLUMN_VMAGIC: '%>' [0-9]+ 'c' -> type(COLUMN);
 
 // case-related tokens
 IGNORE_CASE_VMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -478,6 +487,9 @@ VISUAL_VNOMAGIC: '\\%V' -> type(VISUAL);
 LINE_VNOMAGIC: '\\%' [0-9]+ 'l' -> type(LINE);
 BEFORE_LINE_VNOMAGIC: '\\%<' [0-9]+ 'l' -> type(LINE);
 AFTER_LINE_VNOMAGIC: '\\%>' [0-9]+ 'l' -> type(LINE);
+COLUMN_VNOMAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_VNOMAGIC: '\\%<' [0-9]+ 'c' -> type(COLUMN);
+AFTER_COLUMN_VNOMAGIC: '\\%>' [0-9]+ 'c' -> type(COLUMN);
 
 // case-related tokens
 IGNORE_CASE_VNOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
