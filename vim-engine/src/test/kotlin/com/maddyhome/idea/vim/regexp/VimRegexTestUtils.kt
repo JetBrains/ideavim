@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp
 
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
@@ -22,6 +23,26 @@ internal object VimRegexTestUtils {
   fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
     val editorMock = Mockito.mock<VimEditor>()
     whenever(editorMock.text()).thenReturn(text)
+
+    val lines = text.split("\n").map { it + "\n" }
+    whenever(editorMock.offsetToBufferPosition(Mockito.anyInt())).thenAnswer { invocation ->
+      val offset = invocation.arguments[0] as Int
+      var lineCounter = 0
+      var currentOffset = 0
+
+      while (lineCounter < lines.size && currentOffset + lines[lineCounter].length <= offset) {
+        currentOffset += lines[lineCounter].length
+        lineCounter++
+      }
+
+      if (lineCounter < lines.size) {
+        val column = offset - currentOffset
+        BufferPosition(lineCounter, column)
+      } else {
+        BufferPosition(-1, -1)
+      }
+    }
+
 
     val trueCarets = ArrayList<VimCaret>()
     for (caret in carets) {
