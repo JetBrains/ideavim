@@ -82,11 +82,11 @@ START_OF_WORD_MAGIC: '\\<' -> type(START_OF_WORD);
 END_OF_WORD_MAGIC: '\\>' -> type(END_OF_WORD);
 VISUAL_MAGIC: '\\%V' -> type(VISUAL);
 LINE_MAGIC: '\\%' [0-9]+ 'l' -> type(LINE);
-BEFORE_LINE_MAGIC: '\\%<' [0-9]+ 'l' -> type(LINE);
-AFTER_LINE_MAGIC: '\\%>' [0-9]+ 'l' -> type(LINE);
+BEFORE_LINE_MAGIC: '\\%<' [0-9]+ 'l' -> type(BEFORE_LINE);
+AFTER_LINE_MAGIC: '\\%>' [0-9]+ 'l' -> type(AFTER_LINE);
 COLUMN_MAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_MAGIC: '\\%<' [0-9]+ 'c' -> type(COLUMN);
-AFTER_COLUMN_MAGIC: '\\%>' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_MAGIC: '\\%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
+AFTER_COLUMN_MAGIC: '\\%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
 
 // case-related tokens
 IGNORE_CASE_MAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -216,11 +216,11 @@ START_OF_WORD_NOMAGIC: '\\<' -> type(START_OF_WORD);
 END_OF_WORD_NOMAGIC: '\\>' -> type(END_OF_WORD);
 VISUAL_NOMAGIC: '\\%V' -> type(VISUAL);
 LINE_NOMAGIC: '\\%' [0-9]+ 'l' -> type(LINE);
-BEFORE_LINE_NOMAGIC: '\\%<' [0-9]+ 'l' -> type(LINE);
-AFTER_LINE_NOMAGIC: '\\%>' [0-9]+ 'l' -> type(LINE);
+BEFORE_LINE_NOMAGIC: '\\%<' [0-9]+ 'l' -> type(BEFORE_LINE);
+AFTER_LINE_NOMAGIC: '\\%>' [0-9]+ 'l' -> type(AFTER_LINE);
 COLUMN_NOMAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_NOMAGIC: '\\%<' [0-9]+ 'c' -> type(COLUMN);
-AFTER_COLUMN_NOMAGIC: '\\%>' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_NOMAGIC: '\\%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
+AFTER_COLUMN_NOMAGIC: '\\%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
 
 // case-related tokens
 IGNORE_CASE_NOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -351,11 +351,11 @@ START_OF_WORD_VMAGIC: '<' -> type(START_OF_WORD);
 END_OF_WORD_VMAGIC: '>' -> type(END_OF_WORD);
 VISUAL_VMAGIC: '%V' -> type(VISUAL);
 LINE_VMAGIC: '%' [0-9]+ 'l' -> type(LINE);
-BEFORE_LINE_VMAGIC: '%<' [0-9]+ 'l' -> type(LINE);
-AFTER_LINE_VMAGIC: '%>' [0-9]+ 'l' -> type(LINE);
+BEFORE_LINE_VMAGIC: '%<' [0-9]+ 'l' -> type(BEFORE_LINE);
+AFTER_LINE_VMAGIC: '%>' [0-9]+ 'l' -> type(AFTER_LINE);
 COLUMN_VMAGIC: '%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_VMAGIC: '%<' [0-9]+ 'c' -> type(COLUMN);
-AFTER_COLUMN_VMAGIC: '%>' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_VMAGIC: '%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
+AFTER_COLUMN_VMAGIC: '%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
 
 // case-related tokens
 IGNORE_CASE_VMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -485,11 +485,11 @@ START_OF_WORD_VNOMAGIC: '\\<' -> type(START_OF_WORD);
 END_OF_WORD_VNOMAGIC: '\\>' -> type(END_OF_WORD);
 VISUAL_VNOMAGIC: '\\%V' -> type(VISUAL);
 LINE_VNOMAGIC: '\\%' [0-9]+ 'l' -> type(LINE);
-BEFORE_LINE_VNOMAGIC: '\\%<' [0-9]+ 'l' -> type(LINE);
-AFTER_LINE_VNOMAGIC: '\\%>' [0-9]+ 'l' -> type(LINE);
+BEFORE_LINE_VNOMAGIC: '\\%<' [0-9]+ 'l' -> type(BEFORE_LINE);
+AFTER_LINE_VNOMAGIC: '\\%>' [0-9]+ 'l' -> type(AFTER_LINE);
 COLUMN_VNOMAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_VNOMAGIC: '\\%<' [0-9]+ 'c' -> type(COLUMN);
-AFTER_COLUMN_VNOMAGIC: '\\%>' [0-9]+ 'c' -> type(COLUMN);
+BEFORE_COLUMN_VNOMAGIC: '\\%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
+AFTER_COLUMN_VNOMAGIC: '\\%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
 
 // case-related tokens
 IGNORE_CASE_VNOMAGIC: '\\c' { setIgnoreCase(); } -> skip;

@@ -1580,7 +1580,7 @@ class NFATest {
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
-      "\\%<11m",
+      "\\%<11cm",
       TextRange(4, 5)
     )
   }
