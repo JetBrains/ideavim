@@ -32,7 +32,7 @@ val knownPlugins = listOf(
   "com.github.dankinsoid.multicursor",
   "com.joshestein.ideavim-quickscope",
 
-   "cc.implicated.intellij.plugins.bunny", // I don't want to include this plugin in the list of IdeaVim plugins as I don't understand what this is for
+//   "cc.implicated.intellij.plugins.bunny", // I don't want to include this plugin in the list of IdeaVim plugins as I don't understand what this is for
 )
 
 suspend fun main() {
