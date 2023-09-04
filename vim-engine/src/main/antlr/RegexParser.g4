@@ -188,6 +188,9 @@ zero_width : CURSOR        #Cursor
            | END_OF_LINE   #EndOfLine
            | START_OF_WORD #StartOfWord
            | END_OF_WORD   #EndOfWord
+           | LINE          #Line
+           | BEFORE_LINE   #BeforeLine
+           | AFTER_LINE    #AfterLine
            ;
 
 /**
