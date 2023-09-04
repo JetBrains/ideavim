@@ -9,9 +9,13 @@
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
 import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterColumnMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtColumnMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BackreferenceMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeColumnMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionRange
@@ -617,12 +621,14 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitBeforeLine(ctx: RegexParser.BeforeLineContext): NFA {
     return NFA.fromMatcher(
-      AtLineMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
+      BeforeLineMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt())
+    )
   }
 
   override fun visitAfterLine(ctx: RegexParser.AfterLineContext): NFA {
     return NFA.fromMatcher(
-      AtLineMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
+      AfterLineMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt())
+    )
   }
 
   override fun visitColumn(ctx: RegexParser.ColumnContext): NFA {
@@ -633,12 +639,14 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitBeforeColumn(ctx: RegexParser.BeforeColumnContext): NFA {
     return NFA.fromMatcher(
-      AtColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
+      BeforeColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt())
+    )
   }
 
   override fun visitAfterColumn(ctx: RegexParser.AfterColumnContext): NFA {
     return NFA.fromMatcher(
-      AtColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
+      AfterColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt())
+    )
   }
 
   private fun cleanLiteralChar(str : String) : Char {
