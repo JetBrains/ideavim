@@ -191,9 +191,9 @@ zero_width : CURSOR        #Cursor
            | LINE          #Line
            | BEFORE_LINE   #BeforeLine
            | AFTER_LINE    #AfterLine
-           | COLUMN          #Column
-           | BEFORE_COLUMN   #BeforeColumn
-           | AFTER_COLUMN    #AfterColumn
+           | COLUMN        #Column
+           | BEFORE_COLUMN #BeforeColumn
+           | AFTER_COLUMN  #AfterColumn
            ;
 
 /**

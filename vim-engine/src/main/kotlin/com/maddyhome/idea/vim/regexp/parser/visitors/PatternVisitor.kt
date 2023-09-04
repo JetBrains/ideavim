@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
 import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AtColumnMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AtLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BackreferenceMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
@@ -606,6 +608,37 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
         Char((if (ctx.text[0] == '\\') ctx.text.substring(3) else ctx.text.substring(2)).toInt(16))
       )
     )
+  }
+
+  override fun visitLine(ctx: RegexParser.LineContext): NFA {
+    return NFA.fromMatcher(
+      AtLineMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 2 else 1, ctx.text.length - 1).toInt()))
+  }
+
+  override fun visitBeforeLine(ctx: RegexParser.BeforeLineContext): NFA {
+    return NFA.fromMatcher(
+      AtLineMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
+  }
+
+  override fun visitAfterLine(ctx: RegexParser.AfterLineContext): NFA {
+    return NFA.fromMatcher(
+      AtLineMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
+  }
+
+  override fun visitColumn(ctx: RegexParser.ColumnContext): NFA {
+    return NFA.fromMatcher(
+      AtColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 2 else 1, ctx.text.length - 1).toInt())
+    )
+  }
+
+  override fun visitBeforeColumn(ctx: RegexParser.BeforeColumnContext): NFA {
+    return NFA.fromMatcher(
+      AtColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
+  }
+
+  override fun visitAfterColumn(ctx: RegexParser.AfterColumnContext): NFA {
+    return NFA.fromMatcher(
+      AtColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt()))
   }
 
   private fun cleanLiteralChar(str : String) : Char {
