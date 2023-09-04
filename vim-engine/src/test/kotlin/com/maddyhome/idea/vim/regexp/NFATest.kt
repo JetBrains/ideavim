@@ -1515,6 +1515,90 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test match characters at line 3`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%3lLorem",
+      TextRange(13, 18)
+    )
+  }
+
+  @Test
+  fun `test match characters before line 3`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%<3lLorem",
+      TextRange(0, 5)
+    )
+  }
+
+  @Test
+  fun `test match characters after line 2`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%>2lLorem",
+      TextRange(13, 18)
+    )
+  }
+
+  @Test
+  fun `test match character at column 11`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%11cm",
+      TextRange(10, 11)
+    )
+  }
+
+  @Test
+  fun `test match characters before column 11`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%<11m",
+      TextRange(4, 5)
+    )
+  }
+
+  @Test
+  fun `test match characters after column 6`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%>6cm",
+      TextRange(10, 11)
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
