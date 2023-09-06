@@ -1639,7 +1639,7 @@ class NFATest {
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\%>.l...",
-      TextRange(13, 16),
+      TextRange(41, 44),
       carets=listOf(18)
     )
   }

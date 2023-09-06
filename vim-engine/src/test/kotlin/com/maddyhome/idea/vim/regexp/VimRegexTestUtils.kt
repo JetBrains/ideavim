@@ -51,6 +51,7 @@ internal object VimRegexTestUtils {
       trueCarets.add(caretMock)
     }
     whenever(editorMock.carets()).thenReturn(trueCarets)
+    whenever(editorMock.currentCaret()).thenReturn(trueCarets.firstOrNull())
     return editorMock
   }
 

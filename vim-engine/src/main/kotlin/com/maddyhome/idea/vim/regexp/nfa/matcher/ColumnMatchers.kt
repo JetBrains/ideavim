@@ -54,7 +54,7 @@ internal class AtColumnCursorMatcher : Matcher {
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).column + 1 == editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
@@ -66,7 +66,7 @@ internal class BeforeColumnCursorMatcher : Matcher {
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).column + 1 < editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
@@ -78,7 +78,7 @@ internal class AfterColumnCursorMatcher : Matcher {
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).column + 1 > editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
