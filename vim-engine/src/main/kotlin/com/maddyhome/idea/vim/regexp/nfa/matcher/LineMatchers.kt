@@ -46,3 +46,38 @@ internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
     else MatcherResult.Failure
   }
 }
+internal class AtLineCursorMatcher : Matcher {
+  override fun matches(
+    editor: VimEditor,
+    index: Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+  ): MatcherResult {
+    return if (editor.offsetToBufferPosition(index).line + 1 == editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    else MatcherResult.Failure
+  }
+}
+
+internal class BeforeLineCursorMatcher : Matcher {
+  override fun matches(
+    editor: VimEditor,
+    index: Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+  ): MatcherResult {
+    return if (editor.offsetToBufferPosition(index).line + 1 < editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    else MatcherResult.Failure
+  }
+}
+
+internal class AfterLineCursorMatcher : Matcher {
+  override fun matches(
+    editor: VimEditor,
+    index: Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+  ): MatcherResult {
+    return if (editor.offsetToBufferPosition(index).line + 1 > editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    else MatcherResult.Failure
+  }
+}

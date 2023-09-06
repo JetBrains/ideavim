@@ -46,3 +46,39 @@ internal class AfterColumnMatcher(private val columnNumber: Int) : Matcher {
     else MatcherResult.Failure
   }
 }
+
+internal class AtColumnCursorMatcher : Matcher {
+  override fun matches(
+    editor: VimEditor,
+    index: Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+  ): MatcherResult {
+    return if (editor.offsetToBufferPosition(index).column + 1 == editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    else MatcherResult.Failure
+  }
+}
+
+internal class BeforeColumnCursorMatcher : Matcher {
+  override fun matches(
+    editor: VimEditor,
+    index: Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+  ): MatcherResult {
+    return if (editor.offsetToBufferPosition(index).column + 1 < editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    else MatcherResult.Failure
+  }
+}
+
+internal class AfterColumnCursorMatcher : Matcher {
+  override fun matches(
+    editor: VimEditor,
+    index: Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+  ): MatcherResult {
+    return if (editor.offsetToBufferPosition(index).column + 1 > editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    else MatcherResult.Failure
+  }
+}
