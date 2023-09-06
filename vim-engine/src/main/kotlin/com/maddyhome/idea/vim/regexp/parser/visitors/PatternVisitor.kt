@@ -9,12 +9,18 @@
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
 import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterColumnMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterLineCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterLineMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AtColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtColumnMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AtLineCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BackreferenceMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeColumnMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeLineCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
@@ -647,6 +653,30 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(
       AfterColumnMatcher(ctx.text.substring(if (ctx.text[0] == '\\') 3 else 2, ctx.text.length - 1).toInt())
     )
+  }
+
+  override fun visitLineCursor(ctx: RegexParser.LineCursorContext?): NFA {
+    return NFA.fromMatcher(AtLineCursorMatcher())
+  }
+
+  override fun visitBeforeLineCursor(ctx: RegexParser.BeforeLineCursorContext?): NFA {
+    return NFA.fromMatcher(BeforeLineCursorMatcher())
+  }
+
+  override fun visitAfterLineCursor(ctx: RegexParser.AfterLineCursorContext?): NFA {
+    return NFA.fromMatcher(AfterLineCursorMatcher())
+  }
+
+  override fun visitColumnCursor(ctx: RegexParser.ColumnCursorContext?): NFA {
+    return NFA.fromMatcher(AtColumnCursorMatcher())
+  }
+
+  override fun visitBeforeColumnCursor(ctx: RegexParser.BeforeColumnCursorContext?): NFA {
+    return NFA.fromMatcher(BeforeColumnCursorMatcher())
+  }
+
+  override fun visitAfterColumnCursor(ctx: RegexParser.AfterColumnCursorContext?): NFA {
+    return NFA.fromMatcher(AfterColumnCursorMatcher())
   }
 
   private fun cleanLiteralChar(str : String) : Char {
