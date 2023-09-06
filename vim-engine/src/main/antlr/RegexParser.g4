@@ -178,25 +178,28 @@ collection_char_class_expression : ALPHA_CLASS     #AlphaClass
  * When using zero-width tokens, no characters are
  * included in the match.
  */
-zero_width : CURSOR             #Cursor
-           | VISUAL             #Visual
-           | START_MATCH        #StartMatch
-           | END_MATCH          #EndMatch
-           | START_OF_FILE      #StartOfFile
-           | END_OF_FILE        #EndOfFile
-           | START_OF_LINE      #StartOfLine
-           | END_OF_LINE        #EndOfLine
-           | START_OF_WORD      #StartOfWord
-           | END_OF_WORD        #EndOfWord
-           | LINE               #Line
-           | BEFORE_LINE        #BeforeLine
-           | AFTER_LINE         #AfterLine
-           | LINE_CURSOR        #LineCursor
-           | BEFORE_LINE_CURSOR #BeforeLineCursor
-           | AFTER_LINE_CURSOR  #AfterLineCursor
-           | COLUMN             #Column
-           | BEFORE_COLUMN      #BeforeColumn
-           | AFTER_COLUMN       #AfterColumn
+zero_width : CURSOR               #Cursor
+           | VISUAL               #Visual
+           | START_MATCH          #StartMatch
+           | END_MATCH            #EndMatch
+           | START_OF_FILE        #StartOfFile
+           | END_OF_FILE          #EndOfFile
+           | START_OF_LINE        #StartOfLine
+           | END_OF_LINE          #EndOfLine
+           | START_OF_WORD        #StartOfWord
+           | END_OF_WORD          #EndOfWord
+           | LINE                 #Line
+           | BEFORE_LINE          #BeforeLine
+           | AFTER_LINE           #AfterLine
+           | LINE_CURSOR          #LineCursor
+           | BEFORE_LINE_CURSOR   #BeforeLineCursor
+           | AFTER_LINE_CURSOR    #AfterLineCursor
+           | COLUMN               #Column
+           | BEFORE_COLUMN        #BeforeColumn
+           | AFTER_COLUMN         #AfterColumn
+           | COLUMN_CURSOR        #ColumnCursor
+           | BEFORE_COLUMN_CURSOR #BeforeColumnCursor
+           | AFTER_COLUMN_CURSOR  #AfterColumnCursor
            ;
 
 /**
