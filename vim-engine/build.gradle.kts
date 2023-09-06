@@ -10,7 +10,7 @@ plugins {
     java
     kotlin("jvm")
 //    id("org.jlleitschuh.gradle.ktlint")
-    id("com.google.devtools.ksp") version "1.8.21-1.0.11"
+    id("com.google.devtools.ksp") version "1.9.10-1.0.13"
   `maven-publish`
 }
 
