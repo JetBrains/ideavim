@@ -121,8 +121,8 @@ class PutVisualTextActionTest : VimTestCase() {
   fun `test put visual text multicaret clipboard register`() {
     val before = "${c}I found ${c}it in a ${c}legendary land"
     configureByText(before)
-    injector.registerGroup.storeText('*', "legendary", SelectionType.CHARACTER_WISE)
-    typeText(injector.parser.parseKeys("ve" + "\"*p"))
+    injector.registerGroup.storeText('+', "legendary", SelectionType.CHARACTER_WISE)
+    typeText(injector.parser.parseKeys("ve" + "\"+p"))
     val after = "legendar${c}y legendar${c}y in a legendar${c}y land"
     assertState(after)
   }
@@ -296,8 +296,8 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "A Discovery\n", SelectionType.LINE_WISE)
-    typeText(injector.parser.parseKeys("ve" + "\"*p"))
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("ve" + "\"+p"))
     val after = """
             A Discovery
 
@@ -356,8 +356,8 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}hard by the$c torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "A Discovery\n", SelectionType.LINE_WISE)
-    typeText(injector.parser.parseKeys("ve" + "\"*p"))
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("ve" + "\"+p"))
     val after = """
             A Discovery
 
@@ -416,8 +416,8 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}hard by the$c torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "A Discovery\n", SelectionType.LINE_WISE)
-    typeText(injector.parser.parseKeys("ve" + "2\"*p"))
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("ve" + "2\"+p"))
     val after = """
             A Discovery
 
@@ -604,9 +604,9 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy ${c}underside, the checquered fringe.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    injector.registerGroup.storeText('+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
 //    VimPlugin.getRegister().storeText(editor.vim, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-    typeText(injector.parser.parseKeys("ve" + "\"*p"))
+    typeText(injector.parser.parseKeys("ve" + "\"+p"))
     val after = """
             A Discovery
 
@@ -775,8 +775,8 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "Discovery", SelectionType.CHARACTER_WISE)
-    typeText(injector.parser.parseKeys("V" + "\"*p"))
+    injector.registerGroup.storeText('+', "Discovery", SelectionType.CHARACTER_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
 
@@ -847,8 +847,8 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "Discovery", SelectionType.CHARACTER_WISE)
-    typeText(injector.parser.parseKeys("V" + "\"*p"))
+    injector.registerGroup.storeText('+', "Discovery", SelectionType.CHARACTER_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
 
@@ -1011,8 +1011,8 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "A Discovery\n", SelectionType.LINE_WISE)
-    typeText(injector.parser.parseKeys("V" + "\"*p"))
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
 
@@ -1083,8 +1083,8 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "A Discovery\n", SelectionType.LINE_WISE)
-    typeText(injector.parser.parseKeys("V" + "\"*p"))
+    injector.registerGroup.storeText('+', "A Discovery\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
 
@@ -1353,8 +1353,8 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy ${c}underside, the checquered fringe.
     """.trimIndent()
     configureByText(before)
-    injector.registerGroup.storeText('*', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
-    typeText(injector.parser.parseKeys("V" + "\"*p"))
+    injector.registerGroup.storeText('+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
 

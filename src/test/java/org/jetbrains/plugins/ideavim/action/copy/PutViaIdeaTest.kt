@@ -161,7 +161,7 @@ class PutViaIdeaTest : VimTestCase() {
     // For this particular test, we want to set exact this type of transferable
     CopyPasteManagerEx.getInstance().setContents(StringSelection("Hello"))
 
-    typeText("\"*p", "\"*p")
+    typeText("\"+p", "\"+p")
     val after = """
             A Discovery
             HelloHello

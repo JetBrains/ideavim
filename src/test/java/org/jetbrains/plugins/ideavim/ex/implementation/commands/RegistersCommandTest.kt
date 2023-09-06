@@ -300,11 +300,12 @@ class RegistersCommandTest : VimTestCase() {
     enterCommand("set clipboard&")
   }
 
+  @Test
   @TestWithPrimaryClipboard
   fun `test list empty registers linux`() {
     configureByText("")
     enterCommand("registers")
-    assertExOutput("Type Name Content\n  c  \"+   ")
+    assertExOutput("Type Name Content\n  c  \"*   ")
   }
 
   @TestWithPrimaryClipboard
@@ -317,7 +318,7 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput(
       """Type Name Content
                      |  c  "a   ^IHello World^J^[
-                     |  c  "+   
+                     |  c  "*   
       """.trimMargin(),
     )
   }
@@ -412,8 +413,8 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "y   Hello world y
       |  c  "z   Hello world z
       |  c  "-   s
-      |  c  "*   clipboard content
-      |  c  "+   mall delete register
+      |  c  "*   mall delete register
+      |  c  "+   clipboard content
       |  c  ":   ascii
       |  c  "/   search pattern
       """.trimMargin(),
@@ -431,8 +432,8 @@ class RegistersCommandTest : VimTestCase() {
     enterCommand("registers")
     assertExOutput(
       """Type Name Content
-      |  c  "*   clipboard content
-      |  c  "+   line 0 
+      |  c  "*   line 0 
+      |  c  "+   clipboard content
       """.trimMargin(),
     )
   }
@@ -469,6 +470,7 @@ class RegistersCommandTest : VimTestCase() {
       """Type Name Content
       |  c  ""   line
       |  c  "-   line
+      |  c  "*   
       |  c  "+   line
       |  c  ":   set clipboard=unnamed,unnamedplus
       """.trimMargin(),

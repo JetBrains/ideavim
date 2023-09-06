@@ -19,30 +19,7 @@ import org.jetbrains.plugins.ideavim.impl.VimOption
 
 @TraceOptions(TestOptionConstants.clipboard)
 class YankAndPutTest : VimTestCase() {
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed]))
-  fun `test yank to number register with unnamed`() {
-    val before = """
-            I ${c}found it in a legendary land
-            consectetur adipiscing elit
-    """.trimIndent()
-    configureByText(before)
-    // Select and yank first word
-    typeText(injector.parser.parseKeys("vey"))
-    // Replace second word
-    typeText(injector.parser.parseKeys("wvep"))
-    // Replace previous word
-    typeText(injector.parser.parseKeys("bbvep"))
-
-    assertState(
-      """
-            I it found in a legendary land
-            consectetur adipiscing elit
-      """.trimIndent(),
-    )
-  }
-
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamedplus]))
-  @TestWithoutPrimaryClipboard
   fun `test yank to number register with unnamedplus`() {
     val before = """
             I ${c}found it in a legendary land
@@ -64,7 +41,30 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed]))
+  @TestWithoutPrimaryClipboard
+  fun `test yank to number register with unnamed`() {
+    val before = """
+            I ${c}found it in a legendary land
+            consectetur adipiscing elit
+    """.trimIndent()
+    configureByText(before)
+    // Select and yank first word
+    typeText(injector.parser.parseKeys("vey"))
+    // Replace second word
+    typeText(injector.parser.parseKeys("wvep"))
+    // Replace previous word
+    typeText(injector.parser.parseKeys("bbvep"))
+
+    assertState(
+      """
+            I it found in a legendary land
+            consectetur adipiscing elit
+      """.trimIndent(),
+    )
+  }
+
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamedplus + "," + OptionConstants.clipboard_ideaput]))
   fun `test yank to number register with unnamedplus and ideaput`() {
     val before = """
             I ${c}found it in a legendary land

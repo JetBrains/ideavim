@@ -74,15 +74,14 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   private val onClipboardChanged: () -> Unit = {
     val clipboardOptionValue = injector.globalOptions().clipboard
     defaultRegisterChar = when {
-      "unnamedplus" in clipboardOptionValue -> {
+      "unnamedplus" in clipboardOptionValue -> CLIPBOARD_REGISTER
+      "unnamed" in clipboardOptionValue -> {
         if (isPrimaryRegisterSupported()) {
           PRIMARY_REGISTER
         } else {
           CLIPBOARD_REGISTER
         }
-
       }
-      "unnamed" in clipboardOptionValue -> CLIPBOARD_REGISTER
       else -> UNNAMED_REGISTER
     }
     lastRegisterChar = defaultRegisterChar
