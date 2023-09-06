@@ -1599,6 +1599,96 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test match characters at cursor line`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%.l...",
+      TextRange(13, 16),
+      carets=listOf(18)
+    )
+  }
+
+  @Test
+  fun `test match characters before cursor line`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%<.l...",
+      TextRange(0, 3),
+      carets=listOf(18)
+    )
+  }
+
+  @Test
+  fun `test match characters after cursor line`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%>.l...",
+      TextRange(13, 16),
+      carets=listOf(18)
+    )
+  }
+
+  @Test
+  fun `test match characters at cursor column`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%.c...",
+      TextRange(5, 8),
+      carets=listOf(18)
+    )
+  }
+
+  @Test
+  fun `test match characters before cursor column`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%<.c...",
+      TextRange(0, 3),
+      carets=listOf(18)
+    )
+  }
+
+  @Test
+  fun `test match characters after cursor column`() {
+    assertCorrectRange(
+      "Lorem Ipsum\n" +
+        "\n" +
+        "Lorem ipsum dolor sit amet,\n" +
+        "consectetur adipiscing elit\n" +
+        "Sed in orci mauris.\n" +
+        "Cras id tellus in ex imperdiet egestas.",
+      "\\%>.c...",
+      TextRange(6, 9),
+      carets=listOf(18)
+    )
+  }
+
   private fun assertCorrectRange(
     text: CharSequence,
     pattern: String,
