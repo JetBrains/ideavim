@@ -53,7 +53,7 @@ internal class AtLineCursorMatcher : Matcher {
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line + 1 == editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
@@ -65,7 +65,7 @@ internal class BeforeLineCursorMatcher : Matcher {
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line + 1 < editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
@@ -77,7 +77,7 @@ internal class AfterLineCursorMatcher : Matcher {
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line + 1 > editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
