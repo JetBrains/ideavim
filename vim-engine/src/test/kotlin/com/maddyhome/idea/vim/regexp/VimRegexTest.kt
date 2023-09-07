@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildEditor
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -179,14 +179,14 @@ class VimRegexTest {
   }
 
   private fun assertContainsMatchIn(text: CharSequence, pattern: String, expectedResult : Boolean) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.containsMatchIn(editor)
     assertEquals(expectedResult, matchResult)
   }
 
   private fun assertFind(text: CharSequence, pattern: String, expectedResult: TextRange, startIndex: Int = 0) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.find(editor, startIndex)
     when (matchResult) {
@@ -196,7 +196,7 @@ class VimRegexTest {
   }
 
   private fun assertFindAll(text: CharSequence, pattern: String, expectedResult: Set<TextRange>, startIndex: Int = 0) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val regex = VimRegex(pattern)
     val matchResults = regex.findAll(editor, startIndex)
     assertEquals(expectedResult, matchResults
@@ -206,7 +206,7 @@ class VimRegexTest {
   }
 
   private fun assertMatchAt(text: CharSequence, pattern: String, index: Int, expectedResult: TextRange? = null) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.matchAt(editor, index)
     when (matchResult) {
@@ -216,7 +216,7 @@ class VimRegexTest {
   }
 
   private fun assertMatchEntire(text: CharSequence, pattern: String, expectedResult: TextRange? = null) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val regex = VimRegex(pattern)
     val matchResult = regex.matchEntire(editor)
     when (matchResult) {
