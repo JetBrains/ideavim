@@ -23,7 +23,7 @@ internal object VimRegexTestUtils {
 
   const val CARET: String = "<caret>"
 
-  fun buildEditor(text: CharSequence) : VimEditor {
+  fun mockEditorFromText(text: CharSequence) : VimEditor {
     val caretIndices = mutableListOf<Int>()
 
     val processedText = StringBuilder(text)
@@ -34,15 +34,26 @@ internal object VimRegexTestUtils {
       processedText.delete(currentIndex, currentIndex + CARET.length)
       currentIndex = processedText.indexOf(CARET, currentIndex)
     }
-    return buildEditor(processedText, caretIndices)
+    return mockEditor(processedText, caretIndices)
   }
 
-  private fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
-    val editorMock = Mockito.mock<VimEditor>()
-    whenever(editorMock.text()).thenReturn(text)
-
+  private fun mockEditor(text: CharSequence, caretOffsets: List<Int> = emptyList()) : VimEditor {
     val lines = text.split("\n").map { it + "\n" }
-    whenever(editorMock.offsetToBufferPosition(Mockito.anyInt())).thenAnswer { invocation ->
+
+    val editorMock = Mockito.mock<VimEditor>()
+    mockEditorText(editorMock, text)
+    mockEditorOffsetToBufferPosition(editorMock, lines)
+    mockEditorCarets(editorMock, caretOffsets)
+
+    return editorMock
+  }
+
+  private fun mockEditorText(editor: VimEditor, text: CharSequence) {
+    whenever(editor.text()).thenReturn(text)
+  }
+
+  private fun mockEditorOffsetToBufferPosition(editor: VimEditor, lines: List<String>) {
+    whenever(editor.offsetToBufferPosition(Mockito.anyInt())).thenAnswer { invocation ->
       val offset = invocation.arguments[0] as Int
       var lineCounter = 0
       var currentOffset = 0
@@ -59,17 +70,17 @@ internal object VimRegexTestUtils {
         BufferPosition(-1, -1)
       }
     }
+  }
 
-
+  private fun mockEditorCarets(editor: VimEditor, caretOffsets: List<Int>) {
     val trueCarets = ArrayList<VimCaret>()
-    for (caret in carets) {
+    for (caret in caretOffsets) {
       val caretMock = Mockito.mock<VimCaret>()
       whenever(caretMock.offset).thenReturn(Offset(caret))
       trueCarets.add(caretMock)
     }
-    whenever(editorMock.carets()).thenReturn(trueCarets)
-    whenever(editorMock.currentCaret()).thenReturn(trueCarets.firstOrNull())
-    return editorMock
+    whenever(editor.carets()).thenReturn(trueCarets)
+    whenever(editor.currentCaret()).thenReturn(trueCarets.firstOrNull())
   }
 
   fun buildNFA(pattern: String) : NFA? {

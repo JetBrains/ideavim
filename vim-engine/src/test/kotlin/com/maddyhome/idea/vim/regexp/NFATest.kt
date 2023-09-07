@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildEditor
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildNFA
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
@@ -1689,7 +1689,7 @@ class NFATest {
     offset: Int = 0,
     ignoreCase: Boolean = false
   ) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val nfa = buildNFA(pattern)
     val result = nfa?.simulate(editor, offset, isCaseInsensitive = ignoreCase)
     when (result) {
@@ -1705,7 +1705,7 @@ class NFATest {
     groupNumber: Int,
     offset: Int = 0,
   ) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val nfa = buildNFA(pattern)
     val result = nfa?.simulate(editor, offset)
     when (result) {
@@ -1720,7 +1720,7 @@ class NFATest {
     offset: Int = 0,
     ignoreCase: Boolean = false
   ) {
-    val editor = buildEditor(text)
+    val editor = mockEditorFromText(text)
     val nfa = buildNFA(pattern)
     assertTrue(nfa?.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
   }
