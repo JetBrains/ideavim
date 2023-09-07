@@ -8,8 +8,10 @@
 
 package com.maddyhome.idea.vim.regexp.api
 
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.END
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Nested
@@ -52,7 +54,10 @@ class VimRegexTest {
       )
     }
 
-    private fun doTest(text: CharSequence, pattern: String, expectedResult : Boolean) {
+    private fun doTest(
+      text: CharSequence,
+      pattern: String, expectedResult : Boolean
+    ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
       val matchResult = regex.containsMatchIn(editor)
@@ -66,7 +71,7 @@ class VimRegexTest {
     fun `test find single word starting at beginning`() {
       doTest(
         """
-      	|Lorem Ipsum
+      	|${START}Lorem${END} Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -74,7 +79,6 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        TextRange(0, 5)
       )
     }
 
@@ -84,24 +88,27 @@ class VimRegexTest {
         """
       	|Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        TextRange(13, 18),
         1
       )
     }
 
-    private fun doTest(text: CharSequence, pattern: String, expectedResult: TextRange, startIndex: Int = 0) {
+    private fun doTest(
+      text: CharSequence,
+      pattern: String,
+      startIndex: Int = 0
+    ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
       val matchResult = regex.find(editor, startIndex)
       when (matchResult) {
         is VimMatchResult.Failure -> fail("Expected to find match")
-        is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
+        is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), matchResult.range)
       }
     }
   }
@@ -112,15 +119,14 @@ class VimRegexTest {
     fun `test find all occurrences of word`() {
       doTest(
         """
-      	|Lorem Ipsum
+      	|${START}Lorem${END} Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-        "Lorem",
-        setOf(TextRange(0, 5), TextRange(13, 18))
+        "Lorem"
       )
     }
 
@@ -130,13 +136,12 @@ class VimRegexTest {
         """
       	|Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        setOf(TextRange(13, 18)),
         10
       )
     }
@@ -145,23 +150,27 @@ class VimRegexTest {
     fun `test find all occurrences of word case insensitive`() {
       doTest(
         """
-      	|Lorem Ipsum
+      	|${START}Lorem${END} Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "lorem\\c",
-        setOf(TextRange(0, 5), TextRange(13, 18))
       )
     }
 
-    private fun doTest(text: CharSequence, pattern: String, expectedResult: Set<TextRange>, startIndex: Int = 0) {
+    private fun doTest(
+      text: CharSequence,
+      pattern: String,
+      startIndex: Int = 0
+    ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
       val matchResults = regex.findAll(editor, startIndex)
-      assertEquals(expectedResult, matchResults
+      assertEquals(
+        getMatchRanges(text).toSet(), matchResults
         .map { it.range }
         .toSet()
       )
@@ -176,20 +185,19 @@ class VimRegexTest {
         """
       	|Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
         13,
-        TextRange(13, 18)
       )
     }
 
     @Test
     fun `test word does not match at index`() {
-      doTest(
+      assertFailure(
         """
       	|Lorem Ipsum
         |
@@ -199,19 +207,34 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        12,
-        null
+        12
       )
     }
 
-    private fun doTest(text: CharSequence, pattern: String, index: Int, expectedResult: TextRange? = null) {
+    private fun doTest(
+      text: CharSequence,
+      pattern: String,
+      index: Int
+      ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
       val matchResult = regex.matchAt(editor, index)
       when (matchResult) {
-        is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
-        is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+        is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), matchResult.range)
+        is VimMatchResult.Failure -> fail("Expected to find match.")
       }
+    }
+
+    private fun assertFailure(
+      text: CharSequence,
+      pattern: String,
+      index: Int
+    ) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.matchAt(editor, index)
+      if (matchResult is VimMatchResult.Success)
+        fail("Expected to not find any matches but instead found match at ${matchResult.range}")
     }
   }
 
@@ -219,26 +242,22 @@ class VimRegexTest {
   inner class MatchEntireTest {
     @Test
     fun `test pattern matches entire editor`() {
-      val text =
+      doTest(
         """
-      	|Lorem Ipsum
+      	|${START}Lorem Ipsum
       	|
       	|Lorem ipsum dolor sit amet,
       	|consectetur adipiscing elit
       	|Sed in orci mauris.
-      	|Cras id tellus in ex imperdiet egestas
-      """.trimMargin()
-
-      doTest(
-        text,
+      	|Cras id tellus in ex imperdiet egestas.${END}
+      """.trimMargin(),
         "\\_.*",
-        TextRange(0 , text.length)
       )
     }
 
     @Test
     fun `test pattern matches string only partially`() {
-      doTest(
+      assertFailure(
         """
       	|Lorem Ipsum
         |
@@ -248,18 +267,30 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        null
       )
     }
 
-    private fun doTest(text: CharSequence, pattern: String, expectedResult: TextRange? = null) {
+    private fun doTest(
+      text: CharSequence,
+      pattern: String) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
       val matchResult = regex.matchEntire(editor)
       when (matchResult) {
-        is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
-        is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+        is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), matchResult.range)
+        is VimMatchResult.Failure -> fail("Expected to find match.")
       }
+    }
+
+    private fun assertFailure(
+      text: CharSequence,
+      pattern: String
+    ) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.matchEntire(editor)
+      if (matchResult is VimMatchResult.Success)
+        fail("Expected to not find any matches but instead found match at ${matchResult.range}")
     }
   }
 }

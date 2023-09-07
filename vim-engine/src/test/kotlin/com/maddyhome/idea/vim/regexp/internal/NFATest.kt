@@ -8,10 +8,11 @@
 
 package com.maddyhome.idea.vim.regexp.internal
 
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getTextWithoutEditorTags
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.END
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
@@ -1565,9 +1566,6 @@ class NFATest {
   }
 
   companion object {
-    const val START: String = "<start>"
-    const val END: String = "<end>"
-
     private fun assertFailure(
       text: CharSequence,
       pattern: String,
@@ -1586,45 +1584,14 @@ class NFATest {
       ignoreCase: Boolean = false,
       groupNumber: Int = 0
     ) {
-      verifyRangeTags(text)
-
-      val textWithoutRangeTags = getTextWithoutRangeTags(text)
-      val textWithoutEditorTags = getTextWithoutEditorTags(text)
-
-      val startIndex = textWithoutEditorTags.indexOf(START)
-      val endIndex = textWithoutEditorTags.indexOf(END) - START.length
-
-      val editor = mockEditorFromText(textWithoutRangeTags)
+      val editor = mockEditorFromText(text)
       val nfa = buildNFA(pattern)
 
-      val expectedRange = TextRange(startIndex, endIndex)
       val result = nfa?.simulate(editor, offset, ignoreCase)
       when (result) {
-        is VimMatchResult.Success -> assertEquals(expectedRange, result.groups.get(groupNumber)?.range)
+        is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), result.groups.get(groupNumber)?.range)
         else -> fail("Expected to find match")
       }
-    }
-
-    private fun verifyRangeTags(text: CharSequence) {
-      if (text.indexOf(START) < 0 || text.indexOf(END) < 0) {
-        fail(
-          """
-          Please provide START and END tags!
-          
-          Instead of:
-          "Lorem Ipsum"
-          
-          Use:
-          "${'$'}{START}Lorem Ipsum${'$'}{END}"
-        """.trimIndent()
-        )
-      }
-    }
-
-    private fun getTextWithoutRangeTags(text: CharSequence): CharSequence {
-      return StringBuilder(text)
-        .delete(text.indexOf(START), text.indexOf(START) + START.length)
-        .delete(text.indexOf(END) - START.length, text.indexOf(END) - START.length + END.length)
     }
 
     private fun buildNFA(pattern: String) : NFA? {
