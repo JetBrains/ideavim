@@ -48,6 +48,17 @@ internal object VimRegexTestUtils {
     return editorMock
   }
 
+  fun getTextWithoutEditorTags(text: CharSequence): CharSequence {
+    val textWithoutEditorTags = StringBuilder(text)
+    var currentIndex = textWithoutEditorTags.indexOf(CARET)
+
+    while (currentIndex != -1) {
+      textWithoutEditorTags.delete(currentIndex, currentIndex + CARET.length)
+      currentIndex = textWithoutEditorTags.indexOf(CARET, currentIndex)
+    }
+    return textWithoutEditorTags
+  }
+
   private fun mockEditorText(editor: VimEditor, text: CharSequence) {
     whenever(editor.text()).thenReturn(text)
   }
@@ -81,13 +92,5 @@ internal object VimRegexTestUtils {
     }
     whenever(editor.carets()).thenReturn(trueCarets)
     whenever(editor.currentCaret()).thenReturn(trueCarets.firstOrNull())
-  }
-
-  fun buildNFA(pattern: String) : NFA? {
-    val parserResult = VimRegexParser.parse(pattern)
-    return when (parserResult) {
-      is VimRegexParserResult.Failure -> null
-      is VimRegexParserResult.Success -> PatternVisitor.visit(parserResult.tree)
-    }
   }
 }
