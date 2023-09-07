@@ -20,12 +20,14 @@ class VimRegexTest {
   @Test
   fun `test single word contains match in editor`() {
     assertContainsMatchIn(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "dolor",
       true
     )
@@ -34,12 +36,14 @@ class VimRegexTest {
   @Test
   fun `test single word does not contain match in editor`() {
     assertContainsMatchIn(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "IdeaVim",
       false
     )
@@ -48,12 +52,14 @@ class VimRegexTest {
   @Test
   fun `test find single word starting at beginning`() {
     assertFind(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       TextRange(0, 5)
     )
@@ -62,12 +68,14 @@ class VimRegexTest {
   @Test
   fun `test find single word starting from offset`() {
     assertFind(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       TextRange(13, 18),
       1
@@ -77,12 +85,14 @@ class VimRegexTest {
   @Test
   fun `test find all occurrences of word`() {
     assertFindAll(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       setOf(TextRange(0, 5), TextRange(13, 18))
     )
@@ -91,12 +101,14 @@ class VimRegexTest {
   @Test
   fun `test find all occurrences of word from offset`() {
     assertFindAll(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       setOf(TextRange(13, 18)),
       10
@@ -106,12 +118,14 @@ class VimRegexTest {
   @Test
   fun `test find all occurrences of word case insensitive`() {
     assertFindAll(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "lorem\\c",
       setOf(TextRange(0, 5), TextRange(13, 18))
     )
@@ -120,12 +134,14 @@ class VimRegexTest {
   @Test
   fun `test word matches at index`() {
     assertMatchAt(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       13,
       TextRange(13, 18)
@@ -135,12 +151,14 @@ class VimRegexTest {
   @Test
   fun `test word does not match at index`() {
     assertMatchAt(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       12,
       null
@@ -150,12 +168,14 @@ class VimRegexTest {
   @Test
   fun `test pattern matches entire editor`() {
     val text =
-      "Lorem Ipsum\n" +
-      "\n" +
-      "Lorem ipsum dolor sit amet,\n" +
-      "consectetur adipiscing elit\n" +
-      "Sed in orci mauris.\n" +
-      "Cras id tellus in ex imperdiet egestas."
+      """
+      	|Lorem Ipsum
+      	|
+      	|Lorem ipsum dolor sit amet,
+      	|consectetur adipiscing elit
+      	|Sed in orci mauris.
+      	|Cras id tellus in ex imperdiet egestas
+      """.trimMargin()
 
     assertMatchEntire(
         text,
@@ -167,61 +187,65 @@ class VimRegexTest {
   @Test
   fun `test pattern matches string only partially`() {
     assertMatchEntire(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       null
       )
   }
 
-  private fun assertContainsMatchIn(text: CharSequence, pattern: String, expectedResult : Boolean) {
-    val editor = mockEditorFromText(text)
-    val regex = VimRegex(pattern)
-    val matchResult = regex.containsMatchIn(editor)
-    assertEquals(expectedResult, matchResult)
-  }
-
-  private fun assertFind(text: CharSequence, pattern: String, expectedResult: TextRange, startIndex: Int = 0) {
-    val editor = mockEditorFromText(text)
-    val regex = VimRegex(pattern)
-    val matchResult = regex.find(editor, startIndex)
-    when (matchResult) {
-      is VimMatchResult.Failure -> fail("Expected to find match")
-      is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
+  companion object {
+    private fun assertContainsMatchIn(text: CharSequence, pattern: String, expectedResult : Boolean) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.containsMatchIn(editor)
+      assertEquals(expectedResult, matchResult)
     }
-  }
 
-  private fun assertFindAll(text: CharSequence, pattern: String, expectedResult: Set<TextRange>, startIndex: Int = 0) {
-    val editor = mockEditorFromText(text)
-    val regex = VimRegex(pattern)
-    val matchResults = regex.findAll(editor, startIndex)
-    assertEquals(expectedResult, matchResults
-      .map { it.range }
-      .toSet()
-    )
-  }
-
-  private fun assertMatchAt(text: CharSequence, pattern: String, index: Int, expectedResult: TextRange? = null) {
-    val editor = mockEditorFromText(text)
-    val regex = VimRegex(pattern)
-    val matchResult = regex.matchAt(editor, index)
-    when (matchResult) {
-      is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
-      is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+    private fun assertFind(text: CharSequence, pattern: String, expectedResult: TextRange, startIndex: Int = 0) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.find(editor, startIndex)
+      when (matchResult) {
+        is VimMatchResult.Failure -> fail("Expected to find match")
+        is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
+      }
     }
-  }
 
-  private fun assertMatchEntire(text: CharSequence, pattern: String, expectedResult: TextRange? = null) {
-    val editor = mockEditorFromText(text)
-    val regex = VimRegex(pattern)
-    val matchResult = regex.matchEntire(editor)
-    when (matchResult) {
-      is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
-      is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+    private fun assertFindAll(text: CharSequence, pattern: String, expectedResult: Set<TextRange>, startIndex: Int = 0) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResults = regex.findAll(editor, startIndex)
+      assertEquals(expectedResult, matchResults
+        .map { it.range }
+        .toSet()
+      )
+    }
+
+    private fun assertMatchAt(text: CharSequence, pattern: String, index: Int, expectedResult: TextRange? = null) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.matchAt(editor, index)
+      when (matchResult) {
+        is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
+        is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+      }
+    }
+
+    private fun assertMatchEntire(text: CharSequence, pattern: String, expectedResult: TextRange? = null) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.matchEntire(editor)
+      when (matchResult) {
+        is VimMatchResult.Success -> assertEquals(expectedResult, matchResult.range)
+        is VimMatchResult.Failure -> assertEquals(expectedResult, null)
+      }
     }
   }
 }
