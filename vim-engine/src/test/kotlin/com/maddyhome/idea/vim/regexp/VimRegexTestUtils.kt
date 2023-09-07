@@ -20,7 +20,24 @@ import org.mockito.Mockito
 import org.mockito.kotlin.whenever
 
 internal object VimRegexTestUtils {
-  fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
+
+  const val CARET: String = "<caret>"
+
+  fun buildEditor(text: CharSequence) : VimEditor {
+    val caretIndices = mutableListOf<Int>()
+
+    val processedText = StringBuilder(text)
+    var currentIndex = processedText.indexOf(CARET)
+
+    while (currentIndex != -1) {
+      caretIndices.add(currentIndex)
+      processedText.delete(currentIndex, currentIndex + CARET.length)
+      currentIndex = processedText.indexOf(CARET, currentIndex)
+    }
+    return buildEditor(processedText, caretIndices)
+  }
+
+  private fun buildEditor(text: CharSequence, carets: List<Int> = emptyList()) : VimEditor {
     val editorMock = Mockito.mock<VimEditor>()
     whenever(editorMock.text()).thenReturn(text)
 

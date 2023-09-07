@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildEditor
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildNFA
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Test
@@ -351,29 +352,27 @@ class NFATest {
   @Test
   fun `test single cursor`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
+      "Lo${CARET}rem Ipsum\n" +
         "\n" +
         "Lorem ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "Lo\\%#rem",
-      TextRange(0, 5),
-      carets = listOf(2)
+      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test single cursor should fail`() {
     assertFailure(
-      "Lorem Ipsum\n" +
+      "Lo${CARET}rem Ipsum\n" +
         "\n" +
         "Lorem ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
-      "\\%#Lorem",
-      carets = listOf(2)
+      "\\%#Lorem"
     )
   }
 
@@ -1604,13 +1603,12 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
+        "Lorem${CARET} ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\%.l...",
-      TextRange(13, 16),
-      carets=listOf(18)
+      TextRange(13, 16)
     )
   }
 
@@ -1619,13 +1617,12 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
+        "Lorem${CARET} ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\%<.l...",
-      TextRange(0, 3),
-      carets=listOf(18)
+      TextRange(0, 3)
     )
   }
 
@@ -1634,13 +1631,12 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
+        "Lorem${CARET} ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\%>.l...",
-      TextRange(41, 44),
-      carets=listOf(18)
+      TextRange(41, 44)
     )
   }
 
@@ -1649,13 +1645,12 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
+        "Lorem${CARET} ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\%.c...",
-      TextRange(5, 8),
-      carets=listOf(18)
+      TextRange(5, 8)
     )
   }
 
@@ -1664,13 +1659,12 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
+        "Lorem${CARET} ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\%<.c...",
-      TextRange(0, 3),
-      carets=listOf(18)
+      TextRange(0, 3)
     )
   }
 
@@ -1679,13 +1673,12 @@ class NFATest {
     assertCorrectRange(
       "Lorem Ipsum\n" +
         "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
+        "Lorem${CARET} ipsum dolor sit amet,\n" +
         "consectetur adipiscing elit\n" +
         "Sed in orci mauris.\n" +
         "Cras id tellus in ex imperdiet egestas.",
       "\\%>.c...",
-      TextRange(6, 9),
-      carets=listOf(18)
+      TextRange(6, 9)
     )
   }
 
@@ -1694,10 +1687,9 @@ class NFATest {
     pattern: String,
     expectedResultRange: TextRange,
     offset: Int = 0,
-    carets: List<Int> = emptyList(),
     ignoreCase: Boolean = false
   ) {
-    val editor = buildEditor(text, carets)
+    val editor = buildEditor(text)
     val nfa = buildNFA(pattern)
     val result = nfa?.simulate(editor, offset, isCaseInsensitive = ignoreCase)
     when (result) {
@@ -1712,9 +1704,8 @@ class NFATest {
     expectedResultRange: TextRange,
     groupNumber: Int,
     offset: Int = 0,
-    carets: List<Int> = emptyList()
   ) {
-    val editor = buildEditor(text, carets)
+    val editor = buildEditor(text)
     val nfa = buildNFA(pattern)
     val result = nfa?.simulate(editor, offset)
     when (result) {
@@ -1723,8 +1714,13 @@ class NFATest {
     }
   }
 
-  private fun assertFailure(text: CharSequence, pattern: String, offset: Int = 0, carets: List<Int> = emptyList(), ignoreCase: Boolean = false) {
-    val editor = buildEditor(text, carets)
+  private fun assertFailure(
+    text: CharSequence,
+    pattern: String,
+    offset: Int = 0,
+    ignoreCase: Boolean = false
+  ) {
+    val editor = buildEditor(text)
     val nfa = buildNFA(pattern)
     assertTrue(nfa?.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
   }
