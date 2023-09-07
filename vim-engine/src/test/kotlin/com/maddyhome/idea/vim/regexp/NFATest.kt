@@ -11,8 +11,12 @@ package com.maddyhome.idea.vim.regexp
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.buildNFA
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getTextWithoutEditorTags
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
+import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
+import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
+import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -36,9 +40,9 @@ class NFATest {
 
   @Test
   fun `test concatenation from start`() {
-    assertCorrectRange(
+    doTest(
       """
-        |Lorem Ipsum
+        |${START}Lorem${END} Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -46,60 +50,54 @@ class NFATest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "Lorem",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test concatenation from offset`() {
-    assertCorrectRange(
+    doTest(
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "Lorem",
-      TextRange(13, 18),
       13
     )
   }
 
   @Test
   fun `test concatenation with escaped char`() {
-    assertCorrectRange(
-      "a*bcd",
+    doTest(
+      "${START}a*${END}bcd",
       "a\\*",
-      TextRange(0, 2),
     )
   }
 
   @Test
   fun `test star multi`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aaaaa${END}bcd",
       "a*",
-      TextRange(0, 5),
     )
   }
 
   @Test
   fun `test star multi empty match`() {
-    assertCorrectRange(
-      "bcd",
+    doTest(
+      "${START}${END}bcd",
       "a*",
-      TextRange(0, 0)
     )
   }
 
   @Test
   fun `test plus multi`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aaaaa${END}bcd",
       "a\\+",
-      TextRange(0, 5),
     )
   }
 
@@ -113,55 +111,49 @@ class NFATest {
 
   @Test
   fun `test range multi both bounds`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aaa${END}aabcd",
       "a\\{0,3}",
-      TextRange(0, 3),
     )
   }
 
   @Test
   fun `test range multi lower bound`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aaaaa${END}bcd",
       "a\\{2,}",
-      TextRange(0, 5),
     )
   }
 
   @Test
   fun `test range multi upper bound`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aa${END}aaabcd",
       "a\\{,2}",
-      TextRange(0, 2),
     )
   }
 
   @Test
   fun `test range unbounded`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aaaaa${END}bcd",
       "a\\{}",
-      TextRange(0, 5),
     )
   }
 
   @Test
   fun `test range unbounded with comma`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aaaaa${END}bcd",
       "a\\{,}",
-      TextRange(0, 5),
     )
   }
 
   @Test
   fun `test range absolute bound`() {
-    assertCorrectRange(
-      "aaaaabcd",
+    doTest(
+      "${START}aa${END}aaabcd",
       "a\\{2}",
-      TextRange(0, 2),
     )
   }
 
@@ -175,142 +167,128 @@ class NFATest {
 
   @Test
   fun `test group`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\v(Lorem)",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test group followed by word`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "\\v(Lorem) Ipsum",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test capture group 1`() {
-    assertCorrectGroupRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\v(Lorem) Ipsum",
-      TextRange(0, 5),
-      1
+      groupNumber = 1
     )
   }
 
   @Test
   fun `test capture group 2`() {
-    assertCorrectGroupRange(
-      "Lorem Ipsum",
+    doTest(
+      "Lorem ${START}Ipsum${END}",
       "\\v(Lorem) (Ipsum)",
-      TextRange(6, 11),
-      2
+      groupNumber = 2
     )
   }
 
   @Test
   fun `test group updates range`() {
-    assertCorrectGroupRange(
-      "abababc",
+    doTest(
+      "abab${START}ab${END}c",
       "\\v(ab)*c",
-      TextRange(4, 6),
-      1
+      groupNumber = 1
     )
   }
 
   @Test
   fun `test empty group`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}${END}Lorem Ipsum",
       "\\v()",
-        TextRange(0, 0)
     )
   }
 
   @Test
   fun `test alternation with star multi`() {
-    assertCorrectRange(
-      "abc",
+    doTest(
+      "${START}abc${END}",
       "\\v%(a|b)*c",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test star multi has to backtrack`() {
-    assertCorrectRange(
-      "a",
+    doTest(
+      "${START}a${END}",
       "a*a",
-      TextRange(0, 1)
     )
   }
 
   @Test
   fun `test multiple paths to loop`() {
-    assertCorrectRange(
-      "ababc",
+    doTest(
+      "${START}ababc${END}",
       "\\v(a|b)+c=",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test nested multi`() {
-    assertCorrectRange(
-      "aaaa",
+    doTest(
+      "${START}aaaa${END}",
       "\\v(a=)*",
-      TextRange(0, 4)
     )
   }
 
   @Test
   fun `test nested multi madness`() {
-    assertCorrectRange(
-      "acabcdabcacd",
+    doTest(
+      "${START}acabcdabcacd${END}",
       "\\v((ab=c+)+d)*",
-      TextRange(0, 12)
     )
   }
 
   @Test
   fun `test lazy multi doesn't consume anything`() {
-    assertCorrectRange(
-      "aaaaa",
+    doTest(
+      "${START}${END}aaaaa",
       "a\\{-}",
-      TextRange(0, 0)
     )
   }
 
   @Test
   fun `test closest matching quotes`() {
-    assertCorrectRange(
+    doTest(
       """
-        |"Lorem" "Ipsum"
+        |${START}"Lorem"$END "Ipsum"
       """.trimMargin(),
       "\".\\{-}\"",
-      TextRange(0, 7)
     )
   }
 
   @Test
   fun `test farthest matching quotes`() {
-    assertCorrectRange(
+    doTest(
       """
-        |"Lorem" "Ipsum"
+        |${START}"Lorem" "Ipsum"$END
       """.trimMargin(),
       "\".\\{}\"",
-      TextRange(0, 15)
     )
   }
 
   @Test
   fun `text sequence of any characters`() {
-    assertCorrectRange(
+    doTest(
       """
-        |Lorem Ipsum
+        |${START}Lorem Ipsum${END}
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -318,33 +296,29 @@ class NFATest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       ".*",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test sequence of any characters with newline`() {
-    val text = """
-        |Lorem Ipsum
+    doTest(
+      """
+        |${START}Lorem Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
-        |Cras id tellus in ex imperdiet egestas.
-      """.trimMargin()
-    assertCorrectRange(
-      text,
+        |Cras id tellus in ex imperdiet egestas.${END}
+      """.trimMargin(),
       "\\_.*",
-      TextRange(0, text.length)
     )
   }
 
   @Test
   fun `test single cursor`() {
-    assertCorrectRange(
-      "Lo${CARET}rem Ipsum",
+    doTest(
+      "${START}Lo${CARET}rem${END} Ipsum",
       "Lo\\%#rem",
-      TextRange(0, 5)
     )
   }
 
@@ -358,64 +332,57 @@ class NFATest {
 
   @Test
   fun `test words separated by spaces`() {
-    assertCorrectRange(
-      "Lorem   \t   Ipsum",
+    doTest(
+      "${START}Lorem   \t   Ipsum${END}",
       "\\v\\w+\\s+\\w+",
-      TextRange(0, 17)
     )
   }
 
   @Test
   fun `test date format 1`() {
-    assertCorrectRange(
-      "08-08-2023",
+    doTest(
+      "${START}08-08-2023${END}",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
-      TextRange(0, 10)
     )
   }
 
   @Test
   fun `test date format 2`() {
-    assertCorrectRange(
-      "08/08/2023",
+    doTest(
+      "${START}08/08/2023${END}",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
-      TextRange(0, 10)
     )
   }
 
   @Test
   fun `test date format 3`() {
-    assertCorrectRange(
-      "08/08/23",
+    doTest(
+      "${START}08/08/23${END}",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
-      TextRange(0, 8)
     )
   }
 
   @Test
   fun `test hexadecimal number 1`() {
-    assertCorrectRange(
-      "0x193ab3f is a hexadecimal number",
+    doTest(
+      "${START}0x193ab3f${END} is a hexadecimal number",
       "\\v%(0x)?\\x+",
-      TextRange(0, 9)
     )
   }
 
   @Test
   fun `test hexadecimal number 2`() {
-    assertCorrectRange(
-      "abcdef23901a is also a hexadecimal number",
+    doTest(
+      "${START}abcdef23901a${END} is also a hexadecimal number",
       "\\v%(0x)?\\x+",
-      TextRange(0, 12)
     )
   }
 
   @Test
   fun `test name surname`() {
-    assertCorrectRange(
-      "Emanuel Gestosa",
+    doTest(
+      "${START}Emanuel Gestosa${END}",
       "\\v\\u\\l+\\s+\\u\\l+",
-      TextRange(0, 15)
     )
   }
 
@@ -429,154 +396,137 @@ class NFATest {
 
   @Test
   fun `test sequence of digits`() {
-    assertCorrectRange(
-      "45135abc235",
+    doTest(
+      "${START}45135${END}abc235",
       "\\d\\+",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test sequence of not digits`() {
-    assertCorrectRange(
-      "abcd123efg",
+    doTest(
+      "${START}abcd${END}123efg",
       "\\D\\+",
-      TextRange(0, 4)
     )
   }
 
   @Test
   fun `test empty collection`() {
-    assertCorrectRange(
-      "[]abc",
+    doTest(
+      "${START}[]${END}abc",
       "[]",
-      TextRange(0, 2)
     )
   }
 
   @Test
   fun `test empty negated collection`() {
-    assertCorrectRange(
-      "[^]abc",
+    doTest(
+      "${START}[^]${END}abc",
       "[^]",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test collection a to z and 0`() {
-    assertCorrectRange(
-      "abcd0efg1hij",
+    doTest(
+      "${START}abcd0efg${END}1hij",
       "[a-z0]\\+",
-      TextRange(0, 8)
     )
   }
 
   @Test
   fun `test collection a to z and 0 negated`() {
-    assertCorrectRange(
-      "ABCD0EFG1HIJ",
+    doTest(
+      "${START}ABCD${END}0EFG1HIJ",
       "[^a-z0]\\+",
-      TextRange(0, 4)
     )
   }
 
   @Test
   fun `test collection dash and a to z`() {
-    assertCorrectRange(
-      "a-b-c-d_f-g",
+    doTest(
+      "${START}a-b-c-d${END}_f-g",
       "[-a-z]\\+",
-      TextRange(0, 7)
     )
   }
 
   @Test
   fun `test collection a, dash and z`() {
-    assertCorrectRange(
-      "az-e",
+    doTest(
+      "${START}az-${END}e",
       "[a\\-z]\\+",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test collection backslash and a`() {
-    assertCorrectRange(
-      "\\aa\\bc",
+    doTest(
+      "${START}\\aa\\${END}bc",
       "[\\a]\\+",
-      TextRange(0, 4)
     )
   }
 
   @Test
   fun `test collection unicode a to unicode z`() {
-    assertCorrectRange(
-      "abcdf123",
+    doTest(
+      "${START}abcdf${END}123",
       "[\\u61-\\u007a]\\+",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test collection backslash, u and z`() {
-    assertCorrectRange(
-      "uz\\zuabc",
+    doTest(
+      "${START}uz\\zu${END}abc",
       "[\\uz]\\+",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test set start of match`() {
-    assertCorrectRange(
-      "endif",
+    doTest(
+      "end${START}if${END}",
       "end\\zsif",
-      TextRange(3, 5)
     )
   }
 
   @Test
   fun `test set end of match`() {
-    assertCorrectRange(
-      "endif",
+    doTest(
+      "${START}end${END}if",
       "end\\zeif",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test set multiple start of match`() {
-    assertCorrectRange(
-      "endif",
+    doTest(
+      "end${START}if${END}",
       "\\zse\\zsn\\zsd\\zsif",
-      TextRange(3, 5)
     )
   }
 
   @Test
   fun `test set multiple end of match`() {
-    assertCorrectRange(
-      "endif",
+    doTest(
+      "${START}end${END}if",
       "\\zee\\zen\\zed\\zeif",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test set match start after set match end`() {
-    assertCorrectRange(
-      "endif",
+    doTest(
+      "end${START}if${END}",
       "\\zeend\\zsif",
-      TextRange(3, 5)
     )
   }
 
   @Test
   fun `test backreference to group 1`() {
-    assertCorrectRange(
-      "cat cat",
+    doTest(
+      "${START}cat cat${END}",
       "\\v(dog|cat) \\1",
-      TextRange(0, 7)
     )
   }
 
@@ -590,48 +540,43 @@ class NFATest {
 
   @Test
   fun `test backreference to uncaptured group`() {
-    assertCorrectRange(
-      "aaa",
+    doTest(
+      "${START}${END}aaa",
       "\\v(b)*\\1",
-      TextRange(0, 0)
     )
   }
 
   @Test
   fun `test back-referenced group value updates`() {
-    assertCorrectRange(
-      "aaabb",
+    doTest(
+      "${START}aaabb${END}",
       "\\v(a|b){1,100}\\1",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test capturing inner nested group`() {
-    assertCorrectGroupRange(
-      "abaabb",
+    doTest(
+      "abaa${START}b${END}b",
       "\\v(a(b)?)+",
-      TextRange(4, 5),
-      2
+      groupNumber = 2
     )
   }
 
   @Test
   fun `test case insensitive word`() {
-    assertCorrectRange(
-      "IdeaVim",
+    doTest(
+      "${START}IdeaVim${END}",
       "ideavim",
-      TextRange(0, 7),
       ignoreCase = true
     )
   }
 
   @Test
   fun `test case insensitive collection`() {
-    assertCorrectRange(
-      "IdeaVim",
+    doTest(
+      "${START}IdeaVim${END}",
       "[a-z]\\+",
-      TextRange(0, 7),
       ignoreCase = true
     )
   }
@@ -647,10 +592,9 @@ class NFATest {
 
   @Test
   fun `test start of file`() {
-    assertCorrectRange(
-      "IdeaVim",
+    doTest(
+      "${START}Idea${END}Vim",
       "\\%^Idea",
-      TextRange(0, 4)
     )
   }
   @Test
@@ -663,10 +607,9 @@ class NFATest {
 
   @Test
   fun `test end of file`()  {
-    assertCorrectRange(
-      "IdeaVim",
+    doTest(
+      "Idea${START}Vim${END}",
       "Vim\\%$",
-      TextRange(4, 7),
     )
   }
 
@@ -680,19 +623,17 @@ class NFATest {
 
   @Test
   fun `test start and end of file`() {
-    assertCorrectRange(
-      "IdeaVim",
+    doTest(
+      "${START}IdeaVim${END}",
       "\\%^IdeaVim\\%$",
-      TextRange(0, 7)
     )
   }
 
   @Test
   fun `test for empty file`() {
-    assertCorrectRange(
-      "",
+    doTest(
+      "${START}${END}",
       "\\v%^%$",
-      TextRange(0, 0)
     )
   }
 
@@ -706,17 +647,16 @@ class NFATest {
 
   @Test
   fun `test start of line`() {
-    assertCorrectRange(
+    doTest(
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "^Lorem",
-      TextRange(13, 18),
       1
     )
   }
@@ -738,9 +678,9 @@ class NFATest {
 
   @Test
   fun `test end of line`() {
-    assertCorrectRange(
+    doTest(
       """
-        |Lorem Ipsum
+        |Lorem ${START}Ipsum${END}
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -748,7 +688,6 @@ class NFATest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "Ipsum$",
-      TextRange(6, 11),
     )
   }
 
@@ -769,116 +708,106 @@ class NFATest {
 
   @Test
   fun `test start of line after alternation`() {
-    assertCorrectRange(
-      "dog barks",
+    doTest(
+      "${START}dog${END} barks",
       "^cat\\|^dog",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test end of line before alternation`() {
-    assertCorrectRange(
-      "cat\n" +
-      "meows",
+    doTest(
+      """
+        |"${START}cat${END}
+        |"meows"
+      """.trimMargin(),
       "cat$\\|dog$",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test start and end of line inside parenthesis`() {
-    assertCorrectRange(
-      "cat meows",
+    doTest(
+      "${START}cat meows${END}",
       "\\v(^(cat|dog)) ((meows|barks)$)",
-      TextRange(0, 9)
     )
   }
 
   @Test
   fun `test caret is taken literally`() {
-    assertCorrectRange(
-      "the symbol ^ is known as caret.",
+    doTest(
+      "${START}the symbol ^ is known as caret.${END}",
       "^.\\+^.\\+$",
-      TextRange(0, 31)
     )
   }
 
   @Test
   fun `test dollar sign is taken literally`() {
-    assertCorrectRange(
-      "the symbol for the dollar is $.",
+    doTest(
+      "${START}the symbol for the dollar is $.${END}",
       "^.\\+$.\\+$",
-      TextRange(0, 31)
     )
   }
 
   @Test
   fun `test caret is taken literally at the start of pattern`() {
-    assertCorrectRange(
-      "^ is known as caret.",
+    doTest(
+      "${START}^ is known${END} as caret.",
       "\\^ is known",
-      TextRange(0, 10)
     )
   }
 
   @Test
   fun `test dollar sign is taken literally at the end of pattern`() {
-    assertCorrectRange(
-      "the symbol for the dollar is $.",
+    doTest(
+      "the symbol for the ${START}dollar is $${END}.",
       "dollar is \\$",
-      TextRange(19, 30),
     )
   }
 
   @Test
   fun `test start of line anywhere in pattern`() {
-    assertCorrectRange(
+    doTest(
       """
-        |Lorem Ipsum Lorem
+        |${START}Lorem Ipsum Lorem
         |
-        |Lorem ipsum dolor sit amet,
+        |Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\_.\\+\\_^Lorem",
-      TextRange(0, 24)
     )
   }
 
   @Test
   fun `test end of line anywhere in pattern`() {
-    assertCorrectRange(
+    doTest(
       """
-        |Lorem Ipsum
+        |${START}Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${END}Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "Lorem Ipsum\\_$\\_s*",
-      TextRange(0, 13)
     )
   }
 
   @Test
   fun `test atomic group 1`() {
-    assertCorrectRange(
-      "aaab",
+    doTest(
+      "${START}aaab${END}",
       "\\(a*\\)\\@>b",
-      TextRange(0, 4)
-
     )
   }
 
   @Test
   fun `test atomic group 2`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\v.*(Lorem)@>",
-      TextRange(0, 5)
     )
   }
 
@@ -902,19 +831,17 @@ class NFATest {
 
   @Test
   fun `test start of word at start of text`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\<Lorem",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test start of word at offset`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "Lorem ${START}Ipsum${END}",
       "\\<Ipsum",
-      TextRange(6, 11),
     )
   }
 
@@ -928,19 +855,17 @@ class NFATest {
 
   @Test
   fun `test end of word at end of text`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "Lorem ${START}Ipsum${END}",
       "Ipsum\\>",
-      TextRange(6, 11),
     )
   }
 
   @Test
   fun `test end of word at middle of text`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "Lorem\\>",
-      TextRange(0, 5)
     )
   }
 
@@ -954,133 +879,120 @@ class NFATest {
 
   @Test
   fun `test collection with EOL`() {
-    assertCorrectRange(
+    doTest(
       """
-        |Lorem Ipsum
+        |${START}Lorem Ipsum
         |
-        |123Lorem ipsum dolor sit amet, Lorem
+        |${END}123Lorem ipsum dolor sit amet, Lorem
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\_[a-z A-Z]\\+",
-      TextRange(0, 13)
     )
   }
 
   @Test
   fun `test negated collection with EOL includes EOL anyway`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|${START}Lorem Ipsum
         |
-        |123Lorem ipsum dolor sit amet, Lorem
+        |${END}123Lorem ipsum dolor sit amet, Lorem
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\_[^0-9]\\+",
-      TextRange(0, 13)
     )
   }
 
   @Test
   fun `test collection decimal range`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "[\\d65-\\d122]*",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test collection octal range`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "[\\o101-\\o172]*",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test collection hex range`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "[\\x41-\\x7a]*",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test collection unicode range`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "[\\u0041-\\u007a]*",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test collection wide unicode range`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "[\\U00000041-\\U007a]*",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test collection with escaped new line`() {
-    assertCorrectRange(
-      "Lorem Ipsum\n" +
-      "Lorem 123",
+    doTest(
+      "${START}Lorem Ipsum\n" +
+      "Lorem ${END}123",
       "[\\n a-zA-Z]*",
-      TextRange(0, 18)
     )
   }
 
   @Test
   fun `test collection with character class expression`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "[[:upper:][:lower:]]*",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test collection with character class expression, range and single elements`() {
-    assertCorrectRange(
-      "/unix/file/path/../path/.",
+    doTest(
+      "${START}/unix/file/path/../path/.${END}",
       "[-./[:alpha:]0-9_~]\\+",
-      TextRange(0, 25)
     )
   }
 
   @Test
   fun `test positive lookahead 1`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "Lorem\\( Ipsum\\)\\@=",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test positive lookahead 2`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "Lorem\\( Ipsum\\)\\@= Ipsum",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test positive lookahead 3`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\vLorem( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=",
-      TextRange(0, 5)
     )
   }
 
@@ -1102,28 +1014,25 @@ class NFATest {
 
   @Test
   fun `test negative lookahead 1`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "Lorem\\( Lorem\\)\\@!",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test negative lookahead 2`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "Lorem\\( Lorem\\)\\@! Ipsum",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test negative lookahead 3`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\vLorem( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!",
-      TextRange(0, 5)
     )
   }
 
@@ -1145,37 +1054,33 @@ class NFATest {
 
   @Test
   fun `test double negative lookahead equals a positive`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\vLorem(( Ipsum)@!)@!",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test double positive lookahead equals a positive`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\vLorem(( Ipsum)@=)@=",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test positive and negative lookahead equals a negative`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\vLorem(( Lorem)@=)@!",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test negative and positive lookahead equals a negative`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\vLorem(( Lorem)@!)@=",
-      TextRange(0, 5)
     )
   }
 
@@ -1189,92 +1094,82 @@ class NFATest {
 
   @Test
   fun `test positive lookahead with nested capturing groups`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\v(Lorem( Ipsum)@=)",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test positive lookahead with multiple conditions`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "\\vLorem( Ipsum)@=( XYZ| Ipsum)",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test negative lookahead with nested capturing groups`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\v(Lorem( XYZ)@!)",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test negative lookahead with multiple conditions`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "\\vLorem( XYZ)@!( XYZ| Ipsum)",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test combination of positive and negative lookahead`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "\\vLorem( Ipsum)@=( Ipsum( Lorem)@!)",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test AND operator 1`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "Lorem Ipsum\\&.....",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test AND operator 2`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       ".*Ip\\&.*sum",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test multiple AND operators`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       ".*Ip\\&.*sum\\&Lorem Ipsum\\&Lorem",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test AND operator inside group followed by word`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "\\v(Lorem&.*) Ipsum",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test AND operator inside group correct capture`() {
-    assertCorrectGroupRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\v(Lorem&.*) Ipsum",
-      TextRange(0, 5),
-      1
+      groupNumber = 1
     )
   }
 
@@ -1288,28 +1183,25 @@ class NFATest {
 
   @Test
   fun `test positive lookbehind 1`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "Lorem ${START}Ipsum${END}",
       "\\v(Lorem )@<=Ipsum",
-      TextRange(6, 11)
     )
   }
 
   @Test
   fun `test positive lookbehind 2`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "Lor${START}e${END}m Ipsum",
       "\\v(\\w{3})@<=\\w",
-      TextRange(3, 4)
     )
   }
 
   @Test
   fun `test positive lookbehind 3`() {
-    assertCorrectRange(
-      "Lorem     Ipsum",
+    doTest(
+      "Lorem     ${START}Ipsum${END}",
       "\\v(\\s+)@<=\\w+",
-      TextRange(10, 15)
     )
   }
 
@@ -1331,28 +1223,25 @@ class NFATest {
 
   @Test
   fun `test negative lookbehind 1`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "Lorem ${START}Ipsum${END}",
       "\\v(Ipsum)@<!Ipsum",
-      TextRange(6, 11)
     )
   }
 
   @Test
   fun `test negative lookbehind 2`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem Ipsum${END}",
       "\\vLorem( Ipsum)@<! Ipsum",
-      TextRange(0, 11)
     )
   }
 
   @Test
   fun `test negative lookbehind 3`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\v( Lorem)@<!( Lorem)@<!( Lorem)@<!( Lorem)@<!( Lorem)@<!Lorem",
-      TextRange(0, 5)
     )
   }
 
@@ -1374,28 +1263,25 @@ class NFATest {
 
   @Test
   fun `test limited lookbehind doesn't go out of bounds`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "Lorem ${START}Ipsum${END}",
       "\\v(Lorem )@10000<=Ipsum",
-      TextRange(6, 11)
     )
   }
 
   @Test
   fun `test limited positive lookbehind succeeds`() {
-    assertCorrectRange(
-      "abbcabc",
+    doTest(
+      "abbcab${START}c${END}",
       "\\v(a.*)@2<=c",
-      TextRange(6, 7)
     )
   }
 
   @Test
   fun `test limited negative lookbehind succeeds`() {
-    assertCorrectRange(
-      "abbcabc",
+    doTest(
+      "abb${START}c${END}abc",
       "\\v(a.*)@2<!c",
-      TextRange(3, 4)
     )
   }
 
@@ -1409,19 +1295,17 @@ class NFATest {
 
   @Test
   fun `test match character by decimal code`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\%d76orem",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test match character by non-ascii decimal code`() {
-    assertCorrectRange(
-      "Гorem Ipsum",
+    doTest(
+      "${START}Гorem${END} Ipsum",
       "\\%d1043orem",
-      TextRange(0, 5)
     )
   }
 
@@ -1435,10 +1319,9 @@ class NFATest {
 
   @Test
   fun `test match character by octal code`() {
-    assertCorrectRange(
-      "Lorem Ipsum",
+    doTest(
+      "${START}Lorem${END} Ipsum",
       "\\%o114orem",
-      TextRange(0, 5)
     )
   }
 
@@ -1451,10 +1334,9 @@ class NFATest {
      * the character with octal code 40 (space) followed
      * by a '0'
      */
-    assertCorrectRange(
-      " 0123",
+    doTest(
+      "$START 0${END}123",
       "\\%o400",
-      TextRange(0, 2)
     )
   }
 
@@ -1463,10 +1345,9 @@ class NFATest {
     /**
      * Match character with code 0x31, followed by '23'
      */
-    assertCorrectRange(
-      "123",
+    doTest(
+      "${START}123${END}",
       "\\%x3123",
-      TextRange(0, 3)
     )
   }
 
@@ -1486,10 +1367,9 @@ class NFATest {
     /**
      * Match character with code 0x31 followed by '23'
      */
-    assertCorrectRange(
-      "123",
+    doTest(
+      "${START}123${END}",
       "\\%u003123",
-      TextRange(0, 3)
     )
   }
 
@@ -1498,34 +1378,32 @@ class NFATest {
     /**
      * Match character with code 0x31 followed by '23'
      */
-    assertCorrectRange(
-      "123",
+    doTest(
+      "${START}123${END}",
       "\\%U0000003123",
-      TextRange(0, 3)
     )
   }
 
   @Test
   fun `test match characters at line 3`() {
-    assertCorrectRange(
+    doTest(
       """
       	|Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\%3lLorem",
-      TextRange(13, 18)
     )
   }
 
   @Test
   fun `test match characters before line 3`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|${START}Lorem${END} Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -1533,31 +1411,29 @@ class NFATest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\%<3lLorem",
-      TextRange(0, 5)
     )
   }
 
   @Test
   fun `test match characters after line 2`() {
-    assertCorrectRange(
+    doTest(
       """
       	|Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\%>2lLorem",
-      TextRange(13, 18)
     )
   }
 
   @Test
   fun `test match character at column 11`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|Lorem Ipsu${START}m${END}
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -1565,178 +1441,198 @@ class NFATest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\%11cm",
-      TextRange(10, 11)
     )
   }
 
   @Test
   fun `test match characters before column 11`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|Lore${START}m${END} Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      "\\%<11cm",
-      TextRange(4, 5)
+      "\\%<11cm"
     )
   }
 
   @Test
   fun `test match characters after column 6`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|Lorem Ipsu${START}m${END}
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      "\\%>6cm",
-      TextRange(10, 11)
+      "\\%>6cm"
     )
   }
 
   @Test
   fun `test match characters at cursor line`() {
-    assertCorrectRange(
+    doTest(
       """
       	|Lorem Ipsum
         |
-        |Lorem${CARET} ipsum dolor sit amet,
+        |${START}Lor${END}em${CARET} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       "\\%.l...",
-      TextRange(13, 16)
     )
   }
 
   @Test
   fun `test match characters before cursor line`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|${START}Lor${END}em Ipsum
         |
         |Lorem${CARET} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      "\\%<.l...",
-      TextRange(0, 3)
+      "\\%<.l..."
     )
   }
 
   @Test
   fun `test match characters after cursor line`() {
-    assertCorrectRange(
+    doTest(
       """
       	|Lorem Ipsum
         |
         |Lorem${CARET} ipsum dolor sit amet,
-        |consectetur adipiscing elit
+        |${START}con${END}sectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      "\\%>.l...",
-      TextRange(41, 44)
+      "\\%>.l..."
     )
   }
 
   @Test
   fun `test match characters at cursor column`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|Lorem${START} Ip${END}sum
         |
         |Lorem${CARET} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      "\\%.c...",
-      TextRange(5, 8)
+      "\\%.c..."
     )
   }
 
   @Test
   fun `test match characters before cursor column`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|${START}Lor${END}em Ipsum
         |
         |Lorem${CARET} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      "\\%<.c...",
-      TextRange(0, 3)
+      "\\%<.c..."
     )
   }
 
   @Test
   fun `test match characters after cursor column`() {
-    assertCorrectRange(
+    doTest(
       """
-      	|Lorem Ipsum
+      	|Lorem ${START}Ips${END}um
         |
         |Lorem${CARET} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      "\\%>.c...",
-      TextRange(6, 9)
+      "\\%>.c..."
     )
   }
 
-  private fun assertCorrectRange(
-    text: CharSequence,
-    pattern: String,
-    expectedResultRange: TextRange,
-    offset: Int = 0,
-    ignoreCase: Boolean = false
-  ) {
-    val editor = mockEditorFromText(text)
-    val nfa = buildNFA(pattern)
-    val result = nfa?.simulate(editor, offset, isCaseInsensitive = ignoreCase)
-    when (result) {
-      is VimMatchResult.Success -> assertEquals(expectedResultRange, result.range)
-      else -> fail("Expected to find match")
-    }
-  }
+  companion object {
+    const val START: String = "<start>"
+    const val END: String = "<end>"
 
-  private fun assertCorrectGroupRange(
-    text: CharSequence,
-    pattern: String,
-    expectedResultRange: TextRange,
-    groupNumber: Int,
-    offset: Int = 0,
-  ) {
-    val editor = mockEditorFromText(text)
-    val nfa = buildNFA(pattern)
-    val result = nfa?.simulate(editor, offset)
-    when (result) {
-      is VimMatchResult.Success -> assertEquals(expectedResultRange, result.groups.get(groupNumber)?.range)
-      else -> fail("Expected to find match")
+    private fun assertFailure(
+      text: CharSequence,
+      pattern: String,
+      offset: Int = 0,
+      ignoreCase: Boolean = false
+    ) {
+      val editor = mockEditorFromText(text)
+      val nfa = buildNFA(pattern)
+      assertTrue(nfa?.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
     }
-  }
 
-  private fun assertFailure(
-    text: CharSequence,
-    pattern: String,
-    offset: Int = 0,
-    ignoreCase: Boolean = false
-  ) {
-    val editor = mockEditorFromText(text)
-    val nfa = buildNFA(pattern)
-    assertTrue(nfa?.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
+    private fun doTest(
+      text: CharSequence,
+      pattern: String,
+      offset: Int = 0,
+      ignoreCase: Boolean = false,
+      groupNumber: Int = 0
+    ) {
+      verifyRangeTags(text)
+
+      val textWithoutRangeTags = getTextWithoutRangeTags(text)
+      val textWithoutEditorTags = getTextWithoutEditorTags(text)
+
+      val startIndex = textWithoutEditorTags.indexOf(START)
+      val endIndex = textWithoutEditorTags.indexOf(END) - START.length
+
+      val editor = mockEditorFromText(textWithoutRangeTags)
+      val nfa = buildNFA(pattern)
+
+      val expectedRange = TextRange(startIndex, endIndex)
+      val result = nfa?.simulate(editor, offset, ignoreCase)
+      when (result) {
+        is VimMatchResult.Success -> assertEquals(expectedRange, result.groups.get(groupNumber)?.range)
+        else -> fail("Expected to find match")
+      }
+    }
+
+    private fun verifyRangeTags(text: CharSequence) {
+      if (text.indexOf(START) < 0 || text.indexOf(END) < 0) {
+        fail(
+          """
+          Please provide START and END tags!
+          
+          Instead of:
+          "Lorem Ipsum"
+          
+          Use:
+          "${'$'}{START}Lorem Ipsum${'$'}{END}"
+        """.trimIndent()
+        )
+      }
+    }
+
+    private fun getTextWithoutRangeTags(text: CharSequence): CharSequence {
+      return StringBuilder(text)
+        .delete(text.indexOf(START), text.indexOf(START) + START.length)
+        .delete(text.indexOf(END) - START.length, text.indexOf(END) - START.length + END.length)
+    }
+
+    private fun buildNFA(pattern: String) : NFA? {
+      val parserResult = VimRegexParser.parse(pattern)
+      return when (parserResult) {
+        is VimRegexParserResult.Failure -> null
+        is VimRegexParserResult.Success -> PatternVisitor.visit(parserResult.tree)
+      }
+    }
   }
 }
