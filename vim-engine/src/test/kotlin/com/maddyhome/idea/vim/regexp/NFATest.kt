@@ -22,12 +22,14 @@ class NFATest {
   @Test
   fun `test match not found`() {
     assertFailure(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "VIM"
     )
   }
@@ -35,12 +37,14 @@ class NFATest {
   @Test
   fun `test concatenation from start`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-      "\n" +
-      "Lorem ipsum dolor sit amet,\n" +
-      "consectetur adipiscing elit\n" +
-      "Sed in orci mauris.\n" +
-      "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       TextRange(0, 5)
     )
@@ -49,12 +53,14 @@ class NFATest {
   @Test
   fun `test concatenation from offset`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem",
       TextRange(13, 18),
       13
@@ -170,12 +176,7 @@ class NFATest {
   @Test
   fun `test group`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem Ipsum",
       "\\v(Lorem)",
       TextRange(0, 5)
     )
@@ -184,12 +185,7 @@ class NFATest {
   @Test
   fun `test group followed by word`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem Ipsum",
       "\\v(Lorem) Ipsum",
       TextRange(0, 11)
     )
@@ -198,12 +194,7 @@ class NFATest {
   @Test
   fun `test capture group 1`() {
     assertCorrectGroupRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem Ipsum",
       "\\v(Lorem) Ipsum",
       TextRange(0, 5),
       1
@@ -213,12 +204,7 @@ class NFATest {
   @Test
   fun `test capture group 2`() {
     assertCorrectGroupRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem Ipsum",
       "\\v(Lorem) (Ipsum)",
       TextRange(6, 11),
       2
@@ -238,12 +224,7 @@ class NFATest {
   @Test
   fun `test empty group`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem Ipsum",
       "\\v()",
         TextRange(0, 0)
     )
@@ -306,7 +287,9 @@ class NFATest {
   @Test
   fun `test closest matching quotes`() {
     assertCorrectRange(
-      "\"Lorem\" \"Ipsum\"",
+      """
+        |"Lorem" "Ipsum"
+      """.trimMargin(),
       "\".\\{-}\"",
       TextRange(0, 7)
     )
@@ -315,7 +298,9 @@ class NFATest {
   @Test
   fun `test farthest matching quotes`() {
     assertCorrectRange(
-      "\"Lorem\" \"Ipsum\"",
+      """
+        |"Lorem" "Ipsum"
+      """.trimMargin(),
       "\".\\{}\"",
       TextRange(0, 15)
     )
@@ -324,12 +309,14 @@ class NFATest {
   @Test
   fun `text sequence of any characters`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       ".*",
       TextRange(0, 11)
     )
@@ -337,27 +324,25 @@ class NFATest {
 
   @Test
   fun `test sequence of any characters with newline`() {
+    val text = """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      text,
       "\\_.*",
-      TextRange(0, 128)
+      TextRange(0, text.length)
     )
   }
 
   @Test
   fun `test single cursor`() {
     assertCorrectRange(
-      "Lo${CARET}rem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lo${CARET}rem Ipsum",
       "Lo\\%#rem",
       TextRange(0, 5)
     )
@@ -366,12 +351,7 @@ class NFATest {
   @Test
   fun `test single cursor should fail`() {
     assertFailure(
-      "Lo${CARET}rem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lo${CARET}rem Ipsum",
       "\\%#Lorem"
     )
   }
@@ -379,12 +359,7 @@ class NFATest {
   @Test
   fun `test words separated by spaces`() {
     assertCorrectRange(
-      "Lorem   \t   Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      "Lorem   \t   Ipsum",
       "\\v\\w+\\s+\\w+",
       TextRange(0, 17)
     )
@@ -732,12 +707,14 @@ class NFATest {
   @Test
   fun `test start of line`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "^Lorem",
       TextRange(13, 18),
       1
@@ -747,12 +724,14 @@ class NFATest {
   @Test
   fun `test start of line should fail`() {
     assertFailure(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "^Ipsum",
     )
   }
@@ -760,12 +739,14 @@ class NFATest {
   @Test
   fun `test end of line`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Ipsum$",
       TextRange(6, 11),
     )
@@ -774,12 +755,14 @@ class NFATest {
   @Test
   fun `test end of line should fail`() {
     assertFailure(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem$"
     )
   }
@@ -851,12 +834,14 @@ class NFATest {
   @Test
   fun `test start of line anywhere in pattern`() {
     assertCorrectRange(
-      "Lorem Ipsum Lorem\n" + // added an extra 'Lorem' that isn't at start of line
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum Lorem
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\_.\\+\\_^Lorem",
       TextRange(0, 24)
     )
@@ -865,12 +850,14 @@ class NFATest {
   @Test
   fun `test end of line anywhere in pattern`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet, Lorem\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "Lorem Ipsum\\_$\\_s*",
       TextRange(0, 13)
     )
@@ -968,12 +955,14 @@ class NFATest {
   @Test
   fun `test collection with EOL`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "123Lorem ipsum dolor sit amet, Lorem\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+        |Lorem Ipsum
+        |
+        |123Lorem ipsum dolor sit amet, Lorem
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\_[a-z A-Z]\\+",
       TextRange(0, 13)
     )
@@ -982,12 +971,14 @@ class NFATest {
   @Test
   fun `test negated collection with EOL includes EOL anyway`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "123Lorem ipsum dolor sit amet, Lorem\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |123Lorem ipsum dolor sit amet, Lorem
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\_[^0-9]\\+",
       TextRange(0, 13)
     )
@@ -1517,12 +1508,14 @@ class NFATest {
   @Test
   fun `test match characters at line 3`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%3lLorem",
       TextRange(13, 18)
     )
@@ -1531,12 +1524,14 @@ class NFATest {
   @Test
   fun `test match characters before line 3`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%<3lLorem",
       TextRange(0, 5)
     )
@@ -1545,12 +1540,14 @@ class NFATest {
   @Test
   fun `test match characters after line 2`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%>2lLorem",
       TextRange(13, 18)
     )
@@ -1559,12 +1556,14 @@ class NFATest {
   @Test
   fun `test match character at column 11`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%11cm",
       TextRange(10, 11)
     )
@@ -1573,12 +1572,14 @@ class NFATest {
   @Test
   fun `test match characters before column 11`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%<11cm",
       TextRange(4, 5)
     )
@@ -1587,12 +1588,14 @@ class NFATest {
   @Test
   fun `test match characters after column 6`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%>6cm",
       TextRange(10, 11)
     )
@@ -1601,12 +1604,14 @@ class NFATest {
   @Test
   fun `test match characters at cursor line`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem${CARET} ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem${CARET} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%.l...",
       TextRange(13, 16)
     )
@@ -1615,12 +1620,14 @@ class NFATest {
   @Test
   fun `test match characters before cursor line`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem${CARET} ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem${CARET} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%<.l...",
       TextRange(0, 3)
     )
@@ -1629,12 +1636,14 @@ class NFATest {
   @Test
   fun `test match characters after cursor line`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem${CARET} ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem${CARET} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%>.l...",
       TextRange(41, 44)
     )
@@ -1643,12 +1652,14 @@ class NFATest {
   @Test
   fun `test match characters at cursor column`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem${CARET} ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem${CARET} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%.c...",
       TextRange(5, 8)
     )
@@ -1657,12 +1668,14 @@ class NFATest {
   @Test
   fun `test match characters before cursor column`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem${CARET} ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem${CARET} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%<.c...",
       TextRange(0, 3)
     )
@@ -1671,12 +1684,14 @@ class NFATest {
   @Test
   fun `test match characters after cursor column`() {
     assertCorrectRange(
-      "Lorem Ipsum\n" +
-        "\n" +
-        "Lorem${CARET} ipsum dolor sit amet,\n" +
-        "consectetur adipiscing elit\n" +
-        "Sed in orci mauris.\n" +
-        "Cras id tellus in ex imperdiet egestas.",
+      """
+      	|Lorem Ipsum
+        |
+        |Lorem${CARET} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       "\\%>.c...",
       TextRange(6, 9)
     )
