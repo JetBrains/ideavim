@@ -74,14 +74,14 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   private val onClipboardChanged: () -> Unit = {
     val clipboardOptionValue = injector.globalOptions().clipboard
     defaultRegisterChar = when {
-      "unnamedplus" in clipboardOptionValue -> CLIPBOARD_REGISTER
-      "unnamed" in clipboardOptionValue -> {
+      "unnamedplus" in clipboardOptionValue -> {
         if (isPrimaryRegisterSupported()) {
-          PRIMARY_REGISTER
-        } else {
           CLIPBOARD_REGISTER
+        } else {
+          PRIMARY_REGISTER // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
         }
       }
+      "unnamed" in clipboardOptionValue -> PRIMARY_REGISTER
       else -> UNNAMED_REGISTER
     }
     lastRegisterChar = defaultRegisterChar
@@ -422,14 +422,17 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   private fun refreshClipboardRegister(): Register? {
+    // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
+    val systemAwareClipboardRegister = if (isPrimaryRegisterSupported()) CLIPBOARD_REGISTER else PRIMARY_REGISTER
+
     val clipboardData = injector.clipboardManager.getClipboardTextAndTransferableData() ?: return null
-    val currentRegister = myRegisters[CLIPBOARD_REGISTER]
+    val currentRegister = myRegisters[systemAwareClipboardRegister]
     val text = clipboardData.first
     val transferableData = clipboardData.second?.toMutableList()
     if (currentRegister != null && text == currentRegister.text) {
       return currentRegister
     }
-    return transferableData?.let { Register(CLIPBOARD_REGISTER, guessSelectionType(text), text, it) }
+    return transferableData?.let { Register(systemAwareClipboardRegister, guessSelectionType(text), text, it) }
   }
 
   override fun getRegister(r: Char): Register? {
@@ -444,7 +447,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
   override fun getRegisters(): List<Register> {
     val filteredRegisters = myRegisters.values.filterNot { CLIPBOARD_REGISTERS.contains(it.name) }.toMutableList()
     val clipboardRegisters = CLIPBOARD_REGISTERS
-      .filterNot { it == PRIMARY_REGISTER && !isPrimaryRegisterSupported() }
+      .filterNot { it == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported() } // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
       .mapNotNull { refreshClipboardRegister(it) }
 
     return (filteredRegisters + clipboardRegisters).sortedWith(Register.KeySorter)
@@ -457,14 +460,15 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0 && text != null && rawText != null) {
       when (myR) {
-        CLIPBOARD_REGISTER -> setSystemClipboardRegisterText(text, rawText, ArrayList(register.transferableData))
-        PRIMARY_REGISTER -> {
-          if (isPrimaryRegisterSupported()) {
-            setSystemPrimaryRegisterText(text, rawText, ArrayList(register.transferableData))
-          } else {
-            setSystemClipboardRegisterText(text, rawText, ArrayList(register.transferableData))
-            myR = CLIPBOARD_REGISTER
+        CLIPBOARD_REGISTER -> {
+          if (!isPrimaryRegisterSupported()) {
+            // it looks wrong, but for some reason non-X systems use the * register to store the clipboard content
+            myR = PRIMARY_REGISTER
           }
+          setSystemClipboardRegisterText(text, rawText, ArrayList(register.transferableData))
+        }
+        PRIMARY_REGISTER -> {
+          setSystemPrimaryRegisterText(text, rawText, ArrayList(register.transferableData))
         }
       }
     }
