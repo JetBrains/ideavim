@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp
+package com.maddyhome.idea.vim.regexp.internal
 
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult

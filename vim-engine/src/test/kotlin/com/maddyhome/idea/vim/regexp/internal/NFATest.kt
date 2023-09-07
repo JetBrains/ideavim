@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp
+package com.maddyhome.idea.vim.regexp.internal
 
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
@@ -42,7 +42,7 @@ class NFATest {
   fun `test concatenation from start`() {
     doTest(
       """
-        |${START}Lorem${END} Ipsum
+        |${START}Lorem$END Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -59,7 +59,7 @@ class NFATest {
       """
         |Lorem Ipsum
         |
-        |${START}Lorem${END} ipsum dolor sit amet,
+        |${START}Lorem$END ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -88,7 +88,7 @@ class NFATest {
   @Test
   fun `test star multi empty match`() {
     doTest(
-      "${START}${END}bcd",
+      "$START${END}bcd",
       "a*",
     )
   }
@@ -168,7 +168,7 @@ class NFATest {
   @Test
   fun `test group`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\v(Lorem)",
     )
   }
@@ -176,7 +176,7 @@ class NFATest {
   @Test
   fun `test group followed by word`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "\\v(Lorem) Ipsum",
     )
   }
@@ -184,7 +184,7 @@ class NFATest {
   @Test
   fun `test capture group 1`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\v(Lorem) Ipsum",
       groupNumber = 1
     )
@@ -193,7 +193,7 @@ class NFATest {
   @Test
   fun `test capture group 2`() {
     doTest(
-      "Lorem ${START}Ipsum${END}",
+      "Lorem ${START}Ipsum$END",
       "\\v(Lorem) (Ipsum)",
       groupNumber = 2
     )
@@ -211,7 +211,7 @@ class NFATest {
   @Test
   fun `test empty group`() {
     doTest(
-      "${START}${END}Lorem Ipsum",
+      "$START${END}Lorem Ipsum",
       "\\v()",
     )
   }
@@ -219,7 +219,7 @@ class NFATest {
   @Test
   fun `test alternation with star multi`() {
     doTest(
-      "${START}abc${END}",
+      "${START}abc$END",
       "\\v%(a|b)*c",
     )
   }
@@ -227,7 +227,7 @@ class NFATest {
   @Test
   fun `test star multi has to backtrack`() {
     doTest(
-      "${START}a${END}",
+      "${START}a$END",
       "a*a",
     )
   }
@@ -235,7 +235,7 @@ class NFATest {
   @Test
   fun `test multiple paths to loop`() {
     doTest(
-      "${START}ababc${END}",
+      "${START}ababc$END",
       "\\v(a|b)+c=",
     )
   }
@@ -243,7 +243,7 @@ class NFATest {
   @Test
   fun `test nested multi`() {
     doTest(
-      "${START}aaaa${END}",
+      "${START}aaaa$END",
       "\\v(a=)*",
     )
   }
@@ -251,7 +251,7 @@ class NFATest {
   @Test
   fun `test nested multi madness`() {
     doTest(
-      "${START}acabcdabcacd${END}",
+      "${START}acabcdabcacd$END",
       "\\v((ab=c+)+d)*",
     )
   }
@@ -259,7 +259,7 @@ class NFATest {
   @Test
   fun `test lazy multi doesn't consume anything`() {
     doTest(
-      "${START}${END}aaaaa",
+      "$START${END}aaaaa",
       "a\\{-}",
     )
   }
@@ -268,7 +268,7 @@ class NFATest {
   fun `test closest matching quotes`() {
     doTest(
       """
-        |${START}"Lorem"$END "Ipsum"
+        |$START"Lorem"$END "Ipsum"
       """.trimMargin(),
       "\".\\{-}\"",
     )
@@ -278,7 +278,7 @@ class NFATest {
   fun `test farthest matching quotes`() {
     doTest(
       """
-        |${START}"Lorem" "Ipsum"$END
+        |$START"Lorem" "Ipsum"$END
       """.trimMargin(),
       "\".\\{}\"",
     )
@@ -288,7 +288,7 @@ class NFATest {
   fun `text sequence of any characters`() {
     doTest(
       """
-        |${START}Lorem Ipsum${END}
+        |${START}Lorem Ipsum$END
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -308,7 +308,7 @@ class NFATest {
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
-        |Cras id tellus in ex imperdiet egestas.${END}
+        |Cras id tellus in ex imperdiet egestas.$END
       """.trimMargin(),
       "\\_.*",
     )
@@ -317,7 +317,7 @@ class NFATest {
   @Test
   fun `test single cursor`() {
     doTest(
-      "${START}Lo${CARET}rem${END} Ipsum",
+      "${START}Lo${CARET}rem$END Ipsum",
       "Lo\\%#rem",
     )
   }
@@ -333,7 +333,7 @@ class NFATest {
   @Test
   fun `test words separated by spaces`() {
     doTest(
-      "${START}Lorem   \t   Ipsum${END}",
+      "${START}Lorem   \t   Ipsum$END",
       "\\v\\w+\\s+\\w+",
     )
   }
@@ -341,7 +341,7 @@ class NFATest {
   @Test
   fun `test date format 1`() {
     doTest(
-      "${START}08-08-2023${END}",
+      "${START}08-08-2023$END",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
     )
   }
@@ -349,7 +349,7 @@ class NFATest {
   @Test
   fun `test date format 2`() {
     doTest(
-      "${START}08/08/2023${END}",
+      "${START}08/08/2023$END",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
     )
   }
@@ -357,7 +357,7 @@ class NFATest {
   @Test
   fun `test date format 3`() {
     doTest(
-      "${START}08/08/23${END}",
+      "${START}08/08/23$END",
       "\\v\\d{2}%(-|/)\\d{2}%(-|/)%(\\d{4}|\\d{2})",
     )
   }
@@ -365,7 +365,7 @@ class NFATest {
   @Test
   fun `test hexadecimal number 1`() {
     doTest(
-      "${START}0x193ab3f${END} is a hexadecimal number",
+      "${START}0x193ab3f$END is a hexadecimal number",
       "\\v%(0x)?\\x+",
     )
   }
@@ -373,7 +373,7 @@ class NFATest {
   @Test
   fun `test hexadecimal number 2`() {
     doTest(
-      "${START}abcdef23901a${END} is also a hexadecimal number",
+      "${START}abcdef23901a$END is also a hexadecimal number",
       "\\v%(0x)?\\x+",
     )
   }
@@ -381,7 +381,7 @@ class NFATest {
   @Test
   fun `test name surname`() {
     doTest(
-      "${START}Emanuel Gestosa${END}",
+      "${START}Emanuel Gestosa$END",
       "\\v\\u\\l+\\s+\\u\\l+",
     )
   }
@@ -413,7 +413,7 @@ class NFATest {
   @Test
   fun `test empty collection`() {
     doTest(
-      "${START}[]${END}abc",
+      "$START[]${END}abc",
       "[]",
     )
   }
@@ -421,7 +421,7 @@ class NFATest {
   @Test
   fun `test empty negated collection`() {
     doTest(
-      "${START}[^]${END}abc",
+      "$START[^]${END}abc",
       "[^]",
     )
   }
@@ -461,7 +461,7 @@ class NFATest {
   @Test
   fun `test collection backslash and a`() {
     doTest(
-      "${START}\\aa\\${END}bc",
+      "$START\\aa\\${END}bc",
       "[\\a]\\+",
     )
   }
@@ -485,7 +485,7 @@ class NFATest {
   @Test
   fun `test set start of match`() {
     doTest(
-      "end${START}if${END}",
+      "end${START}if$END",
       "end\\zsif",
     )
   }
@@ -501,7 +501,7 @@ class NFATest {
   @Test
   fun `test set multiple start of match`() {
     doTest(
-      "end${START}if${END}",
+      "end${START}if$END",
       "\\zse\\zsn\\zsd\\zsif",
     )
   }
@@ -517,7 +517,7 @@ class NFATest {
   @Test
   fun `test set match start after set match end`() {
     doTest(
-      "end${START}if${END}",
+      "end${START}if$END",
       "\\zeend\\zsif",
     )
   }
@@ -525,7 +525,7 @@ class NFATest {
   @Test
   fun `test backreference to group 1`() {
     doTest(
-      "${START}cat cat${END}",
+      "${START}cat cat$END",
       "\\v(dog|cat) \\1",
     )
   }
@@ -541,7 +541,7 @@ class NFATest {
   @Test
   fun `test backreference to uncaptured group`() {
     doTest(
-      "${START}${END}aaa",
+      "$START${END}aaa",
       "\\v(b)*\\1",
     )
   }
@@ -549,7 +549,7 @@ class NFATest {
   @Test
   fun `test back-referenced group value updates`() {
     doTest(
-      "${START}aaabb${END}",
+      "${START}aaabb$END",
       "\\v(a|b){1,100}\\1",
     )
   }
@@ -566,7 +566,7 @@ class NFATest {
   @Test
   fun `test case insensitive word`() {
     doTest(
-      "${START}IdeaVim${END}",
+      "${START}IdeaVim$END",
       "ideavim",
       ignoreCase = true
     )
@@ -575,7 +575,7 @@ class NFATest {
   @Test
   fun `test case insensitive collection`() {
     doTest(
-      "${START}IdeaVim${END}",
+      "${START}IdeaVim$END",
       "[a-z]\\+",
       ignoreCase = true
     )
@@ -608,7 +608,7 @@ class NFATest {
   @Test
   fun `test end of file`()  {
     doTest(
-      "Idea${START}Vim${END}",
+      "Idea${START}Vim$END",
       "Vim\\%$",
     )
   }
@@ -624,7 +624,7 @@ class NFATest {
   @Test
   fun `test start and end of file`() {
     doTest(
-      "${START}IdeaVim${END}",
+      "${START}IdeaVim$END",
       "\\%^IdeaVim\\%$",
     )
   }
@@ -632,7 +632,7 @@ class NFATest {
   @Test
   fun `test for empty file`() {
     doTest(
-      "${START}${END}",
+      "$START$END",
       "\\v%^%$",
     )
   }
@@ -651,7 +651,7 @@ class NFATest {
       """
         |Lorem Ipsum
         |
-        |${START}Lorem${END} ipsum dolor sit amet,
+        |${START}Lorem$END ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -680,7 +680,7 @@ class NFATest {
   fun `test end of line`() {
     doTest(
       """
-        |Lorem ${START}Ipsum${END}
+        |Lorem ${START}Ipsum$END
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -709,7 +709,7 @@ class NFATest {
   @Test
   fun `test start of line after alternation`() {
     doTest(
-      "${START}dog${END} barks",
+      "${START}dog$END barks",
       "^cat\\|^dog",
     )
   }
@@ -718,7 +718,7 @@ class NFATest {
   fun `test end of line before alternation`() {
     doTest(
       """
-        |"${START}cat${END}
+        |"${START}cat$END
         |"meows"
       """.trimMargin(),
       "cat$\\|dog$",
@@ -728,7 +728,7 @@ class NFATest {
   @Test
   fun `test start and end of line inside parenthesis`() {
     doTest(
-      "${START}cat meows${END}",
+      "${START}cat meows$END",
       "\\v(^(cat|dog)) ((meows|barks)$)",
     )
   }
@@ -736,7 +736,7 @@ class NFATest {
   @Test
   fun `test caret is taken literally`() {
     doTest(
-      "${START}the symbol ^ is known as caret.${END}",
+      "${START}the symbol ^ is known as caret.$END",
       "^.\\+^.\\+$",
     )
   }
@@ -744,7 +744,7 @@ class NFATest {
   @Test
   fun `test dollar sign is taken literally`() {
     doTest(
-      "${START}the symbol for the dollar is $.${END}",
+      "${START}the symbol for the dollar is $.$END",
       "^.\\+$.\\+$",
     )
   }
@@ -752,7 +752,7 @@ class NFATest {
   @Test
   fun `test caret is taken literally at the start of pattern`() {
     doTest(
-      "${START}^ is known${END} as caret.",
+      "$START^ is known$END as caret.",
       "\\^ is known",
     )
   }
@@ -760,7 +760,7 @@ class NFATest {
   @Test
   fun `test dollar sign is taken literally at the end of pattern`() {
     doTest(
-      "the symbol for the ${START}dollar is $${END}.",
+      "the symbol for the ${START}dollar is $$END.",
       "dollar is \\$",
     )
   }
@@ -771,7 +771,7 @@ class NFATest {
       """
         |${START}Lorem Ipsum Lorem
         |
-        |Lorem${END} ipsum dolor sit amet,
+        |Lorem$END ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -798,7 +798,7 @@ class NFATest {
   @Test
   fun `test atomic group 1`() {
     doTest(
-      "${START}aaab${END}",
+      "${START}aaab$END",
       "\\(a*\\)\\@>b",
     )
   }
@@ -806,7 +806,7 @@ class NFATest {
   @Test
   fun `test atomic group 2`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\v.*(Lorem)@>",
     )
   }
@@ -832,7 +832,7 @@ class NFATest {
   @Test
   fun `test start of word at start of text`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\<Lorem",
     )
   }
@@ -840,7 +840,7 @@ class NFATest {
   @Test
   fun `test start of word at offset`() {
     doTest(
-      "Lorem ${START}Ipsum${END}",
+      "Lorem ${START}Ipsum$END",
       "\\<Ipsum",
     )
   }
@@ -856,7 +856,7 @@ class NFATest {
   @Test
   fun `test end of word at end of text`() {
     doTest(
-      "Lorem ${START}Ipsum${END}",
+      "Lorem ${START}Ipsum$END",
       "Ipsum\\>",
     )
   }
@@ -864,7 +864,7 @@ class NFATest {
   @Test
   fun `test end of word at middle of text`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "Lorem\\>",
     )
   }
@@ -910,7 +910,7 @@ class NFATest {
   @Test
   fun `test collection decimal range`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "[\\d65-\\d122]*",
     )
   }
@@ -918,7 +918,7 @@ class NFATest {
   @Test
   fun `test collection octal range`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "[\\o101-\\o172]*",
     )
   }
@@ -926,7 +926,7 @@ class NFATest {
   @Test
   fun `test collection hex range`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "[\\x41-\\x7a]*",
     )
   }
@@ -934,7 +934,7 @@ class NFATest {
   @Test
   fun `test collection unicode range`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "[\\u0041-\\u007a]*",
     )
   }
@@ -942,7 +942,7 @@ class NFATest {
   @Test
   fun `test collection wide unicode range`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "[\\U00000041-\\U007a]*",
     )
   }
@@ -959,7 +959,7 @@ class NFATest {
   @Test
   fun `test collection with character class expression`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "[[:upper:][:lower:]]*",
     )
   }
@@ -967,7 +967,7 @@ class NFATest {
   @Test
   fun `test collection with character class expression, range and single elements`() {
     doTest(
-      "${START}/unix/file/path/../path/.${END}",
+      "$START/unix/file/path/../path/.$END",
       "[-./[:alpha:]0-9_~]\\+",
     )
   }
@@ -975,7 +975,7 @@ class NFATest {
   @Test
   fun `test positive lookahead 1`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "Lorem\\( Ipsum\\)\\@=",
     )
   }
@@ -983,7 +983,7 @@ class NFATest {
   @Test
   fun `test positive lookahead 2`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "Lorem\\( Ipsum\\)\\@= Ipsum",
     )
   }
@@ -991,7 +991,7 @@ class NFATest {
   @Test
   fun `test positive lookahead 3`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\vLorem( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=( Ipsum)@=",
     )
   }
@@ -1015,7 +1015,7 @@ class NFATest {
   @Test
   fun `test negative lookahead 1`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "Lorem\\( Lorem\\)\\@!",
     )
   }
@@ -1023,7 +1023,7 @@ class NFATest {
   @Test
   fun `test negative lookahead 2`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "Lorem\\( Lorem\\)\\@! Ipsum",
     )
   }
@@ -1031,7 +1031,7 @@ class NFATest {
   @Test
   fun `test negative lookahead 3`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\vLorem( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!( Lorem)@!",
     )
   }
@@ -1055,7 +1055,7 @@ class NFATest {
   @Test
   fun `test double negative lookahead equals a positive`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\vLorem(( Ipsum)@!)@!",
     )
   }
@@ -1063,7 +1063,7 @@ class NFATest {
   @Test
   fun `test double positive lookahead equals a positive`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\vLorem(( Ipsum)@=)@=",
     )
   }
@@ -1071,7 +1071,7 @@ class NFATest {
   @Test
   fun `test positive and negative lookahead equals a negative`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\vLorem(( Lorem)@=)@!",
     )
   }
@@ -1079,7 +1079,7 @@ class NFATest {
   @Test
   fun `test negative and positive lookahead equals a negative`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\vLorem(( Lorem)@!)@=",
     )
   }
@@ -1095,7 +1095,7 @@ class NFATest {
   @Test
   fun `test positive lookahead with nested capturing groups`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\v(Lorem( Ipsum)@=)",
     )
   }
@@ -1103,7 +1103,7 @@ class NFATest {
   @Test
   fun `test positive lookahead with multiple conditions`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "\\vLorem( Ipsum)@=( XYZ| Ipsum)",
     )
   }
@@ -1111,7 +1111,7 @@ class NFATest {
   @Test
   fun `test negative lookahead with nested capturing groups`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\v(Lorem( XYZ)@!)",
     )
   }
@@ -1119,7 +1119,7 @@ class NFATest {
   @Test
   fun `test negative lookahead with multiple conditions`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "\\vLorem( XYZ)@!( XYZ| Ipsum)",
     )
   }
@@ -1127,7 +1127,7 @@ class NFATest {
   @Test
   fun `test combination of positive and negative lookahead`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "\\vLorem( Ipsum)@=( Ipsum( Lorem)@!)",
     )
   }
@@ -1135,7 +1135,7 @@ class NFATest {
   @Test
   fun `test AND operator 1`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "Lorem Ipsum\\&.....",
     )
   }
@@ -1143,7 +1143,7 @@ class NFATest {
   @Test
   fun `test AND operator 2`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       ".*Ip\\&.*sum",
     )
   }
@@ -1151,7 +1151,7 @@ class NFATest {
   @Test
   fun `test multiple AND operators`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       ".*Ip\\&.*sum\\&Lorem Ipsum\\&Lorem",
     )
   }
@@ -1159,7 +1159,7 @@ class NFATest {
   @Test
   fun `test AND operator inside group followed by word`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "\\v(Lorem&.*) Ipsum",
     )
   }
@@ -1167,7 +1167,7 @@ class NFATest {
   @Test
   fun `test AND operator inside group correct capture`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\v(Lorem&.*) Ipsum",
       groupNumber = 1
     )
@@ -1184,7 +1184,7 @@ class NFATest {
   @Test
   fun `test positive lookbehind 1`() {
     doTest(
-      "Lorem ${START}Ipsum${END}",
+      "Lorem ${START}Ipsum$END",
       "\\v(Lorem )@<=Ipsum",
     )
   }
@@ -1200,7 +1200,7 @@ class NFATest {
   @Test
   fun `test positive lookbehind 3`() {
     doTest(
-      "Lorem     ${START}Ipsum${END}",
+      "Lorem     ${START}Ipsum$END",
       "\\v(\\s+)@<=\\w+",
     )
   }
@@ -1224,7 +1224,7 @@ class NFATest {
   @Test
   fun `test negative lookbehind 1`() {
     doTest(
-      "Lorem ${START}Ipsum${END}",
+      "Lorem ${START}Ipsum$END",
       "\\v(Ipsum)@<!Ipsum",
     )
   }
@@ -1232,7 +1232,7 @@ class NFATest {
   @Test
   fun `test negative lookbehind 2`() {
     doTest(
-      "${START}Lorem Ipsum${END}",
+      "${START}Lorem Ipsum$END",
       "\\vLorem( Ipsum)@<! Ipsum",
     )
   }
@@ -1240,7 +1240,7 @@ class NFATest {
   @Test
   fun `test negative lookbehind 3`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\v( Lorem)@<!( Lorem)@<!( Lorem)@<!( Lorem)@<!( Lorem)@<!Lorem",
     )
   }
@@ -1264,7 +1264,7 @@ class NFATest {
   @Test
   fun `test limited lookbehind doesn't go out of bounds`() {
     doTest(
-      "Lorem ${START}Ipsum${END}",
+      "Lorem ${START}Ipsum$END",
       "\\v(Lorem )@10000<=Ipsum",
     )
   }
@@ -1272,7 +1272,7 @@ class NFATest {
   @Test
   fun `test limited positive lookbehind succeeds`() {
     doTest(
-      "abbcab${START}c${END}",
+      "abbcab${START}c$END",
       "\\v(a.*)@2<=c",
     )
   }
@@ -1296,7 +1296,7 @@ class NFATest {
   @Test
   fun `test match character by decimal code`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\%d76orem",
     )
   }
@@ -1304,7 +1304,7 @@ class NFATest {
   @Test
   fun `test match character by non-ascii decimal code`() {
     doTest(
-      "${START}Гorem${END} Ipsum",
+      "${START}Гorem$END Ipsum",
       "\\%d1043orem",
     )
   }
@@ -1320,7 +1320,7 @@ class NFATest {
   @Test
   fun `test match character by octal code`() {
     doTest(
-      "${START}Lorem${END} Ipsum",
+      "${START}Lorem$END Ipsum",
       "\\%o114orem",
     )
   }
@@ -1346,7 +1346,7 @@ class NFATest {
      * Match character with code 0x31, followed by '23'
      */
     doTest(
-      "${START}123${END}",
+      "${START}123$END",
       "\\%x3123",
     )
   }
@@ -1368,7 +1368,7 @@ class NFATest {
      * Match character with code 0x31 followed by '23'
      */
     doTest(
-      "${START}123${END}",
+      "${START}123$END",
       "\\%u003123",
     )
   }
@@ -1379,7 +1379,7 @@ class NFATest {
      * Match character with code 0x31 followed by '23'
      */
     doTest(
-      "${START}123${END}",
+      "${START}123$END",
       "\\%U0000003123",
     )
   }
@@ -1390,7 +1390,7 @@ class NFATest {
       """
       	|Lorem Ipsum
         |
-        |${START}Lorem${END} ipsum dolor sit amet,
+        |${START}Lorem$END ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -1403,7 +1403,7 @@ class NFATest {
   fun `test match characters before line 3`() {
     doTest(
       """
-      	|${START}Lorem${END} Ipsum
+      	|${START}Lorem$END Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -1420,7 +1420,7 @@ class NFATest {
       """
       	|Lorem Ipsum
         |
-        |${START}Lorem${END} ipsum dolor sit amet,
+        |${START}Lorem$END ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -1433,7 +1433,7 @@ class NFATest {
   fun `test match character at column 11`() {
     doTest(
       """
-      	|Lorem Ipsu${START}m${END}
+      	|Lorem Ipsu${START}m$END
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -1448,7 +1448,7 @@ class NFATest {
   fun `test match characters before column 11`() {
     doTest(
       """
-      	|Lore${START}m${END} Ipsum
+      	|Lore${START}m$END Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -1463,7 +1463,7 @@ class NFATest {
   fun `test match characters after column 6`() {
     doTest(
       """
-      	|Lorem Ipsu${START}m${END}
+      	|Lorem Ipsu${START}m$END
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -1523,7 +1523,7 @@ class NFATest {
   fun `test match characters at cursor column`() {
     doTest(
       """
-      	|Lorem${START} Ip${END}sum
+      	|Lorem$START Ip${END}sum
         |
         |Lorem${CARET} ipsum dolor sit amet,
         |consectetur adipiscing elit

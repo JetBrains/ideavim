@@ -6,9 +6,10 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp
+package com.maddyhome.idea.vim.regexp.api
 
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Test
