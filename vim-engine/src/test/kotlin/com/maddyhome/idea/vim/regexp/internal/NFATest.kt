@@ -1638,7 +1638,7 @@ class NFATest {
   }
 
   @Test
-  fun `test optionally matched sequence with group`() {
+  fun `test optionally matched sequence with group 1`() {
     doTest(
       "${START}function${END}",
       "\\vf%[(un)ction]"
@@ -1646,9 +1646,9 @@ class NFATest {
   }
 
   @Test
-  fun `test optionally matched sequence with group fails`() {
-    assertFailure(
-      "fu",
+  fun `test optionally matched sequence with group 2`() {
+    doTest(
+      "${START}f${END}u",
       "\\vf%[(un)ction]"
     )
   }
