@@ -1565,6 +1565,94 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test optionally matched characters 1`() {
+    doTest(
+      "${START}substitute${END}",
+      "s\\%[ubstitute]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched characters 2`() {
+    doTest(
+      "${START}sub${END}",
+      "s\\%[ubstitute]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched characters 3`() {
+    doTest(
+      "${START}s${END}",
+      "s\\%[ubstitute]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with collection 1`() {
+    doTest(
+      "${START}read${END}",
+      "r\\%[[eo]ad]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with collection 2`() {
+    doTest(
+      "${START}road${END}",
+      "r\\%[[eo]ad]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with collection 3`() {
+    doTest(
+      "${START}rea${END}",
+      "r\\%[[eo]ad]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with collection 4`() {
+    doTest(
+      "${START}roa${END}",
+      "r\\%[[eo]ad]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with escaped brackets 1`() {
+    doTest(
+      "${START}index[0]${END}",
+      "index\\%[\\[0\\]]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with escaped brackets 2`() {
+    doTest(
+      "${START}index[${END}",
+      "index\\%[\\[0\\]]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with group`() {
+    doTest(
+      "${START}function${END}",
+      "\\vf%[(un)ction]"
+    )
+  }
+
+  @Test
+  fun `test optionally matched sequence with group fails`() {
+    assertFailure(
+      "fu",
+      "\\vf%[(un)ction]"
+    )
+  }
+
   companion object {
     private fun assertFailure(
       text: CharSequence,
