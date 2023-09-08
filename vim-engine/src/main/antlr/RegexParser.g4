@@ -44,10 +44,13 @@ piece : atom multi?
  * An atom is an ordinary_atom, or a sub_pattern surrounded with parenthesis.
  * If the left parenthesis is preceded by a %, it doesn't count as a
  * capture group.
+ *
+ * It can also be a sequence of optionally matched atoms. See :help \%[]
  */
-atom : ordinary_atom                                 #OrdinaryAtom
-     | LEFT_PAREN sub_pattern? RIGHT_PAREN           #GroupingCapture
-     | LEFT_PAREN_NOCAPTURE sub_pattern? RIGHT_PAREN #GroupingNoCapture
+atom : ordinary_atom                                                         #OrdinaryAtom
+     | LEFT_PAREN sub_pattern? RIGHT_PAREN                                   #GroupingCapture
+     | LEFT_PAREN_NOCAPTURE sub_pattern? RIGHT_PAREN                         #GroupingNoCapture
+     | OPTIONALLY_MATCHED_START atoms+=ordinary_atom* OPTIONALLY_MATCHED_END #OptionallyMatched
      ;
 
 /**
@@ -87,15 +90,15 @@ range : RANGE_START lower_bound=INT? (COMMA upper_bound=INT?)? RANGE_END      #R
  * An ordinary_atom can be a single character that matches itself, a token with
  * a special meaning, or a collection of characters.
  */
-ordinary_atom : (LITERAL_CHAR | CARET | DOLLAR)  #LiteralChar
-              | DOT                              #AnyChar
-              | DOTNL                            #AnyCharNL
-              | BACKREFERENCE                    #Backreference
-              | LAST_SUBSTITUTE                  #LastSubstitute
-              | zero_width                       #ZeroWidth
-              | char_class                       #CharClass
-              | collection                       #Collec
-              | char_code                        #CharCode
+ordinary_atom : (LITERAL_CHAR | CARET | DOLLAR | OPTIONALLY_MATCHED_END) #LiteralChar
+              | DOT                                                      #AnyChar
+              | DOTNL                                                    #AnyCharNL
+              | BACKREFERENCE                                            #Backreference
+              | LAST_SUBSTITUTE                                          #LastSubstitute
+              | zero_width                                               #ZeroWidth
+              | char_class                                               #CharClass
+              | collection                                               #Collec
+              | char_code                                                #CharCode
               ;
 
 /**
