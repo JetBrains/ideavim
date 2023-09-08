@@ -50,7 +50,7 @@ piece : atom multi?
 atom : ordinary_atom                                                         #OrdinaryAtom
      | LEFT_PAREN sub_pattern? RIGHT_PAREN                                   #GroupingCapture
      | LEFT_PAREN_NOCAPTURE sub_pattern? RIGHT_PAREN                         #GroupingNoCapture
-     | OPTIONALLY_MATCHED_START atoms+=ordinary_atom* OPTIONALLY_MATCHED_END #OptionallyMatched
+     | OPTIONALLY_MATCHED_START atoms+=atom* OPTIONALLY_MATCHED_END          #OptionallyMatched
      ;
 
 /**
