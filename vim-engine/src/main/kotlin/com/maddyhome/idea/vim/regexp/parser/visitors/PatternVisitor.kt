@@ -679,6 +679,14 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(AfterColumnCursorMatcher())
   }
 
+  override fun visitOptionallyMatched(ctx: RegexParser.OptionallyMatchedContext): NFA {
+    if (ctx.atoms.isEmpty()) { return NFA.fromSingleState() } // TODO: Throw E70 error
+
+    val nfa = NFA.fromSingleState()
+    for (atom in ctx.atoms) nfa.concatenate(visit(atom).optional(true))
+    return nfa
+  }
+
   private fun cleanLiteralChar(str : String) : Char {
     return if (str.length == 2 && str[0] == '\\') str[1]
     else str[0]

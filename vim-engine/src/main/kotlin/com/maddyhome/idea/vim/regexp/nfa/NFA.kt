@@ -114,7 +114,7 @@ internal class NFA private constructor(
    *
    * @return The new NFA, that can be matched optionally
    */
-  internal fun optional(isGreedy: Boolean) {
+  internal fun optional(isGreedy: Boolean) : NFA {
     val newStart = NFAState()
     val newEnd = NFAState()
 
@@ -130,6 +130,8 @@ internal class NFA private constructor(
     acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
     startState = newStart
     acceptState = newEnd
+
+    return this
   }
 
   /**
