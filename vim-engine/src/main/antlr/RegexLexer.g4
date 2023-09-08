@@ -91,12 +91,12 @@ AFTER_LINE_MAGIC: '\\%>' [0-9]+ 'l' -> type(AFTER_LINE);
 LINE_CURSOR_MAGIC: '\\%.l' -> type(LINE_CURSOR);
 BEFORE_LINE_CURSOR_MAGIC: '\\%<.l' -> type(BEFORE_LINE_CURSOR);
 AFTER_LINE_CURSOR_MAGIC: '\\%>.l' -> type(AFTER_LINE_CURSOR);
-COLUMN_MAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_MAGIC: '\\%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
-AFTER_COLUMN_MAGIC: '\\%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
-COLUMN_CURSOR_MAGIC: '\\%.c' -> type(COLUMN_CURSOR);
-BEFORE_COLUMN_CURSOR_MAGIC: '\\%<.c' -> type(BEFORE_COLUMN_CURSOR);
-AFTER_COLUMN_CURSOR_MAGIC: '\\%>.c' -> type(AFTER_COLUMN_CURSOR);
+COLUMN_MAGIC: '\\%' [0-9]+ [cv] -> type(COLUMN);
+BEFORE_COLUMN_MAGIC: '\\%<' [0-9]+ [cv] -> type(BEFORE_COLUMN);
+AFTER_COLUMN_MAGIC: '\\%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
+COLUMN_CURSOR_MAGIC: '\\%.' [cv] -> type(COLUMN_CURSOR);
+BEFORE_COLUMN_CURSOR_MAGIC: '\\%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
+AFTER_COLUMN_CURSOR_MAGIC: '\\%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
 
 // case-related tokens
 IGNORE_CASE_MAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -233,12 +233,12 @@ AFTER_LINE_NOMAGIC: '\\%>' [0-9]+ 'l' -> type(AFTER_LINE);
 LINE_CURSOR_NOMAGIC: '\\%.l' -> type(LINE_CURSOR);
 BEFORE_LINE_CURSOR_NOMAGIC: '\\%<.l' -> type(BEFORE_LINE_CURSOR);
 AFTER_LINE_CURSOR_NOMAGIC: '\\%>.l' -> type(AFTER_LINE_CURSOR);
-COLUMN_NOMAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_NOMAGIC: '\\%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
-AFTER_COLUMN_NOMAGIC: '\\%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
-COLUMN_CURSOR_NOMAGIC: '\\%.c' -> type(COLUMN_CURSOR);
-BEFORE_COLUMN_CURSOR_NOMAGIC: '\\%<.c' -> type(BEFORE_COLUMN_CURSOR);
-AFTER_COLUMN_CURSOR_NOMAGIC: '\\%>.c' -> type(AFTER_COLUMN_CURSOR);
+COLUMN_NOMAGIC: '\\%' [0-9]+ [cv] -> type(COLUMN);
+BEFORE_COLUMN_NOMAGIC: '\\%<' [0-9]+ [cv] -> type(BEFORE_COLUMN);
+AFTER_COLUMN_NOMAGIC: '\\%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
+COLUMN_CURSOR_NOMAGIC: '\\%.' [cv] -> type(COLUMN_CURSOR);
+BEFORE_COLUMN_CURSOR_NOMAGIC: '\\%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
+AFTER_COLUMN_CURSOR_NOMAGIC: '\\%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
 
 // case-related tokens
 IGNORE_CASE_NOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -376,12 +376,12 @@ AFTER_LINE_VMAGIC: '%>' [0-9]+ 'l' -> type(AFTER_LINE);
 LINE_CURSOR_VMAGIC: '%.l' -> type(LINE_CURSOR);
 BEFORE_LINE_CURSOR_VMAGIC: '%<.l' -> type(BEFORE_LINE_CURSOR);
 AFTER_LINE_CURSOR_VMAGIC: '%>.l' -> type(AFTER_LINE_CURSOR);
-COLUMN_VMAGIC: '%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_VMAGIC: '%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
-AFTER_COLUMN_VMAGIC: '%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
-COLUMN_CURSOR_VMAGIC: '%.c' -> type(COLUMN_CURSOR);
-BEFORE_COLUMN_CURSOR_VMAGIC: '%<.c' -> type(BEFORE_COLUMN_CURSOR);
-AFTER_COLUMN_CURSOR_VMAGIC: '%>.c' -> type(AFTER_COLUMN_CURSOR);
+COLUMN_VMAGIC: '%' [0-9]+ [cv] -> type(COLUMN);
+BEFORE_COLUMN_VMAGIC: '%<' [0-9]+ [cv] -> type(BEFORE_COLUMN);
+AFTER_COLUMN_VMAGIC: '%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
+COLUMN_CURSOR_VMAGIC: '%.' [cv] -> type(COLUMN_CURSOR);
+BEFORE_COLUMN_CURSOR_VMAGIC: '%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
+AFTER_COLUMN_CURSOR_VMAGIC: '%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
 
 // case-related tokens
 IGNORE_CASE_VMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -518,12 +518,12 @@ AFTER_LINE_VNOMAGIC: '\\%>' [0-9]+ 'l' -> type(AFTER_LINE);
 LINE_CURSOR_VNOMAGIC: '\\%.l' -> type(LINE_CURSOR);
 BEFORE_LINE_CURSOR_VNOMAGIC: '\\%<.l' -> type(BEFORE_LINE_CURSOR);
 AFTER_LINE_CURSOR_VNOMAGIC: '\\%>.l' -> type(AFTER_LINE_CURSOR);
-COLUMN_VNOMAGIC: '\\%' [0-9]+ 'c' -> type(COLUMN);
-BEFORE_COLUMN_VNOMAGIC: '\\%<' [0-9]+ 'c' -> type(BEFORE_COLUMN);
-AFTER_COLUMN_VNOMAGIC: '\\%>' [0-9]+ 'c' -> type(AFTER_COLUMN);
-COLUMN_CURSOR_VNOMAGIC: '\\%.c' -> type(COLUMN_CURSOR);
-BEFORE_COLUMN_CURSOR_VNOMAGIC: '\\%<.c' -> type(BEFORE_COLUMN_CURSOR);
-AFTER_COLUMN_CURSOR_VNOMAGIC: '\\%>.c' -> type(AFTER_COLUMN_CURSOR);
+COLUMN_VNOMAGIC: '\\%' [0-9]+ [cv] -> type(COLUMN);
+BEFORE_COLUMN_VNOMAGIC: '\\%<' [0-9]+ [cv] -> type(BEFORE_COLUMN);
+AFTER_COLUMN_VNOMAGIC: '\\%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
+COLUMN_CURSOR_VNOMAGIC: '\\%.' [cv] -> type(COLUMN_CURSOR);
+BEFORE_COLUMN_CURSOR_VNOMAGIC: '\\%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
+AFTER_COLUMN_CURSOR_VNOMAGIC: '\\%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
 
 // case-related tokens
 IGNORE_CASE_VNOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
