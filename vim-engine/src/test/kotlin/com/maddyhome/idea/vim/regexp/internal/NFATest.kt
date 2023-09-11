@@ -12,6 +12,8 @@ import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.END
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_END
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
@@ -1650,6 +1652,22 @@ class NFATest {
     doTest(
       "${START}f${END}u",
       "\\vf%[(un)ction]"
+    )
+  }
+
+  @Test
+  fun `test text is inside visual area`() {
+    doTest(
+      "${START}${VISUAL_START}Lorem Ipsum$CARET${VISUAL_END}${END}",
+      "\\%VLorem Ipsu\\%Vm"
+    )
+  }
+
+  @Test
+  fun `text text is not inside visual area`() {
+    assertFailure(
+      "${VISUAL_START}Lorem $CARET${VISUAL_END}Ipsum",
+      "\\%VLorem Ipsu\\%Vm"
     )
   }
 
