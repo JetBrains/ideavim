@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.PredicateMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfFileMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfLineMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.StartOfWordMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.VisualAreaMatcher
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 
@@ -685,6 +686,10 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     val nfa = NFA.fromSingleState()
     for (atom in ctx.atoms) nfa.concatenate(visit(atom).optional(true))
     return nfa
+  }
+
+  override fun visitVisual(ctx: RegexParser.VisualContext?): NFA {
+    return NFA.fromMatcher(VisualAreaMatcher())
   }
 
   private fun cleanLiteralChar(str : String) : Char {
