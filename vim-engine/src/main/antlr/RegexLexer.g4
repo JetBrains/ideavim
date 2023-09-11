@@ -21,7 +21,8 @@ tokens {
   DECIMAL_CODE, OCTAL_CODE, HEXADECIMAL_CODE, UNICODE_CODE, WIDE_UNICODE_CODE,
   LINE, BEFORE_LINE, AFTER_LINE, COLUMN, BEFORE_COLUMN, AFTER_COLUMN, LINE_CURSOR,
   BEFORE_LINE_CURSOR, AFTER_LINE_CURSOR, COLUMN_CURSOR, BEFORE_COLUMN_CURSOR,
-  AFTER_COLUMN_CURSOR, OPTIONALLY_MATCHED_START, OPTIONALLY_MATCHED_END
+  AFTER_COLUMN_CURSOR, OPTIONALLY_MATCHED_START, OPTIONALLY_MATCHED_END, MARK,
+  BEFORE_MARK, AFTER_MARK
 }
 
 @members {
@@ -97,6 +98,9 @@ AFTER_COLUMN_MAGIC: '\\%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
 COLUMN_CURSOR_MAGIC: '\\%.' [cv] -> type(COLUMN_CURSOR);
 BEFORE_COLUMN_CURSOR_MAGIC: '\\%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
 AFTER_COLUMN_CURSOR_MAGIC: '\\%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
+MARK_MAGIC: '\\%\'' [a-zA-Z] -> type(MARK);
+BEFORE_MARK_MAGIC: '\\%<\'' [a-zA-Z] -> type(BEFORE_MARK);
+AFTER_MARK_MAGIC: '\\%>\'' [a-zA-Z] -> type(AFTER_MARK);
 
 // case-related tokens
 IGNORE_CASE_MAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -239,6 +243,9 @@ AFTER_COLUMN_NOMAGIC: '\\%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
 COLUMN_CURSOR_NOMAGIC: '\\%.' [cv] -> type(COLUMN_CURSOR);
 BEFORE_COLUMN_CURSOR_NOMAGIC: '\\%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
 AFTER_COLUMN_CURSOR_NOMAGIC: '\\%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
+MARK_NOMAGIC: '\\%\'' [a-zA-Z] -> type(MARK);
+BEFORE_MARK_NOMAGIC: '\\%<\'' [a-zA-Z] -> type(BEFORE_MARK);
+AFTER_MARK_NOMAGIC: '\\%>\'' [a-zA-Z] -> type(AFTER_MARK);
 
 // case-related tokens
 IGNORE_CASE_NOMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -382,6 +389,9 @@ AFTER_COLUMN_VMAGIC: '%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
 COLUMN_CURSOR_VMAGIC: '%.' [cv] -> type(COLUMN_CURSOR);
 BEFORE_COLUMN_CURSOR_VMAGIC: '%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
 AFTER_COLUMN_CURSOR_VMAGIC: '%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
+MARK_VMAGIC: '%\'' [a-zA-Z] -> type(MARK);
+BEFORE_MARK_VMAGIC: '%<\'' [a-zA-Z] -> type(BEFORE_MARK);
+AFTER_MARK_VMAGIC: '%>\'' [a-zA-Z] -> type(AFTER_MARK);
 
 // case-related tokens
 IGNORE_CASE_VMAGIC: '\\c' { setIgnoreCase(); } -> skip;
@@ -524,6 +534,9 @@ AFTER_COLUMN_VNOMAGIC: '\\%>' [0-9]+ [cv] -> type(AFTER_COLUMN);
 COLUMN_CURSOR_VNOMAGIC: '\\%.' [cv] -> type(COLUMN_CURSOR);
 BEFORE_COLUMN_CURSOR_VNOMAGIC: '\\%<.' [cv] -> type(BEFORE_COLUMN_CURSOR);
 AFTER_COLUMN_CURSOR_VNOMAGIC: '\\%>.' [cv] -> type(AFTER_COLUMN_CURSOR);
+MARK_VNOMAGIC: '\\%\'' [a-zA-Z] -> type(MARK);
+BEFORE_MARK_VNOMAGIC: '\\%<\'' [a-zA-Z] -> type(BEFORE_MARK);
+AFTER_MARK_VNOMAGIC: '\\%>\'' [a-zA-Z] -> type(AFTER_MARK);
 
 // case-related tokens
 IGNORE_CASE_VNOMAGIC: '\\c' { setIgnoreCase(); } -> skip;

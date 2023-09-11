@@ -203,6 +203,9 @@ zero_width : CURSOR               #Cursor
            | COLUMN_CURSOR        #ColumnCursor
            | BEFORE_COLUMN_CURSOR #BeforeColumnCursor
            | AFTER_COLUMN_CURSOR  #AfterColumnCursor
+           | MARK                 #Mark
+           | BEFORE_MARK          #BeforeMark
+           | AFTER_MARK           #AfterMark
            ;
 
 /**
