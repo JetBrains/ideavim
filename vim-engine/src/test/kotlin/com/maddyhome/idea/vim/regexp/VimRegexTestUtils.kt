@@ -22,42 +22,73 @@ internal object VimRegexTestUtils {
   const val START: String = "<start>"
   const val END: String = "<end>"
   const val CARET: String = "<caret>"
+  const val VISUAL_START = "<vstart>"
+  const val VISUAL_END = "<vend>"
 
   fun mockEditorFromText(text: CharSequence) : VimEditor {
     val textWithoutRangeTags = getTextWithoutRangeTags(text)
 
-    val caretIndices = mutableListOf<Int>()
-    val processedText = StringBuilder(textWithoutRangeTags)
-    var currentIndex = processedText.indexOf(CARET)
+    val carets = mutableListOf<VimCaret>()
+    val textWithCarets = getTextWithoutVisualTags(textWithoutRangeTags)
+    val textWithVisuals = getTextWithoutCaretTags(textWithoutRangeTags)
+    val visualStart = textWithVisuals.indexOf(VISUAL_START)
+    val visualEnd = if (visualStart > 0) textWithVisuals.indexOf(VISUAL_END) - VISUAL_START.length
+                    else -1
+
+    var currentIndex = textWithCarets.indexOf(CARET)
+    var offset = 0
 
     while (currentIndex != -1) {
-      caretIndices.add(currentIndex)
-      processedText.delete(currentIndex, currentIndex + CARET.length)
-      currentIndex = processedText.indexOf(CARET, currentIndex)
+      carets.add(mockCaret(currentIndex - offset, Pair(visualStart, visualEnd)))
+      currentIndex = textWithCarets.indexOf(CARET, currentIndex + CARET.length)
+      offset += CARET.length
     }
-    return mockEditor(processedText, caretIndices)
+
+    return mockEditor(getTextWithoutCaretTags(textWithCarets), carets)
   }
 
-  private fun mockEditor(text: CharSequence, caretOffsets: List<Int> = emptyList()) : VimEditor {
+  private fun mockEditor(text: CharSequence, carets: List<VimCaret> = emptyList()) : VimEditor {
     val lines = text.split("\n").map { it + "\n" }
 
     val editorMock = Mockito.mock<VimEditor>()
     mockEditorText(editorMock, text)
     mockEditorOffsetToBufferPosition(editorMock, lines)
-    mockEditorCarets(editorMock, caretOffsets)
+
+    if (carets.isEmpty()) {
+      // if no carets are provided, place on at the start of the text
+      val caret = mockCaret(0, Pair(-1, -1))
+      whenever(editorMock.carets()).thenReturn(listOf(caret))
+      whenever(editorMock.currentCaret()).thenReturn(caret)
+    } else {
+      whenever(editorMock.carets()).thenReturn(carets)
+      whenever(editorMock.currentCaret()).thenReturn(carets.first())
+    }
 
     return editorMock
   }
 
-  private fun getTextWithoutEditorTags(text: CharSequence): CharSequence {
-    val textWithoutEditorTags = StringBuilder(text)
-    var currentIndex = textWithoutEditorTags.indexOf(CARET)
+  private fun mockCaret(caretOffset: Int, visualOffset: Pair<Int, Int>): VimCaret {
+    val caretMock = Mockito.mock<VimCaret>()
+    whenever(caretMock.offset).thenReturn(Offset(caretOffset))
+    whenever(caretMock.selectionStart).thenReturn(visualOffset.first)
+    whenever(caretMock.selectionEnd).thenReturn(visualOffset.second)
+    return caretMock
+  }
 
-    while (currentIndex != -1) {
-      textWithoutEditorTags.delete(currentIndex, currentIndex + CARET.length)
-      currentIndex = textWithoutEditorTags.indexOf(CARET, currentIndex)
-    }
-    return textWithoutEditorTags
+  private fun getTextWithoutCaretTags(text: CharSequence): CharSequence {
+    return text.replace(CARET.toRegex(), "")
+  }
+
+  private fun getTextWithoutVisualTags(text: CharSequence): CharSequence {
+    return text.replace("$VISUAL_START|$VISUAL_END".toRegex(), "")
+  }
+
+  private fun getTextWithoutEditorTags(text: CharSequence): CharSequence {
+    return getTextWithoutVisualTags(
+      getTextWithoutCaretTags(
+        text
+      )
+    )
   }
 
   private fun mockEditorText(editor: VimEditor, text: CharSequence) {
@@ -121,16 +152,5 @@ internal object VimRegexTestUtils {
         BufferPosition(-1, -1)
       }
     }
-  }
-
-  private fun mockEditorCarets(editor: VimEditor, caretOffsets: List<Int>) {
-    val trueCarets = ArrayList<VimCaret>()
-    for (caret in caretOffsets) {
-      val caretMock = Mockito.mock<VimCaret>()
-      whenever(caretMock.offset).thenReturn(Offset(caret))
-      trueCarets.add(caretMock)
-    }
-    whenever(editor.carets()).thenReturn(trueCarets)
-    whenever(editor.currentCaret()).thenReturn(trueCarets.firstOrNull())
   }
 }
