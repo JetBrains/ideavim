@@ -1664,7 +1664,7 @@ class NFATest {
   }
 
   @Test
-  fun `text text is not inside visual area`() {
+  fun `test text is not inside visual area`() {
     assertFailure(
       "${VISUAL_START}Lorem $CARET${VISUAL_END}Ipsum",
       "\\%VLorem Ipsu\\%Vm"
