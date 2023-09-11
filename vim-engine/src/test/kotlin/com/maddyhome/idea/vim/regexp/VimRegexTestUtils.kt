@@ -32,7 +32,7 @@ internal object VimRegexTestUtils {
     val textWithCarets = getTextWithoutVisualTags(textWithoutRangeTags)
     val textWithVisuals = getTextWithoutCaretTags(textWithoutRangeTags)
     val visualStart = textWithVisuals.indexOf(VISUAL_START)
-    val visualEnd = if (visualStart > 0) textWithVisuals.indexOf(VISUAL_END) - VISUAL_START.length
+    val visualEnd = if (visualStart >= 0) textWithVisuals.indexOf(VISUAL_END) - VISUAL_START.length
                     else -1
 
     var currentIndex = textWithCarets.indexOf(CARET)
