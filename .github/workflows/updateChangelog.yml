@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 300
+          ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
       - name: Get tags
         run: git fetch --tags origin
       - name: Set up JDK 11
