@@ -25,6 +25,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Fixes:
+* [VIM-3060](https://youtrack.jetbrains.com/issue/VIM-3060) Clipboard interaction stopped working
+
 ## 2.5.0, 2023-09-01
 
 ### Fixes:
