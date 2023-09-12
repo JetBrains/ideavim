@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 300
+          # See end of file updateChangeslog.yml for explanation of this secret
           ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
       - name: Get tags
         run: git fetch --tags origin
@@ -56,3 +57,9 @@ jobs:
           git push origin :refs/tags/workflow-changelog || true
           git tag workflow-changelog
           git push origin workflow-changelog
+
+# Regarding secrets.PUSH_TO_PROTECTED_BRANCH_SECRET - we use branch protection rules to automate merges of the
+#   dependabot updates. See mergeDependatobPR.yml file.
+# However, it turned out that GitHub accepts pushes from the actions as a PR and requires checks, that are always
+#   false for pushing from actions.
+# This secret is created to implement the workaround described in https://stackoverflow.com/a/76135647/3124227

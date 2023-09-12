@@ -20,6 +20,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: origin
+          # See end of file updateChangeslog.yml for explanation of this secret
+          ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
 
       - name: Fetch docs repo
         uses: actions/checkout@v3
