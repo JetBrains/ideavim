@@ -28,6 +28,9 @@ usual beta standards.
 ### Fixes:
 * [VIM-3060](https://youtrack.jetbrains.com/issue/VIM-3060) Clipboard interaction stopped working
 
+### Merged PRs:
+* [697](https://github.com/JetBrains/ideavim/pull/697) by [Matt Ellis](https://github.com/citizenmatt): Support per-window "global" values for local-to-window options
+
 ## 2.5.0, 2023-09-01
 
 ### Fixes:
