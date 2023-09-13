@@ -13,15 +13,18 @@ import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterColumnMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterLineCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterLineMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AfterMarkMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtColumnMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtLineCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.AtLineMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.AtMarkMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BackreferenceMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeColumnMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeLineCursorMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeLineMatcher
+import com.maddyhome.idea.vim.regexp.nfa.matcher.BeforeMarkMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CharacterMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionMatcher
 import com.maddyhome.idea.vim.regexp.nfa.matcher.CollectionRange
@@ -690,6 +693,24 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   override fun visitVisual(ctx: RegexParser.VisualContext?): NFA {
     return NFA.fromMatcher(VisualAreaMatcher())
+  }
+
+  override fun visitMark(ctx: RegexParser.MarkContext): NFA {
+    return NFA.fromMatcher(
+      AtMarkMatcher(ctx.text[if (ctx.text[0] == '\\') 3 else 2])
+    )
+  }
+
+  override fun visitBeforeMark(ctx: RegexParser.BeforeMarkContext): NFA {
+    return NFA.fromMatcher(
+      BeforeMarkMatcher(ctx.text[if (ctx.text[0] == '\\') 4 else 3])
+    )
+  }
+
+  override fun visitAfterMark(ctx: RegexParser.AfterMarkContext): NFA {
+    return NFA.fromMatcher(
+      AfterMarkMatcher(ctx.text[if (ctx.text[0] == '\\') 4 else 3])
+    )
   }
 
   private fun cleanLiteralChar(str : String) : Char {

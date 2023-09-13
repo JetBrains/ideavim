@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
-internal class MarkMatcher(val mark: Char) : Matcher {
+internal class AtMarkMatcher(val mark: Char) : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
