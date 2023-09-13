@@ -1728,6 +1728,20 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test cursor and visual belong to the same cursor`() {
+    doTest(
+      "${START}Lor${END}em Ipsum",
+      "\\%V.\\{-}\\%#.",
+      listOf(
+        mockCaret(0),
+        mockCaret(1),
+        mockCaret(2, Pair(0, 5)),
+        mockCaret(3),
+      )
+    )
+  }
+
   companion object {
     private fun assertFailure(
       text: CharSequence,

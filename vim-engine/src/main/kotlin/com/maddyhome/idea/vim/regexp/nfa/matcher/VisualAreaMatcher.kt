@@ -23,7 +23,13 @@ internal class VisualAreaMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-      return if (index >= editor.currentCaret().selectionStart && index < editor.currentCaret().selectionEnd) MatcherResult.Success(0)
-      else MatcherResult.Failure
+    return if (possibleCursors.any { index >= it.selectionStart && index < it.selectionEnd }) {
+      val newPossibleCursors = possibleCursors.filter { index >= it.selectionStart && index < it.selectionEnd }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    } else {
+      MatcherResult.Failure
     }
+  }
 }
