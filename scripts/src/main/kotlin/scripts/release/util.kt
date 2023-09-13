@@ -13,6 +13,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.lib.RepositoryBuilder
+import org.eclipse.jgit.revwalk.RevWalk
 import java.io.File
 
 
@@ -64,7 +65,11 @@ internal fun getVersion(projectDir: String, onlyStable: Boolean): Pair<Semver, O
 
   val versions = git.tagList().call().mapNotNull { ref ->
     runCatching {
-      Semver(ref.name.removePrefix("refs/tags/")) to ref.objectId
+      // Git has two types of tags: light and annotated. This code detect hash of the commit for both types of tags
+      val revWalk = RevWalk(repository)
+      val tag = revWalk.parseAny(ref.objectId)
+      val commitHash = revWalk.peel(tag).id
+      Semver(ref.name.removePrefix("refs/tags/")) to commitHash
     }.getOrNull()
   }
     .sortedBy { it.first }
