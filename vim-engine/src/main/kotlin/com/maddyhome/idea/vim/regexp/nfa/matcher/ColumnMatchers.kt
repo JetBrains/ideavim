@@ -59,7 +59,12 @@ internal class AtColumnCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(it.offset.point).column }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(it.offset.point).column }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    }
     else MatcherResult.Failure
   }
 }
@@ -72,7 +77,12 @@ internal class BeforeColumnCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(it.offset.point).column }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(it.offset.point).column }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    }
     else MatcherResult.Failure
   }
 }
@@ -85,7 +95,12 @@ internal class AfterColumnCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(it.offset.point).column }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(it.offset.point).column }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    }
     else MatcherResult.Failure
   }
 }
