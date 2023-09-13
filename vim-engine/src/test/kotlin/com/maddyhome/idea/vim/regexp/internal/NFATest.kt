@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.END
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.MARK
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_END
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
@@ -1668,6 +1669,38 @@ class NFATest {
     assertFailure(
       "${VISUAL_START}Lorem $CARET${VISUAL_END}Ipsum",
       "\\%VLorem Ipsu\\%Vm"
+    )
+  }
+
+  @Test
+  fun `test text at mark position`() {
+    doTest(
+      "Lorem ${START}${MARK('m')}Ips${END}um",
+      "\\%'m..."
+    )
+  }
+
+  @Test
+  fun `test text before mark position`() {
+    doTest(
+      "${START}Lor${END}em ${MARK('m')}Ipsum",
+      "\\%<'m..."
+    )
+  }
+
+  @Test
+  fun `test text after mark position`() {
+    doTest(
+      "Lorem ${MARK('m')}I${START}psu${END}m",
+      "\\%>'m..."
+    )
+  }
+
+  @Test
+  fun `test mark does not exist`() {
+    assertFailure(
+      "Lorem ${MARK('m')}Ipsum",
+      "\\%'n..."
     )
   }
 
