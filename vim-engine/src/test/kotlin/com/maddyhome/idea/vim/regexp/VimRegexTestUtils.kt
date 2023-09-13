@@ -9,10 +9,12 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.api.BufferPosition
+import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.mark.VimMark
 import org.mockito.Mockito
 import org.mockito.kotlin.whenever
 import kotlin.test.fail
@@ -24,39 +26,52 @@ internal object VimRegexTestUtils {
   const val CARET: String = "<caret>"
   const val VISUAL_START = "<vstart>"
   const val VISUAL_END = "<vend>"
+  private const val MARK = "<mark.>"
+  fun MARK(mark: Char): CharSequence { return "<mark$mark>" }
 
   fun mockEditorFromText(text: CharSequence) : VimEditor {
+    val cleanText = getTextWithoutEditorTags(getTextWithoutRangeTags(text))
+    val lines = cleanText.split("\n").map { it + "\n" }
+
+    val editorMock = Mockito.mock<VimEditor>()
+    mockEditorText(editorMock, cleanText)
+    mockEditorOffsetToBufferPosition(editorMock, lines)
+    mockEditorBufferPositionToOffset(editorMock, lines)
+
     val textWithoutRangeTags = getTextWithoutRangeTags(text)
 
     val carets = mutableListOf<VimCaret>()
-    val textWithCarets = getTextWithoutVisualTags(textWithoutRangeTags)
-    val textWithVisuals = getTextWithoutCaretTags(textWithoutRangeTags)
-    val visualStart = textWithVisuals.indexOf(VISUAL_START)
-    val visualEnd = if (visualStart >= 0) textWithVisuals.indexOf(VISUAL_END) - VISUAL_START.length
+    val textWithOnlyCarets = getTextWithoutVisualTags(getTextWithoutMarkTags(textWithoutRangeTags))
+    val textWithOnlyVisuals = getTextWithoutCaretTags(getTextWithoutMarkTags(textWithoutRangeTags))
+    val textWithOnlyMarks = getTextWithoutCaretTags(getTextWithoutVisualTags(textWithoutRangeTags))
+
+    val visualStart = textWithOnlyVisuals.indexOf(VISUAL_START)
+    val visualEnd = if (visualStart >= 0) textWithOnlyVisuals.indexOf(VISUAL_END) - VISUAL_START.length
                     else -1
 
-    var currentIndex = textWithCarets.indexOf(CARET)
-    var offset = 0
+    val marks = mutableMapOf<Char, BufferPosition>()
 
-    while (currentIndex != -1) {
-      carets.add(mockCaret(currentIndex - offset, Pair(visualStart, visualEnd)))
-      currentIndex = textWithCarets.indexOf(CARET, currentIndex + CARET.length)
+    var nextMark = MARK.toRegex().find(textWithOnlyMarks)
+    var offset = 0
+    while (nextMark != null) {
+      val nextMarkIndex = nextMark.range.first - offset
+      offset += MARK.length
+      marks[nextMark.value[5]] = editorMock.offsetToBufferPosition(nextMarkIndex)
+      nextMark = nextMark.next()
+    }
+
+    var nextCaretIndex = textWithOnlyCarets.indexOf(CARET)
+    offset = 0
+
+    while (nextCaretIndex != -1) {
+      carets.add(mockCaret(nextCaretIndex - offset, Pair(visualStart, visualEnd), marks))
+      nextCaretIndex = textWithOnlyCarets.indexOf(CARET, nextCaretIndex + CARET.length)
       offset += CARET.length
     }
 
-    return mockEditor(getTextWithoutCaretTags(textWithCarets), carets)
-  }
-
-  private fun mockEditor(text: CharSequence, carets: List<VimCaret> = emptyList()) : VimEditor {
-    val lines = text.split("\n").map { it + "\n" }
-
-    val editorMock = Mockito.mock<VimEditor>()
-    mockEditorText(editorMock, text)
-    mockEditorOffsetToBufferPosition(editorMock, lines)
-
     if (carets.isEmpty()) {
       // if no carets are provided, place on at the start of the text
-      val caret = mockCaret(0, Pair(-1, -1))
+      val caret = mockCaret(0, Pair(-1, -1), emptyMap())
       whenever(editorMock.carets()).thenReturn(listOf(caret))
       whenever(editorMock.currentCaret()).thenReturn(caret)
     } else {
@@ -67,12 +82,25 @@ internal object VimRegexTestUtils {
     return editorMock
   }
 
-  private fun mockCaret(caretOffset: Int, visualOffset: Pair<Int, Int>): VimCaret {
+  private fun mockCaret(caretOffset: Int, visualOffset: Pair<Int, Int>, marks: Map<Char, BufferPosition>): VimCaret {
     val caretMock = Mockito.mock<VimCaret>()
     whenever(caretMock.offset).thenReturn(Offset(caretOffset))
     whenever(caretMock.selectionStart).thenReturn(visualOffset.first)
     whenever(caretMock.selectionEnd).thenReturn(visualOffset.second)
+    val markStorage = mockMarkStorage(marks)
+    whenever(caretMock.markStorage).thenReturn(markStorage)
+
     return caretMock
+  }
+
+  private fun mockMarkStorage(marks: Map<Char, BufferPosition>): LocalMarkStorage {
+    val markStorage = Mockito.mock<LocalMarkStorage>()
+    whenever(markStorage.getMark(Mockito.anyChar())).thenAnswer { invocation ->
+      val key = invocation.arguments[0] as Char
+      val position = marks[key] ?: return@thenAnswer null
+      VimMark(key, position.line, position.column, "", "")
+    }
+    return markStorage
   }
 
   private fun getTextWithoutCaretTags(text: CharSequence): CharSequence {
@@ -83,10 +111,16 @@ internal object VimRegexTestUtils {
     return text.replace("$VISUAL_START|$VISUAL_END".toRegex(), "")
   }
 
+  private fun getTextWithoutMarkTags(text: CharSequence): CharSequence {
+    return text.replace(MARK.toRegex(), "")
+  }
+
   private fun getTextWithoutEditorTags(text: CharSequence): CharSequence {
-    return getTextWithoutVisualTags(
-      getTextWithoutCaretTags(
-        text
+    return getTextWithoutMarkTags(
+      getTextWithoutVisualTags(
+        getTextWithoutCaretTags(
+          text
+        )
       )
     )
   }
@@ -153,4 +187,13 @@ internal object VimRegexTestUtils {
       }
     }
   }
+
+  private fun mockEditorBufferPositionToOffset(editor: VimEditor, lines: List<String>) {
+    whenever(editor.bufferPositionToOffset(any(BufferPosition::class.java))).thenAnswer { invocation ->
+      val position = invocation.arguments[0] as BufferPosition
+      return@thenAnswer lines.subList(0, position.line).sumOf { it.length } + position.column
+    }
+  }
+
+  private fun <T> any(type: Class<T>): T = Mockito.any(type)
 }
