@@ -1742,6 +1742,14 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test pattern with multiple cursors at different indexes fails`() {
+    assertFailure(
+      "${CARET}Lorem ${CARET}Ipsum",
+      "\\%#.\\+\\%#"
+    )
+  }
+
   companion object {
     private fun assertFailure(
       text: CharSequence,
