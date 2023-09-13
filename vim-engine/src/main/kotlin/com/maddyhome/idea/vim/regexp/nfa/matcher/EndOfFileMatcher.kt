@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -21,6 +22,7 @@ internal class EndOfFileMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (index == editor.text().length) MatcherResult.Success(0) else MatcherResult.Failure
   }

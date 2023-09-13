@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -24,8 +25,15 @@ internal interface Matcher {
    * @param index             The current index in the text of the editor
    * @param groups            The groups captured so far
    * @param isCaseInsensitive Whether the matcher should ignore case
+   * @param possibleCursors   The cursors that are allowed to match
    *
    * @return A result indicating either a failure to match, or success with the number of consumed characters
    */
-  fun matches(editor: VimEditor, index : Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult
+  fun matches(
+    editor: VimEditor,
+    index : Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
+  ): MatcherResult
 }

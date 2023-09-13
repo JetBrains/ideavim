@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -15,7 +16,13 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * Matcher that matches with any character
  */
 internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
+  override fun matches(
+    editor: VimEditor,
+    index: Int, groups:
+    VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
+  ): MatcherResult {
     return if (includeNewLine)
       if (index < editor.text().length) MatcherResult.Success(1)
       else MatcherResult.Failure

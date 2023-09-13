@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
@@ -17,11 +18,12 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 internal class VisualAreaMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int,
-    groups: VimMatchGroupCollection,
+    index: Int, groups:
+    VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (index >= editor.currentCaret().selectionStart && index < editor.currentCaret().selectionEnd) MatcherResult.Success(0)
-    else MatcherResult.Failure
-  }
+      return if (index >= editor.currentCaret().selectionStart && index < editor.currentCaret().selectionEnd) MatcherResult.Success(0)
+      else MatcherResult.Failure
+    }
 }

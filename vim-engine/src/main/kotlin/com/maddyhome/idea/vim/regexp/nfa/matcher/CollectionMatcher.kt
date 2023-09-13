@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -28,7 +29,13 @@ internal class CollectionMatcher(
   private val includesEOL: Boolean = false,
   private val forceNoIgnoreCase: Boolean = false
 ) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
+  override fun matches(
+    editor: VimEditor,
+    index: Int, groups:
+    VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
+  ): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
 
     if (!includesEOL && editor.text()[index] == '\n') return MatcherResult.Failure

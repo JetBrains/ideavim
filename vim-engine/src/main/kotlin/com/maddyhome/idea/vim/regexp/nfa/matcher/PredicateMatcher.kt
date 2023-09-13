@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -17,7 +18,13 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * @param predicate The predicate used to check if the character should be accepted
  */
 internal class PredicateMatcher(val predicate: (Char) -> Boolean) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
+  override fun matches(
+    editor: VimEditor,
+    index: Int, groups:
+    VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
+  ): MatcherResult {
     return if (index < editor.text().length && predicate(editor.text()[index])) MatcherResult.Success(1)
     else MatcherResult.Failure
   }
