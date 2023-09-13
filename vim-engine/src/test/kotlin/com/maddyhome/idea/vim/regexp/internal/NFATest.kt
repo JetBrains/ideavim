@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.internal
 
+import com.maddyhome.idea.vim.api.BufferPosition
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
@@ -16,6 +18,8 @@ import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.MARK
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_END
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockCaret
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
@@ -1704,6 +1708,26 @@ class NFATest {
     )
   }
 
+  @Test
+  fun `test cursor and mark belong to the same cursor`() {
+    /*
+    In this test, there are two cursors, one at offset 3 and the other at 6.
+    The second cursor (at offset 6) has a mark 'm' at offset 0.
+    The pattern reads as "match the character at the cursor position that is after a mark 'm'".
+    Since the cursor and mark tokens have to "belong" to the same cursor, the resulting match
+    is at offset 6 (the offset of the second cursor), even though the first cursor appears first
+    in the text.
+    */
+    doTest(
+      "Lorem ${START}I${END}psum",
+      "\\%>'m\\%#.",
+      listOf(
+        mockCaret(3),
+        mockCaret(6, marks = mapOf(Pair('m', BufferPosition(0, 0))))
+      )
+    )
+  }
+
   companion object {
     private fun assertFailure(
       text: CharSequence,
@@ -1724,6 +1748,24 @@ class NFATest {
       groupNumber: Int = 0
     ) {
       val editor = mockEditorFromText(text)
+      val nfa = buildNFA(pattern)
+
+      val result = nfa?.simulate(editor, offset, ignoreCase)
+      when (result) {
+        is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), result.groups.get(groupNumber)?.range)
+        else -> fail("Expected to find match")
+      }
+    }
+
+    private fun doTest(
+      text: CharSequence,
+      pattern: String,
+      carets: List<VimCaret>,
+      offset: Int = 0,
+      ignoreCase: Boolean = false,
+      groupNumber: Int = 0
+    ) {
+      val editor = mockEditor(text, carets)
       val nfa = buildNFA(pattern)
 
       val result = nfa?.simulate(editor, offset, ignoreCase)

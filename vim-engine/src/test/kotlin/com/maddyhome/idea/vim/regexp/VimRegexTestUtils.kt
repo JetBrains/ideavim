@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.mark.VimMark
 import org.mockito.Mockito
 import org.mockito.kotlin.whenever
+import kotlin.test.assertNotEquals
 import kotlin.test.fail
 
 internal object VimRegexTestUtils {
@@ -82,7 +83,22 @@ internal object VimRegexTestUtils {
     return editorMock
   }
 
-  private fun mockCaret(caretOffset: Int, visualOffset: Pair<Int, Int>, marks: Map<Char, BufferPosition>): VimCaret {
+  fun mockEditor(text: CharSequence, carets: List<VimCaret>): VimEditor {
+    assertNotEquals(0, carets.size, "Expected at least one caret.")
+    val cleanText = getTextWithoutEditorTags(getTextWithoutRangeTags(text))
+    val lines = cleanText.split("\n").map { it + "\n" }
+
+    val editorMock = Mockito.mock<VimEditor>()
+    mockEditorText(editorMock, cleanText)
+    mockEditorOffsetToBufferPosition(editorMock, lines)
+    mockEditorBufferPositionToOffset(editorMock, lines)
+    whenever(editorMock.carets()).thenReturn(carets)
+    whenever(editorMock.currentCaret()).thenReturn(carets.first())
+
+    return editorMock
+  }
+
+  fun mockCaret(caretOffset: Int, visualOffset: Pair<Int, Int> = Pair(-1, -1), marks: Map<Char, BufferPosition> = emptyMap()): VimCaret {
     val caretMock = Mockito.mock<VimCaret>()
     whenever(caretMock.offset).thenReturn(Offset(caretOffset))
     whenever(caretMock.selectionStart).thenReturn(visualOffset.first)
