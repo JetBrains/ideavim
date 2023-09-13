@@ -58,7 +58,12 @@ internal class AtLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset.point).line }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset.point).line }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    }
     else MatcherResult.Failure
   }
 }
@@ -71,7 +76,12 @@ internal class BeforeLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset.point).line }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset.point).line }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    }
     else MatcherResult.Failure
   }
 }
@@ -84,7 +94,12 @@ internal class AfterLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset.point).line }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset.point).line }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    }
     else MatcherResult.Failure
   }
 }
