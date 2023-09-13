@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
@@ -17,8 +18,21 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
  * on the given index
  */
 internal class CursorMatcher : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean): MatcherResult {
-    return if (editor.carets().map { it.offset }.contains(Offset(index))) MatcherResult.Success(0)
-    else MatcherResult.Failure
+  override fun matches(
+    editor: VimEditor,
+    index: Int, groups:
+    VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
+  ): MatcherResult {
+    return if (possibleCursors.map { it.offset.point }.contains(index)) {
+      // now the only cursors possible are the ones at this index
+      val newPossibleCursors = possibleCursors.filter { it.offset.point == index }
+      possibleCursors.clear()
+      possibleCursors.addAll(newPossibleCursors)
+      MatcherResult.Success(0)
+    } else {
+      MatcherResult.Failure
+    }
   }
 }

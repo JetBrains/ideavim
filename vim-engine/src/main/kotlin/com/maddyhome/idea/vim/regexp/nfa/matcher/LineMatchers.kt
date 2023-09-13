@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -17,6 +18,7 @@ internal class AtLineMatcher(private val lineNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line + 1 == lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -29,6 +31,7 @@ internal class BeforeLineMatcher(private val lineNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line + 1 < lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -41,6 +44,7 @@ internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line + 1 > lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -52,6 +56,7 @@ internal class AtLineCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -64,6 +69,7 @@ internal class BeforeLineCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -76,6 +82,7 @@ internal class AfterLineCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(editor.currentCaret().offset.point).line) MatcherResult.Success(0)
     else MatcherResult.Failure

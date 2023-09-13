@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -17,6 +18,7 @@ internal class AtColumnMatcher(private val columnNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column + 1 == columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -29,6 +31,7 @@ internal class BeforeColumnMatcher(private val columnNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column + 1 < columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -41,6 +44,7 @@ internal class AfterColumnMatcher(private val columnNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column + 1 > columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -53,6 +57,7 @@ internal class AtColumnCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -65,6 +70,7 @@ internal class BeforeColumnCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -77,6 +83,7 @@ internal class AfterColumnCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(editor.currentCaret().offset.point).column) MatcherResult.Success(0)
     else MatcherResult.Failure

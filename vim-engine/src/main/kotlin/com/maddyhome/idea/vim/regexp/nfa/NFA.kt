@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
@@ -194,14 +195,15 @@ internal class NFA private constructor(
   /**
    * Simulates the nfa in depth-first search fashion.
    *
-   * @param editor       The editor that is used for the simulation
-   * @param startIndex   The index where the simulation should start
+   * @param editor            The editor that is used for the simulation
+   * @param startIndex        The index where the simulation should start
+   * @param isCaseInsensitive Whether the simulation should ignore case
    *
    * @return The resulting match result
    */
   internal fun simulate(editor: VimEditor, startIndex: Int = 0, isCaseInsensitive: Boolean = false) : VimMatchResult {
     groups.groupCount = 0
-    if (simulate(editor, startIndex, startState, acceptState, isCaseInsensitive).simulationResult) {
+    if (simulate(editor, startIndex, startState, acceptState, isCaseInsensitive, editor.carets().toMutableList()).simulationResult) {
       return groups.get(0)?.let {
         VimMatchResult.Success(
           it.range,
@@ -223,6 +225,7 @@ internal class NFA private constructor(
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
    * @param maxIndex          The maximum index of the text that the simulation is allowed to go to
+   * @param possibleCursors   The cursors that are allowed to match
    *
    * @return The result of the simulation. It tells whether it was successful, and at what index it stopped.
    */
@@ -232,6 +235,7 @@ internal class NFA private constructor(
     currentState: NFAState,
     targetState: NFAState,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>,
     epsilonVisited: Set<NFAState> = HashSet(),
     maxIndex: Int = editor.text().length
   ): NFASimulationResult {
@@ -239,14 +243,14 @@ internal class NFA private constructor(
 
     updateCaptureGroups(editor, currentIndex, currentState)
     currentState.assertion?.let {
-      val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it)
+      val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it, possibleCursors)
       if (!assertionResult.simulationResult) return NFASimulationResult(false, currentIndex)
-      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive, maxIndex=maxIndex)
+      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive, possibleCursors, maxIndex=maxIndex)
     }
     if (currentState === targetState) return NFASimulationResult(true, currentIndex)
 
     for (transition in currentState.transitions) {
-      val transitionResult = handleTransition(editor, currentIndex, currentState, targetState, isCaseInsensitive, transition, epsilonVisited, maxIndex)
+      val transitionResult = handleTransition(editor, currentIndex, currentState, targetState, isCaseInsensitive, transition, epsilonVisited, maxIndex, possibleCursors)
       if (transitionResult.simulationResult) return transitionResult
     }
     return NFASimulationResult(false, currentIndex)
@@ -260,6 +264,7 @@ internal class NFA private constructor(
    * @param currentIndex      The current index of the text in the simulation
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param assertion         The assertion that is to be handled
+   * @param possibleCursors   The cursors that are allowed to match
    *
    * @return The result of the assertion. It tells whether it was successful, and at what index it stopped.
    */
@@ -267,10 +272,11 @@ internal class NFA private constructor(
     editor: VimEditor,
     currentIndex: Int,
     isCaseInsensitive: Boolean,
-    assertion: NFAAssertion
+    assertion: NFAAssertion,
+    possibleCursors: MutableList<VimCaret>
   ): NFASimulationResult {
-    return if (assertion.isAhead) handleAheadAssertion(editor, currentIndex, isCaseInsensitive, assertion)
-    else handleBehindAssertion(editor, currentIndex, isCaseInsensitive, assertion)
+    return if (assertion.isAhead) handleAheadAssertion(editor, currentIndex, isCaseInsensitive, assertion, possibleCursors)
+    else handleBehindAssertion(editor, currentIndex, isCaseInsensitive, assertion, possibleCursors)
   }
 
   /**
@@ -281,6 +287,7 @@ internal class NFA private constructor(
    * @param currentIndex      The current index of the text in the simulation
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param assertion         The assertion that is to be handled
+   * @param possibleCursors   The cursors that are allowed to match
    *
    * @return The result of the assertion. It tells whether it was successful, and at what index it stopped.
    */
@@ -288,9 +295,10 @@ internal class NFA private constructor(
     editor: VimEditor,
     currentIndex: Int,
     isCaseInsensitive: Boolean,
-    assertion: NFAAssertion
+    assertion: NFAAssertion,
+    possibleCursors: MutableList<VimCaret>
   ): NFASimulationResult {
-    val assertionResult = simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive)
+    val assertionResult = simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive, possibleCursors)
     if (assertionResult.simulationResult != assertion.isPositive) {
       return NFASimulationResult(false, currentIndex)
     }
@@ -311,6 +319,7 @@ internal class NFA private constructor(
    * @param currentIndex      The current index of the text in the simulation
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param assertion         The assertion that is to be handled
+   * @param possibleCursors   The cursors that are allowed to match
    *
    * @return The result of the assertion. It tells whether it was successful, and at what index it stopped.
    */
@@ -318,7 +327,8 @@ internal class NFA private constructor(
     editor: VimEditor,
     currentIndex: Int,
     isCaseInsensitive: Boolean,
-    assertion: NFAAssertion
+    assertion: NFAAssertion,
+    possibleCursors: MutableList<VimCaret>
   ): NFASimulationResult {
     var lookBehindStartIndex = currentIndex - 1
     val minIndex = if (assertion.limit == 0) 0 else max(0, currentIndex - assertion.limit)
@@ -327,7 +337,7 @@ internal class NFA private constructor(
       // the lookbehind is allowed to look back as far as to the start of the previous line
       if (editor.text()[lookBehindStartIndex] == '\n') seenNewLine = true
 
-      val result = simulate(editor, lookBehindStartIndex, assertion.startState, assertion.endState, isCaseInsensitive, maxIndex = currentIndex)
+      val result = simulate(editor, lookBehindStartIndex, assertion.startState, assertion.endState, isCaseInsensitive, possibleCursors, maxIndex = currentIndex)
       // found a match that ends before the "currentIndex"
       if (result.simulationResult && result.index == currentIndex) {
         return if (assertion.isPositive) NFASimulationResult(true, currentIndex)
@@ -351,6 +361,7 @@ internal class NFA private constructor(
    * @param transition        The transition that is to be handled
    * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
    * @param maxIndex          The maximum index of the text that the simulation is allowed to go to
+   * @param possibleCursors   The cursors that are allowed to match
    *
    * @return The result of taking the transition. It tells whether it was successful, and at what index it stopped.
    */
@@ -362,9 +373,10 @@ internal class NFA private constructor(
     isCaseInsensitive: Boolean,
     transition: NFATransition,
     epsilonVisited: Set<NFAState>,
-    maxIndex: Int
+    maxIndex: Int,
+    possibleCursors: MutableList<VimCaret>
   ): NFASimulationResult {
-    val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive)
+    val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive, possibleCursors)
     if (transitionMatcherResult !is MatcherResult.Success) return NFASimulationResult(false, currentIndex)
 
     val nextIndex = currentIndex + transitionMatcherResult.consumed
@@ -379,7 +391,7 @@ internal class NFA private constructor(
     } else {
       HashSet()
     }
-    return simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, epsilonVisitedCopy, maxIndex)
+    return simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, possibleCursors, epsilonVisitedCopy, maxIndex)
   }
 
   /**

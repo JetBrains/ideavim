@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.nfa.matcher
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
@@ -20,6 +21,7 @@ internal class StartOfLineMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
     return if (index == 0 || editor.text()[index - 1] == '\n') MatcherResult.Success(0)
     else MatcherResult.Failure
