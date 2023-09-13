@@ -70,8 +70,8 @@ internal object VimRegexTestUtils {
     }
 
     if (carets.isEmpty()) {
-      // if no carets are provided, place on at the start of the text
-      val caret = mockCaret(0, Pair(-1, -1), emptyMap())
+      // if no carets are provided, place one at the start of the text
+      val caret = mockCaret(0, Pair(visualStart, visualEnd), marks)
       whenever(editorMock.carets()).thenReturn(listOf(caret))
       whenever(editorMock.currentCaret()).thenReturn(caret)
     } else {
