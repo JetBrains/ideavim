@@ -144,7 +144,7 @@ public class VimRegex(pattern: String) {
       is VimMatchResult.Failure -> result
       is VimMatchResult.Success -> {
         if (result.range.endOffset == editor.text().length) result
-        else VimMatchResult.Failure(VimRegexErrors.E000)
+        else VimMatchResult.Failure(VimRegexErrors.E486) // create a more appropriate error code?
       }
     }
   }

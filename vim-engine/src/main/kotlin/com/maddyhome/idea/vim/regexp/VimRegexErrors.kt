@@ -9,6 +9,6 @@
 package com.maddyhome.idea.vim.regexp
 
 public enum class VimRegexErrors {
-  E000, // TODO: currently used for failed parse, need to change
+  E383, // Invalid search string
   E486, // Pattern not found
 }

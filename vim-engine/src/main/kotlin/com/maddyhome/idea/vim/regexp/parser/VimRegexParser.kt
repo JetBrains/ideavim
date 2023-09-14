@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.regexp.parser
 
-import com.maddyhome.idea.vim.regexp.VimRegexErrors
 import com.maddyhome.idea.vim.regexp.parser.error.BailErrorLexer
 import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserErrorStrategy
 import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserException
@@ -36,10 +35,11 @@ internal object VimRegexParser {
       val tokens = CommonTokenStream(regexLexer)
       val parser = RegexParser(tokens)
       parser.errorHandler = VimRegexParserErrorStrategy()
+      parser.errorListeners.clear()
       val tree = parser.pattern()
       VimRegexParserResult.Success(tree, getCaseSensitivitySettings(regexLexer))
     } catch (e: VimRegexParserException) {
-      VimRegexParserResult.Failure(VimRegexErrors.E000)
+      VimRegexParserResult.Failure(e.errorCode)
     }
   }
 
