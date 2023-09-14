@@ -18,17 +18,22 @@ import javax.swing.KeyStroke
  */
 public object StringHelper {
   @JvmStatic
+  @Deprecated("Use injector.parser.parseKeys(string)",
+    ReplaceWith("injector.parser.parseKeys(string)", "com.maddyhome.idea.vim.api.injector")
+  )
   public fun parseKeys(string: String): List<KeyStroke> {
     return injector.parser.parseKeys(string)
   }
 
   @JvmStatic
+  @Deprecated("Use injector.parser.parseKeys(string)")
   public fun parseKeys(vararg string: String): List<KeyStroke> {
     return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).stream() }
       .collect(Collectors.toList())
   }
 
   @JvmStatic
+  @Deprecated("Use KeyStroke.isCloseKeyStroke", ReplaceWith("stroke.isCloseKeyStroke()"))
   public fun isCloseKeyStroke(stroke: KeyStroke): Boolean {
     return stroke.isCloseKeyStroke()
   }

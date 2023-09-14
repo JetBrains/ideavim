@@ -10,12 +10,10 @@ package com.maddyhome.idea.vim.vimscript.services
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 /**
@@ -40,14 +38,6 @@ public interface OptionService {
   public fun getOptionValue(scope: OptionScope, optionName: String, token: String = optionName): VimDataType
 
   /**
-   * COMPATIBILITY-LAYER: New method added
-   * Please see: https://jb.gg/zo8n0r
-   */
-  // Used by IdeaVimExtension 1.6.8 - setOption(GLOBAL, "keep-english-in-normal")
-  // Note that Find External Usages doesn't return any results because it calls setOption$default
-  public fun setOption(scope: Scope, optionName: String, token: String = optionName)
-
-  /**
    * COMPATIBILITY-LAYER: Added this class
    * Please see: https://jb.gg/zo8n0r
    */
@@ -63,16 +53,5 @@ internal class OptionServiceImpl : OptionService {
   override fun getOptionValue(scope: OptionScope, optionName: String, token: String): VimDataType {
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
     return injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null))
-  }
-
-  override fun setOption(scope: OptionService.Scope, optionName: String, token: String) {
-    // Use the fallback window to avoid any possible asserts. Do not do this in non-deprecated code!
-    val newScope = when (scope) {
-      is OptionService.Scope.GLOBAL -> OptionAccessScope.GLOBAL(injector.fallbackWindow)
-      is OptionService.Scope.LOCAL -> OptionAccessScope.LOCAL(scope.editor)
-    }
-    val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
-    val toggleOption = (option as? ToggleOption) ?: throw exExceptionMessage("E474", token)
-    injector.optionGroup.setToggleOption(toggleOption, newScope)
   }
 }
