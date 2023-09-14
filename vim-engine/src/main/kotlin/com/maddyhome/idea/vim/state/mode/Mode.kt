@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.state.VimStateMachine
  * To update the current mode, use [VimStateMachine.setMode]. To get the current mode use [VimStateMachine.mode].
  *
  * [Mode] also has a bunch of extension functions like [Mode.isSingleModeActive].
+ *
+ * Also read about how modes work in Vim: https://github.com/JetBrains/ideavim/wiki/how-many-modes-does-vim-have
  */
 public sealed interface Mode {
   public data class NORMAL(public val returnTo: ReturnTo? = null) : Mode
