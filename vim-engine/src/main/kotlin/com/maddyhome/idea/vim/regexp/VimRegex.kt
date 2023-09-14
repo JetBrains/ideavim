@@ -87,7 +87,7 @@ public class VimRegex(pattern: String) {
    * @param editor     The editor where to look for the match in
    * @param startIndex The index to start the find
    *
-   * @return The first match found in the editor
+   * @return The first match found in the editor after startIndex
    */
   public fun findNext(
     editor: VimEditor,
@@ -115,6 +115,64 @@ public class VimRegex(pattern: String) {
           else VimMatchResult.Failure(VimRegexErrors.E486)
         }
       }
+  }
+
+  /**
+   * Returns the first match of a pattern in the editor, that comes before the startIndex
+   *
+   * @param editor     The editor where to look for the match in
+   * @param startIndex The index to start the find
+   *
+   * @return The first match found in the editor before startIndex
+   */
+  public fun findPrevious(
+    editor: VimEditor,
+    startIndex: Int = 0
+  ): VimMatchResult {
+    val startLine = editor.offsetToBufferPosition(startIndex).line
+    val result = findLastMatchInLine(editor, startLine, startIndex)
+    if (result is VimMatchResult.Success && result.range.startOffset < startIndex) {
+        // there is a match at this line that starts before the startIndex
+        return result
+    } else {
+      // try searching in previous lines, line by line, and if necessary wrap around to the last line
+      var currentLine = startLine - 1
+      var wrappedAround = false
+      while (!(wrappedAround && currentLine <= startLine)) {
+        if (currentLine < 0) {
+          currentLine = editor.lineCount() - 1
+          wrappedAround = true
+        } else {
+          val previous = findLastMatchInLine(editor, currentLine)
+          if (previous is VimMatchResult.Success) return previous
+          else currentLine--
+        }
+      }
+      // there are no matches in the entire file
+      return VimMatchResult.Failure(VimRegexErrors.E486)
+    }
+  }
+
+  private fun findLastMatchInLine(editor: VimEditor, line: Int, maxIndex: Int = editor.getLineEndOffset(line)): VimMatchResult {
+    var index = editor.getLineStartOffset(line)
+    var prevResult: VimMatchResult = VimMatchResult.Failure(VimRegexErrors.E486)
+    while (index < maxIndex) {
+      val result = simulateNFANonExactSingleLine(editor, index)
+      when (result) {
+        // no more matches in this line, break out of the loop
+        is VimMatchResult.Failure -> break
+        is VimMatchResult.Success -> {
+          // no more matches in this line, break out of the loop
+          if (result.range.startOffset > editor.getLineEndOffset(line)) break
+
+
+          prevResult = result
+          index = if (result.range.startOffset == result.range.endOffset) result.range.endOffset + 1 else result.range.endOffset
+        }
+      }
+    }
+    // return the last found match in the line, if any
+    return prevResult
   }
 
   /**
