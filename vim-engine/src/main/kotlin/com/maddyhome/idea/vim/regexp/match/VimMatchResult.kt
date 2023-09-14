@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.regexp.match
 
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.regexp.VimRegexErrors
 
 /**
  * The result of matching a pattern against an editor
@@ -17,26 +18,23 @@ public sealed class VimMatchResult {
 
   /**
    * Successful match
+   *
+   * @param range  The range of indices in the editor text of where the match was found
+   * @param value  The string value of the match found
+   * @param groups The results of sub-matches corresponding to capture groups
    */
   public data class Success(
-    /**
-     * The range of indices in the editor text of where the match was found
-     */
     public val range: TextRange,
-
-    /**
-     * The string value of the match found
-     */
     public val value: String,
-
-    /**
-     * The results of sub-matches corresponding to capture groups
-     */
     public val groups: VimMatchGroupCollection
   ) : VimMatchResult()
 
   /**
    * Match was unsuccessful or not found
+   *
+   * @param errorCode Code of the error that caused matching to fail
    */
-  public object Failure : VimMatchResult()
+  public data class Failure(
+    val errorCode: VimRegexErrors
+  ) : VimMatchResult()
 }
