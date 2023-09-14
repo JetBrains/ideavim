@@ -114,6 +114,54 @@ class VimRegexTest {
   }
 
   @Nested
+  inner class FindPreviousTest {
+    @Test
+    fun `test find previous single word starting from offset`() {
+      doTest(
+        """
+      	|${START}Lorem${END} Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+        "Lorem",
+        1
+      )
+    }
+
+    @Test
+    fun `test find previous single word starting from the beginning`() {
+      doTest(
+        """
+      	|Lorem Ipsum
+        |
+        |${START}Lorem${END} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+        "Lorem"
+      )
+    }
+
+    private fun doTest(
+      text: CharSequence,
+      pattern: String,
+      startIndex: Int = 0
+    ) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.findPrevious(editor, startIndex)
+      when (matchResult) {
+        is VimMatchResult.Failure -> fail("Expected to find match")
+        is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), matchResult.range)
+      }
+    }
+  }
+
+  @Nested
   inner class FindAllTest {
     @Test
     fun `test find all occurrences of word`() {

@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.mark.VimMark
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito
 import org.mockito.kotlin.whenever
 import kotlin.test.assertNotEquals
@@ -38,6 +39,9 @@ internal object VimRegexTestUtils {
     mockEditorText(editorMock, cleanText)
     mockEditorOffsetToBufferPosition(editorMock, lines)
     mockEditorBufferPositionToOffset(editorMock, lines)
+    mockEditorLineStartOffset(editorMock)
+    mockEditorLineEndOffset(editorMock, lines)
+    mockEditorLineCount(editorMock, lines)
 
     val textWithoutRangeTags = getTextWithoutRangeTags(text)
 
@@ -92,6 +96,9 @@ internal object VimRegexTestUtils {
     mockEditorText(editorMock, cleanText)
     mockEditorOffsetToBufferPosition(editorMock, lines)
     mockEditorBufferPositionToOffset(editorMock, lines)
+    mockEditorLineStartOffset(editorMock)
+    mockEditorLineEndOffset(editorMock, lines)
+    mockEditorLineCount(editorMock, lines)
     whenever(editorMock.carets()).thenReturn(carets)
     whenever(editorMock.currentCaret()).thenReturn(carets.first())
 
@@ -209,6 +216,24 @@ internal object VimRegexTestUtils {
       val position = invocation.arguments[0] as BufferPosition
       return@thenAnswer lines.subList(0, position.line).sumOf { it.length } + position.column
     }
+  }
+
+  private fun mockEditorLineStartOffset(editor: VimEditor) {
+    whenever(editor.getLineStartOffset(anyInt())).thenAnswer { invocation ->
+      val line = invocation.arguments[0] as Int
+      editor.bufferPositionToOffset(BufferPosition(line, 0))
+    }
+  }
+
+  private fun mockEditorLineEndOffset(editor: VimEditor, lines: List<String>) {
+    whenever(editor.getLineEndOffset(anyInt())).thenAnswer { invocation ->
+      val line = invocation.arguments[0] as Int
+      editor.bufferPositionToOffset(BufferPosition(line, lines[line].length))
+    }
+  }
+
+  private fun mockEditorLineCount(editor: VimEditor, lines: List<String>) {
+    whenever(editor.lineCount()).thenReturn(lines.size)
   }
 
   private fun <T> any(type: Class<T>): T = Mockito.any(type)
