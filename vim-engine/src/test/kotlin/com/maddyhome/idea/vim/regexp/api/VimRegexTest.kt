@@ -66,7 +66,7 @@ class VimRegexTest {
   }
 
   @Nested
-  inner class FindTest {
+  inner class FindNextTest {
     @Test
     fun `test find single word starting at beginning`() {
       doTest(
@@ -105,7 +105,7 @@ class VimRegexTest {
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
-      val matchResult = regex.find(editor, startIndex)
+      val matchResult = regex.findNext(editor, startIndex)
       when (matchResult) {
         is VimMatchResult.Failure -> fail("Expected to find match")
         is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), matchResult.range)
