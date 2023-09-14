@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
+import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserException
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
 import org.antlr.v4.runtime.Token
@@ -45,7 +46,8 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
     val lowerDelimiter = if (lowerBoundToken == null) RangeBoundary.IntRangeBoundary(0) else RangeBoundary.IntRangeBoundary(lowerBoundToken.text.toInt())
     val upperDelimiter = if (comma != null) if (upperBoundToken == null) RangeBoundary.InfiniteRangeBoundary else RangeBoundary.IntRangeBoundary(upperBoundToken.text.toInt())
     else if (lowerBoundToken == null) RangeBoundary.InfiniteRangeBoundary else lowerDelimiter
-    return Multi.RangeMulti(lowerDelimiter, upperDelimiter, isGreedy)
+    return if (upperDelimiter is RangeBoundary.IntRangeBoundary && lowerDelimiter.i > upperDelimiter.i) Multi.RangeMulti(lowerDelimiter, upperDelimiter, isGreedy)
+    else Multi.RangeMulti(lowerDelimiter, upperDelimiter, isGreedy)
   }
 
   override fun visitAtomic(ctx: RegexParser.AtomicContext?): Multi {

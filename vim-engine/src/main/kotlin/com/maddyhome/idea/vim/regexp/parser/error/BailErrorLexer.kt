@@ -8,12 +8,13 @@
 
 package com.maddyhome.idea.vim.regexp.parser.error
 
+import com.maddyhome.idea.vim.regexp.VimRegexErrors
 import com.maddyhome.idea.vim.regexp.parser.generated.RegexLexer
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.LexerNoViableAltException
 
 internal class BailErrorLexer(input: CharStream) : RegexLexer(input) {
-  override fun recover(e: LexerNoViableAltException?) {
-    throw VimRegexParserException()
+  override fun recover(e: LexerNoViableAltException) {
+    throw VimRegexParserException(VimRegexErrors.E383)
   }
 }

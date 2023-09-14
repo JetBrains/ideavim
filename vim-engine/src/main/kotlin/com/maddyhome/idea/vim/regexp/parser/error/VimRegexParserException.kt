@@ -8,5 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.parser.error
 
-internal class VimRegexParserException : RuntimeException() {
-}
+import com.maddyhome.idea.vim.regexp.VimRegexErrors
+
+internal data class VimRegexParserException(
+  val errorCode: VimRegexErrors
+) : RuntimeException(errorCode.toString())
