@@ -22,8 +22,21 @@ import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
  * match, replace and split strings in the editor with a pattern.
  *
  * @see :help /pattern
+ *
  */
 public class VimRegex(pattern: String) {
+  /**
+   * TODO: in my option only the find() and findAll() methods are necessary.
+   *
+   * The replace methods (not present yet) should probably be implemented
+   * somewhere else, using the find() or findAll() methods.
+   *
+   * The rest of the methods are just useless in my opinion
+   */
+
+  /**
+   * Case sensitivity settings determined by the parser
+   */
   private val caseSensitivitySettings: CaseSensitivitySettings
 
   /**
@@ -33,9 +46,15 @@ public class VimRegex(pattern: String) {
 
   /**
    * The NFA representing the compiled pattern, preceded by any characters.
-   * Equivalent to /.\{-}pattern
+   * Equivalent to /\_.\{-}pattern
    */
   private val nfaNonExact: NFA
+
+  /**
+   * The NFA representing the compiled pattern, preceded by any characters except line breaks.
+   * Equivalent to /.\{-}pattern
+   */
+  private val nfaNonExactSingleLine: NFA
 
   init {
     val parseResult = VimRegexParser.parse(pattern)
@@ -45,6 +64,7 @@ public class VimRegex(pattern: String) {
       is VimRegexParserResult.Success -> {
         nfaExact = PatternVisitor.visit(parseResult.tree)
         nfaNonExact = NFA.fromMatcher(DotMatcher(true)).closure(false).concatenate(nfaExact)
+        nfaNonExactSingleLine = NFA.fromMatcher(DotMatcher(false)).closure(false).concatenate(nfaExact)
         caseSensitivitySettings = parseResult.caseSensitivitySettings
       }
     }
@@ -62,18 +82,39 @@ public class VimRegex(pattern: String) {
   }
 
   /**
-   * Returns the first match of a pattern in the editor, beginning at the specified index.
+   * Returns the first match of a pattern in the editor, that comes after the startIndex
    *
    * @param editor     The editor where to look for the match in
    * @param startIndex The index to start the find
    *
    * @return The first match found in the editor
    */
-  public fun find(
+  public fun findNext(
     editor: VimEditor,
     startIndex: Int = 0
   ): VimMatchResult {
-    return simulateNFANonExact(editor, startIndex)
+    val lineStartIndex = editor.getLineStartOffset(editor.offsetToBufferPosition(startIndex).line)
+    var result = simulateNFANonExactSingleLine(editor, lineStartIndex)
+    while (true)
+      when (result) {
+        is VimMatchResult.Success -> {
+          // the match comes after the startIndex, return it
+          if (result.range.startOffset > startIndex) return result
+          // there is a match but starts before the startIndex, try again starting from the end of this match
+          else result = simulateNFANonExactSingleLine(editor, if (result.range.startOffset == result.range.endOffset) result.range.endOffset + 1 else result.range.endOffset)
+        }
+        is VimMatchResult.Failure -> {
+          // there is no match that starts in the line of startIndex, find a match that starts anywhere after startIndex
+          val nextMatch = simulateNFANonExact(editor, startIndex)
+
+          // match found, return it
+          return if (nextMatch is VimMatchResult.Success) nextMatch
+          // no match found, try from the start of the editor
+          else if (startIndex != 0) simulateNFANonExact(editor, 0)
+          // there are no matches in the entire file
+          else VimMatchResult.Failure(VimRegexErrors.E486)
+        }
+      }
   }
 
   /**
@@ -208,6 +249,19 @@ public class VimRegex(pattern: String) {
    */
   private fun simulateNFANonExact(editor: VimEditor, index: Int = 0) : VimMatchResult {
     return nfaNonExact.simulate(editor, index, shouldIgnoreCase())
+  }
+
+  /**
+   * Simulates the internal non-exact single line NFA with the determined flags,
+   * started on a given index.
+   *
+   * @param editor The editor that is used for the simulation
+   * @param index  The index where the simulation should start
+   *
+   * @return The resulting match result
+   */
+  private fun simulateNFANonExactSingleLine(editor: VimEditor, index: Int = 0) : VimMatchResult {
+    return nfaNonExactSingleLine.simulate(editor, index, shouldIgnoreCase())
   }
 
   /**
