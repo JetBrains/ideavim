@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.regexp.parser
 
+import com.maddyhome.idea.vim.regexp.VimRegexErrors
 import org.antlr.v4.runtime.tree.ParseTree
 
 /**
@@ -27,9 +28,9 @@ internal sealed class VimRegexParserResult {
   /**
    * Represents an unsuccessful parse
    *
-   * @param message A message giving output on why parsing failed
+   * @param errorCode A message giving output on why parsing failed
    */
-  data class Failure(val message: String = "Invalid pattern") : VimRegexParserResult()
+  data class Failure(val errorCode: VimRegexErrors) : VimRegexParserResult()
 }
 
 /**

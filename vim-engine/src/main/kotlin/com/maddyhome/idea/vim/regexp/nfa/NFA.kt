@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.regexp.nfa
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.VimRegexErrors
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
@@ -210,9 +211,9 @@ internal class NFA private constructor(
           it.value,
           groups
         )
-      } ?: run { VimMatchResult.Failure }
+      } ?: run { VimMatchResult.Failure(VimRegexErrors.E486) }
     }
-    return VimMatchResult.Failure
+    return VimMatchResult.Failure(VimRegexErrors.E486)
   }
 
   /**

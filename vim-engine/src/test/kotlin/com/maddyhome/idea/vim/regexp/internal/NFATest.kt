@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockCaret
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
@@ -1801,7 +1802,7 @@ class NFATest {
       val parserResult = VimRegexParser.parse(pattern)
       return when (parserResult) {
         is VimRegexParserResult.Failure -> null
-        is VimRegexParserResult.Success -> PatternVisitor.visit(parserResult.tree)
+        is VimRegexParserResult.Success -> NFA.fromMatcher(DotMatcher(true)).closure(false).concatenate(PatternVisitor.visit(parserResult.tree))
       }
     }
   }

@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.regexp
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.nfa.NFA
+import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.parser.CaseSensitivitySettings
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
@@ -23,31 +24,31 @@ import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
  * @see :help /pattern
  */
 public class VimRegex(pattern: String) {
-  private enum class CaseSensitivity { SMART_CASE, IGNORE_CASE, NO_IGNORE_CASE }
-  private val caseSensitivity: CaseSensitivity
+  private val caseSensitivitySettings: CaseSensitivitySettings
 
   /**
    * The NFA representing the compiled pattern
    */
-  private val nfa: NFA
+  private val nfaExact: NFA
+
+  /**
+   * The NFA representing the compiled pattern, preceded by any characters.
+   * Equivalent to /.\{-}pattern
+   */
+  private val nfaNonExact: NFA
 
   init {
     val parseResult = VimRegexParser.parse(pattern)
 
     when (parseResult) {
-      is VimRegexParserResult.Failure -> throw RuntimeException() // TODO: show actual error message
+      is VimRegexParserResult.Failure -> throw RuntimeException(parseResult.errorCode.toString()) // TODO: use different exception
       is VimRegexParserResult.Success -> {
-        nfa = PatternVisitor.visit(parseResult.tree)
-        caseSensitivity = when (parseResult.caseSensitivitySettings) {
-          // TODO: check ignorecase options
-          CaseSensitivitySettings.DEFAULT-> CaseSensitivity.NO_IGNORE_CASE
-          CaseSensitivitySettings.IGNORE_CASE -> CaseSensitivity.IGNORE_CASE
-          CaseSensitivitySettings.NO_IGNORE_CASE -> CaseSensitivity.NO_IGNORE_CASE
-        }
-      }
+        nfaExact = PatternVisitor.visit(parseResult.tree)
+        nfaNonExact = NFA.fromMatcher(DotMatcher(true)).closure(false).concatenate(nfaExact)
+        caseSensitivitySettings = parseResult.caseSensitivitySettings
       }
     }
-
+  }
 
   /**
    * Indicates whether the pattern can find at least one match in the specified editor
@@ -57,7 +58,7 @@ public class VimRegex(pattern: String) {
    * @return True if any match was found, false otherwise
    */
   public fun containsMatchIn(editor: VimEditor): Boolean {
-    return simulateNFA(editor) is VimMatchResult.Success
+    return simulateNFANonExact(editor) is VimMatchResult.Success
   }
 
   /**
@@ -72,7 +73,7 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     startIndex: Int = 0
   ): VimMatchResult {
-    return simulateNFA(editor, startIndex)
+    return simulateNFANonExact(editor, startIndex)
   }
 
   /**
@@ -91,7 +92,7 @@ public class VimRegex(pattern: String) {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
     while (index <= editor.text().length) {
-      val result = simulateNFA(editor, index)
+      val result = simulateNFANonExact(editor, index)
       when (result) {
         /**
          * A match was found, add it to foundMatches and increment
@@ -125,12 +126,7 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     index: Int
   ): VimMatchResult {
-    val result = simulateNFA(editor, index)
-    return when (result) {
-      is VimMatchResult.Failure -> result
-      // TODO: this can be made faster
-      is VimMatchResult.Success -> if (result.range.startOffset == index) result else VimMatchResult.Failure
-    }
+    return simulateNFAExact(editor, index)
   }
 
   /**
@@ -143,13 +139,12 @@ public class VimRegex(pattern: String) {
   public fun matchEntire(
     editor: VimEditor
   ): VimMatchResult {
-    val result = simulateNFA(editor)
+    val result = simulateNFAExact(editor)
     return when (result) {
       is VimMatchResult.Failure -> result
       is VimMatchResult.Success -> {
-        // TODO: this can be made faster
-        if (result.range.endOffset == editor.text().length && result.range.startOffset == 0) result
-        else VimMatchResult.Failure
+        if (result.range.endOffset == editor.text().length) result
+        else VimMatchResult.Failure(VimRegexErrors.E000)
       }
     }
   }
@@ -164,11 +159,10 @@ public class VimRegex(pattern: String) {
   public fun matches(
     editor: VimEditor
   ): Boolean {
-    val result = simulateNFA(editor)
+    val result = simulateNFAExact(editor)
     return when (result) {
       is VimMatchResult.Failure -> false
-      // TODO: this can be made faster
-      is VimMatchResult.Success -> result.range.endOffset == editor.text().length && result.range.startOffset == 0
+      is VimMatchResult.Success -> result.range.endOffset == editor.text().length
     }
   }
 
@@ -184,16 +178,14 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     index: Int
   ): Boolean {
-    val result = simulateNFA(editor, index)
-    return when (result) {
+    return when (simulateNFAExact(editor, index)) {
+      is VimMatchResult.Success -> true
       is VimMatchResult.Failure -> false
-      // TODO: this can be made faster
-      is VimMatchResult.Success -> result.range.startOffset == index
     }
   }
 
   /**
-   * Simulates the internal NFA with the determined flags,
+   * Simulates the internal exact NFA with the determined flags,
    * started on a given index.
    *
    * @param editor The editor that is used for the simulation
@@ -201,12 +193,32 @@ public class VimRegex(pattern: String) {
    *
    * @return The resulting match result
    */
-  private fun simulateNFA(editor: VimEditor, index: Int = 0) : VimMatchResult {
-    val ignoreCase = when (caseSensitivity) {
-      CaseSensitivity.NO_IGNORE_CASE -> false
-      CaseSensitivity.IGNORE_CASE -> true
-      CaseSensitivity.SMART_CASE -> false // TODO
+  private fun simulateNFAExact(editor: VimEditor, index: Int = 0) : VimMatchResult {
+    return nfaExact.simulate(editor, index, shouldIgnoreCase())
+  }
+
+  /**
+   * Simulates the internal non-exact NFA with the determined flags,
+   * started on a given index.
+   *
+   * @param editor The editor that is used for the simulation
+   * @param index  The index where the simulation should start
+   *
+   * @return The resulting match result
+   */
+  private fun simulateNFANonExact(editor: VimEditor, index: Int = 0) : VimMatchResult {
+    return nfaNonExact.simulate(editor, index, shouldIgnoreCase())
+  }
+
+  /**
+   * Determines, based on information that comes from the parser and other
+   * options that may be set, whether to ignore case.
+   */
+  private fun shouldIgnoreCase() : Boolean {
+    return when (caseSensitivitySettings) {
+      CaseSensitivitySettings.NO_IGNORE_CASE -> false
+      CaseSensitivitySettings.IGNORE_CASE -> true
+      CaseSensitivitySettings.DEFAULT -> false // TODO: check if ignorecase or smartcase is set
     }
-    return nfa.simulate(editor, index, ignoreCase)
   }
 }
