@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.regexp.engine.strategies
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.VimRegexErrors
-import com.maddyhome.idea.vim.regexp.engine.SimulationResult
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFAAssertion
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFAState
@@ -22,7 +21,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import kotlin.math.max
 
 /**
- * Uses a backtracking base strategy to simulate the nfa. This strategy is very powerful, since it
+ * Uses a backtracking based strategy to simulate the nfa. This strategy is very powerful, since it
  * can be used with any nfa, but comes at the cost of speed.
  */
 internal class BacktrackingStrategy : SimulationStrategy {

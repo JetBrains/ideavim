@@ -9,9 +9,11 @@
 package com.maddyhome.idea.vim.regexp.engine.strategies
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.regexp.engine.SimulationResult
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 
+/**
+ * A strategy that can be used to simulate a NFA
+ */
 internal interface SimulationStrategy {
 
   /**
