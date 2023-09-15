@@ -21,8 +21,9 @@ import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockCaret
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
-import com.maddyhome.idea.vim.regexp.nfa.NFA
-import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
+import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
+import com.maddyhome.idea.vim.regexp.engine.VimRegexEngine
+import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
@@ -548,7 +549,7 @@ class NFATest {
   }
 
   @Test
-  fun `test backreference to uncaptured group`() {
+  fun `test backreference to un-captured group`() {
     doTest(
       "$START${END}aaa",
       "\\v(b)*\\1",
@@ -1760,7 +1761,7 @@ class NFATest {
     ) {
       val editor = mockEditorFromText(text)
       val nfa = buildNFA(pattern)
-      assertTrue(nfa?.simulate(editor, offset, ignoreCase) is VimMatchResult.Failure)
+      assertTrue(VimRegexEngine.simulate(nfa, editor, offset, ignoreCase) is VimMatchResult.Failure)
     }
 
     private fun doTest(
@@ -1773,7 +1774,7 @@ class NFATest {
       val editor = mockEditorFromText(text)
       val nfa = buildNFA(pattern)
 
-      val result = nfa?.simulate(editor, offset, ignoreCase)
+      val result = VimRegexEngine.simulate(nfa, editor, offset, ignoreCase)
       when (result) {
         is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), result.groups.get(groupNumber)?.range)
         else -> fail("Expected to find match")
@@ -1791,17 +1792,17 @@ class NFATest {
       val editor = mockEditor(text, carets)
       val nfa = buildNFA(pattern)
 
-      val result = nfa?.simulate(editor, offset, ignoreCase)
+      val result = VimRegexEngine.simulate(nfa, editor, offset, ignoreCase)
       when (result) {
         is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), result.groups.get(groupNumber)?.range)
         else -> fail("Expected to find match")
       }
     }
 
-    private fun buildNFA(pattern: String) : NFA? {
+    private fun buildNFA(pattern: String) : NFA {
       val parserResult = VimRegexParser.parse(pattern)
       return when (parserResult) {
-        is VimRegexParserResult.Failure -> null
+        is VimRegexParserResult.Failure -> fail("Parsing failed")
         is VimRegexParserResult.Success -> NFA.fromMatcher(DotMatcher(true)).closure(false).concatenate(PatternVisitor.visit(parserResult.tree))
       }
     }

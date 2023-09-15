@@ -6,24 +6,28 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
- * Matcher used to check if index is at the start of a line.
+ * Matcher that matches with any character
  */
-internal class StartOfLineMatcher : Matcher {
+internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int,
-    groups: VimMatchGroupCollection,
+    index: Int, groups:
+    VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (index == 0 || editor.text()[index - 1] == '\n') MatcherResult.Success(0)
-    else MatcherResult.Failure
+    return if (includeNewLine)
+      if (index < editor.text().length) MatcherResult.Success(1)
+      else MatcherResult.Failure
+    else
+      if (index < editor.text().length && editor.text()[index] != '\n') MatcherResult.Success(1)
+      else MatcherResult.Failure
   }
 }

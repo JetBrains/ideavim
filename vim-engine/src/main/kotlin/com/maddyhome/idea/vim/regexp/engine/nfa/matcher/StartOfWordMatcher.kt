@@ -6,16 +6,16 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
- * Matcher used to check if index is at the end of a line.
+ * Matcher used to check if index is at the start of a word.
  */
-internal class EndOfLineMatcher : Matcher {
+internal class StartOfWordMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -23,7 +23,18 @@ internal class EndOfLineMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (index == editor.text().length || editor.text()[index] == '\n') MatcherResult.Success(0)
+    if (index >= editor.text().length) return MatcherResult.Failure
+
+    val char = editor.text()[index]
+
+    /**
+     * The current index is the start of a word if it is a keyword character,
+     * and the previous index isn't.
+     */
+    return if (
+      (char.isLetterOrDigit() || char == '_') &&
+      (index == 0 || !(editor.text()[index - 1].isLetterOrDigit() || editor.text()[index - 1] == '_'))
+    ) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }

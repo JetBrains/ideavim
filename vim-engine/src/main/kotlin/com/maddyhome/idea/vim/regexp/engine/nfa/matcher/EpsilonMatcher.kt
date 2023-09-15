@@ -6,16 +6,18 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
- * Matcher that matches with any character
+ * Matcher that always matches. It is used to represent
+ * epsilon transitions. This transitions can always be
+ * taken and without consuming any character.
  */
-internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
+internal class EpsilonMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int, groups:
@@ -23,11 +25,6 @@ internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (includeNewLine)
-      if (index < editor.text().length) MatcherResult.Success(1)
-      else MatcherResult.Failure
-    else
-      if (index < editor.text().length && editor.text()[index] != '\n') MatcherResult.Success(1)
-      else MatcherResult.Failure
+    return MatcherResult.Success(0)
   }
 }

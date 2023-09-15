@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 /**
  * Indicates the result of attempting to match with a Matcher

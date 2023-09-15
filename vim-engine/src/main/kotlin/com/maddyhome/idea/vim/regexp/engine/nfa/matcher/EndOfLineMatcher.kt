@@ -6,16 +6,16 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
- * Matcher used to check if index is at the start of a file.
+ * Matcher used to check if index is at the end of a line.
  */
-internal class StartOfFileMatcher : Matcher{
+internal class EndOfLineMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -23,6 +23,7 @@ internal class StartOfFileMatcher : Matcher{
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (index == 0) MatcherResult.Success(0) else MatcherResult.Failure
+    return if (index == editor.text().length || editor.text()[index] == '\n') MatcherResult.Success(0)
+    else MatcherResult.Failure
   }
 }
