@@ -32,7 +32,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-class NFATest {
+class VimRegexEngineTest {
   @Test
   fun `test match not found`() {
     assertFailure(
