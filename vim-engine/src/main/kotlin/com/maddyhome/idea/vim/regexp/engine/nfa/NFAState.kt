@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa
+package com.maddyhome.idea.vim.regexp.engine.nfa
 
 /**
  * Represents a single state of a NFA.

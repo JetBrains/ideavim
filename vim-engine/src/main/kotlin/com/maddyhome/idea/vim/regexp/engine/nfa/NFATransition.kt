@@ -6,9 +6,9 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa
+package com.maddyhome.idea.vim.regexp.engine.nfa
 
-import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
+import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.Matcher
 
 /**
  * Represents a transition of the NFA.

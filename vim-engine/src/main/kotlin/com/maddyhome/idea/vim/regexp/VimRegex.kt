@@ -9,9 +9,10 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.regexp.engine.VimRegexEngine
+import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
-import com.maddyhome.idea.vim.regexp.nfa.NFA
-import com.maddyhome.idea.vim.regexp.nfa.matcher.DotMatcher
+import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.parser.CaseSensitivitySettings
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
@@ -306,7 +307,7 @@ public class VimRegex(pattern: String) {
    * @return The resulting match result
    */
   private fun simulateNFAExact(editor: VimEditor, index: Int = 0) : VimMatchResult {
-    return nfaExact.simulate(editor, index, shouldIgnoreCase())
+    return VimRegexEngine.simulate(nfaExact, editor,index, shouldIgnoreCase())
   }
 
   /**
@@ -319,7 +320,7 @@ public class VimRegex(pattern: String) {
    * @return The resulting match result
    */
   private fun simulateNFANonExact(editor: VimEditor, index: Int = 0) : VimMatchResult {
-    return nfaNonExact.simulate(editor, index, shouldIgnoreCase())
+    return VimRegexEngine.simulate(nfaNonExact, editor,index, shouldIgnoreCase())
   }
 
   /**
@@ -332,7 +333,7 @@ public class VimRegex(pattern: String) {
    * @return The resulting match result
    */
   private fun simulateNFANonExactSingleLine(editor: VimEditor, index: Int = 0) : VimMatchResult {
-    return nfaNonExactSingleLine.simulate(editor, index, shouldIgnoreCase())
+    return VimRegexEngine.simulate(nfaNonExactSingleLine, editor,index, shouldIgnoreCase())
   }
 
   /**

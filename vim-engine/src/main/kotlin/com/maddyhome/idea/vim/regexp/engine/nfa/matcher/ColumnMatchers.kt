@@ -6,13 +6,13 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
-internal class AtLineMatcher(private val lineNumber: Int) : Matcher {
+internal class AtColumnMatcher(private val columnNumber: Int) : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -20,12 +20,12 @@ internal class AtLineMatcher(private val lineNumber: Int) : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line + 1 == lineNumber) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).column + 1 == columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
 
-internal class BeforeLineMatcher(private val lineNumber: Int) : Matcher {
+internal class BeforeColumnMatcher(private val columnNumber: Int) : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -33,12 +33,12 @@ internal class BeforeLineMatcher(private val lineNumber: Int) : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line + 1 < lineNumber) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).column + 1 < columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
 
-internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
+internal class AfterColumnMatcher(private val columnNumber: Int) : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -46,11 +46,12 @@ internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (editor.offsetToBufferPosition(index).line + 1 > lineNumber) MatcherResult.Success(0)
+    return if (editor.offsetToBufferPosition(index).column + 1 > columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }
-internal class AtLineCursorMatcher : Matcher {
+
+internal class AtColumnCursorMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -58,8 +59,8 @@ internal class AtLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset.point).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset.point).line }
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(it.offset.point).column }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(it.offset.point).column }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
@@ -68,7 +69,7 @@ internal class AtLineCursorMatcher : Matcher {
   }
 }
 
-internal class BeforeLineCursorMatcher : Matcher {
+internal class BeforeColumnCursorMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -76,8 +77,8 @@ internal class BeforeLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset.point).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset.point).line }
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(it.offset.point).column }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(it.offset.point).column }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
@@ -86,7 +87,7 @@ internal class BeforeLineCursorMatcher : Matcher {
   }
 }
 
-internal class AfterLineCursorMatcher : Matcher {
+internal class AfterColumnCursorMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
@@ -94,8 +95,8 @@ internal class AfterLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset.point).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset.point).line }
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(it.offset.point).column }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(it.offset.point).column }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)

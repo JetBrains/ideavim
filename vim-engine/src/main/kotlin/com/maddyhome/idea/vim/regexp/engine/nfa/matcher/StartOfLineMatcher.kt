@@ -6,26 +6,24 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
- * Matcher used to match a character against a predicate
- *
- * @param predicate The predicate used to check if the character should be accepted
+ * Matcher used to check if index is at the start of a line.
  */
-internal class PredicateMatcher(val predicate: (Char) -> Boolean) : Matcher {
+internal class StartOfLineMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
-    VimMatchGroupCollection,
+    index: Int,
+    groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (index < editor.text().length && predicate(editor.text()[index])) MatcherResult.Success(1)
+    return if (index == 0 || editor.text()[index - 1] == '\n') MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 }

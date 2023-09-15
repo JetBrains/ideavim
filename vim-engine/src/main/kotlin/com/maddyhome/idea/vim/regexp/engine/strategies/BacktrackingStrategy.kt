@@ -6,214 +6,46 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa
+package com.maddyhome.idea.vim.regexp.engine.strategies
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.VimRegexErrors
+import com.maddyhome.idea.vim.regexp.engine.SimulationResult
+import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
+import com.maddyhome.idea.vim.regexp.engine.nfa.NFAAssertion
+import com.maddyhome.idea.vim.regexp.engine.nfa.NFAState
+import com.maddyhome.idea.vim.regexp.engine.nfa.NFATransition
+import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.MatcherResult
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
-import com.maddyhome.idea.vim.regexp.nfa.matcher.EpsilonMatcher
-import com.maddyhome.idea.vim.regexp.nfa.matcher.Matcher
-import com.maddyhome.idea.vim.regexp.nfa.matcher.MatcherResult
 import kotlin.math.max
 
 /**
- * Represents a non-deterministic finite automaton.
+ * Uses a backtracking base strategy to simulate the nfa. This strategy is very powerful, since it
+ * can be used with any nfa, but comes at the cost of speed.
  */
-internal class NFA private constructor(
-  /**
-   * The start state of the NFA
-   */
-  private var startState: NFAState,
-  /**
-   * The end state of the NFA
-   */
-  private var acceptState: NFAState
-) {
+internal class BacktrackingStrategy : SimulationStrategy {
 
   /**
    * Memory used to store capture groups
    */
-  private val groups: VimMatchGroupCollection = VimMatchGroupCollection()
+  private lateinit var groups: VimMatchGroupCollection
 
-  /**
-   * Concatenates the NFA with another NFA. The new NFA accepts inputs
-   * that are accepted by the old NFA followed by the other.
-   *
-   * @param other The NFA to concatenate with
-   *
-   * @return The new NFA representing the concatenation
-   */
-  internal fun concatenate(other: NFA): NFA {
-    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), other.startState))
-
-    this.acceptState = other.acceptState
-
-    return this
-  }
-
-  /**
-   * Unifies the NFA with another NFA. The new NFA accepts inputs
-   * that are accepted by either the old NFA or the other.
-   *
-   * @param other The NFA to unify with
-   *
-   * @return The new NFA representing the union
-   */
-  internal fun unify(other: NFA): NFA {
-    val newStart = NFAState()
-    val newEnd = NFAState()
-
-    newStart.addTransition(NFATransition(EpsilonMatcher(), this.startState))
-    newStart.addTransition(NFATransition(EpsilonMatcher(), other.startState))
-
-    this.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    other.acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-
-    this.startState = newStart
-    this.acceptState = newEnd
-
-    return this
-  }
-
-  /**
-   * Kleene's closure of the NFA. Allows the NFA to "loop" any amount of times.
-   *
-   * @param isGreedy Whether the NFA should give priority to consuming as much input as possible
-   *
-   * @return The new NFA representing the closure
-   */
-  internal fun closure(isGreedy: Boolean): NFA {
-    val newStart = NFAState()
-    val newEnd = NFAState()
-
-    if (isGreedy){
-      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
-      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-
-      acceptState.addTransition(NFATransition(EpsilonMatcher(), startState))
-      acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    } else {
-      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
-
-      acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-      acceptState.addTransition(NFATransition(EpsilonMatcher(), startState))
+  override fun simulate(nfa: NFA, editor: VimEditor, startIndex: Int, isCaseInsensitive: Boolean): SimulationResult {
+    groups = VimMatchGroupCollection()
+    if (simulate(editor, startIndex, nfa.startState, nfa.acceptState, isCaseInsensitive, editor.carets().toMutableList()).simulationResult) {
+      return SimulationResult.Complete(
+        groups.get(0)?.let {
+          VimMatchResult.Success(
+            it.range,
+            it.value,
+            groups
+          )
+        } ?: run { VimMatchResult.Failure(VimRegexErrors.E486) }
+      )
     }
-
-    startState = newStart
-    acceptState = newEnd
-
-    return this
-  }
-
-  /**
-   * Gives the NFA the choice to jump directly from its start to
-   * accept state, without taking any of the inner transitions.
-   *
-   * @param isGreedy Whether the NFA should give priority to consuming as much input as possible
-   *
-   * @return The new NFA, that can be matched optionally
-   */
-  internal fun optional(isGreedy: Boolean): NFA {
-    val newStart = NFAState()
-    val newEnd = NFAState()
-
-    if (isGreedy) {
-      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
-      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    }
-    else {
-      newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-      newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
-    }
-
-    acceptState.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    startState = newStart
-    acceptState = newEnd
-
-    return this
-  }
-
-  /**
-   * Marks the start and accept states of the NFA to start
-   * and end, respectfully, the capturing of a group.
-   *
-   * @param groupNumber The number of the capture group
-   * @param force       Whether the state should force-end the capturing of the group
-   */
-  internal fun capture(groupNumber: Int, force: Boolean = true) {
-    this.startState.startCapture.add(groupNumber)
-    if (force) this.acceptState.forceEndCapture.add(groupNumber)
-    else this.acceptState.endCapture.add(groupNumber)
-  }
-
-  /**
-   * Marks the NFA to be asserted during simulation. The simulation
-   * may or may not consume input, and can be positive (simulation must
-   * succeed) or negative (simulation must fail).
-   *
-   * @param shouldConsume Whether the assertion should consume input.
-   * @param isPositive    Whether the assertion is positive or negative.
-   *
-   * @return The NFA instance marked for assertion.
-   */
-  internal fun assert(shouldConsume: Boolean, isPositive: Boolean, isAhead: Boolean, limit: Int = 0): NFA {
-    val newStart = NFAState()
-    val newEnd = NFAState()
-
-    newStart.assertion = NFAAssertion(
-      shouldConsume,
-      isPositive,
-      isAhead,
-      startState,
-      acceptState,
-      newEnd,
-      limit
-    )
-
-    acceptState = newEnd
-    startState = newStart
-
-    return this
-  }
-
-  /**
-   * Sets the start state of the NFA to mark where the whole match should begin.
-   */
-  internal fun startMatch() {
-    this.startState.startCapture.add(0)
-  }
-
-  /**
-   * Sets the accept state of the NFA to mark where the whole match should end.
-   */
-  internal fun endMatch() {
-    this.acceptState.forceEndCapture.add(0)
-  }
-
-  /**
-   * Simulates the nfa in depth-first search fashion.
-   *
-   * @param editor            The editor that is used for the simulation
-   * @param startIndex        The index where the simulation should start
-   * @param isCaseInsensitive Whether the simulation should ignore case
-   *
-   * @return The resulting match result
-   */
-  internal fun simulate(editor: VimEditor, startIndex: Int = 0, isCaseInsensitive: Boolean = false) : VimMatchResult {
-    groups.groupCount = 0
-    if (simulate(editor, startIndex, startState, acceptState, isCaseInsensitive, editor.carets().toMutableList()).simulationResult) {
-      return groups.get(0)?.let {
-        VimMatchResult.Success(
-          it.range,
-          it.value,
-          groups
-        )
-      } ?: run { VimMatchResult.Failure(VimRegexErrors.E486) }
-    }
-    return VimMatchResult.Failure(VimRegexErrors.E486)
+    return SimulationResult.Complete(VimMatchResult.Failure(VimRegexErrors.E486))
   }
 
   /**
@@ -240,15 +72,24 @@ internal class NFA private constructor(
     epsilonVisited: Set<NFAState> = HashSet(),
     maxIndex: Int = editor.text().length
   ): NFASimulationResult {
-    if (currentIndex > maxIndex) return NFASimulationResult(false, currentIndex)
+    if (currentIndex > maxIndex) return NFASimulationResult(
+      false,
+      currentIndex
+    )
 
     updateCaptureGroups(editor, currentIndex, currentState)
     currentState.assertion?.let {
       val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it, possibleCursors)
-      if (!assertionResult.simulationResult) return NFASimulationResult(false, currentIndex)
+      if (!assertionResult.simulationResult) return NFASimulationResult(
+        false,
+        currentIndex
+      )
       else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive, possibleCursors, maxIndex=maxIndex)
     }
-    if (currentState === targetState) return NFASimulationResult(true, currentIndex)
+    if (currentState === targetState) return NFASimulationResult(
+      true,
+      currentIndex
+    )
 
     for (transition in currentState.transitions) {
       val transitionResult = handleTransition(editor, currentIndex, currentState, targetState, isCaseInsensitive, transition, epsilonVisited, maxIndex, possibleCursors)
@@ -341,7 +182,10 @@ internal class NFA private constructor(
       val result = simulate(editor, lookBehindStartIndex, assertion.startState, assertion.endState, isCaseInsensitive, possibleCursors, maxIndex = currentIndex)
       // found a match that ends before the "currentIndex"
       if (result.simulationResult && result.index == currentIndex) {
-        return if (assertion.isPositive) NFASimulationResult(true, currentIndex)
+        return if (assertion.isPositive) NFASimulationResult(
+          true,
+          currentIndex
+        )
         else NFASimulationResult(false, currentIndex)
       }
       lookBehindStartIndex--
@@ -378,7 +222,10 @@ internal class NFA private constructor(
     possibleCursors: MutableList<VimCaret>
   ): NFASimulationResult {
     val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive, possibleCursors)
-    if (transitionMatcherResult !is MatcherResult.Success) return NFASimulationResult(false, currentIndex)
+    if (transitionMatcherResult !is MatcherResult.Success) return NFASimulationResult(
+      false,
+      currentIndex
+    )
 
     val nextIndex = currentIndex + transitionMatcherResult.consumed
     val destState = transition.destState
@@ -406,38 +253,6 @@ internal class NFA private constructor(
     for (groupNumber in state.startCapture) groups.setGroupStart(groupNumber, index)
     for (groupNumber in state.endCapture) groups.setGroupEnd(groupNumber, index, editor.text())
     for (groupNumber in state.forceEndCapture) groups.setForceGroupEnd(groupNumber, index, editor.text())
-  }
-
-  internal companion object {
-
-    /**
-     * Creates a new instance of a NFA, that has a single
-     * state.
-     *
-     * @return The new NFA instance
-     */
-    internal fun fromSingleState() : NFA {
-      val state = NFAState()
-      return NFA(state, state)
-    }
-
-    /**
-     * Creates a new instance of a NFA, that has two states
-     * with a transition from one state to the other
-     * defined by a matcher.
-     *
-     * start --matcher-> end
-     *
-     * @param matcher The matcher used for the transition
-     * @return The new NFA instance
-     */
-    internal fun fromMatcher(matcher: Matcher) : NFA {
-      val startState = NFAState()
-      val acceptState = NFAState()
-
-      startState.addTransition(NFATransition(matcher, acceptState))
-      return NFA(startState, acceptState)
-    }
   }
 }
 

@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.regexp.nfa.matcher
+package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,8 +20,8 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 internal class BackreferenceMatcher(private val groupNumber: Int) : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
-    VimMatchGroupCollection,
+    index: Int,
+    groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
