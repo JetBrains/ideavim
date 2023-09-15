@@ -201,7 +201,7 @@ public class VimRegex(pattern: String) {
   public fun findAll(
     editor: VimEditor,
     startIndex: Int = 0
-  ): Sequence<VimMatchResult.Success> {
+  ): List<VimMatchResult.Success> {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
     while (index <= editor.text().length) {
@@ -220,10 +220,10 @@ public class VimRegex(pattern: String) {
         /**
          * No more matches found. Return.
          */
-        is VimMatchResult.Failure -> return foundMatches.asSequence()
+        is VimMatchResult.Failure -> return foundMatches
       }
     }
-    return foundMatches.asSequence()
+    return foundMatches
   }
 
   /**
