@@ -78,7 +78,7 @@ object ReleaseEap : IdeaVimBuildType({
         exit 1
       fi
       
-      git push origin --tags
+      git push origin %build.number%
       """.trimIndent()
     }
   }
