@@ -8,7 +8,17 @@
 
 package com.maddyhome.idea.vim.regexp
 
+/**
+ * Error codes related to Vim regular expressions
+ */
 public enum class VimRegexErrors {
-  E383, // Invalid search string
-  E486, // Pattern not found
+  /**
+   * Invalid search string
+   */
+  E383,
+
+  /**
+   * Pattern not found
+   */
+  E486,
 }
