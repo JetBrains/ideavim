@@ -39,13 +39,13 @@ internal class NFA private constructor(
 
   /**
    * Concatenates the NFA with another NFA. The new NFA accepts inputs
-   * that are accepted by the old NFA followed the other.
+   * that are accepted by the old NFA followed by the other.
    *
    * @param other The NFA to concatenate with
    *
    * @return The new NFA representing the concatenation
    */
-  internal fun concatenate(other: NFA) : NFA {
+  internal fun concatenate(other: NFA): NFA {
     this.acceptState.addTransition(NFATransition(EpsilonMatcher(), other.startState))
 
     this.acceptState = other.acceptState
@@ -61,7 +61,7 @@ internal class NFA private constructor(
    *
    * @return The new NFA representing the union
    */
-  internal fun unify(other: NFA) : NFA {
+  internal fun unify(other: NFA): NFA {
     val newStart = NFAState()
     val newEnd = NFAState()
 
@@ -84,7 +84,7 @@ internal class NFA private constructor(
    *
    * @return The new NFA representing the closure
    */
-  internal fun closure(isGreedy: Boolean) : NFA {
+  internal fun closure(isGreedy: Boolean): NFA {
     val newStart = NFAState()
     val newEnd = NFAState()
 
@@ -116,7 +116,7 @@ internal class NFA private constructor(
    *
    * @return The new NFA, that can be matched optionally
    */
-  internal fun optional(isGreedy: Boolean) : NFA {
+  internal fun optional(isGreedy: Boolean): NFA {
     val newStart = NFAState()
     val newEnd = NFAState()
 
@@ -155,11 +155,11 @@ internal class NFA private constructor(
    * succeed) or negative (simulation must fail).
    *
    * @param shouldConsume Whether the assertion should consume input.
-   * @param isPositive Whether the assertion is positive or negative.
+   * @param isPositive    Whether the assertion is positive or negative.
    *
    * @return The NFA instance marked for assertion.
    */
-  internal fun assert(shouldConsume: Boolean, isPositive: Boolean, isAhead: Boolean, limit: Int = 0) : NFA {
+  internal fun assert(shouldConsume: Boolean, isPositive: Boolean, isAhead: Boolean, limit: Int = 0): NFA {
     val newStart = NFAState()
     val newEnd = NFAState()
 
@@ -414,7 +414,7 @@ internal class NFA private constructor(
      * Creates a new instance of a NFA, that has a single
      * state.
      *
-     * @return THe new NFA instance
+     * @return The new NFA instance
      */
     internal fun fromSingleState() : NFA {
       val state = NFAState()

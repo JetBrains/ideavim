@@ -16,8 +16,8 @@ package com.maddyhome.idea.vim.regexp.nfa
  * @param startState    The state to jump to, to start the assertion
  * @param endState      The state where the assertion should end
  * @param jumpTo        The state that the simulation should jump to, to resume with normal
- * @param limit         Only relevant for lookbehinds. Determines how far back to look for assertion
  * simulation after the assertion.
+ * @param limit         Only relevant for lookbehinds. Determines how far back to look for assertion
  *
  * @see :help /@=
  * @see :help /@!

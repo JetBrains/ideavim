@@ -153,7 +153,20 @@ public class VimRegex(pattern: String) {
     }
   }
 
-  private fun findLastMatchInLine(editor: VimEditor, line: Int, maxIndex: Int = editor.getLineEndOffset(line)): VimMatchResult {
+  /**
+   * Finds the last match that starts at line, before maxIndex
+   *
+   * @param editor The editor where to look for the match in
+   * @param line   The where the match should start
+   * @param maxIndex The maximum index (exclusive) where the match should start
+   *
+   * @return The last match found, if any
+   */
+  private fun findLastMatchInLine(
+    editor: VimEditor,
+    line: Int,
+    maxIndex: Int = editor.getLineEndOffset(line)
+  ): VimMatchResult {
     var index = editor.getLineStartOffset(line)
     var prevResult: VimMatchResult = VimMatchResult.Failure(VimRegexErrors.E486)
     while (index < maxIndex) {
