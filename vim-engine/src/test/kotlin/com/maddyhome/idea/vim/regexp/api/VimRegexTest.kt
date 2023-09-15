@@ -71,9 +71,9 @@ class VimRegexTest {
     fun `test find single word starting at beginning`() {
       doTest(
         """
-      	|${START}Lorem${END} Ipsum
+      	|Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet,
+        |${START}Lorem${END} ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -86,15 +86,15 @@ class VimRegexTest {
     fun `test find single word starting from offset`() {
       doTest(
         """
-      	|Lorem Ipsum
+      	|${START}Lorem${END} Ipsum
         |
-        |${START}Lorem${END} ipsum dolor sit amet,
+        |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        1
+        40
       )
     }
 
