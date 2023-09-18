@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.regexp.VimRegexErrors
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFAAssertion
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFAState
-import com.maddyhome.idea.vim.regexp.engine.nfa.NFATransition
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.MatcherResult
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
@@ -71,28 +70,26 @@ internal class BacktrackingStrategy : SimulationStrategy {
     epsilonVisited: Set<NFAState> = HashSet(),
     maxIndex: Int = editor.text().length
   ): NFASimulationResult {
-    if (currentIndex > maxIndex) return NFASimulationResult(
-      false,
-      currentIndex
+    if (currentIndex > maxIndex) return NFASimulationResult(false, currentIndex
     )
 
     updateCaptureGroups(editor, currentIndex, currentState)
     currentState.assertion?.let {
       val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it, possibleCursors)
-      if (!assertionResult.simulationResult) return NFASimulationResult(
-        false,
-        currentIndex
-      )
-      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive, possibleCursors, maxIndex=maxIndex)
+      if (!assertionResult.simulationResult) return NFASimulationResult(false, currentIndex)
+      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive, possibleCursors, maxIndex = maxIndex)
     }
-    if (currentState === targetState) return NFASimulationResult(
-      true,
-      currentIndex
-    )
+    if (currentState === targetState) return NFASimulationResult(true, currentIndex)
 
     for (transition in currentState.transitions) {
-      val transitionResult = handleTransition(editor, currentIndex, currentState, targetState, isCaseInsensitive, transition, epsilonVisited, maxIndex, possibleCursors)
-      if (transitionResult.simulationResult) return transitionResult
+      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive, possibleCursors)
+      if (transitionMatcherResult !is MatcherResult.Success) continue
+      val destState = transition.destState
+      if (transitionMatcherResult.consumed == 0 && epsilonVisited.contains(destState)) continue
+      val nextIndex = currentIndex + transitionMatcherResult.consumed
+      val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !epsilonVisited.contains(destState)) epsilonVisited.plusElement(currentState) else HashSet()
+      val result = simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, possibleCursors, epsilonVisitedCopy, maxIndex)
+      if (result.simulationResult) return result
     }
     return NFASimulationResult(false, currentIndex)
   }
@@ -191,54 +188,6 @@ internal class BacktrackingStrategy : SimulationStrategy {
     }
     return if (assertion.isPositive) NFASimulationResult(false, currentIndex)
     else NFASimulationResult(true, currentIndex)
-  }
-
-  /**
-   * Tries to take a transition, and continues the simulation from the destination state
-   * of said transition.
-   *
-   * @param editor            The editor that is used for the simulation
-   * @param currentIndex      The current index of the text in the simulation
-   * @param currentState      The current NFA state in the simulation
-   * @param targetState       The NFA state that needs to be found for a successful match
-   * @param isCaseInsensitive Whether the simulation should ignore case
-   * @param transition        The transition that is to be handled
-   * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
-   * @param maxIndex          The maximum index of the text that the simulation is allowed to go to
-   * @param possibleCursors   The cursors that are allowed to match
-   *
-   * @return The result of taking the transition. It tells whether it was successful, and at what index it stopped.
-   */
-  private fun handleTransition(
-    editor: VimEditor,
-    currentIndex: Int,
-    currentState: NFAState,
-    targetState: NFAState,
-    isCaseInsensitive: Boolean,
-    transition: NFATransition,
-    epsilonVisited: Set<NFAState>,
-    maxIndex: Int,
-    possibleCursors: MutableList<VimCaret>
-  ): NFASimulationResult {
-    val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive, possibleCursors)
-    if (transitionMatcherResult !is MatcherResult.Success) return NFASimulationResult(
-      false,
-      currentIndex
-    )
-
-    val nextIndex = currentIndex + transitionMatcherResult.consumed
-    val destState = transition.destState
-
-    if (transitionMatcherResult.consumed == 0 && epsilonVisited.contains(destState)) {
-      return NFASimulationResult(false, currentIndex)
-    }
-
-    val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !epsilonVisited.contains(destState)) {
-      epsilonVisited.plusElement(currentState)
-    } else {
-      HashSet()
-    }
-    return simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, possibleCursors, epsilonVisitedCopy, maxIndex)
   }
 
   /**
