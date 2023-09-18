@@ -28,10 +28,10 @@ internal class BacktrackingStrategy : SimulationStrategy {
   /**
    * Memory used to store capture groups
    */
-  private lateinit var groups: VimMatchGroupCollection
+  private val groups: VimMatchGroupCollection = VimMatchGroupCollection()
 
   override fun simulate(nfa: NFA, editor: VimEditor, startIndex: Int, isCaseInsensitive: Boolean): SimulationResult {
-    groups = VimMatchGroupCollection()
+    groups.clear()
     if (simulate(editor, startIndex, nfa.startState, nfa.acceptState, isCaseInsensitive, editor.carets().toMutableList()).simulationResult) {
       return SimulationResult.Complete(
         groups.get(0)?.let {
@@ -50,11 +50,10 @@ internal class BacktrackingStrategy : SimulationStrategy {
    * Simulates the NFA in a depth-first search fashion.
    *
    * @param editor            The editor that is used for the simulation
-   * @param currentIndex      The current index of the text in the simulation
-   * @param currentState      The current NFA state in the simulation
+   * @param index             The current index of the text in the simulation
+   * @param state             The current NFA state in the simulation
    * @param targetState       The NFA state that needs to be found for a successful match
    * @param isCaseInsensitive Whether the simulation should ignore case
-   * @param epsilonVisited    Records the states that have been visited up to this point without consuming any input
    * @param maxIndex          The maximum index of the text that the simulation is allowed to go to
    * @param possibleCursors   The cursors that are allowed to match
    *
@@ -62,36 +61,37 @@ internal class BacktrackingStrategy : SimulationStrategy {
    */
   private fun simulate(
     editor: VimEditor,
-    currentIndex: Int,
-    currentState: NFAState,
+    index: Int,
+    state: NFAState,
     targetState: NFAState,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
-    epsilonVisited: Set<NFAState> = HashSet(),
     maxIndex: Int = editor.text().length
   ): NFASimulationResult {
-    if (currentIndex > maxIndex) return NFASimulationResult(false, currentIndex
-    )
+    val stack = emptyList<SimulationStackFrame>().toMutableList()
+    stack.add(SimulationStackFrame(index, state, emptySet()))
 
-    updateCaptureGroups(editor, currentIndex, currentState)
-    currentState.assertion?.let {
-      val assertionResult = handleAssertion(editor, currentIndex, isCaseInsensitive, it, possibleCursors)
-      if (!assertionResult.simulationResult) return NFASimulationResult(false, currentIndex)
-      else return simulate(editor, assertionResult.index, currentState.assertion!!.jumpTo, targetState, isCaseInsensitive, possibleCursors, maxIndex = maxIndex)
-    }
-    if (currentState === targetState) return NFASimulationResult(true, currentIndex)
+    while (stack.isNotEmpty()) {
+      val currFrame = stack.removeLast()
+      if (currFrame.currentIndex > maxIndex) continue
+      updateCaptureGroups(editor, currFrame.currentIndex, currFrame.currentState)
+      if (currFrame.currentState === targetState) return NFASimulationResult(true, currFrame.currentIndex)
+      currFrame.currentState.assertion?.let {
+        val assertionResult = handleAssertion(editor, currFrame.currentIndex, isCaseInsensitive, it, possibleCursors)
+        if (assertionResult.simulationResult) stack.add(SimulationStackFrame(assertionResult.index, currFrame.currentState.assertion!!.jumpTo, emptySet()))
+      }
 
-    for (transition in currentState.transitions) {
-      val transitionMatcherResult = transition.matcher.matches(editor, currentIndex, groups, isCaseInsensitive, possibleCursors)
-      if (transitionMatcherResult !is MatcherResult.Success) continue
-      val destState = transition.destState
-      if (transitionMatcherResult.consumed == 0 && epsilonVisited.contains(destState)) continue
-      val nextIndex = currentIndex + transitionMatcherResult.consumed
-      val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !epsilonVisited.contains(destState)) epsilonVisited.plusElement(currentState) else HashSet()
-      val result = simulate(editor, nextIndex, destState, targetState, isCaseInsensitive, possibleCursors, epsilonVisitedCopy, maxIndex)
-      if (result.simulationResult) return result
+      for (transition in currFrame.currentState.transitions.reversed()) {
+        val transitionMatcherResult = transition.matcher.matches(editor, currFrame.currentIndex, groups, isCaseInsensitive, possibleCursors)
+        if (transitionMatcherResult !is MatcherResult.Success) continue
+        val destState = transition.destState
+        if (transitionMatcherResult.consumed == 0 && currFrame.epsilonVisited.contains(destState)) continue
+        val nextIndex = currFrame.currentIndex + transitionMatcherResult.consumed
+        val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !currFrame.epsilonVisited.contains(destState)) currFrame.epsilonVisited.plusElement(currFrame.currentState) else HashSet()
+        stack.add(SimulationStackFrame(nextIndex, destState, epsilonVisitedCopy))
+      }
     }
-    return NFASimulationResult(false, currentIndex)
+    return NFASimulationResult(false, index)
   }
 
   /**
@@ -207,7 +207,7 @@ internal class BacktrackingStrategy : SimulationStrategy {
 /**
  * Represents the result of simulating a NFA
  */
-private data class NFASimulationResult (
+private data class NFASimulationResult(
   /**
    * Whether the simulation reached a target state successfully
    */
@@ -217,4 +217,10 @@ private data class NFASimulationResult (
    * The index of the input editor text at which the simulation stopped
    */
   val index: Int
+)
+
+private data class SimulationStackFrame(
+  val currentIndex: Int,
+  val currentState: NFAState,
+  val epsilonVisited: Set<NFAState>
 )
