@@ -42,7 +42,7 @@ public class VimMatchGroupCollection(
    * Store the highest seen group number plus one, which
    * should correspond to the number of tracked groups
    */
-  internal var groupCount: Int = 0
+  private var groupCount: Int = 0
 
   /**
    * Gets a single capture group match
@@ -95,6 +95,11 @@ public class VimMatchGroupCollection(
     groups[groupNumber] = VimMatchGroup(range, text.substring(range.startOffset, range.endOffset))
     groupCount = maxOf(groupCount, groupNumber + 1)
     completedGroups[groupNumber] = true
+  }
+
+  internal fun clear() {
+    groupCount = 0
+    for (groupNumber in completedGroups.indices) completedGroups[groupNumber] = false
   }
 
   override fun contains(element: VimMatchGroup): Boolean {
