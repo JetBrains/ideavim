@@ -90,8 +90,21 @@ public class SearchHelper {
       try {
         final VimRegex regex = new VimRegex(pattern);
         VimMatchResult result;
+
         if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset);
         else result = regex.findPrevious(vimEditor, startOffset);
+
+        if (result.getClass() == VimMatchResult.Failure.class) {
+          injector.getMessages().showStatusBarMessage(vimEditor, ((VimMatchResult.Failure)result).getErrorCode().toString());
+          return null;
+        }
+
+        for (int i = 1; i < count; i++) {
+          int nextOffset = ((VimMatchResult.Success)result).getRange().getStartOffset();
+          if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, nextOffset);
+          else result = regex.findPrevious(vimEditor, nextOffset);
+        }
+
         if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
         else {
           injector.getMessages().showStatusBarMessage(vimEditor, ((VimMatchResult.Failure)result).getErrorCode().toString());

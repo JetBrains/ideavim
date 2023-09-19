@@ -1,3 +1,4 @@
+one two three one two three
 /*
  * Copyright 2003-2023 The IdeaVim authors
  *
