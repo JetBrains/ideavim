@@ -48,14 +48,12 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 
 /**
  * Helper methods for searching text
  */
 public class SearchHelper {
-
-  // TODO: we don't have access to globalijoptions here, since this is a java file!
-  static final boolean useNewRegex = false;
 
   public static String makeSearchPattern(String pattern, Boolean whole) {
     return whole ? "\\<" + pattern + "\\>" : pattern;
@@ -86,7 +84,7 @@ public class SearchHelper {
 
     Direction dir = searchOptions.contains(SearchOptions.BACKWARDS) ? Direction.BACKWARDS : Direction.FORWARDS;
 
-    if (useNewRegex) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
       final VimRegex regex = new VimRegex(pattern);
       final VimEditor vimEditor = new IjVimEditor(editor);
       VimMatchResult result;
@@ -376,7 +374,7 @@ public class SearchHelper {
                                                  boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
 
-    if (useNewRegex) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
       VimRegex regex = new VimRegex(pattern);
       VimEditor vimEditor = new IjVimEditor(editor);
       List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine));
