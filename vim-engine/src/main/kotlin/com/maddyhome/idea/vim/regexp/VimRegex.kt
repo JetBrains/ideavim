@@ -222,11 +222,12 @@ public class VimRegex(pattern: String) {
    */
   public fun findAll(
     editor: VimEditor,
-    startIndex: Int = 0
+    startIndex: Int = 0,
+    maxIndex: Int = editor.text().length
   ): List<VimMatchResult.Success> {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
-    while (index <= editor.text().length) {
+    while (index < maxIndex) {
       val result = simulateNonExactNFA(editor, index)
       when (result) {
         /**
