@@ -116,7 +116,7 @@ public class VimRegex(pattern: String) {
     }
     index = 0
     // no match found after startIndex, try wrapping around to file start
-    while (index < lineStartIndex) {
+    while (index <= startIndex) {
       val result = simulateNFA(editor, index)
       // just return the first match found
       when (result) {
