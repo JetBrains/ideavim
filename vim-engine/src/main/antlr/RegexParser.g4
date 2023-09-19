@@ -22,6 +22,7 @@ sub_pattern : (branches+=branch ALTERNATION)* branches+=branch
  */
 branch : CARET
        | DOLLAR
+       | AND
        | CARET? (concats+=concat AND)* concats+=concat DOLLAR
        | CARET? (concats+=concat AND)* concats+=concat
        ;
