@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.regexp.engine.VimRegexEngine
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
@@ -99,14 +100,22 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     startIndex: Int = 0
   ): VimMatchResult {
-    val lineStartIndex = editor.getLineStartOffset(editor.offsetToBufferPosition(startIndex).line)
+    /*
+    if the startIndex is at the end of a line, start searching at the next position,
+    to avoid the cursor getting stuck at line ends
+    */
+    val newStartIndex =
+     if (startIndex + 1 == editor.getLineEndOffset(editor.offsetToBufferPosition(startIndex).line)) startIndex + 1
+     else startIndex
+
+    val lineStartIndex = editor.getLineStartOffset(editor.offsetToBufferPosition(newStartIndex).line)
     var index = lineStartIndex
     while (index <= editor.text().length) {
       val result = simulateNFA(editor, index)
       when (result) {
         is VimMatchResult.Success -> {
           // the match comes after the startIndex, return it
-          if (result.range.startOffset > startIndex) return result
+          if (result.range.startOffset > newStartIndex) return result
           // there is a match but starts before the startIndex, try again starting from the end of this match
           else index = result.range.endOffset + if (result.range.startOffset == result.range.endOffset) 1 else 0
         }
