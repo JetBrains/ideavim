@@ -23,6 +23,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.regexp.VimRegex;
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
 import com.maddyhome.idea.vim.state.mode.Mode;
 import com.maddyhome.idea.vim.state.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
@@ -74,12 +76,24 @@ public class SearchHelper {
                                       int startOffset,
                                       int count,
                                       EnumSet<SearchOptions> searchOptions) {
-    if (pattern == null || pattern.length() == 0) {
+    if (pattern == null || pattern.isEmpty()) {
       logger.warn("Pattern is null or empty. Cannot perform search");
       return null;
     }
 
     Direction dir = searchOptions.contains(SearchOptions.BACKWARDS) ? Direction.BACKWARDS : Direction.FORWARDS;
+
+    // TODO: we don't have access to globalijoptions here, since this is a java file!
+    boolean useNewRegex = false;
+    if (useNewRegex) {
+      final VimRegex regex = new VimRegex(pattern);
+      final VimEditor vimEditor = new IjVimEditor(editor);
+      VimMatchResult result;
+      if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset);
+      else result = regex.findPrevious(vimEditor, startOffset);
+      if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
+      else return null;
+    }
 
     //RE sp;
     RegExp sp;
