@@ -1752,6 +1752,22 @@ class VimRegexEngineTest {
     )
   }
 
+  @Test
+  fun `test pattern with single dollar sign`() {
+    doTest(
+      "Lorem\$Ipsum${START}${END}",
+      "$"
+    )
+  }
+
+  @Test
+  fun `test pattern with single caret symbol`() {
+    doTest(
+      "${START}${END}Lorem^Ipsum",
+      "^"
+    )
+  }
+
   companion object {
     private fun assertFailure(
       text: CharSequence,

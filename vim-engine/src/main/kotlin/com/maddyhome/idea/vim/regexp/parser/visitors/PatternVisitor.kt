@@ -81,7 +81,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
       subNFA.assert(shouldConsume = false, isPositive = true, isAhead = true)
       nfaStart.concatenate(subNFA)
     }
-    return nfaStart.concatenate(visit(ctx.concats.last())).concatenate(nfaEnd)
+    return nfaStart.concatenate(if (ctx.concats.isNotEmpty()) visit(ctx.concats.last()) else NFA.fromSingleState()).concatenate(nfaEnd)
   }
 
   override fun visitConcat(ctx: RegexParser.ConcatContext): NFA {
