@@ -18,8 +18,8 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
-    VimMatchGroupCollection,
+    index: Int,
+    groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
