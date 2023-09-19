@@ -9,11 +9,9 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.regexp.engine.VimRegexEngine
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
-import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.parser.CaseSensitivitySettings
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
