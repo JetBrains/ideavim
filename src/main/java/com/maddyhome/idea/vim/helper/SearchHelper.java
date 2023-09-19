@@ -400,7 +400,7 @@ public class SearchHelper {
       VimEditor vimEditor = new IjVimEditor(editor);
       try {
         VimRegex regex = new VimRegex(pattern);
-        List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine));
+        List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine), vimEditor.getLineEndOffset(endLine == -1 ? vimEditor.lineCount() - 1 : endLine) + 1);
         for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
         return results;
       } catch (VimRegexException e) {
