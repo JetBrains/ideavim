@@ -20,7 +20,9 @@ sub_pattern : (branches+=branch ALTERNATION)* branches+=branch
  * concat, but only if all the preceding concats also match at the same
  * position. Example: "IdeaVim\&Idea matches "Idea" in "IdeaVim".
  */
-branch : CARET? (concats+=concat AND)* concats+=concat DOLLAR
+branch : CARET
+       | DOLLAR
+       | CARET? (concats+=concat AND)* concats+=concat DOLLAR
        | CARET? (concats+=concat AND)* concats+=concat
        ;
 
