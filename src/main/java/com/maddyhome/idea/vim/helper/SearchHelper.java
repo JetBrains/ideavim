@@ -95,7 +95,7 @@ public class SearchHelper {
         else result = regex.findPrevious(vimEditor, startOffset);
 
         if (result.getClass() == VimMatchResult.Failure.class) {
-          injector.getMessages().showStatusBarMessage(vimEditor, ((VimMatchResult.Failure)result).getErrorCode().toString());
+          injector.getMessages().showStatusBarMessage(vimEditor, "Pattern not found: " + pattern);
           return null;
         }
 
@@ -107,7 +107,7 @@ public class SearchHelper {
 
         if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
         else {
-          injector.getMessages().showStatusBarMessage(vimEditor, ((VimMatchResult.Failure)result).getErrorCode().toString());
+          injector.getMessages().showStatusBarMessage(vimEditor, "Pattern not found: " + pattern);
           return null;
         }
       } catch (VimRegexException e) {
