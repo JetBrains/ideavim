@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.regexp
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.engine.VimRegexEngine
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
+import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.DotMatcher
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.parser.CaseSensitivitySettings
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
@@ -26,7 +27,7 @@ import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
  */
 public class VimRegex(pattern: String) {
   /**
-   * TODO: in my option only the find() and findAll() methods are necessary.
+   * TODO: in my opinion only the find() and findAll() methods are necessary.
    *
    * The replace methods (not present yet) should probably be implemented
    * somewhere else, using the find() or findAll() methods.
@@ -44,13 +45,20 @@ public class VimRegex(pattern: String) {
    */
   private val nfa: NFA
 
+  /**
+   * The NFA representing the compiled pattern, preceded by anything
+   * Equivalent to ".*pattern"
+   */
+  private val nonExactNFA: NFA
+
   init {
     val parseResult = VimRegexParser.parse(pattern)
 
     when (parseResult) {
       is VimRegexParserResult.Failure -> throw RuntimeException(parseResult.errorCode.toString()) // TODO: use different exception
       is VimRegexParserResult.Success -> {
-        nfa= PatternVisitor.visit(parseResult.tree)
+        nfa = PatternVisitor.visit(parseResult.tree)
+        nonExactNFA = NFA.fromMatcher(DotMatcher(false)).closure(false).concatenate(nfa)
         caseSensitivitySettings = parseResult.caseSensitivitySettings
       }
     }
@@ -64,20 +72,9 @@ public class VimRegex(pattern: String) {
    * @return True if any match was found, false otherwise
    */
   public fun containsMatchIn(editor: VimEditor): Boolean {
-    var startIndex = 0
-    while (startIndex <= editor.text().length) {
-      val result = simulateNFA(editor, startIndex)
-      when (result) {
-        /**
-         * A match was found
-         */
-        is VimMatchResult.Success -> return true
-
-        /**
-         * No match found yet, try searching on next index
-         */
-        is VimMatchResult.Failure -> startIndex++
-      }
+    for (line in 0 until editor.lineCount()) {
+      val result = simulateNonExactNFA(editor, editor.getLineStartOffset(line))
+      if (result is VimMatchResult.Success) return true
     }
 
     /**
@@ -109,26 +106,34 @@ public class VimRegex(pattern: String) {
     val lineStartIndex = editor.getLineStartOffset(editor.offsetToBufferPosition(newStartIndex).line)
     var index = lineStartIndex
     while (index <= editor.text().length) {
-      val result = simulateNFA(editor, index)
-      when (result) {
+      val result = simulateNonExactNFA(editor, index)
+      index = when (result) {
         is VimMatchResult.Success -> {
           // the match comes after the startIndex, return it
           if (result.range.startOffset > newStartIndex) return result
           // there is a match but starts before the startIndex, try again starting from the end of this match
-          else index = result.range.endOffset + if (result.range.startOffset == result.range.endOffset) 1 else 0
+          else result.range.endOffset + if (result.range.startOffset == result.range.endOffset) 1 else 0
         }
-        // no match starting here, try the next index
-        is VimMatchResult.Failure -> index++
+        // no match starting here, try the next line
+        is VimMatchResult.Failure -> {
+          val nextLine = editor.offsetToBufferPosition(index).line + 1
+          if (nextLine >= editor.lineCount()) break
+          editor.getLineStartOffset(nextLine)
+        }
       }
     }
     index = 0
     // no match found after startIndex, try wrapping around to file start
     while (index <= startIndex) {
-      val result = simulateNFA(editor, index)
+      val result = simulateNonExactNFA(editor, index)
       // just return the first match found
       when (result) {
         is VimMatchResult.Success -> return result
-        is VimMatchResult.Failure -> index++
+        is VimMatchResult.Failure -> {
+          val nextLine = editor.offsetToBufferPosition(index).line + 1
+          if (nextLine >= editor.lineCount()) break
+          index = editor.getLineStartOffset(nextLine)
+        }
       }
     }
     // entire editor was searched, but no match found
@@ -188,12 +193,12 @@ public class VimRegex(pattern: String) {
     var index = editor.getLineStartOffset(line)
     var prevResult: VimMatchResult = VimMatchResult.Failure(VimRegexErrors.E486)
     while (index <= maxIndex) {
-      val result = simulateNFA(editor, index)
+      val result = simulateNonExactNFA(editor, index)
       when (result) {
-        // try at next index
-        is VimMatchResult.Failure -> index++
+        // no more matches in this line, break out of the loop
+        is VimMatchResult.Failure -> break
         is VimMatchResult.Success -> {
-          // no more matches in this line, break out of the loop
+          // no more relevant matches in this line, break out of the loop
           if (result.range.startOffset > maxIndex) break
 
           // match found, try to find more after it
@@ -222,7 +227,7 @@ public class VimRegex(pattern: String) {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
     while (index <= editor.text().length) {
-      val result = simulateNFA(editor, index)
+      val result = simulateNonExactNFA(editor, index)
       when (result) {
         /**
          * A match was found, add it to foundMatches and increment
@@ -235,9 +240,13 @@ public class VimRegex(pattern: String) {
         }
 
         /**
-         * No match found starting on this index, try searching on next index
+         * No match found starting on this index, try searching on next line
          */
-        is VimMatchResult.Failure -> index++
+        is VimMatchResult.Failure -> {
+          val nextLine = editor.offsetToBufferPosition(index).line + 1
+          if (nextLine >= editor.lineCount()) break
+          index = editor.getLineStartOffset(nextLine)
+        }
       }
     }
     return foundMatches
@@ -324,7 +333,20 @@ public class VimRegex(pattern: String) {
    * @return The resulting match result
    */
   private fun simulateNFA(editor: VimEditor, index: Int = 0) : VimMatchResult {
-    return VimRegexEngine.simulate(nfa, editor,index, shouldIgnoreCase())
+    return VimRegexEngine.simulate(nfa, editor, index, shouldIgnoreCase())
+  }
+
+  /**
+   * Simulates the internal non-exact NFA with the determined flags,
+   * started on a given index.
+   *
+   * @param editor The editor that is used for the simulation
+   * @param index  The index where the simulation should start
+   *
+   * @return The resulting match result
+   */
+  private fun simulateNonExactNFA(editor: VimEditor, index: Int = 0) : VimMatchResult {
+    return VimRegexEngine.simulate(nonExactNFA, editor, index, shouldIgnoreCase())
   }
 
   /**
