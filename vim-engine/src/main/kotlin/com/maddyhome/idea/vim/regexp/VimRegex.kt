@@ -1,4 +1,3 @@
-one two three one two three
 /*
  * Copyright 2003-2023 The IdeaVim authors
  *
@@ -30,7 +29,7 @@ public class VimRegex(pattern: String) {
   /**
    * TODO: in my opinion only the find() and findAll() methods are necessary.
    *
-   * The replace methods (not present yet) should probably be implemented
+   * The replace methods (not present here) should probably be implemented
    * somewhere else, using the find() or findAll() methods.
    *
    * The rest of the methods are just useless in my opinion
@@ -162,7 +161,7 @@ public class VimRegex(pattern: String) {
       // try searching in previous lines, line by line, and if necessary wrap around to the last line
       var currentLine = startLine - 1
       var wrappedAround = false
-      while (!(wrappedAround && currentLine <= startLine)) {
+      while (!(wrappedAround && currentLine < startLine)) {
         if (currentLine < 0) {
           currentLine = editor.lineCount() - 1
           wrappedAround = true
