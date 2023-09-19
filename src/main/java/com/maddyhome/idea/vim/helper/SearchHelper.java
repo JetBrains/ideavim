@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.regexp.VimRegex;
+import com.maddyhome.idea.vim.regexp.VimRegexException;
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
 import com.maddyhome.idea.vim.state.mode.Mode;
 import com.maddyhome.idea.vim.state.VimStateMachine;
@@ -85,13 +86,18 @@ public class SearchHelper {
     Direction dir = searchOptions.contains(SearchOptions.BACKWARDS) ? Direction.BACKWARDS : Direction.FORWARDS;
 
     if (globalIjOptions(injector).getUseNewRegex()) {
-      final VimRegex regex = new VimRegex(pattern);
       final VimEditor vimEditor = new IjVimEditor(editor);
-      VimMatchResult result;
-      if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset);
-      else result = regex.findPrevious(vimEditor, startOffset);
-      if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
-      else return null;
+      try {
+        final VimRegex regex = new VimRegex(pattern);
+        VimMatchResult result;
+        if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset);
+        else result = regex.findPrevious(vimEditor, startOffset);
+        if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
+        else return null;
+      } catch (VimRegexException e) {
+        injector.getMessages().showStatusBarMessage(vimEditor, e.getMessage());
+        return null;
+      }
     }
 
     //RE sp;
@@ -375,11 +381,16 @@ public class SearchHelper {
     final List<TextRange> results = Lists.newArrayList();
 
     if (globalIjOptions(injector).getUseNewRegex()) {
-      VimRegex regex = new VimRegex(pattern);
       VimEditor vimEditor = new IjVimEditor(editor);
-      List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine));
-      for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
-      return results;
+      try {
+        VimRegex regex = new VimRegex(pattern);
+        List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine));
+        for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
+        return results;
+      } catch (VimRegexException e) {
+        injector.getMessages().showStatusBarMessage(vimEditor, e.getMessage());
+        return results;
+      }
     }
 
     final int lineCount = new IjVimEditor(editor).lineCount();

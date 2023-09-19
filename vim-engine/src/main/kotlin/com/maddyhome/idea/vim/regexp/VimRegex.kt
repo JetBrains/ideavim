@@ -55,7 +55,7 @@ public class VimRegex(pattern: String) {
     val parseResult = VimRegexParser.parse(pattern)
 
     when (parseResult) {
-      is VimRegexParserResult.Failure -> throw RuntimeException(parseResult.errorCode.toString()) // TODO: use different exception
+      is VimRegexParserResult.Failure -> throw VimRegexException(parseResult.errorCode.toString())
       is VimRegexParserResult.Success -> {
         nfa = PatternVisitor.visit(parseResult.tree)
         nonExactNFA = NFA.fromMatcher(DotMatcher(false)).closure(false).concatenate(nfa)
