@@ -93,7 +93,10 @@ public class SearchHelper {
         if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset);
         else result = regex.findPrevious(vimEditor, startOffset);
         if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
-        else return null;
+        else {
+          injector.getMessages().showStatusBarMessage(vimEditor, ((VimMatchResult.Failure)result).getErrorCode().toString());
+          return null;
+        }
       } catch (VimRegexException e) {
         injector.getMessages().showStatusBarMessage(vimEditor, e.getMessage());
         return null;
