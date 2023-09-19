@@ -54,6 +54,9 @@ import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
  */
 public class SearchHelper {
 
+  // TODO: we don't have access to globalijoptions here, since this is a java file!
+  static final boolean useNewRegex = false;
+
   public static String makeSearchPattern(String pattern, Boolean whole) {
     return whole ? "\\<" + pattern + "\\>" : pattern;
   }
@@ -83,8 +86,6 @@ public class SearchHelper {
 
     Direction dir = searchOptions.contains(SearchOptions.BACKWARDS) ? Direction.BACKWARDS : Direction.FORWARDS;
 
-    // TODO: we don't have access to globalijoptions here, since this is a java file!
-    boolean useNewRegex = false;
     if (useNewRegex) {
       final VimRegex regex = new VimRegex(pattern);
       final VimEditor vimEditor = new IjVimEditor(editor);
@@ -374,6 +375,15 @@ public class SearchHelper {
                                                  int endLine,
                                                  boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
+
+    if (useNewRegex) {
+      VimRegex regex = new VimRegex(pattern);
+      VimEditor vimEditor = new IjVimEditor(editor);
+      List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine));
+      for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
+      return results;
+    }
+
     final int lineCount = new IjVimEditor(editor).lineCount();
     final int actualEndLine = endLine == -1 ? lineCount - 1 : endLine;
 
