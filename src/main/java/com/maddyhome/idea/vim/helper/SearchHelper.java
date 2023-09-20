@@ -23,8 +23,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.regexp.VimRegex;
-import com.maddyhome.idea.vim.regexp.VimRegexException;
+import com.maddyhome.idea.vim.regexp.*;
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
 import com.maddyhome.idea.vim.state.mode.Mode;
 import com.maddyhome.idea.vim.state.VimStateMachine;
@@ -33,8 +32,6 @@ import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.regexp.CharPointer;
-import com.maddyhome.idea.vim.regexp.RegExp;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -45,8 +42,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
@@ -87,12 +83,15 @@ public class SearchHelper {
 
     if (globalIjOptions(injector).getUseNewRegex()) {
       final VimEditor vimEditor = new IjVimEditor(editor);
+      final List<VimRegexOptions> options = new ArrayList<>();
+      if (globalOptions(injector).getSmartcase() && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE);
+      if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
       try {
         final VimRegex regex = new VimRegex(pattern);
         VimMatchResult result;
 
-        if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset);
-        else result = regex.findPrevious(vimEditor, startOffset);
+        if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset, options);
+        else result = regex.findPrevious(vimEditor, startOffset, options);
 
         if (result.getClass() == VimMatchResult.Failure.class) {
           injector.getMessages().showStatusBarMessage(vimEditor, "Pattern not found: " + pattern);
@@ -101,8 +100,8 @@ public class SearchHelper {
 
         for (int i = 1; i < count; i++) {
           int nextOffset = ((VimMatchResult.Success)result).getRange().getStartOffset();
-          if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, nextOffset);
-          else result = regex.findPrevious(vimEditor, nextOffset);
+          if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, nextOffset, options);
+          else result = regex.findPrevious(vimEditor, nextOffset, options);
         }
 
         if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
@@ -397,10 +396,16 @@ public class SearchHelper {
     final List<TextRange> results = Lists.newArrayList();
 
     if (globalIjOptions(injector).getUseNewRegex()) {
+      final List<VimRegexOptions> options = new ArrayList<>();
+      if (globalOptions(injector).getSmartcase()) options.add(VimRegexOptions.SMART_CASE);
+      if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
       VimEditor vimEditor = new IjVimEditor(editor);
       try {
-        VimRegex regex = new VimRegex(pattern);
-        List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine), vimEditor.getLineEndOffset(endLine == -1 ? vimEditor.lineCount() - 1 : endLine) + 1);
+        // TODO: we shouldn't care about the ignoreCase argument, and instead just look into the editor options.
+        // It would require a refactor, so for now prepend \c or \C to "force" ignoreCase
+        String newPattern = (ignoreCase ? "\\c" : "\\C") + pattern;
+        VimRegex regex = new VimRegex(newPattern);
+        List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine), vimEditor.getLineEndOffset(endLine == -1 ? vimEditor.lineCount() - 1 : endLine) + 1, options);
         for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
         return results;
       } catch (VimRegexException e) {

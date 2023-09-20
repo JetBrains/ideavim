@@ -375,12 +375,7 @@ public class VimRegex(pattern: String) {
     return when (caseSensitivitySettings) {
       CaseSensitivitySettings.NO_IGNORE_CASE -> false
       CaseSensitivitySettings.IGNORE_CASE -> true
-      CaseSensitivitySettings.DEFAULT -> {
-        if (options.contains(VimRegexOptions.IGNORE_CASE)) true
-        // if smartcase is set, ignore case unless the pattern has any upper case character
-        else if (options.contains(VimRegexOptions.SMART_CASE)) !hasUpperCase
-        else false
-      }
+      CaseSensitivitySettings.DEFAULT -> options.contains(VimRegexOptions.IGNORE_CASE) && !(options.contains(VimRegexOptions.SMART_CASE) && hasUpperCase)
     }
   }
 }
