@@ -8,6 +8,7 @@ import com.maddyhome.idea.vim.helper.Msg
 import org.jetbrains.annotations.NonNls
 import java.util.*
 
+@Deprecated("Please use VimRegex class instead")
 internal class RegExp {
     /*
      * The first byte of the regexp internal "program" is actually this magic
