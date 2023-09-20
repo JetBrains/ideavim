@@ -132,17 +132,19 @@ public class VimRegex(pattern: String) {
         }
       }
     }
-    index = 0
-    // no match found after startIndex, try wrapping around to file start
-    while (index <= startIndex) {
-      val result = simulateNonExactNFA(editor, index, options)
-      // just return the first match found
-      when (result) {
-        is VimMatchResult.Success -> return result
-        is VimMatchResult.Failure -> {
-          val nextLine = editor.offsetToBufferPosition(index).line + 1
-          if (nextLine >= editor.lineCount()) break
-          index = editor.getLineStartOffset(nextLine)
+    // no match found after startIndex, try wrapping around to file start, if wrapscan is set
+    if (options.contains(VimRegexOptions.WRAP_SCAN)) {
+      index = 0
+      while (index <= startIndex) {
+        val result = simulateNonExactNFA(editor, index, options)
+        // just return the first match found
+        when (result) {
+          is VimMatchResult.Success -> return result
+          is VimMatchResult.Failure -> {
+            val nextLine = editor.offsetToBufferPosition(index).line + 1
+            if (nextLine >= editor.lineCount()) break
+            index = editor.getLineStartOffset(nextLine)
+          }
         }
       }
     }
@@ -169,10 +171,10 @@ public class VimRegex(pattern: String) {
         // there is a match at this line that starts before the startIndex
         return result
     } else {
-      // try searching in previous lines, line by line, and if necessary wrap around to the last line
+      // try searching in previous lines, line by line, and if necessary wrap around to the last line if wrapscan is set
       var currentLine = startLine - 1
       var wrappedAround = false
-      while (!(wrappedAround && currentLine < startLine)) {
+      while (!(wrappedAround && (currentLine < startLine || !options.contains(VimRegexOptions.WRAP_SCAN)))) {
         if (currentLine < 0) {
           currentLine = editor.lineCount() - 1
           wrappedAround = true

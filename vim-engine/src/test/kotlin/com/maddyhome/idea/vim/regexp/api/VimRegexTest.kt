@@ -84,10 +84,27 @@ class VimRegexTest {
     }
 
     @Test
-    fun `test find single word starting from offset`() {
+    fun `test find single word wraps around`() {
       doTest(
         """
       	|${START}Lorem${END} Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+        "Lorem",
+        40,
+        listOf(VimRegexOptions.WRAP_SCAN)
+      )
+    }
+
+    @Test
+    fun `test find single word doesn't wrap around`() {
+      assertFailure(
+        """
+      	|Lorem Ipsum
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -102,15 +119,28 @@ class VimRegexTest {
     private fun doTest(
       text: CharSequence,
       pattern: String,
-      startIndex: Int = 0
+      startIndex: Int = 0,
+      options: List<VimRegexOptions> = emptyList()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
-      val matchResult = regex.findNext(editor, startIndex)
+      val matchResult = regex.findNext(editor, startIndex, options)
       when (matchResult) {
         is VimMatchResult.Failure -> fail("Expected to find match")
         is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), matchResult.range)
       }
+    }
+
+    private fun assertFailure(
+      text: CharSequence,
+      pattern: String,
+      startIndex: Int = 0,
+      options: List<VimRegexOptions> = emptyList()
+    ) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.findNext(editor, startIndex, options)
+      if (matchResult is VimMatchResult.Success) fail("Expected to not find any match, but one was found at ${matchResult.range}")
     }
   }
 
@@ -133,12 +163,28 @@ class VimRegexTest {
     }
 
     @Test
-    fun `test find previous single word starting from the beginning`() {
+    fun `test find previous single word warps around`() {
       doTest(
         """
       	|Lorem Ipsum
         |
         |${START}Lorem${END} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+        "Lorem",
+        options = listOf(VimRegexOptions.WRAP_SCAN)
+      )
+    }
+
+    @Test
+    fun `test find previous single word doesn't warp around`() {
+      assertFailure(
+        """
+      	|Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -150,15 +196,28 @@ class VimRegexTest {
     private fun doTest(
       text: CharSequence,
       pattern: String,
-      startIndex: Int = 0
+      startIndex: Int = 0,
+      options: List<VimRegexOptions> = emptyList()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
-      val matchResult = regex.findPrevious(editor, startIndex)
+      val matchResult = regex.findPrevious(editor, startIndex, options)
       when (matchResult) {
         is VimMatchResult.Failure -> fail("Expected to find match")
         is VimMatchResult.Success -> assertEquals(getMatchRanges(text).firstOrNull(), matchResult.range)
       }
+    }
+
+    private fun assertFailure(
+      text: CharSequence,
+      pattern: String,
+      startIndex: Int = 0,
+      options: List<VimRegexOptions> = emptyList()
+    ) {
+      val editor = mockEditorFromText(text)
+      val regex = VimRegex(pattern)
+      val matchResult = regex.findPrevious(editor, startIndex, options)
+      if (matchResult is VimMatchResult.Success) fail("Expected to not find any match, but one was found at ${matchResult.range}")
     }
   }
 
@@ -222,7 +281,7 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "lorem ipsum",
-        options = listOf(VimRegexOptions.SMART_CASE)
+        options = listOf(VimRegexOptions.IGNORE_CASE, VimRegexOptions.SMART_CASE)
       )
     }
 
@@ -238,7 +297,7 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem Ipsum",
-        options = listOf(VimRegexOptions.SMART_CASE)
+        options = listOf(VimRegexOptions.IGNORE_CASE, VimRegexOptions.SMART_CASE)
       )
     }
 
