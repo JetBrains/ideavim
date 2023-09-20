@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.regexp.api
 
 import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.VimRegexOptions
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.END
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
@@ -209,14 +210,47 @@ class VimRegexTest {
       )
     }
 
+    @Test
+    fun `test find all occurrences of word with smartcase ignores case`() {
+      doTest(
+        """
+      	|${START}Lorem Ipsum${END}
+        |
+        |${START}Lorem ipsum${END} dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+        "lorem ipsum",
+        options = listOf(VimRegexOptions.SMART_CASE)
+      )
+    }
+
+    @Test
+    fun `test find all occurrences of word with smartcase doesn't ignore case`() {
+      doTest(
+        """
+      	|${START}Lorem Ipsum${END}
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+        "Lorem Ipsum",
+        options = listOf(VimRegexOptions.SMART_CASE)
+      )
+    }
+
     private fun doTest(
       text: CharSequence,
       pattern: String,
-      startIndex: Int = 0
+      startIndex: Int = 0,
+      options: List<VimRegexOptions> = emptyList()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
-      val matchResults = regex.findAll(editor, startIndex)
+      val matchResults = regex.findAll(editor, startIndex, options=options)
       assertEquals(
         getMatchRanges(text).toSet(), matchResults
         .map { it.range }

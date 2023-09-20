@@ -55,11 +55,16 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   /**
    * Maps tree nodes representing capture groups to their respective group number
-   *
    */
   private val groupNumbers: HashMap<RegexParser.GroupingCaptureContext, Int> = HashMap()
 
+  /**
+   * Determines whether the visited tree contains
+   */
+  internal var hasUpperCase: Boolean = false
+
   override fun visitPattern(ctx: RegexParser.PatternContext): NFA {
+    hasUpperCase = false
     groupCount = 0
     groupNumbers.clear()
     groupCount++
@@ -513,7 +518,10 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
       containsEOL = containsEOL || result.second
       val element = result.first
       when (element) {
-        is CollectionElement.SingleCharacter -> individualChars.add(element.char)
+        is CollectionElement.SingleCharacter -> {
+          hasUpperCase = hasUpperCase || element.char.isUpperCase()
+          individualChars.add(element.char)
+        }
         is CollectionElement.CharacterRange -> ranges.add(CollectionRange(element.start, element.end))
         is CollectionElement.CharacterClassExpression -> charClasses.add(element.predicate)
       }
@@ -714,8 +722,14 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   private fun cleanLiteralChar(str : String) : Char {
-    return if (str.length == 2 && str[0] == '\\') str[1]
-    else str[0]
+    return if (str.length == 2 && str[0] == '\\') {
+      hasUpperCase = hasUpperCase || str[1].isUpperCase()
+      str[1]
+    }
+    else {
+      hasUpperCase = hasUpperCase || str[0].isUpperCase()
+      str[0]
+    }
   }
 
   private fun List<NFA>.union(): NFA {
