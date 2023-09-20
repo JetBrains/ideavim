@@ -10,5 +10,6 @@ package com.maddyhome.idea.vim.regexp
 
 public enum class VimRegexOptions {
   IGNORE_CASE,
-  SMART_CASE
+  SMART_CASE,
+  WRAP_SCAN
 }

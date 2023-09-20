@@ -86,6 +86,7 @@ public class SearchHelper {
       final List<VimRegexOptions> options = new ArrayList<>();
       if (globalOptions(injector).getSmartcase() && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE);
       if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
+      if (globalOptions(injector).getWrapscan()) options.add(VimRegexOptions.WRAP_SCAN);
       try {
         final VimRegex regex = new VimRegex(pattern);
         VimMatchResult result;
