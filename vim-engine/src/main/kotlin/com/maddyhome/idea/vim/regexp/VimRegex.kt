@@ -51,6 +51,11 @@ public class VimRegex(pattern: String) {
    */
   private val nonExactNFA: NFA
 
+  /**
+   * Whether the pattern contains any upper case literal character
+   */
+  private val hasUpperCase: Boolean
+
   init {
     val parseResult = VimRegexParser.parse(pattern)
 
@@ -58,6 +63,7 @@ public class VimRegex(pattern: String) {
       is VimRegexParserResult.Failure -> throw VimRegexException(parseResult.errorCode.toString())
       is VimRegexParserResult.Success -> {
         nfa = PatternVisitor.visit(parseResult.tree)
+        hasUpperCase = PatternVisitor.hasUpperCase
         nonExactNFA = NFA.fromMatcher(DotMatcher(false)).closure(false).concatenate(nfa)
         caseSensitivitySettings = parseResult.caseSensitivitySettings
       }
@@ -371,7 +377,8 @@ public class VimRegex(pattern: String) {
       CaseSensitivitySettings.IGNORE_CASE -> true
       CaseSensitivitySettings.DEFAULT -> {
         if (options.contains(VimRegexOptions.IGNORE_CASE)) true
-        else if (options.contains(VimRegexOptions.SMART_CASE)) true // TODO
+        // if smartcase is set, ignore case unless the pattern has any upper case character
+        else if (options.contains(VimRegexOptions.SMART_CASE)) !hasUpperCase
         else false
       }
     }
