@@ -721,7 +721,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     )
   }
 
-  private fun cleanLiteralChar(str : String) : Char {
+  private fun cleanLiteralChar(str : String): Char {
     return if (str.length == 2 && str[0] == '\\') {
       hasUpperCase = hasUpperCase || str[1].isUpperCase()
       str[1]

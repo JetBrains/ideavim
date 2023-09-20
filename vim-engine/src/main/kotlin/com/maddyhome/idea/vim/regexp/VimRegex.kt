@@ -164,7 +164,7 @@ public class VimRegex(pattern: String) {
     options: List<VimRegexOptions> = emptyList()
   ): VimMatchResult {
     val startLine = editor.offsetToBufferPosition(startIndex).line
-    val result = findLastMatchInLine(editor, startLine, startIndex - 1)
+    val result = findLastMatchInLine(editor, startLine, startIndex - 1, options)
     if (result is VimMatchResult.Success && result.range.startOffset < startIndex) {
         // there is a match at this line that starts before the startIndex
         return result
@@ -177,7 +177,7 @@ public class VimRegex(pattern: String) {
           currentLine = editor.lineCount() - 1
           wrappedAround = true
         } else {
-          val previous = findLastMatchInLine(editor, currentLine)
+          val previous = findLastMatchInLine(editor, currentLine, options=options)
           if (previous is VimMatchResult.Success) return previous
           else currentLine--
         }
@@ -200,7 +200,7 @@ public class VimRegex(pattern: String) {
     editor: VimEditor,
     line: Int,
     maxIndex: Int = editor.getLineEndOffset(line),
-    options: List<VimRegexOptions> = emptyList()
+    options: List<VimRegexOptions>
   ): VimMatchResult {
     var index = editor.getLineStartOffset(line)
     var prevResult: VimMatchResult = VimMatchResult.Failure(VimRegexErrors.E486)
