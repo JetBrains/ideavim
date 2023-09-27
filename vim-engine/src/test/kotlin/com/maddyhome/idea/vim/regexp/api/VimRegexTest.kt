@@ -116,6 +116,21 @@ class VimRegexTest {
       )
     }
 
+    @Test
+    fun `test find word case insensitive prevails`() {
+      doTest(
+        """
+      	|Lorem Ipsum
+        |
+        |${START}Lorem${END} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+        "\\ClO\\crEm\\C"
+      )
+    }
+
     private fun doTest(
       text: CharSequence,
       pattern: String,
