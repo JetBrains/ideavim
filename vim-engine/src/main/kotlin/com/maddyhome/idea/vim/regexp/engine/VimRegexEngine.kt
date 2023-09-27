@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.VimRegexErrors
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.engine.strategies.BacktrackingStrategy
+import com.maddyhome.idea.vim.regexp.engine.strategies.ImplicitDFAStrategy
 import com.maddyhome.idea.vim.regexp.engine.strategies.SimulationResult
 import com.maddyhome.idea.vim.regexp.engine.strategies.SimulationStrategy
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
@@ -41,7 +42,6 @@ internal object VimRegexEngine {
       val result = strategy.simulate(nfa, editor, startIndex, isCaseInsensitive)
       if (result is SimulationResult.Complete) return result.matchResult
     }
-    // should never reach here, since at least one strategy should be powerful enough to complete the simulation
     return VimMatchResult.Failure(VimRegexErrors.E486)
   }
 }

@@ -36,4 +36,9 @@ internal interface Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult
+
+  /**
+   * Returns true if this matcher never consumes any input.
+   */
+  fun isEpsilon(): Boolean
 }

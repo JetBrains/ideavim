@@ -47,6 +47,10 @@ internal class CollectionMatcher(
     return if (result) MatcherResult.Success(1)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return false
+  }
 }
 
 /**

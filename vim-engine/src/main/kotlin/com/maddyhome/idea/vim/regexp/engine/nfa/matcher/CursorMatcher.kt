@@ -35,4 +35,8 @@ internal class CursorMatcher : Matcher {
       MatcherResult.Failure
     }
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }

@@ -26,4 +26,8 @@ internal class EndOfFileMatcher : Matcher {
   ): MatcherResult {
     return if (index == editor.text().length) MatcherResult.Success(0) else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }

@@ -38,6 +38,8 @@ public class VimMatchGroupCollection(
    */
   private val completedGroups: BooleanArray = BooleanArray(size) { false }
 
+  private val forceEnded: BooleanArray = BooleanArray(size) { false }
+
   /**
    * Store the highest seen group number plus one, which
    * should correspond to the number of tracked groups
@@ -75,7 +77,7 @@ public class VimMatchGroupCollection(
    * @param text        The text used to extract the matched string
    */
   internal fun setGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
-    if (completedGroups[groupNumber]) return
+    if (completedGroups[groupNumber] && forceEnded[groupNumber]) return
 
     val range = TextRange(groupStarts[groupNumber], endIndex)
     groups[groupNumber] = VimMatchGroup(range, text.substring(range.startOffset, range.endOffset))
@@ -95,11 +97,13 @@ public class VimMatchGroupCollection(
     groups[groupNumber] = VimMatchGroup(range, text.substring(range.startOffset, range.endOffset))
     groupCount = maxOf(groupCount, groupNumber + 1)
     completedGroups[groupNumber] = true
+    forceEnded[groupNumber] = true
   }
 
   internal fun clear() {
     groupCount = 0
     for (groupNumber in completedGroups.indices) completedGroups[groupNumber] = false
+    for (groupNumber in forceEnded.indices) forceEnded[groupNumber] = false
   }
 
   override fun contains(element: VimMatchGroup): Boolean {

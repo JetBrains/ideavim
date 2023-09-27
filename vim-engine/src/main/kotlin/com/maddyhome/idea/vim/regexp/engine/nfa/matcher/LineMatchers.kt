@@ -23,6 +23,10 @@ internal class AtLineMatcher(private val lineNumber: Int) : Matcher {
     return if (editor.offsetToBufferPosition(index).line + 1 == lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class BeforeLineMatcher(private val lineNumber: Int) : Matcher {
@@ -36,6 +40,10 @@ internal class BeforeLineMatcher(private val lineNumber: Int) : Matcher {
     return if (editor.offsetToBufferPosition(index).line + 1 < lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
@@ -48,6 +56,10 @@ internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line + 1 > lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
+  }
+
+  override fun isEpsilon(): Boolean {
+    return true
   }
 }
 internal class AtLineCursorMatcher : Matcher {
@@ -65,6 +77,10 @@ internal class AtLineCursorMatcher : Matcher {
       MatcherResult.Success(0)
     }
     else MatcherResult.Failure
+  }
+
+  override fun isEpsilon(): Boolean {
+    return true
   }
 }
 
@@ -84,6 +100,10 @@ internal class BeforeLineCursorMatcher : Matcher {
     }
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class AfterLineCursorMatcher : Matcher {
@@ -101,5 +121,9 @@ internal class AfterLineCursorMatcher : Matcher {
       MatcherResult.Success(0)
     }
     else MatcherResult.Failure
+  }
+
+  override fun isEpsilon(): Boolean {
+    return true
   }
 }

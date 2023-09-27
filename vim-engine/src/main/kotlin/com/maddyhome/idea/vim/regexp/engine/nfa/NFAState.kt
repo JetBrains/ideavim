@@ -18,7 +18,7 @@ internal class NFAState {
    * indexes. This is relevant for the implementation of
    * lazy quantifiers.
    */
-  internal val transitions: ArrayList<NFATransition> = ArrayList()
+  internal val transitions: MutableList<NFATransition> = mutableListOf()
 
   /**
    * When a state has an assertion, it has to be asserted
@@ -44,6 +44,8 @@ internal class NFAState {
    *  had already been set to stop being captured
    */
   internal val forceEndCapture: MutableList<Int> = ArrayList()
+
+  internal var hasLazyMulti: Boolean = false
 
   /**
    * Adds a new transition from this state. This transition

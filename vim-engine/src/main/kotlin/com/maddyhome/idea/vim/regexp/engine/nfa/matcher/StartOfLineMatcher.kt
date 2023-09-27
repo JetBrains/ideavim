@@ -26,4 +26,8 @@ internal class StartOfLineMatcher : Matcher {
     return if (index == 0 || editor.text()[index - 1] == '\n') MatcherResult.Success(0)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }

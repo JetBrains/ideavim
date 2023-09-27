@@ -32,4 +32,8 @@ internal class VisualAreaMatcher : Matcher {
       MatcherResult.Failure
     }
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
