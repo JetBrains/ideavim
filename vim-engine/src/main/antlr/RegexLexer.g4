@@ -29,7 +29,7 @@ tokens {
     public Boolean ignoreCase = null;
 
     void setIgnoreCase() { ignoreCase = true; }
-    void setNoIgnoreCase() { ignoreCase = false; }
+    void setNoIgnoreCase() { if (ignoreCase == null) ignoreCase = false; }
 }
 
 // ------------------------------------------------------------------------------------------------ //
