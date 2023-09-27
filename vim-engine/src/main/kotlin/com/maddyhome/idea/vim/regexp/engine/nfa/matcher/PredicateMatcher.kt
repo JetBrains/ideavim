@@ -28,4 +28,8 @@ internal class PredicateMatcher(val predicate: (Char) -> Boolean) : Matcher {
     return if (index < editor.text().length && predicate(editor.text()[index])) MatcherResult.Success(1)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return false
+  }
 }

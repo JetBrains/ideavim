@@ -25,4 +25,8 @@ internal class StartOfFileMatcher : Matcher{
   ): MatcherResult {
     return if (index == 0) MatcherResult.Success(0) else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }

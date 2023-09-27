@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.regexp.engine.nfa
 
-import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.EpsilonMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.Matcher
 

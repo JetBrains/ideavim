@@ -37,4 +37,8 @@ internal class StartOfWordMatcher : Matcher {
     ) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }

@@ -42,4 +42,8 @@ internal class BackreferenceMatcher(private val groupNumber: Int) : Matcher {
     else
       MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return false
+  }
 }

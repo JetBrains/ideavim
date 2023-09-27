@@ -23,6 +23,10 @@ internal class AtColumnMatcher(private val columnNumber: Int) : Matcher {
     return if (editor.offsetToBufferPosition(index).column + 1 == columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class BeforeColumnMatcher(private val columnNumber: Int) : Matcher {
@@ -36,6 +40,10 @@ internal class BeforeColumnMatcher(private val columnNumber: Int) : Matcher {
     return if (editor.offsetToBufferPosition(index).column + 1 < columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class AfterColumnMatcher(private val columnNumber: Int) : Matcher {
@@ -48,6 +56,10 @@ internal class AfterColumnMatcher(private val columnNumber: Int) : Matcher {
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column + 1 > columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
+  }
+
+  override fun isEpsilon(): Boolean {
+    return true
   }
 }
 
@@ -67,6 +79,10 @@ internal class AtColumnCursorMatcher : Matcher {
     }
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class BeforeColumnCursorMatcher : Matcher {
@@ -85,6 +101,10 @@ internal class BeforeColumnCursorMatcher : Matcher {
     }
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class AfterColumnCursorMatcher : Matcher {
@@ -102,5 +122,9 @@ internal class AfterColumnCursorMatcher : Matcher {
       MatcherResult.Success(0)
     }
     else MatcherResult.Failure
+  }
+
+  override fun isEpsilon(): Boolean {
+    return true
   }
 }

@@ -37,6 +37,10 @@ internal class AtMarkMatcher(val mark: Char) : Matcher {
     }
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class BeforeMarkMatcher(val mark: Char) : Matcher {
@@ -63,6 +67,10 @@ internal class BeforeMarkMatcher(val mark: Char) : Matcher {
     }
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }
 
 internal class AfterMarkMatcher(val mark: Char) : Matcher {
@@ -88,5 +96,9 @@ internal class AfterMarkMatcher(val mark: Char) : Matcher {
       MatcherResult.Success(0)
     }
     else MatcherResult.Failure
+  }
+
+  override fun isEpsilon(): Boolean {
+    return true
   }
 }

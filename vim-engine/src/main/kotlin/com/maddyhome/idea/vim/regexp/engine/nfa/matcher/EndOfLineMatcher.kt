@@ -26,4 +26,8 @@ internal class EndOfLineMatcher : Matcher {
     return if (index == editor.text().length || editor.text()[index] == '\n') MatcherResult.Success(0)
     else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }

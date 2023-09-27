@@ -30,4 +30,8 @@ internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
       if (index < editor.text().length && editor.text()[index] != '\n') MatcherResult.Success(1)
       else MatcherResult.Failure
   }
+
+  override fun isEpsilon(): Boolean {
+    return false
+  }
 }

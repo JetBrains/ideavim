@@ -27,4 +27,8 @@ internal class EpsilonMatcher : Matcher {
   ): MatcherResult {
     return MatcherResult.Success(0)
   }
+
+  override fun isEpsilon(): Boolean {
+    return true
+  }
 }

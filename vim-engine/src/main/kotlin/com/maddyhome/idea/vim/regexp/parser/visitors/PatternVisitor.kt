@@ -122,6 +122,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     prefixNFA.concatenate(suffixNFA)
     if (atom is RegexParser.GroupingCaptureContext)
       groupNumbers[atom]?.let { prefixNFA.capture(it, false) }
+    if (!range.isGreedy) prefixNFA.startState.hasLazyMulti = true
     return prefixNFA
   }
 
