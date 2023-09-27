@@ -268,6 +268,14 @@ public class VimRegex(pattern: String) {
     return foundMatches
   }
 
+  public fun findInLine(
+    editor: VimEditor,
+    line: Int,
+    options: List<VimRegexOptions> = emptyList()
+  ): VimMatchResult {
+    return simulateNonExactNFA(editor, editor.getLineStartOffset(line), options)
+  }
+
   /**
    * Attempts to match a pattern exactly at the specified
    * index in the editor text.
