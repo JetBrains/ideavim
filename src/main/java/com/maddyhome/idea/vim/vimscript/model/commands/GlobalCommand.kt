@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineStartForOffset
@@ -24,9 +25,13 @@ import com.maddyhome.idea.vim.group.SearchGroup.RE_SEARCH
 import com.maddyhome.idea.vim.group.SearchGroup.RE_SUBST
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.RegExp
+import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.VimRegexException
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -99,63 +104,110 @@ internal data class GlobalCommand(val ranges: Ranges, val argument: String, val 
       }
     }
 
-    val (first, second) = injector.searchGroup.search_regcomp(pat, whichPat, RE_BOTH)
-    if (!first) {
-      VimPlugin.showMessage(message(Msg.e_invcmd))
-      VimPlugin.indicateError()
-      return false
-    }
-    val regmatch = second.first as RegExp.regmmatch_T
-    val sp = second.third as RegExp
-
-    var match: Int
-    val lcount = editor.lineCount()
-    val searchcol = 0
-    if (globalBusy) {
-      val offset = editor.currentCaret().offset
-      val lineStartOffset = editor.getLineStartForOffset(offset.point)
-      match = sp.vim_regexec_multi(regmatch, editor, lcount, editor.currentCaret().getLine().line, searchcol)
-      if ((!invert && match > 0) || (invert && match <= 0)) {
-        globalExecuteOne(editor, context, lineStartOffset, cmd.toString())
-      }
-    } else {
-      // pass 1: set marks for each (not) matching line
-      val line1 = range.startLine
-      val line2 = range.endLine
-      //region search_regcomp implementation
-      // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
-      // it to true when searching for a word with `*`, `#`, `g*`, etc.
-
-      if (line1 < 0 || line2 < 0) {
+    if (injector.globalIjOptions().useNewRegex) {
+      val regex = try {
+        VimRegex(pat.toString())
+      } catch (e: VimRegexException) {
+        injector.messages.showStatusBarMessage(editor, e.message)
         return false
       }
 
-      var ndone = 0
-      val marks = mutableListOf<RangeMarker>()
-      for (lnum in line1..line2) {
-        if (gotInt) break
-
-        // a match on this line?
-        match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
-        if ((!invert && match > 0) || (invert && match <= 0)) {
-          val lineStartOffset = editor.getLineStartOffset(lnum)
-          marks += editor.ij.document.createRangeMarker(lineStartOffset, lineStartOffset)
-          ndone += 1
-        }
-        // TODO: 25.05.2021 Check break
-      }
-
-      // pass 2: execute the command for each line that has been marked
-      if (gotInt) {
-        VimPlugin.showMessage(message("e_interr"))
-      } else if (ndone == 0) {
-        if (invert) {
-          VimPlugin.showMessage(message("global.command.not.found.v", pat.toString()))
-        } else {
-          VimPlugin.showMessage(message("global.command.not.found.g", pat.toString()))
+      if (globalBusy) {
+        val match = regex.findInLine(editor, editor.currentCaret().getLine().line)
+        if (match is VimMatchResult.Success == !invert) {
+          globalExecuteOne(editor, context, editor.getLineStartOffset(editor.currentCaret().getLine().line), cmd.toString())
         }
       } else {
-        globalExe(editor, context, marks, cmd.toString())
+        val line1 = range.startLine
+        val line2 = range.endLine
+        if (line1 < 0 || line2 < 0) {
+          return false
+        }
+        val matches = regex.findAll(
+          editor,
+          editor.getLineStartOffset(line1),
+          editor.getLineEndOffset(line2),
+        )
+        val marks = if (!invert) matches.map {
+          editor.ij.document.createRangeMarker(editor.getLineStartForOffset(it.range.startOffset), editor.getLineStartForOffset(it.range.startOffset))
+        // filter out lines that contain a match
+        } else (line1..line2).filterNot { line ->
+          matches.map { match ->
+            editor.offsetToBufferPosition(match.range.startOffset).line
+          }.contains(line)
+        }.map { editor.ij.document.createRangeMarker(editor.getLineStartOffset(it), editor.getLineStartOffset(it)) }
+
+        if (gotInt) {
+          VimPlugin.showMessage(message("e_interr"))
+        } else if (marks.isEmpty()) {
+          if (invert) {
+            VimPlugin.showMessage(message("global.command.not.found.v", pat.toString()))
+          } else {
+            VimPlugin.showMessage(message("global.command.not.found.g", pat.toString()))
+          }
+        } else {
+          globalExe(editor, context, marks, cmd.toString())
+        }
+      }
+    } else {
+      val (first, second) = injector.searchGroup.search_regcomp(pat, whichPat, RE_BOTH)
+      if (!first) {
+        VimPlugin.showMessage(message(Msg.e_invcmd))
+        VimPlugin.indicateError()
+        return false
+      }
+      val regmatch = second.first as RegExp.regmmatch_T
+      val sp = second.third as RegExp
+
+      var match: Int
+      val lcount = editor.lineCount()
+      val searchcol = 0
+      if (globalBusy) {
+        val offset = editor.currentCaret().offset
+        val lineStartOffset = editor.getLineStartForOffset(offset.point)
+        match = sp.vim_regexec_multi(regmatch, editor, lcount, editor.currentCaret().getLine().line, searchcol)
+        if ((!invert && match > 0) || (invert && match <= 0)) {
+          globalExecuteOne(editor, context, lineStartOffset, cmd.toString())
+        }
+      } else {
+        // pass 1: set marks for each (not) matching line
+        val line1 = range.startLine
+        val line2 = range.endLine
+        //region search_regcomp implementation
+        // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
+        // it to true when searching for a word with `*`, `#`, `g*`, etc.
+
+        if (line1 < 0 || line2 < 0) {
+          return false
+        }
+
+        var ndone = 0
+        val marks = mutableListOf<RangeMarker>()
+        for (lnum in line1..line2) {
+          if (gotInt) break
+
+          // a match on this line?
+          match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
+          if ((!invert && match > 0) || (invert && match <= 0)) {
+            val lineStartOffset = editor.getLineStartOffset(lnum)
+            marks += editor.ij.document.createRangeMarker(lineStartOffset, lineStartOffset)
+            ndone += 1
+          }
+          // TODO: 25.05.2021 Check break
+        }
+
+        // pass 2: execute the command for each line that has been marked
+        if (gotInt) {
+          VimPlugin.showMessage(message("e_interr"))
+        } else if (ndone == 0) {
+          if (invert) {
+            VimPlugin.showMessage(message("global.command.not.found.v", pat.toString()))
+          } else {
+            VimPlugin.showMessage(message("global.command.not.found.g", pat.toString()))
+          }
+        } else {
+          globalExe(editor, context, marks, cmd.toString())
+        }
       }
     }
     return true
