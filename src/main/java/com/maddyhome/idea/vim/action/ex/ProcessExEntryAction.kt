@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.ex
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -23,6 +25,7 @@ import javax.swing.KeyStroke
  *
  * The mapping for this action means that the ex command is executed as a write action
  */
+@CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.CMD_LINE])
 public class ProcessExEntryAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> =
     parseKeysSet("<CR>", "<C-M>", 0x0a.toChar().toString(), 0x0d.toChar().toString())

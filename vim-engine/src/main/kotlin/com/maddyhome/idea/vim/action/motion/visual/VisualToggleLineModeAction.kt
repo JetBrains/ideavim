@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.visual
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 
+@CommandOrMotion(keys = ["V"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

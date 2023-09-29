@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.change
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -18,6 +20,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.CharacterHelper
 
+@CommandOrMotion(keys = ["gU"], modes = [Mode.NORMAL])
 public class ChangeCaseUpperMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.`object`
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -19,6 +21,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["ap"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 public class MotionOuterParagraphAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
@@ -36,6 +39,7 @@ public class MotionOuterParagraphAction : TextObjectActionHandler() {
   }
 }
 
+@CommandOrMotion(keys = ["ip"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 public class MotionInnerParagraphAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.mark
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 
+@CommandOrMotion(keys = ["`"], modes = [Mode.NORMAL])
 public class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -41,6 +44,7 @@ public class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
+@CommandOrMotion(keys = ["g`"], modes = [Mode.NORMAL])
 public class MotionGotoMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

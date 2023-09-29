@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -21,6 +23,7 @@ import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.vimscript.model.Script
 
+@CommandOrMotion(keys = ["<C-R>"], modes = [Mode.INSERT])
 public class InsertRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

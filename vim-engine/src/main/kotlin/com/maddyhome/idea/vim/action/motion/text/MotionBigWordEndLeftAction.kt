@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -19,9 +21,16 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
+@CommandOrMotion(keys = ["gE"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, true)
+
+@CommandOrMotion(keys = ["E"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, true)
+
+@CommandOrMotion(keys = ["ge"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, false)
+
+@CommandOrMotion(keys = ["e"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
 
 public sealed class WordEndAction(public val direction: Direction, public val bigWord: Boolean) : MotionActionHandler.ForEachCaret() {

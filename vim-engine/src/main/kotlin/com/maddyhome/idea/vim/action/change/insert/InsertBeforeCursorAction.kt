@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -19,6 +21,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import org.jetbrains.annotations.Contract
 import java.util.*
 
+@CommandOrMotion(keys = ["i", "<Insert>"], modes = [Mode.NORMAL])
 public class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
   @get:Contract(pure = true)
   override val type: Command.Type = Command.Type.INSERT

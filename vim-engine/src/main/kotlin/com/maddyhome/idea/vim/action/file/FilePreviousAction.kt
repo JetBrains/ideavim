@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.action.file
 
+import com.intellij.vim.annotations.CommandOrMotion
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -17,6 +18,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+@CommandOrMotion(keys = ["<C-^>"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
 public class FilePreviousAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_DOWN_MASK or KeyEvent.SHIFT_DOWN_MASK)),

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -17,13 +19,13 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.setSelectMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * @author Alex Plate
  */
 
+@CommandOrMotion(keys = ["<C-G>"], modes = [Mode.VISUAL, Mode.SELECT])
 public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -42,7 +44,7 @@ public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
     public fun toggleMode(editor: VimEditor) {
       val commandState = editor.vimStateMachine
       val myMode = commandState.mode
-      if (myMode is Mode.VISUAL) {
+      if (myMode is com.maddyhome.idea.vim.state.mode.Mode.VISUAL) {
         commandState.setSelectMode(myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {
           editor.nativeCarets().forEach {
@@ -51,7 +53,7 @@ public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
             }
           }
         }
-      } else if (myMode is Mode.SELECT) {
+      } else if (myMode is com.maddyhome.idea.vim.state.mode.Mode.SELECT) {
         commandState.pushVisualMode(myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {
           editor.nativeCarets().forEach {

@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -18,6 +20,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["I"], modes = [Mode.NORMAL])
 public class InsertBeforeFirstNonBlankAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

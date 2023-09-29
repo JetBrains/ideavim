@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -17,6 +19,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["<C-O>"], modes = [Mode.INSERT])
 public class InsertSingleCommandAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

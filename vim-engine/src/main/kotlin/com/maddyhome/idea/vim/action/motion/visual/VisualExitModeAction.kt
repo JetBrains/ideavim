@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.visual
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -21,6 +23,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["<Esc>", "<C-[>", "<C-C>"], modes = [Mode.VISUAL])
 public class VisualExitModeAction : VimActionHandler.ConditionalMulticaret() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun runAsMulticaret(

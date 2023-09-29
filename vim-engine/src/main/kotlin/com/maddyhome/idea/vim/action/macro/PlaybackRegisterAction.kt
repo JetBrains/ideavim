@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.macro
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -17,6 +19,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 
+@CommandOrMotion(keys = ["@"], modes = [Mode.NORMAL])
 public class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.visual
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.state.mode.inBlockSelection
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["o"], modes = [Mode.VISUAL])
 public class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -36,6 +39,7 @@ public class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["O"], modes = [Mode.VISUAL])
 public class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

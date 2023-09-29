@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,6 +25,7 @@ import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 
+@CommandOrMotion(keys = ["<End>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING])
 public class MotionEndAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 

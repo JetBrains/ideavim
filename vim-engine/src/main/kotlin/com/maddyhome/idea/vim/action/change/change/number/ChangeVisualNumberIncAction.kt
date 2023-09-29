@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.change.number
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -35,7 +37,14 @@ public sealed class IncNumber(public val inc: Int, private val avalanche: Boolea
   }
 }
 
+@CommandOrMotion(keys = ["<C-A>"], modes = [Mode.VISUAL])
 public class ChangeVisualNumberIncAction : IncNumber(1, false)
+
+@CommandOrMotion(keys = ["<C-X>"], modes = [Mode.VISUAL])
 public class ChangeVisualNumberDecAction : IncNumber(-1, false)
+
+@CommandOrMotion(keys = ["g<C-A>"], modes = [Mode.VISUAL])
 public class ChangeVisualNumberAvalancheIncAction : IncNumber(1, true)
+
+@CommandOrMotion(keys = ["g<C-X>"], modes = [Mode.VISUAL])
 public class ChangeVisualNumberAvalancheDecAction : IncNumber(-1, true)

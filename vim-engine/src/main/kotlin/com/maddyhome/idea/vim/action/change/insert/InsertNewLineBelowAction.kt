@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -21,6 +22,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["o"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
 public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
@@ -38,6 +40,7 @@ public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecutio
   }
 }
 
+@CommandOrMotion(keys = ["O"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
 public class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

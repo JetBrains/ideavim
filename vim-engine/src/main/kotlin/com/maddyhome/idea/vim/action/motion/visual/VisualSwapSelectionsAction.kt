@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.visual
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -17,12 +19,12 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.mode
 
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["gv"], modes = [Mode.VISUAL])
 public class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -39,7 +41,7 @@ public class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
 
 private fun swapVisualSelections(editor: VimEditor): Boolean {
   val mode = editor.mode
-  check(mode is Mode.VISUAL)
+  check(mode is com.maddyhome.idea.vim.state.mode.Mode.VISUAL)
 
   val lastSelectionType = editor.vimLastSelectionType ?: return false
 

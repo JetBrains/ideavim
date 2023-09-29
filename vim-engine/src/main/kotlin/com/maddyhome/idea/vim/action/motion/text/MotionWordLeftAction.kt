@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.text
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -24,6 +26,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
+@CommandOrMotion(keys = ["b"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionWordLeftAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
@@ -39,6 +42,7 @@ public class MotionWordLeftAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
+@CommandOrMotion(keys = ["<C-Left>", "<C-kLeft>"], modes = [Mode.INSERT])
 public class MotionWordLeftInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

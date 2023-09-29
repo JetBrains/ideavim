@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.copy
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -71,11 +73,20 @@ public sealed class PutVisualTextBaseAction(
   }
 }
 
+@CommandOrMotion(keys = ["P"], modes = [Mode.VISUAL])
 public class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false, modifyRegister = false)
+
+@CommandOrMotion(keys = ["p"], modes = [Mode.VISUAL])
 public class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
 
+@CommandOrMotion(keys = ["]P", "[P"], modes = [Mode.VISUAL])
 public class PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
+
+@CommandOrMotion(keys = ["[p", "]p"], modes = [Mode.VISUAL])
 public class PutVisualTextAfterCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
 
+@CommandOrMotion(keys = ["gP"], modes = [Mode.VISUAL])
 public class PutVisualTextBeforeCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
+
+@CommandOrMotion(keys = ["gp"], modes = [Mode.VISUAL])
 public class PutVisualTextAfterCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)

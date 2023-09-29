@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.change
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
@@ -22,6 +24,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["S"], modes = [Mode.NORMAL])
 public class ChangeLineAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

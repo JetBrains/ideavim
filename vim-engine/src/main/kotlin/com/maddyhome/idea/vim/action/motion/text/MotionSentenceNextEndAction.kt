@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,7 +25,10 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["g)"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionSentenceNextEndAction : MotionSentenceEndAction(Direction.FORWARDS)
+
+@CommandOrMotion(keys = ["g("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionSentencePreviousEndAction : MotionSentenceEndAction(Direction.BACKWARDS)
 
 public sealed class MotionSentenceEndAction(public val direction: Direction) : MotionActionHandler.ForEachCaret() {

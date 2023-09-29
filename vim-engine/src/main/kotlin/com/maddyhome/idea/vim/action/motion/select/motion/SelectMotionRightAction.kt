@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.select.motion
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -25,6 +27,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
  * @author Alex Plate
  */
 
+@CommandOrMotion(keys = ["<Right>"], modes = [Mode.SELECT])
 public class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

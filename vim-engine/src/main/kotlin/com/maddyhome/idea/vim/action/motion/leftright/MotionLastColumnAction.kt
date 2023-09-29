@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -25,10 +27,12 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import java.util.*
 
+@CommandOrMotion(keys = ["<End>"], modes = [Mode.INSERT])
 public class MotionLastColumnInsertAction : MotionLastColumnAction() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 }
 
+@CommandOrMotion(keys = ["$"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -21,6 +23,7 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
+@CommandOrMotion(keys = ["<BS>", "<DEL>"], modes = [Mode.SELECT])
 public class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT

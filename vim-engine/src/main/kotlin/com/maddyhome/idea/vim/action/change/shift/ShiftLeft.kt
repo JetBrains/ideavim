@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.change.shift
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,6 +25,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["<C-D>"], modes = [Mode.INSERT])
 public class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.INSERT
@@ -42,6 +45,7 @@ public class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
   }
 }
 
+@CommandOrMotion(keys = ["<"], modes = [Mode.NORMAL])
 public class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
@@ -63,6 +67,7 @@ public class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), D
   }
 }
 
+@CommandOrMotion(keys = ["<"], modes = [Mode.VISUAL])
 public class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

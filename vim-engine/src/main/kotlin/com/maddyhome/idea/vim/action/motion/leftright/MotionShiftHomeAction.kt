@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -18,6 +20,7 @@ import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
 /**
  * @author Alex Plate
  */
+@CommandOrMotion(keys = ["<S-Home>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
 public class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

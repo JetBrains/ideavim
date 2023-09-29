@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.window
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -17,6 +19,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["<C-W>j", "<C-W><C-J>", "<C-W><Down>"], modes = [Mode.NORMAL])
 public class WindowDownAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -34,6 +37,7 @@ public class WindowDownAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["<C-W>h", "<C-W><C-H>", "<C-W><Left>"], modes = [Mode.NORMAL])
 public class WindowLeftAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -51,6 +55,7 @@ public class WindowLeftAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["<C-W>l", "<C-W><C-L>", "<C-W><Right>"], modes = [Mode.NORMAL])
 public class WindowRightAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -68,6 +73,7 @@ public class WindowRightAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["<C-W>k", "<C-W><C-K>", "<C-W><Up>"], modes = [Mode.NORMAL])
 public class WindowUpAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

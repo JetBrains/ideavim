@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.scroll
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -16,6 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.util.*
 
+@CommandOrMotion(keys = ["zh", "z<Left>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionScrollColumnRightAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

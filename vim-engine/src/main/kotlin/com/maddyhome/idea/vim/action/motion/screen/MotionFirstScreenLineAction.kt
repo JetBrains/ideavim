@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.screen
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -52,5 +54,8 @@ public abstract class MotionFirstScreenLineActionBase(private val operatorPendin
   }
 }
 
+@CommandOrMotion(keys = ["H"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class MotionFirstScreenLineAction : MotionFirstScreenLineActionBase(false)
+
+@CommandOrMotion(keys = ["H"], modes = [Mode.OP_PENDING])
 public class MotionOpPendingFirstScreenLineAction : MotionFirstScreenLineActionBase(true)

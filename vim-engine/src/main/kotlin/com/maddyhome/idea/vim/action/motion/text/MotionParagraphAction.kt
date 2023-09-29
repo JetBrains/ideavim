@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -39,7 +41,10 @@ public sealed class MotionParagraphAction(public val direction: Direction) : Mot
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
+@CommandOrMotion(keys = ["}"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionParagraphNextAction : MotionParagraphAction(Direction.FORWARDS)
+
+@CommandOrMotion(keys = ["{"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionParagraphPreviousAction : MotionParagraphAction(Direction.BACKWARDS)
 
 private fun moveCaretToNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {

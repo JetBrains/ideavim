@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.change.number
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -30,5 +32,8 @@ public sealed class IncAction(public val inc: Int) : ChangeEditorActionHandler.F
   }
 }
 
+@CommandOrMotion(keys = ["<C-A>"], modes = [Mode.NORMAL])
 public class ChangeNumberIncAction : IncAction(1)
+
+@CommandOrMotion(keys = ["<C-X>"], modes = [Mode.NORMAL])
 public class ChangeNumberDecAction : IncAction(-1)

@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.updown
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -18,6 +20,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
+@CommandOrMotion(keys = ["_"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 

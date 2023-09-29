@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.scroll
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -19,6 +21,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 // FIXME: 2019-07-05 Workaround to make jump through methods work
+@CommandOrMotion(keys = ["<C-Down>"], modes = [Mode.NORMAL])
 public class CtrlDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Down>")
@@ -40,6 +43,7 @@ public class CtrlDownAction : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["<C-Up>"], modes = [Mode.NORMAL])
 public class CtrlUpAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Up>")

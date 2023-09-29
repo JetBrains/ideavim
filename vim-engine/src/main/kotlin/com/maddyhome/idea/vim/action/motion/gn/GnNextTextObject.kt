@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.gn
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
  * @author Alex Plate
  */
 
+@CommandOrMotion(keys = ["gn"], modes = [Mode.OP_PENDING])
 public class GnNextTextObject : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE

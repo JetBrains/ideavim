@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -30,9 +32,16 @@ public enum class TillCharacterMotionType {
   LAST_SMALL_T,
 }
 
+@CommandOrMotion(keys = ["F"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionLeftMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_F, false)
+
+@CommandOrMotion(keys = ["T"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionLeftTillMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_T, true)
+
+@CommandOrMotion(keys = ["f"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionRightMatchCharAction : TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_F, false)
+
+@CommandOrMotion(keys = ["t"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionRightTillMatchCharAction :
   TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_T, true)
 

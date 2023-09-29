@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -19,6 +21,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
+@CommandOrMotion(keys = ["k"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public open class MotionUpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
@@ -34,6 +37,7 @@ public open class MotionUpAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
+@CommandOrMotion(keys = ["<C-P>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionUpCtrlPAction : MotionUpAction() {
   override fun getOffset(
     editor: VimEditor,
@@ -55,6 +59,7 @@ public class MotionUpCtrlPAction : MotionUpAction() {
   }
 }
 
+@CommandOrMotion(keys = ["gk", "g<Up>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionUpNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

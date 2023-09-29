@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.shift
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 /**
  * @author Aleksey Lagoshin
  */
+@CommandOrMotion(keys = ["="], modes = [Mode.NORMAL])
 public class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 

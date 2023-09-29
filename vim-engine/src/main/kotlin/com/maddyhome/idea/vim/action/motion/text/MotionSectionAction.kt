@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,9 +25,16 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["[]"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionSectionBackwardEndAction : MotionSectionAction('}', Direction.BACKWARDS)
+
+@CommandOrMotion(keys = ["[["], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionSectionBackwardStartAction : MotionSectionAction('{', Direction.BACKWARDS)
+
+@CommandOrMotion(keys = ["]["], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionSectionForwardEndAction : MotionSectionAction('}', Direction.FORWARDS)
+
+@CommandOrMotion(keys = ["]]"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionSectionForwardStartAction : MotionSectionAction('{', Direction.FORWARDS)
 
 public sealed class MotionSectionAction(private val charType: Char, public val direction: Direction) : MotionActionHandler.ForEachCaret() {

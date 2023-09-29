@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,6 +24,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["0"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -36,6 +39,8 @@ public class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
+// TODO we have the same command but for NX modes
+@CommandOrMotion(keys = ["<Home>"], modes = [Mode.INSERT])
 public class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

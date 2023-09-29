@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -19,6 +21,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 
+@CommandOrMotion(keys = ["<Home>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
 public class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -24,6 +26,7 @@ import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+@CommandOrMotion(keys = ["l"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -41,6 +44,7 @@ public class MotionRightAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
+@CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.INSERT])
 public class MotionRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

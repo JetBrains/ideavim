@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.change
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,6 +24,7 @@ import java.util.*
 /**
  * @author vlan
  */
+@CommandOrMotion(keys = ["c", "s"], modes = [Mode.VISUAL])
 public class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

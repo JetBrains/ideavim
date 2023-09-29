@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
+@CommandOrMotion(keys = ["<Enter>"], modes = [Mode.SELECT])
 public class SelectEnterAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.INSERT

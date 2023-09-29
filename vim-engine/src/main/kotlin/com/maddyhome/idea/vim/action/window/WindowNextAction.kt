@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.window
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -17,6 +19,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
+@CommandOrMotion(keys = ["<C-W>w", "<C-W><C-W>"], modes = [Mode.NORMAL])
 public class WindowNextAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -35,6 +38,7 @@ public class WindowNextAction : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["<C-W>W"], modes = [Mode.NORMAL])
 public class WindowPrevAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

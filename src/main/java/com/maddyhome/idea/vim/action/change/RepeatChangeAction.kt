@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.intellij.openapi.command.CommandProcessor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -18,6 +20,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 
+@CommandOrMotion(keys = ["."], modes = [Mode.NORMAL])
 internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 

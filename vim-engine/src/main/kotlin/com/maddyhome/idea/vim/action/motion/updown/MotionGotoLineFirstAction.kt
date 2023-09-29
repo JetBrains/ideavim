@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,6 +25,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["gg", "<C-Home>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
@@ -41,6 +44,7 @@ public class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
+@CommandOrMotion(keys = ["<C-Home>"], modes = [Mode.INSERT])
 public class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

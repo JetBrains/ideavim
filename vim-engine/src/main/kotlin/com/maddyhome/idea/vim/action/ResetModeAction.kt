@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
@@ -14,13 +16,13 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.state.mode.mode
 
+@CommandOrMotion(keys = ["<C-\\><C-N>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING, Mode.INSERT, Mode.CMD_LINE])
 public class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
-  private lateinit var modeBeforeReset: Mode
+  private lateinit var modeBeforeReset: com.maddyhome.idea.vim.state.mode.Mode
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
   override fun runAsMulticaret(
     editor: VimEditor,
@@ -40,7 +42,7 @@ public class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (modeBeforeReset == Mode.INSERT) {
+    if (modeBeforeReset == com.maddyhome.idea.vim.state.mode.Mode.INSERT) {
       val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
       caret.moveToMotion(position)
     }

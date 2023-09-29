@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -47,6 +49,7 @@ private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textR
   return result
 }
 
+@CommandOrMotion(keys = ["g@"], modes = [Mode.NORMAL])
 internal class OperatorAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
@@ -97,6 +100,7 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["g@"], modes = [Mode.VISUAL])
 internal class VisualOperatorAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

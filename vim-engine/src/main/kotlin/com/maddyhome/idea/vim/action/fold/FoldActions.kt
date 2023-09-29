@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.fold
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -15,6 +17,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
+@CommandOrMotion(keys = ["zM"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -30,6 +33,7 @@ public class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["zc"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VimCollapseRegion : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -45,6 +49,7 @@ public class VimCollapseRegion : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["zC"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -59,6 +64,7 @@ public class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["zR"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VimExpandAllRegions : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -74,6 +80,7 @@ public class VimExpandAllRegions : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["zo"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VimExpandRegion : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -89,6 +96,7 @@ public class VimExpandRegion : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["zO"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

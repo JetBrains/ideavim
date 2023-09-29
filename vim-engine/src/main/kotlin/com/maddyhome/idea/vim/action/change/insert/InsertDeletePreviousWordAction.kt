@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,6 +24,7 @@ import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["<C-W>"], modes = [Mode.INSERT])
 public class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 

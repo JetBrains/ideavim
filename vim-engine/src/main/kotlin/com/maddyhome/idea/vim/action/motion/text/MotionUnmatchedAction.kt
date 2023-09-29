@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -39,9 +41,16 @@ public sealed class MotionUnmatchedAction(private val motionChar: Char) : Motion
   }
 }
 
+@CommandOrMotion(keys = ["]}"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
+
+@CommandOrMotion(keys = ["[{"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
+
+@CommandOrMotion(keys = ["])"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
+
+@CommandOrMotion(keys = ["[("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
 private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int {

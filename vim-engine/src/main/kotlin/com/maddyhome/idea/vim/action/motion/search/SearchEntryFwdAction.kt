@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.search
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,6 +24,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+@CommandOrMotion(keys = ["/"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class SearchEntryFwdAction : MotionActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.EX_STRING
 

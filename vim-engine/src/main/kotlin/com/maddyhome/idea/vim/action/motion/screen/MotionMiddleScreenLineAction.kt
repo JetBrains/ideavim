@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.screen
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -26,6 +28,7 @@ import java.util.*
 M                       To Middle line of window, on the first non-blank
                         character |linewise|.  See also 'startofline' option.
  */
+@CommandOrMotion(keys = ["M"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 

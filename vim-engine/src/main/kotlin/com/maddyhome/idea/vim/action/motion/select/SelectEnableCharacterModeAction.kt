@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
@@ -22,6 +24,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
+@CommandOrMotion(keys = ["gh"], modes = [Mode.NORMAL])
 public class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -19,6 +21,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
+@CommandOrMotion(keys = ["+", "<C-M>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
@@ -33,6 +36,8 @@ public class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() 
   }
 }
 
+// FIXME I should not exist (see class above)
+@CommandOrMotion(keys = ["<CR>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 

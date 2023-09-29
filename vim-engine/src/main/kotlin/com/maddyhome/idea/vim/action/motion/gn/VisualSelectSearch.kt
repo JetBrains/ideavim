@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.gn
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -23,6 +25,7 @@ import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
 import kotlin.math.max
 
+@CommandOrMotion(keys = ["gn"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
@@ -38,6 +41,7 @@ public class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
+@CommandOrMotion(keys = ["gN"], modes = [Mode.NORMAL, Mode.VISUAL])
 public class VisualSelectPreviousSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
