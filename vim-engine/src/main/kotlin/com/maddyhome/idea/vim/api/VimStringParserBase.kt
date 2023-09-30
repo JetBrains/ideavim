@@ -241,6 +241,21 @@ public abstract class VimStringParserBase : VimStringParser {
       KeyEvent.VK_F12 -> "f12"
       VK_PLUG -> "plug"
       VK_ACTION -> "action"
+      KeyEvent.VK_NUMPAD0 -> "k0"
+      KeyEvent.VK_NUMPAD1 -> "k1"
+      KeyEvent.VK_NUMPAD2 -> "k2"
+      KeyEvent.VK_NUMPAD3 -> "k3"
+      KeyEvent.VK_NUMPAD4 -> "k4"
+      KeyEvent.VK_NUMPAD5 -> "k5"
+      KeyEvent.VK_NUMPAD6 -> "k6"
+      KeyEvent.VK_NUMPAD7 -> "k7"
+      KeyEvent.VK_NUMPAD8 -> "k8"
+      KeyEvent.VK_NUMPAD9 -> "k9"
+      KeyEvent.VK_KP_DOWN -> "kdown"
+      KeyEvent.VK_KP_UP -> "kup"
+      KeyEvent.VK_KP_LEFT -> "kleft"
+      KeyEvent.VK_KP_RIGHT -> "kright"
+      KeyEvent.VK_UNDO -> "undo"
       else -> null
     }
   }
@@ -513,6 +528,23 @@ public abstract class VimStringParserBase : VimStringParser {
       "f12" -> KeyEvent.VK_F12
       "plug" -> VK_PLUG
       "action" -> VK_ACTION
+      "k0" -> KeyEvent.VK_NUMPAD0
+      "k1" -> KeyEvent.VK_NUMPAD1
+      "k2" -> KeyEvent.VK_NUMPAD2
+      "k3" -> KeyEvent.VK_NUMPAD3
+      "k4" -> KeyEvent.VK_NUMPAD4
+      "k5" -> KeyEvent.VK_NUMPAD5
+      "k6" -> KeyEvent.VK_NUMPAD6
+      "k7" -> KeyEvent.VK_NUMPAD7
+      "k8" -> KeyEvent.VK_NUMPAD8
+      "k9" -> KeyEvent.VK_NUMPAD9
+      "khome" -> KeyEvent.VK_HOME
+      "kend" -> KeyEvent.VK_END
+      "kdown" -> KeyEvent.VK_KP_DOWN
+      "kup" -> KeyEvent.VK_KP_UP
+      "kleft" -> KeyEvent.VK_KP_LEFT
+      "kright" -> KeyEvent.VK_KP_RIGHT
+      "undo" -> KeyEvent.VK_UNDO
       else -> null
     }
   }

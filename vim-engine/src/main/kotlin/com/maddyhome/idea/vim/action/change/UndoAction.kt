@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-@CommandOrMotion(keys = ["u"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["u", "<Undo>"], modes = [Mode.NORMAL])
 public class UndoAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     injector.parser.parseKeys("u"),
