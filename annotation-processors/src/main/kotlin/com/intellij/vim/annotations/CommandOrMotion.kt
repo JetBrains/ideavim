@@ -22,39 +22,34 @@ annotation class CommandOrMotion(val keys: Array<String>, vararg val modes: Mode
 annotation class TextObject(val keys: String)
 
 
-/**
- * @author vlan
- *
- * COMPATIBILITY-LAYER: Do not move this class to a different package
- */
-enum class Mode {
+enum class Mode(val abbrev: Char) {
   /**
    * Indicates this key mapping applies to Normal mode
    */
-  NORMAL,
+  NORMAL('N'),
 
   /**
    * Indicates this key mapping applies to Visual mode
    */
-  VISUAL,
+  VISUAL('X'),
 
   /**
    * Indicates this key mapping applies to Select mode
    */
-  SELECT,
+  SELECT('S'),
 
   /**
    * Indicates this key mapping applies to Operator Pending mode
    */
-  OP_PENDING,
+  OP_PENDING('O'),
 
   /**
    * Indicates this key mapping applies to Insert mode
    */
-  INSERT,
+  INSERT('I'),
 
   /**
    * Indicates this key mapping applies to Command Line mode
    */
-  CMD_LINE,
+  CMD_LINE('C'),
 }

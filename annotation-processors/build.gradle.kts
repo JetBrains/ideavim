@@ -8,6 +8,7 @@
 
 plugins {
   kotlin("jvm")
+  kotlin("plugin.serialization") version "1.8.21"
 }
 
 group = "com.intellij"
