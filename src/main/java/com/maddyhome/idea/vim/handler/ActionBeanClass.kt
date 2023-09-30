@@ -12,6 +12,7 @@ import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.SmartList
 import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.command.MappingMode
+import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 import javax.swing.KeyStroke
 
 /**
@@ -36,6 +37,8 @@ import javax.swing.KeyStroke
  *   The reason is startup performance. Using the extension points you don't even have to load classes of actions.
  *   So, all actions are loaded on demand, including classes in classloader.
  */
+@Deprecated(message = "Please use CommandOrMotion annotation")
+@ScheduledForRemoval(inVersion = "2.7.0")
 internal class ActionBeanClass : BaseKeyedLazyInstance<EditorActionHandlerBase>() {
   @Attribute("implementation")
   var implementation: String? = null
