@@ -37,9 +37,8 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener;
-import com.maddyhome.idea.vim.regexp.CharPointer;
-import com.maddyhome.idea.vim.regexp.CharacterClasses;
-import com.maddyhome.idea.vim.regexp.RegExp;
+import com.maddyhome.idea.vim.regexp.*;
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.VimLContext;
@@ -62,6 +61,7 @@ import java.util.*;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
 
 @State(name = "VimSearchSettings", storages = {
@@ -687,176 +687,350 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       return false;
     }
 
-    Pair<Boolean, Triple<Object, String, Object>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
-                                                                                          RE_SUBST);
-    if (!booleanregmmatch_tPair.getFirst()) {
-      if (do_error) {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
-        VimPlugin.indicateError();
-      }
-      return false;
-    }
-    RegExp.regmmatch_T regmatch = (RegExp.regmmatch_T) booleanregmmatch_tPair.getSecond().getFirst();
-    String pattern = booleanregmmatch_tPair.getSecond().getSecond();
-    RegExp sp = (RegExp) booleanregmmatch_tPair.getSecond().getThird();
+    if (globalIjOptions(injector).getUseNewRegex()) {
 
-    /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
-    if (do_ic == 'i') {
-      regmatch.rmm_ic = true;
-    }
-    else if (do_ic == 'I') {
-      regmatch.rmm_ic = false;
-    }
+      final List<VimRegexOptions> options = new ArrayList<>();
+      if (globalOptions(injector).getSmartcase()) options.add(VimRegexOptions.SMART_CASE);
+      if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
+      if (globalOptions(injector).getWrapscan()) options.add(VimRegexOptions.WRAP_SCAN);
 
-    /*
-     * ~ in the substitute pattern is replaced with the old pattern.
-     * We do it here once to avoid it to be replaced over and over again.
-     * But don't do it when it starts with "\=", then it's an expression.
-     */
-    if (!(sub.charAt(0) == '\\' && sub.charAt(1) == '=') && lastReplace != null) {
-      StringBuffer tmp = new StringBuffer(sub.toString());
-      int pos = 0;
-      while ((pos = tmp.indexOf("~", pos)) != -1) {
-        if (pos == 0 || tmp.charAt(pos - 1) != '\\') {
-          tmp.replace(pos, pos + 1, lastReplace);
-          pos += lastReplace.length();
+      boolean isNewPattern = true;
+      String pattern = "";
+      if (pat == null || pat.isNul()) {
+        isNewPattern = false;
+        if (which_pat == RE_LAST) {
+          which_pat = lastPatternIdx;
         }
-        pos++;
-      }
-      sub = new CharPointer(tmp);
-    }
-
-    lastReplace = sub.toString();
-
-    resetShowSearchHighlight();
-    forceUpdateSearchHighlights();
-
-    int start = ((IjVimEditor) editor).getEditor().getDocument().getLineStartOffset(line1);
-    int end = ((IjVimEditor) editor).getEditor().getDocument().getLineEndOffset(line2);
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("search range=[" + start + "," + end + "]");
-      logger.debug("pattern=" + pattern + ", replace=" + sub);
-    }
-
-    int lastMatch = -1;
-    int lastLine = -1;
-    int searchcol = 0;
-    boolean firstMatch = true;
-    boolean got_quit = false;
-    int lcount = editor.lineCount();
-    Expression expression = null;
-    for (int lnum = line1; lnum <= line2 && !got_quit; ) {
-      CharacterPosition newpos = null;
-      int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
-      if (nmatch > 0) {
-        if (firstMatch) {
-          VimInjectorKt.injector.getJumpService().saveJumpLocation(editor);
-          firstMatch = false;
+        String errorMessage = switch (which_pat) {
+          case RE_SEARCH -> {
+            pattern = lastSearch;
+            yield MessageHelper.message("e_nopresub");
+          }
+          case RE_SUBST -> {
+            pattern = lastSubstitute;
+            yield MessageHelper.message("e_noprevre");
+          }
+          default -> null;
+        };
+        // Pattern was never defined
+        if (pattern == null) {
+          VimPlugin.showMessage(errorMessage);
+          return false;
         }
+      }
+      else {
+        pattern = pat.toString();
+      }
 
+      // Set RE_SUBST and RE_LAST, but only for explicitly typed patterns. Reused patterns are not saved/updated
+      setLastUsedPattern(pattern, RE_SUBST, isNewPattern);
 
-        String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
-        if (sub.charAt(0) == '\\' && sub.charAt(1) == '=') {
+      // Always reset after checking, only set for nv_ident
+      lastIgnoreSmartCase = false;
+
+      // TODO: allow option to force (no)ignore case in a better way
+      if (do_ic == 'i') {
+        pattern = "\\c" + pattern;
+      }
+      else if (do_ic == 'I') {
+        pattern = "\\C" + pattern;
+      }
+      final VimRegex regex;
+      try {
+        regex = new VimRegex(pattern);
+      }
+      catch (VimRegexException e) {
+        injector.getMessages().showStatusBarMessage(editor, e.getMessage());
+        return false;
+      }
+
+      boolean hasExpression = sub.charAt(0) == '\\' && sub.charAt(1) == '=';
+
+      String oldLastReplace = lastReplace;
+      if (oldLastReplace == null) oldLastReplace = "";
+      lastReplace = sub.toString();
+
+      resetShowSearchHighlight();
+      forceUpdateSearchHighlights();
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("search range=[" + editor.getLineStartOffset(line1) + "," + editor.getLineEndOffset(line2) + "]");
+        logger.debug("pattern=" + pattern + ", replace=" + sub);
+      }
+
+      int lastMatch = -1;
+      boolean got_quit = false;
+      int lastLine = -1;
+      int column = 0;
+      for (int line = line1; line <= line2 && !got_quit; ) {
+        CharacterPosition newpos = null;
+        Pair<VimMatchResult.Success, String> substituteResult = regex.substitute(editor, sub.toString(), oldLastReplace, line, column, hasExpression, options);
+        if (substituteResult == null) {
+          line++;
+          column = 0;
+          continue;
+        }
+        VimInjectorKt.injector.getJumpService().saveJumpLocation(editor);
+        TextRange matchRange = substituteResult.getFirst().getRange();
+
+        Expression expression = null;
+        if (hasExpression) {
           String exprString = sub.toString().substring(2);
           expression = VimscriptParser.INSTANCE.parseExpression(exprString);
           if (expression == null) {
             exceptions.add(new ExException("E15: Invalid expression: " + exprString));
             expression = new SimpleExpression(new VimString(""));
           }
-        } else if (match == null) {
-          return false;
         }
-
-        int line = lnum + regmatch.startpos[0].lnum;
-        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
-        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
-        int startoff = startpos.toOffset(((IjVimEditor) editor).getEditor());
-        int endoff = endpos.toOffset(((IjVimEditor) editor).getEditor());
-
-        if (do_all || line != lastLine) {
+        String match = substituteResult.getSecond();
+        CharacterPosition startpos = new CharacterPosition(editor.offsetToBufferPosition(matchRange.getStartOffset()).getLine(), editor.offsetToBufferPosition(matchRange.getStartOffset()).getColumn());
+        CharacterPosition endpos = new CharacterPosition(editor.offsetToBufferPosition(matchRange.getEndOffset()).getLine(), editor.offsetToBufferPosition(matchRange.getEndOffset()).getColumn());
+        if (do_all || line != editor.lineCount()) {
           boolean doReplace = true;
           if (do_ask) {
-            RangeHighlighter hl = SearchHighlightsHelper.addSubstitutionConfirmationHighlight(((IjVimEditor) editor).getEditor(), startoff, endoff);
-            final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor) editor).getEditor(), match, ((IjVimCaret) caret).getCaret(), startoff);
-            ((IjVimEditor) editor).getEditor().getMarkupModel().removeHighlighter(hl);
+            RangeHighlighter hl = SearchHighlightsHelper.addSubstitutionConfirmationHighlight(((IjVimEditor)editor).getEditor(), matchRange.getStartOffset(), matchRange.getEndOffset());
+            final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor)editor).getEditor(), match, ((IjVimCaret)caret).getCaret(), matchRange.getStartOffset());
+            ((IjVimEditor)editor).getEditor().getMarkupModel().removeHighlighter(hl);
             switch (choice) {
-              case SUBSTITUTE_THIS:
-                doReplace = true;
-                break;
-              case SKIP:
-                doReplace = false;
-                break;
-              case SUBSTITUTE_ALL:
-                do_ask = false;
-                break;
-              case QUIT:
+              case SUBSTITUTE_THIS -> { }
+              case SKIP -> doReplace = false;
+              case SUBSTITUTE_ALL -> do_ask = false;
+              case QUIT -> {
                 doReplace = false;
                 got_quit = true;
-                break;
-              case SUBSTITUTE_LAST:
+              }
+              case SUBSTITUTE_LAST -> {
                 do_all = false;
-                line2 = lnum;
-                doReplace = true;
-                break;
+                line2 = line;
+              }
             }
           }
           if (doReplace) {
-            SubmatchFunctionHandler.Companion.getInstance().setLatestMatch(((IjVimEditor) editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
-            caret.moveToOffset(startoff);
+            SubmatchFunctionHandler.Companion.getInstance().setLatestMatch(
+              ((IjVimEditor)editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(matchRange.getStartOffset(), matchRange.getEndOffset())));
+            caret.moveToOffset(matchRange.getStartOffset());
             if (expression != null) {
               try {
-              match = expression
-                .evaluate(editor, injector.getExecutionContextManager().onEditor(editor, null), parent)
-                .toInsertableString();
-              } catch (Exception e) {
-                exceptions.add((ExException) e);
+                match =
+                  expression.evaluate(editor, injector.getExecutionContextManager().onEditor(editor, null), parent).toInsertableString();
+              }
+              catch (Exception e) {
+                exceptions.add((ExException)e);
                 match = "";
               }
             }
 
             String finalMatch = match;
-            ApplicationManager.getApplication().runWriteAction(() -> ((IjVimEditor) editor).getEditor().getDocument().replaceString(startoff, endoff,
-                                                                                                        finalMatch));
-            lastMatch = startoff;
-            int newend = startoff + match.length();
-            newpos = CharacterPosition.Companion.fromOffset(((IjVimEditor) editor).getEditor(), newend);
+            ApplicationManager.getApplication().runWriteAction(
+              () -> ((IjVimEditor)editor).getEditor().getDocument().replaceString(matchRange.getStartOffset(), matchRange.getEndOffset(), finalMatch));
+            lastMatch = matchRange.getStartOffset();
+            int newend = matchRange.getStartOffset() + match.length();
+            newpos = CharacterPosition.Companion.fromOffset(((IjVimEditor)editor).getEditor(), newend);
 
-            lnum += newpos.line - endpos.line;
+            line += newpos.line - endpos.line;
             line2 += newpos.line - endpos.line;
           }
         }
-
         lastLine = line;
 
-        lnum += nmatch - 1;
-        if (do_all && startoff != endoff) {
+        // line = nmatch - 1;
+        if (do_all && matchRange.getStartOffset() != matchRange.getEndOffset()) {
           if (newpos != null) {
-            lnum = newpos.line;
-            searchcol = newpos.column;
+            line = newpos.line;
+            column = newpos.column;
           }
           else {
-            searchcol = endpos.column;
+            column = endpos.column;
           }
         }
         else {
-          searchcol = 0;
-          lnum++;
+          column = 0;
+          line++;
         }
       }
-      else {
-        lnum++;
-        searchcol = 0;
+      if (!got_quit) {
+        if (lastMatch != -1) {
+          caret.moveToOffset(
+            VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
+        }
+        else {
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+        }
       }
-    }
+    } else {
+      Pair<Boolean, Triple<Object, String, Object>> booleanregmmatch_tPair = search_regcomp(pat, which_pat, RE_SUBST);
+      if (!booleanregmmatch_tPair.getFirst()) {
+        if (do_error) {
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
+          VimPlugin.indicateError();
+        }
+        return false;
+      }
+      RegExp.regmmatch_T regmatch = (RegExp.regmmatch_T)booleanregmmatch_tPair.getSecond().getFirst();
+      String pattern = booleanregmmatch_tPair.getSecond().getSecond();
+      RegExp sp = (RegExp)booleanregmmatch_tPair.getSecond().getThird();
 
-    if (!got_quit) {
-      if (lastMatch != -1) {
-        caret.moveToOffset(
-          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
+      /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
+      if (do_ic == 'i') {
+        regmatch.rmm_ic = true;
       }
-      else {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+      else if (do_ic == 'I') {
+        regmatch.rmm_ic = false;
+      }
+
+      /*
+       * ~ in the substitute pattern is replaced with the old pattern.
+       * We do it here once to avoid it to be replaced over and over again.
+       * But don't do it when it starts with "\=", then it's an expression.
+       */
+      if (!(sub.charAt(0) == '\\' && sub.charAt(1) == '=') && lastReplace != null) {
+        StringBuffer tmp = new StringBuffer(sub.toString());
+        int pos = 0;
+        while ((pos = tmp.indexOf("~", pos)) != -1) {
+          if (pos == 0 || tmp.charAt(pos - 1) != '\\') {
+            tmp.replace(pos, pos + 1, lastReplace);
+            pos += lastReplace.length();
+          }
+          pos++;
+        }
+        sub = new CharPointer(tmp);
+      }
+
+      lastReplace = sub.toString();
+
+      resetShowSearchHighlight();
+      forceUpdateSearchHighlights();
+
+      int start = ((IjVimEditor)editor).getEditor().getDocument().getLineStartOffset(line1);
+      int end = ((IjVimEditor)editor).getEditor().getDocument().getLineEndOffset(line2);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("search range=[" + start + "," + end + "]");
+        logger.debug("pattern=" + pattern + ", replace=" + sub);
+      }
+
+      int lastMatch = -1;
+      int lastLine = -1;
+      int searchcol = 0;
+      boolean firstMatch = true;
+      boolean got_quit = false;
+      int lcount = editor.lineCount();
+      Expression expression = null;
+      for (int lnum = line1; lnum <= line2 && !got_quit; ) {
+        CharacterPosition newpos = null;
+        int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
+        if (nmatch > 0) {
+          if (firstMatch) {
+            VimInjectorKt.injector.getJumpService().saveJumpLocation(editor);
+            firstMatch = false;
+          }
+
+          String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
+          if (sub.charAt(0) == '\\' && sub.charAt(1) == '=') {
+            String exprString = sub.toString().substring(2);
+            expression = VimscriptParser.INSTANCE.parseExpression(exprString);
+            if (expression == null) {
+              exceptions.add(new ExException("E15: Invalid expression: " + exprString));
+              expression = new SimpleExpression(new VimString(""));
+            }
+          }
+          else if (match == null) {
+            return false;
+          }
+
+          int line = lnum + regmatch.startpos[0].lnum;
+          CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
+          CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
+          int startoff = startpos.toOffset(((IjVimEditor)editor).getEditor());
+          int endoff = endpos.toOffset(((IjVimEditor)editor).getEditor());
+
+          if (do_all || line != lastLine) {
+            boolean doReplace = true;
+            if (do_ask) {
+              RangeHighlighter hl =
+                SearchHighlightsHelper.addSubstitutionConfirmationHighlight(((IjVimEditor)editor).getEditor(), startoff,
+                                                                            endoff);
+              final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor)editor).getEditor(), match, ((IjVimCaret)caret).getCaret(), startoff);
+              ((IjVimEditor)editor).getEditor().getMarkupModel().removeHighlighter(hl);
+              switch (choice) {
+                case SUBSTITUTE_THIS:
+                  doReplace = true;
+                  break;
+                case SKIP:
+                  doReplace = false;
+                  break;
+                case SUBSTITUTE_ALL:
+                  do_ask = false;
+                  break;
+                case QUIT:
+                  doReplace = false;
+                  got_quit = true;
+                  break;
+                case SUBSTITUTE_LAST:
+                  do_all = false;
+                  line2 = lnum;
+                  doReplace = true;
+                  break;
+              }
+            }
+            if (doReplace) {
+              SubmatchFunctionHandler.Companion.getInstance().setLatestMatch(
+                ((IjVimEditor)editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
+              caret.moveToOffset(startoff);
+              if (expression != null) {
+                try {
+                  match =
+                    expression.evaluate(editor, injector.getExecutionContextManager().onEditor(editor, null), parent).toInsertableString();
+                }
+                catch (Exception e) {
+                  exceptions.add((ExException)e);
+                  match = "";
+                }
+              }
+
+              String finalMatch = match;
+              ApplicationManager.getApplication().runWriteAction(
+                () -> ((IjVimEditor)editor).getEditor().getDocument().replaceString(startoff, endoff, finalMatch));
+              lastMatch = startoff;
+              int newend = startoff + match.length();
+              newpos = CharacterPosition.Companion.fromOffset(((IjVimEditor)editor).getEditor(), newend);
+
+              lnum += newpos.line - endpos.line;
+              line2 += newpos.line - endpos.line;
+            }
+          }
+
+          lastLine = line;
+
+          lnum += nmatch - 1;
+          if (do_all && startoff != endoff) {
+            if (newpos != null) {
+              lnum = newpos.line;
+              searchcol = newpos.column;
+            }
+            else {
+              searchcol = endpos.column;
+            }
+          }
+          else {
+            searchcol = 0;
+            lnum++;
+          }
+        }
+        else {
+          lnum++;
+          searchcol = 0;
+        }
+      }
+
+      if (!got_quit) {
+        if (lastMatch != -1) {
+          caret.moveToOffset(
+            VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
+        }
+        else {
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+        }
       }
     }
 

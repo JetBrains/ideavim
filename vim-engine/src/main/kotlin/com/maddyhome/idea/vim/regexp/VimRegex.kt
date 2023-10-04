@@ -271,9 +271,110 @@ public class VimRegex(pattern: String) {
   public fun findInLine(
     editor: VimEditor,
     line: Int,
+    column: Int = 0,
     options: List<VimRegexOptions> = emptyList()
   ): VimMatchResult {
-    return simulateNonExactNFA(editor, editor.getLineStartOffset(line), options)
+    return simulateNonExactNFA(editor, editor.getLineStartOffset(line) + column, options)
+  }
+
+  public fun substitute(
+    editor: VimEditor,
+    substituteString: String,
+    lastSubstituteString: String,
+    line: Int,
+    column: Int = 0,
+    takeLiterally: Boolean = false,
+    options: List<VimRegexOptions> = emptyList()
+  ): Pair<VimMatchResult.Success, String>? {
+    val match = findInLine(editor, line, column, options)
+    return when (match) {
+      is VimMatchResult.Failure -> null
+      is VimMatchResult.Success -> Pair(match, if (takeLiterally) substituteString else buildSubstituteString(match, substituteString, lastSubstituteString))
+    }
+  }
+
+  private fun buildSubstituteString(
+    matchResult: VimMatchResult.Success,
+    substituteString: String,
+    lastSubstituteString: String,
+    magic: Boolean = true
+  ): String {
+    val result = StringBuilder()
+    var caseSettings: SubstituteCase = SubstituteCase.DEFAULT
+
+    var index = 0
+    while (index < substituteString.length) {
+      if (substituteString[index] == '\\') {
+        index++
+        if (index >= substituteString.length) {
+          result.append('\\')
+          break
+        }
+        when (substituteString[index]) {
+          '&' -> result.append(if (magic) '&' else matchResult.value)
+          '~' -> result.append(if (magic) '~' else lastSubstituteString)
+          '0' -> result.append(matchResult.value)
+          // TODO: check for illegal back references
+          '1' -> result.append(matchResult.groups.get(1)?.value)
+          '2' -> result.append(matchResult.groups.get(2)?.value)
+          '3' -> result.append(matchResult.groups.get(3)?.value)
+          '4' -> result.append(matchResult.groups.get(4)?.value)
+          '5' -> result.append(matchResult.groups.get(5)?.value)
+          '6' -> result.append(matchResult.groups.get(6)?.value)
+          '7' -> result.append(matchResult.groups.get(7)?.value)
+          '8' -> result.append(matchResult.groups.get(8)?.value)
+          '9' -> result.append(matchResult.groups.get(9)?.value)
+          'u' -> caseSettings = SubstituteCase.UPPER
+          'U' -> caseSettings = SubstituteCase.UPPER_PERSISTENT
+          'l' -> caseSettings = SubstituteCase.LOWER
+          'L' -> caseSettings = SubstituteCase.LOWER_PERSISTENT
+          'e' -> caseSettings = SubstituteCase.DEFAULT
+          'E' -> caseSettings = SubstituteCase.DEFAULT
+          'r' -> result.append('\n')
+          'n' -> result.append('\u0000')
+          'b' -> result.append('\b')
+          't' -> result.append('\t')
+          '\\' -> result.append('\\')
+          else -> {
+            val buildResult = buildLiteralChar(substituteString[index], caseSettings)
+            caseSettings = buildResult.second
+            result.append(buildResult.first)
+          }
+        }
+      } else if (substituteString[index] == '&' && magic) {
+        result.append(matchResult.value)
+      } else if (substituteString[index] == '~' && magic) {
+        result.append(lastSubstituteString)
+      } else {
+        val buildResult = buildLiteralChar(substituteString[index], caseSettings)
+        caseSettings = buildResult.second
+        result.append(buildResult.first)
+      }
+      index++
+    }
+
+    return result.toString()
+  }
+
+  private fun buildLiteralChar(
+    char: Char,
+    caseSettings: SubstituteCase
+  ): Pair<Char, SubstituteCase> {
+    return when (caseSettings) {
+      SubstituteCase.DEFAULT -> Pair(char, caseSettings)
+      SubstituteCase.UPPER -> Pair(char.uppercaseChar(), SubstituteCase.DEFAULT)
+      SubstituteCase.UPPER_PERSISTENT -> Pair(char.uppercaseChar(), caseSettings)
+      SubstituteCase.LOWER -> Pair(char.lowercaseChar(), SubstituteCase.DEFAULT)
+      SubstituteCase.LOWER_PERSISTENT -> Pair(char.lowercaseChar(), caseSettings)
+    }
+  }
+
+  private enum class SubstituteCase {
+    DEFAULT,
+    UPPER,
+    UPPER_PERSISTENT,
+    LOWER,
+    LOWER_PERSISTENT,
   }
 
   /**
