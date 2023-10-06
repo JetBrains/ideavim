@@ -39,7 +39,6 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.IjVimSearchHelper
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -247,7 +246,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
 
       // Note that ignoreCase is not overridden by the `\C` in the pattern
       val pattern = makePattern(text, whole)
-      val matches = IjVimSearchHelper().findAll(IjVimEditor(editor), pattern, 0, -1, false)
+      val matches = injector.searchHelper.findAll(IjVimEditor(editor), pattern, 0, -1, false)
       for (match in matches) {
         if (match.contains(primaryCaret.offset)) {
           primaryCaret.vim.moveToOffset(match.startOffset)
@@ -323,7 +322,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
       searchOptions.add(SearchOptions.WRAP)
     }
 
-    return IjVimSearchHelper().findPattern(IjVimEditor(editor), makePattern(text, whole), startOffset, 1, searchOptions)?.startOffset ?: -1
+    return injector.searchHelper.findPattern(IjVimEditor(editor), makePattern(text, whole), startOffset, 1, searchOptions)?.startOffset ?: -1
   }
 
   private fun makePattern(text: String, whole: Boolean): String {
