@@ -59,6 +59,8 @@ public class SearchHelper {
   /**
    * Find text matching the given pattern.
    *
+   * @deprecated Use IjVimSearchHelper.findPattern instead
+   *
    * <p>See search.c:searchit</p>
    *
    * @param editor          The editor to search in
@@ -69,6 +71,7 @@ public class SearchHelper {
    * @return                A TextRange representing the result, or null
    */
   @Nullable
+  @Deprecated
   public static TextRange findPattern(@NotNull Editor editor,
                                       @Nullable String pattern,
                                       int startOffset,
@@ -80,41 +83,6 @@ public class SearchHelper {
     }
 
     Direction dir = searchOptions.contains(SearchOptions.BACKWARDS) ? Direction.BACKWARDS : Direction.FORWARDS;
-
-    if (globalIjOptions(injector).getUseNewRegex()) {
-      final VimEditor vimEditor = new IjVimEditor(editor);
-      final List<VimRegexOptions> options = new ArrayList<>();
-      if (globalOptions(injector).getSmartcase() && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE);
-      if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
-      if (globalOptions(injector).getWrapscan()) options.add(VimRegexOptions.WRAP_SCAN);
-      try {
-        final VimRegex regex = new VimRegex(pattern);
-        VimMatchResult result;
-
-        if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, startOffset, options);
-        else result = regex.findPrevious(vimEditor, startOffset, options);
-
-        if (result.getClass() == VimMatchResult.Failure.class) {
-          injector.getMessages().showStatusBarMessage(vimEditor, "Pattern not found: " + pattern);
-          return null;
-        }
-
-        for (int i = 1; i < count; i++) {
-          int nextOffset = ((VimMatchResult.Success)result).getRange().getStartOffset();
-          if (dir == Direction.FORWARDS) result = regex.findNext(vimEditor, nextOffset, options);
-          else result = regex.findPrevious(vimEditor, nextOffset, options);
-        }
-
-        if (result.getClass() == VimMatchResult.Success.class) return ((VimMatchResult.Success)result).getRange();
-        else {
-          injector.getMessages().showStatusBarMessage(vimEditor, "Pattern not found: " + pattern);
-          return null;
-        }
-      } catch (VimRegexException e) {
-        injector.getMessages().showStatusBarMessage(vimEditor, e.getMessage());
-        return null;
-      }
-    }
 
     //RE sp;
     RegExp sp;
@@ -382,6 +350,8 @@ public class SearchHelper {
   /**
    * Find all occurrences of the pattern.
    *
+   * @deprecated Use IjVimSearchHelper.findall instead
+   *
    * @param editor      The editor to search in
    * @param pattern     The pattern to search for
    * @param startLine   The start line of the range to search for
@@ -389,6 +359,7 @@ public class SearchHelper {
    * @param ignoreCase  Case sensitive or insensitive searching
    * @return            A list of TextRange objects representing the results
    */
+  @Deprecated
   public static @NotNull List<TextRange> findAll(@NotNull Editor editor,
                                                  @NotNull String pattern,
                                                  int startLine,
