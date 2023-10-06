@@ -1448,7 +1448,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS);
 
     // Uses RE_LAST. We know this is always set before being called
-    TextRange range = new injector.getSearchHelper().findPattern(new IjVimEditor(editor), getLastUsedPattern(), startOffset, count, searchOptions);
+    TextRange range = injector.getSearchHelper().findPattern(new IjVimEditor(editor), getLastUsedPattern(), startOffset, count, searchOptions);
     if (range == null) {
       logger.warn("No range is found");
       return -1;

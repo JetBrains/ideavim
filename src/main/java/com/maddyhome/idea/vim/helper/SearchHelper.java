@@ -428,6 +428,10 @@ public class SearchHelper {
     return results;
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findSection instead
+   */
+  @Deprecated
   public static int findSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int line = caret.getLogicalPosition().line + dir;
@@ -454,6 +458,10 @@ public class SearchHelper {
     return res;
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findUnmatchedBlock instead
+   */
+  @Deprecated
   public static int findUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, char type, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
@@ -472,6 +480,8 @@ public class SearchHelper {
 
   /**
    * Find block enclosing the caret
+   *
+   * @deprecated Use IjVimSearchHelper.findBlockRange instead
    *
    * @param editor  The editor to search in
    * @param caret   The caret currently at
@@ -824,6 +834,10 @@ public class SearchHelper {
   }
 
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findBlockTagRange instead
+   */
+  @Deprecated
   public static @Nullable TextRange findBlockTagRange(@NotNull Editor editor,
                                                       @NotNull Caret caret,
                                                       int count,
@@ -1356,6 +1370,10 @@ public class SearchHelper {
     return new TextRange(start, end);
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findWordUnderCursor instead
+   */
+  @Deprecated
   @Contract("_, _, _, _, _, _, _ -> new")
   public static @NotNull TextRange findWordUnderCursor(@NotNull Editor editor,
                                                        @NotNull Caret caret,
@@ -1541,10 +1559,16 @@ public class SearchHelper {
     }
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findMethodStart instead
+   */
   public static int findMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return PsiHelper.findMethodStart(editor, caret.getOffset(), count);
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findMethodEnd instead
+   */
   public static int findMethodEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return PsiHelper.findMethodEnd(editor, caret.getOffset(), count);
   }
