@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.IjVimSearchHelper
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.Contract
 import java.awt.Color
@@ -107,7 +106,7 @@ private fun updateSearchHighlights(
         val startLine = searchRange?.startLine ?: 0
         val endLine = searchRange?.endLine ?: -1
         val results =
-          IjVimSearchHelper().findAll(IjVimEditor(editor), pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
+          injector.searchHelper.findAll(IjVimEditor(editor), pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
         if (results.isNotEmpty()) {
           currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
           highlightSearchResults(editor, pattern, results, currentMatchOffset)
@@ -121,7 +120,7 @@ private fun updateSearchHighlights(
         }
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
         if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
-        val result = IjVimSearchHelper().findPattern(IjVimEditor(editor), pattern, initialOffset, 1, searchOptions)
+        val result = injector.searchHelper.findPattern(IjVimEditor(editor), pattern, initialOffset, 1, searchOptions)
         if (result != null) {
           currentMatchOffset = result.startOffset
           val results = listOf(result)
