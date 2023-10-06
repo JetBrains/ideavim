@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.newapi.IjVimSearchHelper;
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener;
 import com.maddyhome.idea.vim.regexp.*;
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
@@ -226,7 +227,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
                                                  int startLine,
                                                  int endLine,
                                                  boolean ignoreCase) {
-    return SearchHelper.findAll(editor, pattern, startLine, endLine, ignoreCase);
+    return new IjVimSearchHelper().findAll(new IjVimEditor(editor), pattern, startLine, endLine, ignoreCase);
   }
 
   /**
@@ -1279,7 +1280,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
     final String pattern = getLastUsedPattern();
     if (pattern != null) {
-      final List<TextRange> results = SearchHelper.findAll(editor, pattern, startLine, endLine,
+      final List<TextRange> results = new IjVimSearchHelper().findAll(new IjVimEditor(editor), pattern, startLine, endLine,
         shouldIgnoreCase(pattern, lastIgnoreSmartCase));
       SearchHighlightsHelper.highlightSearchResults(editor, pattern, results, -1);
     }
@@ -1448,7 +1449,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS);
 
     // Uses RE_LAST. We know this is always set before being called
-    TextRange range = SearchHelper.findPattern(editor, getLastUsedPattern(), startOffset, count, searchOptions);
+    TextRange range = new IjVimSearchHelper().findPattern(new IjVimEditor(editor), getLastUsedPattern(), startOffset, count, searchOptions);
     if (range == null) {
       logger.warn("No range is found");
       return -1;

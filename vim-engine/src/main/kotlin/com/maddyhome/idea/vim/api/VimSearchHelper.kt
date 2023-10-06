@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.SearchOptions
+import org.jetbrains.annotations.NotNull
 import java.util.*
 
 public interface VimSearchHelper {
@@ -129,6 +130,18 @@ public interface VimSearchHelper {
    */
   public fun findNextWordEnd(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
 
+  /**
+   * Find text matching the given pattern.
+   *
+   * @see :help /pattern
+   *
+   * @param editor          The editor to search in
+   * @param pattern         The pattern to search for
+   * @param startOffset     The offset to start searching from
+   * @param count           Find the nth next occurrence of the pattern. Must be 1 or greater.
+   * @param searchOptions   A set of options, such as direction and wrap
+   * @return                A TextRange representing the result, or null
+   */
   public fun findPattern(
     editor: VimEditor,
     pattern: String?,
@@ -136,6 +149,24 @@ public interface VimSearchHelper {
     count: Int,
     searchOptions: EnumSet<SearchOptions>?,
   ): TextRange?
+
+  /**
+   * Find all occurrences of the pattern.
+   *
+   * @param editor      The editor to search in
+   * @param pattern     The pattern to search for
+   * @param startLine   The start line of the range to search for
+   * @param endLine     The end line of the range to search for, or -1 for the whole document
+   * @param ignoreCase  Case sensitive or insensitive searching
+   * @return            A list of TextRange objects representing the results
+   */
+  public fun findAll(
+    editor: VimEditor,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean
+  ): List<TextRange>
 
   public fun findNextCharacterOnLine(
     editor: VimEditor,

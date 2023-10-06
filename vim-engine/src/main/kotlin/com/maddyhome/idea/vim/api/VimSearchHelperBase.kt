@@ -13,8 +13,14 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.helper.SearchOptions
+import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.VimRegexException
+import com.maddyhome.idea.vim.regexp.VimRegexOptions
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.Range
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -46,13 +52,88 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     return doFindNext(editor, searchFrom, count, bigWord, spaceWords, ::findNextWordEndOne)
   }
 
+  override fun findPattern(
+    editor: VimEditor,
+    pattern: String?,
+    startOffset: Int,
+    count: Int,
+    searchOptions: EnumSet<SearchOptions>?,
+  ): TextRange? {
+
+    if (pattern.isNullOrEmpty()) return null
+
+    val dir = if (searchOptions!!.contains(SearchOptions.BACKWARDS)) Direction.BACKWARDS else Direction.FORWARDS
+
+    val options: MutableList<VimRegexOptions> = mutableListOf()
+    if (injector.globalOptions().smartcase && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE)
+    if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
+    if (injector.globalOptions().wrapscan) options.add(VimRegexOptions.WRAP_SCAN)
+
+    val regex = try {
+      VimRegex(pattern)
+    } catch (e: VimRegexException) {
+      injector.messages.showStatusBarMessage(editor, e.message)
+      return null
+    }
+
+    var result =
+      if (dir === Direction.FORWARDS) regex.findNext(editor, startOffset, options)
+      else regex.findPrevious(editor, startOffset, options)
+
+    if (result is VimMatchResult.Failure) {
+      injector.messages.showStatusBarMessage(editor, "Pattern not found: $pattern")
+      return null
+    }
+
+    for (i in 1 until count) {
+      val nextOffset = (result as VimMatchResult.Success).range.startOffset
+      result =
+        if (dir === Direction.FORWARDS) regex.findNext(editor, nextOffset, options)
+        else regex.findPrevious(editor, nextOffset, options)
+    }
+
+    return if (result is VimMatchResult.Success) {
+      result.range
+    } else {
+      injector.messages.showStatusBarMessage(editor, "Pattern not found: $pattern")
+      null
+    }
+  }
+
+  override fun findAll(
+    editor: VimEditor,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean,
+  ): List<TextRange> {
+    val options: MutableList<VimRegexOptions> = mutableListOf()
+    if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
+    if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
+    val regex = try {
+      // TODO: we shouldn't care about the ignoreCase argument, and instead just look into the editor options.
+      // It would require a refactor, so for now prepend \c or \C to "force" ignoreCase
+      val newPattern = (if (ignoreCase) "\\c" else "\\C") + pattern
+      VimRegex(newPattern)
+    } catch (e: VimRegexException) {
+      injector.messages.showStatusBarMessage(editor, e.message)
+      return emptyList()
+    }
+      return regex.findAll(
+        editor,
+        editor.getLineStartOffset(startLine),
+        editor.getLineEndOffset(if (endLine == -1) editor.lineCount() - 1 else endLine) + 1,
+        options
+      ).map { it.range }
+  }
+
   private fun doFindNext(
     editor: VimEditor,
     searchFrom: Int,
     countDirection: Int,
     bigWord: Boolean,
     spaceWords: Boolean,
-    action: (VimEditor, pos: Int, size: Int, step: Int, bigWord: Boolean, spaceWords: Boolean) -> Int
+    action: (VimEditor, pos: Int, size: Int, step: Int, bigWord: Boolean, spaceWords: Boolean) -> Int,
   ): Int {
     var count = countDirection
     val step = if (count >= 0) 1 else -1

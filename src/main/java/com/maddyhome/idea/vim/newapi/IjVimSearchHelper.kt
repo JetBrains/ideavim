@@ -12,6 +12,7 @@ import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchHelperBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
@@ -61,7 +62,19 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     count: Int,
     searchOptions: EnumSet<SearchOptions>?,
   ): TextRange? {
-    return SearchHelper.findPattern(editor.ij, pattern, startOffset, count, searchOptions)
+    return if (injector.globalIjOptions().useNewRegex) super.findPattern(editor, pattern, startOffset, count, searchOptions)
+    else SearchHelper.findPattern(editor.ij, pattern, startOffset, count, searchOptions)
+  }
+
+  override fun findAll(
+    editor: VimEditor,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean
+  ): List<TextRange> {
+    return if (injector.globalIjOptions().useNewRegex) super.findAll(editor, pattern, startLine, endLine, ignoreCase)
+    else SearchHelper.findAll(editor.ij, pattern, startLine, endLine, ignoreCase)
   }
 
   override fun findNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int {
