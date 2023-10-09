@@ -371,7 +371,11 @@ public class ExTextField extends JTextField {
   void toggleInsertReplace() {
     ExDocument doc = (ExDocument)getDocument();
     doc.toggleInsertReplace();
+
+    // Hide/show the caret so its new shape is immediately visible
+    caret.setVisible(false);
     resetCaret();
+    caret.setVisible(true);
   }
 
   private void resetCaret() {
@@ -414,20 +418,15 @@ public class ExTextField extends JTextField {
     private boolean hasFocus;
 
     public void setAttributes(GuiCursorAttributes attributes) {
-      final boolean active = isActive();
 
-      // Hide the currently visible caret
-      if (isVisible()) {
-        setVisible(false);
-      }
+      // Note: do not call anything that causes a layout in this method! E.g. setVisible. This method is used as a
+      // callback whenever the caret moves, and causing a layout at this point can cause issues such as an infinite
+      // loop in the layout algorithm with multi-width characters such as emoji or non-Latin characters (I don't know
+      // why the layout algorithm gets stuck, but we can easily avoid it)
+      // See VIM-2562
 
       mode = attributes.getType();
       thickness = mode == GuiCursorType.BLOCK ? 100 : attributes.getThickness();
-
-      // Make sure the caret is visible, but only if we're active, otherwise we'll kick off the flasher timer unnecessarily
-      if (active) {
-        setVisible(true);
-      }
     }
 
     @Override
