@@ -21,10 +21,16 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -119,6 +125,15 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler
  */
 internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<Esc>"
+
+  override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
+    val ideaVimSupportDialog =
+      injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
+
+    return editor.isPrimaryEditor() ||
+      EditorHelper.isFileEditor(editor) && !editor.vim.mode.inNormalMode ||
+      ideaVimSupportDialog && !editor.vim.mode.inNormalMode
+  }
 }
 
 internal abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {
