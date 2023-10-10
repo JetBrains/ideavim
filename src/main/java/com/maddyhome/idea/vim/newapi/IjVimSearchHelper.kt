@@ -95,7 +95,7 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     if (pos < chars.length && chars[pos] == type) {
       pos += dir.toInt()
     }
-    return findBlockLocation(chars, found, match, dir, pos, count, false)
+    return findBlockLocation(chars, found, match, dir, pos, count)
   }
 
   private fun findBlockLocation(
@@ -105,7 +105,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     dir: Direction,
     pos: Int,
     cnt: Int,
-    allowInString: Boolean,
   ): Int {
     var position = pos
     var count = cnt
@@ -124,7 +123,7 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
       val (c, second) = SearchHelper.findPositionOfFirstCharacter(chars, position, charsToSearch, true, dir) ?: return -1
       position = second
       // If we found a match and we're not in a string...
-      if (c == match && (if (allowInString) initialInString == inString else !inString) && !inChar) {
+      if (c == match && (!inString) && !inChar) {
         // We found our match
         if (stack == 0) {
           res = position
@@ -637,15 +636,15 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
         val subSequence = chars.subSequence(startOffset, endOffset)
         val inQuotePos = pos - startOffset
         var inQuoteStart =
-          findBlockLocation(subSequence, close, type, Direction.BACKWARDS, inQuotePos, count, false)
+          findBlockLocation(subSequence, close, type, Direction.BACKWARDS, inQuotePos, count)
         if (inQuoteStart == -1) {
           inQuoteStart =
-            findBlockLocation(subSequence, close, type, Direction.FORWARDS, inQuotePos, count, false)
+            findBlockLocation(subSequence, close, type, Direction.FORWARDS, inQuotePos, count)
         }
         if (inQuoteStart != -1) {
           startPosInStringFound = true
           val inQuoteEnd =
-            findBlockLocation(subSequence, type, close, Direction.FORWARDS, inQuoteStart, 1, false)
+            findBlockLocation(subSequence, type, close, Direction.FORWARDS, inQuoteStart, 1)
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset
             bend = inQuoteEnd + startOffset
@@ -655,12 +654,12 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     }
 
     if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, Direction.BACKWARDS, pos, count, false)
+      bstart = findBlockLocation(chars, close, type, Direction.BACKWARDS, pos, count)
       if (bstart == -1) {
-        bstart = findBlockLocation(chars, close, type, Direction.FORWARDS, pos, count, false)
+        bstart = findBlockLocation(chars, close, type, Direction.FORWARDS, pos, count)
       }
       if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, Direction.FORWARDS, bstart, 1, false)
+        bend = findBlockLocation(chars, type, close, Direction.FORWARDS, bstart, 1)
       }
     }
 
