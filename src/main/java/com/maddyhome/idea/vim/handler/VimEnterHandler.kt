@@ -9,23 +9,45 @@
 package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
+import com.intellij.openapi.util.removeUserData
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 internal val commandContinuation = Key.create<EditorActionHandler>("commandContinuation")
+
+/**
+ * Handler that corrects the shape of the caret in python notebooks.
+ *
+ * By default, py notebooks show a thin caret after entering the cell.
+ *   However, we're in normal mode, so this handler fixes it.
+ */
+internal class CaretShapeEnterEditorHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+  override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
+    invokeLater {
+      editor.updateCaretsVisualAttributes()
+    }
+    nextHandler.execute(editor, caret, dataContext)
+  }
+
+  override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
+    return nextHandler.isEnabled(editor, caret, dataContext)
+  }
+}
 
 /**
  * This handler doesn't work in tests for ex commands
@@ -39,8 +61,12 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 
   final override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
     if (isThisHandlerEnabled(editor, caret, dataContext)) {
-      (dataContext as? UserDataHolder)?.putUserData(commandContinuation, nextHandler)
-      executeHandler(editor, caret, dataContext)
+      try {
+        (dataContext as? UserDataHolder)?.putUserData(commandContinuation, nextHandler)
+        executeHandler(editor, caret, dataContext)
+      } finally {
+        (dataContext as? UserDataHolder)?.removeUserData(commandContinuation)
+      }
     } else {
       nextHandler.execute(editor, caret, dataContext)
     }
@@ -72,6 +98,7 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler
   override val key: String = "<CR>"
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
+    if (!super.isHandlerEnabled(editor, dataContext)) return false
     // This is important for one-line editors, to turn off enter.
     // Some one-line editors rely on the fact that there are no enter actions registered. For example, hash search in git
     // See VIM-2974 for example where it was broken

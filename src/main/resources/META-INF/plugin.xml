@@ -108,6 +108,9 @@
     <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
                          id="ideavim-enter"
                          order="before editorEnter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.CaretShapeEnterEditorHandler"
+                         id="ideavim-enter-shape"
+                         order="before jupyterCommandModeEnterKeyHandler"/>
 
 <!--    "first" is not defined for this handler as it leads to "unsatisfied ordering exception". Not sure exectly why, but it appears in tests-->
     <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscHandler"
