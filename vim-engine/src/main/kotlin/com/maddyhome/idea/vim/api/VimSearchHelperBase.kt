@@ -59,6 +59,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     count: Int,
     searchOptions: EnumSet<SearchOptions>?,
   ): TextRange? {
+    println("$pattern, $startOffset, $count")
 
     if (pattern.isNullOrEmpty()) return null
 

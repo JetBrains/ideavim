@@ -249,11 +249,22 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
-   * @param dir         The direction to search
+   * @param dir         T      ${c}I found it in a legendary land
+      all rocks and lavender and tufted grass,
+      where it was settled on some sodden sand
+      hard by the torrent of a mountain pass.
+
+      The features it combines mark it as new
+      to science: shape and shade -- the special tinge,
+      akin to moonlight, tempering its blue,
+      the dingy underside, the checquered fringe.
+he direction to search
    * @return            Offset to the next occurrence of the pattern or -1 if not found
    */
   @Override
   public int processSearchCommand(@NotNull VimEditor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchCommand(editor, command, startOffset, dir);
+
     boolean isNewPattern = false;
     String pattern = null;
     String patternOffset = null;
