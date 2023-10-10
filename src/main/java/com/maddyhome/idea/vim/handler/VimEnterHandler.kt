@@ -58,7 +58,7 @@ internal class CaretShapeEnterEditorHandler(private val nextHandler: EditorActio
 /**
  * This handler doesn't work in tests for ex commands
  */
-internal abstract class OctopusHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+internal abstract class OctopusHandler(private val nextHandler: EditorActionHandler?) : EditorActionHandler() {
 
   abstract fun executeHandler(editor: Editor, caret: Caret?, dataContext: DataContext?)
   open fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
@@ -74,7 +74,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
         (dataContext as? UserDataHolder)?.removeUserData(commandContinuation)
       }
     } else {
-      nextHandler.execute(editor, caret, dataContext)
+      nextHandler?.execute(editor, caret, dataContext)
     }
   }
 
@@ -87,7 +87,8 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
   }
 
   final override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
-    return isThisHandlerEnabled(editor, caret, dataContext) || nextHandler.isEnabled(editor, caret, dataContext)
+    return isThisHandlerEnabled(editor, caret, dataContext)
+      || nextHandler?.isEnabled(editor, caret, dataContext) == true
   }
 }
 
@@ -100,7 +101,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
  * - App code - set handler after
  * - Template - doesn't intersect with enter anymore
  */
-internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
+internal class VimEnterHandler(nextHandler: EditorActionHandler?) : VimKeyHandler(nextHandler) {
   override val key: String = "<CR>"
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
@@ -136,7 +137,7 @@ internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(n
   }
 }
 
-internal abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {
+internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : OctopusHandler(nextHandler) {
 
   abstract val key: String
 
