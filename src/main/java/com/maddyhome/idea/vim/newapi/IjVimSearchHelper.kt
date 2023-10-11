@@ -564,8 +564,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     val close = BLOCK_CHARS[loc + 1]
 
     // extend the range for blank line after type and before close, as they are excluded when inner match
-
-    // extend the range for blank line after type and before close, as they are excluded when inner match
     if (!isOuter) {
       if (start > 1 && chars[start - 2] == type && chars[start - 1] == '\n') {
         start--
