@@ -27,6 +27,8 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-3060](https://youtrack.jetbrains.com/issue/VIM-3060) Clipboard interaction stopped working
+* [VIM-3095](https://youtrack.jetbrains.com/issue/VIM-3095) Fix missing ellipsis digraph
+* [VIM-2562](https://youtrack.jetbrains.com/issue/VIM-2562) Fix hang with multi-width chars in command line
 
 ### Merged PRs:
 * [697](https://github.com/JetBrains/ideavim/pull/697) by [Matt Ellis](https://github.com/citizenmatt): Support per-window "global" values for local-to-window options
