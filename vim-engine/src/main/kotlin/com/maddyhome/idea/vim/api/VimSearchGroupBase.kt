@@ -9,18 +9,24 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.Direction
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.helper.CharacterHelper
+import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.CharacterClasses
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
+import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import java.text.NumberFormat
 import java.text.ParsePosition
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
-public abstract class VimSearchGroupBase : VimSearchGroup {
+public open class VimSearchGroupBase : VimSearchGroup {
 
   private var lastPatternOffset: String? = ""
   private var lastSearch: String? = ""
@@ -29,6 +35,145 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   private var lastIgnoreSmartCase: Boolean = false
   private var lastPatternType: PatternType? = null
   private var showSearchHighlight: Boolean = injector.globalOptions().hlsearch
+  override var lastSearchPattern: String?
+    get() = lastSearch
+    set(value) { lastSearch = value }
+  override var lastSubstitutePattern: String?
+    get() = lastSubstitute
+    set(value) { lastSubstitute = value }
+
+  override fun findUnderCaret(
+    editor: VimEditor,
+  ): TextRange? {
+    val backSearch = searchBackward(editor, editor.primaryCaret().offset.point + 1, 1) ?: return null
+    return if (backSearch.contains(editor.primaryCaret().offset.point)) backSearch else null
+  }
+
+  override fun searchBackward(
+    editor: VimEditor,
+    offset: Int,
+    count: Int,
+  ): TextRange? {
+    // Backward search returns wrong end offset for some cases. That's why we should perform additional forward search
+    val searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS)
+    val foundBackward = injector.searchHelper.findPattern(editor, getLastUsedPattern(), offset, count, searchOptions) ?: return null
+    var startOffset = foundBackward.startOffset - 1
+    if (startOffset < 0) startOffset = editor.fileSize().toInt()
+    searchOptions.remove(SearchOptions.BACKWARDS)
+    return injector.searchHelper.findPattern(editor, getLastUsedPattern(), startOffset, 1, searchOptions)
+  }
+
+  override fun getNextSearchRange(
+    editor: VimEditor,
+    count: Int,
+    forwards: Boolean,
+  ): TextRange? {
+    editor.removeSecondaryCarets()
+    var current = findUnderCaret(editor)
+
+    if (current == null || editor.inVisualMode && atEdgeOfGnRange(
+        current,
+        editor,
+        forwards
+      )
+    ) {
+      current = findNextSearchForGn(editor, count, forwards)
+    } else if (count > 1) {
+      current = findNextSearchForGn(editor, count - 1, forwards)
+    }
+    return current
+  }
+
+  private fun findNextSearchForGn(
+    editor: VimEditor,
+    count: Int,
+    forwards: Boolean,
+  ): TextRange? {
+    return if (forwards) {
+      val searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE)
+      injector.searchHelper.findPattern(
+        editor,
+        getLastUsedPattern(),
+        editor.primaryCaret().offset.point,
+        count,
+        searchOptions
+      )
+    } else {
+      searchBackward(editor, editor.primaryCaret().offset.point, count)
+    }
+  }
+
+  private fun atEdgeOfGnRange(
+    nextRange: TextRange,
+    editor: VimEditor,
+    forwards: Boolean,
+  ): Boolean {
+    val currentPosition: Int = editor.currentCaret().offset.point
+    return if (forwards) {
+      nextRange.endOffset - injector.visualMotionGroup.selectionAdj == currentPosition
+    } else {
+      nextRange.startOffset == currentPosition
+    }
+  }
+
+  override fun processSearchRange(
+    editor: VimEditor,
+    pattern: String,
+    patternOffset: Int,
+    startOffset: Int,
+    direction: Direction,
+  ): Int {
+    // Will set RE_LAST, required by findItOffset
+    // IgnoreSmartCase and Direction are always reset.
+    // PatternOffset is cleared before searching. ExRanges will add/subtract the line offset from the final search range
+    // pattern, but we need the value to update lastPatternOffset for future searches.
+    // TODO: Consider improving pattern offset handling
+    lastSearch = pattern
+    lastPatternType = PatternType.SEARCH
+    lastIgnoreSmartCase = false
+    lastPatternOffset = "" // Do not apply a pattern offset yet!
+
+    lastDirection = direction
+
+    // TODO: Highlighting!
+    // resetShowSearchHighlight()
+    // forceUpdateSearchHighlights()
+
+    val result = findItOffset(editor, startOffset, 1, lastDirection)
+
+    // Set lastPatternOffset AFTER searching, so it doesn't affect the result
+    lastPatternOffset = if (patternOffset != 0) patternOffset.toString() else ""
+
+    return result
+  }
+
+  override fun searchNext(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
+    return searchNextWithDirection(editor, caret, count, lastDirection)
+  }
+
+  override fun searchPrevious(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
+    return searchNextWithDirection(editor, caret, count, lastDirection.reverse())
+  }
+
+  private fun searchNextWithDirection(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    dir: Direction,
+  ): Int {
+    // TODO: Highlighting!
+    // resetShowSearchHighlight()
+    // updateSearchHighlights()
+    val startOffset: Int = caret.offset.point
+    var offset = findItOffset(editor, startOffset, count, dir)
+    if (offset == startOffset) {
+      /* Avoid getting stuck on the current cursor position, which can
+       * happen when an offset is given and the cursor is on the last char
+       * in the buffer: Repeat with count + 1. */
+      offset = findItOffset(editor, startOffset, count + 1, dir)
+    }
+    return offset
+  }
 
   private fun skip_regexp(p: CharPointer, dirc: Char, magic: Boolean): CharPointer {
     var p = p
@@ -175,6 +320,129 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     // forceUpdateSearchHighlights()
 
     return findItOffset(editor, startOffset, 1, lastDirection)
+  }
+
+  override fun searchWord(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    whole: Boolean,
+    dir: Direction,
+  ): Int {
+    val range: TextRange = findWordUnderCursor(editor, caret) ?: return -1
+
+    val start = range.startOffset
+    val end = range.endOffset
+    val pattern: String = if (whole) "\\<${editor.getText(start, end)}\\>" else editor.getText(start, end)
+
+    // Updates RE_LAST, ready for findItOffset
+    // Direction is always saved
+    // IgnoreSmartCase is always set to true
+    // There is no pattern offset available
+    lastSearch = pattern
+    lastPatternType = PatternType.SEARCH
+    lastIgnoreSmartCase = true
+    lastPatternOffset = ""
+    lastDirection = dir
+
+    // TODO: Highlighting!
+    // resetShowSearchHighlight()
+    // forceUpdateSearchHighlights()
+
+    val offset = findItOffset(editor, range.startOffset, count, lastDirection)
+    return if (offset == -1) range.startOffset else offset
+  }
+
+  /**
+   * Find the word under the cursor or the next word to the right of the cursor on the current line.
+   *
+   * @param editor The editor to find the word in
+   * @param caret  The caret to find word under
+   * @return The text range of the found word or null if there is no word under/after the cursor on the line
+   */
+  private fun findWordUnderCursor(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+  ): TextRange? {
+
+    val stop: Int = editor.getLineEndOffset(caret.getBufferPosition().line, true)
+    val pos: Int = caret.offset.point
+
+    // Technically the first condition is covered by the second one, but let it be
+    if (editor.text().isEmpty() || editor.text().length <= pos) return null
+    //if (pos == chars.length() - 1) return new TextRange(chars.length() - 1, chars.length());
+    var start = pos
+    val types = arrayOf(
+      CharacterHelper.CharacterType.KEYWORD,
+      CharacterHelper.CharacterType.PUNCTUATION
+    )
+    for (i in 0..1) {
+      start = pos
+      val type = charType(editor, editor.text()[start], false)
+      if (type === types[i]) {
+        // Search back for start of word
+        while (start > 0 && charType(editor, editor.text()[start - 1], false) === types[i]) {
+          start--
+        }
+      } else {
+        // Search forward for start of word
+        while (start < stop && charType(editor, editor.text()[start], false) !== types[i]) {
+          start++
+        }
+      }
+      if (start != stop) {
+        break
+      }
+    }
+    if (start == stop) {
+      return null
+    }
+    // Special case 1 character words because 'findNextWordEnd' returns one to many chars
+    val end: Int = if (start < stop &&
+      (start >= editor.text().length - 1 ||
+        charType(editor, editor.text()[start + 1], false) !== CharacterHelper.CharacterType.KEYWORD)
+    ) {
+      start + 1
+    } else {
+      injector.searchHelper.findNextWordEnd(editor, start, 1, bigWord = false, spaceWords = false) + 1
+    }
+    return TextRange(start, end)
+  }
+
+  override fun processSubstituteCommand(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: LineRange,
+    excmd: String,
+    exarg: String,
+    parent: VimLContext,
+  ): Boolean {
+    TODO("Not yet implemented")
+  }
+
+  override fun search_regcomp(
+    pat: CharPointer?,
+    which_pat: Int,
+    patSave: Int,
+  ): Pair<Boolean, Triple<Any, String, Any>> {
+    TODO("Not yet implemented")
+  }
+
+  override fun findDecimalNumber(line: String): Int? {
+    val regex = Regex("\\d+")
+    val range = regex.find(line)?.range ?: return null
+
+    return line.substring(range.first, range.last + 1).toInt()
+  }
+
+  override fun clearSearchHighlight() {
+    showSearchHighlight = false
+    // TODO: Highlighting
+    // updateSearchHighlights()
+  }
+
+  override fun getLastSearchDirection(): Direction {
+    return lastDirection
   }
 
   /**

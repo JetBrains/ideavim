@@ -115,6 +115,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return The pattern used for last search. Can be null
    */
   public @Nullable String getLastSearchPattern() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSearchPattern();
     return lastSearch;
   }
 
@@ -123,6 +124,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return The pattern used for the last substitute command. Can be null
    */
   public @Nullable String getLastSubstitutePattern() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSubstitutePattern();
     return lastSubstitute;
   }
 
@@ -425,6 +427,7 @@ he direction to search
    */
   @Override
   public int searchWord(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count, boolean whole, @NotNull Direction dir) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchWord(editor, caret, count, whole, dir);
     TextRange range = SearchHelper.findWordUnderCursor(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
     if (range == null) {
       logger.warn("No range was found");
@@ -466,6 +469,7 @@ he direction to search
    */
   @Override
   public int searchNext(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchNext(editor, caret, count);
     return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count, lastDir);
   }
 
@@ -482,6 +486,7 @@ he direction to search
    */
   @Override
   public int searchPrevious(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchPrevious(editor, caret, count);
     return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count,
                                    lastDir.reverse());
   }
@@ -1060,6 +1065,7 @@ he direction to search
 
   @Override
   public void setLastSearchPattern(@Nullable String lastSearchPattern) {
+    if (globalIjOptions(injector).getUseNewRegex()) super.setLastSearchPattern(lastSearchPattern);
     this.lastSearch = lastSearchPattern;
     if (showSearchHighlight) {
       resetIncsearchHighlights();
@@ -1069,6 +1075,7 @@ he direction to search
 
   @Override
   public void setLastSubstitutePattern(@Nullable String lastSubstitutePattern) {
+    if (globalIjOptions(injector).getUseNewRegex()) super.setLastSubstitutePattern(lastSubstitutePattern);
     this.lastSubstitute = lastSubstitutePattern;
   }
 
@@ -1078,6 +1085,7 @@ he direction to search
                                 int patternOffset,
                                 int startOffset,
                                 @NotNull Direction direction) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchRange(editor, pattern, patternOffset, startOffset, direction);
     return processSearchRange(((IjVimEditor) editor).getEditor(), pattern, patternOffset, startOffset, direction);
   }
 
@@ -1200,6 +1208,7 @@ he direction to search
    */
   @Override
   public @Nullable TextRange getNextSearchRange(@NotNull VimEditor editor, int count, boolean forwards) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getNextSearchRange(editor, count, forwards);
     editor.removeSecondaryCarets();
     TextRange current = findUnderCaret(editor);
 
@@ -1234,6 +1243,7 @@ he direction to search
   @Override
   @Nullable
   public TextRange findUnderCaret(@NotNull VimEditor editor) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.findUnderCaret(editor);
     final TextRange backSearch = searchBackward(editor, editor.primaryCaret().getOffset().getPoint() + 1, 1);
     if (backSearch == null) return null;
     return backSearch.contains(editor.primaryCaret().getOffset().getPoint()) ? backSearch : null;
@@ -1242,6 +1252,7 @@ he direction to search
   @Override
   @Nullable
   public TextRange searchBackward(@NotNull VimEditor editor, int offset, int count) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchBackward(editor, offset, count);
     // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
     final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
     final TextRange foundBackward = VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), offset, count, searchOptions);
@@ -1260,6 +1271,7 @@ he direction to search
   // *******************************************************************************************************************
   //region Search highlights
   public void clearSearchHighlight() {
+    if (globalIjOptions(injector).getUseNewRegex()) super.clearSearchHighlight();
     showSearchHighlight = false;
     updateSearchHighlights();
   }
@@ -1305,6 +1317,7 @@ he direction to search
 
   @Override
   public Integer findDecimalNumber(@NotNull String line) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.findDecimalNumber(line);
     Pair<TextRange, NumberType> searchResult = SearchHelper.findNumberInText(line, 0, false, false, false);
     if (searchResult != null) {
       TextRange range = searchResult.component1();
@@ -1316,6 +1329,7 @@ he direction to search
   @NotNull
   @Override
   public Direction getLastSearchDirection() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSearchDirection();
     return lastDir;
   }
 
