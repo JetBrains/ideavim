@@ -20,12 +20,10 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -149,24 +147,14 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
     val enterKey = key(key)
-    return isOctopusEnabled(enterKey, editor)
+    return isOctopusEnabled(enterKey)
   }
 }
 
-internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
-  when {
-    s.keyCode == KeyEvent.VK_ENTER -> return editor.mode in listOf(
-      CommandState.Mode.COMMAND,
-      CommandState.Mode.INSERT,
-      CommandState.Mode.VISUAL,
-      CommandState.Mode.REPLACE,
-    )
-    s.keyCode == KeyEvent.VK_ESCAPE -> return editor.mode in listOf(
-      CommandState.Mode.COMMAND,
-      CommandState.Mode.INSERT,
-      CommandState.Mode.VISUAL,
-      CommandState.Mode.REPLACE,
-    )
+internal fun isOctopusEnabled(s: KeyStroke): Boolean {
+  when (s.keyCode) {
+    KeyEvent.VK_ENTER -> return true
+    KeyEvent.VK_ESCAPE -> return true
   }
   return false
 }
