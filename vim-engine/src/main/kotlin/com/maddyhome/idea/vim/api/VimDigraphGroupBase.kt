@@ -1085,6 +1085,7 @@ public abstract class VimDigraphGroupBase() : VimDigraphGroup {
     '/', '-', '\u2020', // DAGGER
     '/', '=', '\u2021', // DOUBLE DAGGER
     '.', '.', '\u2025', // TWO DOT LEADER
+    ',', '.', '\u2026', // ELLIPSIS
     '%', '0', '\u2030', // PER MILLE SIGN
     '1', '\'', '\u2032', // PRIME
     '2', '\'', '\u2033', // DOUBLE PRIME
