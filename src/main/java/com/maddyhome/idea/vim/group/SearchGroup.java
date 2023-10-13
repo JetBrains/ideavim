@@ -76,13 +76,18 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
     // changes in the search options.
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch, () -> {
-      resetShowSearchHighlight();
-      forceUpdateSearchHighlights();
+      if (globalIjOptions(injector).getUseNewRegex()) {
+        super.updateSearchHighlights(true);
+      } else {
+        resetShowSearchHighlight();
+        forceUpdateSearchHighlights();
+      }
     });
 
     final GlobalOptionChangeListener updateHighlightsIfVisible = () -> {
       if (showSearchHighlight) {
-        forceUpdateSearchHighlights();
+        if (globalIjOptions(injector).getUseNewRegex()) super.updateSearchHighlights(true);
+        else forceUpdateSearchHighlights();
       }
     };
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.ignorecase, updateHighlightsIfVisible);
@@ -101,6 +106,10 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
   @TestOnly
   public void resetState() {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.resetState();
+      return;
+    }
     lastPatternIdx = RE_SEARCH;
     lastSearch = lastSubstitute = lastReplace = null;
     lastPatternOffset = "";
@@ -133,7 +142,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    *
    * @return The pattern last used for either searching or substitution. Can be null
    */
-  public @Nullable String getLastUsedPattern() {
+  @Override
+  protected @Nullable String getLastUsedPattern() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastUsedPattern();
     switch (lastPatternIdx) {
       case RE_SEARCH: return lastSearch;
       case RE_SUBST:  return lastSubstitute;
@@ -1149,7 +1160,7 @@ he direction to search
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
     if (globalIjOptions(injector).getUseNewRegex()) {
-      IjVimSearchGroup.Companion.highlightSearchLines(new IjVimEditor(editor), startLine, endLine);
+      super.highlightSearchLines(new IjVimEditor(editor), startLine, endLine);
       return;
     }
     final String pattern = getLastUsedPattern();
