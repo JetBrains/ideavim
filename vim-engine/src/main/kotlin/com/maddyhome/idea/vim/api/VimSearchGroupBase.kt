@@ -108,7 +108,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     get() = lastSubstitute
     set(value) { lastSubstitute = value }
 
-  // TODO: this can be made not open when SearchGroup.java is removed
+  // TODO: this can be made not open and private when SearchGroup.java is removed
   protected open fun getLastUsedPattern(): String? {
     return when (lastPatternType) {
       PatternType.SEARCH -> lastSearch
@@ -503,7 +503,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     ) {
       // don't accept alphanumeric for separator
       if (CharacterClasses.isAlpha(cmd.charAt())) {
-        injector.messages.showStatusBarMessage(null, "E146")
+        injector.messages.showStatusBarMessage(null, "E146: Regular expressions can''t be delimited by letters")
         return false
       }
 
@@ -514,7 +514,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
        */if (cmd.charAt() == '\\') {
         cmd.inc()
         if ("/?&".indexOf(cmd.charAt()) == -1) {
-          injector.messages.showStatusBarMessage(null, "e_backslash")
+          injector.messages.showStatusBarMessage(null, "E10: \\ should be followed by /, ? or &")
           return false
         }
         if (cmd.charAt() != '&') {
@@ -554,7 +554,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       // use previous pattern and substitution
       if (lastSubstituteString == null) {
         // there is no previous command
-        injector.messages.showStatusBarMessage(null, "e_nopresub")
+        injector.messages.showStatusBarMessage(null, "E33: No previous substitute regular expression")
         return false
       }
       pat = null
@@ -611,7 +611,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     if (Character.isDigit(cmd.charAt())) {
       val i = cmd.digits
       if (i <= 0 && do_error) {
-        injector.messages.showStatusBarMessage(null, "e_zerocount")
+        injector.messages.showStatusBarMessage(null, "Zero count")
         return false
       }
       line1 = line2
@@ -622,7 +622,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     cmd.skipWhitespaces()
     if (!cmd.isNul && cmd.charAt() != '"') {
       // if not end-of-line or comment
-      injector.messages.showStatusBarMessage(null, "e_trailing")
+      injector.messages.showStatusBarMessage(null, "Trailing characters")
       return false
     }
 
