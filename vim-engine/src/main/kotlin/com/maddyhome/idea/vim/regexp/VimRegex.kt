@@ -312,7 +312,7 @@ public class VimRegex(pattern: String) {
         }
         when (substituteString[index]) {
           '&' -> result.append(if (magic) '&' else matchResult.value)
-          '~' -> result.append(if (magic) '~' else lastSubstituteString)
+          '~' -> result.append(if (magic) '~' else buildSubstituteString(matchResult, lastSubstituteString, "", false))
           '0' -> result.append(matchResult.value)
           // TODO: check for illegal back references
           '1' -> result.append(matchResult.groups.get(1)?.value)
@@ -344,7 +344,7 @@ public class VimRegex(pattern: String) {
       } else if (substituteString[index] == '&' && magic) {
         result.append(matchResult.value)
       } else if (substituteString[index] == '~' && magic) {
-        result.append(lastSubstituteString)
+        result.append(buildSubstituteString(matchResult, lastSubstituteString, "", true))
       } else {
         val buildResult = buildLiteralChar(substituteString[index], caseSettings)
         caseSettings = buildResult.second
