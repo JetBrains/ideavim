@@ -37,19 +37,13 @@ import kotlin.math.min
 public abstract class VimSearchGroupBase : VimSearchGroup {
 
   protected companion object {
-    @JvmStatic
     protected var lastPatternOffset: String? = ""
-    @JvmStatic
     protected var lastSearch: String? = ""
-    @JvmStatic
     protected var lastSubstitute: String? = ""
-    @JvmStatic
     protected var lastDirection: Direction = Direction.FORWARDS
     @JvmStatic
     protected var lastIgnoreSmartCase: Boolean = false
-    @JvmStatic
     protected var lastPatternType: PatternType? = null
-    @JvmStatic
     protected var lastSubstituteString: String? = null
 
   }
@@ -96,6 +90,10 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     endOffset: Int,
     newString: String,
   )
+
+  protected abstract fun resetSearchHighlight()
+
+  abstract override fun clearSearchHighlight()
 
   // For substitute command
   private var do_all = false // do multiple substitutions per line
@@ -212,6 +210,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
 
     lastDirection = direction
 
+    resetSearchHighlight()
     updateSearchHighlights(true)
 
     val result = findItOffset(editor, startOffset, 1, lastDirection)
@@ -236,6 +235,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     count: Int,
     dir: Direction,
   ): Int {
+    resetSearchHighlight()
     updateSearchHighlights(true)
 
     val startOffset: Int = caret.offset.point
@@ -381,6 +381,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
 
     lastDirection = dir
 
+    resetSearchHighlight()
     updateSearchHighlights(true)
 
     return findItOffset(editor, startOffset, 1, lastDirection)
@@ -408,6 +409,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     lastPatternOffset = ""
     lastDirection = dir
 
+    resetSearchHighlight()
     updateSearchHighlights(true)
 
     val offset = findItOffset(editor, range.startOffset, count, lastDirection)
@@ -681,6 +683,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val oldLastSubstituteString: String = lastSubstituteString ?: ""
     lastSubstituteString = sub.toString()
 
+    resetSearchHighlight()
     updateSearchHighlights(true)
 
     var lastMatchStartOffset = -1
@@ -836,10 +839,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val range = regex.find(line)?.range ?: return null
 
     return line.substring(range.first, range.last + 1).toInt()
-  }
-
-  override fun clearSearchHighlight() {
-    updateSearchHighlights(false)
   }
 
   override fun getLastSearchDirection(): Direction {

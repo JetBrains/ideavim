@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Ref
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
@@ -22,6 +24,7 @@ import com.maddyhome.idea.vim.helper.highlightSearchResults
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.ui.ModalEntry
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler
@@ -30,6 +33,27 @@ import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
 public open class IjVimSearchGroup : VimSearchGroupBase() {
+
+  init {
+    // TODO: Investigate migrating these listeners to use the effective value change listener
+    // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
+    // the highlights in that project's current document's open editors (see VIM-2779).
+    // However, we probably only want to update the editors associated with the current document, so maybe the whole
+    // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
+    // changes in the search options.
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch) {
+      resetSearchHighlight()
+      updateSearchHighlights(true)
+    }
+
+    val updateHighlightsIfVisible = GlobalOptionChangeListener {
+      if (showSearchHighlight) {
+        updateSearchHighlights(true)
+      }
+    }
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.ignorecase, updateHighlightsIfVisible)
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.smartcase, updateHighlightsIfVisible)
+  }
 
   private var showSearchHighlight: Boolean = injector.globalOptions().hlsearch
 
@@ -49,7 +73,6 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
   }
 
   override fun updateSearchHighlights(force: Boolean) {
-    showSearchHighlight = injector.globalOptions().hlsearch
     updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, force)
   }
 
@@ -137,7 +160,7 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
     editor: VimEditor,
     startOffset: Int,
     endOffset: Int,
-    newString: String
+    newString: String,
   ) {
     ApplicationManager.getApplication().runWriteAction {
       (editor as IjVimEditor).editor.document.replaceString(startOffset, endOffset, newString)
@@ -148,5 +171,14 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
   override fun resetState() {
     super.resetState()
     showSearchHighlight = injector.globalOptions().hlsearch
+  }
+
+  override fun resetSearchHighlight() {
+    showSearchHighlight = injector.globalOptions().hlsearch
+  }
+
+  override fun clearSearchHighlight() {
+    showSearchHighlight = false
+    updateSearchHighlights(false)
   }
 }

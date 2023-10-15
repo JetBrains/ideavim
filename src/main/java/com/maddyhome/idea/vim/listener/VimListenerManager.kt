@@ -307,7 +307,7 @@ internal object VimListenerManager {
       if (VimPlugin.isNotEnabled()) return
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
-      SearchGroup.fileEditorManagerSelectionChangedCallback(event)
+      VimPlugin.getSearch().fileEditorManagerSelectionChangedCallback(event)
       OptionGroup.fileEditorManagerSelectionChangedCallback(event)
     }
   }
