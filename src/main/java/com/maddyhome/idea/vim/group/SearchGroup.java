@@ -69,32 +69,34 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 })
 public class SearchGroup extends IjVimSearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
-    // TODO: Investigate migrating these listeners to use the effective value change listener
-    // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
-    // the highlights in that project's current document's open editors (see VIM-2779).
-    // However, we probably only want to update the editors associated with the current document, so maybe the whole
-    // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
-    // changes in the search options.
-    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch, () -> {
-      if (globalIjOptions(injector).getUseNewRegex()) {
-        super.updateSearchHighlights(true);
-      } else {
+    super();
+    if (!globalIjOptions(injector).getUseNewRegex()) {
+      // TODO: Investigate migrating these listeners to use the effective value change listener
+      // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
+      // the highlights in that project's current document's open editors (see VIM-2779).
+      // However, we probably only want to update the editors associated with the current document, so maybe the whole
+      // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
+      // changes in the search options.
+      VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch, () -> {
         resetShowSearchHighlight();
         forceUpdateSearchHighlights();
-      }
-    });
+      });
 
-    final GlobalOptionChangeListener updateHighlightsIfVisible = () -> {
-      if (showSearchHighlight) {
-        if (globalIjOptions(injector).getUseNewRegex()) super.updateSearchHighlights(true);
-        else forceUpdateSearchHighlights();
-      }
-    };
-    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.ignorecase, updateHighlightsIfVisible);
-    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.smartcase, updateHighlightsIfVisible);
+      final GlobalOptionChangeListener updateHighlightsIfVisible = () -> {
+        if (showSearchHighlight) {
+          forceUpdateSearchHighlights();
+        }
+      };
+      VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.ignorecase, updateHighlightsIfVisible);
+      VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.smartcase, updateHighlightsIfVisible);
+    }
   }
 
   public void turnOn() {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.updateSearchHighlights(false);
+      return;
+    }
     updateSearchHighlights();
   }
 
@@ -105,6 +107,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
   }
 
   @TestOnly
+  @Override
   public void resetState() {
     if (globalIjOptions(injector).getUseNewRegex()) {
       super.resetState();
@@ -123,6 +126,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    *
    * @return The pattern used for last search. Can be null
    */
+  @Override
   public @Nullable String getLastSearchPattern() {
     if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSearchPattern();
     return lastSearch;
@@ -132,6 +136,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    * Get the last pattern used in substitution.
    * @return The pattern used for the last substitute command. Can be null
    */
+  @Override
   public @Nullable String getLastSubstitutePattern() {
     if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSubstitutePattern();
     return lastSubstitute;
@@ -941,6 +946,7 @@ he direction to search
   }
 
   //public Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
+  @Override
   public Pair<Boolean, Triple<Object, String, Object>> search_regcomp(CharPointer pat,
                                                                                   int which_pat,
                                                                                   int patSave) {
@@ -1121,6 +1127,7 @@ he direction to search
   //
   // *******************************************************************************************************************
   //region Search highlights
+  @Override
   public void clearSearchHighlight() {
     if (globalIjOptions(injector).getUseNewRegex()) {
       super.clearSearchHighlight();
@@ -1174,7 +1181,11 @@ he direction to search
   /**
    * Updates search highlights when the selected editor changes
    */
-  public static void fileEditorManagerSelectionChangedCallback(@SuppressWarnings("unused") @NotNull FileEditorManagerEvent event) {
+  public void fileEditorManagerSelectionChangedCallback(@SuppressWarnings("unused") @NotNull FileEditorManagerEvent event) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.updateSearchHighlights(false);
+      return;
+    }
     VimPlugin.getSearch().updateSearchHighlights();
   }
 
