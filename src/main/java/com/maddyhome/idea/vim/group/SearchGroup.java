@@ -67,6 +67,10 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
+@Deprecated
+/**
+ * @deprecated Replace with IjVimSearchGroup
+ */
 public class SearchGroup extends IjVimSearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
     super();

@@ -502,8 +502,8 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       ) && "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1
     ) {
       // don't accept alphanumeric for separator
-      if (CharacterClasses.isAlpha(cmd.charAt())) {
-        injector.messages.showStatusBarMessage(null, "E146: Regular expressions can''t be delimited by letters")
+      if (cmd.charAt().isLetter()) {
+        injector.messages.showStatusBarMessage(null, "E146: Regular expressions can't be delimited by letters")
         return false
       }
 
@@ -806,7 +806,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     TODO("Remove once old engine is removed")
   }
 
-  protected fun setLastUsedPattern(
+  private fun setLastUsedPattern(
     pattern: String,
     patternType: PatternType,
     isNewPattern: Boolean,
