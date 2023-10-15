@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.regexp
 
 import org.jetbrains.annotations.NonNls
 
+@Deprecated("Remove once old regex engine is removed")
 public object CharacterClasses {
   public val CLASS_NAMES: @NonNls Array<String> = arrayOf(
     "alnum:]",

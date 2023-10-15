@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.regexp
 import java.nio.CharBuffer
 import java.util.*
 
+@Deprecated("Remove once old regex engine is removed")
 public class CharPointer {
   private var seq: CharSequence
   private var pointer = 0

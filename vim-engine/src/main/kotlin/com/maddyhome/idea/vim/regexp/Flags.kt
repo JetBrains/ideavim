@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.regexp
 
+@Deprecated("Remove once old regex engine is removed")
 public class Flags {
   private var flags: Int
 

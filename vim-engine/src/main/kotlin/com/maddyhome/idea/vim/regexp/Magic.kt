@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.regexp
 
+@Deprecated("Remove once old regex engine is removed")
 public object Magic {
   public const val AMP: Int = '&'.code - 256
   public const val AT: Int = '@'.code - 256
