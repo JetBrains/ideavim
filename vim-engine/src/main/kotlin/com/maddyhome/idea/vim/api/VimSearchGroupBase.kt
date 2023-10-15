@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.regexp.CharPointer
-import com.maddyhome.idea.vim.regexp.CharacterClasses
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
@@ -37,15 +36,33 @@ import kotlin.math.min
 public abstract class VimSearchGroupBase : VimSearchGroup {
 
   protected companion object {
-    protected var lastPatternOffset: String? = ""
-    protected var lastSearch: String? = ""
-    protected var lastSubstitute: String? = ""
-    protected var lastDirection: Direction = Direction.FORWARDS
     @JvmStatic
     protected var lastIgnoreSmartCase: Boolean = false
-    protected var lastPatternType: PatternType? = null
-    protected var lastSubstituteString: String? = null
+    private var lastPatternOffset: String? = ""
+    private var lastSearch: String? = ""
+    private var lastSubstitute: String? = ""
+    private var lastDirection: Direction = Direction.FORWARDS
+    private var lastPatternType: PatternType? = null
+    private var lastSubstituteString: String? = null
 
+    private val CLASS_NAMES: List<String> = listOf(
+      "alnum:]",
+      "alpha:]",
+      "blank:]",
+      "cntrl:]",
+      "digit:]",
+      "graph:]",
+      "lower:]",
+      "print:]",
+      "punct:]",
+      "space:]",
+      "upper:]",
+      "xdigit:]",
+      "tab:]",
+      "return:]",
+      "backspace:]",
+      "escape:]",
+    )
   }
 
   protected abstract fun highlightSearchLines(
@@ -96,10 +113,10 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   abstract override fun clearSearchHighlight()
 
   // For substitute command
-  private var do_all = false // do multiple substitutions per line
-  private var do_ask = false // ask for confirmation
-  private var do_error = true // if false, ignore errors
-  private var do_ic: Boolean? = null // ignore case flag
+  private var doAll = false // do multiple substitutions per line
+  private var doAsk = false // ask for confirmation
+  private var doError = true // if false, ignore errors
+  private var doIgnorecase: Boolean? = null // ignore case flag
 
   override var lastSearchPattern: String?
     get() = lastSearch
@@ -249,83 +266,65 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     return offset
   }
 
-  private fun skip_regexp(p: CharPointer, dirc: Char, magic: Boolean): CharPointer {
-    var p = p
-    var mymagic: Int
-    mymagic = if (magic) {
-      3
-    } else {
-      2
-    }
-    while (!p.end()) {
-      if (p.charAt() == dirc) /* found end of regexp */ {
-        break
+  private fun findEndOfPattern(
+    command: String,
+    delimiter: Char,
+    startIndex: Int = 0
+  ): Int {
+    var magic = true
+
+    var i = startIndex
+    while (i < command.length) {
+      // delimiter found
+      if (command[i] == delimiter) break
+
+      // collection start found, ignore until end of collection
+      if (magic && command[i] == '[' ||
+        !magic && command[i] == '\\' && i + 1 < command.length && command[i + 1] == '[') {
+
+        i = findEndOfCollection(command, i)
+      // skip escaped char
+      } else if (command[i] == '\\' && i + 1 < command.length) {
+        i++
+        // update magic
+        if (command[i] == 'v' || command[i] == 'm') magic = true
+        if (command[i] == 'V' || command[i] == 'M') magic = false
       }
-      if (p.charAt() == '[' && mymagic >= 3 ||
-        p.charAt() == '\\' && p.charAt(1) == '[' && mymagic <= 2
-      ) {
-        p = skip_anyof(p.ref(1))
-        if (p.end()) {
-          break
-        }
-      } else if (p.charAt() == '\\' && p.charAt(1) != '\u0000') {
-        p.inc() /* skip next character */
-        if (p.charAt() == 'v') {
-          mymagic = 4
-        } else if (p.charAt() == 'V') {
-          mymagic = 1
-        }
-      }
-      p.inc()
+      i++
     }
-    return p
+    return i
   }
 
-  private val REGEXP_INRANGE = "]^-n\\"
-  private val REGEXP_ABBR = "nrteb"
-  private fun skip_anyof(p: CharPointer): CharPointer {
-    if (p.charAt() == '^') /* Complement of range. */ {
-      p.inc()
+  private fun findEndOfCollection(
+    command: String,
+    startIndex: Int
+  ): Int {
+    var i = startIndex
+    while (i < command.length - 1) {
+      // collection end found
+      if (command[i] == ']') break
+
+      // skip escaped char
+      if (command[i] == '\\' && i + 1 <  command.length) i++
+      // skip character class
+      else if (i + 1 < command.length && command[i] == '[' && command[i + 1] < ':') i = findEndOfCharacterClass(command, i + 2)
+
+      i++
     }
-    if (p.charAt() == ']' || p.charAt() == '-') {
-      p.inc()
-    }
-    while (!p.end() && p.charAt() != ']') {
-      if (p.charAt() == '-') {
-        p.inc()
-        if (!p.end() && p.charAt() != ']') {
-          p.inc()
-        }
-      } else if (p.charAt() == '\\' &&
-        (REGEXP_INRANGE.indexOf(p.charAt(1)) != -1 || REGEXP_ABBR.indexOf(p.charAt(1)) != -1)
-      ) {
-        p.inc(2)
-      } else if (p.charAt() == '[') {
-        if (skip_class_name(p) == CharacterClasses.CLASS_NONE) {
-          p.inc() /* It was not a class name */
-        }
-      } else {
-        p.inc()
-      }
-    }
-    return p
+    return i
   }
 
-  private fun skip_class_name(pp: CharPointer): Int {
-    var i: Int
-    if (pp.charAt(1) == ':') {
-      i = 0
-      while (i < CharacterClasses.CLASS_NAMES.size) {
-        if (pp.ref(2)
-            .strncmp(CharacterClasses.CLASS_NAMES[i], CharacterClasses.CLASS_NAMES[i].length) == 0
-        ) {
-          pp.inc(CharacterClasses.CLASS_NAMES[i].length + 2)
-          return i
-        }
-        ++i
-      }
+  private fun findEndOfCharacterClass(
+    command: String,
+    startIndex: Int
+  ): Int {
+    for (charClass in CLASS_NAMES) {
+      if (startIndex + charClass.length < command.length && command.substring(startIndex, startIndex + charClass.length) == charClass)
+        // char class found, skip to end of it
+        return startIndex + charClass.length - 1
     }
-    return CharacterClasses.CLASS_NONE
+    // there wasn't any valid character class
+    return startIndex
   }
 
   override fun processSearchCommand(
@@ -342,17 +341,11 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
 
     if (command.isNotEmpty()) {
       if (command[0] != type) {
-        val p = CharPointer(command)
-        val end: CharPointer = skip_regexp(p.ref(0), type, true)
-        pattern = p.substring(end.pointer() - p.pointer())
+        val endOfPattern = findEndOfPattern(command, type)
+        pattern = command.substring(0, endOfPattern)
         isNewPattern = true
-        if (p.charAt() == type) p.inc()
-        patternOffset = if (end.charAt(0) == type) {
-          end.inc()
-          end.toString()
-        } else {
-          ""
-        }
+        // if (p.charAt() == type) p.inc()
+        patternOffset = if (endOfPattern < command.length) command.substring(endOfPattern + 1) else ""
       } else if (command.length == 1) {
         patternOffset = ""
       } else {
@@ -484,25 +477,21 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val exceptions: MutableList<ExException> = ArrayList()
     if (editor.inVisualMode) editor.exitVisualMode()
 
-    var cmd = CharPointer(StringBuffer(exarg))
-
-    var which_pat = if ("~" == excmd) {
+    var patternType = if ("~" == excmd) {
       // use last used regexp
       lastPatternType
     } else {
       PatternType.SUBSTITUTE // use last substitute regexp
     }
 
-    val pat: CharPointer?
-    val sub: CharPointer
+    var pattern: String? = ""
+    val sub: String
     val delimiter: Char
+    var trailingOptionsStartIndex = 0
     // new pattern and substitution
-    if (excmd[0] == 's' && !cmd.isNul && !Character.isWhitespace(
-        cmd.charAt()
-      ) && "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1
-    ) {
+    if (excmd[0] == 's' && exarg.isNotEmpty() && !exarg.first().isWhitespace() && !"0123456789cegriIp|\"".contains(exarg.first())) {
       // don't accept alphanumeric for separator
-      if (cmd.charAt().isLetter()) {
+      if (exarg.first().isLetter()) {
         injector.messages.showStatusBarMessage(null, "E146: Regular expressions can't be delimited by letters")
         return false
       }
@@ -511,45 +500,45 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
        * undocumented vi feature:
        *  "\/sub/" and "\?sub?" use last used search pattern (almost like
        *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
-       */if (cmd.charAt() == '\\') {
-        cmd.inc()
-        if ("/?&".indexOf(cmd.charAt()) == -1) {
+       */
+      var substituteStringStartIndex = 0
+      if (exarg.first() == '\\') {
+        if (exarg.length < 2 || !"/?&".contains(exarg[1])) {
           injector.messages.showStatusBarMessage(null, "E10: \\ should be followed by /, ? or &")
           return false
         }
-        if (cmd.charAt() != '&') {
-          which_pat = PatternType.SEARCH // use last search pattern
+        if (exarg[1] != '&') {
+          patternType = PatternType.SEARCH // use last search pattern
         }
-        pat = CharPointer("") // empty search pattern
-        delimiter = cmd.charAt() // remember delimiter character
-        cmd.inc()
+        delimiter = exarg[1] // remember delimiter character
+        substituteStringStartIndex += 2
       } else {
         // find the end of the regexp
-        which_pat = lastPatternType // use last used regexp
-        delimiter = cmd.charAt() // remember delimiter character
-        cmd.inc()
-        pat = cmd.ref(0) // remember start of search pat
-        cmd = skip_regexp(cmd, delimiter, true)
-        if (cmd.charAt() == delimiter) { // end delimiter found
-          cmd.set('\u0000').inc() // replace it with a NUL
-        }
+        patternType = lastPatternType // use last used regexp
+        delimiter = exarg.first() // remember delimiter character
+        val endOfPattern = findEndOfPattern(exarg, delimiter, 1)
+        pattern = exarg.substring(1, endOfPattern)
+        if (pattern.isEmpty()) pattern = null
+        substituteStringStartIndex = endOfPattern
+        if (endOfPattern < exarg.length && exarg[endOfPattern] == delimiter) substituteStringStartIndex++
       }
 
       /*
        * Small incompatibility: vi sees '\n' as end of the command, but in
        * Vim we want to use '\n' to find/substitute a NUL.
        */
-      sub = cmd.ref(0) // remember the start of the substitution
-      while (!cmd.isNul) {
-        if (cmd.charAt() == delimiter) /* end delimiter found */ {
-          cmd.set('\u0000').inc() /* replace it with a NUL */
+      val tmpSub = exarg.substring(substituteStringStartIndex) // remember the start of the substitution
+      var substituteStringEndIndex = tmpSub.length
+      trailingOptionsStartIndex = substituteStringStartIndex + substituteStringEndIndex
+      for (i in tmpSub.indices) {
+        if (tmpSub[i] == delimiter && (i == 0 || tmpSub[i - 1] != '\\')) {
+          substituteStringEndIndex = i
+          trailingOptionsStartIndex = substituteStringStartIndex + substituteStringEndIndex + 1
           break
         }
-        if (cmd.charAt(0) == '\\' && cmd.charAt(1).code != 0) /* skip escaped characters */ {
-          cmd.inc()
-        }
-        cmd.inc()
       }
+      sub = tmpSub.substring(0, substituteStringEndIndex)
+
     } else {
       // use previous pattern and substitution
       if (lastSubstituteString == null) {
@@ -557,46 +546,47 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
         injector.messages.showStatusBarMessage(null, "E33: No previous substitute regular expression")
         return false
       }
-      pat = null
-      sub = CharPointer(lastSubstituteString!!)
+      pattern = null
+      sub = lastSubstituteString!! + ""
     }
 
     // Find trailing options.  When '&' is used, keep old options.
-    if (cmd.charAt() == '&') {
-      cmd.inc()
+    if (trailingOptionsStartIndex < exarg.length && exarg[trailingOptionsStartIndex] == '&') {
+      trailingOptionsStartIndex++
     } else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = injector.options(editor).gdefault
-      do_ask = false
-      do_error = true
-      do_ic = null
+      doAll = injector.options(editor).gdefault
+      doAsk = false
+      doError = true
+      doIgnorecase = null
     }
-    while (!cmd.isNul) {
+    var trailingOptionsEndIndex: Int = trailingOptionsStartIndex
+    for (i in trailingOptionsStartIndex until exarg.length) {
       /*
        * Note that 'g' and 'c' are always inverted, also when p_ed is off.
        * 'r' is never inverted.
        */
-      if (cmd.charAt() == 'g') {
-        do_all = !do_all
-      } else if (cmd.charAt() == 'c') {
-        do_ask = !do_ask
-      } else if (cmd.charAt() == 'e') {
-        do_error = !do_error
-      } else if (cmd.charAt() == 'r') {
+      if (exarg[i] == 'g') {
+        doAll = !doAll
+      } else if (exarg[i] == 'c') {
+        doAsk = !doAsk
+      } else if (exarg[i] == 'e') {
+        doError = !doError
+      } else if (exarg[i] == 'r') {
         // use last used regexp
-        which_pat = lastPatternType
-      } else if (cmd.charAt() == 'i') {
+        patternType = lastPatternType
+      } else if (exarg[i] == 'i') {
         // ignore case
-        do_ic = true
-      } else if (cmd.charAt() == 'I') {
-        /* don't ignore case */
-        do_ic = false
-      } else if (cmd.charAt() != 'p' && cmd.charAt() != 'l' && cmd.charAt() != '#' && cmd.charAt() != 'n') {
+        doIgnorecase = true
+      } else if (exarg[i] == 'I') {
+        // don't ignore case
+        doIgnorecase = false
+      } else if (exarg[i] != 'p' && exarg[i] != 'l' && exarg[i] != '#' && exarg[i] != 'n') {
         // TODO: Support printing last changed line, with options for line number/list format
         // TODO: Support 'n' to report number of matches without substituting
         break
       }
-      cmd.inc()
+      trailingOptionsEndIndex++
     }
 
     var line1 = range.startLine
@@ -607,20 +597,23 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     }
 
     // check for a trailing count
-    cmd.skipWhitespaces()
-    if (Character.isDigit(cmd.charAt())) {
-      val i = cmd.digits
-      if (i <= 0 && do_error) {
+    for (i in trailingOptionsEndIndex until exarg.length) if (exarg[i].isWhitespace()) trailingOptionsEndIndex++
+    if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex].isDigit()) {
+      var count = 0
+      while (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex].isDigit()) {
+        count = count * 10 + exarg[trailingOptionsEndIndex].digitToInt()
+        trailingOptionsEndIndex++
+      }
+      if (count <= 0 && doError) {
         injector.messages.showStatusBarMessage(null, "Zero count")
         return false
       }
       line1 = line2
-      line2 = editor.normalizeLine(line1 + i - 1)
+      line2 = editor.normalizeLine(line1 + count - 1)
     }
 
     // check for trailing command or garbage
-    cmd.skipWhitespaces()
-    if (!cmd.isNul && cmd.charAt() != '"') {
+    if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
       injector.messages.showStatusBarMessage(null, "Trailing characters")
       return false
@@ -633,10 +626,9 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     if (injector.globalOptions().wrapscan) options.add(VimRegexOptions.WRAP_SCAN)
 
     var isNewPattern = true
-    var pattern: String? = ""
-    if (pat == null || pat.isNul) {
+    if (pattern == null) {
       isNewPattern = false
-      val errorMessage: String? = when (which_pat) {
+      val errorMessage: String? = when (patternType) {
         PatternType.SEARCH -> {
           pattern = lastSearch
           "E33: No previous substitute regular expression"
@@ -654,8 +646,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
         injector.messages.showStatusBarMessage(null, errorMessage)
         return false
       }
-    } else {
-      pattern = pat.toString()
     }
 
     // Set last substitute pattern, but only for explicitly typed patterns. Reused patterns are not saved/updated
@@ -665,7 +655,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     lastIgnoreSmartCase = false
 
     // TODO: allow option to force (no)ignore case in a better way
-    pattern = when (do_ic) {
+    pattern = when (doIgnorecase) {
       true -> "\\c$pattern"
       false -> "\\C$pattern"
       null -> pattern
@@ -674,24 +664,25 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val regex: VimRegex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
+      println("here")
       injector.messages.showStatusBarMessage(editor, e.message)
       return false
     }
 
-    val hasExpression = sub.charAt(0) == '\\' && sub.charAt(1) == '='
+    val hasExpression = sub.length >= 2 && sub[0] == '\\' && sub[1] == '='
 
     val oldLastSubstituteString: String = lastSubstituteString ?: ""
-    lastSubstituteString = sub.toString()
+    lastSubstituteString = sub + ""
 
     resetSearchHighlight()
     updateSearchHighlights(true)
 
     var lastMatchStartOffset = -1
-    var got_quit = false
+    var gotQuit = false
     var column = 0
     var line = line1
-    while (line <= line2 && !got_quit) {
-      val substituteResult = regex.substitute(editor, sub.toString(), oldLastSubstituteString, line, column, hasExpression, options)
+    while (line <= line2 && !gotQuit) {
+      val substituteResult = regex.substitute(editor, sub, oldLastSubstituteString, line, column, hasExpression, options)
       if (substituteResult == null) {
         line++
         column = 0
@@ -702,7 +693,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       val matchRange = substituteResult.first.range
       var expression: Expression? = null
       if (hasExpression) {
-        val exprString = sub.toString().substring(2)
+        val exprString = sub.substring(2)
         expression = parseVimScriptExpression(exprString)
         if (expression == null) {
           exceptions.add(ExException("E15: Invalid expression: $exprString"))
@@ -713,23 +704,23 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       lastMatchStartOffset = matchRange.startOffset
 
       var didReplace = false
-      if (do_all || line != editor.lineCount()) {
+      if (doAll || line != editor.lineCount()) {
         var doReplace = true
-        if (do_ask) {
+        if (doAsk) {
           addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
 
           val choice: ReplaceConfirmationChoice = confirmChoice(editor, match, caret, matchRange.startOffset)
           when (choice) {
             ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
             ReplaceConfirmationChoice.SKIP -> doReplace = false
-            ReplaceConfirmationChoice.SUBSTITUTE_ALL -> do_ask = false
+            ReplaceConfirmationChoice.SUBSTITUTE_ALL -> doAsk = false
             ReplaceConfirmationChoice.QUIT -> {
               doReplace = false
-              got_quit = true
+              gotQuit = true
             }
 
             ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
-              do_all = false
+              doAll = false
               line2 = line
             }
           }
@@ -759,7 +750,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
         }
       }
 
-      if (do_all && matchRange.startOffset != matchRange.endOffset) {
+      if (doAll && matchRange.startOffset != matchRange.endOffset) {
         if (didReplace) {
           // if there was a replacement, we start next search from where the new string ends
           val endPosition = editor.offsetToBufferPosition(matchRange.startOffset + match.length)
@@ -776,7 +767,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       }
     }
 
-    if (!got_quit) {
+    if (!gotQuit) {
       if (lastMatchStartOffset != -1) {
         caret.moveToOffset(
           injector.motion.moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatchStartOffset).line)
