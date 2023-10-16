@@ -580,7 +580,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val regex: VimRegex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
-      println("here")
       injector.messages.showStatusBarMessage(editor, e.message)
       return false
     }
