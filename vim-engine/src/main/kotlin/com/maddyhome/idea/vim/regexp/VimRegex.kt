@@ -268,6 +268,13 @@ public class VimRegex(pattern: String) {
     return foundMatches
   }
 
+  /**
+   * Searches for a match of a pattern on a give line, starting at a certain column.
+   *
+   * @param editor     The editor where to look for the match in
+   * @param line       The number of the line where to look for the match in
+   * @param column     The column of that line where to start looking for a match
+   */
   public fun findInLine(
     editor: VimEditor,
     line: Int,
@@ -277,6 +284,19 @@ public class VimRegex(pattern: String) {
     return simulateNonExactNFA(editor, editor.getLineStartOffset(line) + column, options)
   }
 
+  /**
+   * "Simulates" the substitution of the match of a pattern with a substitution string.
+   *
+   * Substitution is not actually performed here, only simulated, since it may still be pending
+   * confirmation from the user.
+   *
+   * @param editor               The editor where to look for the match and perform the substitution in
+   * @param substituteString     The string used for substitution. Can either be taken literally or contain characters with a special meaning
+   * @param lastSubstituteString The substitution string lastly used.
+   * @param line                 The line to simulate the substitution in
+   * @param column               The column of that line where to start looking for a match
+   * @param takeLiterally        Whether to always take the string literally, meaning no character has a special meaning
+   */
   public fun substitute(
     editor: VimEditor,
     substituteString: String,
