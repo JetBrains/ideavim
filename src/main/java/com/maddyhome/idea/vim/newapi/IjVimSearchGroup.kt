@@ -76,9 +76,6 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
     updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, force)
   }
 
-  /**
-   * Reset the search highlights to the last used pattern after highlighting incsearch results.
-   */
   override fun resetIncsearchHighlights() {
     updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, true)
   }
