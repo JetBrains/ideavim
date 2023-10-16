@@ -11,6 +11,7 @@ import com.intellij.codeInsight.actions.AsyncActionExecutionService
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
@@ -74,17 +75,24 @@ internal class CommentaryExtension : VimExtension {
           listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
         }
 
-        val res = Ref.create<Boolean>(true)
-        AsyncActionExecutionService.getInstance(editor.ij.project!!).withExecutionAfterAction(actions[0], {
-          res.set(injector.actionExecutor.executeAction(actions[0], context))
-        }, { afterCommenting(mode, editor, resetCaret, range) })
-        if (!res.get()) {
-          AsyncActionExecutionService.getInstance(editor.ij.project!!).withExecutionAfterAction(actions[1], {
-            res.set(injector.actionExecutor.executeAction(actions[1], context))
-          }, { afterCommenting(mode, editor, resetCaret, range) })
-        }
-        res.get()
+        val project = editor.ij.project!!
+        val callback = { afterCommenting(mode, editor, resetCaret, range) }
+        actions.any { executeActionWithCallbackOnSuccess(it, project, context, callback) }
       }
+    }
+
+    private fun executeActionWithCallbackOnSuccess(
+      action: String,
+      project: Project,
+      context: ExecutionContext,
+      callback: () -> Unit,
+    ): Boolean {
+      val res = Ref.create<Boolean>(false)
+      AsyncActionExecutionService.getInstance(project).withExecutionAfterAction(
+        action,
+        { res.set(injector.actionExecutor.executeAction(action, context)) },
+        { if (res.get()) callback() })
+      return res.get()
     }
 
     private fun afterCommenting(
