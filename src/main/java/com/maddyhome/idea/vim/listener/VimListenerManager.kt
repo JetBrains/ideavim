@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.event.EditorMouseMotionListener
 import com.intellij.openapi.editor.event.SelectionEvent
 import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
+import com.intellij.openapi.editor.ex.FocusChangeListener
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -58,6 +59,7 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
@@ -76,6 +78,7 @@ import com.maddyhome.idea.vim.helper.VimStandalonePluginUpdateChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.forceBarCursor
+import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
@@ -89,6 +92,8 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -215,6 +220,8 @@ internal object VimListenerManager {
 
       editor.contentComponent.addKeyListener(VimKeyListener)
       Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
+
+      editor.addFocusListener(EditorFocusListener, disposable)
 
       // Initialise the local options. We MUST do this before anything has the chance to query options
       VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, openingEditor, scenario)
@@ -683,6 +690,16 @@ internal object VimListenerManager {
   private object EditorCaretHandler : CaretListener {
     override fun caretPositionChanged(event: CaretEvent) {
       event.caret?.resetVimLastColumn()
+    }
+  }
+
+  private object EditorFocusListener : FocusChangeListener {
+    override fun focusGained(editor: Editor) {
+      // If we focus a read-only editor when the global mode is set to insert or replace mode, we need to forcibly
+      // switch to normal mode.
+      if (injector.globalOptions().ideaglobalmode && editor.inInsertMode && !editor.vim.isWritable()) {
+        VimStateMachine.getInstance(editor).mode = Mode.NORMAL()
+      }
     }
   }
 
