@@ -23,6 +23,8 @@ object Project : Project({
   vcsRoot(GitHubPullRequest)
 
   // Active tests
+  buildType(TestingBuildType("2023.2", "<default>", version = "2023.2.3"))
+  buildType(TestingBuildType("2023.1", "<default>", version = "2023.1.5"))
   buildType(TestingBuildType("Latest EAP", "<default>", version = "LATEST-EAP-SNAPSHOT"))
   buildType(TestingBuildType("Latest EAP With Xorg", "<default>", version = "LATEST-EAP-SNAPSHOT"))
 
