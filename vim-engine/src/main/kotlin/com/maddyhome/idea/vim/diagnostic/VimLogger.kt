@@ -19,6 +19,7 @@ public interface VimLogger {
 
   public fun warn(message: String)
   public fun error(message: String)
+  public fun error(message: String, e: Throwable)
   public fun info(message: String)
 }
 

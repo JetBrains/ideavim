@@ -182,20 +182,22 @@ public object MappingProcessor {
     } catch (e: Exception) {
       injector.messages.showStatusBarMessage(editor, e.message)
       injector.messages.indicateError()
-      log.warn(
+      log.error(
         """
                 Caught exception during ${mappingInfo.getPresentableString()}
                 ${e.message}
         """.trimIndent(),
+        e
       )
     } catch (e: NotImplementedError) {
       injector.messages.showStatusBarMessage(editor, e.message)
       injector.messages.indicateError()
-      log.warn(
+      log.error(
         """
                  Caught exception during ${mappingInfo.getPresentableString()}
                  ${e.message}
         """.trimIndent(),
+        e
       )
     } finally {
       mappingState.stopMapExecution()
