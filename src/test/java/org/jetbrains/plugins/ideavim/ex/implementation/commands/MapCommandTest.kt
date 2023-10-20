@@ -10,17 +10,20 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import javax.swing.JTextArea
+import kotlin.test.assertIs
 
 /**
  * @author vlan
@@ -849,7 +852,11 @@ n  ,f            <Plug>Foo
       indicateErrors = true,
       null,
     )
-    typeText(injector.parser.parseKeys("t"))
+    val exception = assertThrows<Throwable> {
+      typeText(injector.parser.parseKeys("t"))
+    }
+    assertIs<ExException>(exception.cause) // The original exception comes from the LOG.error, so we check the cause
+
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
   }
@@ -891,8 +898,13 @@ n  ,f            <Plug>Foo
           -----
     """.trimIndent()
     configureByJavaText(text)
-    typeText(commandToKeys("inoremap <expr> <cr> unknownFunction() ? '\\<C-y>' : '\\<C-g>u\\<CR>'"))
-    typeText(injector.parser.parseKeys("i<CR>"))
+
+    val exception = assertThrows<Throwable> {
+      typeText(commandToKeys("inoremap <expr> <cr> unknownFunction() ? '\\<C-y>' : '\\<C-g>u\\<CR>'"))
+      typeText(injector.parser.parseKeys("i<CR>"))
+    }
+    assertIs<ExException>(exception.cause) // The original exception comes from the LOG.error, so we check the cause
+
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: unknownFunction")
     assertState(text)

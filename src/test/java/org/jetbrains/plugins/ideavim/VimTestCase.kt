@@ -770,7 +770,7 @@ abstract class VimTestCase {
 
   private fun KeyStroke.getChar(editor: Editor): CharType {
     if (keyChar != KeyEvent.CHAR_UNDEFINED) return CharType.CharDetected(keyChar)
-    if (isOctopusEnabled(this)) {
+    if (isOctopusEnabled(this, editor)) {
       if (keyCode in setOf(KeyEvent.VK_ENTER)) return CharType.CharDetected(keyCode.toChar())
       if (keyCode == KeyEvent.VK_ESCAPE) return CharType.EditorAction("EditorEscape")
     }

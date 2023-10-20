@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -147,11 +148,14 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
     val enterKey = key(key)
-    return isOctopusEnabled(enterKey)
+    return isOctopusEnabled(enterKey, editor)
   }
 }
 
-internal fun isOctopusEnabled(s: KeyStroke): Boolean {
+internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
+  // CMD line has a different processing mechanizm: the processing actions are registered
+  //   for the input field component. These keys are not dispatched via the octopus handler.
+  if (editor.vim.mode is Mode.CMD_LINE) return false
   when (s.keyCode) {
     KeyEvent.VK_ENTER -> return true
     KeyEvent.VK_ESCAPE -> return true

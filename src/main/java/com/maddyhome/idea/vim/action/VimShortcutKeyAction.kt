@@ -109,7 +109,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
-      if (isOctopusEnabled(keyStroke)) {
+      if (isOctopusEnabled(keyStroke, editor)) {
         return ActionEnableStatus.no("Octopus handler is enabled", LogLevel.DEBUG)
       }
       if (editor.isIdeaVimDisabledHere) {
