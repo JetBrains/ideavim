@@ -9,10 +9,12 @@
 package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
+import com.intellij.openapi.editor.impl.CaretModelImpl
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.removeUserData
@@ -66,11 +68,29 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 
   final override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
     if (isThisHandlerEnabled(editor, caret, dataContext)) {
-      try {
-        (dataContext as? UserDataHolder)?.putUserData(commandContinuation, nextHandler)
-        executeHandler(editor, caret, dataContext)
-      } finally {
-        (dataContext as? UserDataHolder)?.removeUserData(commandContinuation)
+      val executeInInvokeLater = (editor.caretModel as? CaretModelImpl)?.isIteratingOverCarets ?: true
+      val executionHandler = {
+        try {
+          (dataContext as? UserDataHolder)?.putUserData(commandContinuation, nextHandler)
+          executeHandler(editor, caret, dataContext)
+        } finally {
+          (dataContext as? UserDataHolder)?.removeUserData(commandContinuation)
+        }
+      }
+
+      if (executeInInvokeLater) {
+        // This `invokeLater` is used to escape the potential `runForEachCaret` function.
+        //
+        // The `runForEachCaret` function is disallowed to be called recursively. However, with this new handler, we lose
+        //   control if we execute the code inside this function or not. See IDEA-300030 for details.
+        // This means the code in IdeaVim MUST NOT call `runForEachCaret` function. While this is possible for most cases,
+        //   the user may make a mapping to some intellij action where the `runForEachCaret` is called. This breaks
+        //   the condition (see VIM-3103 for example).
+        // Since we can't make sure we don't execute `runForEachCaret`, we have to "escape" out of this function. This is
+        //   done by scheduling the execution of our code later via the invokeLater function.
+        ApplicationManager.getApplication().invokeLater(executionHandler)
+      } else {
+        executionHandler()
       }
     } else {
       nextHandler?.execute(editor, caret, dataContext)

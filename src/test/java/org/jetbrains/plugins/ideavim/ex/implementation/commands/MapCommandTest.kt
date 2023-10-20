@@ -7,6 +7,7 @@
  */
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.idea.TestFor
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.api.injector
@@ -667,6 +668,29 @@ n  ,f            <Plug>Foo
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `action execution has correct ordering`() {
+    configureByJavaText(
+      """
+          -----
+          1<caret>2345
+          abcde
+          -----
+      """.trimIndent(),
+    )
+    typeText(commandToKeys("map k <Action>(EditorDown)x"))
+    typeText(injector.parser.parseKeys("k"))
+    assertState(
+      """
+          -----
+          12345
+          a${c}cde
+          -----
+      """.trimIndent(),
+    )
+  }
+
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test execute mapping with a delay`() {
@@ -1046,5 +1070,31 @@ n  ,i            <Action>(Back)
       "map A :echo 42<CR>",
       injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry,
     )
+  }
+
+  @TestFor(issues = ["VIM-3103"])
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test map enter to action`() {
+    configureByText(
+      """
+     Lorem Ipsum
+
+     Lorem ipsum dolor sit amet,
+     ${c}consectetur adipiscing elit
+     Sed in orci mauris.
+     Cras id tellus in ex imperdiet egestas. 
+    """.trimIndent()
+    )
+    typeText(commandToKeys("map <Enter> <Action>(EditorSelectWord)"))
+    typeText("<Enter>")
+    assertState("""
+     Lorem Ipsum
+
+     Lorem ipsum dolor sit amet,
+     ${s}${c}consectetur${se} adipiscing elit
+     Sed in orci mauris.
+     Cras id tellus in ex imperdiet egestas. 
+    """.trimIndent())
   }
 }

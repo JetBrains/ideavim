@@ -740,7 +740,6 @@ abstract class VimTestCase {
       when (keyChar) {
         is CharType.CharDetected -> {
           fixture.type(keyChar.char)
-          PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
         }
 
         is CharType.EditorAction -> {
@@ -764,6 +763,7 @@ abstract class VimTestCase {
           }
         }
       }
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
       key = inputModel.nextKeyStroke()
     }
   }
