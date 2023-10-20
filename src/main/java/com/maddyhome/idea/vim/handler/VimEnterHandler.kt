@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.handler
 
+import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
@@ -119,6 +120,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
  * - Lookup - doesn't intersect with enter anymore
  * - App code - set handler after
  * - Template - doesn't intersect with enter anymore
+ * - rd.client.editor.enter - set handler before. Otherwise, rider will add new line on enter even in normal mode
  */
 internal class VimEnterHandler(nextHandler: EditorActionHandler?) : VimKeyHandler(nextHandler) {
   override val key: String = "<CR>"
@@ -136,7 +138,7 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler?) : VimKeyHandle
  * Known conflicts & solutions:
  *
  * - Smart step into - set handler after
- * - Python notebooks - set handler before - yes, we have <CR> as "after" and <esc> as before. I'm not completely sure
+ * - Python notebooks - set handler before - yes, we have `<CR>` as "after" and `<esc>` as before. I'm not completely sure
  *   why this combination is correct, but other versions don't work.
  * - Ace jump - set handler after
  * - Lookup - It disappears after putting our esc before templateEscape. But I'm not sure why it works like that
@@ -153,6 +155,24 @@ internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(n
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.vim.mode.inNormalMode ||
       ideaVimSupportDialog && !editor.vim.mode.inNormalMode
+  }
+}
+
+/**
+ * Rider uses a separate handler for esc to close the completion. IdeaOnlyEscapeHandlerAction is especially
+ *   designer to get all the esc presses, and if there is a completion close it and do not pass the execution further.
+ *   This doesn't work the same as in IJ.
+ * In IdeaVim, we'd like to exit insert mode on closing completion. This is a requirement as the change of this
+ *   behaviour causes a lot of complaining from users. Since the rider handler gets execution control, we don't
+ *    receive an event and don't exit the insert mode.
+ * To fix it, this special handler exists only for rider and stands before the rider's handler. We don't execute the
+ *   handler from rider because the autocompletion is closed automatically anyway.
+ */
+internal class VimEscForRiderHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
+  override val key: String = "<Esc>"
+
+  override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
+    return LookupManager.getActiveLookup(editor) != null
   }
 }
 

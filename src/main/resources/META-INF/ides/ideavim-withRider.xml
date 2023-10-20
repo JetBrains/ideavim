@@ -11,4 +11,11 @@
     <listener class="com.maddyhome.idea.vim.listener.RiderActionListener"
               topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
   </projectListeners>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <editorActionHandler action="EditorEscape"
+                         implementationClass="com.maddyhome.idea.vim.handler.VimEscForRiderHandler"
+                         id="ideavim-rider-esc"
+                         order="first, before idea.only.escape"/>
+  </extensions>
 </idea-plugin>
