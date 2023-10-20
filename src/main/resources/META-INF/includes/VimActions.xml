@@ -314,7 +314,7 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction" mappingModes="NXO" keys="#"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction" mappingModes="NXO" keys="g*"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction" mappingModes="NXO" keys="g#"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction" mappingModes="NX" keys="gD,gd,«C-]»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction" mappingModes="NX" keys="gD,gd,gx,«C-]»"/>
 
     <!-- Macro -->
     <vimAction implementation="com.maddyhome.idea.vim.action.macro.ToggleRecordingAction" mappingModes="NX" keys="q"/>
