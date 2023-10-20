@@ -48,7 +48,7 @@ public open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase
   public val whichwrap: StringListOptionValue by optionProperty(Options.whichwrap)
   public var wrapscan: Boolean by optionProperty(Options.wrapscan)
 
-  // IdeaVim specific options. Put any editor or IDE specific options in IjVimOptionService
+  // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
   public var ideaglobalmode: Boolean by optionProperty(Options.ideaglobalmode)
   public var ideastrictmode: Boolean by optionProperty(Options.ideastrictmode)
   public var ideatracetime: Boolean by optionProperty(Options.ideatracetime)

@@ -298,7 +298,7 @@ public object Options {
     StringListOption("clipboard", GLOBAL, "cb", "autoselect,exclude:cons\\|linux")
   )
 
-  // IdeaVim specific options. Put any editor or IDE specific options in IjVimOptionService
+  // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
   public val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", GLOBAL, "ideaglobalmode", false))
   public val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false))
   public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false))
