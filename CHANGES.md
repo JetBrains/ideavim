@@ -29,6 +29,13 @@ usual beta standards.
 * [VIM-3060](https://youtrack.jetbrains.com/issue/VIM-3060) Clipboard interaction stopped working
 * [VIM-3095](https://youtrack.jetbrains.com/issue/VIM-3095) Fix missing ellipsis digraph
 * [VIM-2562](https://youtrack.jetbrains.com/issue/VIM-2562) Fix hang with multi-width chars in command line
+* [VIM-802](https://youtrack.jetbrains.com/issue/VIM-802) IdeaVim vs. Vim: discrepancies in using registers
+* [VIM-2246](https://youtrack.jetbrains.com/issue/VIM-2246) X11/Xorg Primary selection register "* not supported
+* [VIM-2818](https://youtrack.jetbrains.com/issue/VIM-2818) Wrong caret position after multicaret paste
+* [VIM-1294](https://youtrack.jetbrains.com/issue/VIM-1294) unvoluntary unfolding when using ideavim
+* [VIM-2685](https://youtrack.jetbrains.com/issue/VIM-2685) Register command outputs different values for same registers
+* [VIM-2975](https://youtrack.jetbrains.com/issue/VIM-2975) Fix the offset after the rendered docs
+* [VIM-2964](https://youtrack.jetbrains.com/issue/VIM-2964) Fix an issue with leaking caret instance
 
 ### Merged PRs:
 * [697](https://github.com/JetBrains/ideavim/pull/697) by [Matt Ellis](https://github.com/citizenmatt): Support per-window "global" values for local-to-window options
