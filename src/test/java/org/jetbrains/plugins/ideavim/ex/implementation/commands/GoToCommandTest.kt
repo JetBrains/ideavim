@@ -22,7 +22,7 @@ class GoToCommandTest : VimTestCase() {
     assertTrue(command is GotoCharacterCommand)
     assertEquals("10", command.argument)
   }
-  
+
   @Test
   fun `go to 10th character`() {
     configureByText("""

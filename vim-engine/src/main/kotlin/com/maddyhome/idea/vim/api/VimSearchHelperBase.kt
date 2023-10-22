@@ -873,7 +873,8 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       logger.debug("Starting paragraph range search on line $line")
     }
 
-    val rangeInfo = (if (isOuter) findOuterParagraphRange(editor, line, count) else findInnerParagraphRange(editor, line, count)) ?: return null
+    val rangeInfo = (if (isOuter) findOuterParagraphRange(editor, line, count) else findInnerParagraphRange(editor, line, count))
+      ?: return null
     val startLine: Int = rangeInfo.first
     val endLine: Int = rangeInfo.second
 

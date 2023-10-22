@@ -306,8 +306,7 @@ internal object VimListenerManager {
         }
         add(event.editor, openingEditor?.vim ?: injector.fallbackWindow, scenario)
         firstEditorInitialised = true
-      }
-      else {
+      } else {
         // We've got a virtual file, so FileOpenedSyncListener will be called. Save data
         val project = openingEditor.project ?: return
         val virtualFile = openingEditor.virtualFile ?: return
@@ -320,9 +319,9 @@ internal object VimListenerManager {
         // If the user has enabled "Open declaration source in the same tab", the opening editor will be replaced as
         // long as it's not pinned, and it's not modified, and we're in the same split
         val canBeReused = UISettings.getInstance().reuseNotModifiedTabs &&
-                (manager.getComposite(virtualFile) as? EditorComposite)?.let { composite ->
-                  !composite.isPinned && !composite.isModified
-                } ?: false
+          (manager.getComposite(virtualFile) as? EditorComposite)?.let { composite ->
+            !composite.isPinned && !composite.isModified
+          } ?: false
 
         // Keep a track of the owner of the opening editor, so we can compare later, potentially after the opening
         // editor has been closed. This is nullable, but should always have a value

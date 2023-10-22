@@ -493,11 +493,11 @@ class ReplaceWithRegisterTest : VimTestCase() {
   //  https://youtrack.jetbrains.com/issue/VIM-2881/ReplaceRegister-does-no-longer-worker-with-MultiCursor
   @Test
   fun `test multiple carets`() {
-  // Behaviour of pasting a full line with multiple carets is undefined in Vim and has different implementation in
-  // IdeaVim depending on if ideaput is specified in 'clipboard' or not
-  assertContainsElements(optionsNoEditor().clipboard, OptionConstants.clipboard_ideaput)
+    // Behaviour of pasting a full line with multiple carets is undefined in Vim and has different implementation in
+    // IdeaVim depending on if ideaput is specified in 'clipboard' or not
+    assertContainsElements(optionsNoEditor().clipboard, OptionConstants.clipboard_ideaput)
 
-  enableExtensions("multiple-cursors")
+    enableExtensions("multiple-cursors")
     val text = """
       ${c}copyMe
       selectMe

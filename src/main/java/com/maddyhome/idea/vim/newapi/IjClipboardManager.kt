@@ -102,20 +102,20 @@ internal class IjClipboardManager : VimClipboardManager {
     // Please read docs for com.intellij.openapi.project.DumbService.isAlternativeResolveEnabled
     // [VERSION UPDATE] 2023.2+ Enable alternative context back
 //    DumbService.getInstance(project).withAlternativeResolveEnabled {
-      for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
-        try {
-          logger.debug { "Copy paste processor: ${processor.javaClass.name}" }
-          transferableData.addAll(
-            processor.collectTransferableData(
-              file,
-              editor,
-              textRange.startOffsets,
-              textRange.endOffsets,
-            ),
-          )
-        } catch (ignore: IndexNotReadyException) {
-        }
+    for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
+      try {
+        logger.debug { "Copy paste processor: ${processor.javaClass.name}" }
+        transferableData.addAll(
+          processor.collectTransferableData(
+            file,
+            editor,
+            textRange.startOffsets,
+            textRange.endOffsets,
+          ),
+        )
+      } catch (ignore: IndexNotReadyException) {
       }
+    }
 //    }
     transferableData.add(CaretStateTransferableData(intArrayOf(0), intArrayOf(text.length)))
 

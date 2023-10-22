@@ -82,7 +82,8 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
-  ) {}
+  ) {
+  }
 
   public fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }

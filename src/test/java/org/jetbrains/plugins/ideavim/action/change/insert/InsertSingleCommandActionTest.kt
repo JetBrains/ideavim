@@ -19,7 +19,7 @@ class InsertSingleCommandActionTest : VimTestCase() {
       listOf("i", "<C-O>", "vlll", "<Esc>"),
       "I found ${c}it in a legendary land",
       "I found it ${c}in a legendary land",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 }

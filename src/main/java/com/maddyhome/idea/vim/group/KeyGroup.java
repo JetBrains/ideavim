@@ -54,10 +54,13 @@ import static java.util.stream.Collectors.toList;
  * @author vlan
  */
 @State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
-public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponent<Element>{
-  public static final @NonNls String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
-  private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
-  private static final @NonNls String OWNER_ATTRIBUTE = "owner";
+public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponent<Element> {
+  public static final @NonNls
+  String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
+  private static final @NonNls
+  String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
+  private static final @NonNls
+  String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
@@ -65,18 +68,18 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance()
       .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
-                                 ((IjVimEditor)editor).getEditor().getComponent());
+        ((IjVimEditor) editor).getEditor().getComponent());
   }
 
   public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
     EventFacade.getInstance()
       .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
-                                 lookup.getComponent(), lookup);
+        lookup.getComponent(), lookup);
   }
 
   void unregisterShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                          ((IjVimEditor)editor).getEditor().getComponent());
+      ((IjVimEditor) editor).getEditor().getComponent());
   }
 
   public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull Editor editor) {
@@ -112,12 +115,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       final ShortcutOwner owner;
       ShortcutOwnerInfo myValue = entry.getValue();
       if (myValue instanceof ShortcutOwnerInfo.AllModes) {
-        owner = ((ShortcutOwnerInfo.AllModes)myValue).getOwner();
-      }
-      else if (myValue instanceof ShortcutOwnerInfo.PerMode) {
+        owner = ((ShortcutOwnerInfo.AllModes) myValue).getOwner();
+      } else if (myValue instanceof ShortcutOwnerInfo.PerMode) {
         owner = null;
-      }
-      else {
+      } else {
         throw new RuntimeException();
       }
       if (owner != null && owner != ShortcutOwner.UNDEFINED) {
@@ -141,8 +142,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
         ShortcutOwner owner = ShortcutOwner.UNDEFINED;
         try {
           owner = ShortcutOwner.fromString(ownerValue);
-        }
-        catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
         }
         final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
         if (textElement != null) {
@@ -159,7 +159,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   @Override
-  public @NotNull List<NativeAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
+  public @NotNull
+  List<NativeAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
     final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
     final Keymap keymap = keymapManager.getActiveKeymap();
     final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
@@ -174,7 +175,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return actions.stream().map(IjNativeAction::new).collect(toList());
   }
 
-  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
+  public @NotNull
+  Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
     final Set<RequiredShortcut> requiredShortcutKeys = this.getRequiredShortcutKeys();
     final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
     final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
@@ -209,13 +211,13 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   public void registerCommandAction(@NotNull VimActionsInitiator actionHolder) {
-    IjVimActionsInitiator holder = (IjVimActionsInitiator)actionHolder;
+    IjVimActionsInitiator holder = (IjVimActionsInitiator) actionHolder;
 
     if (!VimPlugin.getPluginId().equals(holder.getBean().getPluginDescriptor().getPluginId())) {
       logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
-                   "Please create a plugin using `VimExtension`. " +
-                   "Plugin to blame: " +
-                   holder.getBean().getPluginDescriptor().getPluginId());
+        "Please create a plugin using `VimExtension`. " +
+        "Plugin to blame: " +
+        holder.getBean().getPluginDescriptor().getPluginId());
       return;
     }
 
@@ -223,9 +225,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     if (actionKeys == null) {
       final EditorActionHandlerBase action = actionHolder.getInstance();
       if (action instanceof ComplicatedKeysAction) {
-        actionKeys = ((ComplicatedKeysAction)action).getKeyStrokesSet();
-      }
-      else {
+        actionKeys = ((ComplicatedKeysAction) action).getKeyStrokesSet();
+      } else {
         throw new RuntimeException("Cannot register action: " + action.getClass().getName());
       }
     }
@@ -260,7 +261,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     }
   }
 
-  public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
+  public static @NotNull
+  ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (RequiredShortcut key : requiredShortcuts) {
       shortcuts.add(new KeyboardShortcut(key.getKeyStroke(), null));
@@ -268,7 +270,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return new CustomShortcutSet(shortcuts.toArray(new Shortcut[0]));
   }
 
-  private static @NotNull List<Pair<EnumSet<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes) {
+  private static @NotNull
+  List<Pair<EnumSet<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes) {
     final Map<ImmutableList<KeyStroke>, EnumSet<MappingMode>> actualModes = new HashMap<>();
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
@@ -279,8 +282,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
         if (value != null) {
           newValue = value.clone();
           newValue.add(mode);
-        }
-        else {
+        } else {
           newValue = EnumSet.of(mode);
         }
         actualModes.put(key, newValue);
@@ -303,21 +305,22 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return rows;
   }
 
-  private static @NotNull @NonNls String getModesStringCode(@NotNull Set<MappingMode> modes) {
+  private static @NotNull
+  @NonNls
+  String getModesStringCode(@NotNull Set<MappingMode> modes) {
     if (modes.equals(MappingMode.NVO)) {
       return "";
-    }
-    else if (modes.contains(MappingMode.INSERT)) {
+    } else if (modes.contains(MappingMode.INSERT)) {
       return "i";
-    }
-    else if (modes.contains(MappingMode.NORMAL)) {
+    } else if (modes.contains(MappingMode.NORMAL)) {
       return "n";
     }
     // TODO: Add more codes
     return "";
   }
 
-  private @NotNull List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+  private @NotNull
+  List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     results.addAll(getLocalActions(component, keyStroke));
     results.addAll(getKeymapActions(keyStroke));
@@ -325,17 +328,19 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   @Override
-  public @NotNull List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull KeyStroke keyStroke) {
-    return getActions(((IjVimEditor)editor).getEditor().getComponent(), keyStroke).stream()
+  public @NotNull
+  List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull KeyStroke keyStroke) {
+    return getActions(((IjVimEditor) editor).getEditor().getComponent(), keyStroke).stream()
       .map(IjNativeAction::new).collect(toList());
   }
 
-  private static @NotNull List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+  private static @NotNull
+  List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     final KeyboardShortcut keyStrokeShortcut = new KeyboardShortcut(keyStroke, null);
     for (Component c = component; c != null; c = c.getParent()) {
       if (c instanceof JComponent) {
-        final List<AnAction> actions = ActionUtil.getActions((JComponent)c);
+        final List<AnAction> actions = ActionUtil.getActions((JComponent) c);
         for (AnAction action : actions) {
           if (action instanceof VimShortcutKeyAction) {
             continue;
@@ -352,7 +357,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return results;
   }
 
-  private static @NotNull List<AnAction> getKeymapActions(@NotNull KeyStroke keyStroke) {
+  private static @NotNull
+  List<AnAction> getKeymapActions(@NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     final Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
     for (String id : keymap.getActionIds(keyStroke)) {

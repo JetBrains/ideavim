@@ -33,6 +33,6 @@ public class WelcomeFrameFixture extends ContainerFixture {
 
   public ComponentFixture importProjectLink() {
     return find(ComponentFixture.class,
-                byXpath("//div[@accessiblename='Get from Version Control...' and @class='JButton']"));
+      byXpath("//div[@accessiblename='Get from Version Control...' and @class='JButton']"));
   }
 }

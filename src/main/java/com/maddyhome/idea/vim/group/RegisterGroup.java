@@ -57,8 +57,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         final Element textElement = new Element("text");
         VimPlugin.getXML().setSafeXmlText(textElement, text);
         registerElement.addContent(textElement);
-      }
-      else {
+      } else {
         logger.trace("Save register as 'keys'");
         final Element keys = new Element("keys");
         final List<KeyStroke> list = register.getKeys();
@@ -98,19 +97,15 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         SelectionType type;
         try {
           type = SelectionType.valueOf(typeText);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
           // This whole `if` keeps compatibility with the mode when SelectionType had numbers
           if (Integer.toString(1 << 1).equals(typeText)) {
             type = SelectionType.CHARACTER_WISE;
-          }
-          else if (Integer.toString(1 << 2).equals(typeText)) {
+          } else if (Integer.toString(1 << 2).equals(typeText)) {
             type = SelectionType.LINE_WISE;
-          }
-          else if (Integer.toString(1 << 3).equals(typeText)) {
+          } else if (Integer.toString(1 << 3).equals(typeText)) {
             type = SelectionType.BLOCK_WISE;
-          }
-          else {
+          } else {
             type = SelectionType.CHARACTER_WISE;
           }
         }
@@ -120,13 +115,11 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           if (text != null) {
             logger.trace("Register data parsed");
             register = new Register(key, type, text, Collections.emptyList());
-          }
-          else {
+          } else {
             logger.trace("Cannot parse register data");
             register = null;
           }
-        }
-        else {
+        } else {
           logger.trace("Register has 'keys' element");
           final Element keysElement = registerElement.getChild("keys");
           final List<Element> keyElements = keysElement.getChildren("key");
@@ -134,11 +127,11 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           for (Element keyElement : keyElements) {
             final int code = Integer.parseInt(keyElement.getAttributeValue("code"));
             final int modifiers = Integer.parseInt(keyElement.getAttributeValue("mods"));
-            final char c = (char)Integer.parseInt(keyElement.getAttributeValue("char"));
+            final char c = (char) Integer.parseInt(keyElement.getAttributeValue("char"));
             //noinspection MagicConstant
             strokes.add(c == KeyEvent.CHAR_UNDEFINED ?
-                        KeyStroke.getKeyStroke(code, modifiers) :
-                        KeyStroke.getKeyStroke(c));
+              KeyStroke.getKeyStroke(code, modifiers) :
+              KeyStroke.getKeyStroke(c));
           }
           register = new Register(key, type, strokes);
         }

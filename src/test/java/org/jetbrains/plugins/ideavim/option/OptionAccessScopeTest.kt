@@ -29,7 +29,7 @@ import kotlin.test.assertEquals
 private const val OPTION_NAME = "test"
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class OptionAccessScopeTest: VimTestCase() {
+class OptionAccessScopeTest : VimTestCase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -437,7 +437,6 @@ class OptionAccessScopeTest: VimTestCase() {
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
     assertEquals(newValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
-
 
 
   // Boolean (unset value defaults to -1)

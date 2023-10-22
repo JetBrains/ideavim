@@ -73,21 +73,20 @@ public class FileGroup extends VimFileBase {
         fem.openFile(found, true);
 
         return true;
-      }
-      else {
+      } else {
         // There was no type and user didn't pick one. Don't open the file
         // Return true here because we found the file but the user canceled by not picking a type.
         return true;
       }
-    }
-    else {
+    } else {
       VimPlugin.showMessage(MessageHelper.message("unable.to.find.0", filename));
 
       return false;
     }
   }
 
-  @Nullable VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
+  @Nullable
+  VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
     VirtualFile found;
     if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
       String homefile = filename.substring(2);
@@ -97,8 +96,7 @@ public class FileGroup extends VimFileBase {
         logger.debug("looking for " + homefile + " in " + dir);
       }
       found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
-    }
-    else {
+    } else {
       found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
 
       if (found == null) {
@@ -144,7 +142,7 @@ public class FileGroup extends VimFileBase {
    */
   @Override
   public void closeFile(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((DataContext)context.getContext()));
+    final Project project = PlatformDataKeys.PROJECT.getData(((DataContext) context.getContext()));
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
@@ -180,7 +178,8 @@ public class FileGroup extends VimFileBase {
       if (number >= 0 && number < editors.length) {
         fileEditorManager.closeFile(editors[number], window);
       }
-    } if (!ApplicationManager.getApplication().isUnitTestMode()) {
+    }
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
       // This thing doesn't have an implementation in test mode
       EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
     }
@@ -194,8 +193,7 @@ public class FileGroup extends VimFileBase {
     NativeAction action;
     if (globalIjOptions(injector).getIdeawrite().contains(IjOptionConstants.ideawrite_all)) {
       action = injector.getNativeActionManager().getSaveAll();
-    }
-    else {
+    } else {
       action = injector.getNativeActionManager().getSaveCurrent();
     }
     ExecuteExtensionKt.execute(action, context);
@@ -252,13 +250,12 @@ public class FileGroup extends VimFileBase {
    */
   @Override
   public void selectPreviousTab(@NotNull ExecutionContext context) {
-    Project project = PlatformDataKeys.PROJECT.getData(((DataContext)context.getContext()));
+    Project project = PlatformDataKeys.PROJECT.getData(((DataContext) context.getContext()));
     if (project == null) return;
     VirtualFile vf = LastTabService.getInstance(project).getLastTab();
     if (vf != null && vf.isValid()) {
       FileEditorManager.getInstance(project).openFile(vf, true);
-    }
-    else {
+    } else {
       VimPlugin.indicateError();
     }
   }
@@ -266,7 +263,8 @@ public class FileGroup extends VimFileBase {
   /**
    * Returns the previous tab.
    */
-  public @Nullable VirtualFile getPreviousTab(@NotNull DataContext context) {
+  public @Nullable
+  VirtualFile getPreviousTab(@NotNull DataContext context) {
     Project project = PlatformDataKeys.PROJECT.getData(context);
     if (project == null) return null;
     VirtualFile vf = LastTabService.getInstance(project).getLastTab();
@@ -276,12 +274,13 @@ public class FileGroup extends VimFileBase {
     return null;
   }
 
-  @Nullable Editor selectEditor(Project project, @NotNull VirtualFile file) {
+  @Nullable
+  Editor selectEditor(Project project, @NotNull VirtualFile file) {
     FileEditorManager fMgr = FileEditorManager.getInstance(project);
     FileEditor[] feditors = fMgr.openFile(file, true);
     if (feditors.length > 0) {
       if (feditors[0] instanceof TextEditor) {
-        Editor editor = ((TextEditor)feditors[0]).getEditor();
+        Editor editor = ((TextEditor) feditors[0]).getEditor();
         if (!editor.isDisposed()) {
           return editor;
         }
@@ -293,7 +292,7 @@ public class FileGroup extends VimFileBase {
 
   @Override
   public void displayLocationInfo(@NotNull VimEditor vimEditor) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
+    Editor editor = ((IjVimEditor) vimEditor).getEditor();
     StringBuilder msg = new StringBuilder();
     Document doc = editor.getDocument();
 
@@ -330,12 +329,11 @@ public class FileGroup extends VimFileBase {
       int size = EditorHelperRt.getFileSize(editor);
 
       msg.append("; Character ").append(offset + 1).append(" of ").append(size);
-    }
-    else {
+    } else {
       msg.append("Selected ");
 
       TextRange vr = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
-                                   editor.getSelectionModel().getBlockSelectionEnds());
+        editor.getSelectionModel().getBlockSelectionEnds());
       vr.normalize();
 
       int lines;
@@ -352,8 +350,7 @@ public class FileGroup extends VimFileBase {
           cp = SearchHelper.countWords(editor, vr.getStartOffsets()[i], vr.getEndOffsets()[i] - 1);
           word += cp.getCount();
         }
-      }
-      else {
+      } else {
         LogicalPosition slp = editor.offsetToLogicalPosition(vr.getStartOffset());
         LogicalPosition elp = editor.offsetToLogicalPosition(vr.getEndOffset());
 
@@ -380,43 +377,39 @@ public class FileGroup extends VimFileBase {
 
   @Override
   public void displayFileInfo(@NotNull VimEditor vimEditor, boolean fullPath) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
+    Editor editor = ((IjVimEditor) vimEditor).getEditor();
     StringBuilder msg = new StringBuilder();
     VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf != null) {
       msg.append('"');
       if (fullPath) {
         msg.append(vf.getPath());
-      }
-      else {
+      } else {
         Project project = editor.getProject();
         if (project != null) {
           VirtualFile root = ProjectRootManager.getInstance(project).getFileIndex().getContentRootForFile(vf);
           if (root != null) {
             msg.append(vf.getPath().substring(root.getPath().length() + 1));
-          }
-          else {
+          } else {
             msg.append(vf.getPath());
           }
         }
       }
       msg.append("\" ");
-    }
-    else {
+    } else {
       msg.append("\"[No File]\" ");
     }
 
     Document doc = editor.getDocument();
     if (!doc.isWritable()) {
       msg.append("[RO] ");
-    }
-    else if (FileDocumentManager.getInstance().isDocumentUnsaved(doc)) {
+    } else if (FileDocumentManager.getInstance().isDocumentUnsaved(doc)) {
       msg.append("[+] ");
     }
 
     int lline = editor.getCaretModel().getLogicalPosition().line;
     int total = new IjVimEditor(editor).lineCount();
-    int pct = (int)((float)lline / (float)total * 100f + 0.5);
+    int pct = (int) ((float) lline / (float) total * 100f + 0.5);
 
     msg.append("line ").append(lline + 1).append(" of ").append(total);
     msg.append(" --").append(pct).append("%-- ");
@@ -432,7 +425,8 @@ public class FileGroup extends VimFileBase {
     VimPlugin.showMessage(msg.toString());
   }
 
-  private static final @NotNull Logger logger = Logger.getInstance(FileGroup.class.getName());
+  private static final @NotNull
+  Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
    * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.

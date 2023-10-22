@@ -197,7 +197,7 @@ public interface VimOptionGroup {
 /**
  * Checks if option is set to its default value
  */
-public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionAccessScope): Boolean =
+public fun <T : VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionAccessScope): Boolean =
   getOptionValue(option, scope) == option.defaultValue
 
 /**
@@ -206,14 +206,14 @@ public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, sco
  * Resetting a global-local value at local scope will set it to the default value, rather than set it to its unset
  * value. This matches Vim behaviour.
  */
-public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionAccessScope) {
+public fun <T : VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionAccessScope) {
   setOptionValue(option, scope, option.defaultValue)
 }
 
 /**
  *
  */
-public fun <T: VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
+public fun <T : VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
   check(option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
     || option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
   return getOptionValue(option, OptionAccessScope.LOCAL(editor)) == option.unsetValue

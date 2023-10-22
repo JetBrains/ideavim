@@ -45,7 +45,9 @@ suspend fun main() {
   println(output)
   if (knownPlugins != output) {
     val newPlugins = (output - knownPlugins).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
-    val removedPlugins = (knownPlugins - output.toSet()).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
+    val removedPlugins = (knownPlugins - output.toSet()).map {
+      it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link")
+    }
     error(
       """
         

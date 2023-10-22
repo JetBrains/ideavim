@@ -57,7 +57,7 @@ public class ProcessGroup extends VimProcessGroupBase {
 
   @Override
   public void startSearchCommand(@NotNull VimEditor editor, ExecutionContext context, int count, char leader) {
-    if (((IjVimEditor)editor).getEditor().isOneLineMode()) // Don't allow searching in one line editors
+    if (((IjVimEditor) editor).getEditor().isOneLineMode()) // Don't allow searching in one line editors
     {
       return;
     }
@@ -66,11 +66,12 @@ public class ProcessGroup extends VimProcessGroupBase {
     String label = String.valueOf(leader);
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.activate(((IjVimEditor)editor).getEditor(), ((DataContext)context.getContext()), label, initText, count);
+    panel.activate(((IjVimEditor) editor).getEditor(), ((DataContext) context.getContext()), label, initText, count);
   }
 
   @Override
-  public @NotNull String endSearchCommand() {
+  public @NotNull
+  String endSearchCommand() {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 
@@ -99,8 +100,7 @@ public class ProcessGroup extends VimProcessGroupBase {
       panel.handleKey(stroke);
 
       return true;
-    }
-    else {
+    } else {
       VimStateMachine.Companion.getInstance(editor).setMode(new Mode.NORMAL());
       KeyHandler.getInstance().reset(editor);
       return false;
@@ -128,13 +128,11 @@ public class ProcessGroup extends VimProcessGroupBase {
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
       VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext.INSTANCE);
-    }
-    catch (ExException e) {
+    } catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());
       VimPlugin.indicateError();
       res = false;
-    }
-    catch (Exception bad) {
+    } catch (Exception bad) {
       ProcessGroup.logger.error(bad);
       VimPlugin.indicateError();
       res = false;
@@ -163,16 +161,15 @@ public class ProcessGroup extends VimProcessGroupBase {
     panel.activate(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext(), ":", initText, 1);
   }
 
-  private @NotNull String getRange(Editor editor, @NotNull Command cmd) {
+  private @NotNull
+  String getRange(Editor editor, @NotNull Command cmd) {
     String initText = "";
     if (VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode() instanceof Mode.VISUAL) {
       initText = "'<,'>";
-    }
-    else if (cmd.getRawCount() > 0) {
+    } else if (cmd.getRawCount() > 0) {
       if (cmd.getCount() == 1) {
         initText = ".";
-      }
-      else {
+      } else {
         initText = ".,.+" + (cmd.getCount() - 1);
       }
     }
@@ -180,7 +177,8 @@ public class ProcessGroup extends VimProcessGroupBase {
     return initText;
   }
 
-  public @Nullable String executeCommand(@NotNull VimEditor editor, @NotNull String command, @Nullable CharSequence input, @Nullable String currentDirectoryPath)
+  public @Nullable
+  String executeCommand(@NotNull VimEditor editor, @NotNull String command, @Nullable CharSequence input, @Nullable String currentDirectoryPath)
     throws ExecutionException, ProcessCanceledException {
 
     // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
@@ -197,14 +195,14 @@ public class ProcessGroup extends VimProcessGroupBase {
 
       // For Win32. See :help 'shellxescape'
       final String escapedCommand = shellxquote.equals("(")
-                                    ? doEscape(command, shellxescape, "^")
-                                    : command;
+        ? doEscape(command, shellxescape, "^")
+        : command;
       // Required for Win32+cmd.exe, defaults to "(". See :help 'shellxquote'
       final String quotedCommand = shellxquote.equals("(")
-                                   ? "(" + escapedCommand + ")"
-                                   : (shellxquote.equals("\"(")
-                                      ? "\"(" + escapedCommand + ")\""
-                                      : shellxquote + escapedCommand + shellxquote);
+        ? "(" + escapedCommand + ")"
+        : (shellxquote.equals("\"(")
+        ? "\"(" + escapedCommand + ")\""
+        : shellxquote + escapedCommand + shellxquote);
 
       final ArrayList<String> commands = new ArrayList<>();
       commands.add(shell);
@@ -232,8 +230,7 @@ public class ProcessGroup extends VimProcessGroupBase {
               final BufferedWriter outputStreamWriter = new BufferedWriter(new OutputStreamWriter(handler.getProcessInput()));
               copy(charSequenceReader, outputStreamWriter);
               outputStreamWriter.close();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
               logger.error(e);
             }
           }

@@ -105,8 +105,10 @@ public object Options {
   public val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
   public val gdefault: ToggleOption = addOption(ToggleOption("gdefault", GLOBAL, "gd", false))
   public val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", GLOBAL, "hi", 50))
-  @JvmField public val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
-  @JvmField public val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
+  @JvmField
+  public val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
+  @JvmField
+  public val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
   public val incsearch: ToggleOption = addOption(ToggleOption("incsearch", GLOBAL, "is", false))
   public val keymodel: StringListOption = addOption(
     StringListOption(
@@ -175,7 +177,8 @@ public object Options {
   public val sidescrolloff: NumberOption = addOption(
     NumberOption("sidescrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "siso", 0)
   )
-  @JvmField public val smartcase: ToggleOption = addOption(ToggleOption("smartcase", GLOBAL, "scs", false))
+  @JvmField
+  public val smartcase: ToggleOption = addOption(ToggleOption("smartcase", GLOBAL, "scs", false))
   public val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
   public val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
   public val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", GLOBAL, "tm", 1000))

@@ -22,7 +22,7 @@ public class ExCommandTree {
       val fullCommand = requiredPart + optionalPart
       commandToInstance[fullCommand] = lazyInstance
 
-      for (i in (0 .. optionalPart.length)) {
+      for (i in (0..optionalPart.length)) {
         abbrevToCommand[requiredPart + optionalPart.substring(0, i)] = fullCommand
       }
     }

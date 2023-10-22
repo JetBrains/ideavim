@@ -113,9 +113,9 @@ public class ChangeGroup : VimChangeGroupBase() {
     val doc = vimEditor.editor.document
     CommandProcessor.getInstance().executeCommand(
       editor.project, {
-        ApplicationManager.getApplication()
-          .runWriteAction { getInstance().originalHandler.execute(editor, key, ijContext) }
-      }, "", doc,
+      ApplicationManager.getApplication()
+        .runWriteAction { getInstance().originalHandler.execute(editor, key, ijContext) }
+    }, "", doc,
       UndoConfirmationPolicy.DEFAULT, doc
     )
     injector.scroll.scrollCaretIntoView(vimEditor)

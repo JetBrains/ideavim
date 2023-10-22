@@ -43,18 +43,25 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
  * This panel displays text in a <code>more</code> like window.
  */
 public class ExOutputPanel extends JPanel {
-  private final @NotNull Editor myEditor;
+  private final @NotNull
+  Editor myEditor;
 
-  private final @NotNull JLabel myLabel = new JLabel("more");
-  private final @NotNull JTextArea myText = new JTextArea();
-  private final @NotNull JScrollPane myScrollPane =
+  private final @NotNull
+  JLabel myLabel = new JLabel("more");
+  private final @NotNull
+  JTextArea myText = new JTextArea();
+  private final @NotNull
+  JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  private final @NotNull ComponentAdapter myAdapter;
+  private final @NotNull
+  ComponentAdapter myAdapter;
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
 
-  private @Nullable JComponent myOldGlass = null;
-  private @Nullable LayoutManager myOldLayout = null;
+  private @Nullable
+  JComponent myOldGlass = null;
+  private @Nullable
+  LayoutManager myOldLayout = null;
   private boolean myWasOpaque = false;
 
   private boolean myActive = false;
@@ -91,7 +98,8 @@ public class ExOutputPanel extends JPanel {
     return UserDataManager.getVimMorePanel(editor) != null;
   }
 
-  public static @NotNull ExOutputPanel getInstance(@NotNull Editor editor) {
+  public static @NotNull
+  ExOutputPanel getInstance(@NotNull Editor editor) {
     ExOutputPanel panel = UserDataManager.getVimMorePanel(editor);
     if (panel == null) {
       panel = new ExOutputPanel(editor);
@@ -184,7 +192,7 @@ public class ExOutputPanel extends JPanel {
    */
   private void activate() {
     JRootPane root = SwingUtilities.getRootPane(myEditor.getContentComponent());
-    myOldGlass = (JComponent)root.getGlassPane();
+    myOldGlass = (JComponent) root.getGlassPane();
     if (myOldGlass != null) {
       myOldLayout = myOldGlass.getLayout();
       myWasOpaque = myOldGlass.isOpaque();
@@ -221,14 +229,13 @@ public class ExOutputPanel extends JPanel {
   private void scrollHalfPage() {
     double sa = myScrollPane.getVerticalScrollBar().getVisibleAmount() / 2.0;
     double offset = Math.ceil(sa / myLineHeight) * myLineHeight;
-    scrollOffset((int)offset);
+    scrollOffset((int) offset);
   }
 
   private void handleEnter() {
     if (myAtEnd) {
       close();
-    }
-    else {
+    } else {
       scrollLine();
     }
   }
@@ -244,11 +251,10 @@ public class ExOutputPanel extends JPanel {
     myScrollPane.getVerticalScrollBar().setValue(val + more);
     myScrollPane.getHorizontalScrollBar().setValue(0);
     if (val + more >=
-        myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
+      myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
       myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
-    }
-    else {
+    } else {
       myLabel.setText(MessageHelper.message("ex.output.panel.more"));
     }
     myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
@@ -264,14 +270,14 @@ public class ExOutputPanel extends JPanel {
     int visLines = getSize().height / myLineHeight - 1;
     int lines = Math.min(count, visLines);
     setSize(getSize().width,
-            lines * myLineHeight + myLabel.getPreferredSize().height + getBorder().getBorderInsets(this).top * 2);
+      lines * myLineHeight + myLabel.getPreferredSize().height + getBorder().getBorderInsets(this).top * 2);
 
     int height = getSize().height;
     Rectangle bounds = scroll.getBounds();
     bounds.translate(0, scroll.getHeight() - height);
     bounds.height = height;
     Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(),
-                                            SwingUtilities.getRootPane(contentComponent).getGlassPane());
+      SwingUtilities.getRootPane(contentComponent).getGlassPane());
     bounds.setLocation(pos);
     setBounds(bounds);
 
@@ -279,8 +285,7 @@ public class ExOutputPanel extends JPanel {
     if (!globalOptions(injector).getMore()) {
       // FIX
       scrollOffset(100000);
-    }
-    else {
+    } else {
       scrollOffset(0);
     }
   }
@@ -320,8 +325,7 @@ public class ExOutputPanel extends JPanel {
     public void keyTyped(@NotNull KeyEvent e) {
       if (myExOutputPanel.myAtEnd) {
         myExOutputPanel.close(e);
-      }
-      else {
+      } else {
         switch (e.getKeyChar()) {
           case ' ':
             myExOutputPanel.scrollPage();

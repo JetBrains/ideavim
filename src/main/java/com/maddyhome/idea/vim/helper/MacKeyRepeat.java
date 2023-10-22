@@ -21,34 +21,41 @@ import java.io.InputStreamReader;
  * @author vlan
  */
 public class MacKeyRepeat {
-  @VimNlsSafe public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
-  @NotNull private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
-  @NonNls private static final String EXEC_COMMAND = "launchctl stop com.apple.SystemUIServer.agent";
-  @NonNls private static final String delete = "delete";
-  @NonNls private static final String write = "write";
-  @NonNls private static final String read = "read";
+  @VimNlsSafe
+  public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
+  @NotNull
+  private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
+  @NonNls
+  private static final String EXEC_COMMAND = "launchctl stop com.apple.SystemUIServer.agent";
+  @NonNls
+  private static final String delete = "delete";
+  @NonNls
+  private static final String write = "write";
+  @NonNls
+  private static final String read = "read";
 
-  public static @NotNull MacKeyRepeat getInstance() {
+  public static @NotNull
+  MacKeyRepeat getInstance() {
     return INSTANCE;
   }
 
-  private static @NotNull String read(@NotNull InputStream stream) throws IOException {
+  private static @NotNull
+  String read(@NotNull InputStream stream) throws IOException {
     return CharStreams.toString(new InputStreamReader(stream));
   }
 
-  public @Nullable Boolean isEnabled() {
+  public @Nullable
+  Boolean isEnabled() {
     final String command = String.format(FMT, read);
     try {
       final Process process = Runtime.getRuntime().exec(command);
       final String data = read(process.getInputStream()).trim();
       try {
         return Integer.parseInt(data) == 0;
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         return null;
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       return null;
     }
   }
@@ -57,8 +64,7 @@ public class MacKeyRepeat {
     final String command;
     if (value == null) {
       command = String.format(FMT, delete);
-    }
-    else {
+    } else {
       final String arg = value ? "0" : "1";
       command = String.format(FMT, write) + " " + arg;
     }
@@ -68,8 +74,7 @@ public class MacKeyRepeat {
       defaults.waitFor();
       final Process restartSystemUI = runtime.exec(EXEC_COMMAND);
       restartSystemUI.waitFor();
-    }
-    catch (IOException | InterruptedException ignored) {
+    } catch (IOException | InterruptedException ignored) {
     }
   }
 }

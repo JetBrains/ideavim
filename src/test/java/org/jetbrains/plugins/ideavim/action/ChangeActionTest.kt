@@ -64,7 +64,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "v", "<esc>"),
       "12${c}345",
       "12${c}345",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -75,7 +75,7 @@ Mode.INSERT,
       listOf("i", "<C-O>", "v", "d"),
       "12${c}345",
       "12${c}45",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -111,7 +111,7 @@ Mode.INSERT,
       listOf("i", "<C-O>", "gh", "<esc>"),
       "12${c}345",
       "123${c}45",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -124,7 +124,7 @@ Mode.INSERT,
       listOf("i", "<C-O>", "gh", "d"),
       "12${c}345",
       "12d${c}45",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -135,7 +135,7 @@ Mode.INSERT,
       listOf("i", "def", "<C-O>", "d2h", "x"),
       "abc$c.\n",
       "abcdx.\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -224,7 +224,7 @@ Mode.INSERT,
    four
    
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -407,7 +407,7 @@ Mode.INSERT,
       listOf("A", ", ", "<C-R>", "a", "!"),
       "${c}Hello\n",
       "Hello, World!\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -418,7 +418,7 @@ Mode.INSERT,
       listOf("O", "bar"),
       "fo${c}o\n",
       "bar\nfoo\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 

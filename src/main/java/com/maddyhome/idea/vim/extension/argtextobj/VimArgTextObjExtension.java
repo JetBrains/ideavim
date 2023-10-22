@@ -44,7 +44,8 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingI
 public class VimArgTextObjExtension implements VimExtension {
 
   @Override
-  public @NotNull String getName() {
+  public @NotNull
+  String getName() {
     return "argtextobj";
   }
 
@@ -63,8 +64,10 @@ public class VimArgTextObjExtension implements VimExtension {
    */
   private static class BracketPairs {
     // NOTE: brackets must match by the position, and ordered by rank (highest to lowest).
-    @NotNull private final String openBrackets;
-    @NotNull private final String closeBrackets;
+    @NotNull
+    private final String openBrackets;
+    @NotNull
+    private final String closeBrackets;
 
     static class ParseException extends Exception {
       public ParseException(@NotNull String message) {
@@ -211,8 +214,8 @@ public class VimArgTextObjExtension implements VimExtension {
             return null;
           }
         }
-        final ArgBoundsFinder finder = new ArgBoundsFinder(((IjVimEditor)editor).getEditor().getDocument(), bracketPairs);
-        int pos = ((IjVimCaret)caret).getCaret().getOffset();
+        final ArgBoundsFinder finder = new ArgBoundsFinder(((IjVimEditor) editor).getEditor().getDocument(), bracketPairs);
+        int pos = ((IjVimCaret) caret).getCaret().getOffset();
 
         for (int i = 0; i < count; ++i) {
           if (!finder.findBoundsAt(pos)) {
@@ -259,14 +262,14 @@ public class VimArgTextObjExtension implements VimExtension {
               if (vimStateMachine.getMode() instanceof Mode.VISUAL) {
                 com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt.vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
-                InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret)caret).getCaret(), range.getStartOffset());
+                InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret) caret).getCaret(), range.getStartOffset());
               }
             }
           }
         });
       } else {
         vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
-                                                                                         textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))));
+          textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))));
       }
     }
   }
@@ -276,14 +279,18 @@ public class VimArgTextObjExtension implements VimExtension {
    * position
    */
   private static class ArgBoundsFinder {
-    @NotNull private final CharSequence text;
-    @NotNull private final Document document;
-    @NotNull private final BracketPairs brackets;
+    @NotNull
+    private final CharSequence text;
+    @NotNull
+    private final Document document;
+    @NotNull
+    private final BracketPairs brackets;
     private int leftBound = Integer.MAX_VALUE;
     private int rightBound = Integer.MIN_VALUE;
     private int leftBracket;
     private int rightBracket;
-    private @Nls String error = null;
+    private @Nls
+    String error = null;
     private static final String QUOTES = "\"'";
 
     private static final int MAX_SEARCH_LINES = 10;
@@ -413,7 +420,7 @@ public class VimArgTextObjExtension implements VimExtension {
     /**
      * Detects if current position is inside a quoted string and adjusts
      * left and right bounds to the boundaries of the string.
-     *
+     * <p>
      * NOTE: Does not support line continuations for quoted string ('\' at the end of line).
      */
     private void getOutOfQuotedText() {

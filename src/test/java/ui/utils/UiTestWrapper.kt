@@ -31,6 +31,7 @@ fun uiTest(testName: String = "test_${System.currentTimeMillis()}", url: String 
     throw e
   }
 }
+
 private val client by lazy { OkHttpClient() }
 private fun BufferedImage.save(name: String) {
   val bytes = ByteArrayOutputStream().use { b ->

@@ -38,7 +38,8 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
   }
 
   private fun getHandlersForShortcut(shortcut: KeyStroke): List<HandledModes> {
-    val modes = VimPlugin.getKey().shortcutConflicts[shortcut] ?: return listOf(HandledModes.NORMAL_UNDEFINED, HandledModes.INSERT_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED)
+    val modes = VimPlugin.getKey().shortcutConflicts[shortcut]
+      ?: return listOf(HandledModes.NORMAL_UNDEFINED, HandledModes.INSERT_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED)
 
     return when (modes) {
       is ShortcutOwnerInfo.AllModes -> {

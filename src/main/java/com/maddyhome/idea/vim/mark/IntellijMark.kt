@@ -33,8 +33,7 @@ internal class IntellijMark(bookmark: LineBookmark, override val col: Int, proje
   }
 
   private fun getMark(): LineBookmark? =
-    getProject()?.let {
-        project ->
+    getProject()?.let { project ->
       BookmarksManager.getInstance(project)?.getBookmark(BookmarkType.get(key)) as? LineBookmark
     }
 

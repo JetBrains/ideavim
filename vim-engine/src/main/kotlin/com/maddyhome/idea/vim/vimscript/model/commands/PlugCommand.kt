@@ -33,7 +33,8 @@ public data class PlugCommand(val ranges: Ranges, val argument: String) : Comman
       return ExecutionResult.Error
     }
 
-    injector.statisticsService.addExtensionEnabledWithPlug(injector.extensionRegistrator.getExtensionNameByAlias(pluginAlias) ?: "unknown extension")
+    injector.statisticsService.addExtensionEnabledWithPlug(injector.extensionRegistrator.getExtensionNameByAlias(pluginAlias)
+      ?: "unknown extension")
     return ExecutionResult.Success
   }
 }

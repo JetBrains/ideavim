@@ -60,7 +60,7 @@ public interface VimSearchHelper {
    */
   public fun findPreviousCamelStart(chars: CharSequence, endIndex: Int, count: Int): Int?
 
-/**
+  /**
    * @param chars         the char sequence to search in
    * @param startIndex    the start index (inclusive)
    * @param count         search for the count-th occurrence

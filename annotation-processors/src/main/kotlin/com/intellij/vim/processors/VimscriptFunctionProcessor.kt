@@ -42,7 +42,8 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
   private inner class VimscriptFunctionVisitor : KSVisitorVoid() {
     @OptIn(KspExperimental::class)
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-      val vimscriptFunctionAnnotation = classDeclaration.getAnnotationsByType(VimscriptFunction::class).firstOrNull() ?: return
+      val vimscriptFunctionAnnotation = classDeclaration.getAnnotationsByType(VimscriptFunction::class).firstOrNull()
+        ?: return
       val functionName = vimscriptFunctionAnnotation.name
       nameToClass[functionName] = classDeclaration.qualifiedName!!.asString()
     }

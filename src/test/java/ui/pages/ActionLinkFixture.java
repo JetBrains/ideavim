@@ -23,9 +23,9 @@ public class ActionLinkFixture extends ComponentFixture {
 
   public void click() {
     runJs("const offset = component.getHeight()/2;\n" +
-          "robot.click(" +
-          "component, " +
-          "new Point(offset, offset), " +
-          "MouseButton.LEFT_BUTTON, 1);");
+      "robot.click(" +
+      "component, " +
+      "new Point(offset, offset), " +
+      "MouseButton.LEFT_BUTTON, 1);");
   }
 }

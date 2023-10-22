@@ -43,8 +43,7 @@ fun main(args: Array<String>) {
         .setPushTags()
         .call()
       println("Pushed release branch with tags")
-    }
-    else {
+    } else {
       println("Do not push release branch because type of release is $releaseType")
     }
 

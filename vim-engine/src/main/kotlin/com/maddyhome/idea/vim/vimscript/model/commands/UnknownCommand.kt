@@ -45,7 +45,8 @@ public data class UnknownCommand(val ranges: Ranges, val name: String, val argum
               val message = injector.messages.message(Msg.NOT_EX_CMD, name)
               throw InvalidCommandException(message, null)
             }
-            val parsedCommand = injector.vimscriptParser.parseCommand(commandAlias.command) ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
+            val parsedCommand = injector.vimscriptParser.parseCommand(commandAlias.command)
+              ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
             return if (parsedCommand is UnknownCommand) {
               processPossiblyAliasCommand(commandAlias.command, editor, context, aliasCountdown - 1)
             } else {

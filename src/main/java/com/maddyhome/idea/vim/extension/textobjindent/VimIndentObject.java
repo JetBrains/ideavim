@@ -46,7 +46,7 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
  *   <li><code>aI</code> <b>A</b>n <b>I</b>ndentation level and lines above and below.</li>
  *   <li><code>iI</code> <b>I</b>nner <b>I</b>ndentation level (no lines above and below). Synonym of <code>ii</code></li>
  * </ul>
- *
+ * <p>
  * See also the reference manual for more details at:
  * https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object.txt
  *
@@ -63,7 +63,7 @@ public class VimIndentObject implements VimExtension {
   @Override
   public void init() {
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ai"), getOwner(),
-                               new IndentObject(true, false), false);
+      new IndentObject(true, false), false);
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-aI"), getOwner(),
       new IndentObject(true, true), false);
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ii"), getOwner(),
@@ -104,8 +104,8 @@ public class VimIndentObject implements VimExtension {
                                 @NotNull ExecutionContext context,
                                 int count,
                                 int rawCount) {
-        final CharSequence charSequence = ((IjVimEditor)editor).getEditor().getDocument().getCharsSequence();
-        final int caretOffset = ((IjVimCaret)caret).getCaret().getOffset();
+        final CharSequence charSequence = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
+        final int caretOffset = ((IjVimCaret) caret).getCaret().getOffset();
 
         // Part 1: Find the start of the caret line.
         int caretLineStartOffset = caretOffset;
@@ -261,14 +261,14 @@ public class VimIndentObject implements VimExtension {
 
     @Override
     public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
-      IjVimEditor vimEditor = (IjVimEditor)editor;
+      IjVimEditor vimEditor = (IjVimEditor) editor;
       @NotNull VimStateMachine vimStateMachine = VimStateMachine.Companion.getInstance(vimEditor);
       int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());
 
       final IndentObjectHandler textObjectHandler = new IndentObjectHandler(includeAbove, includeBelow);
 
       if (!vimStateMachine.isOperatorPending()) {
-        ((IjVimEditor)editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
+        ((IjVimEditor) editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
           final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
@@ -283,8 +283,8 @@ public class VimIndentObject implements VimExtension {
         });
       } else {
         vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
-                                                                                         textObjectHandler, Command.Type.MOTION,
-                                                                                         EnumSet.noneOf(CommandFlags.class))));
+          textObjectHandler, Command.Type.MOTION,
+          EnumSet.noneOf(CommandFlags.class))));
       }
     }
   }

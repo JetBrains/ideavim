@@ -602,7 +602,7 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-// VIM-2733
+  // VIM-2733
   @Test
   fun testDeleteOuterQuoteEmptyString2() {
     val keys = listOf("da'")
@@ -653,7 +653,7 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-// VIM-1427
+  // VIM-1427
   @Test
   fun testDeleteOuterTagWithCount() {
     val keys = listOf("d2at")

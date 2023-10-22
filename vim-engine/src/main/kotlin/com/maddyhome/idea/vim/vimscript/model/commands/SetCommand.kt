@@ -168,8 +168,7 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessS
           }
         }
       }
-    }
-    else {
+    } else {
       // This must be one of =, :, +=, -=, or ^=
       val eq = token.indexOf('=')
       val colon = token.indexOf(':')
@@ -191,8 +190,7 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessS
           else -> value
         } ?: throw exExceptionMessage("E474", token)
         optionGroup.setOptionValue(option, scope, newValue)
-      }
-      else {
+      } else {
         // We're either missing the equals sign, the colon, or the option name itself
         error = Msg.unkopt
       }

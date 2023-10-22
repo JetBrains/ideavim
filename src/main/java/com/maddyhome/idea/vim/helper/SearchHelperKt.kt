@@ -17,7 +17,8 @@ private data class State(val position: Int, val trigger: Char, val inQuote: Bool
 
 // bounds are considered inside corresponding quotes
 internal fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
-  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACKWARDS)?.second?.plus(1) ?: 0
+  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACKWARDS)?.second?.plus(1)
+    ?: 0
   val changes = quoteChanges(chars, begin)
   // TODO: here we need to keep only the latest element in beforePos (if any) and
   //   don't need atAndAfterPos to be eagerly collected

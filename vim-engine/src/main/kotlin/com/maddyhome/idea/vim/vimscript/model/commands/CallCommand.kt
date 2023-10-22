@@ -51,7 +51,8 @@ public class CallCommand(public val ranges: Ranges, public val functionCall: Exp
         return ExecutionResult.Success
       }
 
-      val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
+      val name = (functionCall.scope?.toString()
+        ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
       val funcref = injector.variableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, vimContext)
       if (funcref is VimFuncref) {
         funcref.handler.ranges = ranges

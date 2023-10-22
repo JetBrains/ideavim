@@ -37,7 +37,7 @@ import java.util.*;
 public class WindowGroup extends WindowGroupBase {
   @Override
   public void closeCurrentWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager((DataContext)context.getContext());
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager((DataContext) context.getContext());
     final EditorWindow window = fileEditorManager.getSplitters().getCurrentWindow();
     if (window != null) {
       window.closeAllExcept(null);
@@ -46,7 +46,7 @@ public class WindowGroup extends WindowGroupBase {
 
   @Override
   public void closeAllExceptCurrent(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext) context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     for (final EditorWindow window : fileEditorManager.getWindows()) {
       if (window != current) {
@@ -61,7 +61,7 @@ public class WindowGroup extends WindowGroupBase {
 
   @Override
   public void selectNextWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext) context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     if (current != null) {
       EditorWindow nextWindow = fileEditorManager.getNextWindow(current);
@@ -73,7 +73,7 @@ public class WindowGroup extends WindowGroupBase {
 
   @Override
   public void selectPreviousWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext) context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     if (current != null) {
       EditorWindow prevWindow = fileEditorManager.getPrevWindow(current);
@@ -85,7 +85,7 @@ public class WindowGroup extends WindowGroupBase {
 
   @Override
   public void selectWindow(@NotNull ExecutionContext context, int index) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext) context.getContext()));
     final EditorWindow[] windows = fileEditorManager.getWindows();
     if (index - 1 < windows.length) {
       windows[index - 1].setAsCurrentWindow(true);
@@ -94,12 +94,12 @@ public class WindowGroup extends WindowGroupBase {
 
   @Override
   public void splitWindowHorizontal(@NotNull ExecutionContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.HORIZONTAL, (DataContext)context.getContext(), filename);
+    splitWindow(SwingConstants.HORIZONTAL, (DataContext) context.getContext(), filename);
   }
 
   @Override
   public void splitWindowVertical(@NotNull ExecutionContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.VERTICAL, (DataContext)context.getContext(), filename);
+    splitWindow(SwingConstants.VERTICAL, (DataContext) context.getContext(), filename);
   }
 
   @Override
@@ -107,8 +107,8 @@ public class WindowGroup extends WindowGroupBase {
   @RequiresReadLock
   public void selectWindowInRow(@NotNull VimCaret caret, @NotNull ExecutionContext context, int relativePosition, boolean vertical) {
     final Caret ijCaret = ((IjVimCaret) caret).getCaret();
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow currentWindow =  fileEditorManager.getCurrentWindow();
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext) context.getContext()));
+    final EditorWindow currentWindow = fileEditorManager.getCurrentWindow();
     if (currentWindow != null) {
       final EditorWindow[] windows = fileEditorManager.getWindows();
       final List<EditorWindow> row = findWindowsInRow(ijCaret, currentWindow, Arrays.asList(windows), vertical);
@@ -124,9 +124,10 @@ public class WindowGroup extends WindowGroupBase {
     windows.get(normalized).setAsCurrentWindow(true);
   }
 
-  private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
-                                                              @NotNull EditorWindow editorWindow,
-                                                              @NotNull List<EditorWindow> windows, final boolean vertical) {
+  private static @NotNull
+  List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
+                                      @NotNull EditorWindow editorWindow,
+                                      @NotNull List<EditorWindow> windows, final boolean vertical) {
     final Point anchorPoint = getCaretPoint(caret);
     if (anchorPoint != null) {
       final List<EditorWindow> result = new ArrayList<>();
@@ -155,7 +156,8 @@ public class WindowGroup extends WindowGroupBase {
     return Collections.singletonList(editorWindow);
   }
 
-  private static @NotNull FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
+  private static @NotNull
+  FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     return FileEditorManagerEx.getInstanceEx(Objects.requireNonNull(project));
   }
@@ -180,7 +182,8 @@ public class WindowGroup extends WindowGroupBase {
     }
   }
 
-  private static @NotNull Point getCaretPoint(@NotNull Caret caret) {
+  private static @NotNull
+  Point getCaretPoint(@NotNull Caret caret) {
     final Editor editor = caret.getEditor();
     final Point caretLocation = editor.logicalPositionToXY(caret.getLogicalPosition());
     Point caretScreenLocation = editor.getContentComponent().getLocationOnScreen();
@@ -188,7 +191,8 @@ public class WindowGroup extends WindowGroupBase {
     return caretScreenLocation;
   }
 
-  private static @Nullable Rectangle getSplitRectangle(@NotNull EditorWindow window) {
+  private static @Nullable
+  Rectangle getSplitRectangle(@NotNull EditorWindow window) {
     final EditorComposite editorComposite = window.getSelectedComposite();
     if (editorComposite != null) {
       final EditorTabbedContainer split = window.getTabbedPane();

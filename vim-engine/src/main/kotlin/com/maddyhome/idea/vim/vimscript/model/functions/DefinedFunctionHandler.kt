@@ -92,7 +92,8 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
         is ExecutionResult.Continue -> exceptionsCaught.add(ExException("E586: :continue without :while or :for: continue"))
         is ExecutionResult.Error -> exceptionsCaught.add(ExException("unknown error occurred")) // todo
         is ExecutionResult.Return -> returnValue = result.value
-        is ExecutionResult.Success -> {}
+        is ExecutionResult.Success -> {
+        }
       }
     } else {
       // todo in release 1.9. in this case multiple exceptions can be thrown at once but we don't support it
@@ -108,7 +109,8 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
               returnValue = result.value
               break
             }
-            is ExecutionResult.Success -> {}
+            is ExecutionResult.Success -> {
+            }
           }
         } catch (e: ExException) {
           if (e is FinishException) {

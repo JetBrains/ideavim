@@ -200,7 +200,7 @@ Xbar
       listOf("<C-V>", "lll", "I"),
       before.trimIndent(),
       before.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 }

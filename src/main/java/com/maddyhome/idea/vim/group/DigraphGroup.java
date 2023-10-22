@@ -24,7 +24,7 @@ public class DigraphGroup extends VimDigraphGroupBase {
       width = 80;
     }
     int colCount = width / 12;
-    int height = (int)Math.ceil((double) getDigraphs().size() / (double)colCount);
+    int height = (int) Math.ceil((double) getDigraphs().size() / (double) colCount);
 
     if (logger.isDebugEnabled()) {
       logger.debug("width=" + width);
@@ -41,13 +41,11 @@ public class DigraphGroup extends VimDigraphGroupBase {
       res.append(' ');
       if (code < 32) {
         res.append('^');
-        res.append((char)(code + '@'));
-      }
-      else if (code >= 128 && code <= 159) {
+        res.append((char) (code + '@'));
+      } else if (code >= 128 && code <= 159) {
         res.append('~');
-        res.append((char)(code - 128 + '@'));
-      }
-      else {
+        res.append((char) (code - 128 + '@'));
+      } else {
         res.append(code);
         res.append(' ');
       }

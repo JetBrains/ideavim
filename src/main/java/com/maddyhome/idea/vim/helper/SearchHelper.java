@@ -61,12 +61,12 @@ public class SearchHelper {
    *
    * <p>See search.c:searchit</p>
    *
-   * @param editor          The editor to search in
-   * @param pattern         The pattern to search for
-   * @param startOffset     The offset to start searching from
-   * @param count           Find the nth next occurrence of the pattern. Must be 1 or greater.
-   * @param searchOptions   A set of options, such as direction and wrap
-   * @return                A TextRange representing the result, or null
+   * @param editor        The editor to search in
+   * @param pattern       The pattern to search for
+   * @param startOffset   The offset to start searching from
+   * @param count         Find the nth next occurrence of the pattern. Must be 1 or greater.
+   * @param searchOptions A set of options, such as direction and wrap
+   * @return A TextRange representing the result, or null
    */
   @Nullable
   public static TextRange findPattern(@NotNull Editor editor,
@@ -144,8 +144,7 @@ public class SearchHelper {
       if (dir == Direction.BACKWARDS && start_pos.col == 0) {
         lnum = pos.lnum - 1;
         at_first_line = false;
-      }
-      else {
+      } else {
         lnum = pos.lnum;
       }
 
@@ -219,7 +218,7 @@ public class SearchHelper {
                * relative to the end of the match.
                */
               match_ok = false;
-              for (;;) {
+              for (; ; ) {
                 if (loop != 0 ||
                   (searchOptions.contains(SearchOptions.WANT_ENDPOS)
                     ? (lnum + regmatch.endpos[0].lnum < start_pos.lnum || (lnum + regmatch.endpos[0].lnum == start_pos.lnum && regmatch.endpos[0].col - 1 < start_pos.col + extra_col))
@@ -229,8 +228,7 @@ public class SearchHelper {
                   match_ok = true;
                   matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
                   endpos = new RegExp.lpos_T(regmatch.endpos[0]);
-                }
-                else {
+                } else {
                   break;
                 }
 
@@ -308,8 +306,7 @@ public class SearchHelper {
           lnum = lineCount - 1;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(top_bot_msg), TRUE);
-        }
-        else {
+        } else {
           lnum = 0;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(bot_top_msg), TRUE);
@@ -325,11 +322,9 @@ public class SearchHelper {
       if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
         if (searchOptions.contains(SearchOptions.WRAP)) {
           VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
-        }
-        else if (lnum <= 0) {
+        } else if (lnum <= 0) {
           VimPlugin.showMessage(MessageHelper.message(Msg.E384, pattern));
-        }
-        else {
+        } else {
           VimPlugin.showMessage(MessageHelper.message(Msg.E385, pattern));
         }
       }
@@ -347,18 +342,19 @@ public class SearchHelper {
   /**
    * Find all occurrences of the pattern.
    *
-   * @param editor      The editor to search in
-   * @param pattern     The pattern to search for
-   * @param startLine   The start line of the range to search for
-   * @param endLine     The end line of the range to search for, or -1 for the whole document
-   * @param ignoreCase  Case sensitive or insensitive searching
-   * @return            A list of TextRange objects representing the results
+   * @param editor     The editor to search in
+   * @param pattern    The pattern to search for
+   * @param startLine  The start line of the range to search for
+   * @param endLine    The end line of the range to search for, or -1 for the whole document
+   * @param ignoreCase Case sensitive or insensitive searching
+   * @return A list of TextRange objects representing the results
    */
-  public static @NotNull List<TextRange> findAll(@NotNull Editor editor,
-                                                 @NotNull String pattern,
-                                                 int startLine,
-                                                 int endLine,
-                                                 boolean ignoreCase) {
+  public static @NotNull
+  List<TextRange> findAll(@NotNull Editor editor,
+                          @NotNull String pattern,
+                          int startLine,
+                          int endLine,
+                          boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
     final int lineCount = new IjVimEditor(editor).lineCount();
     final int actualEndLine = endLine == -1 ? lineCount - 1 : endLine;
@@ -387,13 +383,11 @@ public class SearchHelper {
         if (start != end) {
           line += matchedLines - 1;
           col = endPos.column;
-        }
-        else {
+        } else {
           line += matchedLines;
           col = 0;
         }
-      }
-      else {
+      } else {
         line++;
         col = 0;
       }
@@ -455,11 +449,12 @@ public class SearchHelper {
    * @return When block is found, return text range matching where end offset is exclusive,
    * otherwise return null
    */
-  public static @Nullable TextRange findBlockRange(@NotNull Editor editor,
-                                                   @NotNull Caret caret,
-                                                   char type,
-                                                   int count,
-                                                   boolean isOuter) {
+  public static @Nullable
+  TextRange findBlockRange(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           char type,
+                           int count,
+                           boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
     int start = caret.getSelectionStart();
@@ -478,7 +473,7 @@ public class SearchHelper {
         int countWhiteSpaceCharacter = 1;
         for (; end + countWhiteSpaceCharacter < chars.length(); countWhiteSpaceCharacter++) {
           if (Character.isWhitespace(chars.charAt(end + countWhiteSpaceCharacter)) &&
-              chars.charAt(end + countWhiteSpaceCharacter) != '\n') {
+            chars.charAt(end + countWhiteSpaceCharacter) != '\n') {
             continue;
           }
           if (chars.charAt(end + countWhiteSpaceCharacter) == close) {
@@ -503,10 +498,10 @@ public class SearchHelper {
      * In other terms, for the rest of the algorithm, a previous inner selection of a block
      * if equivalent to an outer one. */
     if (!isOuter &&
-        (start - 1) >= 0 &&
-        type == chars.charAt(start - 1) &&
-        end < chars.length() &&
-        close == chars.charAt(end)) {
+      (start - 1) >= 0 &&
+      type == chars.charAt(start - 1) &&
+      end < chars.length() &&
+      close == chars.charAt(end)) {
       start -= 1;
       pos = start;
       rangeSelection = true;
@@ -579,8 +574,7 @@ public class SearchHelper {
 
       if (allWhite) {
         bend = o - 2;
-      }
-      else {
+      } else {
         bend--;
       }
     }
@@ -600,8 +594,7 @@ public class SearchHelper {
         final int endOffset = comment.getTextOffset() + comment.getTextLength();
         if (pos < comment.getTextOffset() + prefix.length()) {
           return endOffset;
-        }
-        else if (pos >= endOffset - suffix.length()) {
+        } else if (pos >= endOffset - suffix.length()) {
           return comment.getTextOffset();
         }
       }
@@ -615,13 +608,13 @@ public class SearchHelper {
     final PsiComment comment = PsiTreeUtil.getParentOfType(element, PsiComment.class, false);
     if (comment != null) {
       final int ret = findMatchingBlockCommentPair(comment, pos, commenter.getBlockCommentPrefix(),
-                                                   commenter.getBlockCommentSuffix());
+        commenter.getBlockCommentSuffix());
       if (ret >= 0) {
         return ret;
       }
       if (commenter instanceof CodeDocumentationAwareCommenter docCommenter) {
         return findMatchingBlockCommentPair(comment, pos, docCommenter.getDocumentationCommentPrefix(),
-                                            docCommenter.getDocumentationCommentSuffix());
+          docCommenter.getDocumentationCommentSuffix());
       }
     }
     return -1;
@@ -736,8 +729,7 @@ public class SearchHelper {
       else if (c == '\n') {
         inString = false;
         inChar = false;
-      }
-      else if (pos != initialPos) {
+      } else if (pos != initialPos) {
         // We found another character like our original - belongs to another pair
         if (!inString && !inChar && c == found) {
           stack++;
@@ -745,8 +737,7 @@ public class SearchHelper {
         // We found the start/end of a string
         else if (!inChar) {
           inString = checkInString(chars, inCheckPosF.apply(pos), true);
-        }
-        else if (!inString) {
+        } else if (!inString) {
           inChar = checkInString(chars, inCheckPosF.apply(pos), false);
         }
       }
@@ -769,11 +760,12 @@ public class SearchHelper {
     return backslashCounter % 2 == 0;
   }
 
-  public static @Nullable Pair<Character, Integer> findPositionOfFirstCharacter(@NotNull CharSequence chars,
-                                                                                int pos,
-                                                                                final Set<Character> needles,
-                                                                                boolean searchEscaped,
-                                                                                @NotNull Direction direction) {
+  public static @Nullable
+  Pair<Character, Integer> findPositionOfFirstCharacter(@NotNull CharSequence chars,
+                                                        int pos,
+                                                        final Set<Character> needles,
+                                                        boolean searchEscaped,
+                                                        @NotNull Direction direction) {
     int dir = direction.toInt();
     while (pos >= 0 && pos < chars.length()) {
       final char c = chars.charAt(pos);
@@ -798,10 +790,11 @@ public class SearchHelper {
   }
 
 
-  public static @Nullable TextRange findBlockTagRange(@NotNull Editor editor,
-                                                      @NotNull Caret caret,
-                                                      int count,
-                                                      boolean isOuter) {
+  public static @Nullable
+  TextRange findBlockTagRange(@NotNull Editor editor,
+                              @NotNull Caret caret,
+                              int count,
+                              boolean isOuter) {
     final int position = caret.getOffset();
     final CharSequence sequence = editor.getDocument().getCharsSequence();
 
@@ -815,8 +808,7 @@ public class SearchHelper {
       final int line = caret.getLogicalPosition().line;
       final int lineBegin = editor.getDocument().getLineStartOffset(line);
       searchStartPosition = ignoreWhitespaceAtLineStart(sequence, lineBegin, position);
-    }
-    else {
+    } else {
       searchStartPosition = selectionEnd;
     }
 
@@ -825,8 +817,7 @@ public class SearchHelper {
       while (searchStartPosition < sequence.length() && sequence.charAt(searchStartPosition) != '>') {
         searchStartPosition++;
       }
-    }
-    else if (isInHTMLTag(sequence, searchStartPosition, true)) {
+    } else if (isInHTMLTag(sequence, searchStartPosition, true)) {
       // caret is inside closing tag. Move to starting '<'.
       while (searchStartPosition > 0 && sequence.charAt(searchStartPosition) != '<') {
         searchStartPosition--;
@@ -866,8 +857,7 @@ public class SearchHelper {
           // Special case: if the inner tag is already selected we should like isOuter is active
           // Note that we need to ignore newlines, because their selection is lost between multiple "it" invocations
           isOuter = true;
-        }
-        else if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() &&
+        } else if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() &&
           selectionStart == openingTag.getEndOffset()) {
           // Special case: for an empty tag pair (e.g. <a></a>) the whole tag is selected if the caret is in the middle.
           isOuter = true;
@@ -876,8 +866,7 @@ public class SearchHelper {
 
       if (isOuter) {
         return new TextRange(openingTag.getStartOffset(), closingTagTextRange.getEndOffset());
-      }
-      else {
+      } else {
         return new TextRange(openingTag.getEndOffset(), closingTagTextRange.getStartOffset());
       }
     }
@@ -918,9 +907,10 @@ public class SearchHelper {
     return closingBracket != -1 && sequence.charAt(closingBracket - 1) != '/';
   }
 
-  private static @Nullable Pair<TextRange, String> findUnmatchedClosingTag(final @NotNull CharSequence sequence,
-                                                                           final int position,
-                                                                           int count) {
+  private static @Nullable
+  Pair<TextRange, String> findUnmatchedClosingTag(final @NotNull CharSequence sequence,
+                                                  final int position,
+                                                  int count) {
     // The tag name may contain any characters except slashes, whitespace and '>'
     final String tagNamePattern = "([^/\\s>]+)";
     // An opening tag consists of '<' followed by a tag name, optionally some additional text after whitespace and a '>'
@@ -942,16 +932,13 @@ public class SearchHelper {
         if (openTags.isEmpty()) {
           if (count <= 1) {
             return new Pair<>(new TextRange(position + matcher.start(), position + matcher.end()), tagName);
-          }
-          else {
+          } else {
             count--;
           }
-        }
-        else {
+        } else {
           openTags.pop();
         }
-      }
-      else {
+      } else {
         final String tagName = matcher.group(1);
         openTags.push(tagName);
       }
@@ -959,20 +946,21 @@ public class SearchHelper {
     return null;
   }
 
-  private static @Nullable TextRange findUnmatchedOpeningTag(@NotNull CharSequence sequence,
-                                                             int position,
-                                                             @NotNull String tagName) {
+  private static @Nullable
+  TextRange findUnmatchedOpeningTag(@NotNull CharSequence sequence,
+                                    int position,
+                                    @NotNull String tagName) {
     final String quotedTagName = Pattern.quote(tagName);
     final String patternString = "(</%s>)"
-                                 // match closing tags
-                                 +
-                                 "|(<%s"
-                                 // or opening tags starting with tagName
-                                 +
-                                 "(\\s([^>]*"
-                                 // After at least one whitespace there might be additional text in the tag. E.g. <html lang="en">
-                                 +
-                                 "[^/])?)?>)";  // Slash is not allowed as last character (this would be a self closing tag).
+      // match closing tags
+      +
+      "|(<%s"
+      // or opening tags starting with tagName
+      +
+      "(\\s([^>]*"
+      // After at least one whitespace there might be additional text in the tag. E.g. <html lang="en">
+      +
+      "[^/])?)?>)";  // Slash is not allowed as last character (this would be a self closing tag).
     final Pattern tagPattern =
       Pattern.compile(String.format(patternString, quotedTagName, quotedTagName), Pattern.CASE_INSENSITIVE);
     final Matcher matcher = tagPattern.matcher(sequence.subSequence(0, position + 1));
@@ -984,16 +972,14 @@ public class SearchHelper {
         if (!openTags.isEmpty()) {
           openTags.pop();
         }
-      }
-      else {
+      } else {
         openTags.push(match);
       }
     }
 
     if (openTags.isEmpty()) {
       return null;
-    }
-    else {
+    } else {
       return openTags.pop();
     }
   }
@@ -1001,7 +987,8 @@ public class SearchHelper {
   /**
    * This counts all the words in the file.
    */
-  public static @NotNull CountPosition countWords(@NotNull Editor editor) {
+  public static @NotNull
+  CountPosition countWords(@NotNull Editor editor) {
     int size = EditorHelperRt.getFileSize(editor);
 
     return countWords(editor, 0, size);
@@ -1010,7 +997,8 @@ public class SearchHelper {
   /**
    * This counts all the words in the file.
    */
-  public static @NotNull CountPosition countWords(@NotNull Editor editor, int start, int end) {
+  public static @NotNull
+  CountPosition countWords(@NotNull Editor editor, int start, int end) {
     int offset = editor.getCaretModel().getOffset();
     final IjVimEditor vimEditor = new IjVimEditor(editor);
 
@@ -1028,12 +1016,10 @@ public class SearchHelper {
 
       if (res == offset) {
         position = count;
-      }
-      else if (last < offset && res >= offset) {
+      } else if (last < offset && res >= offset) {
         if (count == 2) {
           position = 1;
-        }
-        else {
+        } else {
           position = count - 1;
         }
       }
@@ -1048,11 +1034,12 @@ public class SearchHelper {
     return new CountPosition(count, position);
   }
 
-  public static @NotNull List<Pair<TextRange, NumberType>> findNumbersInRange(final @NotNull Editor editor,
-                                                                              @NotNull TextRange textRange,
-                                                                              final boolean alpha,
-                                                                              final boolean hex,
-                                                                              final boolean octal) {
+  public static @NotNull
+  List<Pair<TextRange, NumberType>> findNumbersInRange(final @NotNull Editor editor,
+                                                       @NotNull TextRange textRange,
+                                                       final boolean alpha,
+                                                       final boolean hex,
+                                                       final boolean octal) {
     List<Pair<TextRange, NumberType>> result = new ArrayList<>();
 
 
@@ -1067,8 +1054,8 @@ public class SearchHelper {
 
         if (number != null) {
           result.add(new Pair<>(new TextRange(number.getFirst().getStartOffset() + startOffset + chunkStart,
-                                              number.getFirst().getEndOffset() + startOffset + chunkStart),
-                                number.getSecond()));
+            number.getFirst().getEndOffset() + startOffset + chunkStart),
+            number.getSecond()));
         }
         chunkStart += 1 + chunk.length();
       }
@@ -1100,11 +1087,12 @@ public class SearchHelper {
     return result;
   }
 
-  public static @Nullable Pair<TextRange, NumberType> findNumberUnderCursor(final @NotNull Editor editor,
-                                                                            @NotNull Caret caret,
-                                                                            final boolean alpha,
-                                                                            final boolean hex,
-                                                                            final boolean octal) {
+  public static @Nullable
+  Pair<TextRange, NumberType> findNumberUnderCursor(final @NotNull Editor editor,
+                                                    @NotNull Caret caret,
+                                                    final boolean alpha,
+                                                    final boolean hex,
+                                                    final boolean octal) {
     int lline = caret.getLogicalPosition().line;
     String text = new IjVimEditor(editor).getLineText(lline).toLowerCase();
     int startLineOffset = new IjVimEditor(editor).getLineStartOffset(lline);
@@ -1116,8 +1104,8 @@ public class SearchHelper {
       return null;
     }
     return new Pair<>(new TextRange(numberTextRange.getFirst().getStartOffset() + startLineOffset,
-                                    numberTextRange.getFirst().getEndOffset() + startLineOffset),
-                      numberTextRange.getSecond());
+      numberTextRange.getFirst().getEndOffset() + startLineOffset),
+      numberTextRange.getSecond());
   }
 
   /**
@@ -1127,11 +1115,12 @@ public class SearchHelper {
    * @param startPosOnLine - start offset to search
    * @return - text range with number
    */
-  public static @Nullable Pair<TextRange, NumberType> findNumberInText(final @NotNull String textInRange,
-                                                                       int startPosOnLine,
-                                                                       final boolean alpha,
-                                                                       final boolean hex,
-                                                                       final boolean octal) {
+  public static @Nullable
+  Pair<TextRange, NumberType> findNumberInText(final @NotNull String textInRange,
+                                               int startPosOnLine,
+                                               final boolean alpha,
+                                               final boolean hex,
+                                               final boolean octal) {
 
     if (logger.isDebugEnabled()) {
       logger.debug("text=" + textInRange);
@@ -1157,11 +1146,10 @@ public class SearchHelper {
       if (hex) {
         // Ox and OX handling
         if (textInRange.charAt(pos) == '0' &&
-            pos < lineEndOffset - 1 &&
-            "xX".indexOf(textInRange.charAt(pos + 1)) >= 0) {
+          pos < lineEndOffset - 1 &&
+          "xX".indexOf(textInRange.charAt(pos + 1)) >= 0) {
           pos += 2;
-        }
-        else if ("xX".indexOf(textInRange.charAt(pos)) >= 0 && pos > 0 && textInRange.charAt(pos - 1) == '0') {
+        } else if ("xX".indexOf(textInRange.charAt(pos)) >= 0 && pos > 0 && textInRange.charAt(pos - 1) == '0') {
           pos++;
         }
 
@@ -1178,12 +1166,10 @@ public class SearchHelper {
 
         if (!isHexChar || alpha) {
           break;
-        }
-        else {
+        } else {
           pos++;
         }
-      }
-      else {
+      } else {
         break;
       }
     }
@@ -1198,8 +1184,8 @@ public class SearchHelper {
         return new Pair<>(new TextRange(start, end), NumberType.DEC);
       }
       if (textInRange.charAt(start) == '0' &&
-          end > start &&
-          !(start > 0 && isNumberChar(textInRange.charAt(start - 1), false, false, false, true))) {
+        end > start &&
+        !(start > 0 && isNumberChar(textInRange.charAt(start - 1), false, false, false, true))) {
         logger.debug("found octal");
         return new Pair<>(new TextRange(start, end), NumberType.OCT);
       }
@@ -1226,12 +1212,13 @@ public class SearchHelper {
   /**
    * Searches for digits block that matches parameters
    */
-  private static @NotNull Pair<Integer, Integer> findRange(final @NotNull String text,
-                                                           final int pos,
-                                                           final boolean alpha,
-                                                           final boolean hex,
-                                                           final boolean octal,
-                                                           final boolean decimal) {
+  private static @NotNull
+  Pair<Integer, Integer> findRange(final @NotNull String text,
+                                   final int pos,
+                                   final boolean alpha,
+                                   final boolean hex,
+                                   final boolean octal,
+                                   final boolean decimal) {
     int end = pos;
     while (end < text.length() && isNumberChar(text.charAt(end), alpha, hex, octal, decimal || octal)) {
       end++;
@@ -1241,10 +1228,10 @@ public class SearchHelper {
       start--;
     }
     if (start < end &&
-        (start == -1 ||
-         0 <= start &&
-         start < text.length() &&
-         !isNumberChar(text.charAt(start), alpha, hex, octal, decimal || octal))) {
+      (start == -1 ||
+        0 <= start &&
+          start < text.length() &&
+          !isNumberChar(text.charAt(start), alpha, hex, octal, decimal || octal))) {
       start++;
     }
     if (octal) {
@@ -1258,14 +1245,11 @@ public class SearchHelper {
   private static boolean isNumberChar(char ch, boolean alpha, boolean hex, boolean octal, boolean decimal) {
     if (alpha && ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))) {
       return true;
-    }
-    else if (octal && (ch >= '0' && ch <= '7')) {
+    } else if (octal && (ch >= '0' && ch <= '7')) {
       return true;
-    }
-    else if (hex && ((ch >= '0' && ch <= '9') || "abcdefABCDEF".indexOf(ch) >= 0)) {
+    } else if (hex && ((ch >= '0' && ch <= '9') || "abcdefABCDEF".indexOf(ch) >= 0)) {
       return true;
-    }
-    else {
+    } else {
       return decimal && (ch >= '0' && ch <= '9');
     }
 
@@ -1278,7 +1262,8 @@ public class SearchHelper {
    * @param caret  The caret to find word under
    * @return The text range of the found word or null if there is no word under/after the cursor on the line
    */
-  public static @Nullable TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret) {
+  public static @Nullable
+  TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret) {
     final IjVimEditor vimEditor = new IjVimEditor(editor);
     CharSequence chars = editor.getDocument().getCharsSequence();
     int stop = EngineEditorHelperKt.getLineEndOffset(vimEditor, caret.getLogicalPosition().line, true);
@@ -1299,8 +1284,7 @@ public class SearchHelper {
         while (start > 0 && CharacterHelper.charType(vimEditor, chars.charAt(start - 1), false) == types[i]) {
           start--;
         }
-      }
-      else {
+      } else {
         // Search forward for start of word
         while (start < stop && CharacterHelper.charType(vimEditor, chars.charAt(start), false) != types[i]) {
           start++;
@@ -1319,11 +1303,10 @@ public class SearchHelper {
     int end;
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
     if (start < stop &&
-        (start >= chars.length() - 1 ||
-         CharacterHelper.charType(vimEditor, chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD)) {
+      (start >= chars.length() - 1 ||
+        CharacterHelper.charType(vimEditor, chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD)) {
       end = start + 1;
-    }
-    else {
+    } else {
       end = injector.getSearchHelper().findNextWordEnd(vimEditor, start, 1, false, false) + 1;
     }
 
@@ -1331,13 +1314,14 @@ public class SearchHelper {
   }
 
   @Contract("_, _, _, _, _, _, _ -> new")
-  public static @NotNull TextRange findWordUnderCursor(@NotNull Editor editor,
-                                                       @NotNull Caret caret,
-                                                       int count,
-                                                       int dir,
-                                                       boolean isOuter,
-                                                       boolean isBig,
-                                                       boolean hasSelection) {
+  public static @NotNull
+  TextRange findWordUnderCursor(@NotNull Editor editor,
+                                @NotNull Caret caret,
+                                int count,
+                                int dir,
+                                boolean isOuter,
+                                boolean isBig,
+                                boolean hasSelection) {
     if (logger.isDebugEnabled()) {
       logger.debug("count=" + count);
       logger.debug("dir=" + dir);
@@ -1365,8 +1349,8 @@ public class SearchHelper {
     boolean startSpace = CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
-                          CharacterHelper.charType(vimEditor, chars.charAt(pos - 1), isBig) !=
-                          CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
+      CharacterHelper.charType(vimEditor, chars.charAt(pos - 1), isBig) !=
+        CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
     int start = pos;
 
     if (logger.isDebugEnabled()) {
@@ -1377,8 +1361,7 @@ public class SearchHelper {
     if ((!onWordStart && !(startSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
       if (dir == 1) {
         start = injector.getSearchHelper().findNextWord(vimEditor, pos, -1, isBig, !isOuter);
-      }
-      else {
+      } else {
         start = injector.getSearchHelper().findNextWord(vimEditor, pos, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
       }
 
@@ -1389,8 +1372,8 @@ public class SearchHelper {
 
     // Find word end
     boolean onWordEnd = pos >= max - 1 ||
-                        CharacterHelper.charType(vimEditor, chars.charAt(pos + 1), isBig) !=
-                        CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
+      CharacterHelper.charType(vimEditor, chars.charAt(pos + 1), isBig) !=
+        CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
 
     if (logger.isDebugEnabled()) logger.debug("onWordEnd=" + onWordEnd);
 
@@ -1399,8 +1382,7 @@ public class SearchHelper {
       if (dir == 1) {
         int c = count - (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0);
         end = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, c, isBig, !isOuter);
-      }
-      else {
+      } else {
         end = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, !isOuter);
       }
     }
@@ -1443,7 +1425,7 @@ public class SearchHelper {
     if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
       if (end < max - 1) {
         if (CharacterHelper.charType(vimEditor, chars.charAt(end + 1), !isBig) !=
-            CharacterHelper.charType(vimEditor, chars.charAt(end), !isBig)) {
+          CharacterHelper.charType(vimEditor, chars.charAt(end), !isBig)) {
           goForward = true;
         }
       }
@@ -1457,7 +1439,7 @@ public class SearchHelper {
     if (goForward) {
       if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, end, 1)) {
         while (end + 1 < max &&
-               CharacterHelper.charType(vimEditor, chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+          CharacterHelper.charType(vimEditor, chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           end++;
         }
       }
@@ -1465,7 +1447,7 @@ public class SearchHelper {
     if (goBack) {
       if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, start, -1)) {
         while (start > min &&
-               CharacterHelper.charType(vimEditor, chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+          CharacterHelper.charType(vimEditor, chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           start--;
         }
       }
@@ -1509,8 +1491,7 @@ public class SearchHelper {
 
     if (found == Math.abs(count)) {
       return pos;
-    }
-    else {
+    } else {
       return -1;
     }
   }
@@ -1523,7 +1504,8 @@ public class SearchHelper {
     return PsiHelper.findMethodEnd(editor, caret.getOffset(), count);
   }
 
-  private static @NotNull String parseMatchPairsOption(final VimEditor vimEditor) {
+  private static @NotNull
+  String parseMatchPairsOption(final VimEditor vimEditor) {
     List<String> pairs = options(injector, vimEditor).getMatchpairs();
     StringBuilder res = new StringBuilder();
     for (String s : pairs) {
@@ -1553,7 +1535,8 @@ public class SearchHelper {
     private final int position;
   }
 
-  private static final @NotNull String blockChars = "{}()[]<>";
+  private static final @NotNull
+  String blockChars = "{}()[]<>";
 
   private static final Logger logger = Logger.getInstance(SearchHelper.class.getName());
 }

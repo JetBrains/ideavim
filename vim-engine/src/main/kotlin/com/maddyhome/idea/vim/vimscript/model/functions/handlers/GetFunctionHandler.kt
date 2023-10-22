@@ -38,11 +38,15 @@ internal class GetFunctionHandler : FunctionHandler() {
     return when (container) {
       is VimList -> {
         val idx = argumentValues[1].evaluate(editor, context, vimContext).asDouble().toInt()
-        container.values.getOrElse(idx) { argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(-1) }
+        container.values.getOrElse(idx) {
+          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(-1)
+        }
       }
       is VimDictionary -> {
         val key = argumentValues[1].evaluate(editor, context, vimContext).asString()
-        container.dictionary.getOrElse(VimString(key)) { argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0) }
+        container.dictionary.getOrElse(VimString(key)) {
+          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
+        }
       }
       is VimBlob, is VimFuncref -> throw ExException("Blobs and Funcref are not supported as an argument for get(). If you need it, request support in YouTrack")
       else -> throw ExException("E896: Argument of get() must be a List, Dictionary or Blob")

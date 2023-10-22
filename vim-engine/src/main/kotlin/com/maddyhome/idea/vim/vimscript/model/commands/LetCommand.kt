@@ -55,6 +55,7 @@ public data class LetCommand(
   private companion object {
     private val logger = vimLogger<LetCommand>()
   }
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)

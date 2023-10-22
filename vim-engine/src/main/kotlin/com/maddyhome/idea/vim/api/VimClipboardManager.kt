@@ -19,6 +19,7 @@ import java.awt.datatransfer.Transferable
  */
 public interface VimClipboardManager {
   public fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>?
+
   /**
    * Returns the string currently on the system clipboard.
    *

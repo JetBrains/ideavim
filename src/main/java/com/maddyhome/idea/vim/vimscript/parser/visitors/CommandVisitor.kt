@@ -309,7 +309,8 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
-    val command = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text)
+      ?: LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
     command.rangeInScript = ctx.getTextRange()
     return command
   }

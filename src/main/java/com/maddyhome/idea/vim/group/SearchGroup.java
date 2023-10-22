@@ -114,15 +114,18 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * @return The pattern used for last search. Can be null
    */
-  public @Nullable String getLastSearchPattern() {
+  public @Nullable
+  String getLastSearchPattern() {
     return lastSearch;
   }
 
   /**
    * Get the last pattern used in substitution.
+   *
    * @return The pattern used for the last substitute command. Can be null
    */
-  public @Nullable String getLastSubstitutePattern() {
+  public @Nullable
+  String getLastSubstitutePattern() {
     return lastSubstitute;
   }
 
@@ -131,10 +134,13 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * @return The pattern last used for either searching or substitution. Can be null
    */
-  public @Nullable String getLastUsedPattern() {
+  public @Nullable
+  String getLastUsedPattern() {
     switch (lastPatternIdx) {
-      case RE_SEARCH: return lastSearch;
-      case RE_SUBST:  return lastSubstitute;
+      case RE_SEARCH:
+        return lastSearch;
+      case RE_SUBST:
+        return lastSubstitute;
     }
     return null;
   }
@@ -160,10 +166,10 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * <p>Also saves the text to the search register and history.</p>
    *
-   * @param pattern       The pattern to remember
-   * @param which_pat     Which pattern to save - RE_SEARCH, RE_SUBST or RE_BOTH
-   * @param isNewPattern  Flag to indicate if the pattern is new, or comes from a last used pattern. True means to
-   *                      update the last used pattern index
+   * @param pattern      The pattern to remember
+   * @param which_pat    Which pattern to save - RE_SEARCH, RE_SUBST or RE_BOTH
+   * @param isNewPattern Flag to indicate if the pattern is new, or comes from a last used pattern. True means to
+   *                     update the last used pattern index
    */
   private void setLastUsedPattern(@NotNull String pattern, int which_pat, boolean isNewPattern) {
     // Only update the last pattern with a new input pattern. Do not update if we're reusing the last pattern
@@ -187,10 +193,10 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   /**
    * Sets the last search state, purely for tests
    *
-   * @param editor          The editor to update
-   * @param pattern         The pattern to save. This is the last search pattern, not the last substitute pattern
-   * @param patternOffset   The pattern offset, e.g. `/{pattern}/{offset}`
-   * @param direction       The direction to search
+   * @param editor        The editor to update
+   * @param pattern       The pattern to save. This is the last search pattern, not the last substitute pattern
+   * @param patternOffset The pattern offset, e.g. `/{pattern}/{offset}`
+   * @param direction     The direction to search
    */
   @TestOnly
   public void setLastSearchState(@SuppressWarnings("unused") @NotNull Editor editor, @NotNull String pattern,
@@ -211,21 +217,21 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   /**
    * Find all occurrences of the pattern
    *
+   * @param editor     The editor to search in
+   * @param pattern    The pattern to search for
+   * @param startLine  The start line of the range to search for
+   * @param endLine    The end line of the range to search for, or -1 for the whole document
+   * @param ignoreCase Case sensitive or insensitive searching
+   * @return A list of TextRange objects representing the results
    * @deprecated Use SearchHelper#findAll instead. Kept for compatibility with existing plugins
-   *
-   * @param editor      The editor to search in
-   * @param pattern     The pattern to search for
-   * @param startLine   The start line of the range to search for
-   * @param endLine     The end line of the range to search for, or -1 for the whole document
-   * @param ignoreCase  Case sensitive or insensitive searching
-   * @return            A list of TextRange objects representing the results
    */
   @Deprecated()
-  public static @NotNull List<TextRange> findAll(@NotNull Editor editor,
-                                                 @NotNull String pattern,
-                                                 int startLine,
-                                                 int endLine,
-                                                 boolean ignoreCase) {
+  public static @NotNull
+  List<TextRange> findAll(@NotNull Editor editor,
+                          @NotNull String pattern,
+                          int startLine,
+                          int endLine,
+                          boolean ignoreCase) {
     return SearchHelper.findAll(editor, pattern, startLine, endLine, ignoreCase);
   }
 
@@ -250,7 +256,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
    * @param dir         The direction to search
-   * @return            Offset to the next occurrence of the pattern or -1 if not found
+   * @return Offset to the next occurrence of the pattern or -1 if not found
    */
   @Override
   public int processSearchCommand(@NotNull VimEditor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
@@ -279,16 +285,13 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
           end.inc();
           patternOffset = end.toString();
           if (logger.isDebugEnabled()) logger.debug("Pattern contains offset " + patternOffset);
-        }
-        else {
+        } else {
           logger.debug("no offset");
           patternOffset = "";
         }
-      }
-      else if (command.length() == 1) {
+      } else if (command.length() == 1) {
         patternOffset = "";
-      }
-      else {
+      } else {
         patternOffset = command.substring(1);
         if (logger.isDebugEnabled()) logger.debug("offset=" + patternOffset);
       }
@@ -341,7 +344,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    return findItOffset(((IjVimEditor)editor).getEditor(), startOffset, 1, lastDir);
+    return findItOffset(((IjVimEditor) editor).getEditor(), startOffset, 1, lastDir);
   }
 
   /**
@@ -360,7 +363,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @param patternOffset The offset applied to the range. Not used during searching, but used to populate lastPatternOffset
    * @param startOffset   The offset to start searching from
    * @param direction     The direction to search in
-   * @return              The offset of the match or -1 if not found
+   * @return The offset of the match or -1 if not found
    */
   public int processSearchRange(@NotNull Editor editor, @NotNull String pattern, int patternOffset, int startOffset, @NotNull Direction direction) {
 
@@ -405,22 +408,22 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * <p>Equivalent to normal.c:nv_ident</p>
    *
-   * @param editor  The editor to search in
-   * @param caret   The caret to use to look for the current word
-   * @param count   Search for the nth occurrence of the current word
-   * @param whole   Include word boundaries in the search pattern
-   * @param dir     Which direction to search
-   * @return        The offset of the result or the start of the word under the caret if not found. Returns -1 on error
+   * @param editor The editor to search in
+   * @param caret  The caret to use to look for the current word
+   * @param count  Search for the nth occurrence of the current word
+   * @param whole  Include word boundaries in the search pattern
+   * @param dir    Which direction to search
+   * @return The offset of the result or the start of the word under the caret if not found. Returns -1 on error
    */
   @Override
   public int searchWord(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count, boolean whole, @NotNull Direction dir) {
-    TextRange range = SearchHelper.findWordUnderCursor(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
+    TextRange range = SearchHelper.findWordUnderCursor(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret());
     if (range == null) {
       logger.warn("No range was found");
       return -1;
     }
 
-    @NotNull final Editor editor1 = ((IjVimEditor)editor).getEditor();
+    @NotNull final Editor editor1 = ((IjVimEditor) editor).getEditor();
     final int start = range.getStartOffset();
     final int end = range.getEndOffset();
     final String pattern = SearchHelper.makeSearchPattern(
@@ -438,7 +441,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    final int offset = findItOffset(((IjVimEditor)editor).getEditor(), range.getStartOffset(), count, lastDir);
+    final int offset = findItOffset(((IjVimEditor) editor).getEditor(), range.getStartOffset(), count, lastDir);
     return offset == -1 ? range.getStartOffset() : offset;
   }
 
@@ -448,14 +451,14 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * <p>Searches for RE_LAST, including last used pattern offset. Direction is the same as the last used direction.
    * E.g. `?foo` followed by `n` will search backwards. scanwrap and ignorecase come from options.</p>
    *
-   * @param editor  The editor to search in
-   * @param caret   Used to get the offset to start searching from
-   * @param count   Find the nth occurrence
-   * @return        The offset of the next match, or -1 if not found
+   * @param editor The editor to search in
+   * @param caret  Used to get the offset to start searching from
+   * @param count  Find the nth occurrence
+   * @return The offset of the next match, or -1 if not found
    */
   @Override
   public int searchNext(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
-    return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count, lastDir);
+    return searchNextWithDirection(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), count, lastDir);
   }
 
   /**
@@ -464,15 +467,15 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * <p>Searches for RE_LAST, including last used pattern offset. Direction is the opposite of the last used direction.
    * E.g. `?foo` followed by `N` will be forwards. scanwrap and ignorecase come from options.</p>
    *
-   * @param editor  The editor to search in
-   * @param caret   Used to get the offset to starting searching from
-   * @param count   Find the nth occurrence
-   * @return        The offset of the next match, or -1 if not found
+   * @param editor The editor to search in
+   * @param caret  Used to get the offset to starting searching from
+   * @param count  Find the nth occurrence
+   * @return The offset of the next match, or -1 if not found
    */
   @Override
   public int searchPrevious(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
-    return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count,
-                                   lastDir.reverse());
+    return searchNextWithDirection(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), count,
+      lastDir.reverse());
   }
 
   // See normal.c:nv_next
@@ -509,12 +512,12 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * <p>See ex_cmds.c:ex_substitute</p>
    *
-   * @param editor  The editor to search in
-   * @param caret   The caret to use for initial search offset, and to move for interactive substitution
-   * @param range   Only search and substitute within the given line range. Must be valid
-   * @param excmd   The command part of the ex command line, e.g. `s` or `substitute`, or `~`
-   * @param exarg   The argument to the substitute command, such as `/{pattern}/{string}/[flags]`
-   * @return        True if the substitution succeeds, false on error. Will succeed even if nothing is modified
+   * @param editor The editor to search in
+   * @param caret  The caret to use for initial search offset, and to move for interactive substitution
+   * @param range  Only search and substitute within the given line range. Must be valid
+   * @param excmd  The command part of the ex command line, e.g. `s` or `substitute`, or `~`
+   * @param exarg  The argument to the substitute command, such as `/{pattern}/{string}/[flags]`
+   * @return True if the substitution succeeds, false on error. Will succeed even if nothing is modified
    */
   @Override
   @RWLockLabel.SelfSynchronized
@@ -535,8 +538,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     int which_pat;
     if ("~".equals(excmd)) {
       which_pat = RE_LAST;    /* use last used regexp */
-    }
-    else {
+    } else {
       which_pat = RE_SUBST;   /* use last substitute regexp */
     }
 
@@ -568,8 +570,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         pat = new CharPointer("");       /* empty search pattern */
         delimiter = cmd.charAt();             /* remember delimiter character */
         cmd.inc();
-      }
-      else {
+      } else {
         /* find the end of the regexp */
         which_pat = RE_LAST;                  /* use last used regexp */
         delimiter = cmd.charAt();             /* remember delimiter character */
@@ -597,8 +598,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         }
         cmd.inc();
       }
-    }
-    else {
+    } else {
       /* use previous pattern and substitution */
       if (lastReplace == null) {
         /* there is no previous command */
@@ -614,8 +614,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
      */
     if (cmd.charAt() == '&') {
       cmd.inc();
-    }
-    else {
+    } else {
       // :h :&& - "Note that :s and :& don't keep the flags"
       do_all = options(injector, editor).getGdefault();
       do_ask = false;
@@ -629,26 +628,20 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
        */
       if (cmd.charAt() == 'g') {
         do_all = !do_all;
-      }
-      else if (cmd.charAt() == 'c') {
+      } else if (cmd.charAt() == 'c') {
         do_ask = !do_ask;
-      }
-      else if (cmd.charAt() == 'e') {
+      } else if (cmd.charAt() == 'e') {
         do_error = !do_error;
-      }
-      else if (cmd.charAt() == 'r') {
+      } else if (cmd.charAt() == 'r') {
         /* use last used regexp */
         which_pat = RE_LAST;
-      }
-      else if (cmd.charAt() == 'i') {
+      } else if (cmd.charAt() == 'i') {
         /* ignore case */
         do_ic = 'i';
-      }
-      else if (cmd.charAt() == 'I') {
+      } else if (cmd.charAt() == 'I') {
         /* don't ignore case */
         do_ic = 'I';
-      }
-      else if (cmd.charAt() != 'p' && cmd.charAt() != 'l' && cmd.charAt() != '#' && cmd.charAt() != 'n') {
+      } else if (cmd.charAt() != 'p' && cmd.charAt() != 'l' && cmd.charAt() != '#' && cmd.charAt() != 'n') {
         // TODO: Support printing last changed line, with options for line number/list format
         // TODO: Support 'n' to report number of matches without substituting
         break;
@@ -688,7 +681,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
 
     Pair<Boolean, Triple<Object, String, Object>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
-                                                                                          RE_SUBST);
+      RE_SUBST);
     if (!booleanregmmatch_tPair.getFirst()) {
       if (do_error) {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
@@ -703,8 +696,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
     if (do_ic == 'i') {
       regmatch.rmm_ic = true;
-    }
-    else if (do_ic == 'I') {
+    } else if (do_ic == 'I') {
       regmatch.rmm_ic = false;
     }
 
@@ -806,9 +798,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             caret.moveToOffset(startoff);
             if (expression != null) {
               try {
-              match = expression
-                .evaluate(editor, injector.getExecutionContextManager().onEditor(editor, null), parent)
-                .toInsertableString();
+                match = expression
+                  .evaluate(editor, injector.getExecutionContextManager().onEditor(editor, null), parent)
+                  .toInsertableString();
               } catch (Exception e) {
                 exceptions.add((ExException) e);
                 match = "";
@@ -817,7 +809,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
             String finalMatch = match;
             ApplicationManager.getApplication().runWriteAction(() -> ((IjVimEditor) editor).getEditor().getDocument().replaceString(startoff, endoff,
-                                                                                                        finalMatch));
+              finalMatch));
             lastMatch = startoff;
             int newend = startoff + match.length();
             newpos = CharacterPosition.Companion.fromOffset(((IjVimEditor) editor).getEditor(), newend);
@@ -834,17 +826,14 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
           if (newpos != null) {
             lnum = newpos.line;
             searchcol = newpos.column;
-          }
-          else {
+          } else {
             searchcol = endpos.column;
           }
-        }
-        else {
+        } else {
           searchcol = 0;
           lnum++;
         }
-      }
-      else {
+      } else {
         lnum++;
         searchcol = 0;
       }
@@ -854,8 +843,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       if (lastMatch != -1) {
         caret.moveToOffset(
           VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
-      }
-      else {
+      } else {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
       }
     }
@@ -898,8 +886,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
   //public Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
   public Pair<Boolean, Triple<Object, String, Object>> search_regcomp(CharPointer pat,
-                                                                                  int which_pat,
-                                                                                  int patSave) {
+                                                                      int which_pat,
+                                                                      int patSave) {
     // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
     // it to true when searching for a word with `*`, `#`, `g*`, etc.
     boolean isNewPattern = true;
@@ -926,8 +914,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         VimPlugin.showMessage(errorMessage);
         return new Pair<>(false, null);
       }
-    }
-    else {
+    } else {
       pattern = pat.toString();
     }
 
@@ -949,7 +936,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     return new Pair<>(true, new Triple<>(regmatch, pattern, sp));
   }
 
-  private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
+  private static @NotNull
+  ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
     final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
@@ -979,12 +967,11 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
           break;
         }
       }
-    }
-    else {
+    } else {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
       ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
-      exEntryPanel.activate(editor, ((IjEditorExecutionContext)context).getContext(), MessageHelper.message("replace.with.0", match), "", 1);
+      exEntryPanel.activate(editor, ((IjEditorExecutionContext) context).getContext(), MessageHelper.message("replace.with.0", match), "", 1);
       new IjVimCaret(caret).moveToOffset(startoff);
       ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);
@@ -1008,20 +995,20 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * caret is inside the range of an occurrence, will return that instance. Uses the last used search pattern. Does not
    * update any other state. Direction is explicit, not from state.</p>
    *
-   * @param editor    The editor to search in
-   * @param count     Find the nth occurrence
-   * @param forwards  Search forwards or backwards
-   * @return          The TextRange of the next occurrence or null if not found
+   * @param editor   The editor to search in
+   * @param count    Find the nth occurrence
+   * @param forwards Search forwards or backwards
+   * @return The TextRange of the next occurrence or null if not found
    */
   @Override
-  public @Nullable TextRange getNextSearchRange(@NotNull VimEditor editor, int count, boolean forwards) {
+  public @Nullable
+  TextRange getNextSearchRange(@NotNull VimEditor editor, int count, boolean forwards) {
     editor.removeSecondaryCarets();
     TextRange current = findUnderCaret(editor);
 
-    if (current == null || CommandStateHelper.inVisualMode(((IjVimEditor)editor).getEditor()) && atEdgeOfGnRange(current, ((IjVimEditor)editor).getEditor(), forwards)) {
+    if (current == null || CommandStateHelper.inVisualMode(((IjVimEditor) editor).getEditor()) && atEdgeOfGnRange(current, ((IjVimEditor) editor).getEditor(), forwards)) {
       current = findNextSearchForGn(editor, count, forwards);
-    }
-    else if (count > 1) {
+    } else if (count > 1) {
       current = findNextSearchForGn(editor, count - 1, forwards);
     }
     return current;
@@ -1031,13 +1018,13 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     int currentPosition = editor.getCaretModel().getOffset();
     if (forwards) {
       return nextRange.getEndOffset() - VimPlugin.getVisualMotion().getSelectionAdj() == currentPosition;
-    }
-    else {
+    } else {
       return nextRange.getStartOffset() == currentPosition;
     }
   }
 
-  private @Nullable TextRange findNextSearchForGn(@NotNull VimEditor editor, int count, boolean forwards) {
+  private @Nullable
+  TextRange findNextSearchForGn(@NotNull VimEditor editor, int count, boolean forwards) {
     if (forwards) {
       final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
       return VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), editor.primaryCaret().getOffset().getPoint(), count, searchOptions);
@@ -1062,7 +1049,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     final TextRange foundBackward = VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), offset, count, searchOptions);
     if (foundBackward == null) return null;
     int startOffset = foundBackward.getStartOffset() - 1;
-    if (startOffset < 0) startOffset = (int)editor.fileSize();
+    if (startOffset < 0) startOffset = (int) editor.fileSize();
     searchOptions.remove(SearchOptions.BACKWARDS);
     return VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), startOffset, 1, searchOptions);
   }
@@ -1142,7 +1129,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     public static DocumentSearchListener INSTANCE = new DocumentSearchListener();
 
     @Contract(pure = true)
-    private DocumentSearchListener () {
+    private DocumentSearchListener() {
     }
 
     @Override
@@ -1204,11 +1191,11 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * <p>See search.c:do_search (and a little bit of normal.c:normal_search)</p>
    *
-   * @param editor        The editor to search in
-   * @param startOffset   The offset to search from
-   * @param count         Find the nth occurrence
-   * @param dir           The direction to search in
-   * @return              The offset to the occurrence or -1 if not found
+   * @param editor      The editor to search in
+   * @param startOffset The offset to search from
+   * @param count       Find the nth occurrence
+   * @param dir         The direction to search in
+   * @return The offset to the occurrence or -1 if not found
    */
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
     boolean wrap = globalOptions(injector).getWrapscan();
@@ -1288,8 +1275,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
       // TODO: Don't move the caret!
       res = VimPlugin.getMotion().moveCaretToLineStart(new IjVimEditor(editor), newLine);
-    }
-    else if (hasEndOffset || offset != 0) {
+    } else if (hasEndOffset || offset != 0) {
       int base = hasEndOffset ? range.getEndOffset() - 1 : range.getStartOffset();
       res = Math.max(0, Math.min(base + offset, EditorHelperRt.getFileSize(editor) - 1));
     }
@@ -1299,11 +1285,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       final Direction nextDir;
       if (lastPatternOffset.charAt(ppos + 1) == '/') {
         nextDir = Direction.FORWARDS;
-      }
-      else if (lastPatternOffset.charAt(ppos + 1) == '?') {
+      } else if (lastPatternOffset.charAt(ppos + 1) == '?') {
         nextDir = Direction.BACKWARDS;
-      }
-      else {
+      } else {
         return res;
       }
 
@@ -1359,16 +1343,14 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     final String lastPatternText = getSafeChildText(search, "last-pattern");
     if (lastPatternText == null || lastPatternText.equals(lastSearch)) {
       lastPatternIdx = RE_SEARCH;
-    }
-    else {
+    } else {
       lastPatternIdx = RE_SUBST;
     }
 
     Element dir = search.getChild("last-dir");
     try {
       lastDir = Direction.Companion.fromInt(Integer.parseInt(dir.getText()));
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException e) {
       lastDir = Direction.FORWARDS;
     }
 
@@ -1381,13 +1363,15 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
   }
 
-  private static @Nullable String getSafeChildText(@NotNull Element element, @NotNull String name) {
+  private static @Nullable
+  String getSafeChildText(@NotNull Element element, @NotNull String name) {
     final Element child = element.getChild(name);
     return child != null ? VimPlugin.getXML().getSafeXmlText(child) : null;
   }
 
   @SuppressWarnings("SameParameterValue")
-  private static @NotNull String getSafeChildText(@NotNull Element element, @NotNull String name, @NotNull String defaultValue) {
+  private static @NotNull
+  String getSafeChildText(@NotNull Element element, @NotNull String name, @NotNull String defaultValue) {
     final Element child = element.getChild(name);
     if (child != null) {
       final String value = VimPlugin.getXML().getSafeXmlText(child);
@@ -1425,13 +1409,18 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   // The trailing tilde tracks which was the last used pattern, but line/end/off is only used for search, not substitution
   // Search values can contain new lines, etc. Vim saves these as CTRL chars, e.g. ^M
   // Before saving, Vim reads existing viminfo, merges and writes
-  private @Nullable String lastSearch;             // Pattern used for last search command (`/`)
-  private @Nullable String lastSubstitute;         // Pattern used for last substitute command (`:s`)
+  private @Nullable
+  String lastSearch;             // Pattern used for last search command (`/`)
+  private @Nullable
+  String lastSubstitute;         // Pattern used for last substitute command (`:s`)
   private int lastPatternIdx;                      // Which pattern was used last? RE_SEARCH or RE_SUBST?
-  private @Nullable String lastReplace;            // `# Last Substitute String` from viminfo
-  private @NotNull String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
+  private @Nullable
+  String lastReplace;            // `# Last Substitute String` from viminfo
+  private @NotNull
+  String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
   private boolean lastIgnoreSmartCase;
-  private @NotNull Direction lastDir = Direction.FORWARDS;
+  private @NotNull
+  Direction lastDir = Direction.FORWARDS;
   private boolean showSearchHighlight = globalOptions(injector).getHlsearch();
 
   private boolean do_all = false; /* do multiple substitutions per line */

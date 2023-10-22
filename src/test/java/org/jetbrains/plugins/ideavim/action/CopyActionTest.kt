@@ -259,7 +259,7 @@ class CopyActionTest : VimTestCase() {
   @TestFor(issues = ["VIM-792"])
   fun testLineWiseClipboardYankPaste() {
     configureByText("<caret>foo\n")
-    typeText("\"*yy" +  "\"*p")
+    typeText("\"*yy" + "\"*p")
     val register = VimPlugin.getRegister().getRegister('*')
     assertNotNull<Any>(register)
     kotlin.test.assertEquals("foo\n", register.text)

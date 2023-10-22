@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
 
-internal interface IjVimOptionGroup: VimOptionGroup {
+internal interface IjVimOptionGroup : VimOptionGroup {
   /**
    * Return an accessor for options that only have a global value
    */

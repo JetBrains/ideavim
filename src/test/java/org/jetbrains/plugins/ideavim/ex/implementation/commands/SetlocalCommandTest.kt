@@ -121,8 +121,7 @@ class SetlocalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       assertCommandOutput("setlocal test?", "--test\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -149,8 +148,7 @@ class SetlocalCommandTest : VimTestCase() {
       enterCommand("setlocal test<")  // setlocal {option}< copies the global value to the local value
 
       assertCommandOutput("setlocal test?", "notest\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -225,8 +223,7 @@ class SetlocalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       assertCommandOutput("setlocal test?", "  test=-1\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -252,8 +249,7 @@ class SetlocalCommandTest : VimTestCase() {
       enterCommand("setlocal test<")  // setlocal {option}< copies the global value to the local value
 
       assertCommandOutput("setlocal test?", "  test=10\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -316,8 +312,7 @@ class SetlocalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       assertCommandOutput("setlocal test?", "  test=\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -338,8 +333,7 @@ class SetlocalCommandTest : VimTestCase() {
       enterCommand("setlocal test<")
 
       assertCommandOutput("setlocal test?", "  test=testValue\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }

@@ -69,7 +69,8 @@ internal object IdeaSpecifics {
       val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
       if (!isVimAction && injector.globalIjOptions().trackactionids) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
-          val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
+          val id: String? = ActionManager.getInstance().getId(action)
+            ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
           VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
         }
       }

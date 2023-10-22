@@ -16,10 +16,10 @@ class GraphemesTest {
   @Test
   fun `test next() against UCDs GraphemeBreakTest_txt`() {
     val testCases = parseGraphemeBreakTestCases(resource("GraphemeBreakTest.txt"))
-    
+
     for ((i, testCase) in testCases.withIndex()) {
       val actualGraphemes = graphemes(testCase.string, start = 0, next = Graphemes::next)
-      
+
       assertEquals(testCase.graphemes, actualGraphemes, "test case #$i")
     }
   }
@@ -27,10 +27,10 @@ class GraphemesTest {
   @Test
   fun `test prev() against UCDs GraphemeBreakTest_txt`() {
     val testCases = parseGraphemeBreakTestCases(resource("GraphemeBreakTest.txt"))
-    
+
     for ((i, testCase) in testCases.withIndex()) {
       val actualGraphemes = graphemes(testCase.string, start = testCase.string.length, next = Graphemes::prev)
-      
+
       assertEquals(testCase.graphemes.reversed(), actualGraphemes, "test case #$i")
     }
   }
@@ -41,7 +41,7 @@ class GraphemesTest {
     val graphemes = mutableListOf<String>()
     while (true) {
       val nextBoundary = next(text, boundary) ?: break
-      
+
       // Since we may traverse in both directions, we should properly get the grapheme range.
       val from = min(boundary, nextBoundary)
       val to = max(boundary, nextBoundary)
@@ -56,7 +56,7 @@ class GraphemesTest {
 
   /**
    * Parses a single test case.
-   * 
+   *
    * The test cases are presented as a sequence of code points in the following format:
    *     ÷ 034F × 0308 ÷ 0020 ÷
    * Where the "÷" symbol represents a break (including start of text and end of text breaks)
@@ -97,7 +97,7 @@ class GraphemesTest {
   private fun resource(name: String): String {
     val resourceUrl = javaClass.classLoader.getResource(name)
       ?: error("resource `$name' wasn't found")
-    
+
     return Files.readString(Paths.get(resourceUrl.toURI()))
   }
 

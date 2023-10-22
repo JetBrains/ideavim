@@ -30,14 +30,17 @@ import java.awt.event.MouseListener;
  * @author vlan
  */
 public class EventFacade {
-  private static final @NotNull EventFacade ourInstance = new EventFacade();
+  private static final @NotNull
+  EventFacade ourInstance = new EventFacade();
 
-  private @Nullable TypedActionHandler myOriginalTypedActionHandler;
+  private @Nullable
+  TypedActionHandler myOriginalTypedActionHandler;
 
   private EventFacade() {
   }
 
-  public static @NotNull EventFacade getInstance() {
+  public static @NotNull
+  EventFacade getInstance() {
     return ourInstance;
   }
 
@@ -143,7 +146,8 @@ public class EventFacade {
     editor.getSelectionModel().removeSelectionListener(listener);
   }
 
-  private @NotNull TypedAction getTypedAction() {
+  private @NotNull
+  TypedAction getTypedAction() {
     return TypedAction.getInstance();
   }
 }

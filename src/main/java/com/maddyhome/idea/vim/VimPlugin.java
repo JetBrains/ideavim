@@ -71,7 +71,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     VimInjectorKt.setInjector(new IjVimInjector());
   }
 
-  private final @NotNull VimState state = new VimState();
+  private final @NotNull
+  VimState state = new VimState();
   public Disposable onOffDisposable;
   private int previousStateVersion = 0;
   private String previousKeyMap = "";
@@ -87,130 +88,160 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   /**
    * @return NotificationService as applicationService if project is null and projectService otherwise
    */
-  public static @NotNull NotificationService getNotifications(@Nullable Project project) {
+  public static @NotNull
+  NotificationService getNotifications(@Nullable Project project) {
     if (project == null) {
       return ApplicationManager.getApplication().getService(NotificationService.class);
-    }
-    else {
+    } else {
       return project.getService(NotificationService.class);
     }
   }
 
-  public static @NotNull VimState getVimState() {
+  public static @NotNull
+  VimState getVimState() {
     return getInstance().state;
   }
 
 
-  public static @NotNull MotionGroup getMotion() {
+  public static @NotNull
+  MotionGroup getMotion() {
     return ApplicationManager.getApplication().getService(MotionGroup.class);
   }
 
-  public static @NotNull XMLGroup getXML() {
+  public static @NotNull
+  XMLGroup getXML() {
     return ApplicationManager.getApplication().getService(XMLGroup.class);
   }
 
-  public static @NotNull ChangeGroup getChange() {
-    return ((ChangeGroup)VimInjectorKt.getInjector().getChangeGroup());
+  public static @NotNull
+  ChangeGroup getChange() {
+    return ((ChangeGroup) VimInjectorKt.getInjector().getChangeGroup());
   }
 
-  public static @NotNull CommandGroup getCommand() {
+  public static @NotNull
+  CommandGroup getCommand() {
     return ApplicationManager.getApplication().getService(CommandGroup.class);
   }
 
   @Deprecated // "Please use `injector.markService` instead"
   @ApiStatus.ScheduledForRemoval(inVersion = "2.3")
-  public static @NotNull MarkGroup getMark() {
+  public static @NotNull
+  MarkGroup getMark() {
     return ApplicationManager.getApplication().getService(MarkGroup.class);
   }
 
-  public static @NotNull RegisterGroup getRegister() {
-    return ((RegisterGroup)VimInjectorKt.getInjector().getRegisterGroup());
+  public static @NotNull
+  RegisterGroup getRegister() {
+    return ((RegisterGroup) VimInjectorKt.getInjector().getRegisterGroup());
   }
 
-  public static @NotNull FileGroup getFile() {
-    return (FileGroup)VimInjectorKt.getInjector().getFile();
+  public static @NotNull
+  FileGroup getFile() {
+    return (FileGroup) VimInjectorKt.getInjector().getFile();
   }
 
-  public static @NotNull SearchGroup getSearch() {
+  public static @NotNull
+  SearchGroup getSearch() {
     return ApplicationManager.getApplication().getService(SearchGroup.class);
   }
 
-  public static @Nullable SearchGroup getSearchIfCreated() {
+  public static @Nullable
+  SearchGroup getSearchIfCreated() {
     return ApplicationManager.getApplication().getServiceIfCreated(SearchGroup.class);
   }
 
-  public static @NotNull ProcessGroup getProcess() {
-    return ((ProcessGroup)VimInjectorKt.getInjector().getProcessGroup());
+  public static @NotNull
+  ProcessGroup getProcess() {
+    return ((ProcessGroup) VimInjectorKt.getInjector().getProcessGroup());
   }
 
-  public static @NotNull MacroGroup getMacro() {
-    return (MacroGroup)VimInjectorKt.getInjector().getMacro();
+  public static @NotNull
+  MacroGroup getMacro() {
+    return (MacroGroup) VimInjectorKt.getInjector().getMacro();
   }
 
-  public static @NotNull DigraphGroup getDigraph() {
-    return (DigraphGroup)VimInjectorKt.getInjector().getDigraphGroup();
+  public static @NotNull
+  DigraphGroup getDigraph() {
+    return (DigraphGroup) VimInjectorKt.getInjector().getDigraphGroup();
   }
 
-  public static @NotNull HistoryGroup getHistory() {
+  public static @NotNull
+  HistoryGroup getHistory() {
     return ApplicationManager.getApplication().getService(HistoryGroup.class);
   }
 
-  public static @NotNull KeyGroup getKey() {
-    return ((KeyGroup)VimInjectorKt.getInjector().getKeyGroup());
+  public static @NotNull
+  KeyGroup getKey() {
+    return ((KeyGroup) VimInjectorKt.getInjector().getKeyGroup());
   }
 
-  public static @Nullable KeyGroup getKeyIfCreated() {
-    return ((KeyGroup)ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup.class));
+  public static @Nullable
+  KeyGroup getKeyIfCreated() {
+    return ((KeyGroup) ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup.class));
   }
 
-  public static @NotNull WindowGroup getWindow() {
-    return ((WindowGroup)VimInjectorKt.getInjector().getWindow());
+  public static @NotNull
+  WindowGroup getWindow() {
+    return ((WindowGroup) VimInjectorKt.getInjector().getWindow());
   }
 
-  public static @NotNull EditorGroup getEditor() {
+  public static @NotNull
+  EditorGroup getEditor() {
     return ApplicationManager.getApplication().getService(EditorGroup.class);
   }
 
-  public static @Nullable EditorGroup getEditorIfCreated() {
+  public static @Nullable
+  EditorGroup getEditorIfCreated() {
     return ApplicationManager.getApplication().getServiceIfCreated(EditorGroup.class);
   }
 
-  public static @NotNull VisualMotionGroup getVisualMotion() {
-    return (VisualMotionGroup)VimInjectorKt.getInjector().getVisualMotionGroup();
+  public static @NotNull
+  VisualMotionGroup getVisualMotion() {
+    return (VisualMotionGroup) VimInjectorKt.getInjector().getVisualMotionGroup();
   }
 
-  public static @NotNull YankGroupBase getYank() {
-    return (YankGroupBase)VimInjectorKt.getInjector().getYank();
+  public static @NotNull
+  YankGroupBase getYank() {
+    return (YankGroupBase) VimInjectorKt.getInjector().getYank();
   }
 
-  public static @NotNull PutGroup getPut() {
-    return (PutGroup)VimInjectorKt.getInjector().getPut();
+  public static @NotNull
+  PutGroup getPut() {
+    return (PutGroup) VimInjectorKt.getInjector().getPut();
   }
 
-  public static @NotNull VariableService getVariableService() {
+  public static @NotNull
+  VariableService getVariableService() {
     return ApplicationManager.getApplication().getService(VariableService.class);
   }
 
-  public static @NotNull VimOptionGroup getOptionGroup() {
+  public static @NotNull
+  VimOptionGroup getOptionGroup() {
     return VimInjectorKt.getInjector().getOptionGroup();
   }
 
-  /** Deprecated: Use getOptionGroup */
+  /**
+   * Deprecated: Use getOptionGroup
+   */
   @Deprecated
   // Used by which-key 0.8.0, IdeaVimExtension 1.6.5 + 1.6.8
-  public static @NotNull OptionService getOptionService() {
+  public static @NotNull
+  OptionService getOptionService() {
     return VimInjectorKt.getInjector().getOptionService();
   }
 
-  private static @NotNull NotificationService getNotifications() {
+  private static @NotNull
+  NotificationService getNotifications() {
     return getNotifications(null);
   }
 
-  public static @NotNull PluginId getPluginId() {
+  public static @NotNull
+  PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
 
-  public static @NotNull String getVersion() {
+  public static @NotNull
+  String getVersion() {
     final IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(getPluginId());
     return plugin != null ? plugin.getVersion() : "SNAPSHOT";
   }
@@ -254,7 +285,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     VimInjectorKt.getInjector().getMessages().showStatusBarMessage(null, msg);
   }
 
-  public static @NotNull VimPlugin getInstance() {
+  public static @NotNull
+  VimPlugin getInstance() {
     return ApplicationManager.getApplication().getService(VimPlugin.class);
   }
 
@@ -265,8 +297,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       Application application = ApplicationManager.getApplication();
       if (application.isUnitTestMode()) {
         application.invokeAndWait(this::turnOnPlugin);
-      }
-      else {
+      } else {
         application.invokeLater(this::turnOnPlugin);
       }
     }
@@ -386,8 +417,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
             if (VimPlugin.getNotifications().enableRepeatingMode() == Messages.YES) {
               getEditor().setKeyRepeat(true);
               keyRepeat.setEnabled(true);
-            }
-            else {
+            } else {
               getEditor().setKeyRepeat(false);
             }
           }
@@ -420,8 +450,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (state != null) {
       try {
         previousStateVersion = Integer.parseInt(state.getAttributeValue("version"));
-      }
-      catch (NumberFormatException ignored) {
+      } catch (NumberFormatException ignored) {
       }
       enabled = Boolean.parseBoolean(state.getAttributeValue("enabled"));
       previousKeyMap = state.getAttributeValue("keymap");
@@ -450,8 +479,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private void legacyStateLoading(@NotNull Element element) {
     if (previousStateVersion > 0 && previousStateVersion < 5) {
       // Migrate settings from 4 to 5 version
-      ((VimMarkServiceImpl)VimInjectorKt.getInjector().getMarkService()).loadState(element);
-      ((VimJumpServiceImpl)VimInjectorKt.getInjector().getJumpService()).loadState(element);
+      ((VimMarkServiceImpl) VimInjectorKt.getInjector().getMarkService()).loadState(element);
+      ((VimJumpServiceImpl) VimInjectorKt.getInjector().getJumpService()).loadState(element);
       getRegister().readData(element);
       getSearch().readData(element);
       getHistory().readData(element);

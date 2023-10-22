@@ -33,7 +33,8 @@ public data class ActionCommand(val ranges: Ranges, val argument: String) : Comm
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val actionName = argument.trim()
-    val action = injector.actionExecutor.getAction(actionName) ?: throw ExException(injector.messages.message("action.not.found.0", actionName))
+    val action = injector.actionExecutor.getAction(actionName)
+      ?: throw ExException(injector.messages.message("action.not.found.0", actionName))
     if (injector.application.isUnitTest()) {
       executeAction(editor, action, context)
     } else {

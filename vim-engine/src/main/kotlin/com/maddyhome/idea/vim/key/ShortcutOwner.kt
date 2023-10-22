@@ -54,8 +54,12 @@ public sealed class ShortcutOwnerInfo {
         owners[ShortcutOwner.IDE] = mutableListOf("a")
       }
 
-      val ideOwners = (owners[ShortcutOwner.IDE] ?: emptyList()).sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
-      val vimOwners = (owners[ShortcutOwner.VIM] ?: emptyList()).sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
+      val ideOwners = (owners[ShortcutOwner.IDE] ?: emptyList()).sortedBy {
+        wights[it] ?: 1000
+      }.joinToString(separator = "-")
+      val vimOwners = (owners[ShortcutOwner.VIM] ?: emptyList()).sortedBy {
+        wights[it] ?: 1000
+      }.joinToString(separator = "-")
 
       return if (ideOwners.isNotEmpty() && vimOwners.isNotEmpty()) {
         ideOwners + ":" + ShortcutOwner.IDE.ownerName + " " + vimOwners + ":" + ShortcutOwner.VIM.ownerName

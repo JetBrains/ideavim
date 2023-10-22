@@ -30,6 +30,7 @@ public sealed interface Mode {
   public data class NORMAL(public val returnTo: ReturnTo? = null) : Mode
   public data class OP_PENDING(public val returnTo: ReturnTo? = null, public val forcedVisual: SelectionType? = null) :
     Mode
+
   public data class VISUAL(public val selectionType: SelectionType, public val returnTo: ReturnTo? = null) : Mode
   public data class SELECT(public val selectionType: SelectionType, public val returnTo: ReturnTo? = null) : Mode
   public object INSERT : Mode

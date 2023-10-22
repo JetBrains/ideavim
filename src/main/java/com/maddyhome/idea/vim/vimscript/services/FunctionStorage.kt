@@ -34,6 +34,7 @@ internal class FunctionStorage : VimscriptFunctionService {
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
 
   private val builtInFunctions: MutableMap<String, LazyVimscriptFunction> = mutableMapOf()
+
   @Deprecated("Moved to annotation approach and lazy initialization")
   private val oldBuiltInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
 

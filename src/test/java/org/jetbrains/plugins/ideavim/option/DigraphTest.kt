@@ -40,7 +40,7 @@ class DigraphTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -67,7 +67,7 @@ Mode.INSERT,
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -94,7 +94,7 @@ Mode.INSERT,
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -121,7 +121,7 @@ Mode.INSERT,
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }

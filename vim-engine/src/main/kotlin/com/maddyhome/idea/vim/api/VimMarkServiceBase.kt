@@ -506,7 +506,8 @@ public abstract class VimMarkServiceBase : VimMarkService {
       SENTENCE_END_MARK -> 1
       else -> throw IllegalArgumentException("Invalid sentence mark char")
     }
-    var offset = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true) ?: return null
+    var offset = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true)
+      ?: return null
     offset = editor.normalizeOffset(offset, false)
     val lp = editor.offsetToBufferPosition(offset)
     return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())

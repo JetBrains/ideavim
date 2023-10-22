@@ -128,7 +128,7 @@ class VimHighlightedYankTest : VimTestCase() {
       "yiwi",
       codeWithMultipleCurors,
       codeWithMultipleCurors,
-Mode.INSERT,
+      Mode.INSERT,
     )
 
     assertAllHighlightersCount(0)

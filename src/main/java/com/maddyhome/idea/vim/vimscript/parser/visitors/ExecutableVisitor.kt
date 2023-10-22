@@ -117,7 +117,8 @@ internal object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     tryBlock.rangeInScript = ctx.tryBlock().getTextRange()
     val catchBlocks: MutableList<CatchBlock> = mutableListOf()
     for (catchBlock in ctx.catchBlock()) {
-      val cb = CatchBlock(catchBlock.pattern()?.patternBody()?.text ?: ".", catchBlock.blockMember().mapNotNull { visitBlockMember(it) })
+      val cb = CatchBlock(catchBlock.pattern()?.patternBody()?.text
+        ?: ".", catchBlock.blockMember().mapNotNull { visitBlockMember(it) })
       catchBlocks.add(cb)
       cb.rangeInScript = catchBlock.getTextRange()
     }

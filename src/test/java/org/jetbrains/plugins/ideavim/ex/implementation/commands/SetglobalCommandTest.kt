@@ -139,8 +139,7 @@ class SetglobalCommandTest : VimTestCase() {
       enterCommand("setglobal test<")
 
       assertCommandOutput("setglobal test?", "  test\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -233,8 +232,7 @@ class SetglobalCommandTest : VimTestCase() {
       enterCommand("setglobal test<")
 
       assertCommandOutput("setglobal test?", "  test=20\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -311,8 +309,7 @@ class SetglobalCommandTest : VimTestCase() {
       enterCommand("setlocal test<")
 
       assertCommandOutput("setlocal test?", "  test=testValue\n")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }

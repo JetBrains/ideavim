@@ -50,6 +50,7 @@ public data class CmdCommand(val ranges: Ranges, val argument: String) : Command
     const val zeroOrOneArguments = "?"
     const val moreThanZeroArguments = "+"
   }
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val result: Boolean = if (argument.trim().isEmpty()) {
       this.listAlias(editor, "")

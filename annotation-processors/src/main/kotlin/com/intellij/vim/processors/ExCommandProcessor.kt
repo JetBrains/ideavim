@@ -23,7 +23,7 @@ import kotlinx.serialization.json.Json
 import kotlin.io.path.Path
 import kotlin.io.path.writeText
 
-class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): SymbolProcessor {
+class ExCommandProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   private val visitor = EXCommandVisitor()
   private val commandToClass = mutableMapOf<String, String>()
 

@@ -16,8 +16,7 @@ fun main(args: Array<String>) {
 
   val nextVersion = if (lastVersion.suffixTokens.isEmpty()) {
     lastVersion.nextMinor().withSuffix("eap.1").value
-  }
-  else {
+  } else {
     check(lastVersion.suffixTokens.size == 2) {
       "We should have exactly two suffix tokens. Current tokens: ${lastVersion.suffixTokens.toList()}"
     }

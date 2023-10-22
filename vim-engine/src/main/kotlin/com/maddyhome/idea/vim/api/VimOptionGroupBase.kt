@@ -160,8 +160,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
       if (option.declaredScope == LOCAL_TO_WINDOW) {
         // Remember that this global value is per-window and should be initialised first
         localValues[option.name] = getGlobalOptionValue(option, editor)
-      }
-      else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
+      } else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
         localValues[option.name] = option.unsetValue
       }
     }
@@ -198,8 +197,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
     val cachedValues = if (option.declaredScope == GLOBAL) {
       globalParsedValues
-    }
-    else {
+    } else {
       check(editor != null) { "Editor must be supplied for local options" }
       getParsedEffectiveOptionStorage(option, editor)
     }
@@ -220,7 +218,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     Options.getAllOptions().forEach { option ->
       resetDefaultValue(option, OptionAccessScope.GLOBAL(editor))
       when (option.declaredScope) {
-        GLOBAL -> {}
+        GLOBAL -> {
+        }
         LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> resetDefaultValue(option, OptionAccessScope.LOCAL(editor))
         GLOBAL_OR_LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_WINDOW -> {
           setOptionValue(option, OptionAccessScope.LOCAL(editor), option.unsetValue)
@@ -329,8 +328,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     val values = if (option.declaredScope == LOCAL_TO_WINDOW) {
       check(editor != null) { "Editor must be provided for local options" }
       getPerWindowGlobalOptionStorage(editor)
-    }
-    else {
+    } else {
       globalValues
     }
 
@@ -344,8 +342,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     val changed = if (option.declaredScope == LOCAL_TO_WINDOW) {
       check(editor != null) { "Editor must be provided for local options" }
       doSetPerWindowGlobalOptionValue(option, editor, value)
-    }
-    else {
+    } else {
       doSetGlobalOptionValue(option, value)
     }
 
@@ -354,7 +351,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
         onGlobalOptionValueChanged(option)
         onGlobalOptionEffectiveValueChanged(option)
       }
-      LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> { /* Setting global value of a local option. No need to notify anyone */ }
+      LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> { /* Setting global value of a local option. No need to notify anyone */
+      }
       GLOBAL_OR_LOCAL_TO_BUFFER -> onGlobalLocalToBufferOptionGlobalValueChanged(option)
       GLOBAL_OR_LOCAL_TO_WINDOW -> onGlobalLocalToWindowOptionGlobalValueChanged(option)
     }

@@ -95,6 +95,7 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
     saveToRegister: Boolean = true,
   ): Boolean
+
   public fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
 
   public fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean

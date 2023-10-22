@@ -27,7 +27,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class GlobalOptionChangeListenerTest: VimTestCase() {
+class GlobalOptionChangeListenerTest : VimTestCase() {
   private val optionName = "test"
   private val defaultValue = "defaultValue"
 
@@ -134,8 +134,7 @@ class GlobalOptionChangeListenerTest: VimTestCase() {
       assertThrows<IllegalStateException> {
         injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
       }
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -149,8 +148,7 @@ class GlobalOptionChangeListenerTest: VimTestCase() {
       assertThrows<IllegalStateException> {
         injector.optionGroup.addGlobalOptionChangeListener(option, Listener)
       }
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }

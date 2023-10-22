@@ -35,7 +35,7 @@ class ChangeMotionActionTest : VimTestCase() {
       "cc",
       "foo\n" + "${c}bar\n",
       "foo\n${c}" + "\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -54,7 +54,7 @@ Mode.INSERT,
         ....${c}
         }
       """.trimIndent().dotToSpace(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -65,7 +65,7 @@ Mode.INSERT,
       "ccbaz",
       "${c}foo\n" + "bar\n",
       "baz\n" + "bar\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -83,7 +83,7 @@ Mode.INSERT,
         ${c}
         
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -93,7 +93,7 @@ Mode.INSERT,
       "c_baz",
       "${c}foo\n" + "bar\n",
       "baz\n" + "bar\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -104,7 +104,7 @@ Mode.INSERT,
       "cw",
       "on${c}e two three\n",
       "on${c} two three\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -115,7 +115,7 @@ Mode.INSERT,
       "c2w",
       "on${c}e two three\n",
       "on${c} three\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -134,7 +134,7 @@ Mode.INSERT,
    }
    
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -145,7 +145,7 @@ Mode.INSERT,
       "cT(",
       "if (condition) ${c}{\n" + "}\n",
       "if ({\n" + "}\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -158,7 +158,7 @@ Mode.INSERT,
       "cFc",
       "if (condition) {${c}\n" + "}\n",
       "if (\n" + "}\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -169,7 +169,7 @@ Mode.INSERT,
       "cw",
       "ab.${c}cd\n",
       "ab.${c}\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -180,7 +180,7 @@ Mode.INSERT,
       listOf("c", "iw", "baz"),
       "foo bar bo${c}o\n",
       "foo bar baz\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 

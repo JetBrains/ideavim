@@ -251,10 +251,12 @@ public fun VimEditor.getText(range: TextRange): String {
 public fun VimEditor.getOffset(line: Int, column: Int): Int {
   return bufferPositionToOffset(BufferPosition(line, column))
 }
+
 public fun VimEditor.getLineBuffer(line: Int): CharBuffer {
   val start: Int = getLineStartOffset(line)
   return CharBuffer.wrap(text(), start, start + getLineEndOffset(line, true) - getLineStartOffset(line))
 }
+
 public fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
   val start: Int
   val end: Int
