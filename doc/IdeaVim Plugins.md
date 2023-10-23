@@ -77,7 +77,7 @@ Original plugin: [NERDTree](https://github.com/preservim/nerdtree).
    
 ### Instructions
    
-[[See here|NERDTree-support]].
+[See here](NERDTree-support.md).
 
 </details>
 
