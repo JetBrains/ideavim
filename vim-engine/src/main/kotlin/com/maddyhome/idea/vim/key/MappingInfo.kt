@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -32,7 +31,6 @@ import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
@@ -224,13 +222,12 @@ public class ToHandlerMappingInfo(
             } else {
               startOffset = (startOffset.point - 1).offset
             }
-            val vimSelection = create(startOffset.point, endOffset.point, SelectionType.CHARACTER_WISE, editor)
+            val vimSelection = create(startOffset.point, endOffset.point, CHARACTER_WISE, editor)
             offsets[caret] = vimSelection
-            SelectionVimListenerSuppressor.lock().use {
-              // Move caret to the initial offset for better undo action
-              //  This is not a necessary thing, but without it undo action look less convenient
-              editor.currentCaret().moveToOffset(startOffset.point)
-            }
+            // FIXME: what is the comment below about?...
+            // Move caret to the initial offset for better undo action
+            //  This is not a necessary thing, but without it undo action look less convenient
+            editor.currentCaret().moveToOffset(startOffset.point)
           }
         }
         if (offsets.isNotEmpty()) {

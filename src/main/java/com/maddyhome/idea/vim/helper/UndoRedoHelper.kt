@@ -11,15 +11,12 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.command.impl.UndoManagerImpl
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.ChangesListener
-import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
@@ -30,15 +27,6 @@ import com.maddyhome.idea.vim.undo.UndoRedoBase
  */
 @Service
 internal class UndoRedoHelper : UndoRedoBase() {
-  init {
-    fun onOldUndoChanged() {
-      UndoManagerImpl.ourNeverAskUser = !injector.globalIjOptions().oldundo
-    }
-
-    injector.optionGroup.addGlobalOptionChangeListener(IjOptions.oldundo, ::onOldUndoChanged)
-    onOldUndoChanged()
-  }
-
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
@@ -51,8 +39,7 @@ internal class UndoRedoHelper : UndoRedoBase() {
       if (injector.globalIjOptions().oldundo) {
         SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
       } else {
-        performUntilFileChanges(editor, { undoManager.isUndoAvailable(fileEditor) }, { undoManager.undo(fileEditor) })
-
+        undoManager.undo(fileEditor)
         editor.carets().forEach {
           val ijCaret = it.ij
           val hasSelection = ijCaret.hasSelection()
@@ -82,7 +69,7 @@ internal class UndoRedoHelper : UndoRedoBase() {
       if (injector.globalIjOptions().oldundo) {
         SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
       } else {
-        performUntilFileChanges(editor, { undoManager.isRedoAvailable(fileEditor) }, { undoManager.redo(fileEditor) })
+        undoManager.redo(fileEditor)
         CommandProcessor.getInstance().runUndoTransparentAction {
           editor.carets().forEach { it.ij.removeSelection() }
         }
@@ -90,29 +77,5 @@ internal class UndoRedoHelper : UndoRedoBase() {
       return true
     }
     return false
-  }
-
-  private fun performUntilFileChanges(editor: VimEditor?, check: () -> Boolean, action: Runnable) {
-    if (editor == null) return
-    val vimDocument = editor.document
-
-    val changeListener = object : ChangesListener {
-      var hasChanged = false
-
-      override fun documentChanged(change: ChangesListener.Change) {
-        hasChanged = true
-      }
-    }
-
-    val oldPath = editor.getPath()
-    vimDocument.addChangeListener(changeListener)
-    while (check() && !changeListener.hasChanged && !ifFilePathChanged(editor, oldPath)) {
-      action.run()
-    }
-    vimDocument.removeChangeListener(changeListener)
-  }
-
-  private fun ifFilePathChanged(editor: VimEditor, oldPath: String?): Boolean {
-    return editor.getPath() != oldPath
   }
 }
