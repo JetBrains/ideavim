@@ -483,6 +483,10 @@ Contributors:
   [![icon][github]](https://github.com/ludwig-jb)
   &nbsp;
   ludwig-jb
+* [![icon][mail]](mailto:pvydmuch@gmail.com)
+  [![icon][github]](https://github.com/pWydmuch)
+  &nbsp;
+  pWydmuch
 
 Previous contributors:
 
