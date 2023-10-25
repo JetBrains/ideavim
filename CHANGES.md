@@ -33,6 +33,7 @@ usual beta standards.
 ### Merged PRs:
 * [697](https://github.com/JetBrains/ideavim/pull/697) by [Matt Ellis](https://github.com/citizenmatt): Support per-window "global" values for local-to-window options
 * [717](https://github.com/JetBrains/ideavim/pull/717) by [Matt Ellis](https://github.com/citizenmatt): Fix(VIM-2562): Fix hang with multi-width chars in command line
+* [732](https://github.com/JetBrains/ideavim/pull/732) by [pWydmuch](https://github.com/pWydmuch): Fix md links in doc
 
 ## 2.5.0, 2023-09-01
 
