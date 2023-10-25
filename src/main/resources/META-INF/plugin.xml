@@ -82,6 +82,7 @@
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 
     <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
+    <actionConfigurationCustomizer implementation="com.maddyhome.idea.vim.action.VimActionConfigurationCustomizer"/>
 
     <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
 
