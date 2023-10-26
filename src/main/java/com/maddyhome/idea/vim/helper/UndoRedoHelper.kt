@@ -39,7 +39,13 @@ internal class UndoRedoHelper : UndoRedoBase() {
       if (injector.globalIjOptions().oldundo) {
         SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
       } else {
+        // TODO refactor me after VIM-308 when restoring selection and caret movement will be ignored by undo
         undoManager.undo(fileEditor)
+        if (hasSelection(editor)) {
+          undoManager.undo(fileEditor) // execute one more time if the previous undo just restored selection
+        }
+        
+        // remove selection
         editor.carets().forEach {
           val ijCaret = it.ij
           val hasSelection = ijCaret.hasSelection()
@@ -60,6 +66,10 @@ internal class UndoRedoHelper : UndoRedoBase() {
     return false
   }
 
+  private fun hasSelection(editor: VimEditor): Boolean {
+    return editor.primaryCaret().ij.hasSelection()
+  }
+  
   override fun redo(editor: VimEditor, context: ExecutionContext): Boolean {
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
