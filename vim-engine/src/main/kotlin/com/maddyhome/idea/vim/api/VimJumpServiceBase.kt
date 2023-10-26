@@ -11,51 +11,36 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.mark.Jump
 
 public abstract class VimJumpServiceBase : VimJumpService {
-  @JvmField
-  protected val jumps: MutableList<Jump> = ArrayList() // todo should it be mutable?
-  @JvmField
-  protected var jumpSpot: Int = -1
+  protected val projectToJumps: MutableMap<String, MutableList<Jump>> = mutableMapOf()
+  protected val projectToJumpSpot: MutableMap<String, Int> = mutableMapOf()
 
-  override fun getJumpSpot(): Int {
-    return jumpSpot
-  }
-
-  override fun getJump(count: Int): Jump? {
-    val index = jumps.size - 1 - (jumpSpot - count)
-    return if (index < 0 || index >= jumps.size) {
-      null
-    } else {
-      jumpSpot -= count
-      jumps[index]
+  override fun getJump(projectId: String, count: Int): Jump? {
+    val jumps = projectToJumps[projectId] ?: mutableListOf()
+    projectToJumpSpot.putIfAbsent(projectId, -1)
+    val index = jumps.size - 1 - (projectToJumpSpot[projectId]!! - count)
+    return jumps.getOrNull(index)?.also { 
+      projectToJumpSpot[projectId] = projectToJumpSpot[projectId]!! - count 
     }
   }
 
-  override fun getJumps(): List<Jump> {
-    return jumps
+  override fun getJumps(projectId: String): List<Jump> {
+    return projectToJumps[projectId] ?: emptyList()
   }
 
-  override fun addJump(jump: Jump, reset: Boolean) {
+  override fun getJumpSpot(projectId: String): Int {
+    return projectToJumpSpot[projectId] ?: -1
+  }
+
+  override fun addJump(projectId: String, jump: Jump, reset: Boolean) {
     lastJumpTimeStamp = System.currentTimeMillis()
-    val filename = jump.filepath
-
-    for (i in jumps.indices) {
-      val j = jumps[i]
-      if (filename == j.filepath && j.line == jump.line) {
-        jumps.removeAt(i)
-        break
-      }
-    }
-
+    val jumps = projectToJumps.getOrPut(projectId) { mutableListOf() }
+    jumps.removeIf { it.filepath == jump.filepath && it.line == jump.line }
     jumps.add(jump)
 
-    if (reset) {
-      jumpSpot = -1
-    } else {
-      jumpSpot++
-    }
+    projectToJumpSpot[projectId] = if (reset) -1 else (projectToJumpSpot[projectId] ?: -1) + 1
 
     if (jumps.size > SAVE_JUMP_COUNT) {
-      jumps.removeAt(0)
+      jumps.removeFirst()
     }
   }
 
@@ -65,26 +50,25 @@ public abstract class VimJumpServiceBase : VimJumpService {
     includeCurrentCommandAsNavigation(editor)
   }
 
-  override fun removeJump(jump: Jump) {
-    val lastIndex = jumps.withIndex().findLast { it.value == jump }?.index ?: return
-    jumps.removeAt(lastIndex)
+  override fun removeJump(projectId: String, jump: Jump) {
+    projectToJumps[projectId]?.removeIf { it == jump }
   }
 
-  override fun dropLastJump() {
-    jumps.removeLast()
+  override fun dropLastJump(projectId: String) {
+    projectToJumps[projectId]?.removeLastOrNull()
   }
 
-  override fun updateJumpsFromInsert(editor: VimEditor, startOffset: Int, length: Int) {
+  override fun updateJumpsFromInsert(projectId: String, startOffset: Int, length: Int) {
     TODO("Not yet implemented")
   }
 
-  override fun updateJumpsFromDelete(editor: VimEditor, startOffset: Int, length: Int) {
+  override fun updateJumpsFromDelete(projectId: String, startOffset: Int, length: Int) {
     TODO("Not yet implemented")
   }
 
   override fun resetJumps() {
-    jumps.clear()
-    jumpSpot = -1
+    projectToJumps.clear()
+    projectToJumpSpot.clear()
   }
 
   public companion object {

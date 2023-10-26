@@ -46,10 +46,10 @@ public abstract class VimMarkServiceBase : VimMarkService {
   }
 
   @JvmField
-  protected val globalMarks: java.util.HashMap<Char, Mark> = HashMap()
+  protected val globalMarks: HashMap<Char, Mark> = HashMap()
 
   // marks are stored for primary caret only
-  protected val filepathToLocalMarks: java.util.HashMap<String, LocalMarks<Char, Mark>> = HashMap()
+  protected val filepathToLocalMarks: HashMap<String, LocalMarks<Char, Mark>> = HashMap()
 
   public class LocalMarks<K, V> : HashMap<K, V>() {
     public var myTimestamp: Date = Date()
@@ -185,7 +185,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
         if (caret.isPrimary) {
           if (mark.key == BEFORE_JUMP_MARK) {
             val jump = Jump(mark.line, mark.col, mark.filepath)
-            injector.jumpService.addJump(jump, true)
+            injector.jumpService.addJump(editor, jump, true)
           }
           getLocalMarks(mark.filepath)[markChar] = mark
         } else {

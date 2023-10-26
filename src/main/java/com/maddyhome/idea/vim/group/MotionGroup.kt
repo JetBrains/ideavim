@@ -33,6 +33,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.addJump
 import com.maddyhome.idea.vim.api.anyNonWhitespace
+import com.maddyhome.idea.vim.api.getJump
+import com.maddyhome.idea.vim.api.getJumpSpot
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
@@ -163,8 +165,8 @@ internal class MotionGroup : VimMotionGroupBase() {
 
   override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
     val jumpService = injector.jumpService
-    val spot = jumpService.getJumpSpot()
-    val (line, col, fileName) = jumpService.getJump(count) ?: return Motion.Error
+    val spot = jumpService.getJumpSpot(editor)
+    val (line, col, fileName) = jumpService.getJump(editor, count) ?: return Motion.Error
     val vf = EditorHelper.getVirtualFile(editor.ij) ?: return Motion.Error
     val lp = BufferPosition(line, col, false)
     val lpNative = LogicalPosition(line, col, false)

@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getJumpSpot
+import com.maddyhome.idea.vim.api.getJumps
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
@@ -25,8 +27,8 @@ import kotlin.math.absoluteValue
 public data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val jumps = injector.jumpService.getJumps()
-    val spot = injector.jumpService.getJumpSpot()
+    val jumps = injector.jumpService.getJumps(editor)
+    val spot = injector.jumpService.getJumpSpot(editor)
 
     val text = StringBuilder(" jump line  col file/text\n")
     jumps.forEachIndexed { idx, jump ->

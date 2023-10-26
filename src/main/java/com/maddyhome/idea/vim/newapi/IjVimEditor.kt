@@ -64,6 +64,11 @@ import java.lang.System.identityHashCode
 
 @ApiStatus.Internal
 internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
+  companion object {
+    // For cases where Editor does not have a project (for some reason)
+    // It's something IJ Platform related and stored here because of this reason
+    const val DEFAULT_PROJECT_ID = "no project" 
+  }
 
   // All the editor actions should be performed with top level editor!!!
   // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
@@ -368,6 +373,8 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   override fun extractProtocol(): String? {
     return EditorHelper.getVirtualFile(editor)?.getUrl()?.let { VirtualFileManager.extractProtocol(it) }
   }
+
+  override val projectId = editor.project?.basePath ?: DEFAULT_PROJECT_ID
 
   override fun visualPositionToOffset(position: VimVisualPosition): Offset {
     return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight)).offset
