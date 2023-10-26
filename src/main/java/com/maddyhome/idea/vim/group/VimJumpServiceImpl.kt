@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import org.jdom.Element
 
-
 @State(name = "VimJumpsSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
 internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Element?> {
   companion object {
