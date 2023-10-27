@@ -47,7 +47,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.removeUserData
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ExceptionUtil
-import com.jetbrains.rd.util.lifetime.intersect
+import com.jetbrains.rd.util.lifetime.Lifetime
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
@@ -211,7 +211,8 @@ internal object VimListenerManager {
     fun add(editor: Editor, openingEditor: VimEditor, scenario: LocalOptionInitialisationScenario) {
       val pluginLifetime = VimPlugin.getInstance().createLifetime()
       val editorLifetime = (editor as EditorImpl).disposable.createLifetime()
-      val disposable = editorLifetime.intersect(pluginLifetime).createNestedDisposable("MyLifetimedDisposable")
+      val disposable =
+        Lifetime.intersect(pluginLifetime, editorLifetime).createNestedDisposable("MyLifetimedDisposable")
 
       editor.contentComponent.addKeyListener(VimKeyListener)
       Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
