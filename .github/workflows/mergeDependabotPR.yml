@@ -8,7 +8,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' && github.repository == 'JetBrains/ideavim' }}
     steps:
       - name: Auto-merge Dependabot PR
         run: gh pr merge --auto --rebase "$PR_URL"

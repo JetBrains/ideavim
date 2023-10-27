@@ -5,6 +5,7 @@ on:
       - cron: '0 12 * * *'
 jobs:
   build-for-ui-test-mac-os:
+    if: github.repository == 'JetBrains/ideavim'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
