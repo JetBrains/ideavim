@@ -29,6 +29,8 @@ usual beta standards.
 
 * `ShowHoverInfo` action can be used in mappings to open a tooltip that is shown by
   mouse hovering | [VIM-2106](https://youtrack.jetbrains.com/issue/VIM-2106)
+* `has` Vim Script function supports the most common OS checks: win32, win64, linux, mac, macunix, osx, osxdarwin, bsd, sun, unix
+  * See https://github.com/JetBrains/ideavim#vim-script for details about Vim Script
 
 ### Fixes:
 * [VIM-3060](https://youtrack.jetbrains.com/issue/VIM-3060) Clipboard interaction stopped working
