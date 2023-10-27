@@ -36,6 +36,7 @@ usual beta standards.
 * [717](https://github.com/JetBrains/ideavim/pull/717) by [Matt Ellis](https://github.com/citizenmatt): Fix(VIM-2562): Fix hang with multi-width chars in command line
 * [732](https://github.com/JetBrains/ideavim/pull/732) by [pWydmuch](https://github.com/pWydmuch): Fix md links in doc
 * [733](https://github.com/JetBrains/ideavim/pull/733) by [Matt Ellis](https://github.com/citizenmatt): Add support for ShowHoverInfo action to 2023.1 and 2023.2
+* [729](https://github.com/JetBrains/ideavim/pull/729) by [chylex](https://github.com/chylex): Add operating system type to `has()` function
 
 ## 2.5.0, 2023-09-01
 
