@@ -89,14 +89,17 @@ public class FileGroup extends VimFileBase {
 
   @Nullable VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
     VirtualFile found;
-    if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
-      String homefile = filename.substring(2);
+    // Vim supports both ~/ and ~\ (tested on Mac and Windows). On Windows, it supports forward- and back-slashes, but
+    // it only supports forward slash on Unix (tested on Mac)
+    // VFS works with both directory separators (tested on Mac and Windows)
+    if (filename.startsWith("~/") || filename.startsWith("~\\")) {
+      String relativePath = filename.substring(2);
       String dir = System.getProperty("user.home");
       if (logger.isDebugEnabled()) {
         logger.debug("home dir file");
-        logger.debug("looking for " + homefile + " in " + dir);
+        logger.debug("looking for " + relativePath + " in " + dir);
       }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
+      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, relativePath));
     }
     else {
       found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
