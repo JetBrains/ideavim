@@ -361,7 +361,7 @@ class SetglobalCommandTest : VimTestCase() {
       |nohlsearch          noNERDTree            showmode            virtualedit=
       |noideaglobalmode      nrformats=hex       sidescroll=0      novisualbell
       |noideajoin          nonumber              sidescrolloff=0     visualdelay=100
-      |  ideamarks         nooldundo           nosmartcase           whichwrap=b,s
+      |  ideamarks           oldundo           nosmartcase           whichwrap=b,s
       |  ideastrictmode    norelativenumber      startofline         wrapscan
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  excommandannotation
@@ -443,7 +443,7 @@ class SetglobalCommandTest : VimTestCase() {
       |noNERDTree
       |  nrformats=hex
       |nonumber
-      |nooldundo
+      |  oldundo
       |norelativenumber
       |noReplaceWithRegister
       |  scroll=0

@@ -34,8 +34,9 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-696"])
   fun `undo after selection`() {
-    val keys = listOf("v3eld", "u")
-    val before = """
+    if (!optionsIjNoEditor().oldundo) {
+      val keys = listOf("v3eld", "u")
+      val before = """
                 Lorem Ipsum
 
                 ${c}Lorem ipsum dolor sit amet,
@@ -43,9 +44,10 @@ class UndoActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    val after = before
-    doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(hasSelection())
+      val after = before
+      doTest(keys, before, after, Mode.NORMAL())
+      kotlin.test.assertFalse(hasSelection())
+    }
   }
 
   @Test
