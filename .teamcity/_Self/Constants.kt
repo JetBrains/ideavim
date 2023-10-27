@@ -10,8 +10,8 @@ object Constants {
   const val PROPERTY_TESTS = "2023.2.4"
   const val LONG_RUNNING_TESTS = "2023.2.4"
   const val QODANA_TESTS = "2023.2.4"
-  const val RELEASE = "2023.1.2"
+  const val RELEASE = "2023.2.4"
 
-  const val RELEASE_DEV = "2023.1.2"
-  const val RELEASE_EAP = "2023.1.2"
+  const val RELEASE_DEV = "2023.2.4"
+  const val RELEASE_EAP = "2023.2.4"
 }
