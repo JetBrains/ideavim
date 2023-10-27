@@ -25,6 +25,11 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+
+* `ShowHoverInfo` action can be used in mappings to open a tooltip that is shown by
+  mouse hovering | [VIM-2106](https://youtrack.jetbrains.com/issue/VIM-2106)
+
 ### Fixes:
 * [VIM-3060](https://youtrack.jetbrains.com/issue/VIM-3060) Clipboard interaction stopped working
 * [VIM-3095](https://youtrack.jetbrains.com/issue/VIM-3095) Fix missing ellipsis digraph

@@ -255,8 +255,7 @@ Ex commands or via `:map` command mappings:
 ##### Some popular actions:
 
 ```
-QuickJavaDoc - Quick Documentation (not only for java, all languages)
-ShowErrorDescription - Show description of the error under the caret (cursor hovering)
+ShowHoverInfo - Quick Documentation and Error Description
 QuickImplementations - Quick Definition
 ```
 
