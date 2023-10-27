@@ -37,6 +37,7 @@ usual beta standards.
 * [732](https://github.com/JetBrains/ideavim/pull/732) by [pWydmuch](https://github.com/pWydmuch): Fix md links in doc
 * [733](https://github.com/JetBrains/ideavim/pull/733) by [Matt Ellis](https://github.com/citizenmatt): Add support for ShowHoverInfo action to 2023.1 and 2023.2
 * [729](https://github.com/JetBrains/ideavim/pull/729) by [chylex](https://github.com/chylex): Add operating system type to `has()` function
+* [726](https://github.com/JetBrains/ideavim/pull/726) by [Matt Ellis](https://github.com/citizenmatt): Fix range for fall back comment mode
 
 ## 2.5.0, 2023-09-01
 
