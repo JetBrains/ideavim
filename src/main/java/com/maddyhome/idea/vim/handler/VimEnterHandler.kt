@@ -121,6 +121,9 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
  * - App code - set handler after
  * - Template - doesn't intersect with enter anymore
  * - rd.client.editor.enter - set handler before. Otherwise, rider will add new line on enter even in normal mode
+ * - before terminalEnter - not necessary, but terminalEnter causes "file is read-only" tooltip for readonly files VIM-3122
+ *
+ * - `first` is set to satisfy sorting condition "before terminalEnter".
  */
 internal class VimEnterHandler(nextHandler: EditorActionHandler?) : VimKeyHandler(nextHandler) {
   override val key: String = "<CR>"
