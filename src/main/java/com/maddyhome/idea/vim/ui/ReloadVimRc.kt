@@ -18,12 +18,12 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -149,12 +149,14 @@ internal class ReloadVimRc : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
-    FileDocumentManager.getInstance().saveDocumentAsIs(editor.document)
     injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
     Troubleshooter.instance.removeByType("old-action-notation-in-mappings")
 
     // Reload the ideavimrc in the context of the current window, as though we had called `:source ~/.ideavimrc`
     executeIdeaVimRc(editor.vim)
+
+    // Ensure newly added extensions are initialized
+    VimExtensionRegistrar.enableDelayedExtensions()
   }
 }
 
