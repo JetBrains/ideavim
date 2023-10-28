@@ -21,6 +21,7 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EngineStringHelper
@@ -86,7 +87,10 @@ internal class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEd
     // Nothing
   }
 
-  override fun isAvailable(project: Project): Boolean = injector.globalOptions().showcmd
+  override fun isAvailable(project: Project): Boolean {
+    VimPlugin.getInstance()
+    return injector.globalOptions().showcmd
+  }
 
   override fun createWidget(project: Project): StatusBarWidget = Widget(project)
 
