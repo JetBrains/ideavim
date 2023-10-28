@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.vimscript
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -88,10 +90,20 @@ internal class Executor : VimScriptExecutorBase() {
   override fun executeFile(file: File, editor: VimEditor, indicateErrors: Boolean) {
     val context = DataContext.EMPTY_CONTEXT.vim
     try {
+      ensureFileIsSaved(file)
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (ignored: IOException) {
       LOG.error(ignored)
     }
+  }
+
+  private fun ensureFileIsSaved(file: File) {
+    val documentManager = FileDocumentManager.getInstance()
+
+    VirtualFileManager.getInstance().findFileByNioPath(file.toPath())
+      ?.let(documentManager::getCachedDocument)
+      ?.takeIf(documentManager::isDocumentUnsaved)
+      ?.let(documentManager::saveDocumentAsIs)
   }
 
   @Throws(ExException::class)
