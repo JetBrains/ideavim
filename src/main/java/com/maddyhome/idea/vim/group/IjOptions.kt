@@ -70,6 +70,7 @@ public object IjOptions {
       IjOptionConstants.ideavimsupportValues
     )
   )
+
   @JvmField
   public val ideawrite: StringOption = addOption(
     StringOption("ideawrite", GLOBAL, "ideawrite", "all", IjOptionConstants.ideaWriteValues)
