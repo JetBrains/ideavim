@@ -118,6 +118,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       then
         git checkout release
         echo checkout release branch
+        git branch --set-upstream-to=origin/release release
         git push --tags
         git push origin --force
       fi
