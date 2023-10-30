@@ -23,7 +23,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## 2.6.3, 2023-10-30
+
+### Changes:
+- 2.6.0 and 2.6.1 releases are broken. Version 2.6.3 reverts IdeaVim plugin to the working state as for 2.5.1.
+
 ## 2.6.0, 2023-10-27
+
+This version of IdeaVim contains a lot of issues. Version 2.6.3 reverts these changes.
 
 ### Features:
 
