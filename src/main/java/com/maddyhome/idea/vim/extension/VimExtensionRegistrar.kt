@@ -82,6 +82,31 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     }
   }
 
+  /**
+   * During vim initialization process, it firstly loads the .vimrc file, then executes scripts from the plugins folder.
+   * This practically means that the .vimrc file is initialized first, then the plugins are loaded.
+   * See `:h initialization`
+   *
+   * In IdeaVim we don't have a separate plugins folder to load it after .ideavimrc load. However, we can collect
+   *   the list of plugins mentioned in the .ideavimrc and load them after .ideavimrc execution is finished.
+   *
+   * Why this matters? Because this affects the order of commands are executed. For example:
+   * ```
+   * plug 'tommcdo/vim-exchange'
+   * let g:exchange_no_mappings=1
+   * ```
+   * Here the user will expect that the exchange plugin won't have default mappings. However, if we load vim-exchange
+   *    immediately, this variable won't be initialized at the moment of plugin initialization.
+   *
+   * There is also a tricky case for mappings override:
+   * ```
+   * plug 'tommcdo/vim-exchange'
+   * map X <Plug>(ExchangeLine)
+   * ```
+   * For this case, a plugin with a good implementation detects that there is already a defined mapping for
+   *   `<Plug>(ExchangeLine)` and doesn't register the default cxx mapping. However, such detection requires the mapping
+   *   to be defined before the plugin initialization.
+   */
   @JvmStatic
   fun enableDelayedExtensions() {
     delayedExtensionEnabling.forEach {
