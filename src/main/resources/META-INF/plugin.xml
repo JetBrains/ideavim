@@ -116,7 +116,7 @@
 <!--    "first" is not defined for this handler as it leads to "unsatisfied ordering exception". Not sure exectly why, but it appears in tests-->
     <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscHandler"
                          id="ideavim-esc"
-                         order="after smart-step-into-escape, after AceHandlerEscape, before jupyterCommandModeEscKeyHandler, before templateEscape"/>
+                         order="after smart-step-into-escape, after AceHandlerEscape, before jupyterCommandModeEscKeyHandler, before templateEscape, before backend.escape"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

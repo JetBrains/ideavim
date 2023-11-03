@@ -151,6 +151,7 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler?) : VimKeyHandle
  * - Lookup - It disappears after putting our esc before templateEscape. But I'm not sure why it works like that
  * - App code - Need to review
  * - Template - Need to review
+ * - before backend.escape - to handle our handlers before Rider processing. Also, without this rule, we get problems like VIM-3146
  */
 internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<Esc>"
