@@ -23,7 +23,6 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -154,9 +153,6 @@ internal class ReloadVimRc : DumbAwareAction() {
 
     // Reload the ideavimrc in the context of the current window, as though we had called `:source ~/.ideavimrc`
     executeIdeaVimRc(editor.vim)
-
-    // Ensure newly added extensions are initialized
-    VimExtensionRegistrar.enableDelayedExtensions()
   }
 }
 

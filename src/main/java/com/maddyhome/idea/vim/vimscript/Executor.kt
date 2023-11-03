@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.api.VimScriptExecutorBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
+import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
@@ -40,52 +41,61 @@ internal class Executor : VimScriptExecutorBase() {
 
   @Throws(ExException::class)
   override fun execute(script: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean, vimContext: VimLContext?): ExecutionResult {
-    var finalResult: ExecutionResult = ExecutionResult.Success
+    try {
+      injector.vimscriptExecutor.executingVimscript = true
+      var finalResult: ExecutionResult = ExecutionResult.Success
 
-    val myScript = VimscriptParser.parse(script)
-    myScript.units.forEach { it.vimContext = vimContext ?: myScript }
+      val myScript = VimscriptParser.parse(script)
+      myScript.units.forEach { it.vimContext = vimContext ?: myScript }
 
-    for (unit in myScript.units) {
-      try {
-        val result = unit.execute(editor, context)
-        if (result is ExecutionResult.Error) {
+      for (unit in myScript.units) {
+        try {
+          val result = unit.execute(editor, context)
+          if (result is ExecutionResult.Error) {
+            finalResult = ExecutionResult.Error
+            if (indicateErrors) {
+              VimPlugin.indicateError()
+            }
+          }
+        } catch (e: ExException) {
+          if (e is FinishException) {
+            break
+          }
           finalResult = ExecutionResult.Error
           if (indicateErrors) {
+            VimPlugin.showMessage(e.message)
+            VimPlugin.indicateError()
+          } else {
+            logger.warn("Failed while executing $unit. " + e.message)
+          }
+        } catch (e: NotImplementedError) {
+          if (indicateErrors) {
+            VimPlugin.showMessage("Not implemented yet :(")
             VimPlugin.indicateError()
           }
-        }
-      } catch (e: ExException) {
-        if (e is FinishException) {
-          break
-        }
-        finalResult = ExecutionResult.Error
-        if (indicateErrors) {
-          VimPlugin.showMessage(e.message)
-          VimPlugin.indicateError()
-        } else {
-          logger.warn("Failed while executing $unit. " + e.message)
-        }
-      } catch (e: NotImplementedError) {
-        if (indicateErrors) {
-          VimPlugin.showMessage("Not implemented yet :(")
-          VimPlugin.indicateError()
-        }
-      } catch (e: Exception) {
-        logger.warn("Caught: ${e.message}")
-        logger.warn(e.stackTrace.toString())
-        if (injector.application.isUnitTest()) {
-          throw e
+        } catch (e: Exception) {
+          logger.warn("Caught: ${e.message}")
+          logger.warn(e.stackTrace.toString())
+          if (injector.application.isUnitTest()) {
+            throw e
+          }
         }
       }
-    }
 
-    if (!skipHistory) {
-      VimPlugin.getHistory().addEntry(HistoryConstants.COMMAND, script)
-      if (myScript.units.size == 1 && myScript.units[0] is Command && myScript.units[0] !is RepeatCommand) {
-        VimPlugin.getRegister().storeTextSpecial(LAST_COMMAND_REGISTER, script)
+      if (!skipHistory) {
+        VimPlugin.getHistory().addEntry(HistoryConstants.COMMAND, script)
+        if (myScript.units.size == 1 && myScript.units[0] is Command && myScript.units[0] !is RepeatCommand) {
+          VimPlugin.getRegister().storeTextSpecial(LAST_COMMAND_REGISTER, script)
+        }
       }
+      return finalResult
+    } finally {
+      injector.vimscriptExecutor.executingVimscript = false
+
+      // Initialize any extensions that were enabled during execution of this vimscript
+      // See the doc of this function for details
+      VimExtensionRegistrar.enableDelayedExtensions()
     }
-    return finalResult
   }
 
   override fun executeFile(file: File, editor: VimEditor, fileIsIdeaVimRcConfig: Boolean, indicateErrors: Boolean) {

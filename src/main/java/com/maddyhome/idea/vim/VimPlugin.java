@@ -306,11 +306,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
    * This is required to ensure that all options are correctly initialised and registered. Must be before any commands
    * are executed.</li>
    * <li>~/.ideavimrc execution<br>
-   * <ul>
-   * <li>4.1 executes commands from the .ideavimrc file and 4.2 initializes extensions.</li>
-   * <li>4.1 MUST BE BEFORE 4.2. This is a flow of vim/IdeaVim initialization, firstly .ideavimrc is executed and then
-   * the extensions are initialized.</li>
-   * </ul>
    * </li>
    * <li>Components initialization<br>
    * This should happen after ideavimrc execution because VimListenerManager accesses `number` option
@@ -339,12 +334,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     VimInjectorKt.getInjector().getOptionGroup().initialiseOptions();
 
     // 4) ~/.ideavimrc execution
-    // 4.1) Execute ~/.ideavimrc
     // Evaluate in the context of the fallback window, to capture local option state, to copy to the first editor window
     registerIdeavimrc(VimInjectorKt.getInjector().getFallbackWindow());
-
-    // 4.2) Initialize extensions. Always after 4.1
-    VimExtensionRegistrar.enableDelayedExtensions();
 
     // Turing on should be performed after all commands registration
     getSearch().turnOn();

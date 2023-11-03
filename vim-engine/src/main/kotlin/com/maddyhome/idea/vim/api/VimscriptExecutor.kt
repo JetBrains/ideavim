@@ -14,6 +14,10 @@ import java.io.File
 
 public interface VimscriptExecutor {
 
+  /**
+   * True if Vimscript is under execution. This might be reading of .ideavimrc file, some :source command,
+   *   command from the ex-command line, or any other case.
+   */
   public var executingVimscript: Boolean
 
   /**

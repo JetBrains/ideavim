@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
@@ -268,6 +267,7 @@ class PlugMissingKeysTest : VimTestCase() {
       "Plug 'MyTest'",
     )
 
+    // Mapping to Z was override by the mapping to myKey
     val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
     kotlin.test.assertEquals(1, keyMappings.size)
     kotlin.test.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
@@ -284,6 +284,7 @@ class PlugMissingKeysTest : VimTestCase() {
       "map myKey <Plug>TestMissing",
     )
 
+    // Mapping to Z was override by the mapping to myKey
     val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
     kotlin.test.assertEquals(1, keyMappings.size)
     kotlin.test.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
@@ -323,7 +324,6 @@ class PlugMissingKeysTest : VimTestCase() {
     executeVimscript(text.joinToString("\n"), false)
     injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false
     injector.vimscriptExecutor.executingVimscript = false
-    VimExtensionRegistrar.enableDelayedExtensions()
   }
 }
 
