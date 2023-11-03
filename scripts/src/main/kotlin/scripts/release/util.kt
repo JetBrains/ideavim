@@ -9,6 +9,7 @@
 package scripts.release
 
 import com.vdurmont.semver4j.Semver
+import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Repository
@@ -86,8 +87,12 @@ internal fun getVersion(projectDir: String, onlyStable: Boolean): Pair<Semver, O
 internal fun Git.checkoutBranch(name: String) {
   println("Checking out $name")
   val shouldCreateBranch = this.branchList().call().any { it.name == "refs/heads/$name" }.not()
-  checkout()
+  val checkoutCommand = checkout()
     .setCreateBranch(shouldCreateBranch)
     .setName(name)
-    .call()
+  if (shouldCreateBranch) {
+    // Without starting point the branch will be created on HEAD.
+    checkoutCommand.setStartPoint("origin/$name").setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+  }
+  checkoutCommand.call()
 }
