@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
@@ -39,12 +38,15 @@ import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartClear
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
 
   init {
-    Disposer.register(caret) {
-      (registerStorage as CaretRegisterStorageBase).clearListener()
+    if (caret.isValid) {
+      Disposer.register(caret) {
+        (registerStorage as CaretRegisterStorageBase).clearListener()
+      }
     }
   }
 
