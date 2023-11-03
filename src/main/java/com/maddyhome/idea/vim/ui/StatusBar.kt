@@ -55,7 +55,7 @@ import javax.swing.SwingConstants
 
 @NonNls
 internal const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
-internal const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
+internal const val STATUS_BAR_DISPLAY_NAME = "IdeaVimX"
 
 internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
 
