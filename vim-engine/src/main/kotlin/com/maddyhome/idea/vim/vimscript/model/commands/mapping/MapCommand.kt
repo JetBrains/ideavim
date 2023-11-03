@@ -60,7 +60,7 @@ public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: 
     }
 
     val mappingOwner =
-      if (injector.vimscriptExecutor.executingVimscript) {
+      if (injector.vimscriptExecutor.executingIdeaVimRcConfiguration) {
         MappingOwner.IdeaVim.InitScript
       } else {
         MappingOwner.IdeaVim.Other

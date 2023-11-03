@@ -9,6 +9,8 @@
 package org.jetbrains.plugins.ideavim.ui
 
 import com.intellij.mock.MockEditorFactory
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.VimRcFileState
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import java.nio.file.Files
 
 class ReloadVimRcTest : VimTestCase() {
   private val editorFactory = MockEditorFactory()
@@ -125,6 +128,54 @@ class ReloadVimRcTest : VimTestCase() {
     VimRcFileState.saveFileState("", origFile)
 
     val document = editorFactory.createDocument(changedFile)
+
+    kotlin.test.assertFalse(VimRcFileState.equalTo(document))
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `state is updated when we execute ideavimrc from source`() {
+    configureByText("")
+    val origFile = """
+      map x y
+      set myPlugin
+    """.trimIndent()
+    val changedFile = """
+      map x y
+    """.trimIndent()
+
+    VimRcFileState.saveFileState("", origFile)
+
+    val tempUpdatedFile = Files.createTempFile("xyz", ".txt").toFile()
+    tempUpdatedFile.writeText(changedFile)
+
+    val document = editorFactory.createDocument(changedFile)
+
+    injector.vimscriptExecutor.executeFile(tempUpdatedFile, fixture.editor.vim, true)
+
+    kotlin.test.assertTrue(VimRcFileState.equalTo(document))
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `state is updated when we execute NOT ideavimrc from source`() {
+    configureByText("")
+    val origFile = """
+      map x y
+      set myPlugin
+    """.trimIndent()
+    val changedFile = """
+      map x y
+    """.trimIndent()
+
+    VimRcFileState.saveFileState("", origFile)
+
+    val tempUpdatedFile = Files.createTempFile("xyz", ".txt").toFile()
+    tempUpdatedFile.writeText(changedFile)
+
+    val document = editorFactory.createDocument(changedFile)
+
+    injector.vimscriptExecutor.executeFile(tempUpdatedFile, fixture.editor.vim, false)
 
     kotlin.test.assertFalse(VimRcFileState.equalTo(document))
   }

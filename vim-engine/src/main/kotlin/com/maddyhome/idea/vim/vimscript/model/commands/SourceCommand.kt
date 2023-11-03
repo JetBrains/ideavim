@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.io.File
 
 /**
@@ -27,9 +28,11 @@ public data class SourceCommand(val ranges: Ranges, val argument: String) : Comm
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val path = expandUser(argument.trim())
+    val file = File(path)
     injector.vimscriptExecutor.executeFile(
-      File(path),
+      file,
       editor,
+      VimRcService.isIdeaVimRcFile(file),
       vimContext.getFirstParentContext() is CommandLineVimLContext
     )
 

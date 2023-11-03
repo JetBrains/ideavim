@@ -136,13 +136,17 @@ public object VimRcService {
       val ideaVimRc = findIdeaVimRc()
       if (ideaVimRc != null) {
         logger.info("Execute ideavimrc file: " + ideaVimRc.absolutePath)
-        injector.vimscriptExecutor.executeFile(ideaVimRc, editor)
-        injector.vimrcFileState.saveFileState(ideaVimRc.absolutePath)
+        injector.vimscriptExecutor.executeFile(ideaVimRc, editor, fileIsIdeaVimRcConfig =  true)
       } else {
         logger.info("ideavimrc file isn't found")
       }
     } finally {
       injector.vimscriptExecutor.executingVimscript = false
     }
+  }
+
+  public fun isIdeaVimRcFile(file: File): Boolean {
+    val ideaVimRc = findIdeaVimRc() ?: return false
+    return ideaVimRc == file
   }
 }

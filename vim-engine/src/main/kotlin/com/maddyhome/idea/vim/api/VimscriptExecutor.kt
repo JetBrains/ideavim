@@ -16,9 +16,27 @@ public interface VimscriptExecutor {
 
   public var executingVimscript: Boolean
 
-  public fun execute(script: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean = true, vimContext: VimLContext? = null): ExecutionResult
+  /**
+   * This variable is set to true when we execute .ideavimrc configuration. This might be _ideavimrc file on windows
+   *   or the file from XGD config directory, according to the settings.
+   */
+  public var executingIdeaVimRcConfiguration: Boolean
 
-  public fun executeFile(file: File, editor: VimEditor, indicateErrors: Boolean = false)
+  public fun execute(
+    script: String,
+    editor: VimEditor,
+    context: ExecutionContext,
+    skipHistory: Boolean,
+    indicateErrors: Boolean = true,
+    vimContext: VimLContext? = null,
+  ): ExecutionResult
+
+  public fun executeFile(
+    file: File,
+    editor: VimEditor,
+    fileIsIdeaVimRcConfig: Boolean,
+    indicateErrors: Boolean = false,
+  )
 
   public fun executeLastCommand(editor: VimEditor, context: ExecutionContext): Boolean
 }

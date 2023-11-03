@@ -31,10 +31,11 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.troubleshooting.Troubleshooter
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import com.maddyhome.idea.vim.vimscript.services.VimRcService.VIMRC_FILE_NAME
 import com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc
 import org.jetbrains.annotations.TestOnly
+import java.nio.file.Path
+import kotlin.io.path.readText
 
 /**
  * This file contains a "reload ~/.ideavimrc file" action functionality.
@@ -67,8 +68,7 @@ internal object VimRcFileState : VimrcFileState {
   }
 
   override fun saveFileState(filePath: String) {
-    val vimRcFile = VimRcService.findIdeaVimRc()
-    val ideaVimRcText = vimRcFile?.let {
+    val ideaVimRcText = Path.of(filePath).let {
       kotlin.runCatching { it.readText() }
         .onFailure { LOG.error(it) }
         .getOrNull()

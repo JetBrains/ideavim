@@ -36,6 +36,7 @@ import java.io.IOException
 internal class Executor : VimScriptExecutorBase() {
   private val logger = logger<Executor>()
   override var executingVimscript = false
+  override var executingIdeaVimRcConfiguration = false
 
   @Throws(ExException::class)
   override fun execute(script: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean, vimContext: VimLContext?): ExecutionResult {
@@ -87,13 +88,21 @@ internal class Executor : VimScriptExecutorBase() {
     return finalResult
   }
 
-  override fun executeFile(file: File, editor: VimEditor, indicateErrors: Boolean) {
+  override fun executeFile(file: File, editor: VimEditor, fileIsIdeaVimRcConfig: Boolean, indicateErrors: Boolean) {
     val context = DataContext.EMPTY_CONTEXT.vim
     try {
+      if (fileIsIdeaVimRcConfig) {
+        injector.vimscriptExecutor.executingIdeaVimRcConfiguration = true
+      }
       ensureFileIsSaved(file)
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (ignored: IOException) {
       LOG.error(ignored)
+    } finally {
+      if (fileIsIdeaVimRcConfig) {
+        injector.vimrcFileState.saveFileState(file.absolutePath)
+        injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false
+      }
     }
   }
 

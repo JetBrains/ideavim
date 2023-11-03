@@ -17,9 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.extension.Alias
 import com.maddyhome.idea.vim.extension.ExtensionBeanClass
 import com.maddyhome.idea.vim.extension.ExtensionHandler
@@ -33,6 +31,8 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -319,7 +319,9 @@ class PlugMissingKeysTest : VimTestCase() {
 
   private fun executeLikeVimrc(vararg text: String) {
     injector.vimscriptExecutor.executingVimscript = true
+    injector.vimscriptExecutor.executingIdeaVimRcConfiguration = true
     executeVimscript(text.joinToString("\n"), false)
+    injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false
     injector.vimscriptExecutor.executingVimscript = false
     VimExtensionRegistrar.enableDelayedExtensions()
   }
