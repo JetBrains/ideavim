@@ -25,6 +25,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Fixes:
+* [VIM-2933](https://youtrack.jetbrains.com/issue/VIM-2933) Reloading/sourcing .ideavimrc does not initialize new plugins
+
 ### Merged PRs:
 * [734](https://github.com/JetBrains/ideavim/pull/734) by [Matt Ellis](https://github.com/citizenmatt): Support `~/` on Windows
 * [736](https://github.com/JetBrains/ideavim/pull/736) by [chylex](https://github.com/chylex): Fix(VIM-2933): Reloading/sourcing .ideavimrc does not initialize new plugins
