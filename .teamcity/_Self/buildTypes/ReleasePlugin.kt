@@ -95,45 +95,45 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     }
     gradle {
       name = "Publish release"
-      tasks = "build -x test"
+      tasks = "publishPlugin"
     }
 //    gradle {
 //      name = "Push changes to the repo"
 //      tasks = "scripts:pushChangesWithReleaseBranch"
 //    }
-//    script {
-//      name = "Push changes to the repo"
-//      scriptContent = """
-//      branch=$(git branch --show-current)
-//      echo current branch is ${'$'}branch
-//      if [ "master" != "${'$'}branch" ];
-//      then
-//        git checkout master
-//      fi
-//
-//      git push origin --tags
-//      git push origin
-//
-//      if [ "patch" != $releaseType  ];
-//      then
-//        git checkout release
-//        echo checkout release branch
-//        git branch --set-upstream-to=origin/release release
-//        git push --tags
-//        git push origin --force
-//      fi
-//
-//      git checkout ${'$'}branch
-//      """.trimIndent()
-//    }
-//    gradle {
-//      name = "Run Integrations"
-//      tasks = "releaseActions"
-//    }
-//    gradle {
-//      name = "Slack Notification"
-//      tasks = "slackNotification"
-//    }
+    script {
+      name = "Push changes to the repo"
+      scriptContent = """
+      branch=$(git branch --show-current)  
+      echo current branch is ${'$'}branch
+      if [ "master" != "${'$'}branch" ];
+      then
+        git checkout master
+      fi
+      
+      git push origin --tags
+      git push origin
+      
+      if [ "patch" != $releaseType  ];
+      then
+        git checkout release
+        echo checkout release branch
+        git branch --set-upstream-to=origin/release release
+        git push --tags
+        git push origin --force
+      fi
+      
+      git checkout ${'$'}branch
+      """.trimIndent()
+    }
+    gradle {
+      name = "Run Integrations"
+      tasks = "releaseActions"
+    }
+    gradle {
+      name = "Slack Notification"
+      tasks = "slackNotification"
+    }
   }
 
   features {

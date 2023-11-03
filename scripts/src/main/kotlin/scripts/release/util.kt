@@ -85,7 +85,6 @@ internal fun getVersion(projectDir: String, onlyStable: Boolean): Pair<Semver, O
 }
 
 internal fun Git.checkoutBranch(name: String) {
-  println("Checking out $name")
   val shouldCreateBranch = this.branchList().call().any { it.name == "refs/heads/$name" }.not()
   val checkoutCommand = checkout()
     .setCreateBranch(shouldCreateBranch)
