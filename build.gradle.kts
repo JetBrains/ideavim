@@ -75,7 +75,7 @@ plugins {
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
 //    id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
 
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("org.jetbrains.kotlinx.kover") version "0.7.4"
     id("com.dorongold.task-tree") version "2.1.1"
 
     id("com.google.devtools.ksp") version "1.8.21-1.0.11"
