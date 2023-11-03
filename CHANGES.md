@@ -23,6 +23,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Merged PRs:
+* [734](https://github.com/JetBrains/ideavim/pull/734) by [Matt Ellis](https://github.com/citizenmatt): Support `~/` on Windows
+
 ## 2.6.3, 2023-10-30
 
 ### Changes:
