@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Merged PRs:
 * [734](https://github.com/JetBrains/ideavim/pull/734) by [Matt Ellis](https://github.com/citizenmatt): Support `~/` on Windows
+* [736](https://github.com/JetBrains/ideavim/pull/736) by [chylex](https://github.com/chylex): Fix(VIM-2933): Reloading/sourcing .ideavimrc does not initialize new plugins
 
 ## 2.6.3, 2023-10-30
 
