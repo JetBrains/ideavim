@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2933](https://youtrack.jetbrains.com/issue/VIM-2933) Reloading/sourcing .ideavimrc does not initialize new plugins
+* [VIM-3138](https://youtrack.jetbrains.com/issue/VIM-3138) Do not try to register disposer if the caret is already disposed
 
 ### Merged PRs:
 * [734](https://github.com/JetBrains/ideavim/pull/734) by [Matt Ellis](https://github.com/citizenmatt): Support `~/` on Windows
