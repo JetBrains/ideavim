@@ -23,6 +23,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-3130](https://youtrack.jetbrains.com/issue/VIM-3130) Change the build version to 2023.1.2
+
 ## 2.7.0, 2023-11-07
 
 ### Fixes:
