@@ -18,6 +18,6 @@ repositories {
 }
 
 dependencies {
-  compileOnly("com.google.devtools.ksp:symbol-processing-api:1.9.10-1.0.13")
+  compileOnly("com.google.devtools.ksp:symbol-processing-api:1.9.20-1.0.14")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.0")
 }
