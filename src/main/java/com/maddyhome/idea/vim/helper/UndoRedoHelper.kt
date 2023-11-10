@@ -41,7 +41,7 @@ internal class UndoRedoHelper : UndoRedoBase() {
       } else {
         // TODO refactor me after VIM-308 when restoring selection and caret movement will be ignored by undo
         undoManager.undo(fileEditor)
-        if (hasSelection(editor)) {
+        if (hasSelection(editor) && undoManager.isUndoAvailable(fileEditor)) {
           undoManager.undo(fileEditor) // execute one more time if the previous undo just restored selection
         }
         

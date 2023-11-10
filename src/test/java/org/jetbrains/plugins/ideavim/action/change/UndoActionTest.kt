@@ -33,9 +33,9 @@ class UndoActionTest : VimTestCase() {
 
   @Test
   @TestFor(issues = ["VIM-696"])
-  fun `undo after selection`() {
+  fun `test undo after selection`() {
     if (!optionsIjNoEditor().oldundo) {
-      val keys = listOf("v3eld", "u")
+      val keys = listOf("dwv3eld", "u")
       val before = """
                 Lorem Ipsum
 
@@ -44,7 +44,14 @@ class UndoActionTest : VimTestCase() {
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-      val after = before
+      val after = """
+                Lorem Ipsum
+
+                ${c}ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
       doTest(keys, before, after, Mode.NORMAL())
       kotlin.test.assertFalse(hasSelection())
     }

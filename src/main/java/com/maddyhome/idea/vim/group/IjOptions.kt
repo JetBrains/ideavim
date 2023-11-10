@@ -83,7 +83,7 @@ public object IjOptions {
   public val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", GLOBAL, "tai", false))
   public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true))
   public val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", GLOBAL, "visualdelay", 100))
-  public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", true, isTemporary = true))
+  public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isTemporary = true))
   public val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", GLOBAL, "vimscriptfunctionannotation", true, isTemporary = true))
   public val commandOrMotionAnnotation: ToggleOption = addOption(ToggleOption("commandormotionannotation", GLOBAL, "commandormotionannotation", true, isTemporary = true))
 
