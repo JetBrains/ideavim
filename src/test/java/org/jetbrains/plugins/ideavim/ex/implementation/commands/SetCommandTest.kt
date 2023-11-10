@@ -164,19 +164,19 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set all",
       """
         |--- Options ---
-        |noargtextobj        noideatracetime       scroll=0          nosurround
-        |  closenotebooks      ideawrite=all       scrolljump=1      notextobj-entire
-        |nocommentary        noignorecase          scrolloff=0       notextobj-indent
-        |nodigraph           noincsearch           selectmode=         timeout
-        |noexchange          nomatchit             shellcmdflag=-x     timeoutlen=1000
-        |nogdefault            maxmapdepth=20      shellxescape=@    notrackactionids
-        |nohighlightedyank     more                shellxquote={       undolevels=1000
-        |  history=50        nomultiple-cursors    showcmd             unifyjumps
-        |nohlsearch          noNERDTree            showmode            virtualedit=
-        |noideaglobalmode      nrformats=hex       sidescroll=0      novisualbell
-        |noideajoin          nonumber              sidescrolloff=0     visualdelay=100
-        |  ideamarks           oldundo           nosmartcase           whichwrap=b,s
-        |  ideastrictmode    norelativenumber      startofline         wrapscan
+        |noargtextobj        noideatracetime       scrolljump=1      notextobj-entire
+        |  closenotebooks      ideawrite=all       scrolloff=0       notextobj-indent
+        |nocommentary        noignorecase          selectmode=         timeout
+        |nodigraph           noincsearch           shellcmdflag=-x     timeoutlen=1000
+        |noexchange          nomatchit             shellxescape=@    notrackactionids
+        |nogdefault            maxmapdepth=20      shellxquote={       undolevels=1000
+        |nohighlightedyank     more                showcmd             unifyjumps
+        |  history=50        nomultiple-cursors    showmode            virtualedit=
+        |nohlsearch          noNERDTree            sidescroll=0      novisualbell
+        |noideaglobalmode      nrformats=hex       sidescrolloff=0     visualdelay=100
+        |noideajoin          nonumber            nosmartcase           whichwrap=b,s
+        |  ideamarks         norelativenumber      startofline         wrapscan
+        |  ideastrictmode      scroll=0          nosurround
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
         |  excommandannotation
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -194,7 +194,6 @@ class SetCommandTest : VimTestCase() {
         |  shell=/dummy/path/to/bash
         |novim-paragraph-motion
         |  viminfo='100,<50,s10,h
-        |  vimscriptfunctionannotation
         |
       """.trimMargin())
   }
@@ -261,7 +260,6 @@ class SetCommandTest : VimTestCase() {
       |noNERDTree
       |  nrformats=hex
       |nonumber
-      |  oldundo
       |norelativenumber
       |noReplaceWithRegister
       |  scroll=0
@@ -289,7 +287,6 @@ class SetCommandTest : VimTestCase() {
       |  unifyjumps
       |novim-paragraph-motion
       |  viminfo='100,<50,s10,h
-      |  vimscriptfunctionannotation
       |  virtualedit=
       |novisualbell
       |  visualdelay=100

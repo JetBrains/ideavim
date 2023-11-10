@@ -36,12 +36,15 @@ import java.util.*
  * @param abbrev  An abbreviated name for the option, recognised by `:set`
  * @param defaultValue  The default value of the option, if not set by the user
  * @param unsetValue    The value of the local part of a global-local option, if the local part has not been set
+ * @param isTemporary   True for feature-toggle options that will be reviewed in future releases.
+ *                      Such options won't be printed in option list.
  */
 public abstract class Option<T : VimDataType>(public val name: String,
                                               public val declaredScope: OptionDeclaredScope,
                                               public val abbrev: String,
                                               defaultValue: T,
-                                              public val unsetValue: T) {
+                                              public val unsetValue: T,
+                                              public val isTemporary: Boolean = false) {
   private var defaultValueField = defaultValue
 
   public open val defaultValue: T
@@ -292,13 +295,14 @@ public open class UnsignedNumberOption(
  * @param abbrev  An abbreviated name for the option, recognised by `:set`
  * @param defaultValue The option's default value of the option
  */
-public class ToggleOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt) :
-  Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE) {
-  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Boolean) : this(
+public class ToggleOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt, isTemporary: Boolean = false) :
+  Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE, isTemporary) {
+  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Boolean, isTemporary: Boolean = false) : this(
     name,
     declaredScope,
     abbrev,
-    if (defaultValue) VimInt.ONE else VimInt.ZERO
+    if (defaultValue) VimInt.ONE else VimInt.ZERO,
+    isTemporary
   )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
