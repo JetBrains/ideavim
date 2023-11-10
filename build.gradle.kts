@@ -82,7 +82,7 @@ plugins {
 }
 
 ksp {
-  arg("generated_directory", "$projectDir/src/main/resources")
+  arg("generated_directory", "$projectDir/src/main/resources/ksp-generated")
   arg("vimscript_functions_file", "intellij_vimscript_functions.json")
   arg("ex_commands_file", "intellij_ex_commands.json")
   arg("commands_file", "intellij_commands.json")

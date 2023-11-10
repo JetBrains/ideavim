@@ -18,7 +18,7 @@ import kotlinx.serialization.json.decodeFromStream
 import java.io.InputStream
 
 public interface CommandProvider {
-  public val exCommandListFileName: String
+  public val commandListFileName: String
 
   @OptIn(ExperimentalSerializationApi::class)
   public fun getCommands(): Collection<LazyVimCommand> {
@@ -39,8 +39,7 @@ public interface CommandProvider {
   }
 
   private fun getFile(): InputStream {
-    return object {}.javaClass.classLoader.getResourceAsStream(exCommandListFileName)
+    return object {}.javaClass.classLoader.getResourceAsStream("ksp-generated/$commandListFileName")
       ?: throw RuntimeException("Failed to fetch ex commands from ${javaClass.name}")
   }
-
 }

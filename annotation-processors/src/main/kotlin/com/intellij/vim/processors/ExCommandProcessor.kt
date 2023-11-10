@@ -20,6 +20,7 @@ import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.annotations.ExCommand
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.nio.file.Files
 import kotlin.io.path.Path
 import kotlin.io.path.writeText
 
@@ -31,7 +32,11 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
-    val filePath = Path(environment.options["generated_directory"]!!, environment.options["ex_commands_file"]!!)
+
+    val generatedDirPath = Path(environment.options["generated_directory"]!!)
+    Files.createDirectories(generatedDirPath)
+
+    val filePath = generatedDirPath.resolve(environment.options["ex_commands_file"]!!)
     val fileContent = json.encodeToString(commandToClass)
     filePath.writeText(fileContent)
 

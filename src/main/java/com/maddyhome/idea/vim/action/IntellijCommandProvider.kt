@@ -9,5 +9,5 @@
 package com.maddyhome.idea.vim.action
 
 public object IntellijCommandProvider : CommandProvider {
-  override val exCommandListFileName: String = "intellij_commands.json"
+  override val commandListFileName: String = "intellij_commands.json"
 }

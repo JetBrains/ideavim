@@ -9,5 +9,5 @@
 package com.maddyhome.idea.vim.action
 
 public object EngineCommandProvider : CommandProvider {
-  override val exCommandListFileName: String = "engine_commands.json"
+  override val commandListFileName: String = "engine_commands.json"
 }
