@@ -9,7 +9,10 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import org.jetbrains.annotations.ApiStatus
 
+@Deprecated(message = "Replace it with LazyVimCommand")
+@ApiStatus.ScheduledForRemoval(inVersion = "2.9.0")
 public interface VimActionsInitiator {
   public fun getInstance(): EditorActionHandlerBase
 }

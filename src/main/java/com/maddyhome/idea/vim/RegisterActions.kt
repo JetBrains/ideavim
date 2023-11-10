@@ -9,10 +9,14 @@ package com.maddyhome.idea.vim
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.extensions.ExtensionPointName
+import com.maddyhome.idea.vim.action.EngineCommandProvider
+import com.maddyhome.idea.vim.action.IntellijCommandProvider
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -26,8 +30,10 @@ public object RegisterActions {
   @JvmStatic
   public fun registerActions() {
     registerVimCommandActions()
-    registerEmptyShortcuts()
-    registerEpListener()
+    if (!injector.globalIjOptions().commandOrMotionAnnotation) {
+      registerEmptyShortcuts()
+      registerEpListener()
+    }
   }
 
   @Deprecated("Moving to annotations approach instead of xml")
@@ -41,10 +47,16 @@ public object RegisterActions {
   }
 
   public fun findAction(id: String): EditorActionHandlerBase? {
-    return VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream()
-      .filter { vimActionBean: ActionBeanClass -> vimActionBean.actionId == id }
-      .findFirst().map { obj: ActionBeanClass -> obj.instance }
-      .orElse(null)
+    if (injector.globalIjOptions().commandOrMotionAnnotation) {
+      val commandBean = EngineCommandProvider.getCommands().firstOrNull { it.actionId == id }
+        ?: IntellijCommandProvider.getCommands().firstOrNull { it.actionId == id } ?: return null
+      return commandBean.instance
+    } else {
+      return VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream()
+        .filter { vimActionBean: ActionBeanClass -> vimActionBean.actionId == id }
+        .findFirst().map { obj: ActionBeanClass -> obj.instance }
+        .orElse(null)
+    }
   }
 
   public fun findActionOrDie(id: String): EditorActionHandlerBase {
@@ -59,18 +71,24 @@ public object RegisterActions {
 
   private fun registerVimCommandActions() {
     val parser = VimPlugin.getKey()
-    VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream().map { bean: ActionBeanClass? ->
-      IjVimActionsInitiator(
-        bean!!
-      )
-    }
-      .forEach { actionHolder: IjVimActionsInitiator? ->
-        parser.registerCommandAction(
-          actionHolder!!
+    if (injector.globalIjOptions().commandOrMotionAnnotation) {
+      EngineCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
+      IntellijCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
+    } else {
+      VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream().map { bean: ActionBeanClass? ->
+        IjVimActionsInitiator(
+          bean!!
         )
       }
+        .forEach { actionHolder: IjVimActionsInitiator? ->
+          parser.registerCommandAction(
+            actionHolder!!
+          )
+        }
+    }
   }
 
+  // todo do we really need this?
   private fun registerEmptyShortcuts() {
     val parser = VimPlugin.getKey()
 

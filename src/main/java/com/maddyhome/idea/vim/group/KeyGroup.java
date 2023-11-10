@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
+import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
@@ -208,6 +209,25 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
   }
 
+  public void registerCommandAction(@NotNull LazyVimCommand command) {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      initIdentityChecker();
+      for (List<KeyStroke> keys : command.getKeys()) {
+        checkCommand(command.getModes(), command, keys);
+      }
+    }
+
+    for (List<KeyStroke> keyStrokes : command.getKeys()) {
+      registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
+
+      for (MappingMode mappingMode : command.getModes()) {
+        Node<VimActionsInitiator> node = getKeyRoot(mappingMode);
+        NodesKt.addLeafs(node, keyStrokes, command);
+      }
+    }
+  }
+
+  @Deprecated
   public void registerCommandAction(@NotNull VimActionsInitiator actionHolder) {
     IjVimActionsInitiator holder = (IjVimActionsInitiator)actionHolder;
 

@@ -18,7 +18,6 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.annotations.CommandOrMotion
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.io.path.Path
@@ -55,6 +54,4 @@ class CommandOrMotionProcessor(private val environment: SymbolProcessorEnvironme
     }
   }
 
-  @Serializable
-  data class CommandBean(val keys: String, val `class`: String, val modes: String)
 }

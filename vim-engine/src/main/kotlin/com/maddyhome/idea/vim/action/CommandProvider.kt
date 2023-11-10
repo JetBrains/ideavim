@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.action
 
-import com.intellij.vim.processors.CommandOrMotionProcessor
+import com.intellij.vim.processors.CommandBean
 import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
@@ -23,7 +23,7 @@ public interface CommandProvider {
   @OptIn(ExperimentalSerializationApi::class)
   public fun getCommands(): Collection<LazyVimCommand> {
     val classLoader = this.javaClass.classLoader
-    val commands: List<CommandOrMotionProcessor.CommandBean> = Json.decodeFromStream(getFile())
+    val commands: List<CommandBean> = Json.decodeFromStream(getFile())
     return commands
       .groupBy { it.`class` }
       .map {

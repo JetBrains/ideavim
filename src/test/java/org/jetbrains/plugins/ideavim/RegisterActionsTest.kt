@@ -10,11 +10,13 @@ package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Test
@@ -84,6 +86,7 @@ class RegisterActionsTest : VimTestCase() {
     VimOption(TestOptionConstants.whichwrap, doesntAffectTest = true),
   )
   fun `test unregister extension`() {
+    if (injector.globalIjOptions().commandOrMotionAnnotation) return
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null

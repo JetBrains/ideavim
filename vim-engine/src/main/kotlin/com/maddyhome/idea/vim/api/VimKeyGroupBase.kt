@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
@@ -65,6 +66,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
 
   override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
 
+  @Deprecated("Initialization EditorActionHandlerBase for this method breaks the point of lazy initialization")
   protected fun checkCommand(
     mappingModes: Set<MappingMode>,
     action: EditorActionHandlerBase,
@@ -76,6 +78,13 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
     checkCorrectCombination(action, keys)
   }
 
+  protected fun checkCommand(mappingModes: Set<MappingMode>, command: LazyVimCommand, keys: List<KeyStroke>) {
+    for (mappingMode in mappingModes) {
+      checkIdentity(mappingMode, command.actionId, keys)
+    }
+    checkCorrectCombination(command, keys)
+  }
+
   private fun checkIdentity(mappingMode: MappingMode, actName: String, keys: List<KeyStroke>) {
     val keySets = identityChecker!!.getOrPut(mappingMode) { HashSet() }
     if (keys in keySets) {
@@ -84,6 +93,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
     keySets.add(keys.toMutableList())
   }
 
+  @Deprecated("Initialization EditorActionHandlerBase for this method breaks the point of lazy initialization")
   private fun checkCorrectCombination(action: EditorActionHandlerBase, keys: List<KeyStroke>) {
     for (entry in prefixes!!.entries) {
       val prefix = entry.key
@@ -109,6 +119,33 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
       }
     }
     prefixes!![keys.toMutableList()] = action.id
+  }
+
+  private fun checkCorrectCombination(command: LazyVimCommand, keys: List<KeyStroke>) {
+    for (entry in prefixes!!.entries) {
+      val prefix = entry.key
+      if (prefix.size == keys.size) continue
+      val shortOne = min(prefix.size, keys.size)
+      var i = 0
+      while (i < shortOne) {
+        if (prefix[i] != keys[i]) break
+        i++
+      }
+
+      val actionExceptions = listOf(
+        "VimInsertDeletePreviousWordAction",
+        "VimInsertAfterCursorAction",
+        "VimInsertBeforeCursorAction",
+        "VimFilterVisualLinesAction",
+        "VimAutoIndentMotionAction",
+      )
+      if (i == shortOne && command.actionId !in actionExceptions && entry.value !in actionExceptions) {
+        throw RuntimeException(
+          "Prefix found! $keys in command ${command.actionId} is the same as ${prefix.joinToString(", ") { it.toString() }} in ${entry.value}",
+        )
+      }
+    }
+    prefixes!![keys.toMutableList()] = command.actionId
   }
 
   override val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
