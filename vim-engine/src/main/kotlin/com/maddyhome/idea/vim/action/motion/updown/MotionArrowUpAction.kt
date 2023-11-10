@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-@CommandOrMotion(keys = ["<Up>", "k<Up>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING])
+@CommandOrMotion(keys = ["<Up>", "<kUp>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING])
 public class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true

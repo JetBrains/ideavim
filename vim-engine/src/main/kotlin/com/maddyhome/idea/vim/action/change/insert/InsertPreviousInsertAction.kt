@@ -36,7 +36,7 @@ public class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecut
 }
 
 // TODO is C-S-2 needed?
-@CommandOrMotion(keys = ["C-@", "<C-S-2>"], modes = [Mode.INSERT])
+@CommandOrMotion(keys = ["<C-@>", "<C-S-2>"], modes = [Mode.INSERT])
 public class InsertPreviousInsertExitAction : ChangeEditorActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK or KeyEvent.SHIFT_DOWN_MASK)),
