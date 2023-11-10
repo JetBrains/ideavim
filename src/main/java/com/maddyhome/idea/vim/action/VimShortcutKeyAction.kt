@@ -94,23 +94,25 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
 
   override fun update(e: AnActionEvent) {
     val start = if (traceTime) System.currentTimeMillis() else null
-    val actionEnableStatus = isEnabled(e)
+    val keyStroke = getKeyStroke(e)
+    val actionEnableStatus = isEnabled(e, keyStroke)
     e.presentation.isEnabled = actionEnableStatus.isEnabled
-    actionEnableStatus.printLog()
+    actionEnableStatus.printLog(keyStroke)
     if (start != null) {
-      val keyStroke = getKeyStroke(e)
       val duration = System.currentTimeMillis() - start
       LOG.info("VimShortcut update '$keyStroke': $duration ms")
     }
   }
 
-  private fun isEnabled(e: AnActionEvent): ActionEnableStatus {
+  private fun isEnabled(e: AnActionEvent, keyStroke: KeyStroke?): ActionEnableStatus {
     if (!VimPlugin.isEnabled()) return ActionEnableStatus.no("IdeaVim is disabled", LogLevel.DEBUG)
     val editor = getEditor(e)
-    val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
       if (isOctopusEnabled(keyStroke, editor)) {
-        return ActionEnableStatus.no("Octopus handler is enabled", LogLevel.DEBUG)
+        return ActionEnableStatus.no(
+          "Processing VimShortcutKeyAction for the key that is used in the octopus handler",
+          LogLevel.ERROR
+        )
       }
       if (editor.isIdeaVimDisabledHere) {
         return ActionEnableStatus.no("IdeaVim is disabled in this place", LogLevel.INFO)
@@ -358,10 +360,12 @@ private class ActionEnableStatus(
   val message: String,
   val logLevel: LogLevel,
 ) {
-  fun printLog() {
+  fun printLog(keyStroke: KeyStroke?) {
+    val message = "IdeaVim keys are enabled = $isEnabled for key '$keyStroke': $message"
     when (logLevel) {
-      LogLevel.INFO -> LOG.info("IdeaVim keys are enabled = $isEnabled: $message")
-      LogLevel.DEBUG -> LOG.debug("IdeaVim keys are enabled = $isEnabled: $message")
+      LogLevel.INFO -> LOG.info(message)
+      LogLevel.DEBUG -> LOG.debug(message)
+      LogLevel.ERROR -> LOG.error(message)
     }
   }
 
@@ -374,5 +378,5 @@ private class ActionEnableStatus(
 }
 
 private enum class LogLevel {
-  DEBUG, INFO,
+  DEBUG, INFO, ERROR,
 }

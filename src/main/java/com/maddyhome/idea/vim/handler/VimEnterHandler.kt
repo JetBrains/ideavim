@@ -12,6 +12,7 @@ import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
@@ -181,6 +182,54 @@ internal class VimEscForRiderHandler(nextHandler: EditorActionHandler) : VimKeyH
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
     return LookupManager.getActiveLookup(editor) != null
+  }
+}
+
+/**
+ * Empty logger for esc presses
+ *
+ * As we made a migration to the new way of handling esc keys (VIM-2974), we may face several issues around that
+ * One of the possible issues is that some plugin may also register a shortcut for this key and do not pass
+ * the control to the next handler. In this way, the esc won't work, but there will be no exceptions.
+ * This handler, that should stand in front of handlers change, just logs the event of pressing the key
+ * and passes the execution.
+ */
+internal class VimEscLoggerHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+  override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
+    LOG.info("Esc pressed")
+    nextHandler.execute(editor, caret, dataContext)
+  }
+
+  override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
+    return nextHandler.isEnabled(editor, caret, dataContext)
+  }
+
+  companion object {
+    val LOG = logger<VimEscLoggerHandler>()
+  }
+}
+
+/**
+ * Empty logger for enter presses
+ *
+ * As we made a migration to the new way of handling enter keys (VIM-2974), we may face several issues around that
+ * One of the possible issues is that some plugin may also register a shortcut for this key and do not pass
+ * the control to the next handler. In this way, the esc won't work, but there will be no exceptions.
+ * This handler, that should stand in front of handlers change, just logs the event of pressing the key
+ * and passes the execution.
+ */
+internal class VimEnterLoggerHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+  override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
+    LOG.info("Enter pressed")
+    nextHandler.execute(editor, caret, dataContext)
+  }
+
+  override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
+    return nextHandler.isEnabled(editor, caret, dataContext)
+  }
+
+  companion object {
+    val LOG = logger<VimEnterLoggerHandler>()
   }
 }
 

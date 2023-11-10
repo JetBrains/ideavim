@@ -78,6 +78,7 @@
          which (at least for 2020.1) has some long running activities that block other startup extensions. None of the
          core platform activities have IDs, so we can't use "before ID". We have to use "first" -->
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 
@@ -117,6 +118,12 @@
     <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscHandler"
                          id="ideavim-esc"
                          order="after smart-step-into-escape, after AceHandlerEscape, before jupyterCommandModeEscKeyHandler, before templateEscape, before backend.escape"/>
+    <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscLoggerHandler"
+                         id="ideavim-esc-logger"
+                         order="first"/>
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterLoggerHandler"
+                         id="ideavim-enter-logger"
+                         order="first"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
