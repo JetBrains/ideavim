@@ -38,7 +38,7 @@ import javax.swing.KeyStroke
  *   So, all actions are loaded on demand, including classes in classloader.
  */
 @Deprecated(message = "Please use CommandOrMotion annotation")
-@ScheduledForRemoval(inVersion = "2.7.0")
+@ScheduledForRemoval(inVersion = "2.9.0")
 internal class ActionBeanClass : BaseKeyedLazyInstance<EditorActionHandlerBase>() {
   @Attribute("implementation")
   var implementation: String? = null

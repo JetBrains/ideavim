@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.command
 
+import com.maddyhome.idea.vim.ex.ExException
 import java.util.*
 
 /**
@@ -71,5 +72,18 @@ public enum class MappingMode {
     public val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
     public val INV: EnumSet<MappingMode> = EnumSet.of(INSERT, NORMAL, VISUAL, SELECT)
     public val ALL: EnumSet<MappingMode> = EnumSet.allOf(MappingMode::class.java)
+
+    // This method is used only for single modes, not groups of them (V is not supported)
+    internal fun parseModeChar(char: Char): MappingMode {
+      return when (char.uppercaseChar()) {
+        'N' -> NORMAL
+        'X' -> VISUAL
+        'S' -> SELECT
+        'O' -> OP_PENDING
+        'I' -> INSERT
+        'C' -> CMD_LINE
+        else -> throw ExException("Unexpected mode for char $char")
+      }
+    }
   }
 }

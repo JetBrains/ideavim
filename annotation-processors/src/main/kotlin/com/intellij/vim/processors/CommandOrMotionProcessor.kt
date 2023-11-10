@@ -56,5 +56,5 @@ class CommandOrMotionProcessor(private val environment: SymbolProcessorEnvironme
   }
 
   @Serializable
-  private data class CommandBean(val keys: String, val `class`: String, val modes: String)
+  data class CommandBean(val keys: String, val `class`: String, val modes: String)
 }

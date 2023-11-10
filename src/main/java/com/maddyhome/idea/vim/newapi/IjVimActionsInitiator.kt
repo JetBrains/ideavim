@@ -11,7 +11,10 @@ package com.maddyhome.idea.vim.newapi
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import org.jetbrains.annotations.ApiStatus
 
+@Deprecated(message = "Please use CommandOrMotion annotation")
+@ApiStatus.ScheduledForRemoval(inVersion = "2.9.0")
 internal class IjVimActionsInitiator(val bean: ActionBeanClass) : VimActionsInitiator {
   override fun getInstance(): EditorActionHandlerBase = bean.instance
 }
