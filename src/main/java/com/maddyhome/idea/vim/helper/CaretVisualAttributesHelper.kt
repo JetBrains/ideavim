@@ -8,11 +8,13 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -79,6 +81,7 @@ private fun Editor.guicursorMode(): GuiCursorMode {
 private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance().isBlockCursor
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
+  if (!VimPlugin.isEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
 
   // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
@@ -86,6 +89,7 @@ private fun Editor.updatePrimaryCaretVisualAttributes() {
 }
 
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
+  if (!VimPlugin.isEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
   val attributes = if (this.vim.inBlockSelection) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
   this.caretModel.allCarets.forEach {

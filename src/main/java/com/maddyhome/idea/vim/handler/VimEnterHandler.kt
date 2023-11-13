@@ -49,8 +49,10 @@ internal val commandContinuation = Key.create<EditorActionHandler>("commandConti
  */
 internal class CaretShapeEnterEditorHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    invokeLater {
-      editor.updateCaretsVisualAttributes()
+    if (VimPlugin.isEnabled()) {
+      invokeLater {
+        editor.updateCaretsVisualAttributes()
+      }
     }
     nextHandler.execute(editor, caret, dataContext)
   }
