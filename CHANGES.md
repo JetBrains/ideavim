@@ -27,6 +27,8 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-3130](https://youtrack.jetbrains.com/issue/VIM-3130) Change the build version to 2023.1.2
+* [VIM-3168](https://youtrack.jetbrains.com/issue/VIM-3168) Do not switch to block caret after enter if the IdeaVim is disabled
+* [VIM-3165](https://youtrack.jetbrains.com/issue/VIM-3165) Do not process enter key as IdeaVim shortcut if it's not an actual keypress
 
 ## 2.7.0, 2023-11-07
 
