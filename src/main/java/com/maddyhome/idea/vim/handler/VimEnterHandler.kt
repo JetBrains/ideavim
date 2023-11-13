@@ -8,7 +8,9 @@
 
 package com.maddyhome.idea.vim.handler
 
+import com.intellij.codeInsight.editorActions.AutoHardWrapHandler
 import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
@@ -99,12 +101,32 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
     }
   }
 
-  @Suppress("RedundantIf")
   private fun isThisHandlerEnabled(editor: Editor, caret: Caret?, dataContext: DataContext?): Boolean {
     if (!VimPlugin.isEnabled()) return false
     if (!isHandlerEnabled(editor, dataContext)) return false
-    if (dataContext?.actionStartedFromVim == true) return false
+    if (isNotActualKeyPress(dataContext)) return false
     return true
+  }
+
+  /**
+   * In some cases IJ runs handlers to imitate "enter" or other key. In such cases we should not process it on the
+   *   IdeaVim side because the user may have mappings on enter the we'll get an unexpected behaviour.
+   * This method should return true if we detect that this handler is called in such case and this is not an
+   *   actual keypress from the user.
+   */
+  private fun isNotActualKeyPress(dataContext: DataContext?): Boolean {
+    if (dataContext != null) {
+      // This flag is set when the enter handlers are executed as a part of moving the comment on the new line
+      if (DataManager.getInstance()
+          .loadFromDataContext(dataContext, AutoHardWrapHandler.AUTO_WRAP_LINE_IN_PROGRESS_KEY) == true
+      ) {
+        return true
+      }
+    }
+
+    if (dataContext?.actionStartedFromVim == true) return true
+
+    return false
   }
 
   final override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
