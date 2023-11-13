@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.impl.CaretModelImpl
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.removeUserData
@@ -74,7 +75,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 
   final override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
     if (isThisHandlerEnabled(editor, caret, dataContext)) {
-      val executeInInvokeLater = (editor.caretModel as? CaretModelImpl)?.isIteratingOverCarets ?: true
+      val executeInInvokeLater = executeInInvokeLater(editor)
       val executionHandler = {
         try {
           (dataContext as? UserDataHolder)?.putUserData(commandContinuation, nextHandler)
@@ -101,6 +102,12 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
     } else {
       nextHandler?.execute(editor, caret, dataContext)
     }
+  }
+
+  private fun executeInInvokeLater(editor: Editor): Boolean {
+    // Currently we have a workaround for the PY console VIM-3157
+    if (FileDocumentManager.getInstance().getFile(editor.document)?.name == "Python Console.py") return false
+    return (editor.caretModel as? CaretModelImpl)?.isIteratingOverCarets ?: true
   }
 
   private fun isThisHandlerEnabled(editor: Editor, caret: Caret?, dataContext: DataContext?): Boolean {
