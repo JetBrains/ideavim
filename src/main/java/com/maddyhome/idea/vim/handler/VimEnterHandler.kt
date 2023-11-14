@@ -126,9 +126,12 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
   private fun isNotActualKeyPress(dataContext: DataContext?): Boolean {
     if (dataContext != null) {
       // This flag is set when the enter handlers are executed as a part of moving the comment on the new line
-      if (DataManager.getInstance()
-          .loadFromDataContext(dataContext, AutoHardWrapHandler.AUTO_WRAP_LINE_IN_PROGRESS_KEY) == true
-      ) {
+      val dataManager = DataManager.getInstance()
+      if (dataManager.loadFromDataContext(dataContext, AutoHardWrapHandler.AUTO_WRAP_LINE_IN_PROGRESS_KEY) == true) {
+        return true
+      }
+
+      if (dataManager.loadFromDataContext(dataContext, ShiftEnterDetector.Util.key) == true) {
         return true
       }
     }
@@ -233,6 +236,30 @@ internal class VimEscLoggerHandler(private val nextHandler: EditorActionHandler)
 
   override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
     return nextHandler.isEnabled(editor, caret, dataContext)
+  }
+
+  companion object {
+    val LOG = logger<VimEscLoggerHandler>()
+  }
+}
+
+/**
+ * Workaround to support shift-enter in normal mode.
+ * IJ executes enter handler on shift-enter. This causes an issue that IdeaVim thinks that this is just an enter key.
+ * This thing should be refactored, but for now we'll use this workaround VIM-3159
+ */
+internal class ShiftEnterDetector(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+  override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
+    DataManager.getInstance().saveInDataContext(dataContext, Util.key, true)
+    nextHandler.execute(editor, caret, dataContext)
+  }
+
+  override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
+    return nextHandler.isEnabled(editor, caret, dataContext)
+  }
+
+  object Util {
+    val key = Key.create<Boolean>("vim.is.shift.enter")
   }
 
   companion object {
