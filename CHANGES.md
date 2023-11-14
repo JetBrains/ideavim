@@ -29,6 +29,8 @@ usual beta standards.
 * [VIM-3130](https://youtrack.jetbrains.com/issue/VIM-3130) Change the build version to 2023.1.2
 * [VIM-3168](https://youtrack.jetbrains.com/issue/VIM-3168) Do not switch to block caret after enter if the IdeaVim is disabled
 * [VIM-3165](https://youtrack.jetbrains.com/issue/VIM-3165) Do not process enter key as IdeaVim shortcut if it's not an actual keypress
+* [VIM-3159](https://youtrack.jetbrains.com/issue/VIM-3159) Shift-enter now works in normal mode again
+* [VIM-3157](https://youtrack.jetbrains.com/issue/VIM-3157) Do not invoke enter in invokeLater for python console
 
 ## 2.7.0, 2023-11-07
 
