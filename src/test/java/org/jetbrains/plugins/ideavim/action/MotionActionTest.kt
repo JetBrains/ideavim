@@ -1079,6 +1079,115 @@ two
     doTest(keys, before, after, Mode.NORMAL())
   }
 
+  @Test
+  fun testRestoreSelectionAfterPasteBeforeSelection() {
+    typeTextInFile(
+      injector.parser.parseKeys("V" + "j"),
+      """
+     ${c}line1
+     line2
+      """.trimIndent(),
+    )
+    assertSelection(
+      """
+    line1
+    line2
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("y" + "P"))
+    assertState(
+      """
+    line1
+    line2
+    line1
+    line2
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gv"))
+    assertState(
+      """
+    line1
+    line2
+    ${s}line1
+    line2${se}
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testRestoreSelectionAfterPasteInsideSelection() {
+    typeTextInFile(
+      injector.parser.parseKeys("V" + "j"),
+      """
+     ${c}line1
+     line2
+      """.trimIndent(),
+    )
+    assertSelection(
+      """
+    line1
+    line2
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("y" + "j" + "P"))
+    assertState(
+      """
+    line1
+    line1
+    line2
+    line2
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gv"))
+    assertState(
+      """
+    ${s}line1
+    line1
+    line2
+    line2${se}
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testRestoreSelectionAfterPasteAfterSelection() {
+    typeTextInFile(
+      injector.parser.parseKeys("V" + "j"),
+      """
+     ${c}line1
+     line2
+
+      """.trimIndent(),
+    )
+    assertSelection(
+      """
+    line1
+    line2
+    
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("y" + "j" + "p"))
+    assertState(
+      """
+    line1
+    line2
+    line1
+    line2
+
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gv"))
+    assertState(
+      """
+    ${s}line1
+    line2
+    ${se}line1
+    line2
+
+      """.trimIndent(),
+    )
+  }
+
   // |v_>| |gv|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Complicated")
   @Test

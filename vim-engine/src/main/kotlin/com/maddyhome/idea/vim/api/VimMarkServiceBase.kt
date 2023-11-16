@@ -334,13 +334,13 @@ public abstract class VimMarkServiceBase : VimMarkService {
 
       val startPosition = selectionInfo.start
       var newStartPosition = selectionInfo.start
-      if (startPosition != null && insStart.line < startPosition.line) {
+      if (startPosition != null && insStart.line <= startPosition.line) {
         newStartPosition = BufferPosition(startPosition.line + lines, startPosition.column, startPosition.leansForward)
       }
 
       val endPosition = selectionInfo.end
       var newEndPosition = endPosition
-      if (endPosition != null && insStart.line < endPosition.line) {
+      if (endPosition != null && insStart.line <= endPosition.line) {
         newEndPosition = BufferPosition(endPosition.line + lines, endPosition.column, endPosition.leansForward)
       }
 
