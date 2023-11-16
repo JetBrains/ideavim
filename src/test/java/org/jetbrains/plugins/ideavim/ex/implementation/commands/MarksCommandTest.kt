@@ -64,6 +64,48 @@ class MarksCommandTest : VimTestCase() {
   }
 
   @Test
+  @TestFor(issues = ["VIM-3176"])
+  fun `test gv after pasting inside selection expanded selection`() {
+    configureByText(
+      """
+     ${c}line1
+     line2
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("Vj" + "y" + "j" + "P" + "gv"))
+    assertState(
+      """
+    ${s}line1
+    line1
+    line2
+    line2${se}
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3176"])
+  fun `test gv after pasting below selection not changing selection`() {
+    configureByText(
+      """
+     ${c}line1
+     line2
+     not selected
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("Vj" + "y" + "j" + "p" + "gv"))
+    assertState(
+      """
+    ${s}line1
+    line2
+    ${se}line1
+    line2
+    not selected
+      """.trimIndent(),
+    )
+  }
+
+  @Test
   @TestFor(issues = ["VIM-2223"])
   fun `test gv after replacing a line`() {
     configureByText(
