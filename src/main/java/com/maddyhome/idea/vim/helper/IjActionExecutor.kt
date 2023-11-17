@@ -15,10 +15,12 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.DataContextWrapper
+import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.intellij.openapi.actionSystem.ex.ActionUtil
+import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.Service
@@ -39,6 +41,8 @@ import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.runFromVimKey
 import org.jetbrains.annotations.NonNls
+import java.awt.Component
+import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 @Service
@@ -150,9 +154,42 @@ internal class IjActionExecutor : VimActionExecutor {
    * @param context The context to run it in
    */
   override fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean {
-    val aMgr = ActionManager.getInstance()
-    val action = aMgr.getAction(name)
+    val action = getAction(name, context)
     return action != null && executeAction(null, IjNativeAction(action), context)
+  }
+  
+  private fun getAction(name: String, context: ExecutionContext): AnAction? {
+    val actionManager = ActionManager.getInstance()
+    val action = actionManager.getAction(name)
+    if (action !is EmptyAction) return action
+
+    // But if the action is an instance of EmptyAction, the fun begins
+    var component: Component? = context.ij.getData(PlatformDataKeys.CONTEXT_COMPONENT) ?: return null
+    while (component != null) {
+      if (component !is JComponent) {
+        component = component.parent
+        continue
+      }
+
+      val listOfActions = ActionUtil.getActions(component)
+      if (listOfActions.isEmpty()) {
+        component = component.getParent()
+        continue
+      }
+
+      fun AnAction.getId(): String? {
+        return actionManager.getId(this)
+          ?: (shortcutSet as? ProxyShortcutSet)?.actionId
+      }
+
+      for (action in listOfActions) {
+        if (action.getId() == name) {
+          return action
+        }
+      }
+      component = component.getParent()
+    }
+    return null
   }
 
   override fun executeCommand(
