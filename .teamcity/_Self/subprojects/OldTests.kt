@@ -20,4 +20,6 @@ object OldTests : Project({
   buildType(TestingBuildType("IC-2021.2.2", "203-212", javaVersion = "1.8", javaPlugin = false))
   buildType(TestingBuildType("IC-2021.3.2", "213-221", javaVersion = "1.8", javaPlugin = false))
   buildType(TestingBuildType("IC-2022.2.3", branch = "222", javaPlugin = false))
+  buildType(TestingBuildType("IC-2023.1", "231-232", javaPlugin = false))
+  buildType(TestingBuildType("IC-2023.2", "231-232", javaPlugin = false))
 })
