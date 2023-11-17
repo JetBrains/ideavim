@@ -113,7 +113,11 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 
   private fun executeInInvokeLater(editor: Editor): Boolean {
     // Currently we have a workaround for the PY console VIM-3157
-    if (FileDocumentManager.getInstance().getFile(editor.document)?.name == "Python Console.py") return false
+    val fileName = FileDocumentManager.getInstance().getFile(editor.document)?.name
+    if (
+      fileName == "Python Console.py" || // This is the name in 232+
+      fileName == "Python Console" // This is the name in 231
+    ) return false
     return (editor.caretModel as? CaretModelImpl)?.isIteratingOverCarets ?: true
   }
 
