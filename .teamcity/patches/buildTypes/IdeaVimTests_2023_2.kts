@@ -13,4 +13,12 @@ changeBuildType(RelativeId("IdeaVimTests_2023_2")) {
         "Unexpected name: '$name'"
     }
     name = "Tests for IntelliJ IC-2023.2"
+
+    vcs {
+
+        check(branchFilter == "+:<default>") {
+            "Unexpected option value: branchFilter = $branchFilter"
+        }
+        branchFilter = "+:231-232"
+    }
 }
