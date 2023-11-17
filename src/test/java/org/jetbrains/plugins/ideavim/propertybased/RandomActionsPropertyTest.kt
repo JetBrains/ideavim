@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
+import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.CommandNode
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
@@ -99,7 +99,7 @@ private class AvailableActions(private val editor: Editor) : ImperativeCommand {
     val usedKey = env.generateValue(keyGenerator, null)
     val node = currentNode[usedKey]
 
-    env.logMessage("Use command: ${injector.parser.toKeyNotation(usedKey)}. ${if (node is CommandNode) "Action: ${node.actionHolder.ij.actionId}" else ""}")
+    env.logMessage("Use command: ${injector.parser.toKeyNotation(usedKey)}. ${if (node is CommandNode) "Action: ${(node.actionHolder as LazyVimCommand).actionId}" else ""}")
     VimTestCase.typeText(listOf(usedKey), editor, editor.project)
 
     IdeEventQueue.getInstance().flushQueue()
