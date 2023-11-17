@@ -17,6 +17,12 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.InputStream
 
+/**
+ * An interface defining the contract for providers responsible for reading and parsing JSON files.
+ * These files contain a list of command beans that are intended to be lazily loaded during runtime.
+ * The primary functionality of this interface is to transform the JSON data into a collection of
+ * {@code LazyVimCommand} instances.
+ */
 public interface CommandProvider {
   public val commandListFileName: String
 
@@ -29,12 +35,7 @@ public interface CommandProvider {
       .map {
         val keys = it.value.map { bean -> injector.parser.parseKeys(bean.keys) }.toSet()
         val modes = it.value.first().modes.map { mode -> MappingMode.parseModeChar(mode) }.toSet()
-        LazyVimCommand(
-          keys,
-          modes,
-          it.key,
-          classLoader
-        )
+        LazyVimCommand(keys, modes, it.key, classLoader)
     }
   }
 
