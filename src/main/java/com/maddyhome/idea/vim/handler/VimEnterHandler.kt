@@ -96,7 +96,13 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
         //   the condition (see VIM-3103 for example).
         // Since we can't make sure we don't execute `runForEachCaret`, we have to "escape" out of this function. This is
         //   done by scheduling the execution of our code later via the invokeLater function.
-        ApplicationManager.getApplication().invokeLater(executionHandler)
+        //
+        // We run this job only once for a primary caret. In the handler itself, we'll multiply the execution by the
+        //   number of carets. If we run this job for each caret, we may end up in the issue like VIM-3186.
+        //   However, I think that we may do some refactoring to run this job for each caret (if needed).
+        if (caret == editor.caretModel.primaryCaret) {
+          ApplicationManager.getApplication().invokeLater(executionHandler)
+        }
       } else {
         executionHandler()
       }
