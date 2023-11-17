@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.handler
 
 import com.intellij.codeInsight.editorActions.AutoHardWrapHandler
 import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.formatting.LineWrappingUtil
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
@@ -128,6 +129,13 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
       // This flag is set when the enter handlers are executed as a part of moving the comment on the new line
       val dataManager = DataManager.getInstance()
       if (dataManager.loadFromDataContext(dataContext, AutoHardWrapHandler.AUTO_WRAP_LINE_IN_PROGRESS_KEY) == true) {
+        return true
+      }
+
+      // From VIM-3177
+      val wrapLongLineDuringFormattingInProgress = dataManager
+        .loadFromDataContext(dataContext, LineWrappingUtil.WRAP_LONG_LINE_DURING_FORMATTING_IN_PROGRESS_KEY)
+      if (wrapLongLineDuringFormattingInProgress == true) {
         return true
       }
 
