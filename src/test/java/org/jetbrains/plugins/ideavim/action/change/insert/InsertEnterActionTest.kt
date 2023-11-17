@@ -60,7 +60,7 @@ class InsertEnterActionTest : VimTestCase() {
     } else if (repetitionInfo.currentRepetition == 3) {
       ExtensionTestUtil.maskExtensions(
         ExtensionPointName("com.intellij.editorActionHandler"),
-        listOf(singleBean, mainBean),
+        listOf(forEachBean, mainBean),
         fixture.testRootDisposable
       )
     }
