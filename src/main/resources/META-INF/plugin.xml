@@ -125,8 +125,12 @@
                          id="ideavim-enter-logger"
                          order="first"/>
     <editorActionHandler action="EditorStartNewLine"
-                         implementationClass="com.maddyhome.idea.vim.handler.ShiftEnterDetector"
-                         id="ideavim-shift-enter-detector"
+                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineDetector"
+                         id="ideavim-start-new-line-detector"
+                         order="first"/>
+    <editorActionHandler action="EditorStartNewLineBefore"
+                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineBeforeCurrentDetector"
+                         id="ideavim-start-new-line-before-current-detector"
                          order="first"/>
   </extensions>
 

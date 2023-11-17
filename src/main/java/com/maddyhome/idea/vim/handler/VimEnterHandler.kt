@@ -145,7 +145,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
         return true
       }
 
-      if (dataManager.loadFromDataContext(dataContext, ShiftEnterDetector.Util.key) == true) {
+      if (dataManager.loadFromDataContext(dataContext, StartNewLineDetectorBase.Util.key) == true) {
         return true
       }
     }
@@ -258,11 +258,17 @@ internal class VimEscLoggerHandler(private val nextHandler: EditorActionHandler)
 }
 
 /**
- * Workaround to support shift-enter in normal mode.
- * IJ executes enter handler on shift-enter. This causes an issue that IdeaVim thinks that this is just an enter key.
+ * Workaround to support "Start New Line" action in normal mode.
+ * IJ executes enter handler on "Start New Line". This causes an issue that IdeaVim thinks that this is just an enter key.
  * This thing should be refactored, but for now we'll use this workaround VIM-3159
+ *
+ * The Same thing happens with "Start New Line Before Current" action.
  */
-internal class ShiftEnterDetector(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+internal class StartNewLineDetector(nextHandler: EditorActionHandler) : StartNewLineDetectorBase(nextHandler)
+internal class StartNewLineBeforeCurrentDetector(nextHandler: EditorActionHandler) :
+  StartNewLineDetectorBase(nextHandler)
+
+internal open class StartNewLineDetectorBase(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
     DataManager.getInstance().saveInDataContext(dataContext, Util.key, true)
     nextHandler.execute(editor, caret, dataContext)
@@ -273,7 +279,7 @@ internal class ShiftEnterDetector(private val nextHandler: EditorActionHandler) 
   }
 
   object Util {
-    val key = Key.create<Boolean>("vim.is.shift.enter")
+    val key = Key.create<Boolean>("vim.is.start.new.line")
   }
 
   companion object {
