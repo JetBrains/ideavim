@@ -13,6 +13,7 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.util.Computable
 import com.intellij.util.ExceptionUtil
+import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.api.VimApplicationBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -80,6 +81,10 @@ internal class IjVimApplication : VimApplicationBase() {
 
   override fun runAfterGotFocus(runnable: Runnable) {
     com.maddyhome.idea.vim.helper.runAfterGotFocus(runnable)
+  }
+
+  override fun isThinClient(): Boolean {
+    return PlatformUtils.isJetBrainsClient() || PlatformUtils.isGateway()
   }
 
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {
