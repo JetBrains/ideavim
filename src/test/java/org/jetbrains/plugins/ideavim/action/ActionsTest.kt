@@ -39,4 +39,58 @@ class ActionsTest : VimTestCase() {
     """.trimIndent()
     )
   }
+
+  @Test
+  @TestFor(issues = ["VIM-3159"])
+  fun `start new line before`() {
+    configureByText(
+      """
+      Lorem Ipsum
+
+      Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    )
+
+    fixture.performEditorAction("EditorStartNewLineBefore")
+
+    assertState(
+      """
+      Lorem Ipsum
+
+      $c
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3159"])
+  fun `start new line`() {
+    configureByText(
+      """
+      Lorem Ipsum
+
+      Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    )
+
+    fixture.performEditorAction("EditorStartNewLine")
+
+    assertState(
+      """
+      Lorem Ipsum
+
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      $c
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    )
+  }
 }
