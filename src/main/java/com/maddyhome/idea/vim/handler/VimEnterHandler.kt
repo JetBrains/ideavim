@@ -19,6 +19,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
+import com.intellij.openapi.editor.actions.SplitLineAction
 import com.intellij.openapi.editor.impl.CaretModelImpl
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.Key
@@ -146,6 +147,12 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
       val wrapLongLineDuringFormattingInProgress = dataManager
         .loadFromDataContext(dataContext, LineWrappingUtil.WRAP_LONG_LINE_DURING_FORMATTING_IN_PROGRESS_KEY)
       if (wrapLongLineDuringFormattingInProgress == true) {
+        return true
+      }
+
+      // From VIM-3203
+      val splitLineInProgress = dataManager.loadFromDataContext(dataContext, SplitLineAction.SPLIT_LINE_KEY)
+      if (splitLineInProgress == true) {
         return true
       }
 
