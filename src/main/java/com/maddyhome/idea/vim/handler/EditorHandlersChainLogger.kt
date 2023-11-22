@@ -8,9 +8,11 @@
 
 package com.maddyhome.idea.vim.handler
 
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.actionSystem.EditorActionHandlerBean
 import com.intellij.openapi.extensions.ExtensionPointName
+import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 
@@ -40,6 +42,13 @@ internal class EditorHandlersChainLogger : StartupActivity {
 
     LOG.info("Esc handlers chain:\n$escHandlers")
     LOG.info("Enter handlers chain:\n$enterHandlers")
+
+    val keymapManager = KeymapManagerEx.getInstanceEx()
+    val keymap = keymapManager.activeKeymap
+    val keymapShortcutsForEsc = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ESCAPE).joinToString()
+    val keymapShortcutsForEnter = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ENTER).joinToString()
+
+    LOG.info("Active keymap shortcuts for esc: $keymapShortcutsForEsc, Shortcuts for enter: $keymapShortcutsForEnter")
   }
 
   companion object {
