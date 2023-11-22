@@ -101,7 +101,9 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
         // We run this job only once for a primary caret. In the handler itself, we'll multiply the execution by the
         //   number of carets. If we run this job for each caret, we may end up in the issue like VIM-3186.
         //   However, I think that we may do some refactoring to run this job for each caret (if needed).
-        if (caret == editor.caretModel.primaryCaret) {
+        //
+        // For the moment, the known case when the caret is null - work in injected editor - VIM-3195
+        if (caret == null || caret == editor.caretModel.primaryCaret) {
           ApplicationManager.getApplication().invokeLater(executionHandler)
         }
       } else {
