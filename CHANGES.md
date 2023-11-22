@@ -31,6 +31,13 @@ usual beta standards.
 * [VIM-3165](https://youtrack.jetbrains.com/issue/VIM-3165) Do not process enter key as IdeaVim shortcut if it's not an actual keypress
 * [VIM-3159](https://youtrack.jetbrains.com/issue/VIM-3159) Shift-enter now works in normal mode again
 * [VIM-3157](https://youtrack.jetbrains.com/issue/VIM-3157) Do not invoke enter in invokeLater for python console
+* [VIM-3195](https://youtrack.jetbrains.com/issue/VIM-3195) Fix escape in injected editor
+* [VIM-3190](https://youtrack.jetbrains.com/issue/VIM-3190) Do not use octopus handler if the enter key is used with modifiers like shift or control
+* [VIM-3203](https://youtrack.jetbrains.com/issue/VIM-3203) Split action not works in normal mode
+* [VIM-3184](https://youtrack.jetbrains.com/issue/VIM-3184) Revert "VIM-3184: Temporally disable new handlers for the thin client"
+* [VIM-3186](https://youtrack.jetbrains.com/issue/VIM-3186) Do not multiply the enter action by the amount of carets
+* [VIM-3177](https://youtrack.jetbrains.com/issue/VIM-3177) Formatting of commit message works again
+* [VIM-1611](https://youtrack.jetbrains.com/issue/VIM-1611) actions related to resolving conflicts doesn't seem to work
 
 ## 2.7.0, 2023-11-07
 
