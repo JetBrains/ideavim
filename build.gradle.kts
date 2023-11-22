@@ -116,7 +116,7 @@ repositories {
 
 dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-    compileOnly("org.jetbrains:annotations:24.0.1")
+    compileOnly("org.jetbrains:annotations:24.1.0")
 
     // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
     testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")

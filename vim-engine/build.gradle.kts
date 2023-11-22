@@ -42,7 +42,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
-    compileOnly("org.jetbrains:annotations:24.0.1")
+    compileOnly("org.jetbrains:annotations:24.1.0")
 
     ksp(project(":annotation-processors"))
     implementation(project(":annotation-processors"))
