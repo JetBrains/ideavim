@@ -342,9 +342,9 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   // CMD line has a different processing mechanizm: the processing actions are registered
   //   for the input field component. These keys are not dispatched via the octopus handler.
   if (editor.vim.mode is Mode.CMD_LINE) return false
-  when (s.keyCode) {
-    KeyEvent.VK_ENTER -> return true
-    KeyEvent.VK_ESCAPE -> return true
+  when {
+    s.keyCode == KeyEvent.VK_ENTER && s.modifiers == 0 -> return true
+    s.keyCode == KeyEvent.VK_ESCAPE && s.modifiers == 0 -> return true
   }
   return false
 }

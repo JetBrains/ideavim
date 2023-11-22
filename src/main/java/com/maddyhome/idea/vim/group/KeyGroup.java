@@ -275,8 +275,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
     for (KeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED &&
-          key.getKeyCode() != KeyEvent.VK_ESCAPE &&
-          key.getKeyCode() != KeyEvent.VK_ENTER) {
+          !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
+          !(key.getKeyCode() == KeyEvent.VK_ENTER && key.getModifiers() == 0)) {
         getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
       }
     }
