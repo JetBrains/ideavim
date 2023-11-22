@@ -27,5 +27,4 @@ public interface VimApplication {
 
   public fun currentStackTrace(): String
   public fun runAfterGotFocus(runnable: Runnable)
-  public fun isThinClient(): Boolean
 }
