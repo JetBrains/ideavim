@@ -65,8 +65,4 @@ public class VimApplicationStub : VimApplicationBase() {
   override fun runAfterGotFocus(runnable: Runnable) {
     TODO("Not yet implemented")
   }
-
-  override fun isThinClient(): Boolean {
-    TODO("Not yet implemented")
-  }
 }
