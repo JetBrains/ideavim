@@ -526,7 +526,7 @@ tasks.register("releaseActions") {
             setYoutrackStatus(tickets, "Fixed")
             println("Checking if version $version exists...")
             val versionId = getVersionIdByName(version.toString())
-            if (versionId != null) {
+            if (versionId == null) {
                 addReleaseToYoutrack(version.toString())
             } else {
                 println("Version $version already exists in YouTrack. Version id: $versionId")
