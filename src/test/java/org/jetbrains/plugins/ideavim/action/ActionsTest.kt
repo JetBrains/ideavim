@@ -9,12 +9,15 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.idea.TestFor
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class ActionsTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-3203"])
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `split line action`() {
     configureByText(
       """
@@ -42,6 +45,7 @@ class ActionsTest : VimTestCase() {
 
   @Test
   @TestFor(issues = ["VIM-3159"])
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `start new line before`() {
     configureByText(
       """
@@ -69,6 +73,7 @@ class ActionsTest : VimTestCase() {
 
   @Test
   @TestFor(issues = ["VIM-3159"])
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `start new line`() {
     configureByText(
       """
