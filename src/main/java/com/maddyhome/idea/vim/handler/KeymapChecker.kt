@@ -16,12 +16,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.util.SingleAlarm
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import javax.swing.KeyStroke
 
 // We use alarm with delay to avoid many notifications in case many events are fired at the same time
 // [VERSION UPDATE] 2023.3+ Replace SingleAlarm with coroutine flows https://youtrack.jetbrains.com/articles/IJPL-A-8/Alarm-Alternative
-private val keymapCheckRequester = SingleAlarm({ verifyKeymap() }, 5_000)
+internal val keymapCheckRequester = SingleAlarm({ verifyKeymap() }, 5_000)
 
 /**
  * This checker verifies that the keymap has a correct configuration that is required for IdeaVim plugin
@@ -56,6 +57,8 @@ internal class IdeaVimKeymapChangedListener : KeymapManagerListener {
 private fun verifyKeymap() {
   // This is needed to initialize the injector in case this verification is called to fast
   VimPlugin.getInstance()
+
+  if (!injector.enabler.isEnabled()) return
 
   val keymap = KeymapManagerEx.getInstanceEx().activeKeymap
   val keymapShortcutsForEsc = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ESCAPE)
