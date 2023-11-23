@@ -14,6 +14,8 @@
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
               topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimCorrectorKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
   </applicationListeners>
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"

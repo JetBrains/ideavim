@@ -70,6 +70,7 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
+import com.maddyhome.idea.vim.handler.correctorRequester
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.VimStandalonePluginUpdateChecker
@@ -128,11 +129,13 @@ internal object VimListenerManager {
   fun turnOn() {
     GlobalListeners.enable()
     EditorListeners.addAll()
+    correctorRequester.request()
   }
 
   fun turnOff() {
     GlobalListeners.disable()
     EditorListeners.removeAll()
+    correctorRequester.request()
   }
 
   object GlobalListeners {

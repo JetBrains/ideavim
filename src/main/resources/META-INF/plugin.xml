@@ -80,6 +80,7 @@
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
     <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>
     <postStartupActivity implementation="com.maddyhome.idea.vim.handler.KeymapChecker"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.CopilotKeymapCorrector"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 
