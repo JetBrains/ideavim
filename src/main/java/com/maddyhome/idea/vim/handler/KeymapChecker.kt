@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.actionSystem.Shortcut
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapManagerListener
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
@@ -65,22 +67,44 @@ private fun verifyKeymap() {
   val keymapShortcutsForEnter = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ENTER)
 
   val issues = ArrayList<KeyMapIssue>()
-  if ("[pressed ESCAPE]" !in keymapShortcutsForEsc.map { it.toString() }) {
-    issues += KeyMapIssue(
+  val correctShortcutMissing = keymapShortcutsForEsc
+    .filterIsInstance<KeyboardShortcut>()
+    .none { it.firstKeyStroke.toString() == "pressed ESCAPE" && it.secondKeyStroke == null }
+
+  // We also check if there are any shortcuts starting from esc and with a second key. This should also be removed.
+  // For example, VIM-3162 has a case when two escapes were assigned to editor escape action
+  val shortcutsStartingFromEsc = keymapShortcutsForEsc
+    .filterIsInstance<KeyboardShortcut>()
+    .filter { it.firstKeyStroke.toString() == "pressed ESCAPE" && it.secondKeyStroke != null }
+  if (correctShortcutMissing) {
+    issues += KeyMapIssue.AddShortcut(
       "esc",
       "editor escape",
       IdeActions.ACTION_EDITOR_ESCAPE,
       key("<esc>")
     )
   }
+  shortcutsStartingFromEsc.forEach {
+    issues += KeyMapIssue.RemoveShortcut("editor escape", IdeActions.ACTION_EDITOR_ESCAPE, it)
+  }
 
-  if ("[pressed ENTER]" !in keymapShortcutsForEnter.map { it.toString() }) {
-    issues += KeyMapIssue(
+
+  val correctEnterShortcutMissing = keymapShortcutsForEnter
+    .filterIsInstance<KeyboardShortcut>()
+    .none { it.firstKeyStroke.toString() == "pressed ENTER" && it.secondKeyStroke == null }
+  val shortcutsStartingFromEnter = keymapShortcutsForEnter
+    .filterIsInstance<KeyboardShortcut>()
+    .filter { it.firstKeyStroke.toString() == "pressed ENTER" && it.secondKeyStroke != null }
+  if (correctEnterShortcutMissing) {
+    issues += KeyMapIssue.AddShortcut(
       "enter",
       "editor enter",
       IdeActions.ACTION_EDITOR_ENTER,
       key("<enter>")
     )
+  }
+  shortcutsStartingFromEnter.forEach {
+    issues += KeyMapIssue.RemoveShortcut("editor enter", IdeActions.ACTION_EDITOR_ENTER, it)
   }
 
   if (issues.isNotEmpty()) {
@@ -88,9 +112,17 @@ private fun verifyKeymap() {
   }
 }
 
-internal class KeyMapIssue(
-  val key: String,
-  val action: String,
-  val actionId: String,
-  val keyStroke: KeyStroke,
-)
+internal sealed interface KeyMapIssue {
+  data class AddShortcut(
+    val key: String,
+    val action: String,
+    val actionId: String,
+    val keyStroke: KeyStroke,
+  ) : KeyMapIssue
+
+  data class RemoveShortcut(
+    val action: String,
+    val actionId: String,
+    val shortcut: Shortcut,
+  ): KeyMapIssue
+}
