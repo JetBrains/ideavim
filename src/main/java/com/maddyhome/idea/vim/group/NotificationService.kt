@@ -21,8 +21,11 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.keymap.KeymapUtil
+import com.intellij.openapi.keymap.ex.KeymapManagerEx
+import com.intellij.openapi.keymap.impl.ui.KeymapPanel
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -32,6 +35,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.handler.KeyMapIssue
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -180,6 +184,65 @@ internal class NotificationService(private val project: Project?) {
     ActionIdNotifier.notifyActionId(id, project)
   }
 
+  fun notifyKeymapIssues(issues: ArrayList<KeyMapIssue>) {
+    val keymapManager = KeymapManagerEx.getInstanceEx()
+    val keymap = keymapManager.activeKeymap
+    val message = buildString {
+      if (issues.size == 1) {
+        issues.forEach {
+          appendLine("Current IDE keymap (${keymap.name}) doesn't have ${it.key} key assigned to the ${it.action} action.<br/>")
+        }
+      }
+      else {
+        appendLine("With current IDE keymap (${keymap.name}):<br/>")
+        issues.forEach {
+          appendLine("- ${it.key} key is not assigned to the ${it.action} action.<br/>")
+        }
+      }
+      appendLine("<br/>")
+      appendLine("This is required for proper plugin work.")
+    }
+    val notification = IDEAVIM_STICKY_GROUP.createNotification(
+      IDEAVIM_NOTIFICATION_TITLE,
+      message,
+      NotificationType.ERROR,
+    )
+    notification.subtitle = "IDE keymap misconfigured"
+    notification.addAction(object : DumbAwareAction("Assign Required Shortcuts") {
+      override fun actionPerformed(e: AnActionEvent) {
+        issues.forEach {
+          keymap.addShortcut(it.actionId, KeyboardShortcut(it.keyStroke, null))
+        }
+        LOG.info("Set shortcuts for ${issues.map { it.key }}")
+        notification.expire()
+        requiredShortcutsAssigned()
+      }
+    })
+    notification.addAction(object : DumbAwareAction("Ignore") {
+      override fun actionPerformed(e: AnActionEvent) {
+        LOG.info("Suggestion to set shortcuts ignored for ${issues.map { it.key }}")
+        notification.hideBalloon()
+      }
+    })
+    notification.notify(project)
+  }
+
+  private fun requiredShortcutsAssigned() {
+    val notification = Notification(
+      IDEAVIM_NOTIFICATION_ID,
+      IDEAVIM_NOTIFICATION_TITLE,
+      "Required shortcuts assigned",
+      NotificationType.INFORMATION,
+    )
+    notification.addAction(object : DumbAwareAction("Open Keymap Settings") {
+      override fun actionPerformed(e: AnActionEvent) {
+        ShowSettingsUtil.getInstance().showSettingsDialog(e.project, KeymapPanel::class.java)
+        notification.hideBalloon()
+      }
+    })
+    notification.notify(project)
+  }
+
   object ActionIdNotifier {
     private var notification: Notification? = null
     private const val NO_ID = "<i>Cannot detect action id</i>"
@@ -313,6 +376,8 @@ internal class NotificationService(private val project: Project?) {
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
     const val ideajoinExamplesUrl = "https://jb.gg/f9zji9"
+
+    private val LOG = logger<NotificationService>()
 
     private fun createIdeaVimRcManually(message: String, project: Project?) {
       val notification =

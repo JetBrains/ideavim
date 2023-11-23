@@ -12,6 +12,8 @@
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
               topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
   </applicationListeners>
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
