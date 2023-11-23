@@ -15,6 +15,7 @@ import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
+import com.maddyhome.idea.vim.api.key
 
 /**
  * Logs the chain of handlers for esc and enter
@@ -49,6 +50,15 @@ internal class EditorHandlersChainLogger : StartupActivity {
     val keymapShortcutsForEnter = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ENTER).joinToString()
 
     LOG.info("Active keymap (${keymap.name}) shortcuts for esc: $keymapShortcutsForEsc, Shortcuts for enter: $keymapShortcutsForEnter")
+
+    val actionsForEsc = keymap.getActionIds(key("<esc>")).joinToString("\n")
+    val actionsForEnter = keymap.getActionIds(key("<enter>")).joinToString("\n")
+
+    LOG.info(
+      "Also keymap (${keymap.name}) has " +
+        "the following actions assigned to esc:\n$actionsForEsc " +
+        "\nand following actions assigned to enter:\n$actionsForEnter"
+    )
   }
 
   companion object {
