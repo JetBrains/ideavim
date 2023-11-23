@@ -52,6 +52,7 @@ import java.awt.Point
 import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.SwingConstants
+import javax.swing.Timer
 
 @NonNls
 internal const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
@@ -73,6 +74,14 @@ internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompati
 
   override fun createWidget(project: Project): StatusBarWidget {
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(IjOptions.ideastatusicon) { updateAll() }
+
+    // Double update the status bar icon with 5-second delay
+    // There is an issue VIM-3084 that must probably caused by some race between status bar icon initialization
+    //   and .ideavimrc reading. I believe this is a simple fix for it.
+    val timer = Timer(5_000) { updateAll() }
+    timer.isRepeats = false
+    timer.start()
+
     return VimStatusBar()
   }
 
