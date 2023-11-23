@@ -8,15 +8,63 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class MarksCommandTest : VimTestCase() {
-
-  // https://youtrack.jetbrains.com/issue/VIM-2223
   @Test
+  @TestFor(issues = ["VIM-3176"])
+  fun `test gv after pasting to the same line`() {
+    configureByText(
+      """${c}I found it in a legendary land
+                      |all rocks and lavender and tufted grass,
+                      |where it was settled on some sodden sand
+                      |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    typeText(injector.parser.parseKeys("V3j" + "y" + "P" + "gv"))
+    assertState(
+      """I found it in a legendary land
+                      |all rocks and lavender and tufted grass,
+                      |where it was settled on some sodden sand
+                      |hard by the torrent of a mountain pass.
+                      |${s}I found it in a legendary land
+                      |all rocks and lavender and tufted grass,
+                      |where it was settled on some sodden sand
+                      |${c}hard by the torrent of a mountain pass.${se}
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3176"])
+  fun `test gv after pasting to the same line reversed selection`() {
+    configureByText(
+      """I found it in a legendary land
+                      |all rocks and lavender and tufted grass,
+                      |where it was settled on some sodden sand
+                      |${c}hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    typeText(injector.parser.parseKeys("V3k" + "y" + "P" + "gv"))
+    assertState(
+      """I found it in a legendary land
+                      |all rocks and lavender and tufted grass,
+                      |where it was settled on some sodden sand
+                      |hard by the torrent of a mountain pass.
+                      |${s}${c}I found it in a legendary land
+                      |all rocks and lavender and tufted grass,
+                      |where it was settled on some sodden sand
+                      |hard by the torrent of a mountain pass.${se}
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-2223"])
   fun `test gv after replacing a line`() {
     configureByText(
       """I found it in a legendary land
@@ -35,8 +83,8 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
-  // https://youtrack.jetbrains.com/issue/VIM-1684
   @Test
+  @TestFor(issues = ["VIM-1684"])
   fun `test reselecting different text length`() {
     configureByText(
       """
@@ -53,8 +101,8 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
-  // https://youtrack.jetbrains.com/issue/VIM-2491
   @Test
+  @TestFor(issues = ["VIM-2491"])
   fun `test mapping with gv`() {
     configureByText("Oh, hi ${c}Andy Tom John")
     typeText(commandToKeys("xnoremap p pgvy"))
