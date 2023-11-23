@@ -79,6 +79,7 @@
          core platform activities have IDs, so we can't use "before ID". We have to use "first" -->
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
     <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.KeymapChecker"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 
