@@ -232,7 +232,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       getInstance().turnOnPlugin();
     }
 
-    StatusBarIconFactory.Companion.updateIcon();
+    StatusBarIconFactory.Util.INSTANCE.updateIcon();
   }
 
   public static String getMessage() {

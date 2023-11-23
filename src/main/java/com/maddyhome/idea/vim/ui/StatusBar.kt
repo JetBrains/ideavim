@@ -89,10 +89,10 @@ internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompati
       statusBarWidgetsManager.updateWidget(this)
     }
 
-    updateIcon()
+    Util.updateIcon()
   }
 
-  companion object {
+  object Util {
     fun updateIcon() {
       val projectManager = ProjectManager.getInstanceIfCreated() ?: return
       for (project in projectManager.openProjects) {
