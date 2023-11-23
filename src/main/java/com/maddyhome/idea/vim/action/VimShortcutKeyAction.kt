@@ -56,7 +56,12 @@ import javax.swing.KeyStroke
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
 internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
-  private val traceTime = injector.globalOptions().ideatracetime
+  private val traceTime: Boolean
+    get() {
+      // Make sure the injector is initialized
+      VimPlugin.getInstance()
+      return injector.globalOptions().ideatracetime
+    }
 
   override fun actionPerformed(e: AnActionEvent) {
     LOG.trace("Executing shortcut key action")
