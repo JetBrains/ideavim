@@ -14,30 +14,35 @@ import com.intellij.openapi.keymap.KeymapManagerListener
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
+import com.intellij.util.SingleAlarm
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.key
 import javax.swing.KeyStroke
+
+// We use alarm with delay to avoid many notifications in case many events are fired at the same time
+// [VERSION UPDATE] 2023.3+ Replace SingleAlarm with coroutine flows https://youtrack.jetbrains.com/articles/IJPL-A-8/Alarm-Alternative
+private val keymapCheckRequester = SingleAlarm({ verifyKeymap() }, 5_000)
 
 /**
  * This checker verifies that the keymap has a correct configuration that is required for IdeaVim plugin
  */
 internal class KeymapChecker : StartupActivity {
   override fun runActivity(project: Project) {
-    verifyKeymap(project)
+    keymapCheckRequester.request()
   }
 }
 
 internal class IdeaVimKeymapChangedListener : KeymapManagerListener {
   override fun activeKeymapChanged(keymap: Keymap?) {
-    verifyKeymap(null)
+    keymapCheckRequester.request()
   }
 
   override fun shortcutChanged(keymap: Keymap, actionId: String) {
-    verifyKeymap(null)
+    keymapCheckRequester.request()
   }
 
   override fun shortcutChanged(keymap: Keymap, actionId: String, fromSettings: Boolean) {
-    verifyKeymap(null)
+    keymapCheckRequester.request()
   }
 }
 
@@ -48,9 +53,11 @@ internal class IdeaVimKeymapChangedListener : KeymapManagerListener {
  * Usually this is not a problem because this is a standard mapping, but the problem may appear in a misconfiguration
  *   like it was in VIM-3204
  */
-private fun verifyKeymap(project: Project?) {
-  val keymapManager = KeymapManagerEx.getInstanceEx()
-  val keymap = keymapManager.activeKeymap
+private fun verifyKeymap() {
+  // This is needed to initialize the injector in case this verification is called to fast
+  VimPlugin.getInstance()
+
+  val keymap = KeymapManagerEx.getInstanceEx().activeKeymap
   val keymapShortcutsForEsc = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ESCAPE)
   val keymapShortcutsForEnter = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ENTER)
 
@@ -74,7 +81,7 @@ private fun verifyKeymap(project: Project?) {
   }
 
   if (issues.isNotEmpty()) {
-    VimPlugin.getNotifications(project).notifyKeymapIssues(issues)
+    VimPlugin.getNotifications(null).notifyKeymapIssues(issues)
   }
 }
 
