@@ -48,7 +48,7 @@ internal class EditorHandlersChainLogger : StartupActivity {
     val keymapShortcutsForEsc = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ESCAPE).joinToString()
     val keymapShortcutsForEnter = keymap.getShortcuts(IdeActions.ACTION_EDITOR_ENTER).joinToString()
 
-    LOG.info("Active keymap shortcuts for esc: $keymapShortcutsForEsc, Shortcuts for enter: $keymapShortcutsForEnter")
+    LOG.info("Active keymap (${keymap.name}) shortcuts for esc: $keymapShortcutsForEsc, Shortcuts for enter: $keymapShortcutsForEnter")
   }
 
   companion object {
