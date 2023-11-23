@@ -38,6 +38,8 @@ usual beta standards.
 * [VIM-3186](https://youtrack.jetbrains.com/issue/VIM-3186) Do not multiply the enter action by the amount of carets
 * [VIM-3177](https://youtrack.jetbrains.com/issue/VIM-3177) Formatting of commit message works again
 * [VIM-1611](https://youtrack.jetbrains.com/issue/VIM-1611) actions related to resolving conflicts doesn't seem to work
+* [VIM-3204](https://youtrack.jetbrains.com/issue/VIM-3204) Add checker that verifies the configuratin of the keymap
+* [VIM-3084](https://youtrack.jetbrains.com/issue/VIM-3084) Double update for the status bar icon
 
 ## 2.7.0, 2023-11-07
 
