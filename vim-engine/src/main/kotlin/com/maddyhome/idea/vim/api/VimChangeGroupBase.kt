@@ -35,8 +35,9 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.toReturnTo
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import java.util.*
@@ -614,7 +615,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   override fun processSingleCommand(editor: VimEditor) {
-    getInstance(editor).mode = Mode.NORMAL(returnTo = ReturnTo.INSERT)
+    getInstance(editor).mode = Mode.NORMAL(returnTo = editor.mode.toReturnTo)
     clearStrokes(editor)
   }
 

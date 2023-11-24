@@ -237,7 +237,7 @@ public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachi
         Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
         is Mode.VISUAL -> MappingMode.VISUAL
         is Mode.SELECT -> MappingMode.SELECT
-        Mode.CMD_LINE -> MappingMode.CMD_LINE
+        is Mode.CMD_LINE -> MappingMode.CMD_LINE
         is Mode.OP_PENDING -> MappingMode.OP_PENDING
       }
     }

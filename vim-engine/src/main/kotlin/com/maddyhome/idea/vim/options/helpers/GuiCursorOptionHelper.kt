@@ -10,9 +10,9 @@ package com.maddyhome.idea.vim.options.helpers
 
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
@@ -175,7 +175,7 @@ public enum class GuiCursorMode(public val token: String) {
         is Mode.SELECT -> GuiCursorMode.INSERT
         is Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
         // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
-        Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
+        is Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
       }
     }
   }

@@ -11,9 +11,9 @@ package com.maddyhome.idea.vim.helper
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isSingleModeActive
@@ -41,7 +41,7 @@ public val VimEditor.isEndAllowed: Boolean
 public fun VimEditor.isEndAllowed(mode: Mode): Boolean {
   return when (mode) {
     is Mode.INSERT, is Mode.VISUAL, is Mode.SELECT -> true
-    is Mode.NORMAL, Mode.CMD_LINE, Mode.REPLACE, is Mode.OP_PENDING -> {
+    is Mode.NORMAL, is Mode.CMD_LINE, Mode.REPLACE, is Mode.OP_PENDING -> {
       // One day we'll use a proper insert_normal mode
       if (mode.isSingleModeActive) true else usesVirtualSpace
     }

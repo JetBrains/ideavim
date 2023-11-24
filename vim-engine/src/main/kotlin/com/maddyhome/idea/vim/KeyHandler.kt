@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.returnTo
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -498,7 +499,7 @@ public class KeyHandler {
       val text = injector.processGroup.endSearchCommand()
       commandBuilder.popCommandPart() // Pop ProcessExEntryAction
       commandBuilder.completeCommandPart(Argument(text)) // Set search text on SearchEntry(Fwd|Rev)Action
-      editorState.mode = Mode.NORMAL()
+      editorState.mode = editorState.mode.returnTo()
     }
   }
 
@@ -545,7 +546,9 @@ public class KeyHandler {
         // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
         injector.processGroup.startSearchCommand(editor, context, commandBuilder.count, key)
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
-        editorState.mode = Mode.CMD_LINE
+        val currentMode = editorState.mode
+        check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
+        editorState.mode = Mode.CMD_LINE(currentMode)
       }
 
       else -> Unit

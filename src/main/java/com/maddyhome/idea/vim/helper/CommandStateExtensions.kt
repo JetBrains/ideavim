@@ -36,7 +36,7 @@ public val Editor.mode: CommandState.Mode
   get() {
     val mode = this.vim.vimStateMachine.mode
     return when (mode) {
-      Mode.CMD_LINE -> CommandState.Mode.CMD_LINE
+      is Mode.CMD_LINE -> CommandState.Mode.CMD_LINE
       Mode.INSERT -> CommandState.Mode.INSERT
       is Mode.NORMAL -> CommandState.Mode.COMMAND
       is Mode.OP_PENDING -> CommandState.Mode.OP_PENDING

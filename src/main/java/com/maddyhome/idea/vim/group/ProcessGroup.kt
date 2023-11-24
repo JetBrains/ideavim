@@ -36,6 +36,8 @@ import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.NORMAL
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.io.BufferedWriter
@@ -72,9 +74,14 @@ public class ProcessGroup : VimProcessGroupBase() {
     // Don't allow ex commands in one line editors
     if (editor.isOneLineMode()) return
 
+    val currentMode = editor.vimStateMachine.mode
+    check(currentMode is ReturnableFromCmd) {
+      "Cannot enable cmd mode from current mode $currentMode"
+    }
+
     val initText = getRange(editor, cmd)
     injector.markService.setVisualSelectionMarks(editor)
-    getInstance(editor).mode = Mode.CMD_LINE
+    editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, ":", initText, 1)
   }
@@ -146,7 +153,9 @@ public class ProcessGroup : VimProcessGroupBase() {
 
   public override fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
     val initText = getRange(editor, cmd) + "!"
-    editor.vimStateMachine.mode = Mode.CMD_LINE
+    val currentMode = editor.mode
+    check(currentMode is ReturnableFromCmd) { "Cannot enable cmd mode from $currentMode" }
+    editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, ":", initText, 1)
   }

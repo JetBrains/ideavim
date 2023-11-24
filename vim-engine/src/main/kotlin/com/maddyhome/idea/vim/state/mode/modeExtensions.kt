@@ -117,7 +117,55 @@ public fun Mode.toVimNotation(): String {
     }
 
     Mode.REPLACE -> "R"
-    Mode.CMD_LINE -> "c"
+    is Mode.CMD_LINE -> "c"
     is Mode.OP_PENDING -> "no"
   }
 }
+
+public fun Mode.returnTo(): Mode {
+  return when (this) {
+    is Mode.CMD_LINE -> {
+      val returnMode = returnTo as Mode
+      // We need to understand logic that doesn't exit visual if it's just visual,
+      //   but exits visual if it's one-time visual
+      if (returnMode.returnTo != null) {
+        returnMode.returnTo()
+      } else {
+        returnMode
+      }
+    }
+
+    Mode.INSERT -> Mode.NORMAL()
+    is Mode.NORMAL -> when (returnTo) {
+      ReturnTo.INSERT -> Mode.INSERT
+      ReturnTo.REPLACE -> Mode.REPLACE
+      null -> Mode.NORMAL()
+    }
+
+    is Mode.OP_PENDING -> when (returnTo) {
+      ReturnTo.INSERT -> Mode.INSERT
+      ReturnTo.REPLACE -> Mode.REPLACE
+      null -> Mode.NORMAL()
+    }
+
+    Mode.REPLACE -> Mode.NORMAL()
+    is Mode.SELECT -> when (returnTo) {
+      ReturnTo.INSERT -> Mode.INSERT
+      ReturnTo.REPLACE -> Mode.REPLACE
+      null -> Mode.NORMAL()
+    }
+
+    is Mode.VISUAL -> when (returnTo) {
+      ReturnTo.INSERT -> Mode.INSERT
+      ReturnTo.REPLACE -> Mode.REPLACE
+      null -> Mode.NORMAL()
+    }
+  }
+}
+
+public val Mode.toReturnTo: ReturnTo
+  get() = when (this) {
+    Mode.INSERT -> ReturnTo.INSERT
+    Mode.REPLACE -> ReturnTo.REPLACE
+    else -> error("Cannot get return to from $this")
+  }
