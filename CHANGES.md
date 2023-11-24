@@ -40,6 +40,8 @@ usual beta standards.
 * [VIM-1611](https://youtrack.jetbrains.com/issue/VIM-1611) actions related to resolving conflicts doesn't seem to work
 * [VIM-3204](https://youtrack.jetbrains.com/issue/VIM-3204) Add checker that verifies the configuratin of the keymap
 * [VIM-3084](https://youtrack.jetbrains.com/issue/VIM-3084) Double update for the status bar icon
+* [VIM-3176](https://youtrack.jetbrains.com/issue/VIM-3176) Reselecting visual selection after pasting above it select wrong lines
+* [VIM-3206](https://youtrack.jetbrains.com/issue/VIM-3206) Disable both copilot suggestion and insert mode on a single escape
 
 ## 2.7.0, 2023-11-07
 
