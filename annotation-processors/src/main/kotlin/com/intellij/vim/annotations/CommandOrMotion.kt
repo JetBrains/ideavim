@@ -44,7 +44,7 @@ enum class Mode(val abbrev: Char) {
   OP_PENDING('O'),
 
   /**
-   * Indicates this key mapping applies to Insert mode
+   * Indicates this key mapping applies to Insert or Replace modes
    */
   INSERT('I'),
 
