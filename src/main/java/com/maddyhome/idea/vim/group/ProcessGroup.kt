@@ -5,281 +5,268 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.group
 
-package com.maddyhome.idea.vim.group;
+import com.intellij.execution.ExecutionException
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.execution.process.ProcessAdapter
+import com.intellij.execution.process.ProcessEvent
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicatorProvider
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.util.execution.ParametersListUtil
+import com.intellij.util.text.CharSequenceReader
+import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimProcessGroupBase
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.InvalidCommandException
+import com.maddyhome.idea.vim.helper.requestFocus
+import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.Mode.NORMAL
+import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
+import java.io.BufferedWriter
+import java.io.IOException
+import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
+import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.CapturingProcessHandler;
-import com.intellij.execution.process.ProcessAdapter;
-import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessOutput;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.progress.ProcessCanceledException;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressIndicatorProvider;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.util.execution.ParametersListUtil;
-import com.intellij.util.text.CharSequenceReader;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.ExecutionContext;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.api.VimProcessGroupBase;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.state.mode.Mode;
-import com.maddyhome.idea.vim.state.VimStateMachine;
-import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.InvalidCommandException;
-import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+public class ProcessGroup : VimProcessGroupBase() {
+  override var lastCommand: String? = null
+    private set
 
-import javax.swing.*;
-import java.io.*;
-import java.util.ArrayList;
+  public override fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char) {
+    // Don't allow searching in one line editors
+    if (editor.isOneLineMode()) return
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+    val initText = ""
+    val label = leader.toString()
 
-
-public class ProcessGroup extends VimProcessGroupBase {
-  public String getLastCommand() {
-    return lastCommand;
+    val panel = ExEntryPanel.getInstance()
+    panel.activate(editor.ij, context.ij, label, initText, count)
   }
 
-  @Override
-  public void startSearchCommand(@NotNull VimEditor editor, ExecutionContext context, int count, char leader) {
-    if (((IjVimEditor)editor).getEditor().isOneLineMode()) // Don't allow searching in one line editors
-    {
-      return;
-    }
+  public override fun endSearchCommand(): String {
+    val panel = ExEntryPanel.getInstance()
+    panel.deactivate(true)
 
-    String initText = "";
-    String label = String.valueOf(leader);
-
-    ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.activate(((IjVimEditor)editor).getEditor(), ((DataContext)context.getContext()), label, initText, count);
+    return panel.text
   }
 
-  @Override
-  public @NotNull String endSearchCommand() {
-    ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(true);
-
-    return panel.getText();
-  }
-
-  public void startExCommand(@NotNull VimEditor editor, ExecutionContext context, @NotNull Command cmd) {
+  public override fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
     // Don't allow ex commands in one line editors
-    if (editor.isOneLineMode()) return;
+    if (editor.isOneLineMode()) return
 
-    String initText = getRange(((IjVimEditor) editor).getEditor(), cmd);
-    injector.getMarkService().setVisualSelectionMarks(editor);
-    VimStateMachine.Companion.getInstance(editor).setMode(Mode.CMD_LINE.INSTANCE);
-    ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.activate(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext(), ":", initText, 1);
+    val initText = getRange(editor, cmd)
+    injector.markService.setVisualSelectionMarks(editor)
+    getInstance(editor).mode = Mode.CMD_LINE
+    val panel = ExEntryPanel.getInstance()
+    panel.activate(editor.ij, context.ij, ":", initText, 1)
   }
 
-  @Override
-  public boolean processExKey(@NotNull VimEditor editor, @NotNull KeyStroke stroke) {
+  public override fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
-    ExEntryPanel panel = ExEntryPanel.getInstance();
-    if (panel.isActive()) {
-      UiHelper.requestFocus(panel.getEntry());
-      panel.handleKey(stroke);
+    val panel = ExEntryPanel.getInstance()
+    if (panel.isActive) {
+      requestFocus(panel.entry)
+      panel.handleKey(stroke)
 
-      return true;
-    }
-    else {
-      VimStateMachine.Companion.getInstance(editor).setMode(new Mode.NORMAL());
-      KeyHandler.getInstance().reset(editor);
-      return false;
+      return true
+    } else {
+      getInstance(editor).mode = NORMAL()
+      getInstance().reset(editor)
+      return false
     }
   }
 
-  public boolean processExEntry(final @NotNull VimEditor editor, final @NotNull ExecutionContext context) {
-    ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(true);
-    boolean res = true;
+  public override fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean {
+    val panel = ExEntryPanel.getInstance()
+    panel.deactivate(true)
+    var res = true
     try {
-      VimStateMachine.Companion.getInstance(editor).setMode(new Mode.NORMAL());
+      getInstance(editor).mode = NORMAL()
 
-      logger.debug("processing command");
+      logger.debug("processing command")
 
-      final String text = panel.getText();
+      val text = panel.text
 
-      if (!panel.getLabel().equals(":")) {
+      if (panel.label != ":") {
         // Search is handled via Argument.Type.EX_STRING. Although ProcessExEntryAction is registered as the handler for
         // <CR> in both command and search modes, it's only invoked for command mode (see KeyHandler.handleCommandNode).
         // We should never be invoked for anything other than an actual ex command.
-        throw new InvalidCommandException("Expected ':' command. Got '" + panel.getLabel() + "'", text);
+        throw InvalidCommandException("Expected ':' command. Got '" + panel.label + "'", text)
       }
 
-      if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
+      logger.debug {
+        "swing=" + SwingUtilities.isEventDispatchThread()
+      }
 
-      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext.INSTANCE);
-    }
-    catch (ExException e) {
-      VimPlugin.showMessage(e.getMessage());
-      VimPlugin.indicateError();
-      res = false;
-    }
-    catch (Exception bad) {
-      ProcessGroup.logger.error(bad);
-      VimPlugin.indicateError();
-      res = false;
+      injector.vimscriptExecutor.execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext)
+    } catch (e: ExException) {
+      VimPlugin.showMessage(e.message)
+      VimPlugin.indicateError()
+      res = false
+    } catch (bad: Exception) {
+      logger.error(bad)
+      VimPlugin.indicateError()
+      res = false
     }
 
-    return res;
+    return res
   }
 
   // commands executed from map command / macro should not be added to history
-  private boolean skipHistory(VimEditor editor) {
-    return VimStateMachine.Companion.getInstance(editor).getMappingState().isExecutingMap() || injector.getMacro().isExecutingMacro();
+  private fun skipHistory(editor: VimEditor): Boolean {
+    return getInstance(editor).mappingState.isExecutingMap() || injector.macro.isExecutingMacro
   }
 
-  public void cancelExEntry(final @NotNull VimEditor editor, boolean resetCaret) {
-    VimStateMachine.Companion.getInstance(editor).setMode(new Mode.NORMAL());
-    KeyHandler.getInstance().reset(editor);
-    ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(true, resetCaret);
+  public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
+    editor.vimStateMachine.mode = NORMAL()
+    getInstance().reset(editor)
+    val panel = ExEntryPanel.getInstance()
+    panel.deactivate(true, resetCaret)
   }
 
-  @Override
-  public void startFilterCommand(@NotNull VimEditor editor, ExecutionContext context, @NotNull Command cmd) {
-    String initText = getRange(((IjVimEditor) editor).getEditor(), cmd) + "!";
-    VimStateMachine.Companion.getInstance(editor).setMode(Mode.CMD_LINE.INSTANCE);
-    ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.activate(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext(), ":", initText, 1);
+  public override fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    val initText = getRange(editor, cmd) + "!"
+    editor.vimStateMachine.mode = Mode.CMD_LINE
+    val panel = ExEntryPanel.getInstance()
+    panel.activate(editor.ij, context.ij, ":", initText, 1)
   }
 
-  private @NotNull String getRange(Editor editor, @NotNull Command cmd) {
-    String initText = "";
-    if (VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode() instanceof Mode.VISUAL) {
-      initText = "'<,'>";
-    }
-    else if (cmd.getRawCount() > 0) {
-      if (cmd.getCount() == 1) {
-        initText = ".";
-      }
-      else {
-        initText = ".,.+" + (cmd.getCount() - 1);
+  private fun getRange(editor: VimEditor, cmd: Command): String {
+    var initText = ""
+    if (editor.vimStateMachine.mode is VISUAL) {
+      initText = "'<,'>"
+    } else if (cmd.rawCount > 0) {
+      initText = if (cmd.count == 1) {
+        "."
+      } else {
+        ".,.+" + (cmd.count - 1)
       }
     }
 
-    return initText;
+    return initText
   }
 
-  public @Nullable String executeCommand(@NotNull VimEditor editor, @NotNull String command, @Nullable CharSequence input, @Nullable String currentDirectoryPath)
-    throws ExecutionException, ProcessCanceledException {
-
+  @Throws(ExecutionException::class, ProcessCanceledException::class)
+  public override fun executeCommand(
+    editor: VimEditor,
+    command: String,
+    input: CharSequence?,
+    currentDirectoryPath: String?
+  ): String? {
     // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
     // redirect to temp files ('shellredir' and 'shelltemp') or use pipes. We don't support 'shellquote', because we're
     // not handling redirection, but we do use 'shellxquote' and 'shellxescape', because these have defaults that work
     // better with Windows. We also don't bother using ShellExecute for Windows commands beginning with `start`.
     // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
-    return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
 
-      final String shell = globalOptions(injector).getShell();
-      final String shellcmdflag = globalOptions(injector).getShellcmdflag();
-      final String shellxescape = globalOptions(injector).getShellxescape();
-      final String shellxquote = globalOptions(injector).getShellxquote();
+    return ProgressManager.getInstance().runProcessWithProgressSynchronously<String, ExecutionException>(
+      {
+        val shell = injector.globalOptions().shell
+        val shellcmdflag = injector.globalOptions().shellcmdflag
+        val shellxescape = injector.globalOptions().shellxescape
+        val shellxquote = injector.globalOptions().shellxquote
 
-      // For Win32. See :help 'shellxescape'
-      final String escapedCommand = shellxquote.equals("(")
-                                    ? doEscape(command, shellxescape, "^")
-                                    : command;
-      // Required for Win32+cmd.exe, defaults to "(". See :help 'shellxquote'
-      final String quotedCommand = shellxquote.equals("(")
-                                   ? "(" + escapedCommand + ")"
-                                   : (shellxquote.equals("\"(")
-                                      ? "\"(" + escapedCommand + ")\""
-                                      : shellxquote + escapedCommand + shellxquote);
+        // For Win32. See :help 'shellxescape'
+        val escapedCommand = if (shellxquote == "(") doEscape(command, shellxescape, "^")
+        else command
+        // Required for Win32+cmd.exe, defaults to "(". See :help 'shellxquote'
+        val quotedCommand = if (shellxquote == "(") "($escapedCommand)"
+        else (if (shellxquote == "\"(") "\"($escapedCommand)\""
+        else shellxquote + escapedCommand + shellxquote)
 
-      final ArrayList<String> commands = new ArrayList<>();
-      commands.add(shell);
-      if (!shellcmdflag.isEmpty()) {
-        // Note that Vim also does a simple whitespace split for multiple parameters
-        commands.addAll(ParametersListUtil.parse(shellcmdflag));
-      }
-      commands.add(quotedCommand);
+        val commands = ArrayList<String>()
+        commands.add(shell)
+        if (shellcmdflag.isNotEmpty()) {
+          // Note that Vim also does a simple whitespace split for multiple parameters
+          commands.addAll(ParametersListUtil.parse(shellcmdflag))
+        }
+        commands.add(quotedCommand)
 
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("shell=%s shellcmdflag=%s command=%s", shell, shellcmdflag, quotedCommand));
-      }
+        if (logger.isDebugEnabled) {
+          logger.debug(String.format("shell=%s shellcmdflag=%s command=%s", shell, shellcmdflag, quotedCommand))
+        }
 
-      final GeneralCommandLine commandLine = new GeneralCommandLine(commands);
-      if (currentDirectoryPath != null) {
-        commandLine.setWorkDirectory(currentDirectoryPath);
-      }
-      final CapturingProcessHandler handler = new CapturingProcessHandler(commandLine);
-      if (input != null) {
-        handler.addProcessListener(new ProcessAdapter() {
-          @Override
-          public void startNotified(@NotNull ProcessEvent event) {
-            try {
-              final CharSequenceReader charSequenceReader = new CharSequenceReader(input);
-              final BufferedWriter outputStreamWriter = new BufferedWriter(new OutputStreamWriter(handler.getProcessInput()));
-              copy(charSequenceReader, outputStreamWriter);
-              outputStreamWriter.close();
+        val commandLine = GeneralCommandLine(commands)
+        if (currentDirectoryPath != null) {
+          commandLine.setWorkDirectory(currentDirectoryPath)
+        }
+        val handler = CapturingProcessHandler(commandLine)
+        if (input != null) {
+          handler.addProcessListener(object : ProcessAdapter() {
+            override fun startNotified(event: ProcessEvent) {
+              try {
+                val charSequenceReader = CharSequenceReader(input)
+                val outputStreamWriter = BufferedWriter(OutputStreamWriter(handler.processInput))
+                copy(charSequenceReader, outputStreamWriter)
+                outputStreamWriter.close()
+              } catch (e: IOException) {
+                logger.error(e)
+              }
             }
-            catch (IOException e) {
-              logger.error(e);
-            }
-          }
-        });
-      }
+          })
+        }
 
-      final ProgressIndicator progressIndicator = ProgressIndicatorProvider.getInstance().getProgressIndicator();
-      final ProcessOutput output = handler.runProcessWithProgressIndicator(progressIndicator);
+        val progressIndicator = ProgressIndicatorProvider.getInstance().progressIndicator
+        val output = handler.runProcessWithProgressIndicator(progressIndicator)
 
-      lastCommand = command;
+        lastCommand = command
 
-      if (output.isCancelled()) {
-        // TODO: Vim will use whatever text has already been written to stdout
-        // For whatever reason, we're not getting any here, so just throw an exception
-        throw new ProcessCanceledException();
-      }
+        if (output.isCancelled) {
+          // TODO: Vim will use whatever text has already been written to stdout
+          // For whatever reason, we're not getting any here, so just throw an exception
+          throw ProcessCanceledException()
+        }
 
-      final Integer exitCode = handler.getExitCode();
-      if (exitCode != null && exitCode != 0) {
-        VimPlugin.showMessage("shell returned " + exitCode);
-        VimPlugin.indicateError();
-      }
-
-      // Get stderr; stdout and strip colors, which are not handles properly.
-      return (output.getStderr() + output.getStdout()).replaceAll("\u001B\\[[;\\d]*m", "");
-    }, "IdeaVim - !" + command, true, ((IjVimEditor) editor).getEditor().getProject());
+        val exitCode = handler.exitCode
+        if (exitCode != null && exitCode != 0) {
+          VimPlugin.showMessage("shell returned $exitCode")
+          VimPlugin.indicateError()
+        }
+        (output.stderr + output.stdout).replace("\u001B\\[[;\\d]*m".toRegex(), "")
+      }, "IdeaVim - !$command", true, editor.ij.project
+    )
   }
 
-  private String doEscape(String original, String charsToEscape, String escapeChar) {
-    String result = original;
-    for (char c : charsToEscape.toCharArray()) {
-      result = result.replace("" + c, escapeChar + c);
+  @Suppress("SameParameterValue")
+  private fun doEscape(original: String, charsToEscape: String, escapeChar: String): String {
+    var result = original
+    for (c in charsToEscape.toCharArray()) {
+      result = result.replace("" + c, escapeChar + c)
     }
-    return result;
+    return result
   }
 
   // TODO: Java 10 has a transferTo method we could use instead
-  private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
-    char[] buf = new char[2048];
-    int cnt;
-    while ((cnt = from.read(buf)) != -1) {
-      to.write(buf, 0, cnt);
+  @Throws(IOException::class)
+  private fun copy(from: Reader, to: Writer) {
+    val buf = CharArray(2048)
+    var cnt: Int
+    while ((from.read(buf).also { cnt = it }) != -1) {
+      to.write(buf, 0, cnt)
     }
   }
 
-  private String lastCommand;
-
-  private static final Logger logger = Logger.getInstance(ProcessGroup.class.getName());
+  public companion object {
+    private val logger = logger<ProcessGroup>()
+  }
 }

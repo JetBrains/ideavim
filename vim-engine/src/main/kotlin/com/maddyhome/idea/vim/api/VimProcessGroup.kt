@@ -13,11 +13,11 @@ import javax.swing.KeyStroke
 public interface VimProcessGroup {
   public val lastCommand: String?
 
-  public fun startSearchCommand(editor: VimEditor, context: ExecutionContext?, count: Int, leader: Char)
+  public fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char)
   public fun endSearchCommand(): String
   public fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean
-  public fun startFilterCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
-  public fun startExCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
+  public fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
+  public fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
   public fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean
   public fun cancelExEntry(editor: VimEditor, resetCaret: Boolean)
 
