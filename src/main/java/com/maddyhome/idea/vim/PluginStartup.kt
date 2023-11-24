@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.localEditors
@@ -20,16 +20,11 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 /**
  * @author Alex Plate
  */
-// This service should be migrated to ProjectActivity. But we should cariful because simple replacement
-// leads to deadlock in tests. I'm not sure about the exact reasons, but "invokeAndWait" inside "initialize" function
-// causes this deadlock. Good new: it's easy reproducible in tests.
-// Previous migration: fc7efd5484a13b40ba9bf86a1d5429e215d973f3
-// Revert: 24dd84b31cffb99eb6114524859a46d02717d33f
-internal class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
+internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
 
   private var firstInitializationOccurred = false
 
-  override fun runActivity(project: Project) {
+  override suspend fun execute(project: Project) {
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
 

@@ -10,6 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
 import com.intellij.notification.Notification
 import com.maddyhome.idea.vim.VimPlugin
@@ -20,14 +21,12 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
-import org.junit.jupiter.api.Disabled
 
 /**
  * @author Alex Plate
  */
 @TraceOptions(TestIjOptionConstants.ideajoin)
 class JoinNotificationTest : VimTestCase() {
-  @Disabled("[VERSION UPDATE] Enable when min version is 2023.2+")
   @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["false"]))
   fun `test notification shown for no ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
@@ -45,7 +44,6 @@ class JoinNotificationTest : VimTestCase() {
     }
   }
 
-  @Disabled("[VERSION UPDATE] Enable when min version is 2023.2+")
   @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["true"]))
   fun `test notification not shown for ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
@@ -58,8 +56,7 @@ class JoinNotificationTest : VimTestCase() {
   }
 
   private fun notifications(): MutableList<Notification> {
-    TODO()
-//    return ActionCenter.getNotifications(fixture.project)
+    return ActionCenter.getNotifications(fixture.project)
   }
 
   @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["false"]))

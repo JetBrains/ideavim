@@ -143,7 +143,7 @@ internal class IjActionExecutor : VimActionExecutor {
       manager.fireAfterActionPerformed(action, event, result!!)
     }
     if (indexError != null) {
-      ActionUtil.showDumbModeWarning(project, event)
+      ActionUtil.showDumbModeWarning(project, action, event)
     }
   }
 

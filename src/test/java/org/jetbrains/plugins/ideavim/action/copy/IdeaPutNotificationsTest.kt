@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
 import com.intellij.notification.Notification
 import com.maddyhome.idea.vim.VimPlugin
@@ -22,11 +23,9 @@ import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.rangeOf
-import org.junit.jupiter.api.Disabled
 
 @TraceOptions(TestOptionConstants.clipboard)
 class IdeaPutNotificationsTest : VimTestCase() {
-  @Disabled("[VERSION UPDATE] Enable when min version is 2023.2+")
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
@@ -47,7 +46,6 @@ class IdeaPutNotificationsTest : VimTestCase() {
     }
   }
 
-  @Disabled("[VERSION UPDATE] Enable when min version is 2023.2+")
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test no notification on ideaput`() {
     val before = "${c}I found it in a legendary land"
@@ -63,8 +61,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
   }
 
   private fun notifications(): MutableList<Notification> {
-    TODO()
-//    return ActionCenter.getNotifications(fixture.project)
+    return ActionCenter.getNotifications(fixture.project)
   }
 
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))

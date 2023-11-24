@@ -18,6 +18,7 @@ import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData
 import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.util.ui.EmptyClipboardOwner
@@ -100,8 +101,7 @@ internal class IjClipboardManager : VimClipboardManager {
 
     // This thing enables alternative context resolve for dumb mode.
     // Please read docs for com.intellij.openapi.project.DumbService.isAlternativeResolveEnabled
-    // [VERSION UPDATE] 2023.2+ Enable alternative context back
-//    DumbService.getInstance(project).withAlternativeResolveEnabled {
+    DumbService.getInstance(project).withAlternativeResolveEnabled {
       for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
         try {
           logger.debug { "Copy paste processor: ${processor.javaClass.name}" }
@@ -116,7 +116,7 @@ internal class IjClipboardManager : VimClipboardManager {
         } catch (ignore: IndexNotReadyException) {
         }
       }
-//    }
+    }
     transferableData.add(CaretStateTransferableData(intArrayOf(0), intArrayOf(text.length)))
 
     // These data provided by {@link com.intellij.openapi.editor.richcopy.TextWithMarkupProcessor} doesn't work with

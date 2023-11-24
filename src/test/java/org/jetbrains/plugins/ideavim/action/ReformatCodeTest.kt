@@ -11,10 +11,8 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-// [VERSION UPDATE] 232+ enable tests
 @Suppress("unused")
 class ReformatCodeTest : VimTestCase() {
   @Test
@@ -23,7 +21,6 @@ class ReformatCodeTest : VimTestCase() {
   }
 
   @Test
-  @Disabled
   fun testEmpty() {
     configureByJavaText("<caret>")
     typeText(injector.parser.parseKeys("gqq"))
@@ -32,7 +29,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testWithCount() {
     configureByJavaText("class C {\n\tint a;\n\tint <caret>b;\n\tint c;\n\tint d;\n}\n")
     typeText(injector.parser.parseKeys("2gqq"))
@@ -41,7 +37,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testWithUpMotion() {
     configureByJavaText("class C {\n" + "\tint a;\n" + "\tint b;\n" + "\tint <caret>c;\n" + "\tint d;\n" + "}\n")
     typeText(injector.parser.parseKeys("gqk"))
@@ -50,7 +45,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testWithRightMotion() {
     configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
     typeText(injector.parser.parseKeys("gql"))
@@ -59,7 +53,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testWithTextObject() {
     configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
     typeText(injector.parser.parseKeys("gqi{"))
@@ -75,7 +68,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testWithCountsAndDownMotion() {
     configureByJavaText("class C {\n" + "\tint <caret>a;\n" + "\tint b;\n" + "\tint c;\n" + "\tint d;\n" + "}\n")
     typeText(injector.parser.parseKeys("2gqj"))
@@ -84,7 +76,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testVisual() {
     configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
     typeText(injector.parser.parseKeys("v" + "l" + "gq"))
@@ -93,7 +84,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testLinewiseVisual() {
     configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
     typeText(injector.parser.parseKeys("V" + "l" + "gq"))
@@ -102,7 +92,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testVisualMultiline() {
     configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "\tint d;\n" + "}\n")
     typeText(injector.parser.parseKeys("v" + "j" + "gq"))
@@ -111,7 +100,6 @@ class ReformatCodeTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
-  @Disabled
   fun testVisualBlock() {
     configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "\tint d;\n" + "}\n")
     typeText(injector.parser.parseKeys("<C-V>" + "j" + "gq"))

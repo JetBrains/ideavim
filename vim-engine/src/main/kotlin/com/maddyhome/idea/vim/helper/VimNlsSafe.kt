@@ -8,8 +8,5 @@
 
 package com.maddyhome.idea.vim.helper
 
-import org.jetbrains.annotations.NonNls
-
-// [VERSION UPDATE] 203+ replace this annotation with @VimNlsSafe
-@NonNls
+@VimNlsSafe
 public annotation class VimNlsSafe

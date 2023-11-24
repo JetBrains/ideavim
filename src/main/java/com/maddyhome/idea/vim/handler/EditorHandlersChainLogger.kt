@@ -14,7 +14,7 @@ import com.intellij.openapi.editor.actionSystem.EditorActionHandlerBean
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.api.key
 
 /**
@@ -29,11 +29,11 @@ import com.maddyhome.idea.vim.api.key
  * Strictly speaking, such access to the extension point is not allowed by the platform. But we can't do this thing
  *   otherwise, so let's use it as long as we can.
  */
-internal class EditorHandlersChainLogger : StartupActivity {
+internal class EditorHandlersChainLogger : ProjectActivity {
   @Suppress("UnresolvedPluginConfigReference")
   private val editorHandlers = ExtensionPointName<EditorActionHandlerBean>("com.intellij.editorActionHandler")
 
-  override fun runActivity(project: Project) {
+  override suspend fun execute(project: Project) {
     val escHandlers = editorHandlers.extensionList
       .filter { it.action == "EditorEscape" }
       .joinToString("\n") { it.implementationClass }

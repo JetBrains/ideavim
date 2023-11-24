@@ -102,7 +102,7 @@ import kotlin.test.assertTrue
  * This is done as we have no mechanism to guarantee compatibility as we update this test case.
  * Feel free to copy this class into your plugin, or copy just needed functions.
  */
-@RunInEdt
+@RunInEdt(writeIntent = true)
 @ApiStatus.Internal
 abstract class VimTestCase {
   protected lateinit var fixture: CodeInsightTestFixture

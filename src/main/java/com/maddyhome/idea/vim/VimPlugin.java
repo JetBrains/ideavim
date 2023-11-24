@@ -264,7 +264,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (enabled) {
       Application application = ApplicationManager.getApplication();
       if (application.isUnitTestMode()) {
-        application.invokeAndWait(this::turnOnPlugin);
+        turnOnPlugin();
+        //application.invokeAndWait(this::turnOnPlugin);
       }
       else {
         application.invokeLater(this::turnOnPlugin);

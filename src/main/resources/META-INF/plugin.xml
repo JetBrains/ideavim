@@ -27,7 +27,7 @@
   <!-- Please search for "[VERSION UPDATE]" in project in case you update the since-build version -->
   <!-- Check for [Version Update] tag in YouTrack as well -->
   <!-- Also, please update the value in build.gradle.kts file-->
-  <idea-version since-build="231.8109.175"/>
+  <idea-version since-build="233.11799.30"/>
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform (including CWM) -->
   <depends>com.intellij.modules.platform</depends>
@@ -85,7 +85,6 @@
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 
     <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
-    <actionConfigurationCustomizer implementation="com.maddyhome.idea.vim.action.VimActionConfigurationCustomizer"/>
 
     <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
 

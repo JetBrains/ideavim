@@ -344,7 +344,7 @@ tasks {
     val pluginVersion = version
     // Don't forget to update plugin.xml
     patchPluginXml {
-        sinceBuild.set("231.7515.13")
+        sinceBuild.set("233.11799.30")
 
         // Get the latest available change notes from the changelog file
         changeNotes.set(
