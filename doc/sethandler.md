@@ -20,7 +20,7 @@ and defines the following modes:
 The `handler` is an argument that may accept the following values:
  - ide - use IDE handler
  - vim - use Vim handler
-
+   
 Examples:
  - `n:ide` - use IDE handler in normal mode
  - `i-v:vim` - use Vim handler in normal, visual, and select modes
