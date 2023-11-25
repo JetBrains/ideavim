@@ -42,6 +42,7 @@ usual beta standards.
 * [VIM-3084](https://youtrack.jetbrains.com/issue/VIM-3084) Double update for the status bar icon
 * [VIM-3176](https://youtrack.jetbrains.com/issue/VIM-3176) Reselecting visual selection after pasting above it select wrong lines
 * [VIM-3206](https://youtrack.jetbrains.com/issue/VIM-3206) Disable both copilot suggestion and insert mode on a single escape
+* [VIM-3090](https://youtrack.jetbrains.com/issue/VIM-3090) Cmd line mode saves the visual mode
 
 ## 2.7.0, 2023-11-07
 
