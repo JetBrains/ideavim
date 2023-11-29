@@ -46,7 +46,7 @@ dependencies {
 
     ksp(project(":annotation-processors"))
     implementation(project(":annotation-processors"))
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.0")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.1")
 }
 
 tasks {
