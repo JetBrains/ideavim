@@ -11,6 +11,8 @@ plugins {
   kotlin("plugin.serialization") version "1.8.21"
 }
 
+val kotlinxSerializationVersion: String by project
+
 group = "com.intellij"
 version = "SNAPSHOT"
 
@@ -20,5 +22,9 @@ repositories {
 
 dependencies {
   compileOnly("com.google.devtools.ksp:symbol-processing-api:1.9.21-1.0.15")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinxSerializationVersion") {
+    // kotlin stdlib is provided by IJ, so there is no need to include it into the distribution
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+  }
 }
