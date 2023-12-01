@@ -36,7 +36,7 @@ changeBuildType(RelativeId("ReleaseDev")) {
     steps {
         update<GradleBuildStep>(2) {
             clearConditions()
-            jdkHome = "%env.JDK_17_0%"
+            jdkHome = "%env.JDK_17_0_x64%"
         }
     }
 }
