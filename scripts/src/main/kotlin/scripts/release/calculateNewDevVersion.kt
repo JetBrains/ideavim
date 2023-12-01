@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
   println("HI!")
   val projectDir = args[0]
   println("Working directory: $projectDir")
-  val (lastVersion, objectId) = getVersion(projectDir, onlyStable = true)
+  val (lastVersion, objectId) = getVersion(projectDir, ReleaseType.STABLE_NO_PATCH)
   println("Last version: $lastVersion, hash: ${objectId.name}")
 
   val branch = withRepo(projectDir) { it.branch }

@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
   println("HI!")
   val projectDir = args[0]
   println("Working directory: $projectDir")
-  val (lastVersion, _) = getVersion(projectDir, onlyStable = false)
+  val (lastVersion, _) = getVersion(projectDir, ReleaseType.ANY)
 
   val nextVersion = if (lastVersion.suffixTokens.isEmpty()) {
     lastVersion.nextMinor().withSuffix("eap.1").value

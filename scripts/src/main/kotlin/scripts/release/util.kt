@@ -58,7 +58,13 @@ internal fun checkBranch(rootDir: String, releaseType: String) {
   }
 }
 
-internal fun getVersion(projectDir: String, onlyStable: Boolean): Pair<Semver, ObjectId> {
+enum class ReleaseType {
+  ANY,
+  ONLY_STABLE,
+  STABLE_NO_PATCH, // Version that ends on 0. Like 2.5.0
+}
+
+internal fun getVersion(projectDir: String, releaseType: ReleaseType): Pair<Semver, ObjectId> {
   val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
   val git = Git(repository)
   println(git.log().call().first())
@@ -75,10 +81,10 @@ internal fun getVersion(projectDir: String, onlyStable: Boolean): Pair<Semver, O
   }
     .sortedBy { it.first }
 
-  val version = if (onlyStable) {
-    versions.last { it.first.isStable }
-  } else {
-    versions.last()
+  val version = when (releaseType) {
+    ReleaseType.ANY -> versions.last()
+    ReleaseType.ONLY_STABLE -> versions.last { it.first.isStable }
+    ReleaseType.STABLE_NO_PATCH -> versions.last { it.first.isStable && it.first.patch == 0 }
   }
 
   return version
