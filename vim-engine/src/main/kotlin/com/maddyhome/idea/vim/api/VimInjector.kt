@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.common.VimListenersNotifier
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.TabService
@@ -196,6 +197,8 @@ public interface VimInjector {
    * Please use vimLogger() function
    */
   public fun <T : Any> getLogger(clazz: Class<T>): VimLogger
+  
+  public val listenersNotifier: VimListenersNotifier
 }
 
 public lateinit var injector: VimInjector

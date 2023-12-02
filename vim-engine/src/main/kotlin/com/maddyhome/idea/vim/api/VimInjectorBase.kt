@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.stubs.VimApplicationStub
 import com.maddyhome.idea.vim.api.stubs.VimEnablerStub
 import com.maddyhome.idea.vim.api.stubs.VimMessagesStub
 import com.maddyhome.idea.vim.api.stubs.VimProcessGroupStub
+import com.maddyhome.idea.vim.common.VimListenersNotifier
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.register.VimRegisterGroup
@@ -46,4 +47,5 @@ public abstract class VimInjectorBase : VimInjector {
   override val executionContextManager: ExecutionContextManager by lazy { ExecutionContextManagerStub() }
   override val enabler: VimEnabler by lazy { VimEnablerStub() }
   override val yank: VimYankGroup by lazy { YankGroupBase() }
+  override val listenersNotifier: VimListenersNotifier by lazy { VimListenersNotifier() }
 }

@@ -480,6 +480,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
       VimStateMachine.getInstance(editor).isRecording = true
       recordRegister = register
       recordList = ArrayList()
+      injector.listenersNotifier.notifyMacroRecordingStarted(editor, register)
       true
     } else {
       false
@@ -522,6 +523,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
         }
       }
       VimStateMachine.getInstance(editor).isRecording = false
+      injector.listenersNotifier.notifyMacroRecordingStarted(editor, recordRegister)
     }
 
     recordRegister = 0.toChar()
