@@ -41,8 +41,12 @@ public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachi
     set(value) {
       if (field == value) return
 
+      val oldValue = field
       field = value
       setMappingMode()
+      if (editor != null) {
+        injector.listenersNotifier.notifyModeChanged(editor, oldValue)
+      }
       onModeChanged()
     }
   override val mappingState: MappingState = MappingState()

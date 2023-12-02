@@ -29,6 +29,8 @@ import com.intellij.openapi.editor.event.EditorMouseMotionListener
 import com.intellij.openapi.editor.event.SelectionEvent
 import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
+import com.intellij.openapi.editor.ex.EditorEventMulticasterEx
+import com.intellij.openapi.editor.ex.FocusChangeListener
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
@@ -160,6 +162,8 @@ internal object VimListenerManager {
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
 
       EditorFactory.getInstance().eventMulticaster.addCaretListener(VimCaretListener, VimPlugin.getInstance().onOffDisposable)
+      val eventMulticaster = EditorFactory.getInstance().eventMulticaster as? EditorEventMulticasterEx
+      eventMulticaster?.addFocusChangeListener(VimFocusListener, VimPlugin.getInstance().onOffDisposable)
     }
 
     fun disable() {
@@ -173,7 +177,7 @@ internal object VimListenerManager {
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
     }
   }
-
+  
   object EditorListeners {
     fun addAll() {
       val initialisedEditors = mutableSetOf<Editor>()
@@ -255,6 +259,16 @@ internal object VimListenerManager {
       else StrictMode.fail("Editor doesn't have disposable attached. $editor")
 
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
+    }
+  }
+  
+  private object VimFocusListener : FocusChangeListener {
+    override fun focusGained(editor: Editor) {
+      injector.listenersNotifier.notifyEditorFocusGained(editor.vim)
+    }
+
+    override fun focusLost(editor: Editor) {
+      injector.listenersNotifier.notifyEditorFocusLost(editor.vim)
     }
   }
 
