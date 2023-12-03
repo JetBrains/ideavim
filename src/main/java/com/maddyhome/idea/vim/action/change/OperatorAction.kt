@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.Argument
@@ -21,6 +22,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.argumentCaptured
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
@@ -29,9 +31,62 @@ import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
+import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 
 // todo make it multicaret
 private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, selectionType: SelectionType): Boolean {
+  val func = injector.globalOptions().operatorfunc
+  if (func.isNotEmpty()) {
+    val scriptContext = CommandLineVimLContext
+
+    // The option value is either a function name, which should have a handler, or it might be a lambda expression, or a
+    // `function` or `funcref` call expression, all of which will return a funcref (with a handler)
+    var handler = injector.functionService.getFunctionHandlerOrNull(null, func, scriptContext)
+    if (handler == null) {
+      val expression = injector.vimscriptParser.parseExpression(func)
+      if (expression != null) {
+        try {
+          val value = expression.evaluate(editor, context, scriptContext)
+          if (value is VimFuncref) {
+            handler = value.handler
+          }
+        } catch (ex: ExException) {
+          // Get the argument for function('...') or funcref('...') for the error message
+          val functionName = if (expression is FunctionCallExpression && expression.arguments.size > 0) {
+            expression.arguments[0].evaluate(editor, context, scriptContext).toString()
+          }
+          else {
+            func
+          }
+          VimPlugin.showMessage("E117: Unknown function: $functionName")
+          return false
+        }
+      }
+    }
+
+    if (handler != null) {
+      val arg = when (selectionType) {
+        SelectionType.LINE_WISE -> "line"
+        SelectionType.CHARACTER_WISE -> "char"
+        SelectionType.BLOCK_WISE -> "block"
+      }
+
+      val saveRepeatHandler = VimRepeater.repeatHandler
+      injector.markService.setChangeMarks(editor.primaryCaret(), textRange)
+      KeyHandler.getInstance().reset(editor)
+
+      val arguments = listOf(SimpleExpression(arg))
+      handler.executeFunction(arguments, editor, context, scriptContext)
+
+      VimRepeater.repeatHandler = saveRepeatHandler
+      return true
+    }
+  }
+
+  // TODO: Migrate extensions to use operatorfunc
   val operatorFunction = injector.keyGroup.operatorFunction
   if (operatorFunction == null) {
     VimPlugin.showMessage(MessageHelper.message("E774"))
