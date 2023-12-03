@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.group
 
+import com.intellij.codeInsight.completion.CompletionPhase
+import com.intellij.codeInsight.completion.impl.CompletionServiceImpl
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -71,7 +73,10 @@ internal class MacroGroup : VimMacroBase() {
             } catch (e: ProcessCanceledException) {
               return@runnable
             }
-            ProgressManager.getInstance().executeNonCancelableSection { getInstance().handleKey(editor, key, context) }
+            ProgressManager.getInstance().executeNonCancelableSection {
+              CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
+              getInstance().handleKey(editor, key, context)
+            }
             if (injector.messages.isError()) return@runnable
           }
           keyStack.resetFirst()
