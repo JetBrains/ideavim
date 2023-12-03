@@ -29,6 +29,7 @@ public open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase
   public val keymodel: StringListOptionValue by optionProperty(Options.keymodel)
   public var maxmapdepth: Int by optionProperty(Options.maxmapdepth)
   public var more: Boolean by optionProperty(Options.more)
+  public var operatorfunc: String by optionProperty(Options.operatorfunc)
   public var scrolljump: Int by optionProperty(Options.scrolljump)
   public var selection: String by optionProperty(Options.selection)
   public val selectmode: StringListOptionValue by optionProperty(Options.selectmode)
