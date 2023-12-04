@@ -29,6 +29,7 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
   public val lookupkeys: StringListOptionValue by optionProperty(IjOptions.lookupkeys)
   public var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
   public var visualdelay: Int by optionProperty(IjOptions.visualdelay)
+  public var showmodewidget: Boolean by optionProperty(IjOptions.showmodewidget)
 
   // Temporary options to control work-in-progress behaviour
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)

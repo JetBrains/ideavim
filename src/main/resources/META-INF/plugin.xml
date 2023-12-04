@@ -70,6 +70,7 @@
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
     <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory"/>
+    <statusBarWidgetFactory id="IdeaVim::Mode" implementation="com.maddyhome.idea.vim.ui.StatusBarModeFactory"/>
     <statusBarWidgetFactory id="IdeaVim::ShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
