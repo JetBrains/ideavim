@@ -428,6 +428,7 @@
  * |gu|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction}
  * |gv|                   {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
  * |gw|                   TO BE IMPLEMENTED
+ * |gx|                   {@link com.maddyhome.idea.vim.action.motion.search.GotoUrlAction}
  * |g@|                   {@link com.maddyhome.idea.vim.action.change.OperatorAction}
  * |g~|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction}
  * |g<Down>|              TO BE IMPLEMENTED
