@@ -165,8 +165,6 @@ public interface VimSearchGroup {
     parent: VimLContext,
   ): Boolean
 
-  @Deprecated("Please use the new regexp engine")
-  public fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<Any, String, Any>>
   public fun findDecimalNumber(line: String): Int?
 
   /**
@@ -178,16 +176,4 @@ public interface VimSearchGroup {
    * Gets the direction lastly used in a search.
    */
   public fun getLastSearchDirection(): Direction
-
-  @Deprecated("Please use the new regexp engine")
-  // Matching the values defined in Vim. Do not change these values, they are used as indexes
-  public companion object {
-    public val RE_SEARCH: Int = 0 // Save/use search pattern
-
-    public val RE_SUBST: Int = 1 // Save/use substitute pattern
-
-    public val RE_BOTH: Int = 2 // Save to both patterns
-
-    public val RE_LAST: Int = 2 // Use last used pattern if "pat" is NULL
-  }
 }

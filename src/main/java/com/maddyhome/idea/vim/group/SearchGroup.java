@@ -941,7 +941,6 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
   }
 
   //public Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
-  @Override
   public Pair<Boolean, Triple<Object, String, Object>> search_regcomp(CharPointer pat,
                                                                                   int which_pat,
                                                                                   int patSave) {
