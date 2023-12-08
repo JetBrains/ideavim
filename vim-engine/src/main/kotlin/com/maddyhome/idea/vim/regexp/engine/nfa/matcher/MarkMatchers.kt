@@ -8,97 +8,33 @@
 
 package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
-internal class AtMarkMatcher(val mark: Char) : Matcher {
-  override fun matches(
-    editor: VimEditor,
-    index: Int,
-    groups: VimMatchGroupCollection,
-    isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
-  ): MatcherResult {
-    val markIndexes = possibleCursors
-      .mapNotNull { it.markStorage.getMark(mark) }
-      .map { editor.bufferPositionToOffset(BufferPosition(it.line, it.col)) }
-
-    return if (markIndexes.contains(index)){
-      // now the only cursors possible are that contain a mark at this index
-      val newPossibleCursors = possibleCursors.filter {
-        it.markStorage.getMark(mark) != null &&
-        index == editor.bufferPositionToOffset(BufferPosition(it.markStorage.getMark(mark)!!.line, it.markStorage.getMark(mark)!!.col))
-      }
+internal abstract class BaseMarkMatcher(val mark: Char) : Matcher {
+  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean, possibleCursors: MutableList<VimCaret>): MatcherResult {
+    val newPossibleCursors = possibleCursors.filter { matchesCondition(index, it) }
+    return if (newPossibleCursors.isNotEmpty()) {
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
+    } else MatcherResult.Failure
   }
+  override fun isEpsilon(): Boolean = true
 
-  override fun isEpsilon(): Boolean {
-    return true
-  }
+  abstract fun matchesCondition(index: Int, caret: VimCaret): Boolean
+  protected fun getMarkOffset(caret: VimCaret): Int? = caret.markStorage.getMark(mark)?.offset(caret.editor)
 }
 
-internal class BeforeMarkMatcher(val mark: Char) : Matcher {
-  override fun matches(
-    editor: VimEditor,
-    index: Int,
-    groups: VimMatchGroupCollection,
-    isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
-  ): MatcherResult {
-    val markIndexes = possibleCursors
-      .mapNotNull { it.markStorage.getMark(mark) }
-      .map { editor.bufferPositionToOffset(BufferPosition(it.line, it.col)) }
-
-    return if (markIndexes.any { index < it }){
-      // now the only cursors possible are that contain a mark after this index
-      val newPossibleCursors = possibleCursors.filter {
-        it.markStorage.getMark(mark) != null &&
-          index < editor.bufferPositionToOffset(BufferPosition(it.markStorage.getMark(mark)!!.line, it.markStorage.getMark(mark)!!.col))
-      }
-      possibleCursors.clear()
-      possibleCursors.addAll(newPossibleCursors)
-      MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
-  }
-
-  override fun isEpsilon(): Boolean {
-    return true
-  }
+internal class AtMarkMatcher(mark: Char) : BaseMarkMatcher(mark) {
+  override fun matchesCondition(index: Int, caret: VimCaret): Boolean = index == getMarkOffset(caret)
 }
 
-internal class AfterMarkMatcher(val mark: Char) : Matcher {
-  override fun matches(
-    editor: VimEditor,
-    index: Int,
-    groups: VimMatchGroupCollection,
-    isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
-  ): MatcherResult {
-    val markIndexes = possibleCursors
-      .mapNotNull { it.markStorage.getMark(mark) }
-      .map { editor.bufferPositionToOffset(BufferPosition(it.line, it.col)) }
+internal class BeforeMarkMatcher(mark: Char) : BaseMarkMatcher(mark) {
+  override fun matchesCondition(index: Int, caret: VimCaret): Boolean = getMarkOffset(caret)?.let { index < it } ?: false
+}
 
-    return if (markIndexes.any { index > it }){
-      // now the only cursors possible are that contain a mark before this index
-      val newPossibleCursors = possibleCursors.filter {
-        it.markStorage.getMark(mark) != null &&
-          index > editor.bufferPositionToOffset(BufferPosition(it.markStorage.getMark(mark)!!.line, it.markStorage.getMark(mark)!!.col))
-      }
-      possibleCursors.clear()
-      possibleCursors.addAll(newPossibleCursors)
-      MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
-  }
-
-  override fun isEpsilon(): Boolean {
-    return true
-  }
+internal class AfterMarkMatcher(mark: Char) : BaseMarkMatcher(mark) {
+  override fun matchesCondition(index: Int, caret: VimCaret): Boolean = getMarkOffset(caret)?.let { index > it } ?: false
 }
