@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.AfterColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.AfterColumnMatcher
@@ -30,6 +32,7 @@ import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.CollectionMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.CollectionRange
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.CursorMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.DotMatcher
+import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.EditorAwarePredicateMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.EndOfFileMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.EndOfLineMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.EndOfWordMatcher
@@ -181,27 +184,19 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
   }
 
   override fun visitKeyword(ctx: RegexParser.KeywordContext): NFA {
-    val base = { char: Char -> char.isLetterOrDigit() || char == '_' }
+    val base = { editor: VimEditor, char: Char -> KeywordOptionHelper.isKeyword(editor, char) }
     return if (ctx.text.contains('_'))
-      NFA.fromMatcher(
-        PredicateMatcher { char -> char == '\n' || base(char) }
-      )
+      NFA.fromMatcher(EditorAwarePredicateMatcher { editor, char -> char == '\n' || base(editor, char) })
     else
-      NFA.fromMatcher(
-        PredicateMatcher { char -> base(char) }
-      )
+      NFA.fromMatcher(EditorAwarePredicateMatcher { editor, char -> base(editor, char) })
   }
 
   override fun visitKeywordNotDigit(ctx: RegexParser.KeywordNotDigitContext): NFA {
-    val base = { char: Char -> char.isLetter() || char == '_' }
+    val base = { editor: VimEditor, char: Char -> !char.isDigit() && KeywordOptionHelper.isKeyword(editor, char) }
     return if (ctx.text.contains('_'))
-      NFA.fromMatcher(
-        PredicateMatcher { char -> char == '\n' || base(char) }
-      )
+      NFA.fromMatcher(EditorAwarePredicateMatcher { editor, char -> char == '\n' || base(editor, char) })
     else
-      NFA.fromMatcher(
-        PredicateMatcher { char -> base(char) }
-      )
+      NFA.fromMatcher(EditorAwarePredicateMatcher { editor, char -> base(editor, char) })
   }
 
   override fun visitFilename(ctx: RegexParser.FilenameContext): NFA {
