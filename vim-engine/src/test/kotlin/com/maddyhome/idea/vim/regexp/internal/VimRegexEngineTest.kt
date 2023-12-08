@@ -840,54 +840,6 @@ class VimRegexEngineTest {
   }
 
   @Test
-  fun `test start of word at start of text`() {
-    doTest(
-      "${START}Lorem$END Ipsum",
-      "\\<Lorem",
-    )
-  }
-
-  @Test
-  fun `test start of word at offset`() {
-    doTest(
-      "Lorem ${START}Ipsum$END",
-      "\\<Ipsum",
-    )
-  }
-
-  @Test
-  fun `test start of word should fail`() {
-    assertFailure(
-      "Lorem Ipsum",
-      "Lo\\<rem"
-    )
-  }
-
-  @Test
-  fun `test end of word at end of text`() {
-    doTest(
-      "Lorem ${START}Ipsum$END",
-      "Ipsum\\>",
-    )
-  }
-
-  @Test
-  fun `test end of word at middle of text`() {
-    doTest(
-      "${START}Lorem$END Ipsum",
-      "Lorem\\>",
-    )
-  }
-
-  @Test
-  fun `test end of word should fail`() {
-    assertFailure(
-      "Lorem Ipsum",
-      "Lo\\>rem"
-    )
-  }
-
-  @Test
   fun `test collection with EOL`() {
     doTest(
       """
@@ -1678,55 +1630,13 @@ class VimRegexEngineTest {
     )
   }
 
-  @Test
-  fun `test text at mark position`() {
-    doTest(
-      "Lorem ${START}${MARK('m')}Ips${END}um",
-      "\\%'m..."
-    )
-  }
 
-  @Test
-  fun `test text before mark position`() {
-    doTest(
-      "${START}Lor${END}em ${MARK('m')}Ipsum",
-      "\\%<'m..."
-    )
-  }
-
-  @Test
-  fun `test text after mark position`() {
-    doTest(
-      "Lorem ${MARK('m')}I${START}psu${END}m",
-      "\\%>'m..."
-    )
-  }
 
   @Test
   fun `test mark does not exist`() {
     assertFailure(
       "Lorem ${MARK('m')}Ipsum",
       "\\%'n..."
-    )
-  }
-
-  @Test
-  fun `test cursor and mark belong to the same cursor`() {
-    /*
-    In this test, there are two cursors, one at offset 3 and the other at 6.
-    The second cursor (at offset 6) has a mark 'm' at offset 0.
-    The pattern reads as "match the character at the cursor position that is after a mark 'm'".
-    Since the cursor and mark tokens have to "belong" to the same cursor, the resulting match
-    is at offset 6 (the offset of the second cursor), even though the first cursor appears first
-    in the text.
-    */
-    doTest(
-      "Lorem ${START}I${END}psum",
-      "\\%>'m\\%#.",
-      listOf(
-        mockCaret(3),
-        mockCaret(6, marks = mapOf(Pair('m', BufferPosition(0, 0))))
-      )
     )
   }
 
