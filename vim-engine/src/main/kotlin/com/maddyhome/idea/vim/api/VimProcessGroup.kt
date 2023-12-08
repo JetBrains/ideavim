@@ -8,10 +8,13 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
 public interface VimProcessGroup {
   public val lastCommand: String?
+  public val isCommandProcessing: Boolean
+  public val modeBeforeCommandProcessing: Mode?
 
   public fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char)
   public fun endSearchCommand(): String
