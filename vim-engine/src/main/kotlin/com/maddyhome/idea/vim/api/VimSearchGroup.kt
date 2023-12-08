@@ -26,8 +26,6 @@ public interface VimSearchGroup {
    */
   public var lastSubstitutePattern: String?
 
-  // TODO: this method should be removed from this API, it isn't used anywhere outside of child classes
-  public fun findUnderCaret(editor: VimEditor): TextRange?
   public fun searchBackward(editor: VimEditor, offset: Int, count: Int): TextRange?
 
   /**
@@ -167,7 +165,7 @@ public interface VimSearchGroup {
     parent: VimLContext,
   ): Boolean
 
-  // TODO get rid of this
+  @Deprecated("Please use the new regexp engine")
   public fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<Any, String, Any>>
   public fun findDecimalNumber(line: String): Int?
 
@@ -181,7 +179,7 @@ public interface VimSearchGroup {
    */
   public fun getLastSearchDirection(): Direction
 
-  // TODO: get rid of this
+  @Deprecated("Please use the new regexp engine")
   // Matching the values defined in Vim. Do not change these values, they are used as indexes
   public companion object {
     public val RE_SEARCH: Int = 0 // Save/use search pattern
