@@ -12,5 +12,5 @@ changeBuildType(RelativeId("IdeaVimTests_Latest_EAP")) {
     check(artifactRules == "") {
         "Unexpected option value: artifactRules = $artifactRules"
     }
-    artifactRules = "+:build => build"
+    artifactRules = "+:build/reports => build/reports"
 }
