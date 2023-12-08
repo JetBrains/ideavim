@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
@@ -25,17 +26,10 @@ internal class StartOfWordMatcher : Matcher {
   ): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
 
-    val char = editor.text()[index]
+    val isKeywordAtIndex = KeywordOptionHelper.isKeyword(editor, editor.text()[index])
+    val isKeywordBeforeIndex = editor.text().getOrNull(index - 1)?.let { KeywordOptionHelper.isKeyword(editor, it) } ?: false
 
-    /**
-     * The current index is the start of a word if it is a keyword character,
-     * and the previous index isn't.
-     */
-    return if (
-      (char.isLetterOrDigit() || char == '_') &&
-      (index == 0 || !(editor.text()[index - 1].isLetterOrDigit() || editor.text()[index - 1] == '_'))
-    ) MatcherResult.Success(0)
-    else MatcherResult.Failure
+    return if (!isKeywordBeforeIndex && isKeywordAtIndex) MatcherResult.Success(0) else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {

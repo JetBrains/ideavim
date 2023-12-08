@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
@@ -25,17 +26,10 @@ internal class EndOfWordMatcher : Matcher {
   ): MatcherResult {
     if (index > editor.text().length || index == 0) return MatcherResult.Failure
 
-    val prevChar = editor.text()[index - 1]
+    val isKeywordAtIndex = KeywordOptionHelper.isKeyword(editor, editor.text()[index])
+    val isKeywordBeforeIndex = editor.text().getOrNull(index - 1)?.let { KeywordOptionHelper.isKeyword(editor, it) } ?: false
 
-    /**
-     * The current index is the end of a word if the previous one
-     * is a keyword character, and the current one isn't.
-     */
-    return if (
-      (prevChar.isLetterOrDigit() || prevChar == '_') &&
-      (index == editor.text().length || !(editor.text()[index].isLetterOrDigit() || editor.text()[index] == '_'))
-    ) MatcherResult.Success(0)
-    else MatcherResult.Failure
+    return if (isKeywordBeforeIndex && !isKeywordAtIndex) MatcherResult.Success(0) else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {
