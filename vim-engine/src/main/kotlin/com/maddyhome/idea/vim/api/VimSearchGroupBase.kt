@@ -220,7 +220,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   /* Search related methods                                                   */
   /****************************************************************************/
 
-  override fun findUnderCaret(
+  protected fun findUnderCaret(
     editor: VimEditor,
   ): TextRange? {
     val backSearch = searchBackward(editor, editor.primaryCaret().offset.point + 1, 1) ?: return null

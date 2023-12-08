@@ -1094,15 +1094,6 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
   @Override
   @Nullable
-  public TextRange findUnderCaret(@NotNull VimEditor editor) {
-    if (globalIjOptions(injector).getUseNewRegex()) return super.findUnderCaret(editor);
-    final TextRange backSearch = searchBackward(editor, editor.primaryCaret().getOffset().getPoint() + 1, 1);
-    if (backSearch == null) return null;
-    return backSearch.contains(editor.primaryCaret().getOffset().getPoint()) ? backSearch : null;
-  }
-
-  @Override
-  @Nullable
   public TextRange searchBackward(@NotNull VimEditor editor, int offset, int count) {
     if (globalIjOptions(injector).getUseNewRegex()) return super.searchBackward(editor, offset, count);
     // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
