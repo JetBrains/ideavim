@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
 public class VimProcessGroupStub : VimProcessGroupBase() {
@@ -21,6 +22,10 @@ public class VimProcessGroupStub : VimProcessGroupBase() {
   }
 
   override val lastCommand: String
+    get() = TODO("Not yet implemented")
+  override val isCommandProcessing: Boolean
+    get() = TODO("Not yet implemented")
+  override val modeBeforeCommandProcessing: Mode?
     get() = TODO("Not yet implemented")
 
   override fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char) {

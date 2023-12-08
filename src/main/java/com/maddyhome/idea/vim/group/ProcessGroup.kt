@@ -51,6 +51,8 @@ import javax.swing.SwingUtilities
 public class ProcessGroup : VimProcessGroupBase() {
   override var lastCommand: String? = null
     private set
+  override var isCommandProcessing: Boolean = false
+  override var modeBeforeCommandProcessing: Mode? = null
 
   public override fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char) {
     // Don't allow searching in one line editors
@@ -79,6 +81,8 @@ public class ProcessGroup : VimProcessGroupBase() {
       "Cannot enable cmd mode from current mode $currentMode"
     }
 
+    isCommandProcessing = true
+    modeBeforeCommandProcessing = currentMode
     val initText = getRange(editor, cmd)
     injector.markService.setVisualSelectionMarks(editor)
     editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
@@ -134,6 +138,9 @@ public class ProcessGroup : VimProcessGroupBase() {
       logger.error(bad)
       VimPlugin.indicateError()
       res = false
+    } finally {
+      isCommandProcessing = false
+      modeBeforeCommandProcessing = null
     }
 
     return res
