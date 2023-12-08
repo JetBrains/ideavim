@@ -905,13 +905,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   /****************************************************************************/
   /* Helper methods                                                           */
   /****************************************************************************/
-  override fun search_regcomp(
-    pat: CharPointer?,
-    which_pat: Int,
-    patSave: Int,
-  ): Pair<Boolean, Triple<Any, String, Any>> {
-    TODO("Remove once old engine is removed")
-  }
 
   private fun setLastUsedPattern(
     pattern: String,
