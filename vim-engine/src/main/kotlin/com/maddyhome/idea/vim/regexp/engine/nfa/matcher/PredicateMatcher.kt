@@ -33,3 +33,25 @@ internal class PredicateMatcher(val predicate: (Char) -> Boolean) : Matcher {
     return false
   }
 }
+
+/**
+ * Matcher used to match a character against a predicate
+ *
+ * @param predicate The predicate used to check if the character should be accepted
+ */
+internal class EditorAwarePredicateMatcher(val predicate: (VimEditor, Char) -> Boolean) : Matcher {
+  override fun matches(
+    editor: VimEditor,
+    index: Int, groups:
+    VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>
+  ): MatcherResult {
+    return if (index < editor.text().length && predicate(editor, editor.text()[index])) MatcherResult.Success(1)
+    else MatcherResult.Failure
+  }
+
+  override fun isEpsilon(): Boolean {
+    return false
+  }
+}
