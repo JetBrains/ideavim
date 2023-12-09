@@ -162,5 +162,3 @@ public interface CaretRegisterStorage {
   public fun setKeys(register: Char, keys: List<KeyStroke>)
   public fun saveRegister(r: Char, register: Register)
 }
-
-public data class SelectionInfo(public val start: BufferPosition?, public val end: BufferPosition?, public val type: SelectionType)

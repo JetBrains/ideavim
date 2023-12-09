@@ -291,13 +291,13 @@ public abstract class VimMarkServiceBase : VimMarkService {
   private fun removeSelectionStartMark(caret: ImmutableVimCaret) {
     val selectionInfo = caret.lastSelectionInfo
     val startPosition = selectionInfo.start
-    if (startPosition != null) caret.lastSelectionInfo = SelectionInfo(null, selectionInfo.end, selectionInfo.type)
+    if (startPosition != null) caret.lastSelectionInfo = SelectionInfo(null, selectionInfo.end, selectionInfo.selectionType)
   }
 
   private fun removeSelectionEndMark(caret: ImmutableVimCaret) {
     val selectionInfo = caret.lastSelectionInfo
     val endPosition = selectionInfo.end
-    if (endPosition != null) caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, null, selectionInfo.type)
+    if (endPosition != null) caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, null, selectionInfo.selectionType)
   }
 
   override fun removeGlobalMark(char: Char) {
@@ -345,7 +345,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
       }
 
       if (newStartPosition != startPosition || newEndPosition != endPosition) {
-        caret.lastSelectionInfo = SelectionInfo(newStartPosition, newEndPosition, selectionInfo.type)
+        caret.lastSelectionInfo = SelectionInfo(newStartPosition, newEndPosition, selectionInfo.selectionType)
       }
     }
   }
@@ -522,7 +522,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
       startOffset
     } ?: return null
 
-    if (selectionInfo.type == SelectionType.LINE_WISE) {
+    if (selectionInfo.selectionType == SelectionType.LINE_WISE) {
       offset = caret.editor.getLineStartForOffset(offset)
     }
 
@@ -539,7 +539,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
       endOffset
     } ?: return null
 
-    if (selectionInfo.type == SelectionType.LINE_WISE) {
+    if (selectionInfo.selectionType == SelectionType.LINE_WISE) {
       offset = caret.editor.getLineEndForOffset(offset)
     }
 
@@ -548,12 +548,12 @@ public abstract class VimMarkServiceBase : VimMarkService {
 
   private fun setSelectionStartMark(caret: ImmutableVimCaret, offset: Int) {
     val selectionInfo = caret.lastSelectionInfo
-    caret.lastSelectionInfo = SelectionInfo(caret.editor.offsetToBufferPosition(offset), selectionInfo.end, selectionInfo.type)
+    caret.lastSelectionInfo = SelectionInfo(caret.editor.offsetToBufferPosition(offset), selectionInfo.end, selectionInfo.selectionType)
   }
 
   private fun setSelectionEndMark(caret: ImmutableVimCaret, offset: Int) {
     val selectionInfo = caret.lastSelectionInfo
-    caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, caret.editor.offsetToBufferPosition(offset), selectionInfo.type)
+    caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, caret.editor.offsetToBufferPosition(offset), selectionInfo.selectionType)
   }
 
   private fun createMark(caret: ImmutableVimCaret, char: Char, offset: Int): Mark? {
