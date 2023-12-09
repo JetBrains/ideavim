@@ -31,7 +31,7 @@ public class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val selectionType = editor.primaryCaret().lastSelectionInfo.type
+    val selectionType = editor.primaryCaret().lastSelectionInfo.selectionType
     val caretToSelectionInfo = editor.carets()
       .map { it to it.lastSelectionInfo }
 

@@ -130,16 +130,16 @@ public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Co
   ) {
     var newStartPosition = selectionInfo.start
     if (startOffset != null && selectionInfo.start != null && range.contains(startOffset)) {
-      newStartPosition = shiftBufferPosition(selectionInfo.start, shift)
+      newStartPosition = shiftBufferPosition(selectionInfo.start!!, shift)
     }
 
     var newEndPosition = selectionInfo.end
     if (endOffset != null && selectionInfo.end != null && range.contains(endOffset)) {
-      newEndPosition = shiftBufferPosition(selectionInfo.end, shift)
+      newEndPosition = shiftBufferPosition(selectionInfo.end!!, shift)
     }
 
     if (newStartPosition != selectionInfo.start || newEndPosition != selectionInfo.end) {
-      caret.lastSelectionInfo = SelectionInfo(newStartPosition, newEndPosition, selectionInfo.type)
+      caret.lastSelectionInfo = SelectionInfo(newStartPosition, newEndPosition, selectionInfo.selectionType)
     }
   }
 
