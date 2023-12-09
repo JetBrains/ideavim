@@ -86,8 +86,8 @@ public object IjOptions {
   public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isTemporary = true))
   public val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", GLOBAL, "vimscriptfunctionannotation", true, isTemporary = true))
   public val commandOrMotionAnnotation: ToggleOption = addOption(ToggleOption("commandormotionannotation", GLOBAL, "commandormotionannotation", true, isTemporary = true))
-  public val useNewRegex: ToggleOption = addOption(ToggleOption("usenewregex", GLOBAL, "usenewregex", false, isTemporary = true))
   public val showmodewidget: ToggleOption = addOption(ToggleOption("showmodewidget", GLOBAL, "showmodewidget", false, isTemporary = true))
+  public val useNewRegex: ToggleOption = addOption(ToggleOption("usenewregex", GLOBAL, "usenewregex", true, isTemporary = true))
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>
