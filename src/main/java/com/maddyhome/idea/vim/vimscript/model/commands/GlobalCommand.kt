@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.SearchGroup.RE_BOTH
 import com.maddyhome.idea.vim.group.SearchGroup.RE_LAST
 import com.maddyhome.idea.vim.group.SearchGroup.RE_SEARCH
@@ -150,7 +151,7 @@ internal data class GlobalCommand(val ranges: Ranges, val argument: String, val 
         }
       }
     } else {
-      val (first, second) = injector.searchGroup.search_regcomp(pat, whichPat, RE_BOTH)
+      val (first, second) = (injector.searchGroup as SearchGroup).search_regcomp(pat, whichPat, RE_BOTH)
       if (!first) {
         VimPlugin.showMessage(message(Msg.e_invcmd))
         VimPlugin.indicateError()
