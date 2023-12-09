@@ -11,5 +11,6 @@ package com.maddyhome.idea.vim.regexp
 public enum class VimRegexOptions {
   IGNORE_CASE,
   SMART_CASE,
-  WRAP_SCAN
+  WRAP_SCAN,
+  WANT_END_POSITION,
 }

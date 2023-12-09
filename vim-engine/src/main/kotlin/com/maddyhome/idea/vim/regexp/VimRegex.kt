@@ -206,6 +206,7 @@ public class VimRegex(pattern: String) {
   ): VimMatchResult {
     var index = editor.getLineStartOffset(line)
     var prevResult: VimMatchResult = VimMatchResult.Failure(VimRegexErrors.E486)
+    val returnEndPosition = options.contains(VimRegexOptions.WANT_END_POSITION)
     while (index <= maxIndex) {
       val result = simulateNonExactNFA(editor, index, options)
       when (result) {
@@ -213,7 +214,7 @@ public class VimRegex(pattern: String) {
         is VimMatchResult.Failure -> break
         is VimMatchResult.Success -> {
           // no more relevant matches in this line, break out of the loop
-          if (result.range.startOffset > maxIndex) break
+          if ((!returnEndPosition && result.range.startOffset > maxIndex) || (returnEndPosition && result.range.endOffset > maxIndex)) break
 
           // match found, try to find more after it
           prevResult = result
