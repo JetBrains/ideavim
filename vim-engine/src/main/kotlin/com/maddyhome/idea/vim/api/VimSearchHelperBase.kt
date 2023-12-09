@@ -67,6 +67,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     if (injector.globalOptions().smartcase && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
     if (injector.globalOptions().wrapscan) options.add(VimRegexOptions.WRAP_SCAN)
+    if (searchOptions.contains(SearchOptions.WANT_ENDPOS)) options.add(VimRegexOptions.WANT_END_POSITION)
 
     val regex = try {
       VimRegex(pattern)
