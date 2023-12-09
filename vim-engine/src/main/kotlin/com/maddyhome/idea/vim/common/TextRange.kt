@@ -73,7 +73,9 @@ public data class TextRange(public val startOffsets: IntArray, public val endOff
     return true
   }
 
-  public operator fun contains(offset: Int): Boolean = if (isMultiple) false else offset in startOffset until endOffset
+  public operator fun contains(offset: Int): Boolean {
+    return (0 until size()).any { offset in startOffsets[it] until endOffsets[it] }
+  }
 
   override fun toString(): String {
     @NonNls val sb = StringBuilder()

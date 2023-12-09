@@ -8,15 +8,12 @@
 
 package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
-import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.state.mode.Mode
-import kotlin.math.max
-import kotlin.math.min
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 /**
  * Matcher used to check if index is inside the visual area.
@@ -29,9 +26,18 @@ internal class VisualAreaMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    if (!injector.processGroup.isCommandProcessing || injector.processGroup.modeBeforeCommandProcessing !is Mode.VISUAL) return MatcherResult.Failure
+    val processGroup = injector.processGroup
+    val newPossibleCursors = if (editor.inVisualMode) {
+      possibleCursors.filter { it.hasSelection() && index >= it.selectionStart && index < it.selectionEnd }
+    }
+    // IdeaVim exits visual mode before command processing (e.g. substitute), so we work with lastSelectionInfo
+    else if ((processGroup.isCommandProcessing || injector.vimscriptExecutor.executingVimscript)
+      && processGroup.modeBeforeCommandProcessing is Mode.VISUAL) {
+      possibleCursors.filter { it.lastSelectionInfo.isSelected(index, editor) }
+    } else {
+      emptyList()
+    }
 
-    val newPossibleCursors = possibleCursors.filter { it.lastSelectionInfo.contains(editor, index) }
     return if (newPossibleCursors.isNotEmpty()) {
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
@@ -39,12 +45,6 @@ internal class VisualAreaMatcher : Matcher {
     } else {
       MatcherResult.Failure
     }
-  }
-
-  private fun SelectionInfo.contains(editor: VimEditor, offset: Int): Boolean {
-    val startOffset = start?.let { editor.bufferPositionToOffset(it) } ?: return false
-    val endOffset = end?.let { editor.bufferPositionToOffset(it) } ?: return false
-    return offset >= min(startOffset, endOffset) && offset < max(startOffset, endOffset)
   }
 
   override fun isEpsilon(): Boolean {
