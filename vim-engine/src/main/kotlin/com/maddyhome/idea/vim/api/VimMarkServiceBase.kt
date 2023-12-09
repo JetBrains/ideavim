@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
+import com.maddyhome.idea.vim.state.mode.Mode
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.util.*
@@ -234,18 +235,17 @@ public abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun setVisualSelectionMarks(editor: VimEditor) {
-    if (!editor.inVisualMode) return
-    val selectionType = editor.mode.selectionType ?: CHARACTER_WISE
-    editor.carets()
-      .forEach {
-        val start = editor.offsetToBufferPosition(it.vimSelectionStart)
-        val end = editor.offsetToBufferPosition(it.offset.point)
-        it.lastSelectionInfo = SelectionInfo(start, end, selectionType)
-      }
+    val mode = editor.mode
+    if (mode !is Mode.VISUAL) return
+
+    editor.carets().forEach {
+      it.lastSelectionInfo = SelectionInfo.collectCurrentSelectionInfo(it)
+        ?: SelectionInfo(null, null, CHARACTER_WISE)
+    }
   }
 
   override fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange? {
-    return getMarksRange(caret, SELECTION_START_MARK, SELECTION_END_MARK)
+    return caret.lastSelectionInfo.getSelectionRange(caret.editor)
   }
 
   override fun getChangeMarks(caret: ImmutableVimCaret): TextRange? {
@@ -405,6 +405,10 @@ public abstract class VimMarkServiceBase : VimMarkService {
       filepathToLocalMarks.clear()
     } else {
       caret.markStorage.clear(caret)
+    }
+    caret.lastSelectionInfo.apply {
+      start = null
+      end = null
     }
   }
 
