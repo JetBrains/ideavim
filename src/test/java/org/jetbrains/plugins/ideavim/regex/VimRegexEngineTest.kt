@@ -8,8 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.regex
 
+import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.regexp.VimRegex
@@ -117,4 +120,38 @@ class VimRegexEngineTest : VimTestCase() {
     val result = findAll("\\%>'m...")
     assertEquals(result, listOf(TextRange(6, 9)))
   }
+
+  @Test
+  fun `test text is inside visual area`() {
+    configureByText("${c}Lorem Ipsum")
+    typeText("v$")
+    val result = findAll("\\%VLorem Ipsu\\%Vm")
+    assertEquals(result, listOf(TextRange(0, 11)))
+  }
+
+  @Test
+  fun `test text is not inside visual area`() {
+    configureByText("${c}Lorem Ipsum")
+    typeText("vw")
+    val result = findAll("\\%VLorem Ipsu\\%Vm")
+    assertEquals(result, emptyList())
+  }
+
+  @Test
+  fun `test cursor and visual belong to the same cursor`() {
+    configureByText("Lorem Ipsum")
+
+    val caretModel = fixture.editor.caretModel
+    typeText("v") // a workaround to trigger visual mode
+    caretModel.addCaret(VisualPosition(0, 2))
+    val caret = caretModel.getCaretAt(VisualPosition(0, 2))!!
+    caret.setSelection(0, 5)
+    caretModel.addCaret(VisualPosition(0, 0))
+    caretModel.addCaret(VisualPosition(0, 1))
+    caretModel.addCaret(VisualPosition(0, 3))
+
+    val result = findAll("\\%V.\\{-}\\%#.")
+    assertEquals(result, listOf(TextRange(0, 3)))
+  }
+
 }

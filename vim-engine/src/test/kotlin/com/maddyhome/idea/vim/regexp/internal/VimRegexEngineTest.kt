@@ -1615,42 +1615,10 @@ class VimRegexEngineTest {
   }
 
   @Test
-  fun `test text is inside visual area`() {
-    doTest(
-      "${START}${VISUAL_START}Lorem Ipsum$CARET${VISUAL_END}${END}",
-      "\\%VLorem Ipsu\\%Vm"
-    )
-  }
-
-  @Test
-  fun `test text is not inside visual area`() {
-    assertFailure(
-      "${VISUAL_START}Lorem $CARET${VISUAL_END}Ipsum",
-      "\\%VLorem Ipsu\\%Vm"
-    )
-  }
-
-
-
-  @Test
   fun `test mark does not exist`() {
     assertFailure(
       "Lorem ${MARK('m')}Ipsum",
       "\\%'n..."
-    )
-  }
-
-  @Test
-  fun `test cursor and visual belong to the same cursor`() {
-    doTest(
-      "${START}Lor${END}em Ipsum",
-      "\\%V.\\{-}\\%#.",
-      listOf(
-        mockCaret(0),
-        mockCaret(1),
-        mockCaret(2, Pair(0, 5)),
-        mockCaret(3),
-      )
     )
   }
 
