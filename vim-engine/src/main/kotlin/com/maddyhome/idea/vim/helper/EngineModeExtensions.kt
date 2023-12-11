@@ -27,9 +27,7 @@ public fun VimEditor.exitVisualMode() {
     if (inBlockSelection) {
       this.removeSecondaryCarets()
     }
-    if (!this.vimKeepingVisualOperatorAction) {
-      this.nativeCarets().forEach(VimCaret::removeSelection)
-    }
+    this.nativeCarets().forEach(VimCaret::removeSelection)
   }
   if (this.inVisualMode) {
     this.vimLastSelectionType = selectionType

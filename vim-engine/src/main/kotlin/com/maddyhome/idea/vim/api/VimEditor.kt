@@ -127,7 +127,6 @@ public interface VimEditor {
 
   public val lfMakesNewLine: Boolean
   public var vimChangeActionSwitchMode: Mode?
-  public var vimKeepingVisualOperatorAction: Boolean
 
   public fun fileSize(): Long
 
@@ -242,7 +241,7 @@ public interface VimEditor {
 
   public fun getPath(): String?
   public fun extractProtocol(): String?
-  
+
   // Can be used as a key to store something for specific project
   public val projectId: String
 
