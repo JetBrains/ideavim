@@ -22,6 +22,4 @@ public interface OperatorFunction {
    * Make sure to synchronize your function properly using read/write actions.
    */
   public fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean
-
-  public fun postProcessSelection(): Boolean = true
 }
