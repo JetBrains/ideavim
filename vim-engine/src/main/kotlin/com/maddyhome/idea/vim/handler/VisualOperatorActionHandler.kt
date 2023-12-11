@@ -234,7 +234,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
 
     fun start() {
       logger.debug("Preparing visual command")
-      editor.vimKeepingVisualOperatorAction = CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags
+      editor.vimKeepingVisualOperatorAction = false //CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags
 
       editor.forEachCaret {
         val change =
@@ -248,7 +248,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
       logger.debug { visualChanges.values.joinToString("\n") { "Caret: $visualChanges" } }
 
       // If this is a multi key change then exit visual now
-      if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
+      if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || true /* CommandFlags.FLAG_EXIT_VISUAL in cmd.flags */) {
         logger.debug("Exit visual before command executing")
         editor.exitVisualMode()
       }

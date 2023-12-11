@@ -15,13 +15,10 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.put.PutData
-import java.util.*
 
 /**
  * @author vlan
@@ -34,8 +31,6 @@ public sealed class PutVisualTextBaseAction(
 ) : VisualOperatorActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeForAllCarets(
     editor: VimEditor,

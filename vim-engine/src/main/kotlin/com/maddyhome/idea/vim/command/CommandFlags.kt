@@ -64,11 +64,6 @@ public enum class CommandFlags {
   FLAG_IGNORE_SIDE_SCROLL_JUMP,
 
   /**
-   * Command exits the visual mode, so caret movement shouldn't update visual selection
-   */
-  FLAG_EXIT_VISUAL,
-
-  /**
    * This command starts a multi-command undo transaction
    */
   FLAG_MULTIKEY_UNDO,

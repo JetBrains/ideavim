@@ -18,9 +18,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -28,10 +26,9 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
-import java.util.*
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 // todo make it multicaret
 private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, selectionType: SelectionType): Boolean {
@@ -103,8 +100,6 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
 @CommandOrMotion(keys = ["g@"], modes = [Mode.VISUAL])
 internal class VisualOperatorAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
     editor: VimEditor,
