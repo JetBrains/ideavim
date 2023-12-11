@@ -238,16 +238,16 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
 
       editor.forEachCaret {
         val change =
-          if (this@VisualStartFinishWrapper.editor.inVisualMode && !this@VisualStartFinishWrapper.editor.inRepeatMode) {
-            VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
+          if (editor.inVisualMode && !editor.inRepeatMode) {
+            VisualOperation.getRange(editor, it, cmd.flags)
           } else {
             null
           }
-        this@VisualStartFinishWrapper.visualChanges[it] = change
+        visualChanges[it] = change
       }
       logger.debug { visualChanges.values.joinToString("\n") { "Caret: $visualChanges" } }
 
-      // If this is a mutli key change then exit visual now
+      // If this is a multi key change then exit visual now
       if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
         logger.debug("Exit visual before command executing")
         editor.exitVisualMode()
