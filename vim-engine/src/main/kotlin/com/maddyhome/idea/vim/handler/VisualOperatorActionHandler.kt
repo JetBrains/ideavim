@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -125,7 +124,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
     logger.debug { "Count of selection segments: ${selections.size}" }
     logger.debug { selections.values.joinToString("\n") { vimSelection -> "Caret: $vimSelection" } }
 
-    val commandWrapper = VisualStartFinishWrapper(editor, cmd, this)
+    val commandWrapper = VisualStartFinishWrapper(editor, cmd)
     commandWrapper.start()
 
     val res = arrayOf(true)
@@ -228,7 +227,6 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
   private class VisualStartFinishWrapper(
     private val editor: VimEditor,
     private val cmd: Command,
-    private val visualOperatorActionHandler: VisualOperatorActionHandler,
   ) {
     private val visualChanges = mutableMapOf<VimCaret, VisualChange?>()
 
@@ -254,14 +252,11 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
     fun finish(res: Boolean) {
       logger.debug("Finish visual command. Result: $res")
 
-      if (visualOperatorActionHandler.id != "VimVisualOperatorAction" ||
-        injector.keyGroup.operatorFunction?.postProcessSelection() != false
-      ) {
-        if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
-          logger.debug("Not multikey undo - exit visual")
-          editor.exitVisualMode()
-        }
-      }
+      // Note that we don't exit visual mode here - we've already done it before executing the actual operator, and so
+      // it is up to the operator's implementation to ensure it is in the correct mode. This is important for operators
+      // that are async, such as Commentary when running on Rider (Commentary sets the selection, then invokes the
+      // block/line comment actions, which are implemented in an external process. By exiting visual mode again, we
+      // reset the selection before Rider's backend process has a chance to process the action and it fails).
 
       if (res) {
         VimRepeater.saveLastChange(cmd)
