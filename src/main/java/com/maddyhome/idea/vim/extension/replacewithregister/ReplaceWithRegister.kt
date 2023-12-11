@@ -14,12 +14,12 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.isLine
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
+import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.state.mode.mode
@@ -53,11 +53,13 @@ internal class ReplaceWithRegister : VimExtension {
     putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gr"), owner, injector.parser.parseKeys(RWR_OPERATOR), true)
     putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("grr"), owner, injector.parser.parseKeys(RWR_LINE), true)
     putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr"), owner, injector.parser.parseKeys(RWR_VISUAL), true)
+
+    VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
 
   private class RwrVisual : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val typeInEditor = editor.mode.selectionType ?: CHARACTER_WISE
+      val typeInEditor = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
       editor.sortedCarets().forEach { caret ->
         val selectionStart = caret.selectionStart
         val selectionEnd = caret.selectionEnd
@@ -73,7 +75,7 @@ internal class ReplaceWithRegister : VimExtension {
     override val isRepeatable: Boolean = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      setOperatorFunction(Operator())
+      injector.globalOptions().operatorfunc = OPERATOR_FUNC
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
   }
@@ -112,11 +114,11 @@ internal class ReplaceWithRegister : VimExtension {
           editor.primaryCaret() to VimSelection.create(
             range.startOffset,
             range.endOffset - 1,
-            selectionType ?: CHARACTER_WISE,
+            selectionType ?: SelectionType.CHARACTER_WISE,
             editor,
           ),
         ),
-        selectionType ?: CHARACTER_WISE,
+        selectionType ?: SelectionType.CHARACTER_WISE,
       )
       // todo multicaret
       doReplace(ijEditor, editor.primaryCaret(), visualSelection)
@@ -132,14 +134,10 @@ internal class ReplaceWithRegister : VimExtension {
   }
 
   companion object {
-    @NonNls
-    private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
-
-    @NonNls
-    private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
-
-    @NonNls
-    private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
+    @NonNls private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
+    @NonNls private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
+    @NonNls private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
+    @NonNls private const val OPERATOR_FUNC = "ReplaceWithRegisterOperatorFunc"
 
     private fun doReplace(editor: Editor, caret: ImmutableVimCaret, visualSelection: PutData.VisualSelection) {
       val registerGroup = injector.registerGroup

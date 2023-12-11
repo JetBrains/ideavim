@@ -22,26 +22,26 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.addCommand
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
+import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -49,17 +49,22 @@ import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
 
 internal class CommentaryExtension : VimExtension {
 
   companion object {
+
+    private const val OPERATOR_FUNC = "CommentaryOperatorFunc"
+
     fun doCommentary(
       editor: VimEditor,
       context: ExecutionContext,
       range: TextRange,
       selectionType: SelectionType,
-      resetCaret: Boolean,
+      resetCaret: Boolean = true,
     ): Boolean {
       val mode = editor.vimStateMachine.mode
       if (mode !is Mode.VISUAL) {
@@ -67,8 +72,7 @@ internal class CommentaryExtension : VimExtension {
       }
 
       return runWriteAction {
-        // Treat block- and character-wise selections as block comments. Be ready to fall back to if the first action
-        // isn't available
+        // Treat block- and character-wise selections as block comments. Fall back if the first action isn't available
         val actions = if (selectionType === SelectionType.LINE_WISE) {
           listOf(IdeActions.ACTION_COMMENT_LINE, IdeActions.ACTION_COMMENT_BLOCK)
         } else {
@@ -113,6 +117,7 @@ internal class CommentaryExtension : VimExtension {
       // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
       // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
       // the difference
+      // TODO: If we don't move the caret to the start offset, we should maintain the current logical position
       if (resetCaret) {
         editor.primaryCaret().moveToOffset(range.startOffset)
       }
@@ -145,6 +150,16 @@ internal class CommentaryExtension : VimExtension {
     putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentLine)"), owner, plugCommentaryLineKeys, true)
 
     addCommand("Commentary", CommentaryCommandAliasHandler())
+
+    VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, CommentaryOperatorFunction())
+ }
+
+  private class CommentaryOperatorFunction : OperatorFunction {
+    // todo make it multicaret
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
+      val range = injector.markService.getChangeMarks(editor.primaryCaret()) ?: return false
+      return doCommentary(editor, context, range, selectionType ?: SelectionType.CHARACTER_WISE, true)
+    }
   }
 
   /**
@@ -153,18 +168,12 @@ internal class CommentaryExtension : VimExtension {
    * E.g. handles the `gc` in `gc_`, by setting the operator function, then invoking `g@` to receive the `_` motion to
    * invoke the operator. This object is both the mapping handler and the operator function.
    */
-  private class CommentaryOperatorHandler : OperatorFunction, ExtensionHandler {
+  private class CommentaryOperatorHandler : ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      setOperatorFunction(this)
+      injector.globalOptions().operatorfunc = OPERATOR_FUNC
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
-    }
-
-    // todo make it multicaret
-    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
-      val range = injector.markService.getChangeMarks(editor.primaryCaret()) ?: return false
-      return doCommentary(editor, context, range, selectionType ?: SelectionType.CHARACTER_WISE, true)
     }
   }
 
