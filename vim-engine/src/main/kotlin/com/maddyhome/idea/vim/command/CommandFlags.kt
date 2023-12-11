@@ -64,11 +64,6 @@ public enum class CommandFlags {
   FLAG_IGNORE_SIDE_SCROLL_JUMP,
 
   /**
-   * This command starts a multi-command undo transaction
-   */
-  FLAG_MULTIKEY_UNDO,
-
-  /**
    * This command should be followed by another command
    */
   FLAG_EXPECT_MORE,
