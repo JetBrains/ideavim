@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -33,8 +32,6 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   public val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
   public val keyRoots: MutableMap<MappingMode, CommandPartNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
   public val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
-
-  override var operatorFunction: OperatorFunction? = null
 
   override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>) {
     modes.map { getKeyMapping(it) }.forEach { it.delete(keys) }

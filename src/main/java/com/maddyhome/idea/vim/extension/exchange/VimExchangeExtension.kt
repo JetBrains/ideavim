@@ -19,22 +19,23 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
+import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
@@ -72,17 +73,15 @@ internal class VimExchangeExtension : VimExtension {
     putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("X"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
     putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxc"), owner, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), true)
     putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxx"), owner, injector.parser.parseKeys(EXCHANGE_LINE_CMD), true)
+
+    VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
 
   companion object {
-    @NonNls
-    const val EXCHANGE_CMD = "<Plug>(Exchange)"
-
-    @NonNls
-    const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
-
-    @NonNls
-    const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
+    @NonNls private const val EXCHANGE_CMD = "<Plug>(Exchange)"
+    @NonNls private const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+    @NonNls private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
+    @NonNls private const val OPERATOR_FUNC = "ExchangeOperatorFunc"
 
     val EXCHANGE_KEY = Key<Exchange>("exchange")
 
@@ -108,7 +107,7 @@ internal class VimExchangeExtension : VimExtension {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      setOperatorFunction(Operator(false))
+      injector.globalOptions().operatorfunc = OPERATOR_FUNC
       executeNormalWithoutMapping(injector.parser.parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
     }
   }
@@ -125,12 +124,12 @@ internal class VimExchangeExtension : VimExtension {
         val mode = editor.mode
         // Leave visual mode to create selection marks
         executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
-        Operator(true).apply(editor, context, mode.selectionType ?: CHARACTER_WISE)
+        Operator(true).apply(editor, context, mode.selectionType ?: SelectionType.CHARACTER_WISE)
       }
     }
   }
 
-  private class Operator(private val isVisual: Boolean) : OperatorFunction {
+  private class Operator(private val isVisual: Boolean = false) : OperatorFunction {
     fun Editor.getMarkOffset(mark: Mark) = IjVimEditor(this).getOffset(mark.line, mark.col)
     fun SelectionType.getString() = when (this) {
       SelectionType.CHARACTER_WISE -> "v"
@@ -148,7 +147,7 @@ internal class VimExchangeExtension : VimExtension {
           else -> HighlighterTargetArea.EXACT_RANGE
         }
         val isVisualLine = ex.type == SelectionType.LINE_WISE
-        val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || (isVisual))) 1 else 0
+        val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || isVisual)) 1 else 0
         return ijEditor.markupModel.addRangeHighlighter(
           ijEditor.getMarkOffset(ex.start),
           (ijEditor.getMarkOffset(ex.end) + endAdj).coerceAtMost(ijEditor.fileSize),
@@ -158,7 +157,7 @@ internal class VimExchangeExtension : VimExtension {
         )
       }
 
-      val currentExchange = getExchange(ijEditor, isVisual, selectionType ?: CHARACTER_WISE)
+      val currentExchange = getExchange(ijEditor, isVisual, selectionType ?: SelectionType.CHARACTER_WISE)
       val exchange1 = ijEditor.getUserData(EXCHANGE_KEY)
       if (exchange1 == null) {
         val highlighter = highlightExchange(currentExchange)

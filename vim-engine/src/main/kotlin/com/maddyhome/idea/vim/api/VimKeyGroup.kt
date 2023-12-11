@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import javax.swing.KeyStroke
@@ -66,5 +65,4 @@ public interface VimKeyGroup {
 
   public val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
   public val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
-  public var operatorFunction: OperatorFunction?
 }

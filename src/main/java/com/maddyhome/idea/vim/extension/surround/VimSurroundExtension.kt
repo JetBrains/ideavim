@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.endsWithNewLine
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
@@ -23,14 +24,16 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegisterForCaret
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
+import com.maddyhome.idea.vim.extension.exportOperatorFunction
+import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -74,13 +77,15 @@ internal class VimSurroundExtension : VimExtension {
       putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), owner, injector.parser.parseKeys("<Plug>DSurround"), true)
       putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), owner, injector.parser.parseKeys("<Plug>VSurround"), true)
     }
+
+    VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
 
   private class YSurroundHandler : ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      setOperatorFunction(Operator())
+      injector.globalOptions().operatorfunc = OPERATOR_FUNC
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
   }
@@ -288,7 +293,9 @@ private val LOG = logger<VimSurroundExtension>()
 
 private const val REGISTER = '"'
 
-private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
+private const val OPERATOR_FUNC = "SurroundOperatorFunc"
+
+    private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
 
 private val SURROUND_PAIRS = mapOf(
   'b' to ("(" to ")"),
