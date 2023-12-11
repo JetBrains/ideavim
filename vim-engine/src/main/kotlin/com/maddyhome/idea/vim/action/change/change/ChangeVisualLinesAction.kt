@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MOT_LINEWISE
-import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MULTIKEY_UNDO
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -34,7 +33,7 @@ import java.util.*
 public class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE, FLAG_MULTIKEY_UNDO)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE)
 
   override fun executeAction(
     editor: VimEditor,

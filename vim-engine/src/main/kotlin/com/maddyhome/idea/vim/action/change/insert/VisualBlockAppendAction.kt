@@ -14,13 +14,10 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * @author vlan
@@ -28,8 +25,6 @@ import java.util.*
 @CommandOrMotion(keys = ["A"], modes = [Mode.VISUAL])
 public class VisualBlockAppendAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun executeForAllCarets(
     editor: VimEditor,

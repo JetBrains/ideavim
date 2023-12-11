@@ -14,19 +14,14 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
+import com.maddyhome.idea.vim.state.mode.Mode
 
 @CommandOrMotion(keys = ["o"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
 public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
     editor: VimEditor,
@@ -43,8 +38,6 @@ public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecutio
 @CommandOrMotion(keys = ["O"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
 public class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
     editor: VimEditor,
@@ -67,7 +60,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
   // However, we'll use EditorStartNewLineBefore in PyCharm notebooks where the last character of the previous line
   //   may be locked with a guard
 
-  // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unncessary
+  // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unnecessary
   // scrolling
   val firstLiners: MutableSet<VimCaret> = HashSet()
   val moves: MutableSet<Pair<VimCaret, Int>> = HashSet()

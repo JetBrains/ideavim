@@ -14,19 +14,14 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
 import org.jetbrains.annotations.Contract
-import java.util.*
 
 @CommandOrMotion(keys = ["i", "<Insert>"], modes = [Mode.NORMAL])
 public class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
   @get:Contract(pure = true)
   override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
     editor: VimEditor,
