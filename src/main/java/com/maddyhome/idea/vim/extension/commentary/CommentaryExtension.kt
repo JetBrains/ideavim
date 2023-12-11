@@ -156,11 +156,6 @@ internal class CommentaryExtension : VimExtension {
   private class CommentaryOperatorHandler : OperatorFunction, ExtensionHandler {
     override val isRepeatable = true
 
-    // In this operator we process selection by ourselves. This is necessary for rider, VIM-1758
-    override fun postProcessSelection(): Boolean {
-      return false
-    }
-
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       setOperatorFunction(this)
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
