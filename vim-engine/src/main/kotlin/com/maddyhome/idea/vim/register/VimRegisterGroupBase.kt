@@ -523,7 +523,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
         }
       }
       VimStateMachine.getInstance(editor).isRecording = false
-      injector.listenersNotifier.notifyMacroRecordingStarted(editor, recordRegister)
+      injector.listenersNotifier.notifyMacroRecordingFinished(editor, recordRegister)
     }
 
     recordRegister = 0.toChar()

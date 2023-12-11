@@ -61,6 +61,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollGroup
@@ -93,7 +94,9 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
+import com.maddyhome.idea.vim.ui.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
+import com.maddyhome.idea.vim.ui.ModeWidgetListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimDisposable
 import java.awt.event.MouseAdapter
@@ -155,6 +158,13 @@ internal object VimListenerManager {
       optionGroup.addEffectiveOptionValueChangeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
+
+      // This code is executed after ideavimrc execution, so we trigger onGlobalOptionChanged just in case
+      optionGroup.addGlobalOptionChangeListener(IjOptions.showmodewidget, ModeWidgetListener)
+      optionGroup.addGlobalOptionChangeListener(IjOptions.showmodewidget, MacroWidgetListener)
+      ModeWidgetListener.onGlobalOptionChanged()
+      MacroWidgetListener.onGlobalOptionChanged()
+
       optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
@@ -174,6 +184,8 @@ internal object VimListenerManager {
       optionGroup.removeEffectiveOptionValueChangeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(IjOptions.showmodewidget, ModeWidgetListener)
+      optionGroup.removeGlobalOptionChangeListener(IjOptions.showmodewidget, MacroWidgetListener)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
     }
   }
@@ -233,7 +245,8 @@ internal object VimListenerManager {
       Disposer.register(listenersDisposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
 
       // Initialise the local options. We MUST do this before anything has the chance to query options
-      VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, openingEditor, scenario)
+      val vimEditor = editor.vim
+      VimPlugin.getOptionGroup().initialiseLocalOptions(vimEditor, openingEditor, scenario)
 
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler, listenersDisposable)
@@ -245,6 +258,8 @@ internal object VimListenerManager {
       VimPlugin.getEditor().editorCreated(editor)
 
       VimPlugin.getChange().editorCreated(editor, listenersDisposable)
+
+      injector.listenersNotifier.notifyEditorCreated(vimEditor)
 
       Disposer.register(listenersDisposable) {
         VimPlugin.getEditorIfCreated()?.editorDeinit(editor, true)
@@ -358,7 +373,9 @@ internal object VimListenerManager {
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
-      injector.markService.editorReleased(event.editor.vim)
+      val vimEditor = event.editor.vim
+      injector.listenersNotifier.notifyEditorReleased(vimEditor)
+      injector.markService.editorReleased(vimEditor)
     }
 
     override fun fileOpenedSync(
