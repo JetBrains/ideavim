@@ -232,7 +232,6 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
 
     fun start() {
       logger.debug("Preparing visual command")
-      editor.vimKeepingVisualOperatorAction = false //CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags
 
       editor.forEachCaret {
         val change =
@@ -268,8 +267,6 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
           }
         }
       }
-
-      editor.vimKeepingVisualOperatorAction = false
     }
   }
 

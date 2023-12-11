@@ -124,10 +124,6 @@ internal var Editor.vimMorePanel: ExOutputPanel? by userData()
 internal var Editor.vimExOutput: ExOutputModel? by userData()
 internal var Editor.vimTestInputModel: TestInputModel? by userData()
 
-/**
- * Checks whether a keeping visual mode visual operator action is performed on editor.
- */
-internal var Editor.vimKeepingVisualOperatorAction: Boolean by userDataOr { false }
 internal var Editor.vimChangeActionSwitchMode: Mode? by userData()
 
 /**

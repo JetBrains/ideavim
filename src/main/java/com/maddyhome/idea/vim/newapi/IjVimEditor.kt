@@ -54,7 +54,6 @@ import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
-import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -67,7 +66,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   companion object {
     // For cases where Editor does not have a project (for some reason)
     // It's something IJ Platform related and stored here because of this reason
-    const val DEFAULT_PROJECT_ID = "no project" 
+    const val DEFAULT_PROJECT_ID = "no project"
   }
 
   // All the editor actions should be performed with top level editor!!!
@@ -81,11 +80,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     get() = editor.vimChangeActionSwitchMode
     set(value) {
       editor.vimChangeActionSwitchMode = value
-    }
-  override var vimKeepingVisualOperatorAction: Boolean
-    get() = editor.vimKeepingVisualOperatorAction
-    set(value) {
-      editor.vimKeepingVisualOperatorAction = value
     }
 
   override fun fileSize(): Long = editor.fileSize.toLong()
