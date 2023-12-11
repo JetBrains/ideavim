@@ -10,7 +10,9 @@ package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.VimEditor
 
-public interface EditorFocusListener {
-  public fun focusGained(editor: VimEditor)
-  public fun focusLost(editor: VimEditor)
+public interface EditorListener {
+  public fun created(editor: VimEditor) {}
+  public fun released(editor: VimEditor) {}
+  public fun focusGained(editor: VimEditor) {}
+  public fun focusLost(editor: VimEditor) {}
 }

@@ -13,21 +13,29 @@ import com.maddyhome.idea.vim.state.mode.Mode
 
 public class VimListenersNotifier {
   public val modeChangeListeners: MutableList<ModeChangeListener> = mutableListOf()
-  public val editorFocusListeners: MutableList<EditorFocusListener> = mutableListOf()
+  public val myEditorListeners: MutableList<EditorListener> = mutableListOf()
   public val macroRecordingListeners: MutableList<MacroRecordingListener> = mutableListOf()
   
   public fun notifyModeChanged(editor: VimEditor, oldMode: Mode) {
     modeChangeListeners.forEach { it.modeChanged(editor, oldMode) }
   }
-  
+
+  public fun notifyEditorCreated(editor: VimEditor) {
+    myEditorListeners.forEach { it.created(editor) }
+  }
+
+  public fun notifyEditorReleased(editor: VimEditor) {
+    myEditorListeners.forEach { it.released(editor) }
+  }
+
   public fun notifyEditorFocusGained(editor: VimEditor) {
-    editorFocusListeners.forEach { it.focusGained(editor) }
+    myEditorListeners.forEach { it.focusGained(editor) }
   }
-  
+
   public fun notifyEditorFocusLost(editor: VimEditor) {
-    editorFocusListeners.forEach { it.focusLost(editor) }
+    myEditorListeners.forEach { it.focusLost(editor) }
   }
-  
+
   public fun notifyMacroRecordingStarted(editor: VimEditor, register: Char) {
     macroRecordingListeners.forEach { it.recordingStarted(editor, register) }
   }
