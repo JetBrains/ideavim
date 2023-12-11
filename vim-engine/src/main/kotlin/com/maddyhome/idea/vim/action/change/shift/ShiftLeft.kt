@@ -71,8 +71,6 @@ public class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), D
 public class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
-
   override fun executeAction(
     editor: VimEditor,
     caret: VimCaret,

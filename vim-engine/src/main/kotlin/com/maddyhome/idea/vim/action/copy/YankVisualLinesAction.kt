@@ -30,7 +30,7 @@ import java.util.*
 public class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.COPY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 
   override fun executeForAllCarets(
     editor: VimEditor,

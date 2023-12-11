@@ -34,7 +34,7 @@ public class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCa
 
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH, CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH)
 
   override fun executeAction(
     editor: VimEditor,
