@@ -1,6 +1,8 @@
 package patches.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.GradleBuildStep
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -13,4 +15,18 @@ changeBuildType(RelativeId("IdeaVimTests_Latest_EAP")) {
         "Unexpected option value: artifactRules = $artifactRules"
     }
     artifactRules = "+:build/reports => build/reports"
+
+    expectSteps {
+        gradle {
+            tasks = "clean test"
+            buildFile = ""
+            enableStacktrace = true
+        }
+    }
+    steps {
+        update<GradleBuildStep>(0) {
+            clearConditions()
+            jdkHome = "%env.JDK_21_0%"
+        }
+    }
 }
