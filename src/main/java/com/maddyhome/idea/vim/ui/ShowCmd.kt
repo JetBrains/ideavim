@@ -19,7 +19,6 @@ import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
-import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
@@ -68,13 +67,6 @@ internal object ShowCmd {
 internal object ShowCmdOptionChangeListener : GlobalOptionChangeListener {
   override fun onGlobalOptionChanged() {
     ShowCmd.update()
-
-    val extension = StatusBarWidgetFactory.EP_NAME.findExtension(ShowCmdStatusBarWidgetFactory::class.java) ?: return
-    val projectManager = ProjectManager.getInstanceIfCreated() ?: return
-    for (project in projectManager.openProjects) {
-      val statusBarWidgetsManager = project.getService(StatusBarWidgetsManager::class.java) ?: continue
-      statusBarWidgetsManager.updateWidget(extension)
-    }
   }
 }
 
