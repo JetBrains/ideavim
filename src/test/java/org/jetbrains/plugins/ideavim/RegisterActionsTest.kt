@@ -12,19 +12,17 @@ import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.VimOption
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
 import kotlin.test.assertNotNull
 
-@Disabled
 class RegisterActionsTest : VimTestCase() {
   @OptionTest(
     VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
