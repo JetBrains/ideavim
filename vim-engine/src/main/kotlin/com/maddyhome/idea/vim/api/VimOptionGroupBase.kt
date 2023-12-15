@@ -24,11 +24,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 public abstract class VimOptionGroupBase : VimOptionGroup {
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val globalParsedValues = mutableMapOf<String, Any>()
-  private val globalOptionListeners = MultiSet<String, GlobalOptionChangeListener>()
-  private val effectiveOptionValueListeners = MultiSet<String, EffectiveOptionValueChangeListener>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val perWindowGlobalOptionsKey = Key<MutableMap<String, VimDataType>>("perWindowGlobalOptions")
   private val parsedEffectiveValueKey = Key<MutableMap<String, Any>>("parsedEffectiveOptionValues")
+  private val listeners = OptionListenersImpl()
 
   override fun initialiseOptions() {
     Options.initialise()
@@ -255,8 +254,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun removeOption(optionName: String) {
     Options.removeOption(optionName)
-    globalOptionListeners.removeAll(optionName)
-    effectiveOptionValueListeners.removeAll(optionName)
+    listeners.removeAllListeners(optionName)
   }
 
   override fun <T : VimDataType> addGlobalOptionChangeListener(
@@ -264,28 +262,28 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     listener: GlobalOptionChangeListener
   ) {
     check(option.declaredScope == GLOBAL)
-    globalOptionListeners.add(option.name, listener)
+    listeners.addGlobalOptionChangeListener(option.name, listener)
   }
 
   override fun <T : VimDataType> removeGlobalOptionChangeListener(
     option: Option<T>,
     listener: GlobalOptionChangeListener
   ) {
-    globalOptionListeners.remove(option.name, listener)
+    listeners.removeGlobalOptionChangeListener(option.name, listener)
   }
 
   override fun <T : VimDataType> addEffectiveOptionValueChangeListener(
     option: Option<T>,
     listener: EffectiveOptionValueChangeListener
   ) {
-    effectiveOptionValueListeners.add(option.name, listener)
+    listeners.addEffectiveOptionValueChangeListener(option.name, listener)
   }
 
   override fun <T : VimDataType> removeEffectiveOptionValueChangeListener(
     option: Option<T>,
     listener: EffectiveOptionValueChangeListener
   ) {
-    effectiveOptionValueListeners.remove(option.name, listener)
+    listeners.removeEffectiveOptionValueChangeListener(option.name, listener)
   }
 
   final override fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {
@@ -556,20 +554,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   private fun <T : VimDataType> onGlobalOptionChanged(option: Option<T>) {
-    globalOptionListeners[option.name]?.forEach {
-      it.onGlobalOptionChanged()
-    }
+    listeners.onGlobalOptionChanged(option.name)
   }
 
   private inline fun <T : VimDataType> onEffectiveValueChanged(
     option: Option<T>,
     editorsProvider: () -> Collection<VimEditor>,
   ) {
-    val listeners = effectiveOptionValueListeners[option.name] ?: return
     val editors = editorsProvider()
-    listeners.forEach { listener ->
-      editors.forEach { listener.onEffectiveValueChanged(it) }
-    }
+    listeners.onEffectiveValueChanged(option.name, editors)
   }
 
   /**
@@ -660,16 +653,55 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 }
 
-private class MultiSet<K, V> : HashMap<K, MutableSet<V>>() {
-  fun add(key: K, value: V) {
-    getOrPut(key) { mutableSetOf() }.add(value)
+private class OptionListenersImpl {
+  private val globalOptionListeners = MultiSet<String, GlobalOptionChangeListener>()
+  private val effectiveOptionValueListeners = MultiSet<String, EffectiveOptionValueChangeListener>()
+
+  fun addGlobalOptionChangeListener(optionName: String, listener: GlobalOptionChangeListener) {
+    globalOptionListeners.add(optionName, listener)
   }
 
-  fun remove(key: K, value: V) {
-    this[key]?.remove(value)
+  fun removeGlobalOptionChangeListener(optionName: String, listener: GlobalOptionChangeListener) {
+    globalOptionListeners.remove(optionName, listener)
   }
 
-  fun removeAll(key: K) {
-    remove(key)
+  fun addEffectiveOptionValueChangeListener(optionName: String, listener: EffectiveOptionValueChangeListener) {
+    effectiveOptionValueListeners.add(optionName, listener)
+  }
+
+  fun removeEffectiveOptionValueChangeListener(optionName: String, listener: EffectiveOptionValueChangeListener) {
+    effectiveOptionValueListeners.remove(optionName, listener)
+  }
+
+  fun removeAllListeners(optionName: String) {
+    globalOptionListeners.removeAll(optionName)
+    effectiveOptionValueListeners.removeAll(optionName)
+  }
+
+  fun onGlobalOptionChanged(optionName: String) {
+    globalOptionListeners[optionName]?.forEach {
+      it.onGlobalOptionChanged()
+    }
+  }
+
+  fun onEffectiveValueChanged(optionName: String, editors: Collection<VimEditor>) {
+    val listeners = effectiveOptionValueListeners[optionName] ?: return
+    listeners.forEach { listener ->
+      editors.forEach { listener.onEffectiveValueChanged(it) }
+    }
+  }
+
+  private class MultiSet<K, V> : HashMap<K, MutableSet<V>>() {
+    fun add(key: K, value: V) {
+      getOrPut(key) { mutableSetOf() }.add(value)
+    }
+
+    fun remove(key: K, value: V) {
+      this[key]?.remove(value)
+    }
+
+    fun removeAll(key: K) {
+      remove(key)
+    }
   }
 }
