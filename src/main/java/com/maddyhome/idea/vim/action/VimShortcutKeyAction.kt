@@ -234,7 +234,7 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
    * but we should cache the value because on the second call (isEnabled -> actionPerformed)
    * the event is already consumed
    */
-  private var keyStrokeCache: Pair<KeyEvent?, KeyStroke?> = null to null
+  private var keyStrokeCache: Pair<Int?, KeyStroke?> = null to null
 
   private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
     val inputEvent = e.inputEvent
@@ -242,9 +242,9 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
       val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
       val strokeCache = keyStrokeCache
       if (defaultKeyStroke != null) {
-        keyStrokeCache = inputEvent to defaultKeyStroke
+        keyStrokeCache = inputEvent.hashCode() to defaultKeyStroke
         return defaultKeyStroke
-      } else if (strokeCache.first === inputEvent) {
+      } else if (strokeCache.first === inputEvent.hashCode()) {
         keyStrokeCache = null to null
         return strokeCache.second
       }
