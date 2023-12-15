@@ -20,9 +20,6 @@ import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
 import com.intellij.openapi.editor.impl.TextRangeInterval
-import com.intellij.openapi.ui.MessageType
-import com.intellij.openapi.ui.popup.Balloon
-import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.CodeStyleManager
@@ -65,7 +62,6 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
@@ -89,7 +85,6 @@ import kotlin.math.min
  */
 public class ChangeGroup : VimChangeGroupBase() {
   private val insertListeners = ContainerUtil.createLockFreeCopyOnWriteList<VimInsertListener>()
-  private var lastShownTime = 0L
   private val listener: EditorMouseListener = object : EditorMouseListener {
     override fun mouseClicked(event: EditorMouseEvent) {
       val editor = event.editor
@@ -645,25 +640,6 @@ public class ChangeGroup : VimChangeGroupBase() {
     avalanche: Boolean,
   ): Boolean {
 
-    // Just an easter egg
-    if (avalanche) {
-      val currentTime = System.currentTimeMillis()
-      if (currentTime - lastShownTime > 60000) {
-        lastShownTime = currentTime
-        ApplicationManager.getApplication().invokeLater {
-          val balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder(
-              "Wow, nice vim skills!", VimIcons.IDEAVIM,
-              MessageType.INFO.titleForeground, MessageType.INFO.popupBackground,
-              null
-            ).createBalloon()
-          balloon.show(
-            JBPopupFactory.getInstance().guessBestPopupLocation((editor as IjVimEditor).editor),
-            Balloon.Position.below
-          )
-        }
-      }
-    }
     val nf: List<String> = injector.options(editor).nrformats
     val alpha = nf.contains("alpha")
     val hex = nf.contains("hex")
