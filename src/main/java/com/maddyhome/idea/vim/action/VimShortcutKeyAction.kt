@@ -232,9 +232,9 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
   /**
    * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
    * but we should cache the value because on the second call (isEnabled -> actionPerformed)
-   * the event is already consumed
+   * the event is already consumed and getDefaultKeyStroke returns null
    */
-  private var keyStrokeCache: Pair<KeyEvent?, KeyStroke?> = null to null
+  private var keyStrokeCache: Pair<Long?, KeyStroke?> = null to null
 
   private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
     val inputEvent = e.inputEvent
@@ -242,9 +242,9 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
       val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
       val strokeCache = keyStrokeCache
       if (defaultKeyStroke != null) {
-        keyStrokeCache = inputEvent to defaultKeyStroke
+        keyStrokeCache = inputEvent.`when` to defaultKeyStroke
         return defaultKeyStroke
-      } else if (strokeCache.first === inputEvent) {
+      } else if (strokeCache.first == inputEvent.`when`) {
         keyStrokeCache = null to null
         return strokeCache.second
       }
