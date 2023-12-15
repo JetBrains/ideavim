@@ -29,7 +29,6 @@ import com.intellij.openapi.editor.event.SelectionEvent
 import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
-import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
@@ -40,14 +39,11 @@ import com.intellij.openapi.fileEditor.ex.FileEditorWithProvider
 import com.intellij.openapi.fileEditor.impl.EditorComposite
 import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.rd.createLifetime
-import com.intellij.openapi.rd.createNestedDisposable
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.removeUserData
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ExceptionUtil
-import com.jetbrains.rd.util.lifetime.Lifetime
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
@@ -96,6 +92,7 @@ import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.vimDisposable
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities
@@ -214,10 +211,9 @@ internal object VimListenerManager {
     }
 
     fun add(editor: Editor, openingEditor: VimEditor, scenario: LocalOptionInitialisationScenario) {
-      val pluginLifetime = VimPlugin.getInstance().createLifetime()
-      val editorLifetime = (editor as EditorImpl).disposable.createLifetime()
-      val disposable =
-        Lifetime.intersect(pluginLifetime, editorLifetime).createNestedDisposable("MyLifetimedDisposable")
+      // As I understand, there is no need to pass a disposable that also disposes on editor close
+      //   because all editor resources will be garbage collected anyway on editor close
+      val disposable = editor.project?.vimDisposable ?: return
 
       editor.contentComponent.addKeyListener(VimKeyListener)
       Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
