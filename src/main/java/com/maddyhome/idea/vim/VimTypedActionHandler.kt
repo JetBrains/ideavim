@@ -28,8 +28,11 @@ import javax.swing.KeyStroke
  * Accepts all regular keystrokes and passes them on to the Vim key handler.
  *
  * IDE shortcut keys used by Vim commands are handled by [com.maddyhome.idea.vim.action.VimShortcutKeyAction].
+ *
+ * This class is used in Which-Key plugin, so don't make it internal. Generally, we should provide a proper
+ *   way to get ideavim keys for this plugin. See VIM-3085
  */
-internal class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
+public class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
   private val traceTime = injector.globalOptions().ideatracetime
 
@@ -86,7 +89,7 @@ internal class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedAct
     }
   }
 
-  companion object {
+  internal companion object {
     private val LOG = logger<VimTypedActionHandler>()
   }
 }

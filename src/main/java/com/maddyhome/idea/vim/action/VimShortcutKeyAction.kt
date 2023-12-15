@@ -54,8 +54,11 @@ import javax.swing.KeyStroke
  *
  *
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
+ *
+ * This class is used in Which-Key plugin, so don't make it internal. Generally, we should provide a proper
+ *   way to get ideavim keys for this plugin. See VIM-3085
  */
-internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   private val traceTime: Boolean
     get() {
       // Make sure the injector is initialized
@@ -95,7 +98,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
 
   // There is a chance that we can use BGT, but we call for isCell inside the update.
   // Not sure if can can use BGT with this call. Let's use EDT for now.
-  override fun getActionUpdateThread() = ActionUpdateThread.EDT
+  override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
   override fun update(e: AnActionEvent) {
     val start = if (traceTime) System.currentTimeMillis() else null
@@ -274,7 +277,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
       .toSet()
   }
 
-  companion object {
+  internal companion object {
     @JvmField
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =
       ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
