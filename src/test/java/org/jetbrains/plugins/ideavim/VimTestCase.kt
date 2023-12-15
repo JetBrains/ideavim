@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -154,6 +155,7 @@ abstract class VimTestCase {
   open fun tearDown(testInfo: TestInfo) {
     val swingTimer = swingTimer
     swingTimer?.stop()
+    VimVisualTimer.swingTimer = null
     val bookmarksManager = BookmarksManager.getInstance(fixture.project)
     bookmarksManager?.bookmarks?.forEach { bookmark ->
       bookmarksManager.remove(bookmark)
