@@ -21,14 +21,14 @@ import org.jetbrains.annotations.TestOnly
 
 public interface VimOptionGroup {
   /**
-   * Called to initialise the options
+   * Called to initialise the list of available options
    *
    * This function must be idempotent, as it is called each time the plugin is enabled.
    */
   public fun initialiseOptions()
 
   /**
-   * Initialise the local to buffer and local to window options for this editor
+   * Initialise the local to buffer and local to window option values for this editor
    *
    * Depending on the initialisation scenario, the local-to-buffer, local-to-window and/or global-local options are
    * initialised. The scenario dictates where the local options get their values from. Typically, local-to-buffer
