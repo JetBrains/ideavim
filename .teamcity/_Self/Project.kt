@@ -55,4 +55,9 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
     // Disable detection of the java OOM
     javaCrash = false
   }
+
+  artifactRules = """
+        +:build/reports => build/reports
+        +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
+    """.trimIndent()
 })
