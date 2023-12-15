@@ -27,7 +27,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val perWindowGlobalOptionsKey = Key<MutableMap<String, VimDataType>>("perWindowGlobalOptions")
   private val parsedEffectiveValueKey = Key<MutableMap<String, Any>>("parsedEffectiveOptionValues")
-  private val listeners = OptionListenersImpl()
+  private val listeners by lazy { OptionListenersImpl(this, injector.editorGroup) }
 
   override fun initialiseOptions() {
     Options.initialise()
@@ -348,13 +348,9 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     }
 
     when (option.declaredScope) {
-      GLOBAL -> if (changed) {
-        onGlobalOptionChanged(option)
-        onGlobalOptionEffectiveValueChanged(option)
-      }
+      GLOBAL -> if (changed) listeners.onGlobalOptionChanged(option.name)
       LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> { /* Setting global value of a local option. No need to notify anyone */ }
-      GLOBAL_OR_LOCAL_TO_BUFFER -> onGlobalLocalToBufferOptionGlobalValueChanged(option)
-      GLOBAL_OR_LOCAL_TO_WINDOW -> onGlobalLocalToWindowOptionGlobalValueChanged(option)
+      GLOBAL_OR_LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_WINDOW -> listeners.onGlobalLocalOptionGlobalValueChanged(option)
     }
   }
 
@@ -410,20 +406,28 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private fun <T : VimDataType> setEffectiveValue(option: Option<T>, editor: VimEditor, value: T) {
     when (option.declaredScope) {
       GLOBAL -> if (doSetGlobalValue(option, value)) {
-        onGlobalOptionChanged(option)
-        onGlobalOptionEffectiveValueChanged(option)
+        listeners.onGlobalOptionChanged(option.name)
       }
       LOCAL_TO_BUFFER -> if (doSetBufferLocalValue(option, editor, value)) {
+        // TODO: Update global value even if local value hasn't changed
+        // E.g. :set scroll=5 leaves global and local equal to 5
+        // :setlocal scroll=10 changes local to 10, but leaves global at 5
+        // :set scroll=10 should leave local at 10, but change global to 10
         doSetGlobalValue(option, value)
-        onBufferLocalOptionEffectiveValueChanged(option, editor)
+        listeners.onLocalOptionChanged(option, editor)
       }
       LOCAL_TO_WINDOW -> if (doSetWindowLocalValue(option, editor, value)) {
+        // TODO: Update global value even if local value hasn't changed
+        // E.g. :set scroll=5 leaves global and local equal to 5
+        // :setlocal scroll=10 changes local to 10, but leaves global at 5
+        // :set scroll=10 should leave local at 10, but change global to 10
         doSetPerWindowGlobalValue(option, editor, value)
-        onWindowLocalOptionEffectiveValueChanged(option, editor)
+        listeners.onLocalOptionChanged(option, editor)
       }
       GLOBAL_OR_LOCAL_TO_BUFFER -> {
+        // Reset the local value if it has previously been set, then set the global value. Number based options
+        // (including boolean) get a copy of the global value. String based options get unset.
         if (tryGetBufferLocalValue(option, editor) != option.unsetValue) {
-          // Number based options (including boolean) get a copy of the global value. String based options get unset
           doSetBufferLocalValue(
             option,
             editor,
@@ -431,11 +435,12 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
           )
         }
         doSetGlobalValue(option, value)
-        onGlobalLocalToBufferOptionEffectiveValueChanged(option, editor)
+        listeners.onGlobalLocalOptionEffectiveValueChanged(option, editor)
       }
       GLOBAL_OR_LOCAL_TO_WINDOW -> {
+        // Reset the local value if it has previously been set, then set the global value. Number based options
+        // (including boolean) get a copy of the global value. String based options get unset.
         if (tryGetWindowLocalValue(option, editor) != option.unsetValue) {
-          // Number based options (including boolean) get a copy of the global value. String based options get unset
           doSetWindowLocalValue(
             option,
             editor,
@@ -443,7 +448,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
           )
         }
         doSetGlobalValue(option, value)
-        onGlobalLocalToWindowOptionEffectiveValueChanged(option, editor)
+        listeners.onGlobalLocalOptionEffectiveValueChanged(option, editor)
       }
     }
   }
@@ -475,14 +480,13 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private fun <T : VimDataType> setLocalValue(option: Option<T>, editor: VimEditor, value: T) {
     when (option.declaredScope) {
       GLOBAL -> if (doSetGlobalValue(option, value)) {
-        onGlobalOptionChanged(option)
-        onGlobalOptionEffectiveValueChanged(option)
+        listeners.onGlobalOptionChanged(option.name)
       }
       LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> if (doSetBufferLocalValue(option, editor, value)) {
-        onBufferLocalOptionEffectiveValueChanged(option, editor)
+        listeners.onLocalOptionChanged(option, editor)
       }
       LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> if (doSetWindowLocalValue(option, editor, value)) {
-        onWindowLocalOptionEffectiveValueChanged(option, editor)
+        listeners.onLocalOptionChanged(option, editor)
       }
     }
   }
@@ -553,90 +557,6 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     return values[option.name] as? T
   }
 
-  private fun <T : VimDataType> onGlobalOptionChanged(option: Option<T>) {
-    listeners.onGlobalOptionChanged(option.name)
-  }
-
-  private inline fun <T : VimDataType> onEffectiveValueChanged(
-    option: Option<T>,
-    editorsProvider: () -> Collection<VimEditor>,
-  ) {
-    val editors = editorsProvider()
-    listeners.onEffectiveValueChanged(option.name, editors)
-  }
-
-  /**
-   * Notify all editors that a global option value has changed
-   *
-   * This will call the listener for all open editors. It will also call the listener with a `null` editor, to provide
-   * for non-editor related callbacks. E.g. updating `'showcmd'`, tracking default register for `'clipboard'`, etc.
-   */
-  private fun <T : VimDataType> onGlobalOptionEffectiveValueChanged(option: Option<T>) {
-    onEffectiveValueChanged(option) { injector.editorGroup.localEditors() }
-  }
-
-  /**
-   * Notify all editors for the current buffer that a local-to-buffer option's effective value has changed
-   */
-  private fun <T : VimDataType> onBufferLocalOptionEffectiveValueChanged(option: Option<T>, editor: VimEditor) {
-    onEffectiveValueChanged(option) { injector.editorGroup.localEditors(editor.document) }
-  }
-
-  /**
-   * Notify the given editor that a local-to-window option's effective value has changed
-   */
-  private fun <T : VimDataType> onWindowLocalOptionEffectiveValueChanged(option: Option<T>, editor: VimEditor) {
-    onEffectiveValueChanged(option) { listOf(editor) }
-  }
-
-  /**
-   * Notify the affected editors that a global-local local to buffer option's effective value has changed.
-   *
-   * When a global-local option's effective value is changed with `:set`, the global value is updated, and copied to the
-   * local value. This means we need to notify all editors that are using the global value that it has changed, and skip
-   * any editors that have the value overridden. The editors associated with the current buffer are also notified (their
-   * local value has been updated).
-   *
-   * Note that we make no effort to minimise change notifications for global-local, as the logic is complex enough.
-   */
-  private fun <T : VimDataType> onGlobalLocalToBufferOptionEffectiveValueChanged(option: Option<T>, editor: VimEditor) {
-    onEffectiveValueChanged(option) {
-      mutableListOf<VimEditor>().also { editors ->
-        editors.addAll(injector.editorGroup.localEditors().filter { isUnsetValue(option, it) })
-        editors.addAll(injector.editorGroup.localEditors(editor.document).filter { !isUnsetValue(option, it) })
-      }
-    }
-  }
-
-  private fun <T : VimDataType> onGlobalLocalToBufferOptionGlobalValueChanged(option: Option<T>) {
-    onEffectiveValueChanged(option) { injector.editorGroup.localEditors().filter { isUnsetValue(option, it) } }
-  }
-
-  /**
-   * Notify the affected editors that a global-local local to window option's effective value has changed.
-   *
-   * When a global-local option's effective value is changed with `:set`, the global value is updated, and copied to the
-   * local value. This means we need to notify all editors that are using the global value that it has changed, and skip
-   * any editors that have the value overridden. The editors associated with the current buffer are also notified (their
-   * local value has been updated).
-   *
-   * Note that we make no effort to minimise change notifications for global-local, as the logic is complex enough.
-   */
-  private fun <T : VimDataType> onGlobalLocalToWindowOptionEffectiveValueChanged(option: Option<T>, editor: VimEditor) {
-    onEffectiveValueChanged(option) {
-      mutableListOf<VimEditor>().also { editors ->
-        editors.addAll(injector.editorGroup.localEditors().filter { isUnsetValue(option, it) })
-        if (!isUnsetValue(option, editor)) {
-          editors.add(editor)
-        }
-      }
-    }
-  }
-
-  private fun <T : VimDataType> onGlobalLocalToWindowOptionGlobalValueChanged(option: Option<T>) {
-    onEffectiveValueChanged(option) { injector.editorGroup.localEditors().filter { isUnsetValue(option, it) } }
-  }
-
 
   private fun getParsedEffectiveOptionStorage(option: Option<out VimDataType>, editor: VimEditor): MutableMap<String, Any> {
     return when (option.declaredScope) {
@@ -653,7 +573,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 }
 
-private class OptionListenersImpl {
+private class OptionListenersImpl(private val optionGroup: VimOptionGroup, private val editorGroup: VimEditorGroup) {
   private val globalOptionListeners = MultiSet<String, GlobalOptionChangeListener>()
   private val effectiveOptionValueListeners = MultiSet<String, EffectiveOptionValueChangeListener>()
 
@@ -678,13 +598,74 @@ private class OptionListenersImpl {
     effectiveOptionValueListeners.removeAll(optionName)
   }
 
+  /**
+   * Notify listeners that a global option has changed
+   *
+   * This will notify non-editor listeners that the global option value has changed. It also notifies all open editors
+   * that the global (and therefore effective) value of a global option has changed.
+   */
   fun onGlobalOptionChanged(optionName: String) {
-    globalOptionListeners[optionName]?.forEach {
-      it.onGlobalOptionChanged()
+    globalOptionListeners[optionName]?.forEach { it.onGlobalOptionChanged() }
+    fireEffectiveValueChanged(optionName, editorGroup.localEditors())
+  }
+
+  /**
+   * Notify listeners that the local (and therefore effective) value of a local option has changed.
+   *
+   * For the purposes of notification, we treat changing the local value of a global-local option the same as changing
+   * the local/effective value of a local-to-buffer or local-to-window option. When a local to buffer's local/effective
+   * value changes, we notify all open editors for the same buffer (document). when a local to window option's value
+   * changes, we notify just that window (editor).
+   */
+  fun onLocalOptionChanged(option: Option<out VimDataType>, editor: VimEditor) {
+    if (option.declaredScope == LOCAL_TO_BUFFER || option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
+      fireEffectiveValueChanged(option.name, editorGroup.localEditors(editor.document))
+    }
+    else if (option.declaredScope == LOCAL_TO_WINDOW || option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
+      fireEffectiveValueChanged(option.name, listOf(editor))
     }
   }
 
-  fun onEffectiveValueChanged(optionName: String, editors: Collection<VimEditor>) {
+  /**
+   * Notify listeners that the global value of a global-local option has changed
+   *
+   * This will notify all open editors where the option is not locally set.
+   */
+  fun onGlobalLocalOptionGlobalValueChanged(option: Option<out VimDataType>) {
+    val affectedEditors = editorGroup.localEditors().filter { optionGroup.isUnsetValue(option, it) }
+    fireEffectiveValueChanged(option.name, affectedEditors)
+  }
+
+  /**
+   * Notify listeners that the effective value of a global-local option has changed
+   *
+   * When setting the effective value, the global value is set, and the local value is reset. For string based options,
+   * the local value is unset, while for number based options (including toggle options), the value is set to a copy of
+   * the new value.
+   *
+   * This function will notify all editors that do not override the option locally. It also notifies the local editor
+   * for the current window or current document, if it's not already unset. The side effect of this is that number based
+   * global-local options can never be unset, and setting the effective value of the same option in another window will
+   * not update the effective (local) value in this window.
+   */
+  fun onGlobalLocalOptionEffectiveValueChanged(option: Option<out VimDataType>, editor: VimEditor) {
+    // This is essentially the same as calling [onGlobalLocalOptionGlobalValueChanged] followed by
+    // [onLocalOptionChanged], but ensures local editors are not notified twice in the case that a number based option
+    // is reset rather than unset.
+    val affectedEditors = mutableListOf<VimEditor>()
+    affectedEditors.addAll(editorGroup.localEditors().filter { optionGroup.isUnsetValue(option, it) })
+
+    if (option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
+      if (!optionGroup.isUnsetValue(option, editor)) affectedEditors.add(editor)
+    }
+    else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
+      affectedEditors.addAll(editorGroup.localEditors().filter { !optionGroup.isUnsetValue(option, it) })
+    }
+
+    fireEffectiveValueChanged(option.name, affectedEditors)
+  }
+
+  private fun fireEffectiveValueChanged(optionName: String, editors: Collection<VimEditor>) {
     val listeners = effectiveOptionValueListeners[optionName] ?: return
     listeners.forEach { listener ->
       editors.forEach { listener.onEffectiveValueChanged(it) }
