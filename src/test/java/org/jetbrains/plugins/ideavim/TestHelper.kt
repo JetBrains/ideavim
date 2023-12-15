@@ -15,11 +15,11 @@ import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.mode
 import org.junit.jupiter.params.provider.Arguments
 import kotlin.test.fail
 

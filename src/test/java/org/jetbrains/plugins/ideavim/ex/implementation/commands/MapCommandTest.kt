@@ -19,12 +19,11 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.assertThrowsLogError
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import javax.swing.JTextArea
-import kotlin.test.assertIs
 
 /**
  * @author vlan
@@ -876,10 +875,9 @@ n  ,f            <Plug>Foo
       indicateErrors = true,
       null,
     )
-    val exception = assertThrows<Throwable> {
+    assertThrowsLogError<ExException> {
       typeText(injector.parser.parseKeys("t"))
     }
-    assertIs<ExException>(exception.cause) // The original exception comes from the LOG.error, so we check the cause
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
@@ -923,11 +921,10 @@ n  ,f            <Plug>Foo
     """.trimIndent()
     configureByJavaText(text)
 
-    val exception = assertThrows<Throwable> {
+    assertThrowsLogError<ExException> {
       typeText(commandToKeys("inoremap <expr> <cr> unknownFunction() ? '\\<C-y>' : '\\<C-g>u\\<CR>'"))
       typeText(injector.parser.parseKeys("i<CR>"))
     }
-    assertIs<ExException>(exception.cause) // The original exception comes from the LOG.error, so we check the cause
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: unknownFunction")

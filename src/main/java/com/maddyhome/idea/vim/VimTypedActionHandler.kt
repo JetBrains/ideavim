@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.testFramework.TestLoggerFactory.TestLoggerAssertionError
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -84,6 +85,8 @@ public class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActio
       }
     } catch (e: ProcessCanceledException) {
       // Nothing
+    } catch (e: TestLoggerAssertionError) {
+      throw e
     } catch (e: Throwable) {
       LOG.error(e)
     }
