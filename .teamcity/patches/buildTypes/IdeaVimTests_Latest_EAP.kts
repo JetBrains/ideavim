@@ -14,7 +14,10 @@ changeBuildType(RelativeId("IdeaVimTests_Latest_EAP")) {
     check(artifactRules == "") {
         "Unexpected option value: artifactRules = $artifactRules"
     }
-    artifactRules = "+:build/reports => build/reports"
+    artifactRules = """
+        +:build/reports => build/reports
+        +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
+    """.trimIndent()
 
     expectSteps {
         gradle {
