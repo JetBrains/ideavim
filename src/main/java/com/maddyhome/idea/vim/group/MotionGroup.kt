@@ -48,9 +48,7 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.handler.Motion
@@ -74,6 +72,8 @@ import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.annotations.Range
 import java.io.File
@@ -461,11 +461,13 @@ internal class MotionGroup : VimMotionGroupBase() {
       val fileEditor = event.oldEditor
       if (fileEditor is TextEditor) {
         val editor = fileEditor.editor
-        ExOutputModel.getInstance(editor).clear()
-        editor.vim.let { vimEditor ->
-          if (VimStateMachine.getInstance(vimEditor).mode is Mode.VISUAL) {
-            vimEditor.exitVisualMode()
-            KeyHandler.getInstance().reset(vimEditor)
+        if (!editor.isDisposed) {
+          ExOutputModel.getInstance(editor).clear()
+          editor.vim.let { vimEditor ->
+            if (VimStateMachine.getInstance(vimEditor).mode is Mode.VISUAL) {
+              vimEditor.exitVisualMode()
+              KeyHandler.getInstance().reset(vimEditor)
+            }
           }
         }
       }

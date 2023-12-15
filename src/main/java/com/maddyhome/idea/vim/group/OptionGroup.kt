@@ -58,6 +58,8 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
       // Unfortunately, we can't reliably know if a closing editor is the selected editor. Instead, we rely on selection
       // change events. If an editor is losing selection and there is no new selection, we can assume this means that
       // the last editor has been closed, and use the closed editor to update the fallback window
+      //
+      // XXX: event.oldEditor will must probably return a disposed editor. So, it should be treated with care
       if (event.newEditor == null) {
         (event.oldEditor as? TextEditor)?.editor?.let {
           (VimPlugin.getOptionGroup() as OptionGroup).updateFallbackWindow(injector.fallbackWindow, it.vim)
