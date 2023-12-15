@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.idea.TestFor
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
+import com.intellij.testFramework.TestLoggerFactory.TestLoggerAssertionError
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -24,6 +25,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import javax.swing.JTextArea
+import kotlin.test.assertIs
 
 /**
  * @author vlan
@@ -875,9 +877,10 @@ n  ,f            <Plug>Foo
       indicateErrors = true,
       null,
     )
-    assertThrowsLogError<ExException> {
+    val exception = assertThrowsLogError<TestLoggerAssertionError> {
       typeText(injector.parser.parseKeys("t"))
     }
+    assertIs<ExException>(exception.cause) // Exception is wrapped into LOG.error twice
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
