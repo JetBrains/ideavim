@@ -26,7 +26,7 @@ changeBuildType(RelativeId("IdeaVimTests_Latest_EAP")) {
     steps {
         update<GradleBuildStep>(0) {
             clearConditions()
-            jdkHome = "%env.JDK_21_0%"
+            jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
         }
     }
 }
