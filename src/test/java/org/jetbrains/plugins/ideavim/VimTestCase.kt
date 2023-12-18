@@ -152,8 +152,8 @@ abstract class VimTestCase {
 
   @AfterEach
   open fun tearDown(testInfo: TestInfo) {
-    val swingTimer = swingTimer
     swingTimer?.stop()
+    swingTimer = null
     val bookmarksManager = BookmarksManager.getInstance(fixture.project)
     bookmarksManager?.bookmarks?.forEach { bookmark ->
       bookmarksManager.remove(bookmark)

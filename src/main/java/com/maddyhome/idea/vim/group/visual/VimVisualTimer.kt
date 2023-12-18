@@ -9,10 +9,10 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.ActionEvent
 import javax.swing.Timer
 
@@ -77,6 +77,11 @@ internal object VimVisualTimer {
         it.actionPerformed(ActionEvent(swingTimer1, 0, swingTimer1.actionCommand, System.currentTimeMillis(), 0))
       }
     }
+  }
+
+  fun drop() {
+    swingTimer?.stop()
+    swingTimer = null
   }
 
   inline fun timerAction(task: (initialMode: Mode?) -> Unit) {

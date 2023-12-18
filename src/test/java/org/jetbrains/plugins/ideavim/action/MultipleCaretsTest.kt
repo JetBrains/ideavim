@@ -1025,10 +1025,10 @@ $c  tw${c}o
     )
     assertState(
       """
-    <selection>one two
+    ${s}one two
     three four
     five six
-    </selection>
+    $se
       """.trimIndent(),
     )
   }

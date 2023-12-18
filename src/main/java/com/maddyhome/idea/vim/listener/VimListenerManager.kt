@@ -343,7 +343,7 @@ internal object VimListenerManager {
     override fun fileOpenedSync(
       source: FileEditorManager,
       file: VirtualFile,
-      editorsWithProviders: List<FileEditorWithProvider>
+      editorsWithProviders: List<FileEditorWithProvider>,
     ) {
       // This callback is called once all editors are created for a file being opened. The EditorComposite has been
       // created (and the list of editors and providers is passed here) and added to an EditorWindow tab, inside a
@@ -401,6 +401,7 @@ internal object VimListenerManager {
      */
     override fun selectionChanged(selectionEvent: SelectionEvent) {
       if (selectionEvent.editor.isIdeaVimDisabledHere) return
+      VimVisualTimer.drop()
       val editor = selectionEvent.editor
       val document = editor.document
       val ijVimEditor = IjVimEditor(editor)

@@ -14,16 +14,16 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.ConstantNode
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -33,6 +33,7 @@ import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import kotlin.test.assertNull
 
 @TraceOptions(TestOptionConstants.selectmode)
 class IdeaVisualControlTest : VimTestCase() {
@@ -762,6 +763,23 @@ class IdeaVisualControlTest : VimTestCase() {
     waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
     assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
+  }
+
+  @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test control selection interruption`() {
+    configureByText(
+      """
+            Lorem Ipsum
+
+            I $s${c}found$se it in a legendary land
+            consectetur adipiscing elit
+      """.trimIndent(),
+    )
+
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    typeText(injector.parser.parseKeys("V"))
+    assertNull(VimVisualTimer.swingTimer)
   }
 
   private fun startDummyTemplate() {

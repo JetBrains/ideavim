@@ -40,9 +40,15 @@ internal object IdeaSelectionControl {
    * This method should be in sync with [predictMode]
    *
    * Control unexpected (non vim) selection change and adjust a mode to it. The new mode is not enabled immediately,
-   *   but with some delay (using [VimVisualTimer])
+   *   but with some delay (using [VimVisualTimer]). The delay is used because some platform functionality
+   *   makes features by using selection. E.g. PyCharm unindent firstly select the indenting then applies delete action.
+   *   Such "quick" selection breaks IdeaVim behaviour.
    *
    * See [VimVisualTimer] to more info.
+   *
+   * XXX: This method can be split into "change calculation" and "change apply". In this way, we would be able
+   *   to calculate if we need to make a change or not and reduce the number of these calls.
+   *   If this refactoring ever is applied, please add `assertNull(VimVisualTimer.timer)` to `tearDown` of VimTestCase.
    */
   fun controlNonVimSelectionChange(
     editor: Editor,
@@ -50,6 +56,7 @@ internal object IdeaSelectionControl {
   ) {
     VimVisualTimer.singleTask(editor.vim.mode) { initialMode ->
 
+      if (VimPlugin.isNotEnabled()) return@singleTask
       if (editor.isIdeaVimDisabledHere) return@singleTask
 
       logger.debug("Adjust non-vim selection. Source: $selectionSource, initialMode: $initialMode")

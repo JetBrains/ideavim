@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.listener
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.StrictMode
 import java.io.Closeable
@@ -65,7 +66,7 @@ public sealed class VimListenerSuppressor {
   // Prefer try-with-resources
   public fun unlock() {
     LOG.trace("Suppressor unlock")
-    LOG.trace(injector.application.currentStackTrace())
+    LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor--
   }
 
