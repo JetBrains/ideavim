@@ -36,31 +36,28 @@ public val VimEditor.isIdeaRefactorModeSelect: Boolean
 
 internal object IdeaRefactorModeHelper {
 
-  fun correctSelection(editor: Editor) {
-    val action: () -> Unit = {
-      val mode = editor.vim.mode
-      if (!mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
-        SelectionVimListenerSuppressor.lock().use {
-          editor.selectionModel.removeSelection()
-        }
-      }
-      if (mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
-        val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim)
-        if (mode.selectionType != autodetectedSubmode) {
-          // Update the submode
-          val newMode = when (mode) {
-            is Mode.SELECT -> mode.copy(selectionType = autodetectedSubmode)
-            is Mode.VISUAL -> mode.copy(selectionType = autodetectedSubmode)
-            else -> error("IdeaVim should be either in visual or select modes")
-          }
-          editor.vim.vimStateMachine.mode = newMode
-        }
-      }
+  sealed interface Action {
+    object RemoveSelection : Action
+    class SetMode(val newMode: Mode) : Action
+    class MoveToOffset(val newOffset: Int) : Action
+  }
 
-      if (editor.hasBlockOrUnderscoreCaret()) {
-        TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange?.let { segmentRange ->
-          if (!segmentRange.isEmpty && segmentRange.endOffset == editor.caretModel.offset && editor.caretModel.offset != 0) {
-            editor.caretModel.moveToOffset(editor.caretModel.offset - 1)
+  fun applyCorrections(corrections: List<Action>, editor: Editor) {
+    val correctionsApplier = {
+      corrections.forEach { correction ->
+        when (correction) {
+          is Action.MoveToOffset -> {
+            editor.caretModel.moveToOffset(correction.newOffset)
+          }
+
+          Action.RemoveSelection -> {
+            SelectionVimListenerSuppressor.lock().use {
+              editor.selectionModel.removeSelection()
+            }
+          }
+
+          is Action.SetMode -> {
+            editor.vim.vimStateMachine.mode = correction.newMode
           }
         }
       }
@@ -70,7 +67,9 @@ internal object IdeaRefactorModeHelper {
     if (lookup != null) {
       val selStart = editor.selectionModel.selectionStart
       val selEnd = editor.selectionModel.selectionEnd
-      lookup.performGuardedChange(action)
+      lookup.performGuardedChange {
+        correctionsApplier()
+      }
       lookup.addLookupListener(object : LookupListener {
         override fun beforeItemSelected(event: LookupEvent): Boolean {
           // FIXME: 01.11.2019 Nasty workaround because of problems in IJ platform
@@ -82,7 +81,41 @@ internal object IdeaRefactorModeHelper {
         }
       })
     } else {
-      action()
+      correctionsApplier()
     }
+  }
+
+  fun calculateCorrections(editor: Editor): List<Action> {
+    val corrections = mutableListOf<Action>()
+    val mode = editor.vim.mode
+    if (!mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+      corrections.add(Action.RemoveSelection)
+    }
+    if (mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+      val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim)
+      if (mode.selectionType != autodetectedSubmode) {
+        // Update the submode
+        val newMode = when (mode) {
+          is Mode.SELECT -> mode.copy(selectionType = autodetectedSubmode)
+          is Mode.VISUAL -> mode.copy(selectionType = autodetectedSubmode)
+          else -> error("IdeaVim should be either in visual or select modes")
+        }
+        corrections.add(Action.SetMode(newMode))
+      }
+    }
+
+    if (editor.hasBlockOrUnderscoreCaret()) {
+      TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange?.let { segmentRange ->
+        if (!segmentRange.isEmpty && segmentRange.endOffset == editor.caretModel.offset && editor.caretModel.offset != 0) {
+          corrections.add(Action.MoveToOffset(editor.caretModel.offset - 1))
+        }
+      }
+    }
+    return corrections
+  }
+
+  fun correctSelection(editor: Editor) {
+    val corrections = calculateCorrections(editor)
+    applyCorrections(corrections, editor)
   }
 }

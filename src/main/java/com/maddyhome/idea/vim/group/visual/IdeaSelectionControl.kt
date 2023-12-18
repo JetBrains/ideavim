@@ -121,8 +121,9 @@ internal object IdeaSelectionControl {
     }
   }
 
-  private fun dontChangeMode(editor: Editor): Boolean =
-    editor.isTemplateActive() && (editor.vim.isIdeaRefactorModeKeep || editor.vim.mode.hasVisualSelection)
+  private fun dontChangeMode(editor: Editor): Boolean {
+    return editor.isTemplateActive() && (editor.vim.isIdeaRefactorModeKeep || editor.vim.mode.hasVisualSelection)
+  }
 
   private fun chooseNonSelectionMode(editor: Editor): Mode {
     val templateActive = editor.isTemplateActive()
