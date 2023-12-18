@@ -123,7 +123,7 @@ abstract class VimTestCase {
     VimPlugin.getOptionGroup().resetAllOptionsForTesting()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
-    if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
+    if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
     injector.globalOptions().ideastrictmode = true
     Checks.reset()
     clearClipboard()

@@ -27,7 +27,7 @@ internal class RiderActionListener : AnActionListener {
 
   private var editor: Editor? = null
   override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
-    if (!VimPlugin.isEnabled()) return
+    if (VimPlugin.isNotEnabled()) return
 
     val hostEditor = event.dataContext.getData(CommonDataKeys.HOST_EDITOR)
     if (hostEditor != null) {
@@ -36,7 +36,7 @@ internal class RiderActionListener : AnActionListener {
   }
 
   override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
-    if (!VimPlugin.isEnabled()) return
+    if (VimPlugin.isNotEnabled()) return
 
     //region Extend Selection for Rider
     when (ActionManager.getInstance().getId(action)) {

@@ -267,7 +267,7 @@ internal object VimListenerManager {
 
   class VimFileEditorManagerListener : FileEditorManagerListener {
     override fun selectionChanged(event: FileEditorManagerEvent) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
       SearchGroup.fileEditorManagerSelectionChangedCallback(event)

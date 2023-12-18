@@ -23,7 +23,7 @@ internal class VimStandalonePluginUpdateChecker : StandalonePluginUpdateChecker(
   VimIcons.IDEAVIM,
 ) {
 
-  override fun skipUpdateCheck(): Boolean = !VimPlugin.isEnabled() || "dev" in VimPlugin.getVersion()
+  override fun skipUpdateCheck(): Boolean = VimPlugin.isNotEnabled() || "dev" in VimPlugin.getVersion()
 
   companion object {
     private const val PROPERTY_NAME = "ideavim.statistics.timestamp"

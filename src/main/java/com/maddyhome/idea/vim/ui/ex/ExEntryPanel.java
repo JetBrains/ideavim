@@ -453,7 +453,7 @@ public class ExEntryPanel extends JPanel {
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
-      if (!VimPlugin.isEnabled()) return;
+      if (VimPlugin.isNotEnabled()) return;
       // Calls updateUI on this and child components
       if (ExEntryPanel.isInstanceWithShortcutsActive()) {
         IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstance());

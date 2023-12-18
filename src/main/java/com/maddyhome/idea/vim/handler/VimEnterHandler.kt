@@ -125,7 +125,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
   }
 
   private fun isThisHandlerEnabled(editor: Editor, caret: Caret?, dataContext: DataContext?): Boolean {
-    if (!VimPlugin.isEnabled()) return false
+    if (VimPlugin.isNotEnabled()) return false
     if (!isHandlerEnabled(editor, dataContext)) return false
     if (isNotActualKeyPress(dataContext)) return false
     return true

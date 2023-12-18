@@ -59,7 +59,7 @@ internal object IdeaSpecifics {
     private var completionPrevDocumentLength: Int? = null
     private var completionPrevDocumentOffset: Int? = null
     override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
 
       val hostEditor = event.dataContext.getData(CommonDataKeys.HOST_EDITOR)
       if (hostEditor != null) {
@@ -92,7 +92,7 @@ internal object IdeaSpecifics {
     }
 
     override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
 
       val editor = editor
       if (editor != null && action is ChooseItemAction && editor.vimStateMachine?.isRecording == true) {
@@ -138,7 +138,7 @@ internal object IdeaSpecifics {
   //region Enter insert mode for surround templates without selection
   class VimTemplateManagerListener : TemplateManagerListener {
     override fun templateStarted(state: TemplateState) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
       val editor = state.editor ?: return
 
       state.addTemplateStateListener(object : TemplateEditingAdapter() {
@@ -176,7 +176,7 @@ internal object IdeaSpecifics {
   //region Register shortcuts for lookup and perform partial reset
   class LookupTopicListener : LookupManagerListener {
     override fun activeLookupChanged(oldLookup: Lookup?, newLookup: Lookup?) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
 
       // Lookup opened
       if (oldLookup == null && newLookup is LookupImpl) {
@@ -199,7 +199,7 @@ internal object IdeaSpecifics {
   //region Hide Vim search highlights when showing IntelliJ search results
   class VimFindModelListener : FindModelListener {
     override fun findNextModelChanged() {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
       VimPlugin.getSearch().clearSearchHighlight()
     }
   }

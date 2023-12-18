@@ -219,6 +219,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return getInstance().enabled;
   }
 
+  public static boolean isNotEnabled() {
+    return !isEnabled();
+  }
+
   public static void setEnabled(final boolean enabled) {
     if (isEnabled() == enabled) return;
 

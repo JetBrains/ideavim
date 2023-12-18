@@ -81,7 +81,7 @@ private fun Editor.guicursorMode(): GuiCursorMode {
 private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance().isBlockCursor
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
-  if (!VimPlugin.isEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
+  if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
 
   // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
@@ -89,7 +89,7 @@ private fun Editor.updatePrimaryCaretVisualAttributes() {
 }
 
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
-  if (!VimPlugin.isEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
+  if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
   val attributes = if (this.vim.inBlockSelection) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
   this.caretModel.allCarets.forEach {

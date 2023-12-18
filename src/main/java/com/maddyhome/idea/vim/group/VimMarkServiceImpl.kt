@@ -205,7 +205,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
      * @param event The change event
      */
     override fun beforeDocumentChange(event: DocumentEvent) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
       if (logger.isDebugEnabled) logger.debug("MarkUpdater before, event = $event")
       if (event.oldLength == 0) return
       val doc = event.document
@@ -221,7 +221,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
      * @param event The change event
      */
     override fun documentChanged(event: DocumentEvent) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
       if (logger.isDebugEnabled) logger.debug("MarkUpdater after, event = $event")
       if (event.newLength == 0 || event.newLength == 1 && event.newFragment[0] != '\n') return
       val doc = event.document
@@ -242,7 +242,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
 
   class VimBookmarksListener(private val myProject: Project) : BookmarksListener {
     override fun bookmarkAdded(group: BookmarkGroup, bookmark: Bookmark) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
       if (!injector.globalIjOptions().ideamarks) {
         return
       }
@@ -255,7 +255,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     }
 
     override fun bookmarkRemoved(group: BookmarkGroup, bookmark: Bookmark) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
       if (!injector.globalIjOptions().ideamarks) {
         return
       }

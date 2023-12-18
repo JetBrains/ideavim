@@ -113,7 +113,7 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
   }
 
   private fun isEnabled(e: AnActionEvent, keyStroke: KeyStroke?): ActionEnableStatus {
-    if (!VimPlugin.isEnabled()) return ActionEnableStatus.no("IdeaVim is disabled", LogLevel.DEBUG)
+    if (VimPlugin.isNotEnabled()) return ActionEnableStatus.no("IdeaVim is disabled", LogLevel.DEBUG)
     val editor = getEditor(e)
     if (editor != null && keyStroke != null) {
       if (isOctopusEnabled(keyStroke, editor)) {

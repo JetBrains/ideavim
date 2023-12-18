@@ -110,7 +110,7 @@ internal fun Editor.isTemplateActive(): Boolean {
 }
 
 private fun vimEnabled(editor: Editor?): Boolean {
-  if (!VimPlugin.isEnabled()) return false
+  if (VimPlugin.isNotEnabled()) return false
   if (editor != null && editor.isIdeaVimDisabledHere) return false
   return true
 }
