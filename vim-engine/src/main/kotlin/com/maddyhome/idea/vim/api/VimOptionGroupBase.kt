@@ -408,21 +408,19 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
       GLOBAL -> if (doSetGlobalValue(option, value)) {
         listeners.onGlobalOptionChanged(option.name)
       }
-      LOCAL_TO_BUFFER -> if (doSetBufferLocalValue(option, editor, value)) {
-        // TODO: Update global value even if local value hasn't changed
-        // E.g. :set scroll=5 leaves global and local equal to 5
-        // :setlocal scroll=10 changes local to 10, but leaves global at 5
-        // :set scroll=10 should leave local at 10, but change global to 10
+      LOCAL_TO_BUFFER -> {
+        val changed = doSetBufferLocalValue(option, editor, value)
         doSetGlobalValue(option, value)
-        listeners.onLocalOptionChanged(option, editor)
+        if (changed) {
+          listeners.onLocalOptionChanged(option, editor)
+        }
       }
-      LOCAL_TO_WINDOW -> if (doSetWindowLocalValue(option, editor, value)) {
-        // TODO: Update global value even if local value hasn't changed
-        // E.g. :set scroll=5 leaves global and local equal to 5
-        // :setlocal scroll=10 changes local to 10, but leaves global at 5
-        // :set scroll=10 should leave local at 10, but change global to 10
+      LOCAL_TO_WINDOW -> {
+        val changed = doSetWindowLocalValue(option, editor, value)
         doSetPerWindowGlobalValue(option, editor, value)
-        listeners.onLocalOptionChanged(option, editor)
+        if (changed) {
+          listeners.onLocalOptionChanged(option, editor)
+        }
       }
       GLOBAL_OR_LOCAL_TO_BUFFER -> {
         // Reset the local value if it has previously been set, then set the global value. Number based options
