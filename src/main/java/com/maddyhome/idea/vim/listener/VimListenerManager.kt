@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.listener
 
 import com.intellij.ide.ui.UISettings
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
@@ -215,43 +216,49 @@ internal object VimListenerManager {
       //   because all editor resources will be garbage collected anyway on editor close
       val disposable = editor.project?.vimDisposable ?: return
 
+      val listenersDisposable = Disposer.newDisposable(disposable)
+      editor.putUserData(editorListenersDisposable, listenersDisposable)
+
+      Disposer.register(listenersDisposable) {
+        if (VimListenerTestObject.enabled) {
+          VimListenerTestObject.disposedCounter += 1
+        }
+      }
+
       editor.contentComponent.addKeyListener(VimKeyListener)
-      Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
+      Disposer.register(listenersDisposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
 
       // Initialise the local options. We MUST do this before anything has the chance to query options
       VimPlugin.getOptionGroup().initialiseLocalOptions(editor.vim, openingEditor, scenario)
 
       val eventFacade = EventFacade.getInstance()
-      eventFacade.addEditorMouseListener(editor, EditorMouseHandler, disposable)
-      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler, disposable)
-      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler, disposable)
-      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, disposable)
-      eventFacade.addCaretListener(editor, EditorCaretHandler, disposable)
+      eventFacade.addEditorMouseListener(editor, EditorMouseHandler, listenersDisposable)
+      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler, listenersDisposable)
+      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler, listenersDisposable)
+      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, listenersDisposable)
+      eventFacade.addCaretListener(editor, EditorCaretHandler, listenersDisposable)
 
       VimPlugin.getEditor().editorCreated(editor)
 
-      VimPlugin.getChange().editorCreated(editor, disposable)
+      VimPlugin.getChange().editorCreated(editor, listenersDisposable)
 
-      Disposer.register(disposable) {
+      Disposer.register(listenersDisposable) {
         VimPlugin.getEditorIfCreated()?.editorDeinit(editor, true)
       }
     }
 
     fun remove(editor: Editor, isReleased: Boolean) {
-      editor.contentComponent.removeKeyListener(VimKeyListener)
-      val eventFacade = EventFacade.getInstance()
-      eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
-      eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
-      eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
-      eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
-      eventFacade.removeCaretListener(editor, EditorCaretHandler)
+      val editorDisposable = editor.getUserData(editorListenersDisposable)
+      if (editorDisposable != null) {
+        Disposer.dispose(editorDisposable)
+      }
+      else StrictMode.fail("Editor doesn't have disposable attached. $editor")
 
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
-
-      VimPlugin.getChange().editorReleased(editor)
     }
-
   }
+
+  val editorListenersDisposable = Key.create<Disposable>("IdeaVim listeners disposable")
 
   object VimCaretListener : CaretListener {
     override fun caretAdded(event: CaretEvent) {
@@ -693,6 +700,11 @@ internal object VimListenerManager {
     MOUSE,
     OTHER,
   }
+}
+
+internal object VimListenerTestObject {
+  var enabled: Boolean = false
+  var disposedCounter = 0
 }
 
 private object MouseEventsDataHolder {

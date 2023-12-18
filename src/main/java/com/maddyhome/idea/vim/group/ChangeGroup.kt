@@ -98,10 +98,6 @@ public class ChangeGroup : VimChangeGroupBase() {
     EventFacade.getInstance().addEditorMouseListener(editor!!, listener, disposable)
   }
 
-  public fun editorReleased(editor: Editor?) {
-    EventFacade.getInstance().removeEditorMouseListener(editor!!, listener)
-  }
-
   override fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char) {
     val editor = (vimEditor as IjVimEditor).editor
     val ijContext = context.ij
