@@ -129,6 +129,23 @@ class OptionAccessScopeTest: VimTestCase() {
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
   }
 
+  @Test
+  fun `test set local-to-buffer option at effective scope to current value changes global value`() {
+    val defaultValue = VimInt(10)
+    val option = NumberOption(OPTION_NAME, OptionDeclaredScope.LOCAL_TO_BUFFER, OPTION_NAME, defaultValue)
+    injector.optionGroup.addOption(option)
+
+    val effectiveValue = VimInt(100)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), effectiveValue)
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
+
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
+
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
+  }
+
 
   // LOCAL_TO_WINDOW
   @Test
@@ -166,6 +183,23 @@ class OptionAccessScopeTest: VimTestCase() {
     injector.optionGroup.addOption(option)
 
     val effectiveValue = VimInt(100)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
+
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim)))
+    assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)))
+  }
+
+  @Test
+  fun `test set local-to-window option at effective scope to current value changes global value`() {
+    val defaultValue = VimInt(10)
+    val option = NumberOption(OPTION_NAME, OptionDeclaredScope.LOCAL_TO_WINDOW, OPTION_NAME, defaultValue)
+
+    injector.optionGroup.addOption(option)
+    val effectiveValue = VimInt(100)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim), effectiveValue)
+    assertEquals(defaultValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
+
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), effectiveValue)
 
     assertEquals(effectiveValue, injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)))
