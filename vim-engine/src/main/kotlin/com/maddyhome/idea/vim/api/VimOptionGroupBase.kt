@@ -23,11 +23,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 public abstract class VimOptionGroupBase : VimOptionGroup {
   private val globalValues = mutableMapOf<String, VimDataType>()
-  private val globalParsedValues = mutableMapOf<String, Any>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val perWindowGlobalOptionsKey = Key<MutableMap<String, VimDataType>>("perWindowGlobalOptions")
-  private val parsedEffectiveValueKey = Key<MutableMap<String, Any>>("parsedEffectiveOptionValues")
   private val listeners by lazy { OptionListenersImpl(this, injector.editorGroup) }
+  private val parsedValuesCache by lazy { ParsedValuesCache(this, injector.vimStorageService) }
 
   override fun initialiseOptions() {
     Options.initialise()
@@ -187,28 +186,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     editor: VimEditor?,
     provider: (T) -> TData,
   ): TData {
-    // TODO: We can't correctly clear global-local options
-    // We have to cache global-local values locally, because they can be set locally. But if they're not overridden
-    // locally, we would cache a global value per-window. When the global value is changed with OptionScope.GLOBAL, we
-    // are unable to clear the per-window cached value, so windows would end up with stale cached (global) values.
-    check(option.declaredScope != GLOBAL_OR_LOCAL_TO_WINDOW
-      && option.declaredScope != GLOBAL_OR_LOCAL_TO_BUFFER
-    ) { "Global-local options cannot currently be cached" }
-
-    val cachedValues = if (option.declaredScope == GLOBAL) {
-      globalParsedValues
-    }
-    else {
-      check(editor != null) { "Editor must be supplied for local options" }
-      getParsedEffectiveOptionStorage(option, editor)
-    }
-
-    // Unless the user is calling this method multiple times with different providers, we can be confident this cast
-    // will succeed. Editor will only be null with global options, so it's safe to use null
-    @Suppress("UNCHECKED_CAST")
-    return cachedValues.getOrPut(option.name) {
-      provider(getOptionValue(option, if (editor == null) OptionAccessScope.GLOBAL(null) else OptionAccessScope.EFFECTIVE(editor)))
-    } as TData
+    return parsedValuesCache.getParsedEffectiveOptionValue(option, editor, provider)
   }
 
   override fun getOption(key: String): Option<VimDataType>? = Options.getOption(key)
@@ -356,7 +334,9 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     val oldValue = globalValues[option.name]
     if (oldValue != value) {
       globalValues[option.name] = value
-      globalParsedValues.remove(option.name)
+      if (option.declaredScope == GLOBAL) {
+        parsedValuesCache.reset(option, null)
+      }
       return true
     }
     return false
@@ -488,7 +468,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     val oldValue = values[option.name]
     if (oldValue != value) {
       values[option.name] = value
-      getParsedEffectiveOptionStorage(option, editor).remove(option.name)
+      parsedValuesCache.reset(option, editor)
       return true
     }
     return false
@@ -521,7 +501,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     val oldValue = values[option.name]
     if (oldValue != value) {
       values[option.name] = value
-      getParsedEffectiveOptionStorage(option, editor).remove(option.name)
+      parsedValuesCache.reset(option, editor)
       return true
     }
     return false
@@ -544,22 +524,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     @Suppress("UNCHECKED_CAST")
     return values[option.name] as? T
   }
-
-
-  private fun getParsedEffectiveOptionStorage(option: Option<out VimDataType>, editor: VimEditor): MutableMap<String, Any> {
-    return when (option.declaredScope) {
-      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> {
-        injector.vimStorageService.getOrPutWindowData(editor, parsedEffectiveValueKey) { mutableMapOf() }
-      }
-      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> {
-        injector.vimStorageService.getOrPutBufferData(editor, parsedEffectiveValueKey) { mutableMapOf() }
-      }
-      else -> {
-        throw IllegalStateException("Unexpected option declared scope for parsed effective storage: ${option.name}")
-      }
-    }
-  }
 }
+
 
 private class OptionListenersImpl(private val optionGroup: VimOptionGroup, private val editorGroup: VimEditorGroup) {
   private val globalOptionListeners = MultiSet<String, GlobalOptionChangeListener>()
@@ -722,3 +688,55 @@ private class OptionListenersImpl(private val optionGroup: VimOptionGroup, priva
     }
   }
 }
+
+
+private class ParsedValuesCache(
+  private val optionGroup: VimOptionGroup,
+  private val storageService: VimStorageService,
+) {
+  private val globalParsedValues = mutableMapOf<String, Any>()
+  private val parsedEffectiveValueKey = Key<MutableMap<String, Any>>("parsedEffectiveOptionValues")
+
+  fun <T : VimDataType, TData : Any> getParsedEffectiveOptionValue(
+    option: Option<T>,
+    editor: VimEditor?,
+    provider: (T) -> TData,
+  ): TData {
+    // TODO: We can't correctly clear global-local options
+    // We have to cache global-local values locally, because they can be set locally. But if they're not overridden
+    // locally, we would cache a global value per-window. When the global value is changed with OptionScope.GLOBAL, we
+    // are unable to clear the per-window cached value, so windows would end up with stale cached (global) values.
+    check(option.declaredScope != GLOBAL_OR_LOCAL_TO_WINDOW
+      && option.declaredScope != GLOBAL_OR_LOCAL_TO_BUFFER
+    ) { "Global-local options cannot currently be cached" }
+
+    val cachedValues = getStorage(option, editor)
+
+    // Unless the user is calling this method multiple times with different providers, we can be confident this cast
+    // will succeed. Editor will only be null with global options, so it's safe to use null
+    @Suppress("UNCHECKED_CAST")
+    return cachedValues.getOrPut(option.name) {
+      val scope = if (editor == null) OptionAccessScope.GLOBAL(null) else OptionAccessScope.EFFECTIVE(editor)
+      provider(optionGroup.getOptionValue(option, scope))
+    } as TData
+  }
+
+  private fun getStorage(option: Option<out VimDataType>, editor: VimEditor?): MutableMap<String, Any> {
+    return when (option.declaredScope) {
+      GLOBAL -> globalParsedValues
+      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> {
+        check(editor != null) { "Editor must be supplied for local options" }
+        storageService.getOrPutWindowData(editor, parsedEffectiveValueKey) { mutableMapOf() }
+      }
+      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> {
+        check(editor != null) { "Editor must be supplied for local options" }
+        storageService.getOrPutBufferData(editor, parsedEffectiveValueKey) { mutableMapOf() }
+      }
+    }
+  }
+
+  fun reset(option: Option<out VimDataType>, editor: VimEditor?) {
+    getStorage(option, editor).remove(option.name)
+  }
+}
+
