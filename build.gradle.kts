@@ -184,6 +184,14 @@ tasks {
         include("**/*test.class")
         include("**/*Tests.class")
         exclude("**/ParserTest.class")
+
+        // Set teamcity env variable locally to run additional tests for leaks.
+        // By default, this test runs on TC only, but this test doesn't take a lot of time,
+        //   so we can turn it on for local development
+        if (environment["TEAMCITY_VERSION"] == null) {
+            println("Set env TEAMCITY_VERSION to X")
+            environment("TEAMCITY_VERSION" to "X")
+        }
     }
 
     val testWithNeovim by getting(Test::class) {
