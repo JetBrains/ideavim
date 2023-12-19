@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.idea.TestFor
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
+import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.TestLoggerFactory.TestLoggerAssertionError
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
@@ -884,6 +885,7 @@ n  ,f            <Plug>Foo
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
+    editor.caretModel.allCarets.forEach { Disposer.dispose(it) }
   }
 
   // todo keyPresses invoked inside a script should have access to the script context
