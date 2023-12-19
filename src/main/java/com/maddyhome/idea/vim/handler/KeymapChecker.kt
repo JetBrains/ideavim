@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.handler
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.Shortcut
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapManagerListener
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
@@ -19,9 +21,9 @@ import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -35,16 +37,28 @@ internal val keyCheckRequests = MutableSharedFlow<Unit>(replay=1, onBufferOverfl
  * This checker verifies that the keymap has a correct configuration that is required for IdeaVim plugin
  */
 internal class KeymapChecker : ProjectActivity {
-  @OptIn(FlowPreview::class)
   override suspend fun execute(project: Project) {
-    coroutineScope {
-      launch {
-        keyCheckRequests
-          .debounce(5_000)
-          .collectLatest { verifyKeymap() }
-      }
-    }
+    project.service<KeymapCheckerService>().start()
     keyCheckRequests.emit(Unit)
+  }
+}
+
+/**
+ * At the moment of release 2023.3 there is a problem that starting a coroutine like this
+ *   right in the project activity will block this project activity in tests.
+ * To avoid that, there is an intermediate service that will allow to avoid this issue.
+ *
+ * However, in general we should start this coroutine right in the [KeymapChecker]
+ */
+@OptIn(FlowPreview::class)
+@Service(Service.Level.PROJECT)
+internal class KeymapCheckerService(private val cs: CoroutineScope) {
+  fun start() {
+    cs.launch {
+      keyCheckRequests
+        .debounce(5_000)
+        .collectLatest { verifyKeymap() }
+    }
   }
 }
 
