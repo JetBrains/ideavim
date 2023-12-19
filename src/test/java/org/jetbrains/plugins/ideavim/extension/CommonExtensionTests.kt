@@ -9,7 +9,9 @@
 package org.jetbrains.plugins.ideavim.extension
 
 import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.invokeLater
+import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -41,28 +43,23 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class OpMappingTest : VimTestCase() {
-  private var initialized = false
-
   private lateinit var extension: ExtensionBeanClass
+
+  private var disposable: Disposable = Disposer.newDisposable()
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    if (!initialized) {
-      initialized = true
+    extension = TestExtension.createBean()
 
-      extension = TestExtension.createBean()
-
-      VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
-      enableExtensions("TestExtension")
-    }
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
+    enableExtensions("TestExtension")
   }
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
-    super.tearDown(super.testInfo)
+    Disposer.dispose(disposable)
+    super.tearDown(testInfo)
   }
 
   @Test
@@ -138,13 +135,13 @@ class OpMappingTest : VimTestCase() {
     typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    Disposer.dispose(disposable)
+    disposable = Disposer.newDisposable()
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     enableExtensions("TestExtension")
     typeText(injector.parser.parseKeys("Q"))
@@ -158,12 +155,12 @@ class OpMappingTest : VimTestCase() {
     assertState("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    Disposer.dispose(disposable)
+    disposable = Disposer.newDisposable()
     typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
     enableExtensions("TestExtension")
     typeText(injector.parser.parseKeys("Q"))
     assertState("I ${c}found it in a legendary land")
@@ -201,19 +198,20 @@ class PlugExtensionsTest : VimTestCase() {
 
   private lateinit var extension: ExtensionBeanClass
 
+  private var disposable: Disposable = Disposer.newDisposable()
+
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     configureByText("\n")
 
     extension = TestExtension.createBean()
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
   }
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    Disposer.dispose(disposable)
     super.tearDown(super.testInfo)
   }
 
@@ -244,19 +242,20 @@ class PlugMissingKeysTest : VimTestCase() {
 
   private lateinit var extension: ExtensionBeanClass
 
+  private var disposable: Disposable = Disposer.newDisposable()
+
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     configureByText("\n")
 
     extension = TestExtension.createBean()
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
   }
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    Disposer.dispose(disposable)
     super.tearDown(super.testInfo)
   }
 
