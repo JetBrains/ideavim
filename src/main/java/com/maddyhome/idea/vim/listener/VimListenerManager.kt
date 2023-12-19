@@ -68,7 +68,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.correctorRequester
-import com.maddyhome.idea.vim.handler.keymapCheckRequester
+import com.maddyhome.idea.vim.handler.keyCheckRequests
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.VimStandalonePluginUpdateChecker
@@ -129,7 +129,7 @@ internal object VimListenerManager {
     GlobalListeners.enable()
     EditorListeners.addAll()
     correctorRequester.request()
-    keymapCheckRequester.request()
+    check(keyCheckRequests.tryEmit(Unit))
   }
 
   fun turnOff() {

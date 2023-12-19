@@ -15,37 +15,50 @@ import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapManagerListener
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
-import com.intellij.util.SingleAlarm
+import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 import javax.swing.KeyStroke
 
 // We use alarm with delay to avoid many notifications in case many events are fired at the same time
-// [VERSION UPDATE] 2023.3+ Replace SingleAlarm with coroutine flows https://youtrack.jetbrains.com/articles/IJPL-A-8/Alarm-Alternative
-internal val keymapCheckRequester = SingleAlarm({ verifyKeymap() }, 5_000)
+internal val keyCheckRequests = MutableSharedFlow<Unit>(replay=1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 /**
  * This checker verifies that the keymap has a correct configuration that is required for IdeaVim plugin
  */
-internal class KeymapChecker : StartupActivity {
-  override fun runActivity(project: Project) {
-    keymapCheckRequester.request()
+internal class KeymapChecker : ProjectActivity {
+  @OptIn(FlowPreview::class)
+  override suspend fun execute(project: Project) {
+    coroutineScope {
+      launch {
+        keyCheckRequests
+          .debounce(5_000)
+          .collectLatest { verifyKeymap() }
+      }
+    }
+    keyCheckRequests.emit(Unit)
   }
 }
 
 internal class IdeaVimKeymapChangedListener : KeymapManagerListener {
   override fun activeKeymapChanged(keymap: Keymap?) {
-    keymapCheckRequester.request()
+    check(keyCheckRequests.tryEmit(Unit))
   }
 
   override fun shortcutChanged(keymap: Keymap, actionId: String) {
-    keymapCheckRequester.request()
+    check(keyCheckRequests.tryEmit(Unit))
   }
 
   override fun shortcutChanged(keymap: Keymap, actionId: String, fromSettings: Boolean) {
-    keymapCheckRequester.request()
+    check(keyCheckRequests.tryEmit(Unit))
   }
 }
 
