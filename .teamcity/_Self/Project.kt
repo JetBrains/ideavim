@@ -39,6 +39,11 @@ object Project : Project({
 
 // Common build type for all configurations
 abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
+  artifactRules = """
+        +:build/reports => build/reports
+        +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
+    """.trimIndent()
+
   init()
 
   requirements {
@@ -53,9 +58,4 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
     // Disable detection of the java OOM
     javaCrash = false
   }
-
-  artifactRules = """
-        +:build/reports => build/reports
-        +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
-    """.trimIndent()
 })
