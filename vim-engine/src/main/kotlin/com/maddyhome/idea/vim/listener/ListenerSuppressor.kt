@@ -57,7 +57,7 @@ public sealed class VimListenerSuppressor {
 
   public fun lock(): Locked {
     LOG.trace("Suppressor lock")
-    LOG.trace(injector.application.currentStackTrace())
+    LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor++
     return Locked()
   }

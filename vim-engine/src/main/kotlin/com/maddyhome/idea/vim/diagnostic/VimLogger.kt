@@ -23,13 +23,13 @@ public interface VimLogger {
   public fun info(message: String)
 }
 
-public fun VimLogger.trace(message: () -> String) {
+public inline fun VimLogger.trace(message: () -> String) {
   if (isTrace()) {
     trace(message())
   }
 }
 
-public fun VimLogger.debug(message: () -> String) {
+public inline fun VimLogger.debug(message: () -> String) {
   if (isDebug()) {
     debug(message())
   }
