@@ -40,10 +40,6 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   override fun getGlobalIjOptions() = GlobalIjOptions(OptionAccessScope.GLOBAL(null))
   override fun getEffectiveIjOptions(editor: VimEditor) = EffectiveIjOptions(OptionAccessScope.EFFECTIVE(editor))
 
-  private fun updateFallbackWindow(fallbackWindow: VimEditor, targetEditor: VimEditor) {
-    copyPerWindowGlobalValues(fallbackWindow, targetEditor)
-  }
-
   companion object {
     fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
       // Vim only has one window, and it's not possible to close it. This means that editing a new file will always
@@ -70,7 +66,7 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
 }
 
 internal class IjOptionConstants {
-  @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate")
+  @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate", "ConstPropertyName")
   companion object {
 
     const val idearefactormode_keep = "keep"
