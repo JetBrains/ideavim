@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
@@ -34,145 +35,41 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     // Called for all editors. Ensures that we eagerly initialise all local values, including the per-window "global"
     // values of local-to-window options. Note that global options are not eagerly initialised - the value is the
     // default value unless explicitly set.
-    when (scenario) {
-      // We're initialising the first (hidden) editor. Vim always has at least one window (and buffer); IdeaVim doesn't.
-      // We fake this with a hidden editor that is created when the plugin first starts. It is used to capture state
-      // when initially evaluating `~/.ideavimrc`, and then used to initialise subsequent windows. But first, we must
-      // initialise all local options to the default (global) values
-      LocalOptionInitialisationScenario.DEFAULTS -> {
-        check(sourceEditor == null) { "sourceEditor must be null for DEFAULTS scenario" }
-        initialisePerWindowGlobalValues(editor)
-        initialiseLocalToBufferOptions(editor)
-        initialiseLocalToWindowOptions(editor)
-      }
 
-      // The opening window is either:
-      // a) the fallback window used to evaluate `~/.ideavimrc` during initialisation and potentially before any windows
-      //    are open or:
-      // b) the "ex" or search command line text field/editor associated with a main editor
-      // Either way, the target window should be a clone of the source window, copying local to buffer and local to
-      // window values
-      LocalOptionInitialisationScenario.FALLBACK,
-      LocalOptionInitialisationScenario.CMD_LINE -> {
-        check(sourceEditor != null) { "sourceEditor must not be null for FALLBACK or CMD_LINE scenarios" }
-        copyPerWindowGlobalValues(editor, sourceEditor)
-        copyLocalToBufferLocalValues(editor, sourceEditor)
-        copyLocalToWindowLocalValues(editor, sourceEditor)
-      }
-
-      // The opening/current window is being split. Clone the local-to-window options, both the local values and the
-      // per-window "global" values. The buffer local options are obviously already initialised
-      LocalOptionInitialisationScenario.SPLIT -> {
-        check(sourceEditor != null) { "sourceEditor must not be null for SPLIT scenario" }
-        copyPerWindowGlobalValues(editor, sourceEditor)
-        initialiseLocalToBufferOptions(editor)  // It's a split, they should already be initialised
-        copyLocalToWindowLocalValues(editor, sourceEditor)
-      }
-
-      // Editing a new buffer in the current window (`:edit {file}`). Remove explicitly set local values, which means to
-      // copy the per-window "global" value of local-to-window options to the local value, and to reset all window
-      // global-local options. Since it's a new buffer, we initialise buffer local options.
-      // Note that IdeaVim does not use this scenario for `:edit {file}` because the current implementation will always
-      // open a new window. It does use it for preview tabs and reusing unmodified tabs
-      LocalOptionInitialisationScenario.EDIT -> {
-        check(sourceEditor != null) { "sourceEditor must not be null for EDIT scenario" }
-        copyPerWindowGlobalValues(editor, sourceEditor)
-        initialiseLocalToBufferOptions(editor)
-        resetLocalToWindowOptions(editor)
-      }
-
-      // Editing a new buffer in a new window (`:new {file}`). Vim treats this as a split followed by an edit. That
-      // means, clone the window, then reset its local values to its global values
-      LocalOptionInitialisationScenario.NEW -> {
-        check(sourceEditor != null) { "sourceEditor must not be null for NEW scenario" }
-        copyPerWindowGlobalValues(editor, sourceEditor)
-        initialiseLocalToBufferOptions(editor)
-        copyLocalToWindowLocalValues(editor, sourceEditor)  // Technically redundant
-        resetLocalToWindowOptions(editor)
-      }
+    val strategy = OptionInitialisationStrategy(storage)
+    if (scenario == LocalOptionInitialisationScenario.DEFAULTS) {
+      check(sourceEditor == null) { "sourceEditor must be null when initialising the default options" }
+      strategy.initialiseToDefaults(editor)
+      return
     }
-  }
 
-  private fun copyLocalToBufferLocalValues(targetEditor: VimEditor, sourceEditor: VimEditor) {
-    val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
-    val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
-    getAllOptions().forEach { option ->
-      if (option.declaredScope == LOCAL_TO_BUFFER || option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
-        val value = storage.getOptionValue(option, sourceLocalScope)
-        storage.setOptionValue(option, targetLocalScope, value)
-      }
+    check(sourceEditor != null) { "sourceEditor must not be null for scenario: $scenario" }
+    when (scenario) {
+      LocalOptionInitialisationScenario.FALLBACK,
+      LocalOptionInitialisationScenario.CMD_LINE -> strategy.initialiseCloneCurrentState(sourceEditor, editor)
+      LocalOptionInitialisationScenario.SPLIT -> strategy.initialiseForSplitCurrentWindow(sourceEditor, editor)
+      LocalOptionInitialisationScenario.EDIT -> strategy.initialiseForEditingNewBuffer(sourceEditor, editor)
+      LocalOptionInitialisationScenario.NEW -> strategy.initialiseForNewBufferInNewWindow(sourceEditor, editor)
+      else -> { }
     }
   }
 
   /**
-   * Initialise local-to-buffer options by copying the global value
+   * Update the fallback window to reflect the state of the currently closing window
    *
-   * Note that the buffer might have been previously initialised. The global value is the most recently set value,
-   * across any buffer and any window. This makes most sense for non-visible options - the user always gets what they
-   * last set, regardless of where it was set.
-   *
-   * Remember that `:set` on a buffer-local option will set both the local value and the global value.
+   * The fallback window is used to provide state to the next window to be opened. When all windows are closed, it must
+   * be updated to maintain the state of the last closed window so that the next window has the user's expected state.
    */
-  private fun initialiseLocalToBufferOptions(editor: VimEditor) {
-    if (!storage.isLocalToBufferOptionStorageInitialised(editor)) {
-      val globalScope = OptionAccessScope.GLOBAL(editor)
-      val localScope = OptionAccessScope.LOCAL(editor)
-      getAllOptions().forEach { option ->
-        if (option.declaredScope == LOCAL_TO_BUFFER) {
-          val value = storage.getOptionValue(option, globalScope)
-          storage.setOptionValue(option, localScope, value)
-        } else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
-          storage.setOptionValue(option, localScope, option.unsetValue)
-        }
-      }
-    }
-  }
-
-  protected fun copyPerWindowGlobalValues(targetEditor: VimEditor, sourceEditor: VimEditor) {
-    val sourceGlobalScope = OptionAccessScope.GLOBAL(sourceEditor)
-    val targetGlobalScope = OptionAccessScope.GLOBAL(targetEditor)
-    getAllOptions().forEach { option ->
-      if (option.declaredScope == LOCAL_TO_WINDOW) {
-        val localValue = storage.getOptionValue(option, sourceGlobalScope)
-        storage.setOptionValue(option, targetGlobalScope, localValue)
-      }
-    }
-  }
-
-  private fun initialisePerWindowGlobalValues(targetEditor: VimEditor) {
-    val targetGlobalScope = OptionAccessScope.GLOBAL(targetEditor)
-    getAllOptions().forEach { option ->
-      if (option.declaredScope == LOCAL_TO_WINDOW) {
-        storage.setOptionValue(option, targetGlobalScope, option.defaultValue)
-      }
-    }
-  }
-
-  private fun copyLocalToWindowLocalValues(targetEditor: VimEditor, sourceEditor: VimEditor) {
-    val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
-    val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
-    getAllOptions().forEach { option ->
-      if (option.declaredScope == LOCAL_TO_WINDOW || option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
-        val value = storage.getOptionValue(option, sourceLocalScope)
-        storage.setOptionValue(option, targetLocalScope, value)
-      }
-    }
-  }
-
-  private fun resetLocalToWindowOptions(editor: VimEditor) = initialiseLocalToWindowOptions(editor)
-
-  private fun initialiseLocalToWindowOptions(editor: VimEditor) {
-    val globalScope = OptionAccessScope.GLOBAL(editor)
-    val localScope = OptionAccessScope.LOCAL(editor)
-    getAllOptions().forEach { option ->
-      if (option.declaredScope == LOCAL_TO_WINDOW) {
-        val value = storage.getOptionValue(option, globalScope)
-        storage.setOptionValue(option, localScope, value)
-      }
-      else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
-        storage.setOptionValue(option, localScope, option.unsetValue)
-      }
-    }
+  protected fun updateFallbackWindow(fallbackWindow: VimEditor, sourceEditor: VimEditor) {
+    // We simply clone all options from the closing window. The next window to open will be initialised with the EDIT
+    // scenario, which is like pretending we didn't close the last window and using that window to edit a new buffer.
+    // This is the closest approximation to Vim always having at least one window open.
+    // The EDIT scenario will initialise the new window by copying per-window global values, initialising default
+    // local-to-buffer values and resetting the local-to-window values to the per-window global values. Technically, we
+    // could get away with just copying the per-window local values, but cloning state is equivalent to keeping that
+    // last window available.
+    val strategy = OptionInitialisationStrategy(storage)
+    strategy.initialiseCloneCurrentState(sourceEditor, fallbackWindow)
   }
 
   override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T =
@@ -287,7 +184,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   // We can pass null as the editor because we are only accessing global options
   override fun getGlobalOptions(): GlobalOptions = GlobalOptions(OptionAccessScope.GLOBAL(null))
 
-  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionAccessScope.EFFECTIVE(editor))
+  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions =
+    EffectiveOptions(OptionAccessScope.EFFECTIVE(editor))
 
 
   private fun <T : VimDataType> initialiseNewOptionDefaultValues(option: Option<T>) {
@@ -474,6 +372,157 @@ private class OptionStorage {
     if (globalValues[Options.ideastrictmode.name]?.asBoolean() == true && !condition) {
       error(lazyMessage())
     }
+  }
+}
+
+
+private class OptionInitialisationStrategy(private val storage: OptionStorage) {
+  /**
+   * Initialise the target editor to default values
+   *
+   * Only used to initialise the very first, hidden, "fallback" window. Vim always has at least one window (and buffer);
+   * IdeaVim doesn't. We need to maintain state of options, so we create a simple hidden [VimEditor] when the plugin
+   * first starts, and use it to evaluate `~/.ideavimrc`. We use this fallback editor to provide state when initialising
+   * the first real editor. Before all that, we need to make sure that all options have default values.
+   */
+  fun initialiseToDefaults(targetEditor: VimEditor) {
+    initialisePerWindowGlobalValues(targetEditor)
+    initialiseLocalToBufferOptions(targetEditor)
+    initialiseLocalToWindowOptions(targetEditor)
+  }
+
+  /**
+   * Initialise the target editor by cloning the state of the source editor.
+   *
+   * This is used for two scenarios:
+   * 1. Initialising the first "real" editor from the "fallback" editor. The fallback editor is used to capture options
+   *    state when there are no other windows - evaluating `~/.ideavimrc` during startup or when all editors are closed.
+   * 2. Initialising the "ex" command line or search input text field/editor associated with a buffer editor. This
+   *    allows the command line to use the same options as the main editor.
+   */
+  fun initialiseCloneCurrentState(sourceEditor: VimEditor, targetEditor: VimEditor) {
+    copyPerWindowGlobalValues(sourceEditor, targetEditor)
+    copyLocalToBufferLocalValues(sourceEditor, targetEditor)
+    copyLocalToWindowLocalValues(sourceEditor, targetEditor)
+  }
+
+  /**
+   * Initialise the target editor as a split of the source editor.
+   *
+   * When splitting the current window, the new window is a clone of the current window. Local-to-window options are
+   * copied, both the local and per-window "global" values. Buffer local options are of course already initialised.
+   */
+  fun initialiseForSplitCurrentWindow(sourceEditor: VimEditor, targetEditor: VimEditor) {
+    copyPerWindowGlobalValues(sourceEditor, targetEditor)
+    initialiseLocalToBufferOptions(targetEditor)  // When splitting the current window, the buffer will be the same
+    copyLocalToWindowLocalValues(sourceEditor, targetEditor)
+  }
+
+  /**
+   * Initialise options for the target editor editing a new buffer (`:edit {file}`).
+   *
+   * When editing a new buffer in the current window, the per-window global values are untouched. Buffer local options
+   * are initialised for the new buffer (if not already initialised) and window local options are reset; local-to-window
+   * options are reset to the per-window "global" value, and global-local window options are unset.
+   *
+   * Theoretically, the source and target editor should be the same editor, however, IntelliJ fakes reusing editors by
+   * opening a new editor and closing the old one, so there is still a source and target editor. Note also that IntelliJ
+   * does not use this scenario for `:edit {file}`, because the (current) implementation of `:edit` is more like `:new`
+   * and always opens a new file. This scenario is used for preview tabs, and reusing unmodified tabs.
+   */
+  fun initialiseForEditingNewBuffer(sourceEditor: VimEditor, targetEditor: VimEditor) {
+    copyPerWindowGlobalValues(sourceEditor, targetEditor)
+    initialiseLocalToBufferOptions(targetEditor)
+    resetLocalToWindowOptions(targetEditor)
+  }
+
+  /**
+   * Initialise the target editor as a new buffer opening in a new window.
+   *
+   * Vim treats this like a split followed by editing a new buffer in the just created window. This means clone the
+   * window local options, initialise the buffer local options and then reset the window local options to per-window
+   * "global" values, or unset global-local values.
+   */
+  fun initialiseForNewBufferInNewWindow(sourceEditor: VimEditor, targetEditor: VimEditor) {
+    initialiseForSplitCurrentWindow(sourceEditor, targetEditor)
+    initialiseForEditingNewBuffer(sourceEditor, targetEditor)
+  }
+
+  private fun initialisePerWindowGlobalValues(editor: VimEditor) {
+    val scope = OptionAccessScope.GLOBAL(editor)
+    forEachOption(LOCAL_TO_WINDOW) { option ->
+      storage.setOptionValue(option, scope, option.defaultValue)
+    }
+  }
+
+  private fun copyPerWindowGlobalValues(sourceEditor: VimEditor, targetEditor: VimEditor) {
+    val sourceGlobalScope = OptionAccessScope.GLOBAL(sourceEditor)
+    val targetGlobalScope = OptionAccessScope.GLOBAL(targetEditor)
+    forEachOption(LOCAL_TO_WINDOW) { option ->
+      val value = storage.getOptionValue(option, sourceGlobalScope)
+      storage.setOptionValue(option, targetGlobalScope, value)
+    }
+  }
+
+  private fun initialiseLocalToBufferOptions(editor: VimEditor) {
+    val globalScope = OptionAccessScope.GLOBAL(editor)
+    val localScope = OptionAccessScope.LOCAL(editor)
+    if (!storage.isLocalToBufferOptionStorageInitialised(editor)) {
+      forEachOption(LOCAL_TO_BUFFER) { option ->
+        val value = storage.getOptionValue(option, globalScope)
+        storage.setOptionValue(option, localScope, value)
+      }
+      forEachOption(GLOBAL_OR_LOCAL_TO_BUFFER) { option ->
+        storage.setOptionValue(option, localScope, option.unsetValue)
+      }
+    }
+  }
+
+  private fun copyLocalToBufferLocalValues(sourceEditor: VimEditor, targetEditor: VimEditor) {
+    val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
+    val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
+    forEachOption(LOCAL_TO_BUFFER) { option ->
+      val value = storage.getOptionValue(option, sourceLocalScope)
+      storage.setOptionValue(option, targetLocalScope, value)
+    }
+    forEachOption(GLOBAL_OR_LOCAL_TO_BUFFER) { option ->
+      val value = storage.getOptionValue(option, sourceLocalScope)
+      storage.setOptionValue(option, targetLocalScope, value)
+    }
+  }
+
+  private fun initialiseLocalToWindowOptions(editor: VimEditor) {
+    val globalScope = OptionAccessScope.GLOBAL(editor)
+    val localScope = OptionAccessScope.LOCAL(editor)
+    forEachOption(LOCAL_TO_WINDOW) { option ->
+      val value = storage.getOptionValue(option, globalScope)
+      storage.setOptionValue(option, localScope, value)
+    }
+    forEachOption(GLOBAL_OR_LOCAL_TO_WINDOW) { option ->
+      storage.setOptionValue(option, localScope, option.unsetValue)
+    }
+  }
+
+  private fun resetLocalToWindowOptions(editor: VimEditor) {
+    // This will copy the per-window global to the local value. This is the equivalent of `:set {option}<`
+    initialiseLocalToWindowOptions(editor)
+  }
+
+  private fun copyLocalToWindowLocalValues(sourceEditor: VimEditor, targetEditor: VimEditor) {
+    val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
+    val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
+    forEachOption(LOCAL_TO_WINDOW) { option ->
+      val value = storage.getOptionValue(option, sourceLocalScope)
+      storage.setOptionValue(option, targetLocalScope, value)
+    }
+    forEachOption(GLOBAL_OR_LOCAL_TO_WINDOW) { option ->
+      val value = storage.getOptionValue(option, sourceLocalScope)
+      storage.setOptionValue(option, targetLocalScope, value)
+    }
+  }
+
+  private fun forEachOption(scope: OptionDeclaredScope, action: (Option<VimDataType>) -> Unit) {
+    Options.getAllOptions().forEach { option -> if (option.declaredScope == scope) action(option) }
   }
 }
 
