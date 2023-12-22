@@ -207,18 +207,13 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun resetAllOptionsForTesting() {
-    // During testing, this collection is usually empty. Just in case, make sure all editors have default options
-    injector.editorGroup.localEditors().forEach { resetAllOptions(it) }
+    // Resets the global values of all options, including per-window global of the fallback window. Also resets the
+    // local options of the fallback window. When combined with resetting all options for any open editors, this resets
+    // all options everywhere.
     resetAllOptions(injector.fallbackWindow)
 
-    // Make sure we reset global options even if we don't have any editors. This fires listeners and clears caches
-    Options.getAllOptions().filter { it.declaredScope == GLOBAL }.forEach { resetDefaultValue(it, OptionAccessScope.GLOBAL(null)) }
-
-    // Reset global value of other options manually, without firing listeners or clearing caches. This is safe because
-    // we only cache values or listen to changes for the effective values of local options (and not global-local). But
-    // local-to-window options will store global values per-window (which we don't have). So this will have the same
-    // result as resetDefaultValue but without the asserts for setting a local option without a window.
-    Options.getAllOptions().filter { it.declaredScope != GLOBAL }.forEach { globalValues[it.name] = it.defaultValue }
+    // During testing, we do not expect to have any editors, so this collection is usually empty
+    injector.editorGroup.localEditors().forEach { resetAllOptions(it) }
   }
 
   override fun addOption(option: Option<out VimDataType>) {
