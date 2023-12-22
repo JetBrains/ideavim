@@ -74,6 +74,8 @@ internal class MacroGroup : VimMacroBase() {
               return@runnable
             }
             ProgressManager.getInstance().executeNonCancelableSection {
+              // Prevent autocompletion during macros.
+              // See https://github.com/JetBrains/ideavim/pull/772 for details
               CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
               getInstance().handleKey(editor, key, context)
             }
