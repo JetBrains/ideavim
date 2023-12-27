@@ -49,10 +49,4 @@ internal object ModeWidgetListener : GlobalOptionChangeListener {
       statusBarWidgetsManager.updateWidget(factory)
     }
   }
-//
-//  private fun getWidget(project: Project): VimModeWidget? {
-//    val windowManager = WindowManager.getInstance()
-//    val statusBar = windowManager.getStatusBar(project)
-//    return statusBar.getWidget(ModeWidgetFactory.ID) as? VimModeWidget
-//  }
 }
