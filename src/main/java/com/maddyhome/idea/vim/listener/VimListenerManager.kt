@@ -94,9 +94,9 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
-import com.maddyhome.idea.vim.ui.MacroWidgetListener
+import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
-import com.maddyhome.idea.vim.ui.ModeWidgetListener
+import com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimDisposable
 import java.awt.event.MouseAdapter

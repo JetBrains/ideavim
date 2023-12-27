@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.ui
+package com.maddyhome.idea.vim.ui.widgets.macro
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project

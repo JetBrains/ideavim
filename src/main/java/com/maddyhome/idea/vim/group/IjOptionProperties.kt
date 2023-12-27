@@ -30,6 +30,7 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
   public var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
   public var visualdelay: Int by optionProperty(IjOptions.visualdelay)
   public var showmodewidget: Boolean by optionProperty(IjOptions.showmodewidget)
+  public var colorfulmodewidget: Boolean by optionProperty(IjOptions.colorfulmodewidget)
 
   // Temporary options to control work-in-progress behaviour
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
