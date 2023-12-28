@@ -226,14 +226,20 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   public static void setEnabled(final boolean enabled) {
     if (isEnabled() == enabled) return;
 
-    getInstance().enabled = enabled;
-
     if (!enabled) {
       getInstance().turnOffPlugin(true);
     }
 
+    getInstance().enabled = enabled;
+
     if (enabled) {
       getInstance().turnOnPlugin();
+    }
+
+    if (enabled) {
+      VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOn();
+    } else {
+      VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOff();
     }
 
     StatusBarIconFactory.Util.INSTANCE.updateIcon();
@@ -345,7 +351,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // Turing on should be performed after all commands registration
     getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
-    VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOn();
   }
 
   private void turnOffPlugin(boolean unsubscribe) {
@@ -364,7 +369,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (onOffDisposable != null) {
       Disposer.dispose(onOffDisposable);
     }
-    VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOff();
   }
 
   private void updateState() {
