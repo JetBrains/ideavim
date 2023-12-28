@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
@@ -43,6 +44,10 @@ public abstract class VimMacroBase : VimMacro {
         register.keys
       } else {
         injector.parser.parseKeys(register.rawText)
+      }
+
+      logger.trace {
+        "Adding new keys to keyStack as part of playback. State before adding keys: ${KeyHandler.getInstance().keyStack.dump()}"
       }
       KeyHandler.getInstance().keyStack.addKeys(keys)
       playbackKeys(editor, context, count)

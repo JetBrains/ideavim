@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.extension
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -17,7 +18,6 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.helper.CommandLineHelper
@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ModalEntry
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -38,6 +39,9 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 public object VimExtensionFacade {
+
+  private val LOG = logger<VimExtensionFacade>()
+
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
   public fun putExtensionHandlerMapping(
@@ -140,10 +144,12 @@ public object VimExtensionFacade {
   public fun inputKeyStroke(editor: Editor): KeyStroke {
     if (editor.vim.vimStateMachine.isDotRepeatInProgress) {
       val input = Extension.consumeKeystroke()
+      LOG.trace("inputKeyStroke: dot repeat in progress. Input: $input")
       return input ?: error("Not enough keystrokes saved: ${Extension.lastExtensionHandler}")
     }
 
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
+      LOG.trace("Unit test mode is active")
       val mappingStack = KeyHandler.getInstance().keyStack
       mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
         if (editor.vim.vimStateMachine.isRecording) {
@@ -151,11 +157,13 @@ public object VimExtensionFacade {
         }
       }
     } else {
+      LOG.trace("Getting char from the modal entry...")
       var ref: KeyStroke? = null
       ModalEntry.activate(editor.vim) { stroke: KeyStroke? ->
         ref = stroke
         false
       }
+      LOG.trace("Got char $ref")
       ref
     }
     val result = key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())

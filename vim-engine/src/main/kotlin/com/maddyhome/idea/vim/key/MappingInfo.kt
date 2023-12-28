@@ -16,21 +16,22 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
-import com.maddyhome.idea.vim.state.VimStateMachine
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.common.offset
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
@@ -90,6 +91,7 @@ public class ToKeysMappingInfo(
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     val keyHandler = KeyHandler.getInstance()
+    LOG.trace { "Adding new keys to keyStack as toKeys of mapping. State before adding keys: ${keyHandler.keyStack.dump()}" }
     keyHandler.keyStack.addKeys(toKeys)
     var first = true
     while (keyHandler.keyStack.hasStroke()) {

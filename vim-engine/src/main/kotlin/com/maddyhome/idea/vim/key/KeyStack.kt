@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.trace
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
 /**
@@ -42,6 +44,7 @@ public class KeyStack {
   }
 
   public fun addKeys(keyStrokes: List<KeyStroke>) {
+    LOG.trace { "Got new keys to key stack: $keyStrokes" }
     stack.addFirst(Frame(keyStrokes))
   }
 
@@ -55,6 +58,23 @@ public class KeyStack {
     if (stack.isNotEmpty()) {
       stack.first().resetPointer()
     }
+  }
+
+  public fun dump(): String {
+    return buildString {
+      this.appendLine("KeyStack:")
+      this.appendLine("Stack size: ${stack.size}")
+      stack.forEachIndexed { index, frame ->
+        this.appendLine("Frame $index:")
+        this.appendLine("Keys: ${frame.keys}")
+        this.appendLine("Pointer: ${frame.pointer}")
+        this.appendLine()
+      }
+    }
+  }
+
+  private companion object {
+    private val LOG = vimLogger<KeyStack>()
   }
 }
 

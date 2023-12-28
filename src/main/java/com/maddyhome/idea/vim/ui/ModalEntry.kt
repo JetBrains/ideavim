@@ -8,6 +8,9 @@
 
 package com.maddyhome.idea.vim.ui
 
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
@@ -22,13 +25,19 @@ import javax.swing.KeyStroke
  * @author dhleong
  */
 public object ModalEntry {
+
+  public val LOG: Logger = logger<ModalEntry>()
+
   public inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
     // Firstly we pull the unfinished keys of the current mapping
     val mappingStack = KeyHandler.getInstance().keyStack
+    LOG.trace("Dumping key stack:")
+    LOG.trace { mappingStack.dump() }
     var stroke = mappingStack.feedSomeStroke()
     while (stroke != null) {
       val result = processor(stroke)
       if (!result) {
+        LOG.trace("Got char from mapping stack")
         return
       }
       stroke = mappingStack.feedSomeStroke()
@@ -55,6 +64,7 @@ public object ModalEntry {
           KeyHandler.getInstance().modalEntryKeys += stroke
         }
         if (!processor(stroke)) {
+          LOG.trace("Got char from keyboard input: $stroke. Event: $e")
           KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this)
           loop.exit()
         }

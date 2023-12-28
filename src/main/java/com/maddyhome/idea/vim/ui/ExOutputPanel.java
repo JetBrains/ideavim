@@ -18,6 +18,7 @@ import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.diagnostic.VimLogger;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -58,6 +59,8 @@ public class ExOutputPanel extends JPanel {
   private boolean myWasOpaque = false;
 
   private boolean myActive = false;
+
+  private static final VimLogger LOG = injector.getLogger(ExOutputPanel.class);
 
   private ExOutputPanel(@NotNull Editor editor) {
     myEditor = editor;
@@ -299,6 +302,10 @@ public class ExOutputPanel extends JPanel {
         final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
+        if (LOG.isTrace()) {
+          LOG.trace("Adding new keys to keyStack as part of playback. State before adding keys: " +
+                    KeyHandler.getInstance().getKeyStack().dump());
+        }
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
         ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(myEditor), null);
         VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);

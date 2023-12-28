@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.extension.surround
 
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -249,6 +250,7 @@ internal class VimSurroundExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       // Deleting surround is just changing the surrounding to "nothing"
       val charFrom = getChar(editor.ij)
+      LOG.debug("DSurroundHandler: charFrom = $charFrom")
       if (charFrom.code == 0) return
 
       runWriteAction { CSurroundHandler.change(editor, context, charFrom, null) }
@@ -281,6 +283,8 @@ internal class VimSurroundExtension : VimExtension {
     }
   }
 }
+
+private val LOG = logger<VimSurroundExtension>()
 
 private const val REGISTER = '"'
 
@@ -341,11 +345,13 @@ private fun getOrInputPair(c: Char, editor: Editor): Pair<String, String>? = whe
 private fun getChar(editor: Editor): Char {
   val key = inputKeyStroke(editor)
   val keyChar = key.keyChar
-  return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
+  val res = if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
     0.toChar()
   } else {
     keyChar
   }
+  LOG.trace("getChar: $res")
+  return res
 }
 
 private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
