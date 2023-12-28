@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MacroRecordingListener
+import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import java.awt.Component
@@ -70,7 +71,7 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory {
       return ID
     }
 
-    override fun getPresentation(): StatusBarWidget.WidgetPresentation? {
+    override fun getPresentation(): StatusBarWidget.WidgetPresentation {
       return VimModeWidgetPresentation()
     }
   }
@@ -90,8 +91,24 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory {
   }
 }
 
-internal object MacroWidgetListener : GlobalOptionChangeListener {
+internal object MacroWidgetListener : GlobalOptionChangeListener, VimPluginListener {
+  init {
+    injector.listenersNotifier.vimPluginListeners.add(this)
+  }
+
   override fun onGlobalOptionChanged() {
+    updateWidget()
+  }
+
+  override fun turnedOn() {
+    updateWidget()
+  }
+
+  override fun turnedOff() {
+    updateWidget()
+  }
+
+  private fun updateWidget() {
     val factory = StatusBarWidgetFactory.EP_NAME.findExtension(MacroWidgetFactory::class.java) ?: return
     for (project in ProjectManager.getInstance().openProjects) {
       val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
