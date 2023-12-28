@@ -13,6 +13,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.WindowManager
+import com.intellij.util.ui.UIUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
@@ -112,7 +113,7 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget 
 
   private fun getModeForeground(mode: Mode?): Color {
     // TODO make it customizable via settings (color picker) or .idevimrc
-    return label.parent?.background ?: Color.WHITE
+    return UIUtil.getPanelBackground()
   }
 
   private fun getModeBackground(mode: Mode?): Color? {
