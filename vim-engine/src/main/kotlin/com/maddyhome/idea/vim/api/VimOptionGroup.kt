@@ -36,6 +36,10 @@ public interface VimOptionGroup {
    * "global" value or copied directly from the opening window. Global-local options are usually initialised to the
    * option's "unset" marker value.
    *
+   * Note that listeners are not notified. This method is called when a new editor is opened, and also very early in the
+   * process of enabling IdeaVim (to ensure that options are available for the rest of the process). Depending on when a
+   * listener is registered, it might get called or not. To ensure consistency, this method does not call any listeners.
+   *
    * @param editor  The editor to initialise
    * @param sourceEditor  The editor which is opening the new editor. This source editor is used to get the per-window
    * "global" values to initialise the new editor. It can only be null when [scenario] is
@@ -108,6 +112,9 @@ public interface VimOptionGroup {
    *
    * Note that this function accepts a covariant version of [Option] so it can accept derived instances that are
    * specialised by a type derived from [VimDataType].
+   *
+   * This function will initialise the option to default values across all currently open editors, but it does not
+   * notify listeners. This mirrors the behaviour of [initialiseLocalOptions].
    *
    * @param option option
    */
