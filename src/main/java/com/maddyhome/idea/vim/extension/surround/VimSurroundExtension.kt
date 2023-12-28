@@ -18,10 +18,7 @@ import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -33,12 +30,15 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -280,96 +280,97 @@ internal class VimSurroundExtension : VimExtension {
       }
     }
   }
+}
 
-  companion object {
-    private const val REGISTER = '"'
+private const val REGISTER = '"'
 
-    private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
+private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
 
-    private val SURROUND_PAIRS = mapOf(
-      'b' to ("(" to ")"),
-      '(' to ("( " to " )"),
-      ')' to ("(" to ")"),
-      'B' to ("{" to "}"),
-      '{' to ("{ " to " }"),
-      '}' to ("{" to "}"),
-      'r' to ("[" to "]"),
-      '[' to ("[ " to " ]"),
-      ']' to ("[" to "]"),
-      'a' to ("<" to ">"),
-      '>' to ("<" to ">"),
-      's' to (" " to ""),
-    )
+private val SURROUND_PAIRS = mapOf(
+  'b' to ("(" to ")"),
+  '(' to ("( " to " )"),
+  ')' to ("(" to ")"),
+  'B' to ("{" to "}"),
+  '{' to ("{ " to " }"),
+  '}' to ("{" to "}"),
+  'r' to ("[" to "]"),
+  '[' to ("[ " to " ]"),
+  ']' to ("[" to "]"),
+  'a' to ("<" to ">"),
+  '>' to ("<" to ">"),
+  's' to (" " to ""),
+)
 
-    private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_PAIRS) {
-      SURROUND_PAIRS[c]
-    } else if (!c.isLetter()) {
-      val s = c.toString()
-      s to s
+private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_PAIRS) {
+  SURROUND_PAIRS[c]
+} else if (!c.isLetter()) {
+  val s = c.toString()
+  s to s
+} else {
+  null
+}
+
+private fun inputTagPair(editor: Editor): Pair<String, String>? {
+  val tagInput = inputString(editor, "<", '>')
+  val matcher = tagNameAndAttributesCapturePattern.matcher(tagInput)
+  return if (matcher.find()) {
+    val tagName = matcher.group(1)
+    val tagAttributes = matcher.group(2)
+    "<$tagName$tagAttributes>" to "</$tagName>"
+  } else {
+    null
+  }
+}
+
+private fun inputFunctionName(
+  editor: Editor,
+  withInternalSpaces: Boolean,
+): Pair<String, String>? {
+  val functionNameInput = inputString(editor, "function: ", null)
+  if (functionNameInput.isEmpty()) return null
+  return if (withInternalSpaces) "$functionNameInput( " to " )" else "$functionNameInput(" to ")"
+}
+
+private fun getOrInputPair(c: Char, editor: Editor): Pair<String, String>? = when (c) {
+  '<', 't' -> inputTagPair(editor)
+  'f' -> inputFunctionName(editor, false)
+  'F' -> inputFunctionName(editor, true)
+  else -> getSurroundPair(c)
+}
+
+private fun getChar(editor: Editor): Char {
+  val key = inputKeyStroke(editor)
+  val keyChar = key.keyChar
+  return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
+    0.toChar()
+  } else {
+    keyChar
+  }
+}
+
+private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
+  runWriteAction {
+    val editor = caret.editor
+    val change = VimPlugin.getChange()
+    val leftSurround = pair.first + if (tagsOnNewLines) "\n" else ""
+
+    val isEOF = range.endOffset == editor.text().length
+    val hasNewLine = editor.endsWithNewLine()
+    val rightSurround = if (tagsOnNewLines) {
+      if (isEOF && !hasNewLine) {
+        "\n" + pair.second
+      } else {
+        pair.second + "\n"
+      }
     } else {
-      null
+      pair.second
     }
 
-    private fun inputTagPair(editor: Editor): Pair<String, String>? {
-      val tagInput = inputString(editor, "<", '>')
-      val matcher = tagNameAndAttributesCapturePattern.matcher(tagInput)
-      return if (matcher.find()) {
-        val tagName = matcher.group(1)
-        val tagAttributes = matcher.group(2)
-        "<$tagName$tagAttributes>" to "</$tagName>"
-      } else {
-        null
-      }
-    }
-
-    private fun inputFunctionName(
-      editor: Editor,
-      withInternalSpaces: Boolean,
-    ): Pair<String, String>? {
-      val functionNameInput = inputString(editor, "function: ", null)
-      if (functionNameInput.isEmpty()) return null
-      return if (withInternalSpaces) "$functionNameInput( " to " )" else "$functionNameInput(" to ")"
-    }
-
-    private fun getOrInputPair(c: Char, editor: Editor): Pair<String, String>? = when (c) {
-      '<', 't' -> inputTagPair(editor)
-      'f' -> inputFunctionName(editor, false)
-      'F' -> inputFunctionName(editor, true)
-      else -> getSurroundPair(c)
-    }
-
-    private fun getChar(editor: Editor): Char {
-      val key = inputKeyStroke(editor)
-      val keyChar = key.keyChar
-      return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
-        0.toChar()
-      } else {
-        keyChar
-      }
-    }
-
-    private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
-      runWriteAction {
-        val editor = caret.editor
-        val change = VimPlugin.getChange()
-        val leftSurround = pair.first + if (tagsOnNewLines) "\n" else ""
-
-        val isEOF = range.endOffset == editor.text().length
-        val hasNewLine = editor.endsWithNewLine()
-        val rightSurround = if (tagsOnNewLines) {
-          if (isEOF && !hasNewLine) {
-            "\n" + pair.second
-          } else {
-            pair.second + "\n"
-          }
-        } else {
-          pair.second
-        }
-
-        change.insertText(editor, caret, range.startOffset, leftSurround)
-        change.insertText(editor, caret, range.endOffset + leftSurround.length, rightSurround)
-        injector.markService.setChangeMarks(caret, TextRange(range.startOffset, range.endOffset + leftSurround.length + rightSurround.length))
-      }
-    }
+    change.insertText(editor, caret, range.startOffset, leftSurround)
+    change.insertText(editor, caret, range.endOffset + leftSurround.length, rightSurround)
+    injector.markService.setChangeMarks(
+      caret,
+      TextRange(range.startOffset, range.endOffset + leftSurround.length + rightSurround.length)
+    )
   }
 }
