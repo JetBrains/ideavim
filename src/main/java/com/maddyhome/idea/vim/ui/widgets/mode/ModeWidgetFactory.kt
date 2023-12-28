@@ -16,6 +16,7 @@ import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 
@@ -41,8 +42,24 @@ public class ModeWidgetFactory : StatusBarWidgetFactory {
   }
 }
 
-internal object ModeWidgetListener : GlobalOptionChangeListener {
+internal object ModeWidgetListener : GlobalOptionChangeListener, VimPluginListener {
+  init {
+    injector.listenersNotifier.vimPluginListeners.add(this)
+  }
+
   override fun onGlobalOptionChanged() {
+    updateWidget()
+  }
+
+  override fun turnedOn() {
+    updateWidget()
+  }
+
+  override fun turnedOff() {
+    updateWidget()
+  }
+
+  private fun updateWidget() {
     val factory = StatusBarWidgetFactory.EP_NAME.findExtension(ModeWidgetFactory::class.java) ?: return
     for (project in ProjectManager.getInstance().openProjects) {
       val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
