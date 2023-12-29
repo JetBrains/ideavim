@@ -22,9 +22,11 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
+import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -34,9 +36,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import javax.swing.SwingConstants
-import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
 private const val defaultValue = "defaultValue"
+private const val defaultNumberValue = 10
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class EffectiveOptionChangeListenerTest : VimTestCase() {
@@ -109,10 +112,17 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     return option
   }
 
+  private fun addNumberOption(scope: OptionDeclaredScope): NumberOption {
+    val option = NumberOption(optionName, scope, optionName, defaultNumberValue)
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addEffectiveOptionValueChangeListener(option, Listener)
+    return option
+  }
+
   private fun assertNotifiedEditors(vararg editors: Editor) {
-    val sortedExpected = editors.sortedBy { it.virtualFile!!.path }.toTypedArray()
-    val sortedActual = Listener.notifiedEditors.sortedBy { it.virtualFile!!.path }.toTypedArray()
-    assertContentEquals(sortedExpected, sortedActual)
+    val expected = editors.toSet()
+    val actual = Listener.notifiedEditors.toSet()
+    assertEquals(expected, actual)
   }
 
   private fun assertNoNotifications() = assertNotifiedEditors()
@@ -272,10 +282,23 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
   @Test
   fun `test listener called for all editors when locally modified global-local local-to-buffer option changes at effective scope`() {
     val option = addOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(otherBufferWindow.vim), VimString("localValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(originalEditor.vim), VimString("localValue"))
     Listener.notifiedEditors.clear()
 
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(otherBufferWindow.vim), VimString("newValue"))
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
+
+    assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
+  }
+
+  @Test
+  fun `test listener called for all editors when locally modified number global-local local-to-buffer option changes at effective scope`() {
+    // When a number (and therefore also toggle) global-local option is set at effective scope, the local value is not
+    // reset to [Option.unsetValue] but to a copy of the new value. The local editor(s) should still be notified.
+    val option = addNumberOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(originalEditor.vim), VimInt(100))
+    Listener.notifiedEditors.clear()
+
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(originalEditor.vim), VimInt(200))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
@@ -323,6 +346,19 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     Listener.notifiedEditors.clear()
 
     injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(originalEditor.vim), VimString("newValue"))
+
+    assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
+  }
+
+  @Test
+  fun `test listener called for all editors when locally modified number global-local local-to-window option changes at effective scope`() {
+    // When a number (and therefore also toggle) global-local option is set at effective scope, the local value is not
+    // reset to [Option.unsetValue] but to a copy of the new value. The local editor(s) should still be notified.
+    val option = addNumberOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(originalEditor.vim), VimInt(100))
+    Listener.notifiedEditors.clear()
+
+    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(originalEditor.vim), VimInt(200))
 
     assertNotifiedEditors(originalEditor, splitWindow, otherBufferWindow)
   }
