@@ -212,8 +212,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
  */
 private class OptionStorage {
   private val globalValues = mutableMapOf<String, VimDataType>()
-  private val perWindowGlobalOptionsKey = Key<MutableMap<String, VimDataType>>("perWindowGlobalOptions")
-  private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
+  private val perWindowGlobalOptionsKey = Key<MutableMap<String, VimDataType>>("vimPerWindowGlobalOptions")
+  private val localOptionsKey = Key<MutableMap<String, VimDataType>>("vimLocalOptions")
 
   fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T = when (scope) {
     is OptionAccessScope.EFFECTIVE -> getEffectiveValue(option, scope.editor)
