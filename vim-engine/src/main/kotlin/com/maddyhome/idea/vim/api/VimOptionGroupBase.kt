@@ -243,11 +243,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun addOption(option: Option<out VimDataType>) {
     Options.addOption(option)
-
-    // Initialise the values. Cast away the covariance, because it gets in the way of type inference. We want functions
-    // that are generic on Option<T> to get `VimDataType` and not `out VimDataType`, which we can't use
-    @Suppress("UNCHECKED_CAST")
-    initialiseOptionValues(option as Option<VimDataType>)
+    initialiseNewOptionDefaultValues(option)
   }
 
   override fun removeOption(optionName: String) {
@@ -294,7 +290,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionAccessScope.EFFECTIVE(editor))
 
 
-  private fun initialiseOptionValues(option: Option<VimDataType>) {
+  private fun <T : VimDataType> initialiseNewOptionDefaultValues(option: Option<T>) {
     if (option.declaredScope != LOCAL_TO_WINDOW) {
       storage.setOptionValue(option, OptionAccessScope.GLOBAL(null), option.defaultValue)
     }
@@ -362,11 +358,7 @@ private class OptionStorage {
     else {
       globalValues
     }
-
-    // We set the value via Option<T> so it's safe to cast to T. But note that the value might be null because we don't
-    // explicitly populate global option values in the same way we do local options
-    @Suppress("UNCHECKED_CAST")
-    return values[option.name] as? T ?: option.defaultValue
+    return getValue(values, option) ?: option.defaultValue
   }
 
   private fun <T : VimDataType> getLocalValue(option: Option<T>, editor: VimEditor): T {
@@ -379,18 +371,16 @@ private class OptionStorage {
 
   private fun <T : VimDataType> getBufferLocalValue(option: Option<T>, editor: VimEditor): T {
     val values = getBufferLocalOptionStorage(editor)
-    val value = values[option.name]
+    val value = getValue(values, option)
     strictModeAssert(value != null) { "Unexpected uninitialised buffer local value: ${option.name}" }
-    @Suppress("UNCHECKED_CAST")
-    return value as? T ?: getEmergencyFallbackLocalValue(option, editor)
+    return value ?: getEmergencyFallbackLocalValue(option, editor)
   }
 
   private fun <T : VimDataType> getWindowLocalValue(option: Option<T>, editor: VimEditor): T {
     val values = getWindowLocalOptionStorage(editor)
-    val value = values[option.name]
+    val value = getValue(values, option)
     strictModeAssert(value != null) { "Unexpected uninitialised window local value: ${option.name}" }
-    @Suppress("UNCHECKED_CAST")
-    return value as? T ?: getEmergencyFallbackLocalValue(option, editor)
+    return value ?: getEmergencyFallbackLocalValue(option, editor)
   }
 
   private fun <T : VimDataType> setEffectiveValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
@@ -438,6 +428,13 @@ private class OptionStorage {
     return setValue(values, option.name, value)
   }
 
+  private fun <T : VimDataType> getValue(values: MutableMap<String, VimDataType>, option: Option<T>): T? {
+    // We can safely suppress this because we know we only set it with a strongly typed option and only get it with a
+    // strongly typed option
+    @Suppress("UNCHECKED_CAST")
+    return values[option.name] as? T
+  }
+
   private fun <T : VimDataType> setValue(values: MutableMap<String, VimDataType>, key: String, value: T): Boolean {
     val oldValue = values[key]
     if (oldValue != value) {
@@ -460,7 +457,7 @@ private class OptionStorage {
    * Provides a fallback value if the values map is unexpectedly empty
    *
    * The local-to-window or local-to-buffer values maps should never have a missing option, as we eagerly initialise all
-   * local option values for each editor, but the map returns a nullable value, so let's just make sure we alwyas have
+   * local option values for each editor, but the map returns a nullable value, so let's just make sure we always have
    * a sensible fallback.
    */
   private fun <T : VimDataType> getEmergencyFallbackLocalValue(option: Option<T>, editor: VimEditor?): T {
