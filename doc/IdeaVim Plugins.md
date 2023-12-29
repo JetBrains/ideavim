@@ -396,3 +396,19 @@ Original plugin: [quick-scope](https://github.com/unblevable/quick-scope).
 https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope
 
 </details>
+
+
+<details>
+<summary><h2>Which-Key</h2></summary>
+
+Original plugin: [vim-which-key](https://github.com/liuchengxu/vim-which-key).
+
+### Setup:
+- Install [Which-Key](https://plugins.jetbrains.com/plugin/15976-which-key) plugin.
+- Add the following command to `~/.ideavimrc`: `set which-key`
+
+### Instructions
+
+https://github.com/TheBlob42/idea-which-key?tab=readme-ov-file#installation
+
+</details>
