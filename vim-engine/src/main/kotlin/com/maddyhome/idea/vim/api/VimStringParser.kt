@@ -63,5 +63,9 @@ public interface VimStringParser {
 }
 
 public fun key(string: String): KeyStroke {
-  return injector.parser.parseKeys(string).single()
+  return keys(string).single()
+}
+
+public fun keys(string: String): List<KeyStroke> {
+  return injector.parser.parseKeys(string)
 }
