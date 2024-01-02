@@ -91,6 +91,7 @@ import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -170,6 +171,7 @@ abstract class VimTestCase {
     injector.jumpService.resetJumps()
     VimPlugin.getChange().resetRepeat()
     VimPlugin.getKey().savedShortcutConflicts.clear()
+    assertFalse(KeyHandler.getInstance().keyStack.hasStroke())
 
     // Tear down neovim
     NeovimTesting.tearDown(testInfo)
