@@ -28,6 +28,10 @@ public class KeyStack {
     return stack.isNotEmpty() && stack.first().hasStroke()
   }
 
+  public fun isEmpty(): Boolean {
+    return stack.none { it.hasStroke() }
+  }
+
   public fun feedSomeStroke(): KeyStroke? {
     stack.forEach {
       if (it.hasStroke()) {

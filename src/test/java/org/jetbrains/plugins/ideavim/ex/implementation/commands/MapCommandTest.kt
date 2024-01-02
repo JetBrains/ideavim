@@ -11,27 +11,44 @@ import com.intellij.idea.TestFor
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.intellij.openapi.util.Disposer
+import com.intellij.testFramework.LoggedErrorProcessor
 import com.intellij.testFramework.TestLoggerFactory.TestLoggerAssertionError
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.keys
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
+import org.jetbrains.plugins.ideavim.ExceptionHandler
+import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertThrowsLogError
+import org.jetbrains.plugins.ideavim.exceptionMappingOwner
 import org.jetbrains.plugins.ideavim.waitAndAssert
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import javax.swing.JTextArea
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 /**
  * @author vlan
  */
 class MapCommandTest : VimTestCase() {
+
+  @AfterEach
+  fun tearDown() {
+    injector.keyGroup.removeKeyMapping(exceptionMappingOwner)
+  }
+
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   @Test
   fun testMapKtoJ() {
@@ -1098,5 +1115,33 @@ n  ,i            <Action>(Back)
      Sed in orci mauris.
      Cras id tellus in ex imperdiet egestas. 
     """.trimIndent())
+  }
+
+  @TestFor(issues = ["VIM-2929"])
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `mapping to handler with exception`() {
+    configureByText(
+      """
+     Lorem Ipsum
+
+     Lorem ipsum dolor sit amet,
+     ${c}consectetur adipiscing elit
+     Sed in orci mauris.
+     Cras id tellus in ex imperdiet egestas. 
+    """.trimIndent()
+    )
+    injector.keyGroup.putKeyMapping(MappingMode.NXO, keys("abc"), exceptionMappingOwner, ExceptionHandler(), false)
+
+    typeText(commandToKeys("map k abcx"))
+
+    val exception = assertThrows<Throwable> {
+      LoggedErrorProcessor.executeWith<Throwable>(OnlyThrowLoggedErrorProcessor) {
+        typeText("k")
+      }
+    }
+    assertEquals(ExceptionHandler.exceptionMessage, exception.cause!!.cause!!.message)
+
+    assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
   }
 }

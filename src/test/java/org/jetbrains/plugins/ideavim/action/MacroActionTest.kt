@@ -7,22 +7,40 @@
  */
 package org.jetbrains.plugins.ideavim.action
 
+import com.intellij.idea.TestFor
+import com.intellij.testFramework.LoggedErrorProcessor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.keys
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
+import org.jetbrains.plugins.ideavim.ExceptionHandler
+import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.exceptionMappingOwner
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssert
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * @author vlan
  */
 class MacroActionTest : VimTestCase() {
+
+  @AfterEach
+  fun tearDown() {
+    injector.keyGroup.removeKeyMapping(exceptionMappingOwner)
+  }
+
   // |q|
   @Test
   fun testRecordMacro() {
@@ -177,5 +195,34 @@ class MacroActionTest : VimTestCase() {
             ${c}1Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
+  }
+
+  @TestFor(issues = ["VIM-2929"])
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `macro to handler with exception`() {
+    configureByText(
+      """
+     Lorem Ipsum
+
+     Lorem ipsum dolor sit amet,
+     ${c}consectetur adipiscing elit
+     Sed in orci mauris.
+     Cras id tellus in ex imperdiet egestas. 
+    """.trimIndent()
+    )
+    injector.keyGroup.putKeyMapping(MappingMode.NXO, keys("abc"), exceptionMappingOwner, ExceptionHandler(), false)
+
+    injector.registerGroup.storeText('k', "abc")
+    injector.registerGroup.storeText('q', "x@ky")
+
+    val exception = assertThrows<Throwable> {
+      LoggedErrorProcessor.executeWith<Throwable>(OnlyThrowLoggedErrorProcessor) {
+        typeText("@q")
+      }
+    }
+    assertEquals(ExceptionHandler.exceptionMessage, exception.cause!!.cause!!.message)
+
+    assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
   }
 }

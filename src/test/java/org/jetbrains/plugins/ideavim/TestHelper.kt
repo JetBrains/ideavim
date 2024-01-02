@@ -14,8 +14,13 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.toArray
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.ExtensionHandler
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -129,3 +134,15 @@ internal fun <T> product(vararg elements: List<T>): List<List<T>> {
   }
   return res
 }
+
+internal class ExceptionHandler : ExtensionHandler {
+  override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    error(exceptionMessage)
+  }
+
+  companion object {
+    internal const val exceptionMessage = "Exception here"
+  }
+}
+
+internal val exceptionMappingOwner = MappingOwner.Plugin.get("Exception mapping owner")

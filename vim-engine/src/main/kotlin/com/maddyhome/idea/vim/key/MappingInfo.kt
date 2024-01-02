@@ -93,14 +93,17 @@ public class ToKeysMappingInfo(
     val keyHandler = KeyHandler.getInstance()
     LOG.trace { "Adding new keys to keyStack as toKeys of mapping. State before adding keys: ${keyHandler.keyStack.dump()}" }
     keyHandler.keyStack.addKeys(toKeys)
-    var first = true
-    while (keyHandler.keyStack.hasStroke()) {
-      val keyStroke = keyHandler.keyStack.feedStroke()
-      val recursive = isRecursive && !(first && fromIsPrefix)
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
-      first = false
+    try {
+      var first = true
+      while (keyHandler.keyStack.hasStroke()) {
+        val keyStroke = keyHandler.keyStack.feedStroke()
+        val recursive = isRecursive && !(first && fromIsPrefix)
+        keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+        first = false
+      }
+    } finally {
+      keyHandler.keyStack.removeFirst()
     }
-    keyHandler.keyStack.removeFirst()
   }
 
   public companion object {

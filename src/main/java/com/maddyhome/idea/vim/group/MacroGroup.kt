@@ -63,27 +63,33 @@ internal class MacroGroup : VimMacroBase() {
     try {
       myPotemkinProgress.text2 = if (isInternalMacro) "Executing internal macro" else ""
       val runnable = runnable@{
-        // Handle one keystroke then queue up the next key
-        for (i in 0 until total) {
-          myPotemkinProgress.fraction = (i + 1).toDouble() / total
-          while (keyStack.hasStroke()) {
-            val key = keyStack.feedStroke()
+        try {
+          // Handle one keystroke then queue up the next key
+          for (i in 0 until total) {
             try {
-              myPotemkinProgress.checkCanceled()
-            } catch (e: ProcessCanceledException) {
-              return@runnable
+              myPotemkinProgress.fraction = (i + 1).toDouble() / total
+              while (keyStack.hasStroke()) {
+                val key = keyStack.feedStroke()
+                try {
+                  myPotemkinProgress.checkCanceled()
+                } catch (e: ProcessCanceledException) {
+                  return@runnable
+                }
+                ProgressManager.getInstance().executeNonCancelableSection {
+                  // Prevent autocompletion during macros.
+                  // See https://github.com/JetBrains/ideavim/pull/772 for details
+                  CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
+                  getInstance().handleKey(editor, key, context)
+                }
+                if (injector.messages.isError()) return@runnable
+              }
+            } finally {
+              keyStack.resetFirst()
             }
-            ProgressManager.getInstance().executeNonCancelableSection {
-              // Prevent autocompletion during macros.
-              // See https://github.com/JetBrains/ideavim/pull/772 for details
-              CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
-              getInstance().handleKey(editor, key, context)
-            }
-            if (injector.messages.isError()) return@runnable
           }
-          keyStack.resetFirst()
+        } finally {
+          keyStack.removeFirst()
         }
-        keyStack.removeFirst()
       }
 
       if (isInternalMacro) {
