@@ -487,6 +487,10 @@ Contributors:
   [![icon][github]](https://github.com/pWydmuch)
   &nbsp;
   pWydmuch
+* [![icon][mail]](mailto:leonid989@gmail.com)
+  [![icon][github]](https://github.com/Infonautica)
+  &nbsp;
+  Leonid Danilov
 
 Previous contributors:
 
