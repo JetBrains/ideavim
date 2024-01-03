@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 public abstract class VimOptionGroupBase : VimOptionGroup {
   private val storage = OptionStorage()
-  private val listeners by lazy { OptionListenersImpl(this, injector.editorGroup) }
-  private val parsedValuesCache by lazy { ParsedValuesCache(this, injector.vimStorageService) }
+  private val listeners = OptionListenersImpl(storage, injector.editorGroup)
+  private val parsedValuesCache = ParsedValuesCache(storage, injector.vimStorageService)
 
   override fun initialiseOptions() {
     Options.initialise()
@@ -527,7 +527,12 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
 }
 
 
-private class OptionListenersImpl(private val optionGroup: VimOptionGroup, private val editorGroup: VimEditorGroup) {
+
+private fun <T : VimDataType> OptionStorage.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
+  return this.getOptionValue(option, OptionAccessScope.LOCAL(editor)) == option.unsetValue
+}
+
+private class OptionListenersImpl(private val optionStorage: OptionStorage, private val editorGroup: VimEditorGroup) {
   private val globalOptionListeners = MultiSet<String, GlobalOptionChangeListener>()
   private val effectiveOptionValueListeners = MultiSet<String, EffectiveOptionValueChangeListener>()
 
@@ -634,7 +639,7 @@ private class OptionListenersImpl(private val optionGroup: VimOptionGroup, priva
    * This will notify all open editors where the option is not locally set.
    */
   private fun onGlobalLocalOptionGlobalValueChanged(option: Option<out VimDataType>) {
-    val affectedEditors = editorGroup.localEditors().filter { optionGroup.isUnsetValue(option, it) }
+    val affectedEditors = editorGroup.localEditors().filter { optionStorage.isUnsetValue(option, it) }
     fireEffectiveValueChanged(option.name, affectedEditors)
   }
 
@@ -655,13 +660,13 @@ private class OptionListenersImpl(private val optionGroup: VimOptionGroup, priva
     // [onLocalOptionChanged], but ensures local editors are not notified twice in the case that a number based option
     // is reset rather than unset.
     val affectedEditors = mutableListOf<VimEditor>()
-    affectedEditors.addAll(editorGroup.localEditors().filter { optionGroup.isUnsetValue(option, it) })
+    affectedEditors.addAll(editorGroup.localEditors().filter { optionStorage.isUnsetValue(option, it) })
 
     if (option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
-      if (!optionGroup.isUnsetValue(option, editor)) affectedEditors.add(editor)
+      if (!optionStorage.isUnsetValue(option, editor)) affectedEditors.add(editor)
     }
     else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
-      affectedEditors.addAll(editorGroup.localEditors().filter { !optionGroup.isUnsetValue(option, it) })
+      affectedEditors.addAll(editorGroup.localEditors().filter { !optionStorage.isUnsetValue(option, it) })
     }
 
     fireEffectiveValueChanged(option.name, affectedEditors)
@@ -691,7 +696,7 @@ private class OptionListenersImpl(private val optionGroup: VimOptionGroup, priva
 
 
 private class ParsedValuesCache(
-  private val optionGroup: VimOptionGroup,
+  private val optionStorage: OptionStorage,
   private val storageService: VimStorageService,
 ) {
   private val globalParsedValues = mutableMapOf<String, Any>()
@@ -717,7 +722,7 @@ private class ParsedValuesCache(
     @Suppress("UNCHECKED_CAST")
     return cachedValues.getOrPut(option.name) {
       val scope = if (editor == null) OptionAccessScope.GLOBAL(null) else OptionAccessScope.EFFECTIVE(editor)
-      provider(optionGroup.getOptionValue(option, scope))
+      provider(optionStorage.getOptionValue(option, scope))
     } as TData
   }
 
