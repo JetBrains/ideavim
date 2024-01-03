@@ -49,6 +49,7 @@ usual beta standards.
 * [763](https://github.com/JetBrains/ideavim/pull/763) by [Sam Ng](https://github.com/samabcde): Fix(VIM-3176) add test for restore selection after pasting in/below s…
 * [772](https://github.com/JetBrains/ideavim/pull/772) by [chylex](https://github.com/chylex): Prevent code completion popup from appearing after running a macro
 * [787](https://github.com/JetBrains/ideavim/pull/787) by [Leonid Danilov](https://github.com/Infonautica): Added "Which-Key" to Plugins
+* [778](https://github.com/JetBrains/ideavim/pull/778) by [lippfi](https://github.com/lippfi): Showmode
 
 ## 2.7.0, 2023-11-07
 
