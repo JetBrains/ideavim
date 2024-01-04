@@ -125,5 +125,8 @@ public enum class OptionDeclaredScope {
    *
    * See `:help global-local`
    */
-  GLOBAL_OR_LOCAL_TO_WINDOW
+  GLOBAL_OR_LOCAL_TO_WINDOW;
+
+  public fun isGlobalLocal(): Boolean =
+    this == GLOBAL_OR_LOCAL_TO_BUFFER || this == GLOBAL_OR_LOCAL_TO_WINDOW
 }
