@@ -302,13 +302,18 @@ abstract class VimTestCase {
     configureByText(stringBuilder.toString())
   }
 
-  protected fun configureByColumns(columnCount: Int) {
+  protected fun configureByColumns(columnCount: Int, disableWrap: Boolean = true) {
     val content = buildString {
       repeat(columnCount) {
         append('0' + (it % 10))
       }
     }
     configureByText(content)
+
+    // `'wrap'` is set by default. But if we're configuring long columns, we usually don't want soft wraps enabled
+    if (disableWrap) {
+      enterCommand("set nowrap")
+    }
   }
 
   @JvmOverloads
