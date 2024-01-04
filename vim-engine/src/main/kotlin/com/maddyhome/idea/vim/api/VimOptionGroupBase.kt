@@ -257,11 +257,21 @@ public interface OptionValueOverride<T : VimDataType> {
   /**
    * Sets the local/effective value for the current option.
    *
-   * The implementation can use the new value to set a setting in the local editor that matches the current option.
+   * This method is called when the currently overridden option's local (and therefore effective) value is set, either
+   * to a default value or to a new value. It can be used to map Vim options to equivalent IDE settings. For example,
+   * if the new value is [OptionValue.User] or [OptionValue.External], the user is explicitly setting a value (or the
+   * option is being initialised from a window where the option has been overridden and set externally to IdeaVim). In
+   * this case, an implementation would want to update IDE settings.
    *
-   * @param storedValue The current stored value of the Vim option, if set. This will be `null` during initialisation.
-   * The stored value will be the last value set either explicitly with `:set` commands, or defaults. It will not be the
-   * result of previous calls to [getLocalValue].
+   * If the new value is [OptionValue.Default], an implementation could reset the current IDE setting to a default
+   * value, likely also from the IDE. However, an implementation shouldn't reset IDE settings during initialisation.
+   * The method is passed what IdeaVim thinks the current value is. This value will be null during initialisation
+   * (because there isn't a previous value yet!) and this fact can be used to avoid resetting to default during
+   * initialisation.
+   *
+   * @param storedValue The current stored value of the Vim option. This will only be `null` during initialisation. The
+   * stored value will be the last value set either explicitly with `:set` commands, or defaults. It will not be the
+   * overridden result of previous calls to [getLocalValue].
    * @param newValue The new value being set for the Vim option.
    * @param editor The [VimEditor] instance in which the option should be set.
    * @return `true` if the new, overridden local value is different to [storedValue]. Note that this should be the
@@ -397,7 +407,7 @@ private class OptionStorage {
     else {
       globalValues
     }
-    return getValue(values, option) ?: OptionValue.Default(option.defaultValue)
+    return getStoredValue(values, option) ?: OptionValue.Default(option.defaultValue)
   }
 
   private fun <T : VimDataType> getLocalValue(option: Option<T>, editor: VimEditor): OptionValue<T> {
@@ -410,14 +420,14 @@ private class OptionStorage {
 
   private fun <T : VimDataType> getBufferLocalValue(option: Option<T>, editor: VimEditor): OptionValue<T> {
     val values = getBufferLocalOptionStorage(editor)
-    val value = getOverriddenLocalValue(option, getValue(values, option), editor)
+    val value = getOverriddenLocalValue(option, getStoredValue(values, option), editor)
     strictModeAssert(value != null) { "Unexpected uninitialised buffer local value: ${option.name}" }
     return value ?: getEmergencyFallbackLocalValue(option, editor)
   }
 
   private fun <T : VimDataType> getWindowLocalValue(option: Option<T>, editor: VimEditor): OptionValue<T> {
     val values = getWindowLocalOptionStorage(editor)
-    val value = getOverriddenLocalValue(option, getValue(values, option), editor)
+    val value = getOverriddenLocalValue(option, getStoredValue(values, option), editor)
     strictModeAssert(value != null) { "Unexpected uninitialised window local value: ${option.name}" }
     return value ?: getEmergencyFallbackLocalValue(option, editor)
   }
@@ -458,7 +468,7 @@ private class OptionStorage {
     else {
       globalValues
     }
-    return setValue(values, option.name, value)
+    return setStoredValue(values, option.name, value)
   }
 
   private fun <T : VimDataType> setLocalValue(option: Option<T>, editor: VimEditor, value: OptionValue<T>): Boolean {
@@ -478,14 +488,15 @@ private class OptionStorage {
     value: OptionValue<T>,
   ): Boolean {
     getOptionValueOverride(option)?.let {
-      val storedValue = getValue(values, option)
-      setValue(values, option.name, value)
-      return it.setLocalValue(storedValue, value, editor)
+      val storedValue = getStoredValue(values, option) // Will be null during initialisation!
+      val changed = it.setLocalValue(storedValue, value, editor)
+      setStoredValue(values, option.name, value)
+      return changed
     }
-    return setValue(values, option.name, value)
+    return setStoredValue(values, option.name, value)
   }
 
-  private fun <T : VimDataType> getValue(
+  private fun <T : VimDataType> getStoredValue(
     values: MutableMap<String, OptionValue<out VimDataType>>,
     option: Option<T>,
   ): OptionValue<T>? {
@@ -495,15 +506,15 @@ private class OptionStorage {
     return values[option.name] as? OptionValue<T>
   }
 
-  private fun <T : VimDataType> setValue(
+  private fun <T : VimDataType> setStoredValue(
     values: MutableMap<String, OptionValue<out VimDataType>>,
     key: String,
     value: OptionValue<T>,
   ): Boolean {
     val oldValue = values[key]
 
-    // For change notifications, we don't care how the value is set, whether it's default becoming explicit - it's just
-    // about the actual value changing so we can act on the value.
+    // We need to notify listeners if the actual value changes, so we don't care if it's changed from being default to
+    // now being explicitly set, only if the value is different.
     if (oldValue?.value != value.value) {
       values[key] = value
       return true
