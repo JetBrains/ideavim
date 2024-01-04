@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.OptionValue
 import com.maddyhome.idea.vim.api.OptionValueOverride
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
@@ -117,16 +118,21 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  * Maps the `'wrap'` Vim option to the IntelliJ soft wrap settings
  */
 public class WrapOptionMapper : OptionValueOverride<VimInt> {
-  override fun getLocalValue(storedValue: VimInt?, editor: VimEditor): VimInt {
+  override fun getLocalValue(storedValue: OptionValue<VimInt>?, editor: VimEditor): OptionValue<VimInt> {
     // Always return the current effective value of the IntelliJ setting
-    return editor.ij.settings.isUseSoftWraps.asVimInt()
+    // TODO: Proper value
+    return OptionValue.User(editor.ij.settings.isUseSoftWraps.asVimInt())
   }
 
-  override fun setLocalValue(storedValue: VimInt?, newValue: VimInt, editor: VimEditor): Boolean {
+  override fun setLocalValue(
+    storedValue: OptionValue<VimInt>?,
+    newValue: OptionValue<VimInt>,
+    editor: VimEditor,
+  ): Boolean {
     // TODO: Be smarter here - we shouldn't update if the stored value is the default
     // But we can't just compare storedValue with option.defaultValue since the user can explicitly set that value too
-    if (getLocalValue(storedValue, editor) != newValue) {
-      setIsUseSoftWraps(editor, newValue.asBoolean())
+    if (getLocalValue(storedValue, editor).value != newValue.value) {
+      setIsUseSoftWraps(editor, newValue.value.asBoolean())
       return true
     }
     return false
