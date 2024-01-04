@@ -45,6 +45,10 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
  * As a convenience, this class also provides access to the IntelliJ specific global options, via inheritance.
  */
 public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(scope) {
+  // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
+  public var wrap: Boolean by optionProperty(IjOptions.wrap)
+
+  // IntelliJ specific options
   public var ideacopypreprocess: Boolean by optionProperty(IjOptions.ideacopypreprocess)
   public var ideajoin: Boolean by optionProperty(IjOptions.ideajoin)
   public var idearefactormode: String by optionProperty(IjOptions.idearefactormode)

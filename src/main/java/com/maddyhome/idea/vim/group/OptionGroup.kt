@@ -8,15 +8,21 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.OptionValueOverride
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
 internal interface IjVimOptionGroup: VimOptionGroup {
   /**
@@ -31,6 +37,10 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 }
 
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
+  init {
+    addOptionValueOverride(IjOptions.wrap, WrapOptionMapper())
+  }
+
   override fun initialiseOptions() {
     // We MUST call super!
     super.initialiseOptions()
@@ -64,6 +74,78 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
     }
   }
 }
+
+/* Mapping Vim options to IntelliJ settings
+ *
+ * There is an overlap between some Vim options and IntelliJ settings. Some Vim options such as 'wrap' and 'breakindent'
+ * cannot be implemented in IdeaVim, but must be a feature of the host editor, which will have equivalent settings.
+ * Similarly, IntelliJ has settings for features that also exist in IdeaVim, but with a different implementation (e.g.
+ * IntelliJ has the equivalent of 'scrolloff' et al.) These Vim options can still be implemented by IdeaVim, and mapped
+ * to the IntelliJ Setting values.
+ *
+ * The IntelliJ settings implemented are currently closest to Vim's global-local options. There is a persistent global
+ * value maintained by [EditorSettingsExternalizable], and an initially unset local value in [EditorSettings]. The
+ * global value is used when the local value is unset. The main difference with Vim's global-local is that IntelliJ does
+ * not allow us to "unset" the local value. However, we don't actually care about this - it makes no difference to the
+ * implementation.
+ *
+ * IdeaVim will still keep track of what it thinks the global and local values of these options are, but the
+ * local/effective value is mapped to the IntelliJ setting. The current local value of the Vim option is always reported
+ * as the current local/effective value of the IntelliJ setting, so it never gets out of sync. When setting the Vim
+ * option, IdeaVim will only update the IntelliJ setting if the user explicitly sets it with `:set` or `:setlocal`. It
+ * does not update the IntelliJ setting when setting the Vim defaults. This means that unless the user explicitly opts
+ * in to the Vim option, the current IntelliJ setting is used. Changing the IntelliJ setting through the IDE is always
+ * reflected.
+ *
+ * Normally, Vim updates both local and global values when changing the effective value of an option, and this is still
+ * true for mapped options, although the global value is not mapped to anything. Instead, it is used to provide the
+ * value when initialising a new window. If the user does not explicitly set the Vim option, the global value is still
+ * a default value, and setting the new window's local value to default does not update the IntelliJ setting. But if the
+ * user does explicitly set the Vim option, the global value is used to initialise the new window, and is used to update
+ * the IntelliJ setting. This gives us expected Vim-like behaviour when creating new windows.
+ *
+ * Changing the IntelliJ setting through the IDE is treated like `:setlocal` - it updates the local value, but does not
+ * change the global value, so it does not affect new window initialisation.
+ *
+ * Typically, options that are implemented in IdeaVim should be registered in vim-engine, even if they are mapped to
+ * IntelliJ settings. Options that do not have an IdeaVim implementation should be registered in the host-specific
+ * module.
+ */
+
+
+/**
+ * Maps the `'wrap'` Vim option to the IntelliJ soft wrap settings
+ */
+public class WrapOptionMapper : OptionValueOverride<VimInt> {
+  override fun getLocalValue(storedValue: VimInt?, editor: VimEditor): VimInt {
+    // Always return the current effective value of the IntelliJ setting
+    return editor.ij.settings.isUseSoftWraps.asVimInt()
+  }
+
+  override fun setLocalValue(storedValue: VimInt?, newValue: VimInt, editor: VimEditor): Boolean {
+    // TODO: Be smarter here - we shouldn't update if the stored value is the default
+    // But we can't just compare storedValue with option.defaultValue since the user can explicitly set that value too
+    if (getLocalValue(storedValue, editor) != newValue) {
+      setIsUseSoftWraps(editor, newValue.asBoolean())
+      return true
+    }
+    return false
+  }
+
+  private fun setIsUseSoftWraps(editor: VimEditor, value: Boolean) {
+    editor.ij.settings.isUseSoftWraps = value
+
+    // Something goes wrong when disabling wraps in test mode. They enable correctly (which is good as it's the
+    // default) and the editor scrollbars are reset to the current screen width. But when disabling, the
+    // scrollbars aren't updated, so trying to scroll to the end of a long line doesn't fit, and fails. This
+    // doesn't happen interactively, but I don't see why - the control flow in the debugger is different, perhaps
+    // because tests run headless then the UI is updated less, or differently, at least.
+    if (ApplicationManager.getApplication().isUnitTestMode) {
+      (editor.ij as? EditorEx)?.scrollPane?.viewport?.doLayout()
+    }
+  }
+}
+
 
 public class IjOptionConstants {
   @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate", "ConstPropertyName")

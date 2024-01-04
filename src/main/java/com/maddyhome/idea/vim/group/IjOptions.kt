@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
+import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -33,6 +34,10 @@ public object IjOptions {
     Options.overrideDefaultValue(Options.clipboard, VimString("ideaput,autoselect,exclude:cons\\|linux"))
   }
 
+  // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
+  public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
+
+  // IntelliJ specific functionality - custom options
   public val ide: StringOption = addOption(
     StringOption("ide", GLOBAL, "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
   )

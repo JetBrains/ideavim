@@ -65,6 +65,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
         repeat(200) { append("0") }
       },
     )
+    enterCommand("set nowrap")
     typeText("j$")
     // Assert we got initial scroll correct
     // Note, this matches Vim - we've scrolled to centre (but only because the line above allows us to scroll without
