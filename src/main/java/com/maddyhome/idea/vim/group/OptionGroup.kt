@@ -10,8 +10,10 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.util.PatternUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.OptionValue
 import com.maddyhome.idea.vim.api.OptionValueOverride
@@ -119,9 +121,28 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  */
 public class WrapOptionMapper : OptionValueOverride<VimInt> {
   override fun getLocalValue(storedValue: OptionValue<VimInt>?, editor: VimEditor): OptionValue<VimInt> {
-    // Always return the current effective value of the IntelliJ setting
-    // TODO: Proper value
-    return OptionValue.User(editor.ij.settings.isUseSoftWraps.asVimInt())
+    // Always return the current effective IntelliJ editor setting, regardless of the current IdeaVim value - the user
+    // might have changed the value through the IDE. This means `:setlocal wrap?` will show the current value
+    val intellijValue = editor.ij.settings.isUseSoftWraps.asVimInt()
+
+    // Tell the caller how the value was set as well as what the value is. This is used when copying values to a new
+    // window, and deciding if the IntelliJ value should be set - we don't want to set the IntelliJ value if the current
+    // value is a default. We do want to set it when the user has explicitly set the value, either through the IDE, or
+    // with Vim commands.
+    return if (storedValue is OptionValue.Default) {
+      if (intellijValue.asBoolean() != getGlobalIsUseSoftWraps(editor)) {
+        OptionValue.External(intellijValue)
+      }
+      else {
+        OptionValue.Default(intellijValue)
+      }
+    }
+    else if (storedValue?.value != intellijValue) {
+      OptionValue.External(intellijValue)
+    }
+    else {
+      OptionValue.User(intellijValue)
+    }
   }
 
   override fun setLocalValue(
@@ -129,14 +150,58 @@ public class WrapOptionMapper : OptionValueOverride<VimInt> {
     newValue: OptionValue<VimInt>,
     editor: VimEditor,
   ): Boolean {
-    // TODO: Be smarter here - we shouldn't update if the stored value is the default
-    // But we can't just compare storedValue with option.defaultValue since the user can explicitly set that value too
-    if (getLocalValue(storedValue, editor).value != newValue.value) {
-      setIsUseSoftWraps(editor, newValue.value.asBoolean())
-      return true
+    when (newValue) {
+      is OptionValue.Default -> {
+        // storedValue will only be null during initialisation, when we're setting the value for the first time and
+        // therefore don't have a previous value. This only matters if we're setting the default, in which case we do
+        // nothing, as we want to treat the current IntelliJ value as default.
+        if (storedValue != null) {
+          // We're being asked to reset the default, so make sure the effective IntelliJ value matches the global value
+          // TODO: If we disable and re-enable the plugin, we reinitialise the options, and set defaults again
+          // This leads to incorrectly resetting the IntelliJ value if the current effective IntelliJ value doesn't
+          // match the global IntelliJ value.
+          val default = getGlobalIsUseSoftWraps(editor)
+          if (getEffectiveIsUseSoftWraps(editor) != default) {
+            setIsUseSoftWraps(editor, default)
+          }
+        }
+      }
+      is OptionValue.External -> {
+        // The new value has been explicitly set by the user through the IDE, rather than using Vim commands. The only
+        // way to get an External instance is through the getter for this option, which means we know this was copied
+        // from an existing window/buffer and is being applied as part of initialisation.
+        // It's been explicitly set by a user, so we can explicitly set the IntelliJ value.
+        setIsUseSoftWraps(editor, newValue.value.asBoolean())
+      }
+      is OptionValue.User -> {
+        // The user is explicitly setting a value, so change the IntelliJ value
+        setIsUseSoftWraps(editor, newValue.value.asBoolean())
+      }
     }
+
+    return storedValue?.value != newValue.value
+  }
+
+  private fun getGlobalIsUseSoftWraps(editor: VimEditor): Boolean {
+    val settings = EditorSettingsExternalizable.getInstance()
+    if (settings.isUseSoftWraps) {
+      val masks = settings.softWrapFileMasks
+      if (masks.trim() == "*") return true
+
+      editor.ij.virtualFile?.let { file ->
+        masks.split(";").forEach { mask ->
+          val trimmed = mask.trim()
+          if (trimmed.isNotEmpty() && PatternUtil.fromMask(trimmed).matcher(file.name).matches()) {
+            return true
+          }
+        }
+      }
+    }
+
     return false
   }
+
+  private fun getEffectiveIsUseSoftWraps(editor: VimEditor) = editor.ij.settings.isUseSoftWraps
 
   private fun setIsUseSoftWraps(editor: VimEditor, value: Boolean) {
     editor.ij.settings.isUseSoftWraps = value

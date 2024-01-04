@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
@@ -56,6 +57,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -121,7 +123,7 @@ abstract class VimTestCase {
       KeyHandler.getInstance().fullReset(editor.vim)
     }
     KeyHandler.getInstance().keyHandlerState.reset(Mode.NORMAL())
-    VimPlugin.getOptionGroup().resetAllOptionsForTesting()
+    resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
@@ -137,6 +139,16 @@ abstract class VimTestCase {
     VimPlugin.clearError()
 
     this.testInfo = testInfo
+  }
+
+  private fun resetAllOptions() {
+    VimPlugin.getOptionGroup().resetAllOptionsForTesting()
+
+    // Some options are mapped to IntelliJ settings. Make sure the IntelliJ settings match the Vim defaults
+    EditorSettingsExternalizable.getInstance().apply {
+      softWrapFileMasks = "*"
+      isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
+    }
   }
 
   protected open fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
