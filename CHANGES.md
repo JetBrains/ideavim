@@ -50,6 +50,7 @@ usual beta standards.
 * [772](https://github.com/JetBrains/ideavim/pull/772) by [chylex](https://github.com/chylex): Prevent code completion popup from appearing after running a macro
 * [787](https://github.com/JetBrains/ideavim/pull/787) by [Leonid Danilov](https://github.com/Infonautica): Added "Which-Key" to Plugins
 * [778](https://github.com/JetBrains/ideavim/pull/778) by [lippfi](https://github.com/lippfi): Showmode
+* [788](https://github.com/JetBrains/ideavim/pull/788) by [Matt Ellis](https://github.com/citizenmatt): Refactor VimOptionGroupBase
 
 ## 2.7.0, 2023-11-07
 
