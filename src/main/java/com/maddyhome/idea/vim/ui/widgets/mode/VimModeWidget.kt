@@ -13,6 +13,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.WindowManager
+import com.intellij.ui.components.JBLabel
+import com.intellij.ui.util.width
 import com.intellij.util.ui.UIUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -23,8 +25,9 @@ import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetFocusListener
 import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetModeListener
 import java.awt.Color
+import java.awt.Dimension
 import javax.swing.JComponent
-import javax.swing.JLabel
+import kotlin.math.max
 
 public class VimModeWidget(public val project: Project) : CustomStatusBarWidget {
   private companion object {
@@ -33,14 +36,14 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget 
     private const val REPLACE = "REPLACE"
     private const val COMMAND = "COMMAND"
     private const val VISUAL = "VISUAL"
-    private const val VISUAL_LINE = "VISUAL LINE"
-    private const val VISUAL_BLOCK = "VISUAL BLOCK"
+    private const val VISUAL_LINE = "V-LINE"
+    private const val VISUAL_BLOCK = "V-BLOCK"
     private const val SELECT = "SELECT"
-    private const val SELECT_LINE = "SELECT LINE"
-    private const val SELECT_BLOCK = "SELECT BLOCK"
+    private const val SELECT_LINE = "S-LINE"
+    private const val SELECT_BLOCK = "S-BLOCK"
   }
   private val useColors = injector.globalIjOptions().colorfulmodewidget
-  private val label = JLabel("", JLabel.CENTER).apply {
+  private val label = JBLabelWiderThan(setOf(REPLACE)).apply {
     isOpaque = useColors
   }
 
@@ -126,6 +129,29 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget 
       is Mode.VISUAL -> Color(213, 174, 213)
       is Mode.SELECT -> Color(213, 174, 213)
       is Mode.OP_PENDING, null -> label.parent?.background
+    }
+  }
+
+  private class JBLabelWiderThan(private val words: Collection<String>): JBLabel("", CENTER) {
+    private val wordWidth: Int
+      get() {
+        val fontMetrics = getFontMetrics(font)
+        return words.maxOfOrNull { fontMetrics.stringWidth(it) } ?: 0
+      }
+
+    override fun getMinimumSize(): Dimension {
+      val minimumSize = super.getMinimumSize()
+      return Dimension(max(minimumSize.width, wordWidth + insets.width), minimumSize.height)
+    }
+
+    override fun getPreferredSize(): Dimension {
+      val preferredSize = super.getPreferredSize()
+      return Dimension(max(preferredSize.width, wordWidth + insets.width), preferredSize.height)
+    }
+
+    override fun getMaximumSize(): Dimension {
+      val maximumSize = super.getMaximumSize()
+      return Dimension(max(maximumSize.width, wordWidth + insets.width), maximumSize.height)
     }
   }
 }
