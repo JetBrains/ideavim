@@ -173,8 +173,8 @@ class SetCommandTest : VimTestCase() {
         |  history=50          nrformats=hex       sidescroll=0      novisualbell
         |nohlsearch          nonumber              sidescrolloff=0     visualdelay=100
         |noideaglobalmode      operatorfunc=     nosmartcase           whichwrap=b,s
-        |noideajoin          norelativenumber    nosneak               wrapscan
-        |  ideamarks           scroll=0            startofline
+        |noideajoin          norelativenumber    nosneak               wrap
+        |  ideamarks           scroll=0            startofline         wrapscan
         |  ideawrite=all       scrolljump=1      nosurround
         |noignorecase          scrolloff=0       notextobj-entire
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
@@ -286,6 +286,7 @@ class SetCommandTest : VimTestCase() {
       |novisualbell
       |  visualdelay=100
       |  whichwrap=b,s
+      |  wrap
       |  wrapscan
       |""".trimMargin()
     )

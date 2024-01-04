@@ -390,8 +390,8 @@ class SetlocalCommandTest : VimTestCase() {
       |  history=50        noNERDTree            showmode          novisualbell
       |nohlsearch            nrformats=hex       sidescroll=0        visualdelay=100
       |noideaglobalmode    nonumber              sidescrolloff=-1    whichwrap=b,s
-      |--ideajoin            operatorfunc=     nosmartcase           wrapscan
-      |  ideamarks         norelativenumber    nosneak
+      |--ideajoin            operatorfunc=     nosmartcase           wrap
+      |  ideamarks         norelativenumber    nosneak               wrapscan
       |  idearefactormode=   scroll=0            startofline
       |  ideawrite=all       scrolljump=1      nosurround
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
@@ -505,6 +505,7 @@ class SetlocalCommandTest : VimTestCase() {
       |novisualbell
       |  visualdelay=100
       |  whichwrap=b,s
+      |  wrap
       |  wrapscan
       |""".trimMargin()
     )

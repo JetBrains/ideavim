@@ -72,6 +72,9 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     strategy.initialiseCloneCurrentState(sourceEditor, fallbackWindow)
   }
 
+  protected fun <T : VimDataType> addOptionValueOverride(option: Option<T>, override: OptionValueOverride<T>): Unit =
+    storage.addOptionValueOverride(option, override)
+
   override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T =
     storage.getOptionValue(option, scope)
 
@@ -206,6 +209,51 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
 
 /**
+ * Used to override the local/effective value of an option in order to allow IDE backed option values
+ *
+ * This allows a derived instance of [VimOptionGroupBase] to register providers that can override the local/effective
+ * value of a stored Vim option. When getting the local value, an override provider can return the current state of an
+ * IDE setting, and when setting the value, it can change the IDE setting.
+ *
+ * Note that this interface doesn't currently support global option values. It is not clear if this is necessary, but
+ * can be added easily.
+ *
+ * Ideally, this class would be a protected nested class of [VimOptionGroupBase], since it should only be applicable to
+ * implementors, but it's used by private helper classes, so needs to be public.
+ */
+public interface OptionValueOverride<T : VimDataType> {
+  /**
+   * Gets an overridden local/effective value for the current option
+   *
+   * It can return a value from a setting in the local editor that matches the current option.
+   *
+   * @param storedValue The current value of the stored Vim option, if set. This can be `null` during initialisation.
+   * The stored value will be the last value set either explicitly with `:set` commands, or defaults. It will not be the
+   * result of previous calls to [getLocalValue].
+   * @param editor The Vim editor instance to use for retrieving the local value.
+   * @return The local value of the option as decided by the override provider. There should always be a value returned,
+   * even if there isn't a current stored value, as the point of overriding the option value is to provide a different
+   * value. This return value is used as the value of the Vim option, but is not stored.
+   */
+  public fun getLocalValue(storedValue: T?, editor: VimEditor): T
+
+  /**
+   * Sets the local/effective value for the current option.
+   *
+   * The implementation can use the new value to set a setting in the local editor that matches the current option.
+   *
+   * @param storedValue The current stored value of the Vim option, if set. This will be `null` during initialisation.
+   * The stored value will be the last value set either explicitly with `:set` commands, or defaults. It will not be the
+   * result of previous calls to [getLocalValue].
+   * @param newValue The new value being set for the Vim option.
+   * @param editor The [VimEditor] instance in which the option should be set.
+   * @return `true` if the new, overridden local value is different to [storedValue].
+   */
+  public fun setLocalValue(storedValue: T?, newValue: T, editor: VimEditor): Boolean
+}
+
+
+/**
  * Maintains storage of, and provides accessors to option values
  *
  * This class does not notify any listeners of changes, but provides enough information for a caller to handle this.
@@ -214,6 +262,11 @@ private class OptionStorage {
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val perWindowGlobalOptionsKey = Key<MutableMap<String, VimDataType>>("vimPerWindowGlobalOptions")
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("vimLocalOptions")
+  private val overrides = mutableMapOf<String, OptionValueOverride<out VimDataType>>()
+
+  fun <T : VimDataType> addOptionValueOverride(option: Option<T>, override: OptionValueOverride<T>) {
+    overrides[option.name] = override
+  }
 
   fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T = when (scope) {
     is OptionAccessScope.EFFECTIVE -> getEffectiveValue(option, scope.editor)
@@ -231,6 +284,11 @@ private class OptionStorage {
 
   fun isLocalToBufferOptionStorageInitialised(editor: VimEditor) =
     injector.vimStorageService.getDataFromBuffer(editor, localOptionsKey) != null
+
+  private fun <T : VimDataType> getOptionValueOverride(option: Option<T>): OptionValueOverride<T>? {
+    @Suppress("UNCHECKED_CAST")
+    return overrides[option.name] as? OptionValueOverride<T>
+  }
 
   private fun <T : VimDataType> getEffectiveValue(option: Option<T>, editor: VimEditor): T {
     return when (option.declaredScope) {
@@ -269,16 +327,23 @@ private class OptionStorage {
 
   private fun <T : VimDataType> getBufferLocalValue(option: Option<T>, editor: VimEditor): T {
     val values = getBufferLocalOptionStorage(editor)
-    val value = getValue(values, option)
+    val value = getOverriddenLocalValue(option, getValue(values, option), editor)
     strictModeAssert(value != null) { "Unexpected uninitialised buffer local value: ${option.name}" }
     return value ?: getEmergencyFallbackLocalValue(option, editor)
   }
 
   private fun <T : VimDataType> getWindowLocalValue(option: Option<T>, editor: VimEditor): T {
     val values = getWindowLocalOptionStorage(editor)
-    val value = getValue(values, option)
+    val value = getOverriddenLocalValue(option, getValue(values, option), editor)
     strictModeAssert(value != null) { "Unexpected uninitialised window local value: ${option.name}" }
     return value ?: getEmergencyFallbackLocalValue(option, editor)
+  }
+
+  private fun <T : VimDataType> getOverriddenLocalValue(option: Option<T>, storedValue: T?, editor: VimEditor): T? {
+    getOptionValueOverride(option)?.let {
+      return it.getLocalValue(storedValue, editor)
+    }
+    return storedValue
   }
 
   private fun <T : VimDataType> setEffectiveValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
@@ -311,18 +376,24 @@ private class OptionStorage {
   private fun <T : VimDataType> setLocalValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
     return when (option.declaredScope) {
       GLOBAL -> setGlobalValue(option, editor, value)
-      LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> setBufferLocalValue(option, editor, value)
-      LOCAL_TO_WINDOW, GLOBAL_OR_LOCAL_TO_WINDOW -> setWindowLocalValue(option, editor, value)
+      LOCAL_TO_BUFFER,
+      GLOBAL_OR_LOCAL_TO_BUFFER -> setLocalValue(getBufferLocalOptionStorage(editor), option, editor, value)
+      LOCAL_TO_WINDOW,
+      GLOBAL_OR_LOCAL_TO_WINDOW -> setLocalValue(getWindowLocalOptionStorage(editor) ,option, editor, value)
     }
   }
 
-  private fun <T : VimDataType> setBufferLocalValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
-    val values = getBufferLocalOptionStorage(editor)
-    return setValue(values, option.name, value)
-  }
-
-  private fun <T : VimDataType> setWindowLocalValue(option: Option<T>, editor: VimEditor, value: T): Boolean {
-    val values = getWindowLocalOptionStorage(editor)
+  private fun <T : VimDataType> setLocalValue(
+    values: MutableMap<String, VimDataType>,
+    option: Option<T>,
+    editor: VimEditor,
+    value: T,
+  ): Boolean {
+    getOptionValueOverride(option)?.let {
+      val storedValue = getValue(values, option)
+      setValue(values, option.name, value)
+      return it.setLocalValue(storedValue, value, editor)
+    }
     return setValue(values, option.name, value)
   }
 
