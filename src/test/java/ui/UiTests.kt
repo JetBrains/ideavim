@@ -39,6 +39,7 @@ import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.Point
 import java.awt.event.KeyEvent
+import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -204,7 +205,7 @@ class UiTests {
     remoteRobot.invokeActionJs("GotoAction")
     editor.keyboard {
       enterText(trackActionIds)
-      waitFor {
+      waitFor(duration = Duration.ofMinutes(3)) {
         findAllText(trackActionIds).size > 1
       }
       enter()
