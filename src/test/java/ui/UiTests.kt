@@ -133,7 +133,7 @@ class UiTests {
       createNewProjectLink.click()
       dialog("New Project") {
         findText("Java").click()
-        checkBox("Add sample code").select()
+        checkBox("Add sample code").unselect()
         button("Create").click()
       }
     }
