@@ -90,7 +90,9 @@ class UiTests {
       testGutterClick(editor)
       testAddNewLineInNormalMode(editor)
       testMappingToCtrlOrAltEnter(editor)
+      `simple enter in insert mode`(editor)
       testMilticaretEnter(editor)
+      `simple enter in select mode`(editor)
       reenableIdeaVim(editor)
 
       createFile("MyTest.java", this@uiTest)
@@ -611,6 +613,84 @@ class UiTests {
     // Reset state
     keyboard { escape() }
     assertEquals(1, editor.caretCount)
+    editor.injectText(testTextForEditor)
+    vimExit()
+  }
+
+  private fun ContainerFixture.`simple enter in insert mode`(editor: Editor) {
+    println("Run test 'simple enter in insert mode'...")
+
+    // Start of file
+    keyboard {
+      enterText("i")
+      enter()
+    }
+    assertEquals(
+      """
+      |
+      |One Two
+      |Three Four
+      |Five
+    """.trimMargin(),
+      editor.text
+    )
+
+    // Middle of file
+    findText("Four").click()
+    keyboard { enter() }
+    assertEquals(
+      """
+      |
+      |One Two
+      |Three 
+      |Four
+      |Five
+    """.trimMargin(),
+      editor.text
+    )
+
+    // End of file
+    val fivePoint = findText("Five").point
+    val endOfLine = Point(fivePoint.x + 50, fivePoint.y)
+    click(endOfLine)
+    keyboard { enter() }
+    assertEquals(
+      """
+      |
+      |One Two
+      |Three 
+      |Four
+      |Five
+      |
+    """.trimMargin(),
+      editor.text
+    )
+
+    editor.injectText(testTextForEditor)
+    vimExit()
+  }
+
+
+  private fun ContainerFixture.`simple enter in select mode`(editor: Editor) {
+    println("Run test 'simple enter in select mode'...")
+
+    findText("Four").doubleClick()
+
+    keyboard {
+      pressing(KeyEvent.VK_CONTROL) { enterText("g") }
+      enter()
+    }
+
+    assertEquals(
+      """
+      |One Two
+      |Three 
+      |
+      |Five
+    """.trimMargin(),
+      editor.text
+    )
+
     editor.injectText(testTextForEditor)
     vimExit()
   }
