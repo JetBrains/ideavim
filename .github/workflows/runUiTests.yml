@@ -35,10 +35,13 @@ jobs:
       - name: Tests
         run: gradle :testUi
       - name: Move video
+        if: always()
         run: mv video build/reports
       - name: Move sandbox logs
+        if: always()
         run: mv build/idea-sandbox/system/log sandbox-idea-log
       - name: Save report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ui-test-fails-report-mac
