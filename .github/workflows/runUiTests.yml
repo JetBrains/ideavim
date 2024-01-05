@@ -8,9 +8,9 @@ jobs:
     if: github.repository == 'JetBrains/ideavim'
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Java
-        uses: actions/setup-java@v2.1.0
+        uses: actions/setup-java@v4
         with:
           distribution: zulu
           java-version: 11
@@ -29,7 +29,7 @@ jobs:
           mkdir -p build/reports
           gradle :runIdeForUiTests > build/reports/idea.log &
       - name: Wait for Idea started
-        uses: jtalk/url-health-check-action@1.5
+        uses: jtalk/url-health-check-action@3
         with:
           url: http://127.0.0.1:8082
           max-attempts: 20
