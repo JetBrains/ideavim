@@ -510,7 +510,7 @@ class UiTests {
     vimExit()
   }
 
-  // For VIM-3190
+  // For VIM-3159
   private fun ContainerFixture.testAddNewLineInNormalMode(editor: Editor) {
     println("Run testAddNewLineInNormalMode...")
 
