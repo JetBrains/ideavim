@@ -44,6 +44,9 @@ class Editor(
   val caretOffset: Int
     get() = callJs("component.getEditor().getCaretModel().getOffset()", runInEdt = true)
 
+  val caretCount: Int
+    get() = callJs("component.getEditor().getCaretModel().getCaretCount()", runInEdt = true)
+
   val isBlockCursor: Boolean
 //    get() = callJs("component.getEditor().getSettings().isBlockCursor()", true)
     // Doesn't work at the moment because remote robot can't resolve classes from a plugin classloader

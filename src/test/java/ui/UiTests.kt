@@ -90,6 +90,7 @@ class UiTests {
       testGutterClick(editor)
       testAddNewLineInNormalMode(editor)
       testMappingToCtrlOrAltEnter(editor)
+      testMilticaretEnter(editor)
       reenableIdeaVim(editor)
 
       createFile("MyTest.java", this@uiTest)
@@ -571,5 +572,44 @@ class UiTests {
     assertEquals(19, editor.caretOffset)
 
     vimExit()
+  }
+
+  // For VIM-3186
+  private fun ContainerFixture.testMilticaretEnter(editor: Editor) {
+    println("Run testMilticaretEnter...")
+
+    keyboard {
+      pressing(KeyEvent.VK_ALT) {
+        pressing(KeyEvent.VK_SHIFT) {
+          findText("One").click()
+          findText("Three").click()
+          findText("Five").click()
+        }
+      }
+
+      enterText("A")
+      enter()
+    }
+
+    assertEquals(3, editor.caretCount)
+
+    assertEquals("""
+      |One Two
+      |
+      |Three Four
+      |
+      |Five
+      |
+    """.trimMargin(), editor.text)
+
+    // Reset state
+    keyboard { escape() }
+    assertEquals(1, editor.caretCount)
+    resetPlainTest(editor)
+    vimExit()
+  }
+
+  private fun resetPlainTest(editor: Editor) {
+    editor.injectText(testTextForEditor)
   }
 }
