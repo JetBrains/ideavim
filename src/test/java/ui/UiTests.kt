@@ -8,7 +8,7 @@
 
 package ui
 
-import com.automation.remarks.video.annotations.Video
+import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.stepsProcessing.step
