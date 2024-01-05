@@ -611,7 +611,10 @@ class UiTests {
     )
 
     // Reset state
-    keyboard { escape() }
+    keyboard {
+      escape()
+      escape()
+    }
     assertEquals(1, editor.caretCount)
     editor.injectText(testTextForEditor)
     vimExit()
