@@ -35,10 +35,8 @@ jobs:
       - name: Tests
         run: gradle :testUi
       - name: Move video
-        if: ${{ failure() }}
         run: mv video build/reports
-      - name: Save fails report
-        if: ${{ failure() }}
+      - name: Save report
         uses: actions/upload-artifact@v2
         with:
           name: ui-test-fails-report-mac
