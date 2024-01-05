@@ -37,6 +37,7 @@ import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.Point
+import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -88,6 +89,7 @@ class UiTests {
       testClickOnWord(editor)
       testGutterClick(editor)
       testAddNewLineInNormalMode(editor)
+      testMappingToCtrlOrAltEnter(editor)
       reenableIdeaVim(editor)
 
       createFile("MyTest.java", this@uiTest)
@@ -535,6 +537,38 @@ class UiTests {
     """.trimMargin(), editor.text)
 
     editor.injectText(testTextForEditor)
+
+    vimExit()
+  }
+
+  // For VIM-3190
+  private fun ContainerFixture.testMappingToCtrlOrAltEnter(editor: Editor) {
+    println("Run testMappingToCtrlOrAltEnter...")
+
+    keyboard {
+      enterText(":nmap <C-Enter> k")
+      enter()
+      enterText(":nmap <A-Enter> G")
+      enter()
+    }
+
+    // Set up initial position
+    keyboard {
+      enterText("jll")
+    }
+    assertEquals(10, editor.caretOffset)
+
+    // Checking C-ENTER
+    keyboard {
+      pressing(KeyEvent.VK_CONTROL) { enter() }
+    }
+    assertEquals(2, editor.caretOffset)
+
+    // Checking A-ENTER
+    keyboard {
+      pressing(KeyEvent.VK_ALT) { enter() }
+    }
+    assertEquals(19, editor.caretOffset)
 
     vimExit()
   }
