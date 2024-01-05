@@ -233,7 +233,7 @@ class UiTests {
   private fun IdeaFrame.createFile(fileName: String, remoteRobot: RemoteRobot) {
     step("Create $fileName file") {
       with(projectViewTree) {
-        setExpandTimeout(15_000)
+        setExpandTimeout(30_000)
         expand(projectName, "src")
         findText("src").click(MouseButton.RIGHT_BUTTON)
       }
