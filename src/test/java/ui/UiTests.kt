@@ -11,6 +11,7 @@ package ui
 import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ContainerFixture
+import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
 import org.assertj.swing.core.MouseButton
@@ -45,10 +46,19 @@ class UiTests {
     StepsLogger.init()
   }
 
+  private lateinit var commonSteps: CommonSteps
+
+  private val testTextForEditor = """
+                  |One Two
+                  |Three Four
+                  |Five
+              """.trimMargin()
+
   @Test
   @Video
   fun ideaVimTest() = uiTest("ideaVimTest") {
     val sharedSteps = JavaExampleSteps(this)
+    commonSteps = CommonSteps(this)
 
     startNewProject()
     Thread.sleep(1000)
@@ -60,13 +70,7 @@ class UiTests {
       createFile("MyDoc.txt", this@uiTest)
       val editor = editor("MyDoc.txt") {
         step("Write a text") {
-          injectText(
-            """
-                |One Two
-                |Three Four
-                |Five
-            """.trimMargin(),
-          )
+          injectText(testTextForEditor)
         }
       }
       testSelectTextWithDelay(editor)
@@ -83,6 +87,7 @@ class UiTests {
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testGutterClick(editor)
+      testAddNewLineInNormalMode(editor)
       reenableIdeaVim(editor)
 
       createFile("MyTest.java", this@uiTest)
@@ -501,6 +506,35 @@ class UiTests {
     }
 
     assertEquals("One Two\nThree Four\n", editor.selectedText)
+
+    vimExit()
+  }
+
+  // For VIM-3190
+  private fun ContainerFixture.testAddNewLineInNormalMode(editor: Editor) {
+    println("Run testAddNewLineInNormalMode...")
+
+    commonSteps.invokeAction("EditorStartNewLineBefore")
+
+    assertEquals("""
+      |
+      |One Two
+      |Three Four
+      |Five
+    """.trimMargin(), editor.text)
+
+    editor.injectText(testTextForEditor)
+
+    commonSteps.invokeAction("EditorStartNewLine")
+
+    assertEquals("""
+      |One Two
+      |
+      |Three Four
+      |Five
+    """.trimMargin(), editor.text)
+
+    editor.injectText(testTextForEditor)
 
     vimExit()
   }
