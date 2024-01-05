@@ -302,6 +302,7 @@ tasks {
         systemProperty("ide.mac.message.dialogs.as.sheets", "false")
         systemProperty("jb.privacy.policy.text", "<!--999.999-->")
         systemProperty("jb.consents.confirmation.enabled", "false")
+        systemProperty("ide.show.tips.on.startup.default.value", "false")
     }
 
     runPluginVerifier {
@@ -393,7 +394,6 @@ tasks {
 tasks.register<Test>("testUi") {
     group = "verification"
     useJUnitPlatform()
-    environment["ide.show.tips.on.startup.default.value"] = false
     include("/ui/**")
 }
 
