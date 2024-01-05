@@ -519,23 +519,27 @@ class UiTests {
 
     commonSteps.invokeAction("EditorStartNewLineBefore")
 
-    assertEquals("""
+    assertEquals(
+      """
       |
       |One Two
       |Three Four
       |Five
-    """.trimMargin(), editor.text)
+    """.trimMargin(), editor.text
+    )
 
     editor.injectText(testTextForEditor)
 
     commonSteps.invokeAction("EditorStartNewLine")
 
-    assertEquals("""
+    assertEquals(
+      """
       |One Two
       |
       |Three Four
       |Five
-    """.trimMargin(), editor.text)
+    """.trimMargin(), editor.text
+    )
 
     editor.injectText(testTextForEditor)
 
@@ -593,23 +597,21 @@ class UiTests {
 
     assertEquals(3, editor.caretCount)
 
-    assertEquals("""
+    assertEquals(
+      """
       |One Two
       |
       |Three Four
       |
       |Five
       |
-    """.trimMargin(), editor.text)
+    """.trimMargin(), editor.text
+    )
 
     // Reset state
     keyboard { escape() }
     assertEquals(1, editor.caretCount)
-    resetPlainTest(editor)
-    vimExit()
-  }
-
-  private fun resetPlainTest(editor: Editor) {
     editor.injectText(testTextForEditor)
+    vimExit()
   }
 }
