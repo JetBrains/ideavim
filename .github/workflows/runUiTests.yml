@@ -8,14 +8,14 @@ jobs:
     if: github.repository == 'JetBrains/ideavim'
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Java
         uses: actions/setup-java@v2.1.0
         with:
           distribution: zulu
           java-version: 11
       - name: Setup FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v1
+        uses: FedericoCarboni/setup-ffmpeg@v3
         with:
           # Not strictly necessary, but it may prevent rate limit
           # errors especially on GitHub-hosted macos machines.
