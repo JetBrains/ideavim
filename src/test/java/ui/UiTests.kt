@@ -14,6 +14,7 @@ import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
+import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.junit.jupiter.api.Test
 import ui.pages.Editor
@@ -48,6 +49,8 @@ class UiTests {
   }
 
   private lateinit var commonSteps: CommonSteps
+
+  private val trackActionIds = "IdeaVim: Track Action Ids"
 
   private val testTextForEditor = """
                   |One Two
@@ -100,7 +103,7 @@ class UiTests {
         step("Write a text") {
           injectText(
             """
-                |class Main {
+                |class MyTest {
                 |  public static void main() {
                 |    System.out.println("Hello");
                 |  }
@@ -200,7 +203,10 @@ class UiTests {
   private fun IdeaFrame.testTrackActionId(editor: Editor) {
     remoteRobot.invokeActionJs("GotoAction")
     editor.keyboard {
-      enterText("IdeaVim: Track Action Ids")
+      enterText(trackActionIds)
+      waitFor {
+        findAllText(trackActionIds).size > 1
+      }
       enter()
       escape()
     }
@@ -215,7 +221,7 @@ class UiTests {
 
     assertEquals(
       """
-                |EditorEscapeclass Main {
+                |EditorEscapeclass MyTest {
                 |  public static void main() {
                 |      if (true) {
                 |          System.out.println("Hello");
