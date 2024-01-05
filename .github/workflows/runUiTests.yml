@@ -19,7 +19,7 @@ jobs:
         with:
           # Not strictly necessary, but it may prevent rate limit
           # errors especially on GitHub-hosted macos machines.
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Plugin
         run: gradle :buildPlugin
       - name: Run Idea

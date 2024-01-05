@@ -8,14 +8,12 @@
 
 package ui
 
-import com.automation.remarks.junit.VideoRule
 import com.automation.remarks.video.annotations.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
 import org.assertj.swing.core.MouseButton
-import org.junit.Rule
 import org.junit.jupiter.api.Test
 import ui.pages.Editor
 import ui.pages.IdeaFrame
@@ -46,10 +44,6 @@ class UiTests {
   init {
     StepsLogger.init()
   }
-
-  @Rule
-  @JvmField
-  var videoRule = VideoRule()
 
   @Test
   @Video
