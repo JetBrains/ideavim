@@ -41,6 +41,7 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   init {
     addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper())
+    addOptionValueOverride(IjOptions.list, ListOptionMapper())
     addOptionValueOverride(IjOptions.wrap, WrapOptionMapper())
   }
 
@@ -129,6 +130,22 @@ private class BreakIndentOptionMapper : LocalOptionToGlobalLocalExternalSettingM
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
     editor.ij.settings.isUseCustomSoftWrapIndent = value.asBoolean()
+  }
+}
+
+
+/**
+ * Maps the `'list'` local-to-window Vim option to the IntelliJ global-local whitespace setting
+ */
+private class ListOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+  override fun getGlobalExternalValue(editor: VimEditor) =
+    EditorSettingsExternalizable.getInstance().isWhitespacesShown.asVimInt()
+
+  override fun getEffectiveExternalValue(editor: VimEditor) =
+    editor.ij.settings.isWhitespacesShown.asVimInt()
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    editor.ij.settings.isWhitespacesShown = value.asBoolean()
   }
 }
 

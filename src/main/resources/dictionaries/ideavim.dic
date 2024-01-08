@@ -46,6 +46,7 @@ nogdefault
 nohlsearch
 noignorecase
 noincsearch
+nolist
 nomore
 nonumber
 norelativenumber
