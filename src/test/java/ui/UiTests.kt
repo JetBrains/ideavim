@@ -120,7 +120,6 @@ class UiTests {
 
   private fun closeUnrelated(sharedSteps: JavaExampleSteps) {
     with(sharedSteps) {
-      closeIdeaVimDialog()
       closeTipOfTheDay()
       closeAllTabs()
     }

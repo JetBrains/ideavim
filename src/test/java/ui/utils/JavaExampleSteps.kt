@@ -17,18 +17,10 @@ import com.intellij.remoterobot.utils.Keyboard
 import ui.pages.DialogFixture
 import ui.pages.DialogFixture.Companion.byTitle
 import ui.pages.IdeaFrame
-import ui.pages.dialog
-import ui.pages.idea
 
 class JavaExampleSteps(private val remoteRobot: RemoteRobot) {
   @Suppress("unused")
   private val keyboard: Keyboard = Keyboard(remoteRobot)
-
-  fun closeIdeaVimDialog() = optionalStep("Close Idea Vim dialog if it appears") {
-    remoteRobot.idea {
-      dialog("IdeaVim") { button("Yes").click() }
-    }
-  }
 
   fun closeTipOfTheDay() = optionalStep("Close Tip of the Day if it appears") {
     val idea: IdeaFrame = remoteRobot.find(IdeaFrame::class.java)
