@@ -40,6 +40,7 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   init {
+    addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper())
     addOptionValueOverride(IjOptions.wrap, WrapOptionMapper())
   }
 
@@ -113,6 +114,23 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  * IntelliJ settings. Options that do not have an IdeaVim implementation should be registered in the host-specific
  * module.
  */
+
+
+/**
+ * Maps the `'breakindent'` local-to-window Vim option to the IntelliJ custom soft wrap indent global-local setting
+ */
+// TODO: We could also implement 'breakindentopt', but only the shift:{n} component would be supportable
+private class BreakIndentOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+  override fun getGlobalExternalValue(editor: VimEditor) =
+    EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent.asVimInt()
+
+  override fun getEffectiveExternalValue(editor: VimEditor) =
+    editor.ij.settings.isUseCustomSoftWrapIndent.asVimInt()
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    editor.ij.settings.isUseCustomSoftWrapIndent = value.asBoolean()
+  }
+}
 
 
 /**

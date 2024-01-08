@@ -87,7 +87,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test 'wrap' option reports local intellij setting if set by IDE`() {
+  fun `test 'wrap' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isUseSoftWraps = true
     assertCommandOutput("set wrap?", "  wrap\n")
 
@@ -96,7 +96,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test local 'wrap' option reports local intellij setting if set by IDE`() {
+  fun `test local 'wrap' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isUseSoftWraps = true
     assertCommandOutput("setlocal wrap?", "  wrap\n")
 
@@ -105,7 +105,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test set 'wrap' modifies local intellij setting`() {
+  fun `test set 'wrap' modifies local intellij setting only`() {
     // Note that `:set` modifies both the local and global setting, but that global setting is a Vim setting, not the
     // global IntelliJ setting
     enterCommand("set nowrap")
@@ -118,7 +118,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test setlocal 'wrap' modifies local intellij setting`() {
+  fun `test setlocal 'wrap' modifies local intellij setting only`() {
     enterCommand("setlocal nowrap")
     assertFalse(fixture.editor.settings.isUseSoftWraps)
     assertTrue(EditorSettingsExternalizable.getInstance().isUseSoftWraps)
@@ -147,7 +147,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test IDE setting value is treated like setlocal`() {
+  fun `test setting IDE value is treated like setlocal`() {
     // If we use `:set`, it updates the local and per-window global values. If we set the value from the IDE, it only
     // affects the local value
     fixture.editor.settings.isUseSoftWraps = false

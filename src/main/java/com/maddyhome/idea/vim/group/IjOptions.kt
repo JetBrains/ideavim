@@ -35,6 +35,7 @@ public object IjOptions {
   }
 
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
+  public val breakindent: ToggleOption = addOption(ToggleOption("breakindent", LOCAL_TO_WINDOW, "bri", false))
   public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
 
   // IntelliJ specific functionality - custom options

@@ -380,7 +380,8 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setlocal all", """
       |--- Local option values ---
-      |noargtextobj        noignorecase          scrolloff=-1      notextobj-entire
+      |noargtextobj          ideawrite=all       scrolljump=1      nosurround
+      |nobreakindent       noignorecase          scrolloff=-1      notextobj-entire
       |nocommentary        noincsearch           selectmode=       notextobj-indent
       |nodigraph           nomatchit             shellcmdflag=-x     timeout
       |noexchange            maxmapdepth=20      shellxescape=@      timeoutlen=1000
@@ -392,7 +393,6 @@ class SetlocalCommandTest : VimTestCase() {
       |--ideajoin            operatorfunc=     nosmartcase           wrap
       |  ideamarks         norelativenumber    nosneak               wrapscan
       |  idearefactormode=   scroll=0            startofline
-      |  ideawrite=all       scrolljump=1      nosurround
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -441,6 +441,7 @@ class SetlocalCommandTest : VimTestCase() {
     assertCommandOutput("setlocal! all", """
       |--- Local option values ---
       |noargtextobj
+      |nobreakindent
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |nocommentary
       |nodigraph
