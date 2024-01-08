@@ -22,7 +22,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@Suppress("SpellCheckingInspection")
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class SetCommandTest : VimTestCase() {
 
@@ -325,7 +324,5 @@ class SetCommandTest : VimTestCase() {
 
     assertCommandOutput("set virtualedit?", "  virtualedit=block\n")
     assertCommandOutput("setlocal virtualedit?", "  virtualedit=\n")
-
-    // Note that :setlocal virtualedit< has different behaviour. See SetlocalCommandTest
   }
 }

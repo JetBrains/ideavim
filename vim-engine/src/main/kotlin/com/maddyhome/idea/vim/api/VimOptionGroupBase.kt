@@ -281,6 +281,111 @@ public interface OptionValueOverride<T : VimDataType> {
   public fun setLocalValue(storedValue: OptionValue<T>?, newValue: OptionValue<T>, editor: VimEditor): Boolean
 }
 
+/**
+ * Provides a base implementation to map a local Vim option to a global-local external setting
+ *
+ * Most editor settings in IntelliJ are global-local; they have a persistent global value that can be overridden by a
+ * value local to the current editor. This base class assumes we never want to set the global external setting, and will
+ * set the effective/local external value instead.
+ *
+ * It is not possible to remove the local value in IntelliJ's global-local setting. The best we can do is to set the
+ * value either to a copy of the global external setting value when resetting the option (`:set {option}&`). But if the
+ * user changes that external global value, it won't be reflected in the effective value.
+ *
+ * Setting the global value of the Vim option does not modify the external setting at all - the global value is a
+ * Vim-only value used to initialise new windows.
+ */
+public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType> : OptionValueOverride<T> {
+  override fun getLocalValue(storedValue: OptionValue<T>?, editor: VimEditor): OptionValue<T> {
+    // Always return the current effective IntelliJ editor setting, regardless of the current IdeaVim value - the user
+    // might have changed the value through the IDE. This means `:setlocal wrap?` will show the current value
+    val ideValue = getEffectiveExternalValue(editor)
+
+    // Tell the caller how the value was set as well as what the value is. This is used when copying values to a new
+    // window and deciding if the IntelliJ value should be set - we don't want to set the IntelliJ value if the current
+    // value is a default. We do want to set it when the user has explicitly set the value, either through the IDE or
+    // with Vim commands.
+    return if (storedValue is OptionValue.Default) {
+      if (ideValue != getGlobalExternalValue(editor)) {
+        OptionValue.External(ideValue)
+      }
+      else {
+        OptionValue.Default(ideValue)
+      }
+    }
+    else if (storedValue?.value != ideValue) {
+      OptionValue.External(ideValue)
+    }
+    else {
+      OptionValue.User(ideValue)
+    }
+  }
+
+  override fun setLocalValue(storedValue: OptionValue<T>?, newValue: OptionValue<T>, editor: VimEditor): Boolean {
+    when (newValue) {
+      is OptionValue.Default -> {
+        // storedValue will only be null during initialisation, when we're setting the value for the first time and
+        // therefore don't have a previous value. This only matters if we're setting the default, in which case we do
+        // nothing, as we want to treat the current IntelliJ value as default.
+        if (storedValue != null) {
+          // We're being asked to reset the default, so make sure the effective IntelliJ value matches the global value
+          // TODO: If we disable and re-enable the plugin, we reinitialise the options, and set defaults again
+          // This leads to incorrectly resetting the IntelliJ value if the current effective IntelliJ value doesn't
+          // match the global IntelliJ value.
+          val default = getGlobalExternalValue(editor)
+          if (getEffectiveExternalValue(editor) != default) {
+            setLocalExternalValue(editor, default)
+          }
+        }
+      }
+      is OptionValue.External -> {
+        // The new value has been explicitly set by the user through the IDE, rather than using Vim commands. The only
+        // way to get an External instance is through the getter for this option, which means we know this was copied
+        // from an existing window/buffer and is being applied as part of initialisation.
+        // It's been explicitly set by a user, so we can explicitly set the IntelliJ value. However, only set it if the
+        // current value is different. Since IntelliJ settings are global-local, setting the value will prevent us from
+        // setting it from the UI (unless there's a UI for the local value). This isn't foolproof, but it helps.
+        if (getEffectiveExternalValue(editor) != newValue.value) {
+          setLocalExternalValue(editor, newValue.value)
+        }
+      }
+      is OptionValue.User -> {
+        // The user is explicitly setting a value, so update the IntelliJ value
+        if (getEffectiveExternalValue(editor) != newValue.value) {
+          setLocalExternalValue(editor, newValue.value)
+        }
+      }
+    }
+
+    return storedValue?.value != newValue.value
+  }
+
+  /**
+   * Gets the global persistent value for the external setting.
+   *
+   * @param editor The current editor. Some external settings might have per-editor or per-file type global settings.
+   * @return The global external value for the specified editor.
+   */
+  protected abstract fun getGlobalExternalValue(editor: VimEditor): T
+
+  /**
+   * Gets the current effective value external of the external setting.
+   *
+   * This will return the local value of the external setting, if set, and the global persistent value if not set.
+   *
+   * @param editor The editor to get the effective external value for.
+   * @return The effective external value for the specified editor.
+   */
+  protected abstract fun getEffectiveExternalValue(editor: VimEditor): T
+
+  /**
+   * Sets the local external value for the given editor.
+   *
+   * @param editor The editor to set the effective external value for.
+   * @param value The new value to set as the effective external value.
+   */
+  protected abstract fun setLocalExternalValue(editor: VimEditor, value: T)
+}
 
 /**
  * A wrapper class for an option value that also tracks how it was set
