@@ -23,7 +23,6 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@Suppress("SpellCheckingInspection")
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class SetglobalCommandTest : VimTestCase() {
 

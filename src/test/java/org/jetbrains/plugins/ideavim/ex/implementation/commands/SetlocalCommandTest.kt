@@ -24,7 +24,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@Suppress("SpellCheckingInspection")
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class SetlocalCommandTest : VimTestCase() {
 
