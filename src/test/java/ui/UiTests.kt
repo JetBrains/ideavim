@@ -14,7 +14,6 @@ import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
-import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.junit.jupiter.api.Test
 import ui.pages.Editor
@@ -40,7 +39,6 @@ import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.Point
 import java.awt.event.KeyEvent
-import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -51,8 +49,6 @@ class UiTests {
   }
 
   private lateinit var commonSteps: CommonSteps
-
-  private val trackActionIds = "IdeaVim: Track Action Ids"
 
   private val testTextForEditor = """
                   |One Two
@@ -207,13 +203,8 @@ class UiTests {
 
     val searchEverywhere = this@testTrackActionId.searchEverywhere()
 
+    commonSteps.invokeAction("VimFindActionIdAction")
     keyboard {
-      enterText(trackActionIds)
-      waitFor(duration = Duration.ofSeconds(60), interval = Duration.ofSeconds(10)) {
-        backspace()
-        searchEverywhere.findAllText(trackActionIds).size > 1
-      }
-      enter()
       escape()
     }
 
