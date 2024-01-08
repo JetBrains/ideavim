@@ -25,6 +25,7 @@ import ui.pages.dialog
 import ui.pages.editor
 import ui.pages.gutter
 import ui.pages.idea
+import ui.pages.searchEverywhere
 import ui.pages.welcomeFrame
 import ui.utils.JavaExampleSteps
 import ui.utils.StepsLogger
@@ -203,10 +204,13 @@ class UiTests {
 
   private fun IdeaFrame.testTrackActionId(editor: Editor) {
     remoteRobot.invokeActionJs("GotoAction")
-    editor.keyboard {
+
+    val searchEverywhere = this@testTrackActionId.searchEverywhere()
+
+    keyboard {
       enterText(trackActionIds)
       waitFor(duration = Duration.ofMinutes(3)) {
-        findAllText(trackActionIds).size > 1
+        searchEverywhere.findAllText(trackActionIds).size > 1
       }
       enter()
       escape()
