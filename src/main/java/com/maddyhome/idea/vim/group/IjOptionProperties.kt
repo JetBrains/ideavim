@@ -46,6 +46,7 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
  */
 public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(scope) {
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
+  public var breakindent: Boolean by optionProperty(IjOptions.breakindent)
   public var wrap: Boolean by optionProperty(IjOptions.wrap)
 
   // IntelliJ specific options
