@@ -209,7 +209,8 @@ class UiTests {
 
     keyboard {
       enterText(trackActionIds)
-      waitFor(duration = Duration.ofMinutes(3)) {
+      waitFor(duration = Duration.ofSeconds(60), interval = Duration.ofSeconds(10)) {
+        backspace()
         searchEverywhere.findAllText(trackActionIds).size > 1
       }
       enter()
