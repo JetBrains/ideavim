@@ -7,10 +7,12 @@
  */
 package org.jetbrains.plugins.ideavim
 
+import com.intellij.application.options.CodeStyle
 import com.intellij.ide.ClipboardSynchronizer
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.json.JsonFileType
+import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -33,6 +35,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.project.Project
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings
 import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.PlatformTestUtil
@@ -150,6 +153,16 @@ abstract class VimTestCase {
       isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
       softWrapFileMasks = "*"
       isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
+    }
+
+    CodeStyle.getDefaultSettings().getCommonSettings(null as Language?).apply {
+      RIGHT_MARGIN = IjOptions.textwidth.defaultValue.value
+      WRAP_ON_TYPING = if (IjOptions.textwidth.defaultValue > 0) {
+        CommonCodeStyleSettings.WrapOnTyping.WRAP.intValue
+      }
+      else {
+        CommonCodeStyleSettings.WrapOnTyping.NO_WRAP.intValue
+      }
     }
   }
 
