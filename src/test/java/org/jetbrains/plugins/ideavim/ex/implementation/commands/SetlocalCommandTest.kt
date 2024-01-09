@@ -382,16 +382,16 @@ class SetlocalCommandTest : VimTestCase() {
       |--- Local option values ---
       |noargtextobj          ideawrite=all       scrolljump=1      notextobj-entire
       |nobreakindent       noignorecase          scrolloff=-1      notextobj-indent
-      |nocommentary        noincsearch           selectmode=         timeout
-      |nocursorline        nolist                shellcmdflag=-x     timeoutlen=1000
-      |nodigraph           nomatchit             shellxescape=@    notrackactionids
-      |noexchange            maxmapdepth=20      shellxquote={       virtualedit=
-      |nogdefault            more                showcmd           novisualbell
-      |nohighlightedyank   nomultiple-cursors    showmode            visualdelay=100
-      |  history=50        noNERDTree            sidescroll=0        whichwrap=b,s
-      |nohlsearch            nrformats=hex       sidescrolloff=-1    wrap
-      |noideaglobalmode    nonumber            nosmartcase           wrapscan
-      |--ideajoin            operatorfunc=     nosneak
+      |nocommentary        noincsearch           selectmode=         textwidth=0
+      |nocursorline        nolist                shellcmdflag=-x     timeout
+      |nodigraph           nomatchit             shellxescape=@      timeoutlen=1000
+      |noexchange            maxmapdepth=20      shellxquote={     notrackactionids
+      |nogdefault            more                showcmd             virtualedit=
+      |nohighlightedyank   nomultiple-cursors    showmode          novisualbell
+      |  history=50        noNERDTree            sidescroll=0        visualdelay=100
+      |nohlsearch            nrformats=hex       sidescrolloff=-1    whichwrap=b,s
+      |noideaglobalmode    nonumber            nosmartcase           wrap
+      |--ideajoin            operatorfunc=     nosneak               wrapscan
       |  ideamarks         norelativenumber      startofline
       |  idearefactormode=   scroll=0          nosurround
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
@@ -498,6 +498,7 @@ class SetlocalCommandTest : VimTestCase() {
       |nosurround
       |notextobj-entire
       |notextobj-indent
+      |  textwidth=0
       |  timeout
       |  timeoutlen=1000
       |notrackactionids

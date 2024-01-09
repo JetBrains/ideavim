@@ -348,17 +348,17 @@ class SetglobalCommandTest : VimTestCase() {
     assertCommandOutput("setglobal all", """
       |--- Global option values ---
       |noargtextobj        noignorecase          scrolloff=0       notextobj-indent
-      |nobreakindent       noincsearch           selectmode=         timeout
-      |nocommentary        nolist                shellcmdflag=-x     timeoutlen=1000
-      |nocursorline        nomatchit             shellxescape=@    notrackactionids
-      |nodigraph             maxmapdepth=20      shellxquote={       undolevels=1000
-      |noexchange            more                showcmd             virtualedit=
-      |nogdefault          nomultiple-cursors    showmode          novisualbell
-      |nohighlightedyank   noNERDTree            sidescroll=0        visualdelay=100
-      |  history=50          nrformats=hex       sidescrolloff=0     whichwrap=b,s
-      |nohlsearch          nonumber            nosmartcase           wrap
-      |noideaglobalmode      operatorfunc=     nosneak               wrapscan
-      |noideajoin          norelativenumber      startofline
+      |nobreakindent       noincsearch           selectmode=         textwidth=0
+      |nocommentary        nolist                shellcmdflag=-x     timeout
+      |nocursorline        nomatchit             shellxescape=@      timeoutlen=1000
+      |nodigraph             maxmapdepth=20      shellxquote={     notrackactionids
+      |noexchange            more                showcmd             undolevels=1000
+      |nogdefault          nomultiple-cursors    showmode            virtualedit=
+      |nohighlightedyank   noNERDTree            sidescroll=0      novisualbell
+      |  history=50          nrformats=hex       sidescrolloff=0     visualdelay=100
+      |nohlsearch          nonumber            nosmartcase           whichwrap=b,s
+      |noideaglobalmode      operatorfunc=     nosneak               wrap
+      |noideajoin          norelativenumber      startofline         wrapscan
       |  ideamarks           scroll=0          nosurround
       |  ideawrite=all       scrolljump=1      notextobj-entire
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
@@ -473,6 +473,7 @@ class SetglobalCommandTest : VimTestCase() {
       |nosurround
       |notextobj-entire
       |notextobj-indent
+      |  textwidth=0
       |  timeout
       |  timeoutlen=1000
       |notrackactionids
