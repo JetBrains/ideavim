@@ -150,6 +150,7 @@ abstract class VimTestCase {
     // Some options are mapped to IntelliJ settings. Make sure the IntelliJ settings match the Vim defaults
     EditorSettingsExternalizable.getInstance().apply {
       isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.asBoolean()
+      isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
       isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
       softWrapFileMasks = "*"
       isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
