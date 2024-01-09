@@ -69,6 +69,7 @@ class UiTests {
     Thread.sleep(1000)
 
     idea {
+      waitSmartMode()
       createFile("MyDoc.txt", this@uiTest)
       val editor = editor("MyDoc.txt") {
         step("Write a text") {

@@ -51,6 +51,14 @@ class IdeaFrame(
     }
   }
 
+  fun waitSmartMode(timeout: Duration = Duration.ofMinutes(5)) {
+    step("Wait for smart mode") {
+      waitFor(duration = timeout, interval = Duration.ofSeconds(5)) {
+        isDumbMode().not()
+      }
+    }
+  }
+
   private fun isDumbMode(): Boolean {
     return callJs("com.intellij.openapi. project.DumbService.isDumb(component.project);", true)
   }
