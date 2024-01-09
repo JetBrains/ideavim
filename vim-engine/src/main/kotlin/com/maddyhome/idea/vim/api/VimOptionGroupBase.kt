@@ -397,6 +397,11 @@ public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataT
 
   /**
    * Reset the current external setting value to the global external value, if different
+   *
+   * Implementers can override this function if they need to do more complex reset, such as resetting two IDE values.
+   * The overridden value should only update the local setting if the value has changed. This is especially important
+   * if the IDE values are global-local - updating the IDE value might set the local value to a copy of the default
+   * value, rather than leaving the local value "unset".
    */
   protected open fun resetLocalExternalValueToGlobal(editor: VimEditor) {
     // TODO: If we disable and re-enable the plugin, we reinitialise the options, and set defaults again
@@ -795,9 +800,9 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
   }
 
   private fun initialiseLocalToBufferOptions(editor: VimEditor) {
-    val globalScope = OptionAccessScope.GLOBAL(editor)
-    val localScope = OptionAccessScope.LOCAL(editor)
     if (!storage.isLocalToBufferOptionStorageInitialised(editor)) {
+      val globalScope = OptionAccessScope.GLOBAL(editor)
+      val localScope = OptionAccessScope.LOCAL(editor)
       forEachOption(LOCAL_TO_BUFFER) { option ->
         val value = storage.getOptionValue(option, globalScope)
         storage.setOptionValue(option, localScope, value)

@@ -347,8 +347,9 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setglobal all", """
       |--- Global option values ---
-      |noargtextobj        noignorecase          scrolloff=0       notextobj-indent
-      |nobreakindent       noincsearch           selectmode=         textwidth=0
+      |noargtextobj          ideawrite=all       scrolljump=1      notextobj-entire
+      |nobreakindent       noignorecase          scrolloff=0       notextobj-indent
+      |  colorcolumn=      noincsearch           selectmode=         textwidth=0
       |nocommentary        nolist                shellcmdflag=-x     timeout
       |nocursorline        nomatchit             shellxescape=@      timeoutlen=1000
       |nodigraph             maxmapdepth=20      shellxquote={     notrackactionids
@@ -360,7 +361,6 @@ class SetglobalCommandTest : VimTestCase() {
       |noideaglobalmode      operatorfunc=     nosneak               wrap
       |noideajoin          norelativenumber      startofline         wrapscan
       |  ideamarks           scroll=0          nosurround
-      |  ideawrite=all       scrolljump=1      notextobj-entire
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -419,6 +419,7 @@ class SetglobalCommandTest : VimTestCase() {
       |noargtextobj
       |nobreakindent
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  colorcolumn=
       |nocommentary
       |nocursorline
       |nodigraph
