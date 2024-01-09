@@ -151,6 +151,11 @@ abstract class VimTestCase {
     }
   }
 
+  private fun setDefaultIntelliJSettings(editor: Editor) {
+    // These settings don't have a global setting...
+    editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.asBoolean()
+  }
+
   protected open fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
     val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
     val fixture = factory.createLightFixtureBuilder(projectDescriptor, "IdeaVim").fixture
@@ -270,6 +275,7 @@ abstract class VimTestCase {
 
   protected fun configureByText(fileType: FileType, content: String): Editor {
     fixture.configureByText(fileType, content)
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
@@ -277,6 +283,7 @@ abstract class VimTestCase {
 
   private fun configureByText(fileName: String, content: String): Editor {
     fixture.configureByText(fileName, content)
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
@@ -284,6 +291,7 @@ abstract class VimTestCase {
 
   public fun configureByTextX(fileName: String, content: String): Editor {
     fixture.configureByText(fileName, content)
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
@@ -291,6 +299,7 @@ abstract class VimTestCase {
 
   protected fun configureByFileName(fileName: String): Editor {
     fixture.configureByText(fileName, "\n")
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
