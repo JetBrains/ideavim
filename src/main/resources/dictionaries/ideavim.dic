@@ -6,6 +6,7 @@ setglobal
 setlocal
 
 breakindent
+colorcolumn
 cursorline
 gdefault
 guicursor

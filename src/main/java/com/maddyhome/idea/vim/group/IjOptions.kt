@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
@@ -38,6 +39,21 @@ public object IjOptions {
 
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
   public val breakindent: ToggleOption = addOption(ToggleOption("breakindent", LOCAL_TO_WINDOW, "bri", false))
+  public val colorcolumn: StringListOption = addOption(object : StringListOption("colorcolumn", LOCAL_TO_WINDOW, "cc", "") {
+    override fun checkIfValueValid(value: VimDataType, token: String) {
+      super.checkIfValueValid(value, token)
+      if (value != VimString.EMPTY) {
+        // Each element in the comma-separated string list needs to be a number. No spaces. Vim supports numbers
+        // beginning "+" or "-" to draw a highlight column relative to the 'textwidth' value. We don't fully support
+        // that, but we do automatically add "+0" because IntelliJ always displays the right margin
+        split((value as VimString).asString()).forEach {
+          if (!it.matches(Regex("[+-]?[0-9]+"))) {
+            throw exExceptionMessage("E474", token)
+          }
+        }
+      }
+    }
+  })
   public val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
   public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
   public val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))

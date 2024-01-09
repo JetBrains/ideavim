@@ -27,8 +27,10 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
 internal interface IjVimOptionGroup: VimOptionGroup {
@@ -46,6 +48,7 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   init {
     addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper(IjOptions.breakindent))
+    addOptionValueOverride(IjOptions.colorcolumn, ColorColumnOptionValueProvider(IjOptions.colorcolumn))
     addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper(IjOptions.cursorline))
     addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list))
     addOptionValueOverride(IjOptions.textwidth, TextWidthOptionMapper(IjOptions.textwidth))
@@ -139,6 +142,97 @@ private class BreakIndentOptionMapper(breakIndentOption: ToggleOption)
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
     editor.ij.settings.isUseCustomSoftWrapIndent = value.asBoolean()
+  }
+}
+
+
+/**
+ * Maps the `'colorcolumn'` local-to-window Vim option to the IntelliJ global-local soft margin settings
+ */
+private class ColorColumnOptionValueProvider(private val colorColumnOption: StringListOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimString>(colorColumnOption) {
+
+  override fun getGlobalExternalValue(editor: VimEditor): VimString {
+    if (!EditorSettingsExternalizable.getInstance().isRightMarginShown) {
+      return VimString.EMPTY
+    }
+
+    val ijEditor = editor.ij
+    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+    val softMargins = CodeStyle.getSettings(ijEditor).getSoftMargins(language)
+    return VimString(buildString {
+      softMargins.joinTo(this, ",")
+
+      // Add the default "+0" to mimic Vim showing the 'textwidth' column. See above.
+      if (this.isNotEmpty()) append(",")
+      append("+0")
+    })
+  }
+
+  override fun getEffectiveExternalValue(editor: VimEditor): VimString {
+    // If isRightMarginShown is disabled, then we don't show any visual guides, including the right margin
+    if (!editor.ij.settings.isRightMarginShown) {
+      return VimString.EMPTY
+    }
+
+    val softMargins = editor.ij.settings.softMargins
+    return VimString(buildString {
+      softMargins.joinTo(this, ",")
+
+      // IntelliJ treats right margin and visual guides as the same - if we're showing either, we're showing both.
+      // Vim supports the "+0" syntax to show a highlight column relative to the 'textwidth' value. The user can set
+      // the value to an empty string to remove this, and disable the right margin.
+      // IntelliJ behaves slightly differently to Vim here - "+0" in Vim will only show the column if 'textwidth' is
+      // set, while IntelliJ will show the current right margin even if wrap at margin is false.
+      if (this.isNotEmpty()) append(",")
+      append("+0")
+    })
+  }
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimString) {
+    // Given an empty string, hide the margin.
+    if (value == VimString.EMPTY) {
+      editor.ij.settings.isRightMarginShown = false
+    }
+    else {
+      editor.ij.settings.isRightMarginShown = true
+
+      val softMargins = mutableListOf<Int>()
+      colorColumnOption.split(value.value).forEach {
+        if (it.startsWith("+") || it.startsWith("-")) {
+          // TODO: Support ±1, ±2, ±n, etc. But this is difficult
+          // This would need a listener for the right margin IntelliJ value, and would still add a visual guide at +0
+          // We'd also need some mechanism for saving the relative offsets. The override getters would return real
+          // column values, while the stored Vim option will be relative
+          // We could perhaps add a property change listener from editor settings state?
+          // (editor.ij as EditorImpl).state.addPropertyChangeListener(...)
+          // (editor.ij.settings as SettingsImpl).getState().addPropertyChangeListener(...)
+        }
+        else {
+          it.toIntOrNull()?.let(softMargins::add)
+        }
+      }
+      editor.ij.settings.setSoftMargins(softMargins)
+    }
+  }
+
+  override fun resetLocalExternalValueToGlobal(editor: VimEditor) {
+    // Reset the current settings back to default by setting both the flag and the visual guides
+    val ijEditor = editor.ij
+    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+
+    // Remember to only update if the value has changed! We don't want to force the global-local values to local only
+    if (ijEditor.settings.isRightMarginShown != EditorSettingsExternalizable.getInstance().isRightMarginShown) {
+      ijEditor.settings.isRightMarginShown = EditorSettingsExternalizable.getInstance().isRightMarginShown
+    }
+
+    val codeStyle = CodeStyle.getSettings(ijEditor)
+    val globalSoftMargins = codeStyle.getSoftMargins(language)
+    val localSoftMargins = ijEditor.settings.softMargins
+
+    if (globalSoftMargins.count() != localSoftMargins.count() || !localSoftMargins.containsAll(globalSoftMargins)) {
+      ijEditor.settings.setSoftMargins(codeStyle.getSoftMargins(language))
+    }
   }
 }
 

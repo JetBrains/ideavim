@@ -47,6 +47,7 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
 public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(scope) {
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
   public var breakindent: Boolean by optionProperty(IjOptions.breakindent)
+  public val colorcolumn: StringListOptionValue by optionProperty(IjOptions.colorcolumn)
   public var cursorline: Boolean by optionProperty(IjOptions.cursorline)
   public var list: Boolean by optionProperty(IjOptions.list)
   public var textwidth: Int by optionProperty(IjOptions.textwidth)
