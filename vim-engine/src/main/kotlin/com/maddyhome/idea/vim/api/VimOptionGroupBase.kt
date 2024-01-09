@@ -295,7 +295,9 @@ public interface OptionValueOverride<T : VimDataType> {
  * Setting the global value of the Vim option does not modify the external setting at all - the global value is a
  * Vim-only value used to initialise new windows.
  */
-public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType> : OptionValueOverride<T> {
+public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(private val option: Option<T>)
+  : OptionValueOverride<T> {
+
   override fun getLocalValue(storedValue: OptionValue<T>?, editor: VimEditor): OptionValue<T> {
     // Always return the current effective IntelliJ editor setting, regardless of the current IdeaVim value - the user
     // might have changed the value through the IDE. This means `:setlocal wrap?` will show the current value
@@ -328,14 +330,7 @@ public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataT
         // therefore don't have a previous value. This only matters if we're setting the default, in which case we do
         // nothing, as we want to treat the current IntelliJ value as default.
         if (storedValue != null) {
-          // We're being asked to reset the default, so make sure the effective IntelliJ value matches the global value
-          // TODO: If we disable and re-enable the plugin, we reinitialise the options, and set defaults again
-          // This leads to incorrectly resetting the IntelliJ value if the current effective IntelliJ value doesn't
-          // match the global IntelliJ value.
-          val default = getGlobalExternalValue(editor)
-          if (getEffectiveExternalValue(editor) != default) {
-            setLocalExternalValue(editor, default)
-          }
+          doResetLocalExternalValueToGlobal(editor)
         }
       }
       is OptionValue.External -> {
@@ -346,18 +341,71 @@ public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataT
         // current value is different. Since IntelliJ settings are global-local, setting the value will prevent us from
         // setting it from the UI (unless there's a UI for the local value). This isn't foolproof, but it helps.
         if (getEffectiveExternalValue(editor) != newValue.value) {
-          setLocalExternalValue(editor, newValue.value)
+          doSetLocalExternalValue(editor, newValue.value)
         }
       }
       is OptionValue.User -> {
         // The user is explicitly setting a value, so update the IntelliJ value
         if (getEffectiveExternalValue(editor) != newValue.value) {
-          setLocalExternalValue(editor, newValue.value)
+          doSetLocalExternalValue(editor, newValue.value)
         }
       }
     }
 
     return storedValue?.value != newValue.value
+  }
+
+  private fun doSetLocalExternalValue(editor: VimEditor, value: T) {
+    when (option.declaredScope) {
+      LOCAL_TO_BUFFER -> setBufferLocalExternalValue(editor, value)
+      LOCAL_TO_WINDOW -> setLocalExternalValue(editor, value)
+      else -> error("Invalid declared option scope")
+    }
+  }
+
+  /**
+   * Set the IDE value for all open editors for the given document/buffer
+   *
+   * This function will set the IDE value for all open editors (windows) for the given document (buffer). An
+   * implementer can override this if it is easier to set the IDE setting per-buffer.
+   */
+  protected open fun setBufferLocalExternalValue(editor: VimEditor, value: T) {
+    // Set the value for the current editor, then set it for all other editors with the same buffer. During
+    // initialisation, getEditors won't return the current editor (because it's not initialised) so set it explicitly.
+    // This also means that the value might be set twice, because VimEditor doesn't support equality
+    setLocalExternalValue(editor, value)
+    injector.editorGroup.getEditors(editor.document).forEach { setLocalExternalValue(it, value) }
+  }
+
+  private fun doResetLocalExternalValueToGlobal(editor: VimEditor) {
+    when (option.declaredScope) {
+      LOCAL_TO_BUFFER -> resetBufferLocalExternalValueToGlobal(editor.document)
+      LOCAL_TO_WINDOW -> resetLocalExternalValueToGlobal(editor)
+      else -> error("Invalid declared option scope")
+    }
+  }
+
+  /**
+   * Reset the external setting value for the given document/buffer to the global external value
+   *
+   * This function will reset the local value for all open editors/windows for the given document/buffer. An implementer
+   * can override this if it is easier to reset the external setting per-buffer.
+   */
+  protected open fun resetBufferLocalExternalValueToGlobal(document: VimDocument) {
+    injector.editorGroup.getEditors(document).forEach { resetLocalExternalValueToGlobal(it) }
+  }
+
+  /**
+   * Reset the current external setting value to the global external value, if different
+   */
+  protected open fun resetLocalExternalValueToGlobal(editor: VimEditor) {
+    // TODO: If we disable and re-enable the plugin, we reinitialise the options, and set defaults again
+    // This leads to incorrectly resetting the IntelliJ value if the current effective IntelliJ value doesn't
+    // match the global IntelliJ value.
+    val global = getGlobalExternalValue(editor)
+    if (getEffectiveExternalValue(editor) != global) {
+      doSetLocalExternalValue(editor, global)
+    }
   }
 
   /**

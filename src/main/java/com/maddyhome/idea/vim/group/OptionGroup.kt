@@ -8,11 +8,14 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.application.options.CodeStyle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.PatternUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.LocalOptionToGlobalLocalExternalSettingMapper
@@ -22,7 +25,9 @@ import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
@@ -40,10 +45,11 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   init {
-    addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper())
-    addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper())
-    addOptionValueOverride(IjOptions.list, ListOptionMapper())
-    addOptionValueOverride(IjOptions.wrap, WrapOptionMapper())
+    addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper(IjOptions.breakindent))
+    addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper(IjOptions.cursorline))
+    addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list))
+    addOptionValueOverride(IjOptions.textwidth, TextWidthOptionMapper(IjOptions.textwidth))
+    addOptionValueOverride(IjOptions.wrap, WrapOptionMapper(IjOptions.wrap))
   }
 
   override fun initialiseOptions() {
@@ -122,7 +128,9 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  * Maps the `'breakindent'` local-to-window Vim option to the IntelliJ custom soft wrap indent global-local setting
  */
 // TODO: We could also implement 'breakindentopt', but only the shift:{n} component would be supportable
-private class BreakIndentOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+private class BreakIndentOptionMapper(breakIndentOption: ToggleOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(breakIndentOption) {
+
   override fun getGlobalExternalValue(editor: VimEditor) =
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent.asVimInt()
 
@@ -138,7 +146,9 @@ private class BreakIndentOptionMapper : LocalOptionToGlobalLocalExternalSettingM
 /**
  * Maps the `'cursorline'` local-to-window Vim option to the IntelliJ global-local caret row setting
  */
-private class CursorLineOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+private class CursorLineOptionMapper(cursorLineOption: ToggleOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(cursorLineOption) {
+
   override fun getGlobalExternalValue(editor: VimEditor) =
     EditorSettingsExternalizable.getInstance().isCaretRowShown.asVimInt()
 
@@ -154,7 +164,9 @@ private class CursorLineOptionMapper : LocalOptionToGlobalLocalExternalSettingMa
 /**
  * Maps the `'list'` local-to-window Vim option to the IntelliJ global-local whitespace setting
  */
-private class ListOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+private class ListOptionMapper(listOption: ToggleOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(listOption) {
+
   override fun getGlobalExternalValue(editor: VimEditor) =
     EditorSettingsExternalizable.getInstance().isWhitespacesShown.asVimInt()
 
@@ -168,9 +180,87 @@ private class ListOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<V
 
 
 /**
+ * Map the `'textwidth'` local-to-buffer Vim option to the IntelliJ global-local hard wrap settings
+ *
+ * Note that this option is local-to-buffer, while the IntelliJ settings are either per-language, or local editor
+ * (window) overrides. The [LocalOptionToGlobalLocalExternalSettingMapper] base class will handle this by calling
+ * [setLocalExternalValue] for all open editors for the changed buffer.
+ */
+private class TextWidthOptionMapper(textWidthOption: NumberOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(textWidthOption) {
+
+  override fun getGlobalExternalValue(editor: VimEditor): VimInt {
+    // Get the default value for the current language. This requires a valid project attached to the editor, which we
+    // won't have for the fallback window (it's really a TextComponentEditor). In this case, use a null language and
+    // the default right margin for
+    // If there's no project, we won't have a language for the editor (this will happen with the fallback window, which
+    // is really a TextComponentEditor). In this case, we
+    val ijEditor = editor.ij
+    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+    if (CodeStyle.getSettings(ijEditor).isWrapOnTyping(language)) {
+      return CodeStyle.getSettings(ijEditor).getRightMargin(language).asVimInt()
+    }
+    return VimInt.ZERO
+  }
+
+  override fun getEffectiveExternalValue(editor: VimEditor): VimInt {
+    // This requires a non-null project due to Kotlin's type safety. The project value is only used if the editor is
+    // null, and for our purposes, it won't be.
+    // This value comes from CodeStyle rather than EditorSettingsExternalizable,
+    val ijEditor = editor.ij
+    val project = ijEditor.project ?: ProjectManager.getInstance().defaultProject
+    return if (ijEditor.settings.isWrapWhenTypingReachesRightMargin(project)) {
+      ijEditor.settings.getRightMargin(ijEditor.project).asVimInt()
+    }
+    else {
+      VimInt.ZERO
+    }
+  }
+
+  // This function is called for all open editors, as 'textwidth' is local-to-buffer, but we set the IntelliJ setting
+  // as if it were local-to-window
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    val ijEditor = editor.ij
+    ijEditor.settings.setWrapWhenTypingReachesRightMargin(value.value > 0)
+    if (value.value > 0) {
+      ijEditor.settings.setRightMargin(value.value)
+    }
+  }
+
+  override fun resetLocalExternalValueToGlobal(editor: VimEditor) {
+    // Reset the current settings back to default by changing both the right margin value, and the flag to wrap while
+    // typing. We need to use this override because we don't normally reset the right margin when disabling the flag.
+    // This is mainly because IntelliJ shows the hard wrap right margin visual guide by default, even when wrap while
+    // typing is not enabled, so resetting the default right margin would be very visible and jarring. We also don't
+    // want to try and control visibility of the guide with the 'textwidth' option, as the user is already used to
+    // IntelliJ's default behaviour of showing the guide even when wrap while typing is not enabled. Also, visibility
+    // of the right margin guide is tied with visibility of other visual guides, and we wouldn't know when to re-enable
+    // it - what if we have 'textwidth' enabled but the user doesn't want to see the guide? It's better to let the
+    // 'colorcolumn' option handle it. We can make sure it's always got a value of "+0" to show the 'textwidth' guide,
+    // and the user can disable all visual guides with `:set colorcolumn=0`.
+    val ijEditor = editor.ij
+    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+
+    // Remember to only update if the value has changed! We don't want to force the global-local value to be local only
+    val globalRightMargin = CodeStyle.getSettings(ijEditor).getRightMargin(language)
+    if (ijEditor.settings.getRightMargin(ijEditor.project) != globalRightMargin) {
+      ijEditor.settings.setRightMargin(globalRightMargin)
+    }
+
+    val globalIsWrapOnTyping = CodeStyle.getSettings(ijEditor).isWrapOnTyping(language)
+    if (ijEditor.settings.isWrapWhenTypingReachesRightMargin(ijEditor.project) != globalIsWrapOnTyping) {
+      ijEditor.settings.setWrapWhenTypingReachesRightMargin(globalIsWrapOnTyping)
+    }
+  }
+}
+
+
+/**
  * Maps the `'wrap'` Vim option to the IntelliJ soft wrap settings
  */
-private class WrapOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+private class WrapOptionMapper(wrapOption: ToggleOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(wrapOption) {
+
   override fun getGlobalExternalValue(editor: VimEditor) = getGlobalIsUseSoftWraps(editor).asVimInt()
   override fun getEffectiveExternalValue(editor: VimEditor) = getEffectiveIsUseSoftWraps(editor).asVimInt()
 

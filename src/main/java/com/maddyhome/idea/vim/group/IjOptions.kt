@@ -10,9 +10,11 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
+import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
@@ -38,6 +40,7 @@ public object IjOptions {
   public val breakindent: ToggleOption = addOption(ToggleOption("breakindent", LOCAL_TO_WINDOW, "bri", false))
   public val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
   public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
+  public val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))
   public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
 
   // IntelliJ specific functionality - custom options

@@ -49,6 +49,7 @@ public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOpt
   public var breakindent: Boolean by optionProperty(IjOptions.breakindent)
   public var cursorline: Boolean by optionProperty(IjOptions.cursorline)
   public var list: Boolean by optionProperty(IjOptions.list)
+  public var textwidth: Int by optionProperty(IjOptions.textwidth)
   public var wrap: Boolean by optionProperty(IjOptions.wrap)
 
   // IntelliJ specific options
