@@ -41,6 +41,7 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   init {
     addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper())
+    addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper())
     addOptionValueOverride(IjOptions.list, ListOptionMapper())
     addOptionValueOverride(IjOptions.wrap, WrapOptionMapper())
   }
@@ -130,6 +131,22 @@ private class BreakIndentOptionMapper : LocalOptionToGlobalLocalExternalSettingM
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
     editor.ij.settings.isUseCustomSoftWrapIndent = value.asBoolean()
+  }
+}
+
+
+/**
+ * Maps the `'cursorline'` local-to-window Vim option to the IntelliJ global-local caret row setting
+ */
+private class CursorLineOptionMapper : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+  override fun getGlobalExternalValue(editor: VimEditor) =
+    EditorSettingsExternalizable.getInstance().isCaretRowShown.asVimInt()
+
+  override fun getEffectiveExternalValue(editor: VimEditor) =
+    editor.ij.settings.isCaretRowShown.asVimInt()
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    editor.ij.settings.isCaretRowShown = value.asBoolean()
   }
 }
 

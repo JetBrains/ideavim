@@ -616,15 +616,12 @@ private class OptionStorage {
     key: String,
     value: OptionValue<T>,
   ): Boolean {
-    val oldValue = values[key]
-
     // We need to notify listeners if the actual value changes, so we don't care if it's changed from being default to
-    // now being explicitly set, only if the value is different.
-    if (oldValue?.value != value.value) {
-      values[key] = value
-      return true
-    }
-    return false
+    // now being explicitly set, only if the value is different. However, we will always update the value - we want to
+    // know if we've gone from default to explicit, even if the value is the same
+    val oldValue = values[key]
+    values[key] = value
+    return oldValue?.value != value.value
   }
 
   private fun getPerWindowGlobalOptionStorage(editor: VimEditor) =
