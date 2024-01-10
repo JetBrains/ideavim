@@ -55,7 +55,7 @@ buildscript {
         classpath("io.ktor:ktor-client-core:2.3.7")
         classpath("io.ktor:ktor-client-cio:2.3.7")
         classpath("io.ktor:ktor-client-auth:2.3.7")
-        classpath("io.ktor:ktor-client-content-negotiation:2.3.6")
+        classpath("io.ktor:ktor-client-content-negotiation:2.3.7")
         classpath("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
 
         // This comes from the changelog plugin
