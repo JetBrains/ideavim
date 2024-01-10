@@ -52,7 +52,7 @@ buildscript {
         classpath("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.8.0.202311291450-r")
         classpath("org.kohsuke:github-api:1.305")
 
-        classpath("io.ktor:ktor-client-core:2.3.6")
+        classpath("io.ktor:ktor-client-core:2.3.7")
         classpath("io.ktor:ktor-client-cio:2.3.7")
         classpath("io.ktor:ktor-client-auth:2.3.7")
         classpath("io.ktor:ktor-client-content-negotiation:2.3.6")
