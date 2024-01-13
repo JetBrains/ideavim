@@ -94,10 +94,10 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
-import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
-import com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.ui.widgets.macro.macroWidgetOptionListener
+import com.maddyhome.idea.vim.ui.widgets.mode.modeWidgetOptionListener
 import com.maddyhome.idea.vim.vimDisposable
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -160,10 +160,10 @@ internal object VimListenerManager {
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
 
       // This code is executed after ideavimrc execution, so we trigger onGlobalOptionChanged just in case
-      optionGroup.addGlobalOptionChangeListener(IjOptions.showmodewidget, ModeWidgetListener)
-      optionGroup.addGlobalOptionChangeListener(IjOptions.showmodewidget, MacroWidgetListener)
-      ModeWidgetListener.onGlobalOptionChanged()
-      MacroWidgetListener.onGlobalOptionChanged()
+      optionGroup.addGlobalOptionChangeListener(IjOptions.showmodewidget, modeWidgetOptionListener)
+      optionGroup.addGlobalOptionChangeListener(IjOptions.showmodewidget, macroWidgetOptionListener)
+      modeWidgetOptionListener.onGlobalOptionChanged()
+      macroWidgetOptionListener.onGlobalOptionChanged()
 
       optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
 
@@ -184,8 +184,8 @@ internal object VimListenerManager {
       optionGroup.removeEffectiveOptionValueChangeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
-      optionGroup.removeGlobalOptionChangeListener(IjOptions.showmodewidget, ModeWidgetListener)
-      optionGroup.removeGlobalOptionChangeListener(IjOptions.showmodewidget, MacroWidgetListener)
+      optionGroup.removeGlobalOptionChangeListener(IjOptions.showmodewidget, modeWidgetOptionListener)
+      optionGroup.removeGlobalOptionChangeListener(IjOptions.showmodewidget, macroWidgetOptionListener)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
     }
   }

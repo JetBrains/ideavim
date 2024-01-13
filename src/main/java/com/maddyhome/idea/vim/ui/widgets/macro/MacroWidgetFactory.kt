@@ -8,36 +8,33 @@
 
 package com.maddyhome.idea.vim.ui.widgets.macro
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
-import com.intellij.openapi.wm.WindowManager
-import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MacroRecordingListener
-import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.ui.widgets.VimWidgetListener
+import com.maddyhome.idea.vim.ui.widgets.mode.VimStatusBarWidget
 import java.awt.Component
 
 private const val ID = "IdeaVim::Macro"
 
-internal class MacroWidgetFactory : StatusBarWidgetFactory {
+internal class MacroWidgetFactory : StatusBarWidgetFactory, VimStatusBarWidget {
   private var content: String = ""
 
   private val macroRecordingListener = object : MacroRecordingListener {
     override fun recordingStarted(editor: VimEditor, register: Char) {
       content = "recording @$register"
-      updateWidget()
+      updateWidgetInStatusBar(ID, editor.ij.project)
     }
 
     override fun recordingFinished(editor: VimEditor, register: Char) {
       content = ""
-      updateWidget()
+      updateWidgetInStatusBar(ID, editor.ij.project)
     }
   }
 
@@ -56,14 +53,6 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory {
 
   override fun isAvailable(project: Project): Boolean {
     return VimPlugin.isEnabled() && injector.globalIjOptions().showmodewidget
-  }
-
-  private fun updateWidget() {
-    val windowManager = WindowManager.getInstance()
-    ProjectManager.getInstance().openProjects.forEach {
-      val statusBar = windowManager.getStatusBar(it)
-      statusBar.updateWidget(ID)
-    }
   }
 
   private inner class VimMacroWidget : StatusBarWidget {
@@ -91,28 +80,4 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory {
   }
 }
 
-internal object MacroWidgetListener : GlobalOptionChangeListener, VimPluginListener {
-  init {
-    injector.listenersNotifier.vimPluginListeners.add(this)
-  }
-
-  override fun onGlobalOptionChanged() {
-    updateWidget()
-  }
-
-  override fun turnedOn() {
-    updateWidget()
-  }
-
-  override fun turnedOff() {
-    updateWidget()
-  }
-
-  private fun updateWidget() {
-    val factory = StatusBarWidgetFactory.EP_NAME.findExtension(MacroWidgetFactory::class.java) ?: return
-    for (project in ProjectManager.getInstance().openProjects) {
-      val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
-      statusBarWidgetsManager.updateWidget(factory)
-    }
-  }
-}
+public val macroWidgetOptionListener: VimWidgetListener = VimWidgetListener(MacroWidgetFactory::class.java)

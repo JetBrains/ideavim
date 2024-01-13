@@ -12,7 +12,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.CustomStatusBarWidget
-import com.intellij.openapi.wm.WindowManager
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.util.width
 import com.intellij.util.ui.UIUtil
@@ -29,7 +28,7 @@ import java.awt.Dimension
 import javax.swing.JComponent
 import kotlin.math.max
 
-public class VimModeWidget(public val project: Project) : CustomStatusBarWidget {
+public class VimModeWidget(public val project: Project) : CustomStatusBarWidget, VimStatusBarWidget {
   private companion object {
     private const val INSERT = "INSERT"
     private const val NORMAL = "NORMAL"
@@ -72,9 +71,7 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget 
 
   public fun updateWidget(mode: Mode?) {
     updateLabel(mode)
-    val windowManager = WindowManager.getInstance()
-    val statusBar = windowManager.getStatusBar(project)
-    statusBar.updateWidget(ModeWidgetFactory.ID)
+    updateWidgetInStatusBar(ModeWidgetFactory.ID, project)
   }
 
   private fun updateLabel(mode: Mode?) {
