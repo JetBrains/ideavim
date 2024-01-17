@@ -15,12 +15,14 @@ import java.util.*
 public interface VimStatusBarWidget {
   public fun updateWidgetInStatusBar(widgetID: String, project: Project?) {
     if (project == null) return
-    val updateWidgetTask = TimerWithRetriesTask(500L, 50) {
-      val windowManager = WindowManager.getInstance()
-      val statusBar = windowManager.getStatusBar(project) ?: return@TimerWithRetriesTask
-      statusBar.updateWidget(widgetID)
+    val windowManager = WindowManager.getInstance()
+    windowManager.getStatusBar(project)?.updateWidget(widgetID) ?: run {
+      TimerWithRetriesTask(500L, 50) {
+        val statusBar = windowManager.getStatusBar(project) ?: return@TimerWithRetriesTask false
+        statusBar.updateWidget(widgetID)
+        return@TimerWithRetriesTask true
+      }.execute()
     }
-    updateWidgetTask.execute()
   }
 }
 
@@ -36,7 +38,7 @@ public interface VimStatusBarWidget {
 private class TimerWithRetriesTask(
   private val period: Long,
   private val retriesLimit: Int,
-  private val block: () -> Unit
+  private val block: () -> Boolean,
 ) {
   private val timer = Timer()
 
@@ -48,7 +50,7 @@ private class TimerWithRetriesTask(
         if (counter >= retriesLimit) {
           timer.cancel()
         } else {
-          this@TimerWithRetriesTask.block()
+          if (this@TimerWithRetriesTask.block()) timer.cancel()
           counter++
         }
       }
