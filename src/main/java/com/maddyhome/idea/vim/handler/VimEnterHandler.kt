@@ -229,7 +229,7 @@ internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(n
 }
 
 /**
- * Rider uses a separate handler for esc to close the completion. IdeaOnlyEscapeHandlerAction is especially
+ * Rider (and CLion Nova) uses a separate handler for esc to close the completion. IdeaOnlyEscapeHandlerAction is especially
  *   designer to get all the esc presses, and if there is a completion close it and do not pass the execution further.
  *   This doesn't work the same as in IJ.
  * In IdeaVim, we'd like to exit insert mode on closing completion. This is a requirement as the change of this
