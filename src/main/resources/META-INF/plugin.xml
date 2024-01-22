@@ -160,6 +160,7 @@
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
     <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>
+    <action id="CustomizeModeWidget" class="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetPopup"/>
 
     <group id="IdeaVim.ReloadVimRc.group" class="com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup">
       <action id="IdeaVim.ReloadVimRc.reload" class="com.maddyhome.idea.vim.ui.ReloadVimRc"

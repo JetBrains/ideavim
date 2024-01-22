@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import org.jetbrains.annotations.ApiStatus.Internal
 import org.jetbrains.annotations.TestOnly
 
 /**
@@ -109,4 +110,9 @@ public interface VariableService {
    */
   @TestOnly
   public fun clear()
+
+  @Internal
+  public fun getVimVariable(name: String): VimDataType?
+  @Internal
+  public fun storeVimVariable(name: String, value: VimDataType)
 }

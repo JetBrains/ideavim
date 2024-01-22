@@ -32,6 +32,7 @@ public abstract class VimVariableServiceBase : VariableService {
   private val windowVariablesKey = Key<MutableMap<String, VimDataType>>("TabVariables")
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
   private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
+  private var vimVariables: MutableMap<String, VimDataType> = mutableMapOf()
 
   private fun getWindowVariables(editor: VimEditor) =
     injector.vimStorageService.getOrPutWindowData(editor, windowVariablesKey) { mutableMapOf() }
@@ -240,5 +241,13 @@ public abstract class VimVariableServiceBase : VariableService {
 
   override fun clear() {
     globalVariables.clear()
+  }
+
+  override fun getVimVariable(name: String): VimDataType? {
+    return vimVariables[name]
+  }
+
+  override fun storeVimVariable(name: String, value: VimDataType) {
+    vimVariables[name] = value
   }
 }

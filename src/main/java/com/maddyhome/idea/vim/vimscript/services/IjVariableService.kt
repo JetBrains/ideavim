@@ -47,4 +47,55 @@ internal class IjVariableService : VimVariableServiceBase() {
       else -> error("Unexpected")
     }
   }
+
+  override fun getVimVariable(name: String): VimDataType? {
+    val userSetValue = super.getVimVariable(name)
+    if (userSetValue != null) return userSetValue
+
+    return when (name) {
+      "widget_mode_normal_background_light" -> VimString("#aed586")
+      "widget_mode_normal_foreground_light" -> VimString("v:status_bar_fg")
+      "widget_mode_insert_background_light" -> VimString("#86aed5")
+      "widget_mode_insert_foreground_light" -> VimString("v:status_bar_fg")
+      "widget_mode_replace_background_light" -> VimString("#d58686")
+      "widget_mode_replace_foreground_light" -> VimString("v:status_bar_fg")
+      "widget_mode_command_background_light" -> VimString("#aed586")
+      "widget_mode_command_foreground_light" -> VimString("v:status_bar_fg")
+      "widget_mode_visual_background_light" -> VimString("#d5aed5")
+      "widget_mode_visual_foreground_light" -> VimString("v:status_bar_fg")
+//      "widget_mode_visual_line_background_light" -> VimString("")
+//      "widget_mode_visual_line_foreground_light" -> VimString("v:status_bar_fg")
+//      "widget_mode_visual_block_background_light" -> VimString("")
+//      "widget_mode_visual_block_foreground_light" -> VimString("v:status_bar_fg")
+      "widget_mode_select_background_light" -> VimString("#d5aed5")
+      "widget_mode_select_foreground_light" -> VimString("v:status_bar_fg")
+//      "widget_mode_select_line_background_light" -> VimString("")
+//      "widget_mode_select_line_foreground_light" -> VimString("v:status_bar_fg")
+//      "widget_mode_select_block_background_light" -> VimString("")
+//      "widget_mode_select_block_foreground_light" -> VimString("v:status_bar_fg")
+
+      "widget_mode_normal_background_dark" -> VimString("#aed586")
+      "widget_mode_normal_foreground_dark" -> VimString("v:status_bar_fg")
+      "widget_mode_insert_background_dark" -> VimString("#86aed5")
+      "widget_mode_insert_foreground_dark" -> VimString("v:status_bar_fg")
+      "widget_mode_replace_background_dark" -> VimString("#d58686")
+      "widget_mode_replace_foreground_dark" -> VimString("v:status_bar_fg")
+      "widget_mode_command_background_dark" -> VimString("#aed586")
+      "widget_mode_command_foreground_dark" -> VimString("v:status_bar_fg")
+      "widget_mode_visual_background_dark" -> VimString("#d5aed5")
+      "widget_mode_visual_foreground_dark" -> VimString("v:status_bar_fg")
+//      "widget_mode_visual_line_background_dark" -> VimString("")
+//      "widget_mode_visual_line_foreground_dark" -> VimString("v:status_bar_fg")
+//      "widget_mode_visual_block_background_dark" -> VimString("")
+//      "widget_mode_visual_block_foreground_dark" -> VimString("v:status_bar_fg")
+      "widget_mode_select_background_dark" -> VimString("#d5aed5")
+      "widget_mode_select_foreground_dark" -> VimString("v:status_bar_fg")
+//      "widget_mode_select_line_background_dark" -> VimString("")
+//      "widget_mode_select_line_foreground_dark" -> VimString("v:status_bar_fg")
+//      "widget_mode_select_block_background_dark" -> VimString("")
+//      "widget_mode_select_block_foreground_dark" -> VimString("v:status_bar_fg")
+
+      else -> null
+    }
+  }
 }
