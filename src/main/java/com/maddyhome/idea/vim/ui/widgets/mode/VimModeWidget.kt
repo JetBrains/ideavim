@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
+import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
@@ -242,5 +243,17 @@ public fun updateModeWidget() {
   for (project in ProjectManager.getInstance().openProjects) {
     val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
     statusBarWidgetsManager.updateWidget(factory)
+  }
+}
+
+public fun repaintModeWidget() {
+  for (project in ProjectManager.getInstance().openProjects) {
+    val widgets = WindowManager.getInstance()?.getStatusBar(project)?.allWidgets ?: continue
+
+    for (widget in widgets) {
+      if (widget is VimModeWidget) {
+        widget.updateWidget()
+      }
+    }
   }
 }

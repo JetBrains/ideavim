@@ -80,7 +80,7 @@ public class ModeWidgetPopup : AnAction() {
       applyButton.addActionListener {
         lightThemeSettings.apply()
         darkThemeSettings.apply()
-        // todo update widget
+        repaintModeWidget()
       }
 
       cancelButton.addActionListener {
