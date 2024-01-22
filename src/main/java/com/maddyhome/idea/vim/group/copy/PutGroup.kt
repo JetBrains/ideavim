@@ -27,15 +27,12 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.isBlock
-import com.maddyhome.idea.vim.state.mode.isChar
-import com.maddyhome.idea.vim.state.mode.isLine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -48,6 +45,10 @@ import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.put.VimPasteProvider
 import com.maddyhome.idea.vim.put.VimPutBase
 import com.maddyhome.idea.vim.register.RegisterConstants
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.isBlock
+import com.maddyhome.idea.vim.state.mode.isChar
+import com.maddyhome.idea.vim.state.mode.isLine
 import java.awt.datatransfer.DataFlavor
 
 internal class PutGroup : VimPutBase() {
@@ -189,7 +190,7 @@ internal class PutGroup : VimPutBase() {
     endOffset: Int,
   ): Int {
     // Temp fix for VIM-2808. Should be removed after rider will fix it's issues
-    if (PlatformUtils.isRider()) return endOffset
+    if (PlatformUtils.isRider() || isClionNova()) return endOffset
 
     val startLine = editor.offsetToBufferPosition(startOffset).line
     val endLine = editor.offsetToBufferPosition(endOffset - 1).line

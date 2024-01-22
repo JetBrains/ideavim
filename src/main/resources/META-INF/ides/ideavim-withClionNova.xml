@@ -13,4 +13,7 @@
                          id="ideavim-clion-nova-esc"
                          order="first, before idea.only.escape"/>
   </extensions>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <clionNovaProvider implementation="com.maddyhome.idea.vim.ide.ClionNovaProviderImpl"/>
+  </extensions>
 </idea-plugin>

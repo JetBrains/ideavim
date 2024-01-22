@@ -65,6 +65,8 @@
     <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.handler.ActionBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.handler.EditorActionHandlerBase"/>
     </extensionPoint>
+
+    <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
