@@ -8,6 +8,10 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
+import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.RoamingType
+import com.intellij.openapi.components.State
+import com.intellij.openapi.components.Storage
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
@@ -22,8 +26,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import org.jdom.Element
 
-internal class IjVariableService : VimVariableServiceBase() {
+@State(name = "VimVariables", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
+internal class IjVariableService : VimVariableServiceBase(), PersistentStateComponent<Element?> {
   override fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
     super.storeVariable(variable, value, editor, context, vimContext)
 
@@ -96,6 +102,39 @@ internal class IjVariableService : VimVariableServiceBase() {
 //      "widget_mode_select_block_foreground_dark" -> VimString("v:status_bar_fg")
 
       else -> null
+    }
+  }
+
+  override fun getState(): Element {
+    val element = Element("variables")
+    saveData(element)
+    return element
+  }
+
+  override fun loadState(state: Element) {
+    readData(state)
+  }
+
+  private fun saveData(element: Element) {
+    val vimVariablesElement = Element("vim-variables")
+    for ((key, value) in vimVariables.entries) {
+      if (value is VimString) {
+        val variableElement = Element("variable")
+        variableElement.setAttribute("key", key)
+        variableElement.setAttribute("value", value.value)
+        variableElement.setAttribute("type", "string")
+        vimVariablesElement.addContent(variableElement)
+      }
+    }
+    element.addContent(vimVariablesElement)
+  }
+
+  private fun readData(element: Element) {
+    val vimVariablesElement = element.getChild("vim-variables")
+    val variableElements = vimVariablesElement.getChildren("variable")
+    for (variableElement in variableElements) {
+      if (variableElement.getAttributeValue("type") != "string") continue
+      vimVariables[variableElement.getAttributeValue("key")] = VimString(variableElement.getAttributeValue("value"))
     }
   }
 }
