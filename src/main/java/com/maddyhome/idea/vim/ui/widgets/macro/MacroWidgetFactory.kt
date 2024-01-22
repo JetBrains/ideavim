@@ -8,9 +8,12 @@
 
 package com.maddyhome.idea.vim.ui.widgets.macro
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
+import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -80,4 +83,12 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory, VimStatusBarWidget {
   }
 }
 
-public val macroWidgetOptionListener: VimWidgetListener = VimWidgetListener(MacroWidgetFactory::class.java)
+public fun updateMacroWidget() {
+  val factory = StatusBarWidgetFactory.EP_NAME.findExtension(MacroWidgetFactory::class.java) ?: return
+  for (project in ProjectManager.getInstance().openProjects) {
+    val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
+    statusBarWidgetsManager.updateWidget(factory)
+  }
+}
+
+public val macroWidgetOptionListener: VimWidgetListener = VimWidgetListener { updateMacroWidget() }

@@ -17,14 +17,17 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.widgets.mode.VimModeWidget
+import com.maddyhome.idea.vim.ui.widgets.mode.updateModeWidget
 
 internal class ModeWidgetFocusListener(private val modeWidget: VimModeWidget): EditorListener {
   override fun created(editor: VimEditor) {
+    updateModeWidget()
     val mode = getFocusedEditorForProject(editor.ij.project)?.vim?.mode
     modeWidget.updateWidget(mode)
   }
 
   override fun released(editor: VimEditor) {
+    updateModeWidget()
     val focusedEditor = getFocusedEditorForProject(editor.ij.project)
     if (focusedEditor == null || focusedEditor == editor.ij) {
       modeWidget.updateWidget(null)

@@ -9,10 +9,14 @@
 package com.maddyhome.idea.vim.ui.widgets.mode
 
 import com.intellij.ide.ui.LafManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.CustomStatusBarWidget
+import com.intellij.openapi.wm.StatusBarWidgetFactory
+import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.util.width
@@ -230,5 +234,13 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
       val maximumSize = super.getMaximumSize()
       return Dimension(max(maximumSize.width, wordWidth + insets.width), maximumSize.height)
     }
+  }
+}
+
+public fun updateModeWidget() {
+  val factory = StatusBarWidgetFactory.EP_NAME.findExtension(ModeWidgetFactory::class.java) ?: return
+  for (project in ProjectManager.getInstance().openProjects) {
+    val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
+    statusBarWidgetsManager.updateWidget(factory)
   }
 }

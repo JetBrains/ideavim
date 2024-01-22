@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.ui.widgets.mode
 
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
@@ -34,8 +35,11 @@ public class ModeWidgetFactory : StatusBarWidgetFactory {
   }
 
   override fun isAvailable(project: Project): Boolean {
-    return VimPlugin.isEnabled() && injector.globalIjOptions().showmodewidget
+    return VimPlugin.isEnabled()
+      && injector.globalIjOptions().showmodewidget
+      && !project.isDisposed
+      && FileEditorManager.getInstance(project).hasOpenFiles()
   }
 }
 
-public val modeWidgetOptionListener: VimWidgetListener = VimWidgetListener(ModeWidgetFactory::class.java)
+public val modeWidgetOptionListener: VimWidgetListener = VimWidgetListener { updateModeWidget() }
