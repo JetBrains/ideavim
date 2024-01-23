@@ -39,64 +39,72 @@ import kotlin.reflect.KProperty
 public class ModeWidgetPopup : AnAction() {
   public override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
-    createPopup().showCenteredInCurrentWindow(project)
+    val popup = createPopup() ?: return
+    popup.showCenteredInCurrentWindow(project)
   }
 
   public companion object {
-    public fun createPopup(): JBPopup {
-      val mainPanel = JPanel(BorderLayout())
-      val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
+    @Volatile
+    private var currentPopup: JBPopup? = null
 
-      val applyButton = JButton("Apply")
-      val cancelButton = JButton("Close")
-      buttonPanel.add(applyButton)
-      buttonPanel.add(cancelButton)
-      mainPanel.add(buttonPanel, BorderLayout.SOUTH)
+    public fun createPopup(): JBPopup? {
+      synchronized(this) {
+        if (currentPopup?.isDisposed == false) return null
+        val mainPanel = JPanel(BorderLayout())
+        val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
 
-      val tabbedPane = JBTabbedPane()
-      val lightThemeSettings = createPanel(getWidgetThemeColors(true))
-      val darkThemeSettings = createPanel(getWidgetThemeColors(false))
-      tabbedPane.addTab(MessageHelper.getMessage("widget.mode.popup.tab.light"), lightThemeSettings.addScrollPane())
-      tabbedPane.addTab(MessageHelper.getMessage("widget.mode.popup.tab.dark"), darkThemeSettings.addScrollPane())
-      tabbedPane.preferredSize = Dimension(300, 600)
-      for (i in 0 until tabbedPane.tabCount) {
-        val label = JLabel(tabbedPane.getTitleAt(i), JLabel.CENTER)
-        label.preferredSize = Dimension(126, tabbedPane.getTabComponentAt(i).preferredSize.height)
-        tabbedPane.setTabComponentAt(i, label)
+        val applyButton = JButton("Apply")
+        val cancelButton = JButton("Close")
+        buttonPanel.add(applyButton)
+        buttonPanel.add(cancelButton)
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH)
+
+        val tabbedPane = JBTabbedPane()
+        val lightThemeSettings = createPanel(getWidgetThemeColors(true))
+        val darkThemeSettings = createPanel(getWidgetThemeColors(false))
+        tabbedPane.addTab(MessageHelper.getMessage("widget.mode.popup.tab.light"), lightThemeSettings.addScrollPane())
+        tabbedPane.addTab(MessageHelper.getMessage("widget.mode.popup.tab.dark"), darkThemeSettings.addScrollPane())
+        tabbedPane.preferredSize = Dimension(300, 600)
+        for (i in 0 until tabbedPane.tabCount) {
+          val label = JLabel(tabbedPane.getTitleAt(i), JLabel.CENTER)
+          label.preferredSize = Dimension(126, tabbedPane.getTabComponentAt(i).preferredSize.height)
+          tabbedPane.setTabComponentAt(i, label)
+        }
+        tabbedPane.selectedIndex = if (LafManager.getInstance().currentUIThemeLookAndFeel.isDark) 1 else 0
+        mainPanel.add(tabbedPane, BorderLayout.CENTER)
+
+        val popupContent = ContentFactory.getInstance().createContent(mainPanel, "", false).component
+        val popup = JBPopupFactory.getInstance()
+          .createComponentPopupBuilder(popupContent, popupContent)
+          .setTitle(MessageHelper.getMessage("widget.mode.popup.title"))
+          .setMovable(true)
+          .setRequestFocus(true)
+          .setCancelOnClickOutside(false)
+          .setCancelKeyEnabled(false)
+          .createPopup()
+
+        applyButton.addActionListener {
+          lightThemeSettings.apply()
+          darkThemeSettings.apply()
+          repaintModeWidget()
+        }
+
+        cancelButton.addActionListener {
+          popup.cancel()
+        }
+
+        val alarm = Alarm(popup)
+        fun updateApplyButtonVisibility() {
+          alarm.addRequest({
+            applyButton.isEnabled = lightThemeSettings.isModified() || darkThemeSettings.isModified()
+            updateApplyButtonVisibility()
+          }, 500L)
+        }
+        updateApplyButtonVisibility()
+
+        currentPopup = popup
+        return currentPopup
       }
-      tabbedPane.selectedIndex = if (LafManager.getInstance().currentUIThemeLookAndFeel.isDark) 1 else 0
-      mainPanel.add(tabbedPane, BorderLayout.CENTER)
-
-      val popupContent = ContentFactory.getInstance().createContent(mainPanel, "", false).component
-      val popup = JBPopupFactory.getInstance()
-        .createComponentPopupBuilder(popupContent, popupContent)
-        .setTitle(MessageHelper.getMessage("widget.mode.popup.title"))
-        .setMovable(true)
-        .setRequestFocus(true)
-        .setCancelOnClickOutside(false)
-        .setCancelKeyEnabled(false)
-        .createPopup()
-
-      applyButton.addActionListener {
-        lightThemeSettings.apply()
-        darkThemeSettings.apply()
-        repaintModeWidget()
-      }
-
-      cancelButton.addActionListener {
-        popup.cancel()
-      }
-
-      val alarm = Alarm(popup)
-      fun updateApplyButtonVisibility() {
-        alarm.addRequest({
-          applyButton.isEnabled = lightThemeSettings.isModified() || darkThemeSettings.isModified()
-          updateApplyButtonVisibility()
-        }, 500L)
-      }
-      updateApplyButtonVisibility()
-
-      return popup
     }
 
     private fun getWidgetThemeColors(isLight: Boolean): ModeColors {

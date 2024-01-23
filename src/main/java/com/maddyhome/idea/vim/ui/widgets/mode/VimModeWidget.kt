@@ -67,7 +67,7 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
 
     label.addMouseListener(object : MouseAdapter() {
       override fun mouseClicked(e: MouseEvent) {
-        val popup = ModeWidgetPopup.createPopup()
+        val popup = ModeWidgetPopup.createPopup() ?: return
         val dimension = popup.content.preferredSize
 
         val widgetLocation = e.component.locationOnScreen
