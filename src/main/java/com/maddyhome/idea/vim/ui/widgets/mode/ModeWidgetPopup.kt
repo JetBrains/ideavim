@@ -53,7 +53,7 @@ public class ModeWidgetPopup : AnAction() {
         val mainPanel = JPanel(BorderLayout())
         val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
 
-        val applyButton = JButton("Apply")
+        val applyButton = JButton("Apply").apply { isEnabled = false }
         val cancelButton = JButton("Close")
         buttonPanel.add(applyButton)
         buttonPanel.add(cancelButton)
