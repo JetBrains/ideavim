@@ -54,57 +54,6 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
     }
   }
 
-  override fun getVimVariable(name: String): VimDataType? {
-    val userSetValue = super.getVimVariable(name)
-    if (userSetValue != null) return userSetValue
-
-    return when (name) {
-      "widget_mode_normal_background_light" -> VimString("#aed586")
-      "widget_mode_normal_foreground_light" -> VimString("v:status_bar_fg")
-      "widget_mode_insert_background_light" -> VimString("#86aed5")
-      "widget_mode_insert_foreground_light" -> VimString("v:status_bar_fg")
-      "widget_mode_replace_background_light" -> VimString("#d58686")
-      "widget_mode_replace_foreground_light" -> VimString("v:status_bar_fg")
-      "widget_mode_command_background_light" -> VimString("#aed586")
-      "widget_mode_command_foreground_light" -> VimString("v:status_bar_fg")
-      "widget_mode_visual_background_light" -> VimString("#d5aed5")
-      "widget_mode_visual_foreground_light" -> VimString("v:status_bar_fg")
-//      "widget_mode_visual_line_background_light" -> VimString("")
-//      "widget_mode_visual_line_foreground_light" -> VimString("v:status_bar_fg")
-//      "widget_mode_visual_block_background_light" -> VimString("")
-//      "widget_mode_visual_block_foreground_light" -> VimString("v:status_bar_fg")
-      "widget_mode_select_background_light" -> VimString("#d5aed5")
-      "widget_mode_select_foreground_light" -> VimString("v:status_bar_fg")
-//      "widget_mode_select_line_background_light" -> VimString("")
-//      "widget_mode_select_line_foreground_light" -> VimString("v:status_bar_fg")
-//      "widget_mode_select_block_background_light" -> VimString("")
-//      "widget_mode_select_block_foreground_light" -> VimString("v:status_bar_fg")
-
-      "widget_mode_normal_background_dark" -> VimString("#aed586")
-      "widget_mode_normal_foreground_dark" -> VimString("v:status_bar_fg")
-      "widget_mode_insert_background_dark" -> VimString("#86aed5")
-      "widget_mode_insert_foreground_dark" -> VimString("v:status_bar_fg")
-      "widget_mode_replace_background_dark" -> VimString("#d58686")
-      "widget_mode_replace_foreground_dark" -> VimString("v:status_bar_fg")
-      "widget_mode_command_background_dark" -> VimString("#aed586")
-      "widget_mode_command_foreground_dark" -> VimString("v:status_bar_fg")
-      "widget_mode_visual_background_dark" -> VimString("#d5aed5")
-      "widget_mode_visual_foreground_dark" -> VimString("v:status_bar_fg")
-//      "widget_mode_visual_line_background_dark" -> VimString("")
-//      "widget_mode_visual_line_foreground_dark" -> VimString("v:status_bar_fg")
-//      "widget_mode_visual_block_background_dark" -> VimString("")
-//      "widget_mode_visual_block_foreground_dark" -> VimString("v:status_bar_fg")
-      "widget_mode_select_background_dark" -> VimString("#d5aed5")
-      "widget_mode_select_foreground_dark" -> VimString("v:status_bar_fg")
-//      "widget_mode_select_line_background_dark" -> VimString("")
-//      "widget_mode_select_line_foreground_dark" -> VimString("v:status_bar_fg")
-//      "widget_mode_select_block_background_dark" -> VimString("")
-//      "widget_mode_select_block_foreground_dark" -> VimString("v:status_bar_fg")
-
-      else -> null
-    }
-  }
-
   override fun getState(): Element {
     val element = Element("variables")
     saveData(element)
@@ -124,6 +73,12 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
         variableElement.setAttribute("value", value.value)
         variableElement.setAttribute("type", "string")
         vimVariablesElement.addContent(variableElement)
+      } else if (value is VimInt) {
+        val variableElement = Element("variable")
+        variableElement.setAttribute("key", key)
+        variableElement.setAttribute("value", value.value.toString())
+        variableElement.setAttribute("type", "int")
+        vimVariablesElement.addContent(variableElement)
       }
     }
     element.addContent(vimVariablesElement)
@@ -133,8 +88,14 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
     val vimVariablesElement = element.getChild("vim-variables")
     val variableElements = vimVariablesElement.getChildren("variable")
     for (variableElement in variableElements) {
-      if (variableElement.getAttributeValue("type") != "string") continue
-      vimVariables[variableElement.getAttributeValue("key")] = VimString(variableElement.getAttributeValue("value"))
+      when (variableElement.getAttributeValue("type")) {
+        "string" -> {
+          vimVariables[variableElement.getAttributeValue("key")] = VimString(variableElement.getAttributeValue("value"))
+        }
+        "int" -> {
+          vimVariables[variableElement.getAttributeValue("key")] = VimInt(variableElement.getAttributeValue("value"))
+        }
+      }
     }
   }
 }

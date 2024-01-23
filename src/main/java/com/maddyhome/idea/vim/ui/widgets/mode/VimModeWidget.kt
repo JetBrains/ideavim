@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.ui.widgets.mode
 
-import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -21,7 +20,6 @@ import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.util.width
-import com.intellij.util.ui.UIUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
@@ -30,7 +28,6 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetFocusListener
 import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetModeListener
-import java.awt.Color
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.MouseAdapter
@@ -132,86 +129,6 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
     SelectionType.CHARACTER_WISE -> SELECT
     SelectionType.LINE_WISE -> SELECT_LINE
     SelectionType.BLOCK_WISE -> SELECT_BLOCK
-  }
-
-  private fun getModeForeground(mode: Mode?): Color {
-    val keyPostfix = if (LafManager.getInstance().currentUIThemeLookAndFeel.isDark) "_dark" else "_light"
-    val colorString = when (mode) {
-      Mode.INSERT -> injector.variableService.getVimVariable("widget_mode_insert_foreground$keyPostfix")
-      Mode.REPLACE -> injector.variableService.getVimVariable("widget_mode_replace_foreground$keyPostfix")
-      is Mode.NORMAL -> injector.variableService.getVimVariable("widget_mode_normal_foreground$keyPostfix")
-      is Mode.CMD_LINE -> injector.variableService.getVimVariable("widget_mode_command_foreground$keyPostfix")
-      is Mode.VISUAL -> {
-        val visualModeBackground = injector.variableService.getVimVariable("widget_mode_visual_foreground$keyPostfix")
-        when (mode.selectionType) {
-          SelectionType.CHARACTER_WISE -> visualModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getVimVariable("widget_mode_visual_line_foreground$keyPostfix") ?: visualModeBackground
-          SelectionType.BLOCK_WISE -> injector.variableService.getVimVariable("widget_mode_visual_block_foreground$keyPostfix") ?: visualModeBackground
-        }
-      }
-      is Mode.SELECT -> {
-        val selectModeBackground = injector.variableService.getVimVariable("widget_mode_select_foreground$keyPostfix")
-        when (mode.selectionType) {
-          SelectionType.CHARACTER_WISE -> selectModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getVimVariable("widget_mode_select_line_foreground$keyPostfix") ?: selectModeBackground
-          SelectionType.BLOCK_WISE -> injector.variableService.getVimVariable("widget_mode_select_block_foreground$keyPostfix") ?: selectModeBackground
-        }
-      }
-      is Mode.OP_PENDING, null -> null
-    }?.asString()
-    val defaultColor = UIUtil.getLabelForeground()
-    val color = when (colorString) {
-      "v:status_bar_bg" -> UIUtil.getPanelBackground()
-      "v:status_bar_fg" -> UIUtil.getLabelForeground()
-      else -> {
-        if (colorString == null) {
-          defaultColor
-        } else {
-          try { Color.decode(colorString) } catch (e: Exception) { defaultColor }
-        }
-      }
-    }
-    return color
-  }
-
-  private fun getModeBackground(mode: Mode?): Color {
-    val keyPostfix = if (LafManager.getInstance().currentUIThemeLookAndFeel.isDark) "_dark" else "_light"
-    val colorString = when (mode) {
-      Mode.INSERT -> injector.variableService.getVimVariable("widget_mode_insert_background$keyPostfix")
-      Mode.REPLACE -> injector.variableService.getVimVariable("widget_mode_replace_background$keyPostfix")
-      is Mode.NORMAL -> injector.variableService.getVimVariable("widget_mode_normal_background$keyPostfix")
-      is Mode.CMD_LINE -> injector.variableService.getVimVariable("widget_mode_command_background$keyPostfix")
-      is Mode.VISUAL -> {
-        val visualModeBackground = injector.variableService.getVimVariable("widget_mode_visual_background$keyPostfix")
-        when (mode.selectionType) {
-          SelectionType.CHARACTER_WISE -> visualModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getVimVariable("widget_mode_visual_line_background$keyPostfix") ?: visualModeBackground
-          SelectionType.BLOCK_WISE -> injector.variableService.getVimVariable("widget_mode_visual_block_background$keyPostfix") ?: visualModeBackground
-        }
-      }
-      is Mode.SELECT -> {
-        val selectModeBackground = injector.variableService.getVimVariable("widget_mode_select_background$keyPostfix")
-        when (mode.selectionType) {
-          SelectionType.CHARACTER_WISE -> selectModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getVimVariable("widget_mode_select_line_background$keyPostfix") ?: selectModeBackground
-          SelectionType.BLOCK_WISE -> injector.variableService.getVimVariable("widget_mode_select_block_background$keyPostfix") ?: selectModeBackground
-        }
-      }
-      is Mode.OP_PENDING, null -> null
-    }?.asString()
-    val defaultColor = UIUtil.getPanelBackground()
-    val color = when (colorString) {
-      "v:status_bar_bg" -> UIUtil.getPanelBackground()
-      "v:status_bar_fg" -> UIUtil.getLabelForeground()
-      else -> {
-        if (colorString == null) {
-          defaultColor
-        } else {
-          try { Color.decode(colorString) } catch (e: Exception) { defaultColor }
-        }
-      }
-    }
-    return color
   }
 
   private class JBLabelWiderThan(private val words: Collection<String>): JBLabel("", CENTER) {
