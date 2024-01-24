@@ -333,7 +333,7 @@
  * |[m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction}
  * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
- * |[s|                   TO BE IMPLEMENTED
+ * |[s|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordPreviousAction}
  * |[z|                   TO BE IMPLEMENTED
  * |[{|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceOpenAction}
  * |]_CTRL-D|             TO BE IMPLEMENTED
@@ -358,7 +358,7 @@
  * |]m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction}
  * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
- * |]s|                   TO BE IMPLEMENTED
+ * |]s|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordNextAction}
  * |]z|                   TO BE IMPLEMENTED
  * |]}|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction}
  *

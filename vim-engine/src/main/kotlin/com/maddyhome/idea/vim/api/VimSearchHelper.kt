@@ -239,4 +239,10 @@ public interface VimSearchHelper {
     count: Int,
     isOuter: Boolean,
   ): TextRange?
+
+  public fun findMisspelledWord(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+  ): Int
 }
