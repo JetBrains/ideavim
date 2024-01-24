@@ -69,7 +69,7 @@ plugins {
     kotlin("jvm") version "1.8.21"
     application
 
-    id("org.jetbrains.intellij") version "1.16.1"
+    id("org.jetbrains.intellij") version "1.17.0"
     id("org.jetbrains.changelog") version "2.2.0"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
