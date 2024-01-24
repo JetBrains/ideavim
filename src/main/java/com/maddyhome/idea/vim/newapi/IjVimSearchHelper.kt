@@ -29,6 +29,8 @@ import com.maddyhome.idea.vim.helper.checkInString
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import it.unimi.dsi.fastutil.ints.IntComparator
+import it.unimi.dsi.fastutil.ints.IntComparators
 import java.util.*
 import java.util.function.Function
 import java.util.regex.Pattern
@@ -688,5 +690,27 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
 
     // End offset exclusive
     return TextRange(bstart, bend + 1)
+  }
+
+  override fun findMisspelledWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
+    val startOffset: Int
+    val endOffset: Int
+    val skipCount: Int
+    val offsetOrdering: IntComparator
+
+    if (count < 0) {
+      startOffset = 0
+      endOffset = caret.offset.point - 1
+      skipCount = -count - 1
+      offsetOrdering = IntComparators.OPPOSITE_COMPARATOR
+    }
+    else {
+      startOffset = caret.offset.point + 1
+      endOffset = editor.ij.document.textLength
+      skipCount = count - 1
+      offsetOrdering = IntComparators.NATURAL_COMPARATOR
+    }
+
+    return SearchHelper.findMisspelledWords(editor.ij, startOffset, endOffset, skipCount, offsetOrdering)
   }
 }
