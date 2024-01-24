@@ -47,10 +47,7 @@ class MacroActionTest : VimTestCase() {
     val editor = typeTextInFile(injector.parser.parseKeys("qa" + "3l" + "q"), "on<caret>e two three\n")
     val commandState = editor.vim.vimStateMachine
     kotlin.test.assertFalse(commandState.isRecording)
-    val registerGroup = VimPlugin.getRegister()
-    val register = registerGroup.getRegister('a')
-    assertNotNull<Any>(register)
-    kotlin.test.assertEquals("3l", register.text)
+    assertRegister('a', "3l")
   }
 
   @Test
@@ -58,9 +55,7 @@ class MacroActionTest : VimTestCase() {
     configureByText("")
     enterCommand("imap pp hello")
     typeText(injector.parser.parseKeys("qa" + "i" + "pp<Esc>" + "q"))
-    val register = VimPlugin.getRegister().getRegister('a')
-    assertNotNull<Any>(register)
-    kotlin.test.assertEquals("ipp<Esc>", injector.parser.toKeyNotation(register.keys))
+    assertRegister('a', "ipp<Esc>")
   }
 
   @Test
@@ -68,7 +63,7 @@ class MacroActionTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("qa" + "i" + "<C-K>OK<Esc>" + "q"), "")
     val register = VimPlugin.getRegister().getRegister('a')
     assertNotNull<Any>(register)
-    kotlin.test.assertEquals("i<C-K>OK<Esc>", injector.parser.toKeyNotation(register.keys))
+    assertRegister('a', "i<C-K>OK<Esc>")
   }
 
   @Test
@@ -141,8 +136,8 @@ class MacroActionTest : VimTestCase() {
     assertState("4\n5\n")
   }
 
-  // Broken, see the resulting text
-  fun `ignore test macro with macro`() {
+  @Test
+  fun `test macro with macro`() {
     val content = """
             Lorem Ipsum
 
@@ -152,16 +147,55 @@ class MacroActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(content)
-    typeText(injector.parser.parseKeys("qa" + "l" + "q" + "qb" + "10@a" + "q" + "2@b"))
+    typeText(
+      injector.parser.parseKeys(
+        "qa" + "l" + "q" +
+          "qb" + "6@a" + "q" +
+          "^" + "3@b"
+      )
+    )
 
-    val startOffset = content.rangeOf("rocks").startOffset
+    assertRegister('b', "6@a")
+    assertState("""
+            Lorem Ipsum
 
-    waitAndAssert {
-      println(fixture.editor.caretModel.offset)
-      println(startOffset)
-      println()
-      startOffset == fixture.editor.caretModel.offset
-    }
+            Lorem ipsum dolor ${c}sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test macro with macro with macro`() {
+    val content = """
+            Lorem Ipsum
+
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    configureByText(content)
+    typeText(
+      injector.parser.parseKeys(
+        "qa" + "l" + "q" +
+          "qb" + "3@a" + "q" +
+          "qc" + "2@b" + "q" +
+          "^" + "3@c"
+      )
+    )
+
+    assertRegister('b', "3@a")
+    assertRegister('c', "2@b")
+    assertState("""
+            Lorem Ipsum
+
+            Lorem ipsum dolor ${c}sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent())
   }
 
   @Test

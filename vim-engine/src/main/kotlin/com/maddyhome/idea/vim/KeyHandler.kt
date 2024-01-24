@@ -163,10 +163,10 @@ public class KeyHandler {
           }
         }
       }
+      finishedCommandPreparation(editor, context, editorState, commandBuilder, key, shouldRecord)
     } finally {
       handleKeyRecursionCount--
     }
-    finishedCommandPreparation(editor, context, editorState, commandBuilder, key, shouldRecord)
   }
 
   internal fun finishedCommandPreparation(
