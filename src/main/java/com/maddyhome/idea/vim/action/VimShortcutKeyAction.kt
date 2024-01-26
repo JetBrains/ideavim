@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
+import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
@@ -116,11 +117,13 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
     if (VimPlugin.isNotEnabled()) return ActionEnableStatus.no("IdeaVim is disabled", LogLevel.DEBUG)
     val editor = getEditor(e)
     if (editor != null && keyStroke != null) {
-      if (isOctopusEnabled(keyStroke, editor)) {
-        return ActionEnableStatus.no(
-          "Processing VimShortcutKeyAction for the key that is used in the octopus handler",
-          LogLevel.ERROR
-        )
+      if (enableOctopus) {
+        if (isOctopusEnabled(keyStroke, editor)) {
+          return ActionEnableStatus.no(
+            "Processing VimShortcutKeyAction for the key that is used in the octopus handler",
+            LogLevel.ERROR
+          )
+        }
       }
       if (editor.isIdeaVimDisabledHere) {
         return ActionEnableStatus.no("IdeaVim is disabled in this place", LogLevel.INFO)

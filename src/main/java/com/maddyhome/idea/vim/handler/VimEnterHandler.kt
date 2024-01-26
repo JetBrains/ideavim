@@ -27,6 +27,7 @@ import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.removeUserData
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.group.IjOptionConstants
@@ -128,6 +129,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
     if (VimPlugin.isNotEnabled()) return false
     if (!isHandlerEnabled(editor, dataContext)) return false
     if (isNotActualKeyPress(dataContext)) return false
+    if (!enableOctopus) return false
     return true
   }
 
@@ -341,6 +343,7 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
 }
 
 internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
+  if (!enableOctopus) return false
   // CMD line has a different processing mechanizm: the processing actions are registered
   //   for the input field component. These keys are not dispatched via the octopus handler.
   if (editor.vim.mode is Mode.CMD_LINE) return false
@@ -350,3 +353,6 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   }
   return false
 }
+
+internal val enableOctopus: Boolean
+  get() = injector.globalOptions().octopushandler
