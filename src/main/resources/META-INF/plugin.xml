@@ -57,15 +57,6 @@
       <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
 
     </extensionPoint>
-    <extensionPoint name="vimLibraryFunction"
-                    beanClass="com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass" dynamic="true">
-      <with attribute="implementation" implements="com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler"/>
-    </extensionPoint>
-    <!--    For internal use only -->
-    <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.handler.ActionBeanClass" dynamic="true">
-      <with attribute="implementation" implements="com.maddyhome.idea.vim.handler.EditorActionHandlerBase"/>
-    </extensionPoint>
-
     <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
   </extensionPoints>
 

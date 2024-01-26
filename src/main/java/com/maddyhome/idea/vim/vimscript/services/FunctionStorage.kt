@@ -8,20 +8,15 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.extensions.ExtensionPointName
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.EngineFunctionProvider
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.IntellijFunctionProvider
 import com.maddyhome.idea.vim.vimscript.model.functions.LazyVimscriptFunction
@@ -34,8 +29,6 @@ internal class FunctionStorage : VimscriptFunctionService {
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
 
   private val builtInFunctions: MutableMap<String, LazyVimscriptFunction> = mutableMapOf()
-  @Deprecated("Moved to annotation approach and lazy initialization")
-  private val oldBuiltInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
 
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
@@ -145,11 +138,7 @@ internal class FunctionStorage : VimscriptFunctionService {
   }
 
   override fun getBuiltInFunction(name: String): FunctionHandler? {
-    return if (injector.globalIjOptions().vimscriptFunctionAnnotation) {
-      builtInFunctions[name]?.instance
-    } else {
-      oldBuiltInFunctions[name]
-    }
+    return builtInFunctions[name]?.instance
   }
 
   private fun storeScriptFunction(functionDeclaration: FunctionDeclaration) {
@@ -180,27 +169,9 @@ internal class FunctionStorage : VimscriptFunctionService {
 
     val intellijFunctions = IntellijFunctionProvider.getFunctions()
     intellijFunctions.forEach { addHandler(it) }
-
-    extensionPoint.getExtensionList(ApplicationManager.getApplication()).forEach(FunctionBeanClass::register)
   }
 
   override fun addHandler(handler: LazyVimscriptFunction) {
     builtInFunctions[handler.name] = handler
-  }
-
-  override fun addOldHandler(handler: Any) {
-    handler as FunctionBeanClass
-    oldBuiltInFunctions[handler.name] = handler.instance
-  }
-
-  @Deprecated("Moved to annotation approach and lazy initialization")
-  companion object {
-    private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
-
-    inline fun <reified T : FunctionHandler> getFunctionOfType(): T {
-      val point = extensionPoint.getExtensionList(ApplicationManager.getApplication())
-        .single { it.implementation == T::class.java.name }
-      return point.instance as T
-    }
   }
 }

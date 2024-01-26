@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.api.VimActionsInitiator
+import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
 
-public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActionsInitiator>) {
+public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<LazyVimCommand>) {
   private val commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
@@ -97,11 +97,11 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
     keyList.removeAt(keyList.size - 1)
   }
 
-  public fun setCurrentCommandPartNode(newNode: CommandPartNode<VimActionsInitiator>) {
+  public fun setCurrentCommandPartNode(newNode: CommandPartNode<LazyVimCommand>) {
     currentCommandPartNode = newNode
   }
 
-  public fun getChildNode(key: KeyStroke): Node<VimActionsInitiator>? {
+  public fun getChildNode(key: KeyStroke): Node<LazyVimCommand>? {
     return currentCommandPartNode[key]
   }
 
@@ -171,7 +171,7 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
     return command
   }
 
-  public fun resetAll(commandPartNode: CommandPartNode<VimActionsInitiator>) {
+  public fun resetAll(commandPartNode: CommandPartNode<LazyVimCommand>) {
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
     commandParts.clear()
@@ -184,13 +184,13 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
     count = 0
   }
 
-  public fun resetInProgressCommandPart(commandPartNode: CommandPartNode<VimActionsInitiator>) {
+  public fun resetInProgressCommandPart(commandPartNode: CommandPartNode<LazyVimCommand>) {
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }
 
   @TestOnly
-  public fun getCurrentTrie(): CommandPartNode<VimActionsInitiator> = currentCommandPartNode
+  public fun getCurrentTrie(): CommandPartNode<LazyVimCommand> = currentCommandPartNode
 
   public companion object {
     private val LOG = vimLogger<CommandBuilder>()

@@ -30,11 +30,9 @@ import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
-import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -221,53 +219,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
 
       for (MappingMode mappingMode : command.getModes()) {
-        Node<VimActionsInitiator> node = getKeyRoot(mappingMode);
+        Node<LazyVimCommand> node = getKeyRoot(mappingMode);
         NodesKt.addLeafs(node, keyStrokes, command);
-      }
-    }
-  }
-
-  @Deprecated
-  public void registerCommandAction(@NotNull VimActionsInitiator actionHolder) {
-    IjVimActionsInitiator holder = (IjVimActionsInitiator)actionHolder;
-
-    if (!VimPlugin.getPluginId().equals(holder.getBean().getPluginDescriptor().getPluginId())) {
-      logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
-                   "Please create a plugin using `VimExtension`. " +
-                   "Plugin to blame: " +
-                   holder.getBean().getPluginDescriptor().getPluginId());
-      return;
-    }
-
-    Set<List<KeyStroke>> actionKeys = holder.getBean().getParsedKeys();
-    if (actionKeys == null) {
-      final EditorActionHandlerBase action = actionHolder.getInstance();
-      if (action instanceof ComplicatedKeysAction) {
-        actionKeys = ((ComplicatedKeysAction)action).getKeyStrokesSet();
-      }
-      else {
-        throw new RuntimeException("Cannot register action: " + action.getClass().getName());
-      }
-    }
-
-    Set<MappingMode> actionModes = holder.getBean().getParsedModes();
-    if (actionModes == null) {
-      throw new RuntimeException("Cannot register action: " + holder.getBean().getImplementation());
-    }
-
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      initIdentityChecker();
-      for (List<KeyStroke> keys : actionKeys) {
-        checkCommand(actionModes, actionHolder.getInstance(), keys);
-      }
-    }
-
-    for (List<KeyStroke> keyStrokes : actionKeys) {
-      registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
-
-      for (MappingMode mappingMode : actionModes) {
-        Node<VimActionsInitiator> node = getKeyRoot(mappingMode);
-        NodesKt.addLeafs(node, keyStrokes, actionHolder);
       }
     }
   }

@@ -7,8 +7,8 @@
  */
 package com.maddyhome.idea.vim
 
+import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -126,14 +126,14 @@ public class KeyHandler {
 
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
-          val node: Node<VimActionsInitiator>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState)
+          val node: Node<LazyVimCommand>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState)
           LOG.trace("Get the node for the current mode")
 
-          if (node is CommandNode<VimActionsInitiator>) {
+          if (node is CommandNode<LazyVimCommand>) {
             LOG.trace("Node is a command node")
             handleCommandNode(editor, context, key, node, editorState)
             commandBuilder.addKey(key)
-          } else if (node is CommandPartNode<VimActionsInitiator>) {
+          } else if (node is CommandPartNode<LazyVimCommand>) {
             LOG.trace("Node is a command part node")
             commandBuilder.setCurrentCommandPartNode(node)
             commandBuilder.addKey(key)
@@ -207,9 +207,9 @@ public class KeyHandler {
    */
   private fun mapOpCommand(
     key: KeyStroke,
-    node: Node<VimActionsInitiator>?,
+    node: Node<LazyVimCommand>?,
     editorState: VimStateMachine,
-  ): Node<VimActionsInitiator>? {
+  ): Node<LazyVimCommand>? {
     return if (editorState.isDuplicateOperatorKeyStroke(key)) {
       editorState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
     } else {
@@ -452,12 +452,12 @@ public class KeyHandler {
     editor: VimEditor,
     context: ExecutionContext,
     key: KeyStroke,
-    node: CommandNode<VimActionsInitiator>,
+    node: CommandNode<LazyVimCommand>,
     editorState: VimStateMachine,
   ) {
     LOG.trace("Handle command node")
     // The user entered a valid command. Create the command and add it to the stack.
-    val action = node.actionHolder.getInstance()
+    val action = node.actionHolder.instance
     val commandBuilder = editorState.commandBuilder
     val expectedArgumentType = commandBuilder.expectedArgumentType
     commandBuilder.pushCommandPart(action)
@@ -503,10 +503,10 @@ public class KeyHandler {
     }
   }
 
-  private fun stopMacroRecord(node: CommandNode<VimActionsInitiator>, editorState: VimStateMachine): Boolean {
+  private fun stopMacroRecord(node: CommandNode<LazyVimCommand>, editorState: VimStateMachine): Boolean {
     // TODO
 //    return editorState.isRecording && node.actionHolder.getInstance() is ToggleRecordingAction
-    return editorState.isRecording && node.actionHolder.getInstance().id == "VimToggleRecordingAction"
+    return editorState.isRecording && node.actionHolder.instance.id == "VimToggleRecordingAction"
   }
 
   private fun startWaitingForArgument(
@@ -592,7 +592,7 @@ public class KeyHandler {
     editorState.commandBuilder.resetAll(getKeyRoot(editorState.mappingState.mappingMode))
   }
 
-  private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
+  private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> {
     return injector.keyGroup.getKeyRoot(mappingMode)
   }
 

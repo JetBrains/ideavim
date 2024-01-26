@@ -8,20 +8,11 @@
 
 package org.jetbrains.plugins.ideavim
 
-import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.handler.ActionBeanClass
-import com.maddyhome.idea.vim.key.CommandNode
-import com.maddyhome.idea.vim.key.CommandPartNode
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Test
-import javax.swing.KeyStroke
-import kotlin.test.assertNotNull
 
 class RegisterActionsTest : VimTestCase() {
   @OptionTest(
@@ -78,36 +69,5 @@ class RegisterActionsTest : VimTestCase() {
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
     }
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  @OptionTest(
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-    VimOption(TestOptionConstants.whichwrap, doesntAffectTest = true),
-  )
-  fun `test unregister extension`() {
-    if (injector.globalIjOptions().commandOrMotionAnnotation) return
-    val before = "I ${c}found it in a legendary land"
-    val after = "I f${c}ound it in a legendary land"
-    var motionRightAction: ActionBeanClass? = null
-    doTest("l", before, after, Mode.NORMAL()) {
-      motionRightAction =
-        VIM_ACTIONS_EP.getExtensionList(null).first { it.actionId == "VimPreviousTabAction" }
-
-      assertNotNull<Any>(getCommandNode())
-
-      @Suppress("DEPRECATION")
-      VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction!!)
-      kotlin.test.assertNull(getCommandNode())
-    }
-    @Suppress("DEPRECATION")
-    VIM_ACTIONS_EP.getPoint(null).registerExtension(motionRightAction!!)
-    assertNotNull<Any>(getCommandNode())
-  }
-
-  private fun getCommandNode(): CommandNode<*>? {
-    // TODO: 08.02.2020 Sorry if your tests will fail because of this test
-    val node = VimPlugin.getKey().getKeyRoot(MappingMode.NORMAL)[KeyStroke.getKeyStroke('g')] as CommandPartNode
-    return node[KeyStroke.getKeyStroke('T')] as CommandNode<*>?
   }
 }

@@ -42,7 +42,6 @@ import javax.swing.KeyStroke
 public interface Node<T>
 
 /** Represents a complete command */
-// Todo make T LazyVimCommand
 public class CommandNode<T>(public val actionHolder: T) : Node<T>
 
 /** Represents a part of the command */

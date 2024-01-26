@@ -7,7 +7,7 @@
  */
 package com.maddyhome.idea.vim.impl.state
 
-import com.maddyhome.idea.vim.api.VimActionsInitiator
+import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -230,7 +230,7 @@ public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachi
   public companion object {
     private val logger = vimLogger<VimStateMachine>()
 
-    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
+    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> {
       return injector.keyGroup.getKeyRoot(mappingMode)
     }
 

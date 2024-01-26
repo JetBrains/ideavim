@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.vimscript.model.functions.LazyVimscriptFunction
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
 public interface VimscriptFunctionService {
-
   public fun deleteFunction(name: String, scope: Scope? = null, vimContext: VimLContext)
   public fun storeFunction(declaration: FunctionDeclaration)
   public fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler
@@ -24,5 +23,4 @@ public interface VimscriptFunctionService {
   public fun getBuiltInFunction(name: String): FunctionHandler?
   public fun registerHandlers()
   public fun addHandler(handler: LazyVimscriptFunction)
-  public fun addOldHandler(handler: Any)
 }

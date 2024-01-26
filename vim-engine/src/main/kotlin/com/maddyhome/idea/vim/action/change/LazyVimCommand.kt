@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.action.change
 
-import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.vimscript.model.LazyInstance
@@ -19,10 +18,6 @@ public class LazyVimCommand(
   public val modes: Set<MappingMode>,
   className: String,
   classLoader: ClassLoader,
-) : LazyInstance<EditorActionHandlerBase>(className, classLoader), VimActionsInitiator {
+) : LazyInstance<EditorActionHandlerBase>(className, classLoader) {
   public val actionId: String = EditorActionHandlerBase.getActionId(className)
-
-  override fun getInstance(): EditorActionHandlerBase {
-    return instance
-  }
 }

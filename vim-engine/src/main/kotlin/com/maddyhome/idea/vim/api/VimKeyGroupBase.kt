@@ -31,7 +31,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   @JvmField
   public val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
   public val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
-  public val keyRoots: MutableMap<MappingMode, CommandPartNode<VimActionsInitiator>> = EnumMap(MappingMode::class.java)
+  public val keyRoots: MutableMap<MappingMode, CommandPartNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
   public val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
 
   override var operatorFunction: OperatorFunction? = null
@@ -62,7 +62,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  override fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> = keyRoots.getOrPut(mappingMode) { RootNode() }
+  override fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> = keyRoots.getOrPut(mappingMode) { RootNode() }
 
   override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
 

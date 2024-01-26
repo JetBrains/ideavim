@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.CommandPartNode
@@ -20,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import javax.swing.KeyStroke
 
 public interface VimKeyGroup {
-  public fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator>
+  public fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand>
   public fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
   public fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
   public fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
