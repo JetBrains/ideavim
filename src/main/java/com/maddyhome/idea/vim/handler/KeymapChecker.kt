@@ -87,6 +87,7 @@ private fun verifyKeymap() {
   // This is needed to initialize the injector in case this verification is called to fast
   VimPlugin.getInstance()
 
+  if (!enableOctopus) return
   if (!injector.enabler.isEnabled()) return
 
   val keymap = KeymapManagerEx.getInstanceEx().activeKeymap
