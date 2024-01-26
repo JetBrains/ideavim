@@ -85,7 +85,6 @@ public object IjOptions {
   public val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", GLOBAL, "visualdelay", 100))
   public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isTemporary = true))
   public val showmodewidget: ToggleOption = addOption(ToggleOption("showmodewidget", GLOBAL, "showmodewidget", false, isTemporary = true))
-  public val colorfulmodewidget: ToggleOption = addOption(ToggleOption("colorfulmodewidget", GLOBAL, "colorfulmodewidget", false, isTemporary = true))
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>

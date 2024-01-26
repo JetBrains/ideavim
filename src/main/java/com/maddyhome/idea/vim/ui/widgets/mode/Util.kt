@@ -22,14 +22,12 @@ public fun getModeBackground(mode: Mode?): Color {
     val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.asString() ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     when (theme) {
-      ModeWidgetTheme.TEST -> {
+      ModeWidgetTheme.TERM -> {
         return when (mode) {
-          Mode.INSERT -> Color.decode("#D08770")
-          Mode.REPLACE -> Color.decode("#EBCB8B")
-          is Mode.NORMAL -> Color.decode("#BF616A")
-          is Mode.CMD_LINE -> Color.decode("#A3BE8C")
-          is Mode.VISUAL -> Color.decode("#B48EAD")
-          is Mode.SELECT -> Color.decode("#B48EAD")
+          Mode.INSERT -> Color.decode("#F4BF75")
+          Mode.REPLACE -> Color.decode("#AC4242")
+          is Mode.NORMAL, is Mode.CMD_LINE -> Color.decode("#90A959")
+          is Mode.VISUAL, is Mode.SELECT -> Color.decode("#6A9FB5")
           is Mode.OP_PENDING, null -> UIUtil.getPanelBackground()
         }
       }
@@ -84,7 +82,7 @@ public fun getModeForeground(mode: Mode?): Color {
     val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.asString() ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     return when (theme) {
-      ModeWidgetTheme.TEST -> Color.decode("#2E3440")
+      ModeWidgetTheme.TERM -> UIUtil.getPanelBackground()
       ModeWidgetTheme.COLORLESS -> UIUtil.getLabelForeground()
     }
   } else {

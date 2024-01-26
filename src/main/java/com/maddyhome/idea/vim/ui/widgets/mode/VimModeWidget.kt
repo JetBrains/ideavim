@@ -48,10 +48,7 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
     private const val SELECT_LINE = "S-LINE"
     private const val SELECT_BLOCK = "S-BLOCK"
   }
-  private val useColors = injector.globalIjOptions().colorfulmodewidget
-  private val label = JBLabelWiderThan(setOf(REPLACE)).apply {
-    isOpaque = useColors
-  }
+  private val label = JBLabelWiderThan(setOf(REPLACE)).apply { isOpaque = true }
 
   init {
     val mode = getFocusedEditor(project)?.vim?.mode
@@ -96,10 +93,8 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
 
   private fun updateLabel(mode: Mode?) {
     label.text = getModeText(mode)
-    if (useColors) {
-      label.foreground = getModeForeground(mode)
-      label.background = getModeBackground(mode)
-    }
+    label.foreground = getModeForeground(mode)
+    label.background = getModeBackground(mode)
   }
 
   private fun getFocusedEditor(project: Project): Editor? {

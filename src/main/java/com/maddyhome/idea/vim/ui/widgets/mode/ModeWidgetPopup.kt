@@ -351,7 +351,7 @@ public class ModeWidgetPopup : AnAction() {
 }
 
 public enum class ModeWidgetTheme(private var value: String) {
-  TEST("Nord-Aurora (testing, will be removed)"),
+  TERM("Term"),
   COLORLESS("Colorless");
 
   override fun toString(): String {
@@ -363,6 +363,6 @@ public enum class ModeWidgetTheme(private var value: String) {
       return ModeWidgetTheme.values().firstOrNull { it.value == string }
     }
 
-    public fun getDefaultTheme(): ModeWidgetTheme = TEST
+    public fun getDefaultTheme(): ModeWidgetTheme = TERM
   }
 }
