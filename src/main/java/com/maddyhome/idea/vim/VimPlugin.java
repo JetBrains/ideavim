@@ -43,7 +43,6 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
 import org.jdom.Element;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -115,12 +114,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   public static @NotNull CommandGroup getCommand() {
     return ApplicationManager.getApplication().getService(CommandGroup.class);
-  }
-
-  @Deprecated // "Please use `injector.markService` instead"
-  @ApiStatus.ScheduledForRemoval(inVersion = "2.3")
-  public static @NotNull MarkGroup getMark() {
-    return ApplicationManager.getApplication().getService(MarkGroup.class);
   }
 
   public static @NotNull RegisterGroup getRegister() {
