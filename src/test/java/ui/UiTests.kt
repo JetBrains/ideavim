@@ -240,7 +240,10 @@ class UiTests {
     step("Create $fileName file") {
       with(projectViewTree) {
         setExpandTimeout(30_000)
-        expand(projectName, "src")
+        expandAll()
+        // At the moment expand timeout doesn't affect expand function
+        // https://github.com/JetBrains/intellij-ui-test-robot/pull/392
+//        expand(projectName, "src")
         findText("src").click(MouseButton.RIGHT_BUTTON)
       }
       remoteRobot.actionMenu("New").click()
