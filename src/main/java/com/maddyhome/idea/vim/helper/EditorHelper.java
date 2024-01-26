@@ -46,12 +46,6 @@ public class EditorHelper {
     return editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
   }
 
-  //("Use extension function with the same name on VimEditor")
-  @Deprecated
-  public static boolean isLineEmpty(final @NotNull Editor editor, final int line, final boolean allowBlanks) {
-    return EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, allowBlanks);
-  }
-
   public static boolean scrollVertically(@NotNull Editor editor, int verticalOffset) {
     final ScrollingModel scrollingModel = editor.getScrollingModel();
     final Rectangle area = scrollingModel.getVisibleAreaOnScrollingFinished();
