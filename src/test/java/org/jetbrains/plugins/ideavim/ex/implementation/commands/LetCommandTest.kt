@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -222,7 +221,6 @@ class LetCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("let g:WhichKey_ShowVimActions = \"true\"")
     assertCommandOutput("echo g:WhichKey_ShowVimActions", "true\n")
-    assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
   }
 
   @Test
