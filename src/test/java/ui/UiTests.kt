@@ -95,6 +95,7 @@ class UiTests {
       `simple enter in insert mode`(editor)
       testMilticaretEnter(editor)
       `simple enter in select mode`(editor)
+      testMilticaretEnterInSelectMode(editor)
       reenableIdeaVim(editor)
 
       createFile("MyTest.java", this@uiTest)
@@ -697,6 +698,48 @@ class UiTests {
       editor.text
     )
 
+    editor.injectText(testTextForEditor)
+    vimExit()
+  }
+
+  // For VIM-3186
+  private fun ContainerFixture.testMilticaretEnterInSelectMode(editor: Editor) {
+    println("Run testMilticaretEnter...")
+
+    keyboard {
+      pressing(KeyEvent.VK_ALT) {
+        pressing(KeyEvent.VK_SHIFT) {
+          findText("One").click()
+          findText("Three").click()
+          findText("Five").click()
+        }
+      }
+
+      enterText("$")
+      enterText("v")
+      pressing(KeyEvent.VK_CONTROL) { enterText("g") }
+      enter()
+    }
+
+    assertEquals(3, editor.caretCount)
+
+    assertEquals(
+      """
+      |One Tw
+      |
+      |Three Fou
+      |
+      |Fiv
+      |
+    """.trimMargin(), editor.text
+    )
+
+    // Reset state
+    keyboard {
+      escape()
+      escape()
+    }
+    assertEquals(1, editor.caretCount)
     editor.injectText(testTextForEditor)
     vimExit()
   }
