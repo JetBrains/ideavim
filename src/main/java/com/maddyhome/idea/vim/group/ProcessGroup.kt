@@ -59,15 +59,18 @@ public class ProcessGroup : VimProcessGroupBase() {
     val initText = ""
     val label = leader.toString()
 
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, label, initText, count)
+    injector.application.invokeAndWait {
+      val panel = ExEntryPanel.getInstance()
+      panel.activate(editor.ij, context.ij, label, initText, count)
+    }
   }
 
   public override fun endSearchCommand(): String {
-    val panel = ExEntryPanel.getInstance()
-    panel.deactivate(true)
-
-    return panel.text
+    return injector.application.invokeAndWait {
+      val panel = ExEntryPanel.getInstance()
+      panel.deactivate(true)
+      panel.text
+    }
   }
 
   public override fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
@@ -82,15 +85,17 @@ public class ProcessGroup : VimProcessGroupBase() {
     val initText = getRange(editor, cmd)
     injector.markService.setVisualSelectionMarks(editor)
     editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, ":", initText, 1)
+    injector.application.invokeAndWait {
+      val panel = ExEntryPanel.getInstance()
+      panel.activate(editor.ij, context.ij, ":", initText, 1)
+    }
   }
 
   public override fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
-    val panel = ExEntryPanel.getInstance()
+    val panel = injector.application.invokeAndWait { ExEntryPanel.getInstance() }
     if (panel.isActive) {
       requestFocus(panel.entry)
       panel.handleKey(stroke)
@@ -104,39 +109,40 @@ public class ProcessGroup : VimProcessGroupBase() {
   }
 
   public override fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean {
-    val panel = ExEntryPanel.getInstance()
-    panel.deactivate(true)
-    var res = true
-    try {
-      getInstance(editor).mode = NORMAL()
+    return injector.application.invokeAndWait {
+      val panel = ExEntryPanel.getInstance()
+      panel.deactivate(true)
+      var res = true
+      try {
+        getInstance(editor).mode = NORMAL()
 
-      logger.debug("processing command")
+        logger.debug("processing command")
 
-      val text = panel.text
+        val text = panel.text
 
-      if (panel.label != ":") {
-        // Search is handled via Argument.Type.EX_STRING. Although ProcessExEntryAction is registered as the handler for
-        // <CR> in both command and search modes, it's only invoked for command mode (see KeyHandler.handleCommandNode).
-        // We should never be invoked for anything other than an actual ex command.
-        throw InvalidCommandException("Expected ':' command. Got '" + panel.label + "'", text)
+        if (panel.label != ":") {
+          // Search is handled via Argument.Type.EX_STRING. Although ProcessExEntryAction is registered as the handler for
+          // <CR> in both command and search modes, it's only invoked for command mode (see KeyHandler.handleCommandNode).
+          // We should never be invoked for anything other than an actual ex command.
+          throw InvalidCommandException("Expected ':' command. Got '" + panel.label + "'", text)
+        }
+
+        logger.debug {
+          "swing=" + SwingUtilities.isEventDispatchThread()
+        }
+
+        injector.vimscriptExecutor.execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext)
+      } catch (e: ExException) {
+        VimPlugin.showMessage(e.message)
+        VimPlugin.indicateError()
+        res = false
+      } catch (bad: Exception) {
+        logger.error(bad)
+        VimPlugin.indicateError()
+        res = false
       }
-
-      logger.debug {
-        "swing=" + SwingUtilities.isEventDispatchThread()
-      }
-
-      injector.vimscriptExecutor.execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext)
-    } catch (e: ExException) {
-      VimPlugin.showMessage(e.message)
-      VimPlugin.indicateError()
-      res = false
-    } catch (bad: Exception) {
-      logger.error(bad)
-      VimPlugin.indicateError()
-      res = false
+      res
     }
-
-    return res
   }
 
   // commands executed from map command / macro should not be added to history
@@ -147,8 +153,10 @@ public class ProcessGroup : VimProcessGroupBase() {
   public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
     editor.vimStateMachine.mode = NORMAL()
     getInstance().reset(editor)
-    val panel = ExEntryPanel.getInstance()
-    panel.deactivate(true, resetCaret)
+    injector.application.invokeAndWait {
+      val panel = ExEntryPanel.getInstance()
+      panel.deactivate(true, resetCaret)
+    }
   }
 
   public override fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
@@ -156,8 +164,10 @@ public class ProcessGroup : VimProcessGroupBase() {
     val currentMode = editor.mode
     check(currentMode is ReturnableFromCmd) { "Cannot enable cmd mode from $currentMode" }
     editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, ":", initText, 1)
+    injector.application.invokeAndWait {
+      val panel = ExEntryPanel.getInstance()
+      panel.activate(editor.ij, context.ij, ":", initText, 1)
+    }
   }
 
   private fun getRange(editor: VimEditor, cmd: Command): String {

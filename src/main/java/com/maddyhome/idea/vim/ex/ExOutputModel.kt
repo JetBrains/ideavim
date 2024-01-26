@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.ex
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimExOutputPanel
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 
@@ -23,14 +24,18 @@ public class ExOutputModel private constructor(private val myEditor: Editor) : V
   override fun output(text: String) {
     this.text = text
     if (!ApplicationManager.getApplication().isUnitTestMode) {
-      ExOutputPanel.getInstance(myEditor).setText(text)
+      injector.application.invokeAndWait {
+        ExOutputPanel.getInstance(myEditor).setText(text)
+      }
     }
   }
 
   override fun clear() {
     text = null
     if (!ApplicationManager.getApplication().isUnitTestMode) {
-      ExOutputPanel.getInstance(myEditor).deactivate(false)
+      injector.application.invokeAndWait {
+        ExOutputPanel.getInstance(myEditor).deactivate(false)
+      }
     }
   }
 
