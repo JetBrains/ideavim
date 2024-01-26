@@ -11,9 +11,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Apply Patch
         run: |
-          cd ideavim
           git apply src/test/java/ui/octopus.patch
-          cd ..
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
