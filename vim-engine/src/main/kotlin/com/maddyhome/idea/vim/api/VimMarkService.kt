@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.mark.Mark
-import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 
 public interface VimMarkService {
   public companion object {
@@ -138,11 +137,6 @@ public interface VimMarkService {
   public fun resetAllMarks()
 
   public fun isValidMark(char: Char, operation: Operation, isCaretPrimary: Boolean): Boolean
-
-  // Compatibility
-  @Deprecated("Please use removeMark with other signature")
-  @ScheduledForRemoval(inVersion = "2.3")
-  public fun removeMark(ch: Char, mark: Mark)
 
   public enum class Operation {
     GET,

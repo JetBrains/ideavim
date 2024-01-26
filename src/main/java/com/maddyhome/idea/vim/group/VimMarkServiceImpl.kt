@@ -177,15 +177,6 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     return createOrGetSystemMark(char, line, col, editor)
   }
 
-  @Deprecated("Please use removeMark with other signature")
-  override fun removeMark(ch: Char, mark: Mark) {
-    if (ch.isGlobalMark()) {
-      removeGlobalMark(ch)
-    } else if (ch.isLocalMark()) {
-      getLocalMarks(mark.filepath).remove(ch)
-    }
-  }
-
   override fun removeGlobalMark(char: Char) {
     val mark = getGlobalMark(char)
     if (mark is IntellijMark) {
@@ -277,16 +268,6 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
       val mark = IntellijMark(b, col, myProject)
       injector.markService.setGlobalMark(mark)
     }
-  }
-
-  /**
-   * COMPATIBILITY-LAYER: Method added
-   * Please see: [doc](https://jb.gg/zo8n0r)
-   *
-   */
-  @Deprecated("Please use method with VimEditor")
-  fun saveJumpLocation(editor: Editor?) {
-    injector.jumpService.saveJumpLocation(IjVimEditor(editor!!))
   }
 
   companion object {
