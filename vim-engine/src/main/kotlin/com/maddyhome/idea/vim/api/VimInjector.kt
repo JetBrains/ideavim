@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.undo.VimUndoRedo
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
@@ -71,10 +70,6 @@ public interface VimInjector {
   // [FINISHED] Fully moved to vim-engine. IJ service implementation adds additional IJ specific options
   // (These could be moved out of the implementation and into initialisation code)
   public val optionGroup: VimOptionGroup
-
-  @Suppress("DEPRECATION")
-  @Deprecated("Use optionGroup")
-  public val optionService: OptionService
 
   // [FINISHED] Can't be fully moved to vim-engine.
   public val nativeActionManager: NativeActionManager
