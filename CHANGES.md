@@ -44,6 +44,8 @@ usual beta standards.
 * [VIM-3206](https://youtrack.jetbrains.com/issue/VIM-3206) Disable both copilot suggestion and insert mode on a single escape
 * [VIM-3090](https://youtrack.jetbrains.com/issue/VIM-3090) Cmd line mode saves the visual mode
 * [VIM-3085](https://youtrack.jetbrains.com/issue/VIM-3085) Open access to VimTypedActionHandler and VimShortcutKeyAction
+* [VIM-3260](https://youtrack.jetbrains.com/issue/VIM-3260) Processing the offsets at the file end
+* [VIM-3183](https://youtrack.jetbrains.com/issue/VIM-3183) Execute .ideavimrc on pooled thread
 
 ### Merged PRs:
 * [763](https://github.com/JetBrains/ideavim/pull/763) by [Sam Ng](https://github.com/samabcde): Fix(VIM-3176) add test for restore selection after pasting in/below s…

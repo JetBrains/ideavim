@@ -27,6 +27,7 @@ import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.removeUserData
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.group.IjOptionConstants
@@ -52,7 +53,7 @@ internal val commandContinuation = Key.create<EditorActionHandler>("commandConti
  */
 internal class CaretShapeEnterEditorHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    if (VimPlugin.isEnabled()) {
+    if (VimPlugin.isEnabled() && enableOctopus) {
       invokeLater {
         editor.updateCaretsVisualAttributes()
       }
@@ -128,6 +129,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
     if (VimPlugin.isNotEnabled()) return false
     if (!isHandlerEnabled(editor, dataContext)) return false
     if (isNotActualKeyPress(dataContext)) return false
+    if (!enableOctopus) return false
     return true
   }
 
@@ -242,6 +244,7 @@ internal class VimEscForRiderHandler(nextHandler: EditorActionHandler) : VimKeyH
   override val key: String = "<Esc>"
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
+    if (!enableOctopus) return false
     return LookupManager.getActiveLookup(editor) != null
   }
 }
@@ -257,7 +260,9 @@ internal class VimEscForRiderHandler(nextHandler: EditorActionHandler) : VimKeyH
  */
 internal class VimEscLoggerHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    LOG.info("Esc pressed")
+    if (enableOctopus) {
+      LOG.info("Esc pressed")
+    }
     nextHandler.execute(editor, caret, dataContext)
   }
 
@@ -283,7 +288,9 @@ internal class StartNewLineBeforeCurrentDetector(nextHandler: EditorActionHandle
 
 internal open class StartNewLineDetectorBase(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    DataManager.getInstance().saveInDataContext(dataContext, Util.key, true)
+    if (enableOctopus) {
+      DataManager.getInstance().saveInDataContext(dataContext, Util.key, true)
+    }
     nextHandler.execute(editor, caret, dataContext)
   }
 
@@ -311,7 +318,9 @@ internal open class StartNewLineDetectorBase(private val nextHandler: EditorActi
  */
 internal class VimEnterLoggerHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    LOG.info("Enter pressed")
+    if (enableOctopus) {
+      LOG.info("Enter pressed")
+    }
     nextHandler.execute(editor, caret, dataContext)
   }
 
@@ -341,6 +350,7 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
 }
 
 internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
+  if (!enableOctopus) return false
   // CMD line has a different processing mechanizm: the processing actions are registered
   //   for the input field component. These keys are not dispatched via the octopus handler.
   if (editor.vim.mode is Mode.CMD_LINE) return false
@@ -350,3 +360,6 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   }
   return false
 }
+
+internal val enableOctopus: Boolean
+  get() = injector.globalOptions().octopushandler

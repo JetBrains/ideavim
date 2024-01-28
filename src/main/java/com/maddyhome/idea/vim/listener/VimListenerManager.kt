@@ -55,6 +55,7 @@ import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
@@ -462,11 +463,17 @@ internal object VimListenerManager {
         if (lineEnd == endOffset - 1) {
           // When starting on an empty line and dragging vertically upwards onto
           // another line, the selection should include the entirety of the empty line
-          caret.setSelection(endOffset + 1, startOffset)
+          caret.setSelection(
+            ijVimEditor.coerceOffset(endOffset + 1).point,
+            ijVimEditor.coerceOffset(startOffset).point,
+          )
         } else if (lineEnd == startOffset + 1 && startOffset == endOffset) {
           // When dragging left from EOL on a non-empty line, the selection
           // should include the last character on the line
-          caret.setSelection(lineEnd, lineEnd - 1)
+          caret.setSelection(
+            ijVimEditor.coerceOffset(lineEnd).point,
+            ijVimEditor.coerceOffset(lineEnd - 1).point,
+          )
         }
       }
       //endregion

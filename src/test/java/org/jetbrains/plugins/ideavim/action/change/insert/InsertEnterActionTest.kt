@@ -17,6 +17,8 @@ import com.intellij.openapi.editor.actionSystem.EditorActionHandlerBean
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.testFramework.ExtensionTestUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -45,24 +47,26 @@ class InsertEnterActionTest : VimTestCase() {
     forEachBean.action = "EditorEnter"
     forEachBean.setPluginDescriptor(PluginManagerCore.getPlugin(VimPlugin.getPluginId())!!)
 
-    if (repetitionInfo.currentRepetition == 1) {
-      ExtensionTestUtil.maskExtensions(
-        ExtensionPointName("com.intellij.editorActionHandler"),
-        listOf(mainBean),
-        fixture.testRootDisposable
-      )
-    } else if (repetitionInfo.currentRepetition == 2) {
-      ExtensionTestUtil.maskExtensions(
-        ExtensionPointName("com.intellij.editorActionHandler"),
-        listOf(singleBean, mainBean),
-        fixture.testRootDisposable
-      )
-    } else if (repetitionInfo.currentRepetition == 3) {
-      ExtensionTestUtil.maskExtensions(
-        ExtensionPointName("com.intellij.editorActionHandler"),
-        listOf(forEachBean, mainBean),
-        fixture.testRootDisposable
-      )
+    if (injector.globalOptions().octopushandler) {
+      if (repetitionInfo.currentRepetition == 1) {
+        ExtensionTestUtil.maskExtensions(
+          ExtensionPointName("com.intellij.editorActionHandler"),
+          listOf(mainBean),
+          fixture.testRootDisposable
+        )
+      } else if (repetitionInfo.currentRepetition == 2) {
+        ExtensionTestUtil.maskExtensions(
+          ExtensionPointName("com.intellij.editorActionHandler"),
+          listOf(singleBean, mainBean),
+          fixture.testRootDisposable
+        )
+      } else if (repetitionInfo.currentRepetition == 3) {
+        ExtensionTestUtil.maskExtensions(
+          ExtensionPointName("com.intellij.editorActionHandler"),
+          listOf(forEachBean, mainBean),
+          fixture.testRootDisposable
+        )
+      }
     }
   }
 

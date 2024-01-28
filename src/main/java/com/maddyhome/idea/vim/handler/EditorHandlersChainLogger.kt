@@ -34,6 +34,8 @@ internal class EditorHandlersChainLogger : ProjectActivity {
   private val editorHandlers = ExtensionPointName<EditorActionHandlerBean>("com.intellij.editorActionHandler")
 
   override suspend fun execute(project: Project) {
+    if (!enableOctopus) return
+
     val escHandlers = editorHandlers.extensionList
       .filter { it.action == "EditorEscape" }
       .joinToString("\n") { it.implementationClass }
