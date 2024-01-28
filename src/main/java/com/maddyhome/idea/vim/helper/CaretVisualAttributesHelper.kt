@@ -64,7 +64,9 @@ internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
 
 internal object GuicursorChangeListener : EffectiveOptionValueChangeListener {
   override fun onEffectiveValueChanged(editor: VimEditor) {
-    editor.ij.updatePrimaryCaretVisualAttributes()
+    injector.application.invokeLater {
+      editor.ij.updatePrimaryCaretVisualAttributes()
+    }
   }
 }
 

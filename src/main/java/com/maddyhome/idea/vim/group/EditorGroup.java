@@ -119,11 +119,17 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
     if (relativeNumber) {
       if (!hasRelativeLineNumbersInstalled(editor)) {
-        installRelativeLineNumbers(editor);
+        injector.getApplication().invokeLater(() -> {
+          installRelativeLineNumbers(editor);
+          return null;
+        });
       }
     }
     else if (hasRelativeLineNumbersInstalled(editor)) {
-      removeRelativeLineNumbers(editor);
+      injector.getApplication().invokeLater(() -> {
+        removeRelativeLineNumbers(editor);
+        return null;
+      });
     }
   }
 
