@@ -38,6 +38,13 @@ public interface VariableService {
   /**
    * Get global scope variable value.
    * @param name variable name
+   * @param value variable value
+   */
+  public fun storeGlobalVariable(name: String, value: VimDataType)
+
+  /**
+   * Get global scope variable value.
+   * @param name variable name
    */
   public fun getGlobalVariableValue(name: String): VimDataType?
 

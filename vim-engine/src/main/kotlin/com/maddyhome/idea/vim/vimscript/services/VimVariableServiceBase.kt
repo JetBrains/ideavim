@@ -189,7 +189,7 @@ public abstract class VimVariableServiceBase : VariableService {
     }
   }
 
-  protected open fun storeGlobalVariable(name: String, value: VimDataType) {
+  public override fun storeGlobalVariable(name: String, value: VimDataType) {
     globalVariables[name] = value
   }
 
