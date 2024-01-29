@@ -365,10 +365,10 @@ public class ExOutputPanel extends JPanel {
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
-      // TODO: Confirm context in CWM scenario
       if (VimPlugin.isNotEnabled()) return;
 
-      // Calls updateUI on this and child components
+      // This listener is only invoked for local scenarios, and we only need to update local editor UI. This will invoke
+      // updateUI on the output pane and it's child components
       for (VimEditor vimEditor : injector.getEditorGroup().localEditors()) {
         Editor editor = ((IjVimEditor)vimEditor).getEditor();
         if (!ExOutputPanel.isPanelActive(editor)) continue;
