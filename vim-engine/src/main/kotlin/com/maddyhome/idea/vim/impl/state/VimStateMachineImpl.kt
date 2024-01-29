@@ -121,7 +121,7 @@ public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachi
       editor.updateCaretsVisualAttributes()
       editor.updateCaretsVisualPosition()
     } else {
-      injector.application.localEditors().forEach { editor ->
+      injector.editorGroup.localEditors().forEach { editor ->
         editor.updateCaretsVisualAttributes()
         editor.updateCaretsVisualPosition()
       }

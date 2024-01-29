@@ -80,7 +80,6 @@ import com.maddyhome.idea.vim.helper.forceBarCursor
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
-import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -88,7 +87,9 @@ import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
+import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.mode
@@ -213,7 +214,8 @@ internal object VimListenerManager {
 
       // We could have a split window in this list, but since they're all being initialised from the same opening editor
       // there's no need to use the SPLIT scenario
-      localEditors().forEach { editor ->
+      injector.editorGroup.localEditors().forEach { vimEditor ->
+        val editor = vimEditor.ij
         if (!initialisedEditors.contains(editor)) {
           add(editor, getOpeningEditor(editor)?.vim ?: injector.fallbackWindow, LocalOptionInitialisationScenario.NEW)
         }
@@ -221,8 +223,8 @@ internal object VimListenerManager {
     }
 
     fun removeAll() {
-      localEditors().forEach { editor ->
-        remove(editor, false)
+      injector.editorGroup.localEditors().forEach { editor ->
+        remove(editor.ij, false)
       }
     }
 
@@ -435,6 +437,7 @@ internal object VimListenerManager {
      * This event is executed for each caret using [com.intellij.openapi.editor.CaretModel.runForEachCaret]
      */
     override fun selectionChanged(selectionEvent: SelectionEvent) {
+      // TODO: Confirm context in CWM scenario
       if (selectionEvent.editor.isIdeaVimDisabledHere) return
       VimVisualTimer.drop()
       val editor = selectionEvent.editor

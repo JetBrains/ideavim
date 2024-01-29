@@ -18,8 +18,6 @@ public interface VimApplication {
   public fun isInternal(): Boolean
   public fun postKey(stroke: KeyStroke, editor: VimEditor)
 
-  public fun localEditors(): List<VimEditor>
-
   public fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
   public fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
 
