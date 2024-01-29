@@ -18,7 +18,6 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -32,10 +31,10 @@ import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.SystemMarks.Companion.createOrGetSystemMark
-import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.mark.IntellijMark
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
+import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jdom.Element
@@ -196,13 +195,13 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
      * @param event The change event
      */
     override fun beforeDocumentChange(event: DocumentEvent) {
+      // TODO: Confirm context in CWM scenario
       if (VimPlugin.isNotEnabled()) return
       if (logger.isDebugEnabled) logger.debug("MarkUpdater before, event = $event")
       if (event.oldLength == 0) return
       val doc = event.document
       val anEditor = getAnEditor(doc) ?: return
-      injector.markService
-        .updateMarksFromDelete(IjVimEditor(anEditor), event.offset, event.oldLength)
+      injector.markService.updateMarksFromDelete(anEditor, event.offset, event.oldLength)
     }
 
     /**
@@ -212,23 +211,16 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
      * @param event The change event
      */
     override fun documentChanged(event: DocumentEvent) {
+      // TODO: Confirm context in CWM scenario
       if (VimPlugin.isNotEnabled()) return
       if (logger.isDebugEnabled) logger.debug("MarkUpdater after, event = $event")
       if (event.newLength == 0 || event.newLength == 1 && event.newFragment[0] != '\n') return
       val doc = event.document
       val anEditor = getAnEditor(doc) ?: return
-      injector.markService
-        .updateMarksFromInsert(IjVimEditor(anEditor), event.offset, event.newLength)
+      injector.markService.updateMarksFromInsert(anEditor, event.offset, event.newLength)
     }
 
-    private fun getAnEditor(doc: Document): Editor? {
-      val editors = localEditors(doc)
-      return if (editors.size > 0) {
-        editors[0]
-      } else {
-        null
-      }
-    }
+    private fun getAnEditor(doc: Document) = injector.editorGroup.localEditors(IjVimDocument(doc)).firstOrNull()
   }
 
   class VimBookmarksListener(private val myProject: Project) : BookmarksListener {

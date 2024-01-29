@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -81,7 +80,7 @@ internal data class BufferCommand(val ranges: Ranges, val argument: String) : Co
     for (file in FileEditorManager.getInstance(project).openFiles) {
       if (file.name.contains(fileName)) {
         val editor = EditorHelper.getEditor(file) ?: continue
-        matchedFiles.add(editor.vim)
+        matchedFiles.add(editor)
       }
     }
 

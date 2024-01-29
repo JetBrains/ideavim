@@ -54,10 +54,6 @@ internal class IjVimApplication : VimApplicationBase() {
     }
   }
 
-  override fun localEditors(): List<VimEditor> {
-    return com.maddyhome.idea.vim.helper.localEditors().map { IjVimEditor(it) }
-  }
-
   override fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
     RunnableHelper.runWriteCommand((editor as IjVimEditor).editor.project, command, name, groupId)
   }

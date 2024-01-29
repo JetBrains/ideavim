@@ -38,10 +38,6 @@ public class VimApplicationStub : VimApplicationBase() {
     TODO("Not yet implemented")
   }
 
-  override fun localEditors(): List<VimEditor> {
-    TODO("Not yet implemented")
-  }
-
   override fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
     TODO("Not yet implemented")
   }
