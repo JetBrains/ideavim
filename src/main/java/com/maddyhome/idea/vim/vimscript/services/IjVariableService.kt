@@ -12,12 +12,48 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import org.jdom.Element
 
 @State(name = "VimVariables", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
 internal class IjVariableService : VimVariableServiceBase(), PersistentStateComponent<Element?> {
+  override fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
+    super.storeVariable(variable, value, editor, context, vimContext)
+
+    val scope = variable.scope ?: getDefaultVariableScope(vimContext)
+    if (scope == Scope.GLOBAL_VARIABLE) {
+      val scopeForGlobalEnvironment = variable.scope?.toString() ?: ""
+      VimScriptGlobalEnvironment.getInstance()
+        .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext)] = value.simplify()
+    }
+  }
+
+  private fun VimDataType.simplify(): Any {
+    return when (this) {
+      is VimString -> this.value
+      is VimInt -> this.value
+      is VimFloat -> this.value
+      is VimList -> this.values
+      is VimDictionary -> this.dictionary
+      is VimBlob -> "blob"
+      is VimFuncref -> "funcref"
+      else -> error("Unexpected")
+    }
+  }
+
   override fun getState(): Element {
     val element = Element("variables")
     saveData(element)
