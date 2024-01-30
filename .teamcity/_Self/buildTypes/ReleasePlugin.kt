@@ -97,7 +97,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Reset release branch"
       //language=Shell Script
       scriptContent = """
-        if [ "major" = $releaseType ] && [ "minor" = $releaseType ] && [ "patch" = $releaseType ]
+        if [ "major" = $releaseType ] || [ "minor" = $releaseType ] || [ "patch" = $releaseType ]
         then
           branch=${'$'}(git branch --show-current)  
           echo current branch is ${'$'}branch
