@@ -353,6 +353,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     if (onOffDisposable != null) {
       Disposer.dispose(onOffDisposable);
+      onOffDisposable = null;
     }
   }
 
