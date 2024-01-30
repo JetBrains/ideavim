@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.motion.scroll
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -21,9 +20,7 @@ import com.maddyhome.idea.vim.command.CommandFlags.FLAG_IGNORE_SCROLL_JUMP
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import java.awt.event.KeyEvent
 import java.util.*
-import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<C-B>", "<PageUp>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
@@ -38,12 +35,7 @@ public class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
 }
 
 @CommandOrMotion(keys = ["<PageUp>"], modes = [Mode.INSERT])
-public class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
-  )
-
+public class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_IGNORE_SCROLL_JUMP, FLAG_CLEAR_STROKES)
