@@ -21,8 +21,12 @@ fun main(args: Array<String>) {
   }
 
   withGit(rootDir) { git ->
-    val currentCommit = git.log().setMaxCount(1).call().first()
-    println("Current commit id: ${currentCommit.id.name}")
+    val currentCommits = git.log().setMaxCount(3).call()
+    println("Last three commits:")
+    for (currentCommit in currentCommits) {
+      println(currentCommit.id.name)
+    }
+    val currentCommit = currentCommits.first()
 
     git.checkoutBranch("release")
     println("Checked out release branch")
@@ -32,7 +36,15 @@ fun main(args: Array<String>) {
       .call()
     println("release branch reset")
 
+    val getCurrentCommit = git.log().setMaxCount(1).call().first()
+    println("Release branch is on $getCurrentCommit")
+
     git.checkoutBranch("master")
     println("Checked out master branch")
+
+    val currentCommitAgain = git.log().setMaxCount(1).call().first()
+    println("Current commit: $currentCommitAgain")
   }
+
+  checkBranch(rootDir, releaseType)
 }
