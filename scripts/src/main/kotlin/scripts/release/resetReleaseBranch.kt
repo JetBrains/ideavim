@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
     for (currentCommit in currentCommits) {
       println(currentCommit.id.name)
     }
-    val currentCommit = currentCommits.first()
+    val currentCommit = git.log().setMaxCount(1).call().first()
 
     git.checkoutBranch("release")
     println("Checked out release branch")
