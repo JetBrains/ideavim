@@ -89,9 +89,35 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
     }
-    gradle {
+//    gradle {
+//      name = "Reset release branch"
+//      tasks = "scripts:resetReleaseBranch"
+//    }
+    script {
       name = "Reset release branch"
-      tasks = "scripts:resetReleaseBranch"
+      //language=Shell Script
+      scriptContent = """
+        if [ "major" = $releaseType ] && [ "minor" = $releaseType ] && [ "patch" = $releaseType ]
+        then
+          branch=${'$'}(git branch --show-current)  
+          echo current branch is ${'$'}branch
+          
+          if [ $releaseType != "patch" ]
+          then
+            commit=${'$'}(git rev-parse HEAD)
+            git checkout release
+            echo Checked out release branch
+            git reset --hard ${'$'}commit
+            echo Release branch reset
+            git checkout master
+            echo Checked out master
+          else
+            echo Skip release branch reset because release type is patch
+          fi
+        else
+          echo This function accepts only major, minor, or patch as release type. Current value: $releaseType
+        fi
+      """.trimIndent()
     }
     gradle {
       name = "Publish release"
