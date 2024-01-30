@@ -438,14 +438,11 @@ public class FileGroup extends VimFileBase {
   private static final @NotNull Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
-   * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.
+   * Respond to editor tab selection and remember the last used tab
    */
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
-    // The user has changed the editor they are working with - exit insert/replace mode, and complete any
-    // appropriate repeat
     if (event.getOldFile() != null) {
       LastTabService.getInstance(event.getManager().getProject()).setLastTab(event.getOldFile());
     }
   }
 }
-
