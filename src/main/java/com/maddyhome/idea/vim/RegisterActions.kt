@@ -21,7 +21,7 @@ public object RegisterActions {
   @JvmStatic
   public fun registerActions() {
     registerVimCommandActions()
-    registerEmptyShortcuts() // todo most likely it is not needed
+    registerShortcutsWithoutActions()
   }
 
   public fun findAction(id: String): EditorActionHandlerBase? {
@@ -46,12 +46,11 @@ public object RegisterActions {
     IntellijCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
   }
 
-  private fun registerEmptyShortcuts() {
+  private fun registerShortcutsWithoutActions() {
     val parser = VimPlugin.getKey()
 
     // The {char1} <BS> {char2} shortcut is handled directly by KeyHandler#handleKey, so doesn't have an action. But we
     // still need to register the shortcut, to make sure the editor doesn't swallow it.
-    parser
-      .registerShortcutWithoutAction(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), MappingOwner.IdeaVim.System)
+    parser.registerShortcutWithoutAction(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), MappingOwner.IdeaVim.System)
   }
 }
