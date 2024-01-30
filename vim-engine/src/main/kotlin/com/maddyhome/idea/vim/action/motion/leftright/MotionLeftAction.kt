@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -21,8 +20,6 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["h"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionLeftAction : MotionActionHandler.ForEachCaret() {
@@ -42,13 +39,8 @@ public class MotionLeftAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.INSERT])
-public class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
+public class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)),
-  )
 
   override fun getOffset(
     editor: VimEditor,

@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.motion.text
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,13 +21,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import java.awt.event.KeyEvent
 import java.util.*
-import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["w"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
-
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -43,14 +39,8 @@ public class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<C-Right>", "<C-kRight>"], modes = [Mode.INSERT])
-public class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
+public class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, KeyEvent.CTRL_DOWN_MASK)),
-  )
-
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
   override fun getOffset(

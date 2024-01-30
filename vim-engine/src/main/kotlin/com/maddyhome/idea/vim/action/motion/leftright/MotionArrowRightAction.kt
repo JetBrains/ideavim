@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,17 +22,10 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
+public class MotionArrowRightAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    injector.parser.parseKeys("<Right>"),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0)),
-  )
 
   override fun motion(
     editor: VimEditor,
