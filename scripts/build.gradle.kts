@@ -93,25 +93,6 @@ tasks.register("addReleaseTag", JavaExec::class) {
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
 
-tasks.register("resetReleaseBranch", JavaExec::class) {
-  group = "release"
-  mainClass.set("scripts.release.ResetReleaseBranchKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
-}
-
-tasks.register("pushChanges", JavaExec::class) {
-  mainClass.set("scripts.PushChangesKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(rootProject.rootDir.toString())
-}
-
-tasks.register("pushChangesWithReleaseBranch", JavaExec::class) {
-  mainClass.set("scripts.PushChangesWithReleaseBranchKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(rootProject.rootDir.toString(), releaseType ?: "")
-}
-
 tasks.register("selectBranch", JavaExec::class) {
   group = "release"
   mainClass.set("scripts.release.SelectBranchKt")

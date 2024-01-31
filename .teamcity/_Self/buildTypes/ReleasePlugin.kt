@@ -89,10 +89,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
     }
-//    gradle {
-//      name = "Reset release branch"
-//      tasks = "scripts:resetReleaseBranch"
-//    }
     script {
       name = "Reset release branch"
       //language=Shell Script
@@ -123,10 +119,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Publish release"
       tasks = "publishPlugin"
     }
-//    gradle {
-//      name = "Push changes to the repo"
-//      tasks = "scripts:pushChangesWithReleaseBranch"
-//    }
     script {
       name = "Push changes to the repo"
       scriptContent = """
