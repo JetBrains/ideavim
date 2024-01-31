@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ShortcutSet;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
@@ -80,14 +79,6 @@ public class EventFacade {
     action.unregisterCustomShortcutSet(component);
   }
 
-  public void addDocumentListener(@NotNull Document document, @NotNull DocumentListener listener) {
-    document.addDocumentListener(listener);
-  }
-
-  public void removeDocumentListener(@NotNull Document document, @NotNull DocumentListener listener) {
-    document.removeDocumentListener(listener);
-  }
-
   public void addEditorFactoryListener(@NotNull EditorFactoryListener listener, @NotNull Disposable parentDisposable) {
     EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
   }
@@ -98,18 +89,10 @@ public class EventFacade {
     editor.getCaretModel().addCaretListener(listener, disposable);
   }
 
-  public void removeCaretListener(@NotNull Editor editor, @NotNull CaretListener listener) {
-    editor.getCaretModel().removeCaretListener(listener);
-  }
-
   public void addEditorMouseListener(@NotNull Editor editor,
                                      @NotNull EditorMouseListener listener,
                                      @NotNull Disposable disposable) {
     editor.addEditorMouseListener(listener, disposable);
-  }
-
-  public void removeEditorMouseListener(@NotNull Editor editor, @NotNull EditorMouseListener listener) {
-    editor.removeEditorMouseListener(listener);
   }
 
   public void addComponentMouseListener(@NotNull Component component,
@@ -119,28 +102,16 @@ public class EventFacade {
     Disposer.register(disposable, () -> component.removeMouseListener(mouseListener));
   }
 
-  public void removeComponentMouseListener(@NotNull Component component, @NotNull MouseListener mouseListener) {
-    component.removeMouseListener(mouseListener);
-  }
-
   public void addEditorMouseMotionListener(@NotNull Editor editor,
                                            @NotNull EditorMouseMotionListener listener,
                                            @NotNull Disposable disposable) {
     editor.addEditorMouseMotionListener(listener, disposable);
   }
 
-  public void removeEditorMouseMotionListener(@NotNull Editor editor, @NotNull EditorMouseMotionListener listener) {
-    editor.removeEditorMouseMotionListener(listener);
-  }
-
   public void addEditorSelectionListener(@NotNull Editor editor,
                                          @NotNull SelectionListener listener,
                                          @NotNull Disposable disposable) {
     editor.getSelectionModel().addSelectionListener(listener, disposable);
-  }
-
-  public void removeEditorSelectionListener(@NotNull Editor editor, @NotNull SelectionListener listener) {
-    editor.getSelectionModel().removeSelectionListener(listener);
   }
 
   private @NotNull TypedAction getTypedAction() {

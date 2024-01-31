@@ -21,6 +21,8 @@ import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
+import com.intellij.openapi.editor.event.DocumentEvent
+import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.event.EditorFactoryEvent
 import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.editor.event.EditorMouseEvent
@@ -67,6 +69,8 @@ import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollGroup
+import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.VimMarkServiceImpl
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
@@ -170,8 +174,14 @@ internal object VimListenerManager {
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
 
       // Listen for focus change to update various features such as mode widget
-      val eventMulticaster = EditorFactory.getInstance().eventMulticaster as? EditorEventMulticasterEx
-      eventMulticaster?.addFocusChangeListener(VimFocusListener, VimPlugin.getInstance().onOffDisposable)
+      val eventMulticaster = EditorFactory.getInstance().eventMulticaster
+      (eventMulticaster as? EditorEventMulticasterEx)?.addFocusChangeListener(
+        VimFocusListener,
+        VimPlugin.getInstance().onOffDisposable
+      )
+
+      // Listen for document changes to update document state such as marks
+      eventMulticaster.addDocumentListener(VimDocumentListener, VimPlugin.getInstance().onOffDisposable)
     }
 
     fun disable() {
@@ -230,7 +240,6 @@ internal object VimListenerManager {
       // We shouldn't be called with anything other than local editors, but let's just be sure. This will prevent any
       // unsupported editor from incorrectly being initialised.
       // TODO: If the user changes the 'ideavimsupport' option, existing editors won't be initialised
-      // TODO: This blocks listening for document changes from non-local editors, which is necessary for marks
       if (vimDisabled(editor)) return
 
       // As I understand, there is no need to pass a disposable that also disposes on editor close
@@ -299,6 +308,23 @@ internal object VimListenerManager {
     override fun focusLost(editor: Editor) {
       if (vimDisabled(editor)) return
       injector.listenersNotifier.notifyEditorFocusLost(editor.vim)
+    }
+  }
+
+  /**
+   * Notifies other IdeaVim components of document changes. This will be called for all documents, even those only
+   * open in non-local Code With Me guest editors, which we still want to process (e.g. to update marks when a guest
+   * edits a file. Updating search highlights will be a no-op if there are no open local editors)
+   */
+  private object VimDocumentListener : DocumentListener {
+    override fun beforeDocumentChange(event: DocumentEvent) {
+      VimMarkServiceImpl.MarkUpdater.beforeDocumentChange(event)
+      SearchGroup.DocumentSearchListener.INSTANCE.beforeDocumentChange(event)
+    }
+
+    override fun documentChanged(event: DocumentEvent) {
+      VimMarkServiceImpl.MarkUpdater.documentChanged(event)
+      SearchGroup.DocumentSearchListener.INSTANCE.documentChanged(event)
     }
   }
 
