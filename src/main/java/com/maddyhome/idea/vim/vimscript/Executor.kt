@@ -35,69 +35,66 @@ import java.io.IOException
 
 @Service
 internal class Executor : VimScriptExecutorBase() {
-  internal val lock = Object()
   private val logger = logger<Executor>()
   override var executingVimscript = false
   override var executingIdeaVimRcConfiguration = false
 
   @Throws(ExException::class)
   override fun execute(script: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean, vimContext: VimLContext?): ExecutionResult {
-    synchronized(lock) {
-      try {
-        injector.vimscriptExecutor.executingVimscript = true
-        var finalResult: ExecutionResult = ExecutionResult.Success
+    try {
+      injector.vimscriptExecutor.executingVimscript = true
+      var finalResult: ExecutionResult = ExecutionResult.Success
 
-        val myScript = VimscriptParser.parse(script)
-        myScript.units.forEach { it.vimContext = vimContext ?: myScript }
+      val myScript = VimscriptParser.parse(script)
+      myScript.units.forEach { it.vimContext = vimContext ?: myScript }
 
-        for (unit in myScript.units) {
-          try {
-            val result = unit.execute(editor, context)
-            if (result is ExecutionResult.Error) {
-              finalResult = ExecutionResult.Error
-              if (indicateErrors) {
-                VimPlugin.indicateError()
-              }
-            }
-          } catch (e: ExException) {
-            if (e is FinishException) {
-              break
-            }
+      for (unit in myScript.units) {
+        try {
+          val result = unit.execute(editor, context)
+          if (result is ExecutionResult.Error) {
             finalResult = ExecutionResult.Error
             if (indicateErrors) {
-              VimPlugin.showMessage(e.message)
-              VimPlugin.indicateError()
-            } else {
-              logger.warn("Failed while executing $unit. " + e.message)
-            }
-          } catch (e: NotImplementedError) {
-            if (indicateErrors) {
-              VimPlugin.showMessage("Not implemented yet :(")
               VimPlugin.indicateError()
             }
-          } catch (e: Exception) {
-            logger.warn("Caught: ${e.message}")
-            logger.warn(e.stackTrace.toString())
-            if (injector.application.isUnitTest()) {
-              throw e
-            }
+          }
+        } catch (e: ExException) {
+          if (e is FinishException) {
+            break
+          }
+          finalResult = ExecutionResult.Error
+          if (indicateErrors) {
+            VimPlugin.showMessage(e.message)
+            VimPlugin.indicateError()
+          } else {
+            logger.warn("Failed while executing $unit. " + e.message)
+          }
+        } catch (e: NotImplementedError) {
+          if (indicateErrors) {
+            VimPlugin.showMessage("Not implemented yet :(")
+            VimPlugin.indicateError()
+          }
+        } catch (e: Exception) {
+          logger.warn("Caught: ${e.message}")
+          logger.warn(e.stackTrace.toString())
+          if (injector.application.isUnitTest()) {
+            throw e
           }
         }
-
-        if (!skipHistory) {
-          VimPlugin.getHistory().addEntry(HistoryConstants.COMMAND, script)
-          if (myScript.units.size == 1 && myScript.units[0] is Command && myScript.units[0] !is RepeatCommand) {
-            VimPlugin.getRegister().storeTextSpecial(LAST_COMMAND_REGISTER, script)
-          }
-        }
-        return finalResult
-      } finally {
-        injector.vimscriptExecutor.executingVimscript = false
-
-        // Initialize any extensions that were enabled during execution of this vimscript
-        // See the doc of this function for details
-        VimExtensionRegistrar.enableDelayedExtensions()
       }
+
+      if (!skipHistory) {
+        VimPlugin.getHistory().addEntry(HistoryConstants.COMMAND, script)
+        if (myScript.units.size == 1 && myScript.units[0] is Command && myScript.units[0] !is RepeatCommand) {
+          VimPlugin.getRegister().storeTextSpecial(LAST_COMMAND_REGISTER, script)
+        }
+      }
+      return finalResult
+    } finally {
+      injector.vimscriptExecutor.executingVimscript = false
+
+      // Initialize any extensions that were enabled during execution of this vimscript
+      // See the doc of this function for details
+      VimExtensionRegistrar.enableDelayedExtensions()
     }
   }
 
