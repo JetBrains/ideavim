@@ -1203,10 +1203,10 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     @Override
     public void documentChanged(@NotNull DocumentEvent event) {
-      // TODO: Confirm context in CWM scenario
-      // The document could have been changed by local or remote users
-
-      // Loop over all local editors for the changed document, across all projects, and update search highlights
+      // Loop over all local editors for the changed document, across all projects, and update search highlights.
+      // Note that the change may have come from a remote guest in Code With Me scenarios (in which case
+      // ClientId.current will be a guest ID), but we don't care - we still need to add/remove highlights for the
+      // changed text. Make sure we only update local editors, though.
       final Document document = event.getDocument();
       for (VimEditor vimEditor : injector.getEditorGroup().localEditors(new IjVimDocument(document))) {
         final Editor editor = ((IjVimEditor)vimEditor).getEditor();
