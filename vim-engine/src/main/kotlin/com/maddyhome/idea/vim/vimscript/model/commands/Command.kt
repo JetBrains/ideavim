@@ -61,13 +61,10 @@ public sealed class Command(public var commandRanges: Ranges, public val command
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     checkRanges(editor)
     checkArgument(editor)
-    injector.application.runWriteAction {
-      if (editor.nativeCarets().any { it.hasSelection() } && Flag.SAVE_VISUAL !in argFlags.flags) {
-        editor.removeSelection()
-        editor.removeSecondaryCarets()
-      }
+    if (editor.nativeCarets().any { it.hasSelection() } && Flag.SAVE_VISUAL !in argFlags.flags) {
+      editor.removeSelection()
+      editor.removeSecondaryCarets()
     }
-
     if (argFlags.access == Access.WRITABLE && !editor.isDocumentWritable()) {
       logger.info("Trying to modify readonly document")
       return ExecutionResult.Error
