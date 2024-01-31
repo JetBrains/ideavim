@@ -130,7 +130,7 @@ public object VimRcService {
   }
 
   @JvmStatic
-  public fun executeIdeaVimRc(editor: VimEditor) {
+  public fun executeIdeaVimRc(editor: VimEditor, callback: () -> Unit = {}) {
     injector.application.executeOnPooledThread {
       val ideaVimRc = findIdeaVimRc()
       if (ideaVimRc != null) {
@@ -139,6 +139,7 @@ public object VimRcService {
       } else {
         logger.info("ideavimrc file isn't found")
       }
+      callback()
     }
   }
 

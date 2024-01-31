@@ -41,6 +41,8 @@ import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -277,12 +279,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     LOG.debug("done");
   }
 
-  private void registerIdeavimrc(VimEditor editor) {
+  private void registerIdeavimrc(VimEditor editor, Function0<Unit> callback) {
     if (ideavimrcRegistered) return;
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      executeIdeaVimRc(editor);
+      executeIdeaVimRc(editor, callback);
     }
   }
 
@@ -331,11 +333,16 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // 4) ~/.ideavimrc execution
     // Evaluate in the context of the fallback window, to capture local option state, to copy to the first editor window
-    registerIdeavimrc(VimInjectorKt.getInjector().getFallbackWindow());
+    registerIdeavimrc(VimInjectorKt.getInjector().getFallbackWindow(), new Function0() {
+      @Override
+      public Object invoke() {
+        // Turing on should be performed after all commands registration
+        getSearch().turnOn();
+        VimListenerManager.INSTANCE.turnOn();
+        return null;
+      }
+    });
 
-    // Turing on should be performed after all commands registration
-    getSearch().turnOn();
-    VimListenerManager.INSTANCE.turnOn();
   }
 
   private void turnOffPlugin(boolean unsubscribe) {
