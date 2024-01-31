@@ -116,6 +116,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       """.trimIndent()
     }
     gradle {
+      name = "Run tests"
+      tasks = "test"
+    }
+    gradle {
       name = "Publish release"
       tasks = "publishPlugin"
     }
