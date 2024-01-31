@@ -36,9 +36,7 @@ import java.awt.Color
  * behaviour, e.g. handling selection updates during mouse drag.
  */
 internal fun Caret.forceBarCursor() {
-  injector.application.invokeLater {
-    editor.caretModel.primaryCaret.visualAttributes = BAR
-  }
+  editor.caretModel.primaryCaret.visualAttributes = BAR
 }
 
 internal fun Editor.updateCaretsVisualAttributes() {
@@ -56,9 +54,7 @@ internal fun Editor.updateCaretsVisualAttributes() {
  * Used when Vim emulation is disabled
  */
 internal fun Editor.removeCaretsVisualAttributes() {
-  injector.application.invokeLater {
-    caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
-  }
+  caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
 }
 
 internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
@@ -87,24 +83,20 @@ private fun Editor.guicursorMode(): GuiCursorMode {
 private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance().isBlockCursor
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
-  injector.application.invokeLater {
-    if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
-    caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
+  if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
+  caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
 
-    // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
-    (this as? EditorEx)?.setCaretVisible(true)
-  }
+  // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
+  (this as? EditorEx)?.setCaretVisible(true)
 }
 
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
-  injector.application.invokeLater {
-    if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
-    // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
-    val attributes = if (this.vim.inBlockSelection) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
-    this.caretModel.allCarets.forEach {
-      if (it != this.caretModel.primaryCaret) {
-        it.visualAttributes = attributes
-      }
+  if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
+  // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
+  val attributes = if (this.vim.inBlockSelection) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
+  this.caretModel.allCarets.forEach {
+    if (it != this.caretModel.primaryCaret) {
+      it.visualAttributes = attributes
     }
   }
 }
