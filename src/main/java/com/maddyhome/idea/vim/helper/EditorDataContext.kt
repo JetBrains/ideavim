@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
+import com.maddyhome.idea.vim.api.injector
 
 internal class EditorDataContext @Deprecated("Please use `init` method") constructor(
   private val editor: Editor,
@@ -51,15 +52,17 @@ internal class EditorDataContext @Deprecated("Please use `init` method") constru
     @Suppress("DEPRECATION")
     @JvmStatic
     fun init(editor: Editor, contextDelegate: DataContext? = null): EditorDataContext {
-      val editorContext = EditorUtil.getEditorDataContext(editor)
-      return if (contextDelegate is EditorDataContext) {
-        if (editor === contextDelegate.editor) {
-          contextDelegate
+      return injector.application.invokeAndWait {
+        val editorContext = EditorUtil.getEditorDataContext(editor)
+        if (contextDelegate is EditorDataContext) {
+          if (editor === contextDelegate.editor) {
+            contextDelegate
+          } else {
+            EditorDataContext(editor, editorContext, contextDelegate.contextDelegate)
+          }
         } else {
-          EditorDataContext(editor, editorContext, contextDelegate.contextDelegate)
+          EditorDataContext(editor, editorContext, contextDelegate)
         }
-      } else {
-        EditorDataContext(editor, editorContext, contextDelegate)
       }
     }
   }
