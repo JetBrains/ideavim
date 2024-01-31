@@ -16,6 +16,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.util.ui.table.JBTableRowEditor
+import com.maddyhome.idea.vim.api.StringListOptionValue
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -34,25 +35,27 @@ public val Editor.fileSize: Int
 internal val Editor.isIdeaVimDisabledHere: Boolean
   get() {
     val ideaVimSupportValue = injector.globalIjOptions().ideavimsupport
-    return disabledInDialog ||
-      (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
-      (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_singleline) && isDatabaseCell()) ||
-      (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_singleline) && isOneLineMode)
+    return (ideaVimDisabledInDialog(ideaVimSupportValue) && isInDialog()) ||
+      !ClientId.isCurrentlyUnderLocalId || // CWM-927
+      (ideaVimDisabledForSingleLine(ideaVimSupportValue) && isSingleLine())
   }
 
-private fun Editor.isDatabaseCell(): Boolean {
-  return isTableCellEditor(this.component)
+private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {
+  return !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog)
+    && !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialoglegacy)
 }
 
-private val Editor.disabledInDialog: Boolean
-  get() {
-    val ideaVimSupportValue = injector.globalIjOptions().ideavimsupport
-    return (
-      !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog) &&
-        !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialoglegacy)
-      ) &&
-      (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
-  }
+private fun ideaVimDisabledForSingleLine(ideaVimSupportValue: StringListOptionValue): Boolean {
+  return !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_singleline)
+}
+
+private fun Editor.isInDialog(): Boolean {
+  return !this.isPrimaryEditor() && !EditorHelper.isFileEditor(this)
+}
+
+private fun Editor.isSingleLine(): Boolean {
+  return isTableCellEditor(this.component) || isOneLineMode
+}
 
 /**
  * Checks if the editor is a primary editor in the main editing area.
