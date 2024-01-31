@@ -11,14 +11,15 @@ import com.google.common.collect.Lists
 import com.intellij.openapi.editor.Editor
 import javax.swing.KeyStroke
 
-internal class TestInputModel private constructor() {
+// Do not remove until it's used in EasyMotion plugin in tests
+public class TestInputModel private constructor() {
   private val myKeyStrokes: MutableList<KeyStroke> = Lists.newArrayList()
-  fun setKeyStrokes(keyStrokes: List<KeyStroke>) {
+  public fun setKeyStrokes(keyStrokes: List<KeyStroke>) {
     myKeyStrokes.clear()
     myKeyStrokes.addAll(keyStrokes)
   }
 
-  fun nextKeyStroke(): KeyStroke? {
+  public fun nextKeyStroke(): KeyStroke? {
     // Return key from the unfinished mapping
     /*
 MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();
@@ -33,9 +34,9 @@ if (mappingStack.hasStroke()) {
     }
   }
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun getInstance(editor: Editor): TestInputModel {
+    public fun getInstance(editor: Editor): TestInputModel {
       var model = editor.vimTestInputModel
       if (model == null) {
         model = TestInputModel()
