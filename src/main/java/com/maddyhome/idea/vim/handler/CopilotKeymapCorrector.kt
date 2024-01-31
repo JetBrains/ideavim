@@ -9,42 +9,70 @@
 package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapManagerListener
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
-import com.intellij.util.SingleAlarm
+import com.intellij.openapi.startup.ProjectActivity
 import com.jetbrains.rd.util.ConcurrentHashMap
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 
 
 // We use alarm with delay to avoid many actions in case many events are fired at the same time
-// [VERSION UPDATE] 2023.3+ Replace SingleAlarm with coroutine flows https://youtrack.jetbrains.com/articles/IJPL-A-8/Alarm-Alternative
-internal val correctorRequester = SingleAlarm({ correctCopilotKeymap() }, 1_000)
+internal val correctorRequester = MutableSharedFlow<Unit>(replay=1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 private val LOG = logger<CopilotKeymapCorrector>()
 
-internal class CopilotKeymapCorrector : StartupActivity {
-  override fun runActivity(project: Project) {
-    correctorRequester.request()
+internal class CopilotKeymapCorrector : ProjectActivity {
+  override suspend fun execute(project: Project) {
+    project.service<CopilotKeymapCorrectorService>().start()
+    correctorRequester.emit(Unit)
   }
 }
 
+/**
+ * At the moment of release 2023.3 there is a problem that starting a coroutine like this
+ *   right in the project activity will block this project activity in tests.
+ * To avoid that, there is an intermediate service that will allow to avoid this issue.
+ *
+ * However, in general we should start this coroutine right in the [CopilotKeymapCorrector]
+ */
+@OptIn(FlowPreview::class)
+@Service(Service.Level.PROJECT)
+internal class CopilotKeymapCorrectorService(private val cs: CoroutineScope) {
+  fun start() {
+    cs.launch {
+      correctorRequester
+        .debounce(5_000)
+        .collectLatest { correctCopilotKeymap() }
+    }
+  }
+}
+
+
 internal class IdeaVimCorrectorKeymapChangedListener : KeymapManagerListener {
   override fun activeKeymapChanged(keymap: Keymap?) {
-    correctorRequester.request()
+    check(correctorRequester.tryEmit(Unit))
   }
 
   override fun shortcutChanged(keymap: Keymap, actionId: String) {
-    correctorRequester.request()
+    check(correctorRequester.tryEmit(Unit))
   }
 
   override fun shortcutChanged(keymap: Keymap, actionId: String, fromSettings: Boolean) {
-    correctorRequester.request()
+    check(correctorRequester.tryEmit(Unit))
   }
 }
 

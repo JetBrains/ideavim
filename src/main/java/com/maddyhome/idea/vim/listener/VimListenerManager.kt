@@ -134,14 +134,14 @@ internal object VimListenerManager {
   fun turnOn() {
     GlobalListeners.enable()
     EditorListeners.addAll()
-    correctorRequester.request()
+    check(correctorRequester.tryEmit(Unit))
     check(keyCheckRequests.tryEmit(Unit))
   }
 
   fun turnOff() {
     GlobalListeners.disable()
     EditorListeners.removeAll()
-    correctorRequester.request()
+    check(correctorRequester.tryEmit(Unit))
   }
 
   object GlobalListeners {
