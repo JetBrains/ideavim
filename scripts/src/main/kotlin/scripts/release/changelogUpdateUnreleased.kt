@@ -8,6 +8,7 @@
 
 package scripts.release
 
+import com.vdurmont.semver4j.Semver
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.io.path.Path
@@ -27,13 +28,21 @@ fun main(args: Array<String>) {
 
   val changelogPath = Path("$rootDir/CHANGES.md")
   val changelog = changelogPath.readText()
-  val newChangelog = if (toBeReleased in changelog) {
-    changelog.replace(toBeReleased, newItem)
-  } else {
-    val firstEntry = changelog.indexOf("##")
+  val newChangelog = if (releaseType == "patch") {
+    val decreasedVersion = Semver(newVersion).withIncPatch(-1)
+    val firstEntry = changelog.indexOf("## $decreasedVersion")
     val newLog = StringBuilder(changelog)
     newLog.insert(firstEntry, newItem + "\n")
     newLog.toString()
+  } else {
+    if (toBeReleased in changelog) {
+      changelog.replace(toBeReleased, newItem)
+    } else {
+      val firstEntry = changelog.indexOf("##")
+      val newLog = StringBuilder(changelog)
+      newLog.insert(firstEntry, newItem + "\n")
+      newLog.toString()
+    }
   }
   changelogPath.writeText(newChangelog)
 }
