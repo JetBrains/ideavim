@@ -119,12 +119,10 @@ internal class Executor : VimScriptExecutorBase() {
   private fun ensureFileIsSaved(file: File) {
     val documentManager = FileDocumentManager.getInstance()
 
-    injector.application.invokeAndWait {
-      VirtualFileManager.getInstance().findFileByNioPath(file.toPath())
-        ?.let(documentManager::getCachedDocument)
-        ?.takeIf(documentManager::isDocumentUnsaved)
-        ?.let(documentManager::saveDocumentAsIs)
-    }
+    VirtualFileManager.getInstance().findFileByNioPath(file.toPath())
+      ?.let(documentManager::getCachedDocument)
+      ?.takeIf(documentManager::isDocumentUnsaved)
+      ?.let(documentManager::saveDocumentAsIs)
   }
 
   @Throws(ExException::class)
