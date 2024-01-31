@@ -23,6 +23,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-3273](https://youtrack.jetbrains.com/issue/VIM-3273) Config file stopped working
+
 ## 2.8.0, 2024-01-30
 
 ### Fixes:
