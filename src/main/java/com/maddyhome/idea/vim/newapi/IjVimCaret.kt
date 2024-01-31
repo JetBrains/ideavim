@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
@@ -88,7 +89,7 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)
   override val offset: Offset
-    get() = caret.offset.offset
+    get() = injector.application.runReadAction { caret.offset.offset }
   override var vimLastColumn: Int
     get() = caret.vimLastColumn
     set(value) {

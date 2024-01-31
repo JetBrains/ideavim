@@ -432,57 +432,59 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param mode    The mode - indicate insert or replace
    */
   override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
-    val state = getInstance(editor)
-    for (caret in editor.nativeCarets()) {
-      caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
-      injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset.point)
-    }
-    val cmd = state.executingCommand
-    if (cmd != null && state.isDotRepeatInProgress) {
-      state.mode = mode
-      if (mode == Mode.REPLACE) {
-        editor.insertMode = false
+    injector.application.invokeAndWait {
+      val state = getInstance(editor)
+      for (caret in editor.nativeCarets()) {
+        caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
+        injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset.point)
       }
-      if (cmd.flags.contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
-        val commandState = getInstance(editor)
-        repeatInsert(
-          editor,
-          context,
-          1,
-          false,
-          OperatorArguments(false, 1, commandState.mode),
-        )
+      val cmd = state.executingCommand
+      if (cmd != null && state.isDotRepeatInProgress) {
+        state.mode = mode
+        if (mode == Mode.REPLACE) {
+          editor.insertMode = false
+        }
+        if (cmd.flags.contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
+          val commandState = getInstance(editor)
+          repeatInsert(
+            editor,
+            context,
+            1,
+            false,
+            OperatorArguments(false, 1, commandState.mode),
+          )
+        } else {
+          val commandState = getInstance(editor)
+          repeatInsert(
+            editor,
+            context,
+            cmd.count,
+            false,
+            OperatorArguments(false, cmd.count, commandState.mode),
+          )
+        }
+        if (mode == Mode.REPLACE) {
+          editor.insertMode = true
+        }
+        state.mode = Mode.NORMAL()
       } else {
-        val commandState = getInstance(editor)
-        repeatInsert(
-          editor,
-          context,
-          cmd.count,
-          false,
-          OperatorArguments(false, cmd.count, commandState.mode),
-        )
+        lastInsert = cmd
+        strokes.clear()
+        repeatCharsCount = 0
+        val myVimDocument = vimDocument
+        if (myVimDocument != null && vimDocumentListener != null) {
+          myVimDocument.removeChangeListener(vimDocumentListener!!)
+        }
+        vimDocument = editor.document
+        val myChangeListener = VimChangesListener()
+        vimDocumentListener = myChangeListener
+        vimDocument!!.addChangeListener(myChangeListener)
+        oldOffset = editor.currentCaret().offset.point
+        editor.insertMode = mode == Mode.INSERT
+        state.mode = mode
       }
-      if (mode == Mode.REPLACE) {
-        editor.insertMode = true
-      }
-      state.mode = Mode.NORMAL()
-    } else {
-      lastInsert = cmd
-      strokes.clear()
-      repeatCharsCount = 0
-      val myVimDocument = vimDocument
-      if (myVimDocument != null && vimDocumentListener != null) {
-        myVimDocument.removeChangeListener(vimDocumentListener!!)
-      }
-      vimDocument = editor.document
-      val myChangeListener = VimChangesListener()
-      vimDocumentListener = myChangeListener
-      vimDocument!!.addChangeListener(myChangeListener)
-      oldOffset = editor.currentCaret().offset.point
-      editor.insertMode = mode == Mode.INSERT
-      state.mode = mode
+      notifyListeners(editor)
     }
-    notifyListeners(editor)
   }
 
   override fun runEnterAction(editor: VimEditor, context: ExecutionContext) {

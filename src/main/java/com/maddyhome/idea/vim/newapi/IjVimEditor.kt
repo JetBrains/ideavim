@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
@@ -428,7 +429,9 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 
   override fun createLiveMarker(start: Offset, end: Offset): LiveRange {
-    return editor.document.createRangeMarker(start.point, end.point).vim
+    return injector.application.runReadAction {
+      editor.document.createRangeMarker(start.point, end.point).vim
+    }
   }
 
   /**
