@@ -982,15 +982,12 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
     else {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
-      injector.getApplication().invokeAndWait(() -> {
-        final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-        ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
-        exEntryPanel.activate(editor, ((IjEditorExecutionContext)context).getContext(), MessageHelper.message("replace.with.0", match), "", 1);
-        new IjVimCaret(caret).moveToOffset(startoff);
-        ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
-        exEntryPanel.deactivate(true, false);
-        return null;
-      });
+      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
+      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
+      exEntryPanel.activate(editor, ((IjEditorExecutionContext)context).getContext(), MessageHelper.message("replace.with.0", match), "", 1);
+      new IjVimCaret(caret).moveToOffset(startoff);
+      ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
+      exEntryPanel.deactivate(true, false);
     }
     return result.get();
   }

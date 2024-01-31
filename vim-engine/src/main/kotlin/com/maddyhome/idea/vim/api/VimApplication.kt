@@ -14,8 +14,6 @@ public interface VimApplication {
   public fun isMainThread(): Boolean
   public fun invokeLater(action: () -> Unit, editor: VimEditor)
   public fun invokeLater(action: () -> Unit)
-  public fun <T> invokeAndWait(action: () -> T): T
-  public fun executeOnPooledThread(action: () -> Unit)
   public fun isUnitTest(): Boolean
   public fun postKey(stroke: KeyStroke, editor: VimEditor)
 

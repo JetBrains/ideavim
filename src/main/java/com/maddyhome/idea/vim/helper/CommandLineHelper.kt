@@ -52,30 +52,28 @@ internal class CommandLineHelper : VimCommandLineHelper {
     } else {
       var text: String? = null
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
-      injector.application.invokeAndWait {
-        val exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts()
-        exEntryPanel.activate(editor, injector.executionContextManager.onEditor(editor.vim).ij, prompt.ifEmpty { " " }, "", 1)
-        ModalEntry.activate(editor.vim) { key: KeyStroke ->
-          return@activate when {
-            key.isCloseKeyStroke() -> {
-              exEntryPanel.deactivate(true)
-              false
-            }
-            key.keyCode == KeyEvent.VK_ENTER -> {
-              text = exEntryPanel.text
-              exEntryPanel.deactivate(true)
-              false
-            }
-            finishOn != null && key.keyChar == finishOn -> {
-              exEntryPanel.handleKey(key)
-              text = exEntryPanel.text
-              exEntryPanel.deactivate(true)
-              false
-            }
-            else -> {
-              exEntryPanel.handleKey(key)
-              true
-            }
+      val exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts()
+      exEntryPanel.activate(editor, injector.executionContextManager.onEditor(editor.vim).ij, prompt.ifEmpty { " " }, "", 1)
+      ModalEntry.activate(editor.vim) { key: KeyStroke ->
+        return@activate when {
+          key.isCloseKeyStroke() -> {
+            exEntryPanel.deactivate(true)
+            false
+          }
+          key.keyCode == KeyEvent.VK_ENTER -> {
+            text = exEntryPanel.text
+            exEntryPanel.deactivate(true)
+            false
+          }
+          finishOn != null && key.keyChar == finishOn -> {
+            exEntryPanel.handleKey(key)
+            text = exEntryPanel.text
+            exEntryPanel.deactivate(true)
+            false
+          }
+          else -> {
+            exEntryPanel.handleKey(key)
+            true
           }
         }
       }
