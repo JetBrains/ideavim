@@ -16,7 +16,6 @@ import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
-import com.intellij.util.childScope
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.Option
@@ -52,7 +51,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
     @Suppress("DEPRECATION")
-    manager = FileEditorManagerImpl(fixture.project, fixture.project.coroutineScope.childScope())
+    manager = FileEditorManagerImpl(fixture.project, fixture.project.coroutineScope)
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     // Create a new editor that will represent a new buffer in a separate window. It will have default values
