@@ -15,8 +15,7 @@ fun main(args: Array<String>) {
 
   withGit(rootDir) { git ->
     val branchName = when (releaseType) {
-      "major", "minor" -> "master"
-      "patch" -> "release"
+      "major", "minor", "patch" -> "release"
       else -> error("Unsupported release type: $releaseType")
     }
 

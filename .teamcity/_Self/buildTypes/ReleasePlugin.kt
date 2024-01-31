@@ -65,9 +65,12 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Pull git history"
       scriptContent = "git fetch --unshallow"
     }
-    gradle {
-      name = "Select branch"
-      tasks = "scripts:selectBranch"
+    script {
+      name = "Checkout release branch"
+      scriptContent = """
+      echo Checkout release
+      git checkout release
+      """.trimIndent()
     }
     gradle {
       name = "Calculate new version"
@@ -76,6 +79,25 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
+    }
+    script {
+      name = "Checkout master branch"
+      scriptContent = """
+      echo Checkout master
+      git checkout master
+      """.trimIndent()
+    }
+    gradle {
+      name = "Update change log in master"
+      tasks = "scripts:changelogUpdateUnreleased"
+    }
+    gradle {
+      name = "Commit preparation changes in master"
+      tasks = "scripts:commitChanges"
+    }
+    gradle {
+      name = "Select branch"
+      tasks = "scripts:selectBranch"
     }
     gradle {
       name = "Update change log"
@@ -88,32 +110,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
-    }
-    script {
-      name = "Reset release branch"
-      //language=Shell Script
-      scriptContent = """
-        if [ "major" = $releaseType ] || [ "minor" = $releaseType ] || [ "patch" = $releaseType ]
-        then
-          branch=${'$'}(git branch --show-current)  
-          echo current branch is ${'$'}branch
-          
-          if [ $releaseType != "patch" ]
-          then
-            commit=${'$'}(git rev-parse HEAD)
-            git checkout release
-            echo Checked out release branch
-            git reset --hard ${'$'}commit
-            echo Release branch reset
-            git checkout master
-            echo Checked out master
-          else
-            echo Skip release branch reset because release type is patch
-          fi
-        else
-          echo This function accepts only major, minor, or patch as release type. Current value: $releaseType
-        fi
-      """.trimIndent()
     }
     gradle {
       name = "Run tests"
@@ -136,15 +132,13 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       git push origin --tags
       git push origin
       
-      if [ "patch" != $releaseType  ];
-      then
-        git checkout release
-        echo checkout release branch
-        git branch --set-upstream-to=origin/release release
-        git push --tags
-        git push origin --force
-      fi
+      git checkout release
+      echo checkout release branch
+      git branch --set-upstream-to=origin/release release
+      git push --tags
+      git push origin
       
+      echo Checkout master
       git checkout ${'$'}branch
       """.trimIndent()
     }

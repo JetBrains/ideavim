@@ -13,11 +13,6 @@ fun main(args: Array<String>) {
 
   checkReleaseType(releaseType)
 
-  if (releaseType == "patch") {
-    println("Skip committing changes because release type is 'patch'")
-    return
-  }
-
   withGit(rootDir) { git ->
     git
       .commit()
