@@ -66,9 +66,7 @@ internal object ShowCmd {
 
 internal object ShowCmdOptionChangeListener : GlobalOptionChangeListener {
   override fun onGlobalOptionChanged() {
-    injector.application.invokeLater {
-      ShowCmd.update()
-    }
+    ShowCmd.update()
   }
 }
 

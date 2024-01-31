@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.ui.widgets
 
-import com.intellij.util.application
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
@@ -19,20 +18,14 @@ public class VimWidgetListener(private val updateWidget: Runnable) : GlobalOptio
   }
 
   override fun onGlobalOptionChanged() {
-    application.invokeLater {
-      updateWidget.run()
-    }
+    updateWidget.run()
   }
 
   override fun turnedOn() {
-    application.invokeLater {
-      updateWidget.run()
-    }
+    updateWidget.run()
   }
 
   override fun turnedOff() {
-    application.invokeLater {
-      updateWidget.run()
-    }
+    updateWidget.run()
   }
 }
