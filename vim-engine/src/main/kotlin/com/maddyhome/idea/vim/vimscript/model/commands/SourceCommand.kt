@@ -25,18 +25,16 @@ import java.io.File
  */
 @ExCommand(command = "so[urce]")
 public data class SourceCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val path = expandUser(argument.trim())
     val file = File(path)
-    injector.application.executeOnPooledThread {
-      injector.vimscriptExecutor.executeFile(
-        file,
-        editor,
-        VimRcService.isIdeaVimRcFile(file),
-        vimContext.getFirstParentContext() is CommandLineVimLContext
-      )
-    }
+    injector.vimscriptExecutor.executeFile(
+      file,
+      editor,
+      VimRcService.isIdeaVimRcFile(file),
+      vimContext.getFirstParentContext() is CommandLineVimLContext
+    )
 
     injector.statisticsService.addSourcedFile(path)
     return ExecutionResult.Success

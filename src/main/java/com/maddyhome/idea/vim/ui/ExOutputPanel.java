@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.ui;
 
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
@@ -292,7 +293,7 @@ public class ExOutputPanel extends JPanel {
   }
 
   private void close(final @Nullable KeyEvent e) {
-    injector.getApplication().invokeLater(() -> {
+    ApplicationManager.getApplication().invokeLater(() -> {
       deactivate(true);
 
       final Project project = myEditor.getProject();
@@ -307,13 +308,8 @@ public class ExOutputPanel extends JPanel {
         }
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
         ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(myEditor), null);
-
-        injector.getApplication().runWriteAction(() -> {
-          VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
-          return null;
-        });
+        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
       }
-      return null;
     });
   }
 
