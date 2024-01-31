@@ -21,9 +21,6 @@ import com.maddyhome.idea.vim.api.VimEditor
  * This function will always be called before [EffectiveOptionValueChangeListener.onEffectiveValueChanged].
  */
 public fun interface GlobalOptionChangeListener {
-  /**
-   * Note: This method may not be invoked from the Event Dispatch Thread (EDT). It is the responsibility of the implementation to manage UI updates accordingly.
-   */
   public fun onGlobalOptionChanged()
 }
 
@@ -40,8 +37,5 @@ public fun interface GlobalOptionChangeListener {
  * buffer or window's editor(s)).
  */
 public fun interface EffectiveOptionValueChangeListener {
-  /**
-   * Note: This method may not be invoked from the Event Dispatch Thread (EDT). It is the responsibility of the implementation to manage UI updates accordingly.
-   */
   public fun onEffectiveValueChanged(editor: VimEditor)
 }

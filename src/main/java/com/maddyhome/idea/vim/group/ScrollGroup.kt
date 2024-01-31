@@ -260,9 +260,7 @@ internal class ScrollGroup : VimScrollGroup {
     override fun onEffectiveValueChanged(editor: VimEditor) {
       editor.ij.apply {
         if (vimEditorGroup) {
-          injector.application.invokeLater {
-            ScrollViewHelper.scrollCaretIntoView(this)
-          }
+          ScrollViewHelper.scrollCaretIntoView(this)
         }
       }
     }
