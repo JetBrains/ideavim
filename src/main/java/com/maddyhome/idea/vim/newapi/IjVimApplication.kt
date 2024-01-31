@@ -21,7 +21,6 @@ import java.awt.Component
 import java.awt.Toolkit
 import java.awt.Window
 import java.awt.event.KeyEvent
-import java.util.concurrent.atomic.AtomicReference
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
@@ -38,22 +37,6 @@ internal class IjVimApplication : VimApplicationBase() {
 
   override fun invokeLater(action: () -> Unit) {
     ApplicationManager.getApplication().invokeLater(action)
-  }
-
-  override fun <T> invokeAndWait(action: () -> T): T {
-    if (ApplicationManager.getApplication().isDispatchThread) {
-      return action()
-    } else {
-      val result = AtomicReference<T>()
-      ApplicationManager.getApplication().invokeAndWait {
-        result.set(action())
-      }
-      return result.get()
-    }
-  }
-
-  override fun executeOnPooledThread(action: () -> Unit) {
-    ApplicationManager.getApplication().executeOnPooledThread(action)
   }
 
   override fun isUnitTest(): Boolean {
@@ -84,15 +67,7 @@ internal class IjVimApplication : VimApplicationBase() {
   }
 
   override fun <T> runWriteAction(action: () -> T): T {
-    if (ApplicationManager.getApplication().isDispatchThread) {
-      return ApplicationManager.getApplication().runWriteAction(Computable(action))
-    } else {
-      val result = AtomicReference<T>()
-      ApplicationManager.getApplication().invokeAndWait {
-        result.set(ApplicationManager.getApplication().runWriteAction(Computable(action)))
-      }
-      return result.get()
-    }
+    return ApplicationManager.getApplication().runWriteAction(Computable(action))
   }
 
   override fun <T> runReadAction(action: () -> T): T {
