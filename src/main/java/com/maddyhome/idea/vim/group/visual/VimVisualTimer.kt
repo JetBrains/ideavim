@@ -52,12 +52,13 @@ import javax.swing.Timer
  *   editorHasSelection is false. Insert mode ([mode]) has no selection and editor also has no selection, so
  *   no adjustment gets performed and IdeaVim stays in insert mode.
  */
-internal object VimVisualTimer {
+// Do not remove until it's used in EasyMotion plugin in tests
+public object VimVisualTimer {
 
-  var swingTimer: Timer? = null
-  var mode: Mode? = null
+  public var swingTimer: Timer? = null
+  public var mode: Mode? = null
 
-  inline fun singleTask(currentMode: Mode, crossinline task: (initialMode: Mode?) -> Unit) {
+  public inline fun singleTask(currentMode: Mode, crossinline task: (initialMode: Mode?) -> Unit) {
     swingTimer?.stop()
 
     if (mode == null) mode = currentMode
@@ -69,7 +70,7 @@ internal object VimVisualTimer {
     swingTimer = timer
   }
 
-  fun doNow() {
+  public fun doNow() {
     val swingTimer1 = swingTimer
     if (swingTimer1 != null) {
       swingTimer1.stop()
@@ -79,12 +80,12 @@ internal object VimVisualTimer {
     }
   }
 
-  fun drop() {
+  public fun drop() {
     swingTimer?.stop()
     swingTimer = null
   }
 
-  inline fun timerAction(task: (initialMode: Mode?) -> Unit) {
+  public inline fun timerAction(task: (initialMode: Mode?) -> Unit) {
     task(mode)
     swingTimer = null
     mode = null
