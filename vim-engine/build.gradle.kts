@@ -73,6 +73,11 @@ kotlin {
     explicitApi()
 }
 
+java {
+  withSourcesJar()
+  withJavadocJar()
+}
+
 val spaceUsername: String by project
 val spacePassword: String by project
 val engineVersion: String by project
