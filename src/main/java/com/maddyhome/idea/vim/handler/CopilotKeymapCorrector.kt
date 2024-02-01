@@ -67,7 +67,6 @@ private fun correctCopilotKeymap() {
   // This is needed to initialize the injector in case this verification is called to fast
   VimPlugin.getInstance()
 
-  if (!enableOctopus) return
   if (injector.enabler.isEnabled()) {
     val keymap = KeymapManagerEx.getInstanceEx().activeKeymap
     val res = keymap.getShortcuts("copilot.disposeInlays")

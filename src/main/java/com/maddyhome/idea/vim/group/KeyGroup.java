@@ -46,7 +46,6 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -227,12 +226,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
     for (KeyStroke key : keys) {
-      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        if (!injector.getOptionGroup().getGlobalOptions().getOctopushandler() ||
-            !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
-            !(key.getKeyCode() == KeyEvent.VK_ENTER && key.getModifiers() == 0)) {
-          getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
-        }
+      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED &&
+          !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
+          !(key.getKeyCode() == KeyEvent.VK_ENTER && key.getModifiers() == 0)) {
+        getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
       }
     }
   }

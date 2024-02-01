@@ -166,14 +166,11 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   private fun registerKeyMapping(fromKeys: List<KeyStroke>, owner: MappingOwner) {
     val oldSize = requiredShortcutKeys.size
     for (key in fromKeys) {
-      if (key.keyChar == KeyEvent.CHAR_UNDEFINED) {
-        if (
-          !injector.globalOptions().octopushandler ||
-          !(key.keyCode == KeyEvent.VK_ESCAPE && key.modifiers == 0) &&
-          !(key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0)
-        ) {
-          requiredShortcutKeys.add(RequiredShortcut(key, owner))
-        }
+      if (key.keyChar == KeyEvent.CHAR_UNDEFINED &&
+        !(key.keyCode == KeyEvent.VK_ESCAPE && key.modifiers == 0) &&
+        !(key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0)
+      ) {
+        requiredShortcutKeys.add(RequiredShortcut(key, owner))
       }
     }
     if (requiredShortcutKeys.size != oldSize) {

@@ -53,7 +53,7 @@ internal val commandContinuation = Key.create<EditorActionHandler>("commandConti
  */
 internal class CaretShapeEnterEditorHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    if (VimPlugin.isEnabled() && enableOctopus) {
+    if (VimPlugin.isEnabled()) {
       invokeLater {
         editor.updateCaretsVisualAttributes()
       }
@@ -244,7 +244,6 @@ internal class VimEscForRiderHandler(nextHandler: EditorActionHandler) : VimKeyH
   override val key: String = "<Esc>"
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
-    if (!enableOctopus) return false
     return LookupManager.getActiveLookup(editor) != null
   }
 }
@@ -260,9 +259,7 @@ internal class VimEscForRiderHandler(nextHandler: EditorActionHandler) : VimKeyH
  */
 internal class VimEscLoggerHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    if (enableOctopus) {
-      LOG.info("Esc pressed")
-    }
+    LOG.info("Esc pressed")
     nextHandler.execute(editor, caret, dataContext)
   }
 
@@ -288,9 +285,7 @@ internal class StartNewLineBeforeCurrentDetector(nextHandler: EditorActionHandle
 
 internal open class StartNewLineDetectorBase(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    if (enableOctopus) {
-      DataManager.getInstance().saveInDataContext(dataContext, Util.key, true)
-    }
+    DataManager.getInstance().saveInDataContext(dataContext, Util.key, true)
     nextHandler.execute(editor, caret, dataContext)
   }
 
@@ -318,9 +313,7 @@ internal open class StartNewLineDetectorBase(private val nextHandler: EditorActi
  */
 internal class VimEnterLoggerHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    if (enableOctopus) {
-      LOG.info("Enter pressed")
-    }
+    LOG.info("Enter pressed")
     nextHandler.execute(editor, caret, dataContext)
   }
 
