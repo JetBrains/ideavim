@@ -13,6 +13,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.lineLength
@@ -22,7 +23,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 import kotlin.math.max
 
-internal class AddInlineInlaysAction : AnAction() {
+internal class AddInlineInlaysAction : AnAction(), ActionRemoteBehaviorSpecification.Disabled {
   companion object {
     private val random = Random()
   }

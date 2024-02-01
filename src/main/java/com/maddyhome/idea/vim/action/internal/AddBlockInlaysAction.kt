@@ -13,6 +13,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorCustomElementRenderer
 import com.intellij.openapi.editor.Inlay
@@ -32,7 +33,7 @@ import java.util.*
 import javax.swing.UIManager
 import kotlin.math.max
 
-internal class AddBlockInlaysAction : AnAction() {
+internal class AddBlockInlaysAction : AnAction(), ActionRemoteBehaviorSpecification.Disabled {
   override fun actionPerformed(e: AnActionEvent) {
     val dataContext = e.dataContext
     val editor = getEditor(dataContext) ?: return

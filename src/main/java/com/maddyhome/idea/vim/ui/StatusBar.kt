@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.application.impl.LaterInvocator
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -145,7 +146,7 @@ internal class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation 
   override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
 }
 
-internal class VimActions : DumbAwareAction() {
+internal class VimActions : DumbAwareAction(), ActionRemoteBehaviorSpecification.Disabled {
 
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return

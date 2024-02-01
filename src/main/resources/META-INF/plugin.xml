@@ -135,6 +135,14 @@
   <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
+  <!--
+
+  IMPORTANT!
+
+  Please make sure that all actions added implement the ActionRemoteBehaviorSpecification.Disabled interface on your
+  action. This will prevent the action from flowing from a Code With Me host to the JetBrains Client
+
+  -->
   <actions resource-bundle="messages.IdeaVimBundle">
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
       <add-to-group group-id="ToolsMenu" anchor="last"/>

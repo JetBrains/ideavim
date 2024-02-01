@@ -26,6 +26,7 @@ import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.util.TextRange
@@ -207,7 +208,7 @@ internal object IdeaSpecifics {
 }
 
 //region Find action ID
-internal class FindActionIdAction : DumbAwareToggleAction() {
+internal class FindActionIdAction : DumbAwareToggleAction(), ActionRemoteBehaviorSpecification.Disabled {
   override fun isSelected(e: AnActionEvent): Boolean = injector.globalIjOptions().trackactionids
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
