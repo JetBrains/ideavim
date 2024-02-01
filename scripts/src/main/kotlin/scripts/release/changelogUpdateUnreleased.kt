@@ -31,9 +31,13 @@ fun main(args: Array<String>) {
   val newChangelog = if (releaseType == "patch") {
     val decreasedVersion = Semver(newVersion).withIncPatch(-1)
     val firstEntry = changelog.indexOf("## $decreasedVersion")
-    val newLog = StringBuilder(changelog)
-    newLog.insert(firstEntry, newItem + "\n")
-    newLog.toString()
+    if (firstEntry != -1) {
+      val newLog = StringBuilder(changelog)
+      newLog.insert(firstEntry, newItem + "\n")
+      newLog.toString()
+    } else {
+      changelog
+    }
   } else {
     if (toBeReleased in changelog) {
       changelog.replace(toBeReleased, newItem)
