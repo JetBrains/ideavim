@@ -16,5 +16,11 @@ changeBuildType(RelativeId("PublishVimEngine")) {
         update {
             password("env.ORG_GRADLE_PROJECT_spacePassword", "credentialsJSON:9b51352f-a9a2-4e19-9d27-2fa2c6dc5ede", display = ParameterDisplay.HIDDEN)
         }
+        expect {
+            param("env.ORG_GRADLE_PROJECT_spaceUsername", "Aleksei.Plate")
+        }
+        update {
+            param("env.ORG_GRADLE_PROJECT_spaceUsername", "a121c67e-39ac-40e6-bf82-649855ec27b6")
+        }
     }
 }
