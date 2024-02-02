@@ -34,6 +34,10 @@ public class VimApplicationStub : VimApplicationBase() {
     TODO("Not yet implemented")
   }
 
+  override fun isInternal(): Boolean {
+    TODO("Not yet implemented")
+  }
+
   override fun postKey(stroke: KeyStroke, editor: VimEditor) {
     TODO("Not yet implemented")
   }

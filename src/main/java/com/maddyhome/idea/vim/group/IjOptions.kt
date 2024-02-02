@@ -33,8 +33,6 @@ public object IjOptions {
     Options.overrideDefaultValue(Options.clipboard, VimString("ideaput,autoselect,exclude:cons\\|linux"))
   }
 
-  public val closenotebooks: ToggleOption = addOption(ToggleOption("closenotebooks", GLOBAL, "closenotebooks", true))
-  public val exCommandAnnotation: ToggleOption = addOption(ToggleOption("excommandannotation", GLOBAL, "excommandannotation", true))
   public val ide: StringOption = addOption(
     StringOption("ide", GLOBAL, "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
   )
@@ -81,13 +79,17 @@ public object IjOptions {
       "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>")
   )
   public val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", GLOBAL, "tai", false))
-  public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true))
   public val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", GLOBAL, "visualdelay", 100))
-  public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isTemporary = true))
-  public val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", GLOBAL, "vimscriptfunctionannotation", true, isTemporary = true))
-  public val commandOrMotionAnnotation: ToggleOption = addOption(ToggleOption("commandormotionannotation", GLOBAL, "commandormotionannotation", true, isTemporary = true))
-  public val showmodewidget: ToggleOption = addOption(ToggleOption("showmodewidget", GLOBAL, "showmodewidget", false, isTemporary = true))
-  public val useNewRegex: ToggleOption = addOption(ToggleOption("usenewregex", GLOBAL, "usenewregex", true, isTemporary = true))
+
+  // Temporary feature flags during development, not really intended for external use
+  public val closenotebooks: ToggleOption = addOption(ToggleOption("closenotebooks", GLOBAL, "closenotebooks", true, isHidden = true))
+  public val commandOrMotionAnnotation: ToggleOption = addOption(ToggleOption("commandormotionannotation", GLOBAL, "commandormotionannotation", true, isHidden = true))
+  public val exCommandAnnotation: ToggleOption = addOption(ToggleOption("excommandannotation", GLOBAL, "excommandannotation", true, isHidden = true))
+  public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isHidden = true))
+  public val showmodewidget: ToggleOption = addOption(ToggleOption("showmodewidget", GLOBAL, "showmodewidget", false, isHidden = true))
+  public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true, isHidden = true))
+  public val useNewRegex: ToggleOption = addOption(ToggleOption("usenewregex", GLOBAL, "usenewregex", true, isHidden = true))
+  public val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", GLOBAL, "vimscriptfunctionannotation", true, isHidden = true))
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>

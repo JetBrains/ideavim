@@ -54,6 +54,8 @@ public open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase
   // This is an experimental option that enables global mode for the editor. However,
   //   for the moment it has issues and there is no quality garantee if this option is enabled
   public var ideaglobalmode: Boolean by optionProperty(Options.ideaglobalmode)
+
+  // Temporary flags for work-in-progress behaviour. Hidden from the output of `:set all`
   public var ideastrictmode: Boolean by optionProperty(Options.ideastrictmode)
   public var ideatracetime: Boolean by optionProperty(Options.ideatracetime)
   public var octopushandler: Boolean by optionProperty(Options.octopushandler)

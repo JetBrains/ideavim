@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
  */
 @Suppress("SpellCheckingInspection")
 public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope) {
-  public var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
   public var ide: String by optionProperty(IjOptions.ide)
   public var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)
   public var ideastatusicon: String by optionProperty(IjOptions.ideastatusicon)
@@ -29,15 +28,16 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
   public val lookupkeys: StringListOptionValue by optionProperty(IjOptions.lookupkeys)
   public var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
   public var visualdelay: Int by optionProperty(IjOptions.visualdelay)
-  public var showmodewidget: Boolean by optionProperty(IjOptions.showmodewidget)
 
   // Temporary options to control work-in-progress behaviour
-  public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
-  public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
-  public var exCommandAnnotation: Boolean by optionProperty(IjOptions.exCommandAnnotation)
-  public var vimscriptFunctionAnnotation: Boolean by optionProperty(IjOptions.vimscriptFunctionAnnotation)
+  public var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
   public var commandOrMotionAnnotation: Boolean by optionProperty(IjOptions.commandOrMotionAnnotation)
+  public var exCommandAnnotation: Boolean by optionProperty(IjOptions.exCommandAnnotation)
+  public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
+  public var showmodewidget: Boolean by optionProperty(IjOptions.showmodewidget)
+  public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
   public var useNewRegex: Boolean by optionProperty(IjOptions.useNewRegex)
+  public var vimscriptFunctionAnnotation: Boolean by optionProperty(IjOptions.vimscriptFunctionAnnotation)
 }
 
 /**
