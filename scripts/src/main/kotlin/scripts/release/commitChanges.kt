@@ -14,15 +14,19 @@ fun main(args: Array<String>) {
   checkReleaseType(releaseType)
 
   withGit(rootDir) { git ->
-    git
-      .commit()
-      .setAll(true)
-      .setAuthor("IdeaVim Bot", "maintainers@ideavim.dev")
-      .setMessage("Preparation to $newVersion release")
-      .setSign(false)
-      .call()
+    if (git.diff().call().isNotEmpty()) {
+      git
+        .commit()
+        .setAll(true)
+        .setAuthor("IdeaVim Bot", "maintainers@ideavim.dev")
+        .setMessage("Preparation to $newVersion release")
+        .setSign(false)
+        .call()
 
-    val lastGitMessage = git.log().call().first().shortMessage
-    println("Changes committed. Last gitlog message: $lastGitMessage")
+      val lastGitMessage = git.log().call().first().shortMessage
+      println("Changes committed. Last gitlog message: $lastGitMessage")
+    } else {
+      println("No Changes")
+    }
   }
 }
