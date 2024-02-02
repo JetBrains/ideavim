@@ -130,6 +130,7 @@ dependencies {
 
     testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
     testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
+    testImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
     testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
     runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
     antlr("org.antlr:antlr4:$antlrVersion")
