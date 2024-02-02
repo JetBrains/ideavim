@@ -15,6 +15,7 @@ public interface VimApplication {
   public fun invokeLater(action: () -> Unit, editor: VimEditor)
   public fun invokeLater(action: () -> Unit)
   public fun isUnitTest(): Boolean
+  public fun isInternal(): Boolean
   public fun postKey(stroke: KeyStroke, editor: VimEditor)
 
   public fun localEditors(): List<VimEditor>

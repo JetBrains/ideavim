@@ -318,9 +318,11 @@ public object Options {
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
   public val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", GLOBAL, "ideaglobalmode", false))
-  public val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false))
-  public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false))
-  public val octopushandler: ToggleOption = addOption(ToggleOption("octopushandler", GLOBAL, "octopushandler", true))
+
+  // Temporary feature flags for work-in-progress behaviour, diagnostic switches, etc. Hidden from the output of `:set all`
+  public val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))
+  public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false, isHidden = true))
+  public val octopushandler: ToggleOption = addOption(ToggleOption("octopushandler", GLOBAL, "octopushandler", true, isHidden = true))
 }
 
 private class MultikeyMap(vararg entries: Option<VimDataType>) {

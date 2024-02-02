@@ -355,8 +355,7 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test show all modified local option and unset global-local values`() {
     assertCommandOutput("setlocal", """
       |--- Local option values ---
-      |--ideajoin            ideastrictmode      sidescrolloff=-1
-      |  idearefactormode=   scrolloff=-1
+      |--ideajoin            idearefactormode=   scrolloff=-1        sidescrolloff=-1
       |--ideacopypreprocess
       |  undolevels=-123456
       |""".trimMargin()
@@ -368,8 +367,8 @@ class SetlocalCommandTest : VimTestCase() {
     enterCommand("setlocal number relativenumber scrolloff=10 nrformats=alpha,hex,octal sidescrolloff=10")
     assertCommandOutput("setlocal", """
       |--- Local option values ---
-      |--ideajoin            ideastrictmode      relativenumber      sidescrolloff=10
-      |  idearefactormode=   number              scrolloff=10
+      |--ideajoin            number              scrolloff=10
+      |  idearefactormode=   relativenumber      sidescrolloff=10
       |--ideacopypreprocess
       |  nrformats=alpha,hex,octal
       |  undolevels=-123456
@@ -382,22 +381,20 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setlocal all", """
       |--- Local option values ---
-      |noargtextobj        noideatracetime       scroll=0          nosurround
-      |  closenotebooks      ideawrite=all       scrolljump=1      notextobj-entire
-      |nocommentary        noignorecase          scrolloff=-1      notextobj-indent
-      |nodigraph           noincsearch           selectmode=         timeout
-      |noexchange          nomatchit             shellcmdflag=-x     timeoutlen=1000
-      |nogdefault            maxmapdepth=20      shellxescape=@    notrackactionids
-      |nohighlightedyank     more                shellxquote={       unifyjumps
-      |  history=50        nomultiple-cursors    showcmd             virtualedit=
-      |nohlsearch          noNERDTree            showmode          novisualbell
-      |noideaglobalmode      nrformats=hex       sidescroll=0        visualdelay=100
-      |--ideajoin          nonumber              sidescrolloff=-1    whichwrap=b,s
-      |  ideamarks           octopushandler    nosmartcase           wrapscan
-      |  idearefactormode=   operatorfunc=     nosneak
-      |  ideastrictmode    norelativenumber      startofline
+      |noargtextobj        noignorecase          scrolloff=-1      notextobj-entire
+      |nocommentary        noincsearch           selectmode=       notextobj-indent
+      |nodigraph           nomatchit             shellcmdflag=-x     timeout
+      |noexchange            maxmapdepth=20      shellxescape=@      timeoutlen=1000
+      |nogdefault            more                shellxquote={     notrackactionids
+      |nohighlightedyank   nomultiple-cursors    showcmd             virtualedit=
+      |  history=50        noNERDTree            showmode          novisualbell
+      |nohlsearch            nrformats=hex       sidescroll=0        visualdelay=100
+      |noideaglobalmode    nonumber              sidescrolloff=-1    whichwrap=b,s
+      |--ideajoin            operatorfunc=     nosmartcase           wrapscan
+      |  ideamarks         norelativenumber    nosneak
+      |  idearefactormode=   scroll=0            startofline
+      |  ideawrite=all       scrolljump=1      nosurround
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
-      |  excommandannotation
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
       |--ideacopypreprocess
@@ -432,7 +429,6 @@ class SetlocalCommandTest : VimTestCase() {
       |--ideacopypreprocess
       |--ideajoin
       |  idearefactormode=
-      |  ideastrictmode
       |  scrolloff=-1
       |  sidescrolloff=-1
       |  undolevels=-123456
@@ -447,11 +443,9 @@ class SetlocalCommandTest : VimTestCase() {
       |--- Local option values ---
       |noargtextobj
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
-      |  closenotebooks
       |nocommentary
       |nodigraph
       |noexchange
-      |  excommandannotation
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |nohighlightedyank
@@ -464,8 +458,6 @@ class SetlocalCommandTest : VimTestCase() {
       |  ideamarks
       |  idearefactormode=
       |  ideastatusicon=enabled
-      |  ideastrictmode
-      |noideatracetime
       |  ideavimsupport=dialog
       |  ideawrite=all
       |noignorecase
@@ -481,7 +473,6 @@ class SetlocalCommandTest : VimTestCase() {
       |noNERDTree
       |  nrformats=hex
       |nonumber
-      |  octopushandler
       |  operatorfunc=
       |norelativenumber
       |noReplaceWithRegister
@@ -508,7 +499,6 @@ class SetlocalCommandTest : VimTestCase() {
       |  timeoutlen=1000
       |notrackactionids
       |  undolevels=-123456
-      |  unifyjumps
       |novim-paragraph-motion
       |  viminfo='100,<50,s10,h
       |  virtualedit=

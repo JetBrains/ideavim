@@ -36,15 +36,15 @@ import java.util.*
  * @param abbrev  An abbreviated name for the option, recognised by `:set`
  * @param defaultValue  The default value of the option, if not set by the user
  * @param unsetValue    The value of the local part of a global-local option, if the local part has not been set
- * @param isTemporary   True for feature-toggle options that will be reviewed in future releases.
- *                      Such options won't be printed in option list.
+ * @param isHidden   True for feature-toggle options that will be reviewed in future releases.
+ *                      Such options won't be printed in the output to `:set`
  */
 public abstract class Option<T : VimDataType>(public val name: String,
                                               public val declaredScope: OptionDeclaredScope,
                                               public val abbrev: String,
                                               defaultValue: T,
                                               public val unsetValue: T,
-                                              public val isTemporary: Boolean = false) {
+                                              public val isHidden: Boolean = false) {
   private var defaultValueField = defaultValue
 
   public open val defaultValue: T
@@ -294,16 +294,24 @@ public open class UnsignedNumberOption(
  * @param declaredScope The declared scope of the option - global, global-local, local-to-buffer, local-to-window
  * @param abbrev  An abbreviated name for the option, recognised by `:set`
  * @param defaultValue The option's default value of the option
+ * @param isHidden   True for feature-toggle options that will be reviewed in future releases.
+ *                   Such options won't be printed in the output to `:set`
  */
-public class ToggleOption(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: VimInt, isTemporary: Boolean = false) :
-  Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE, isTemporary) {
-  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Boolean, isTemporary: Boolean = false) : this(
-    name,
-    declaredScope,
-    abbrev,
-    if (defaultValue) VimInt.ONE else VimInt.ZERO,
-    isTemporary
-  )
+public class ToggleOption(
+  name: String,
+  declaredScope: OptionDeclaredScope,
+  abbrev: String,
+  defaultValue: VimInt,
+  isHidden: Boolean = false,
+) : Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE, isHidden) {
+
+  public constructor(
+    name: String,
+    declaredScope: OptionDeclaredScope,
+    abbrev: String,
+    defaultValue: Boolean,
+    isHidden: Boolean = false,
+  ) : this(name, declaredScope, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO, isHidden)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimInt) throw exExceptionMessage("E474", token)

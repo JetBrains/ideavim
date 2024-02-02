@@ -153,7 +153,7 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set",
       """
         |--- Options ---
-        |  ideastrictmode      number              relativenumber
+        |  number              relativenumber
         |
       """.trimMargin())
   }
@@ -164,22 +164,20 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set all",
       """
         |--- Options ---
-        |noargtextobj          ideawrite=all       scrolljump=1      notextobj-entire
-        |  closenotebooks    noignorecase          scrolloff=0       notextobj-indent
-        |nocommentary        noincsearch           selectmode=         timeout
-        |nodigraph           nomatchit             shellcmdflag=-x     timeoutlen=1000
-        |noexchange            maxmapdepth=20      shellxescape=@    notrackactionids
-        |nogdefault            more                shellxquote={       undolevels=1000
-        |nohighlightedyank   nomultiple-cursors    showcmd             unifyjumps
-        |  history=50        noNERDTree            showmode            virtualedit=
-        |nohlsearch            nrformats=hex       sidescroll=0      novisualbell
-        |noideaglobalmode    nonumber              sidescrolloff=0     visualdelay=100
-        |noideajoin            octopushandler    nosmartcase           whichwrap=b,s
-        |  ideamarks           operatorfunc=     nosneak               wrapscan
-        |  ideastrictmode    norelativenumber      startofline
-        |noideatracetime       scroll=0          nosurround
+        |noargtextobj        noincsearch           selectmode=       notextobj-indent
+        |nocommentary        nomatchit             shellcmdflag=-x     timeout
+        |nodigraph             maxmapdepth=20      shellxescape=@      timeoutlen=1000
+        |noexchange            more                shellxquote={     notrackactionids
+        |nogdefault          nomultiple-cursors    showcmd             undolevels=1000
+        |nohighlightedyank   noNERDTree            showmode            virtualedit=
+        |  history=50          nrformats=hex       sidescroll=0      novisualbell
+        |nohlsearch          nonumber              sidescrolloff=0     visualdelay=100
+        |noideaglobalmode      operatorfunc=     nosmartcase           whichwrap=b,s
+        |noideajoin          norelativenumber    nosneak               wrapscan
+        |  ideamarks           scroll=0            startofline
+        |  ideawrite=all       scrolljump=1      nosurround
+        |noignorecase          scrolloff=0       notextobj-entire
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
-        |  excommandannotation
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
         |  ide=IntelliJ IDEA Community Edition
         |noideacopypreprocess
@@ -213,7 +211,6 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set!",
       """
       |--- Options ---
-      |  ideastrictmode
       |  number
       |  relativenumber
       |""".trimMargin()
@@ -227,11 +224,9 @@ class SetCommandTest : VimTestCase() {
       |--- Options ---
       |noargtextobj
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
-      |  closenotebooks
       |nocommentary
       |nodigraph
       |noexchange
-      |  excommandannotation
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |nohighlightedyank
@@ -244,8 +239,6 @@ class SetCommandTest : VimTestCase() {
       |  ideamarks
       |  idearefactormode=select
       |  ideastatusicon=enabled
-      |  ideastrictmode
-      |noideatracetime
       |  ideavimsupport=dialog
       |  ideawrite=all
       |noignorecase
@@ -261,7 +254,6 @@ class SetCommandTest : VimTestCase() {
       |noNERDTree
       |  nrformats=hex
       |nonumber
-      |  octopushandler
       |  operatorfunc=
       |norelativenumber
       |noReplaceWithRegister
@@ -288,7 +280,6 @@ class SetCommandTest : VimTestCase() {
       |  timeoutlen=1000
       |notrackactionids
       |  undolevels=1000
-      |  unifyjumps
       |novim-paragraph-motion
       |  viminfo='100,<50,s10,h
       |  virtualedit=

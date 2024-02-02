@@ -43,6 +43,10 @@ internal class IjVimApplication : VimApplicationBase() {
     return ApplicationManager.getApplication().isUnitTestMode
   }
 
+  override fun isInternal(): Boolean {
+    return ApplicationManager.getApplication().isInternal
+  }
+
   override fun postKey(stroke: KeyStroke, editor: VimEditor) {
     val component: Component = SwingUtilities.getAncestorOfClass(Window::class.java, editor.ij.component)
     val event = createKeyEvent(stroke, component)
