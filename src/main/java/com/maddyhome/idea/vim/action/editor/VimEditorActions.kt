@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.action.editor
 
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.intellij.openapi.actionSystem.IdeActions
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -30,7 +30,6 @@ internal class VimEditorBackSpace : IdeActionHandler(IdeActions.ACTION_EDITOR_BA
 @CommandOrMotion(keys = ["<Del>"], modes = [Mode.INSERT])
 internal class VimEditorDelete : IdeActionHandler(IdeActions.ACTION_EDITOR_DELETE) {
   override val type: Command.Type = Command.Type.DELETE
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 }
 
 @CommandOrMotion(keys = ["<Down>", "<kDown>"], modes = [Mode.INSERT])

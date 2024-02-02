@@ -9,6 +9,9 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.key
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -66,5 +69,45 @@ class RepeatActionTest : VimTestCase() {
         "They have blue windows.\n" +
         "Good.",
     )
+  }
+
+  @Test
+  fun `repeat delete command`() {
+    doTest(
+      "i<del><esc>.",
+      "${c}1234567890",
+      "${c}34567890"
+    )
+  }
+
+  @Test
+  fun `map for the delete`() {
+    doTest(
+      "i<del><esc>.",
+      """
+      Lorem Ipsum
+
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+      Lorem Ipsum
+
+      ${c}jjLorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+    ) {
+      injector.keyGroup.putKeyMapping(
+        MappingMode.I,
+        listOf(key("<DEL>")),
+        MappingOwner.IdeaVim.Other,
+        listOf(key("j")),
+        false
+      )
+    }
   }
 }
