@@ -202,9 +202,6 @@ public interface VimEditor {
     shiftType: LineDeleteShift,
   ): Pair<Pair<Offset, Offset>, LineDeleteShift>?
 
-  public fun updateCaretsVisualAttributes()
-  public fun updateCaretsVisualPosition()
-
   public fun offsetToBufferPosition(offset: Int): BufferPosition
   public fun bufferPositionToOffset(position: BufferPosition): Int
 

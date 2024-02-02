@@ -53,8 +53,6 @@ import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
-import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
-import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -143,9 +141,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       val oldValue = vimStateMachine.mode
       (vimStateMachine as VimStateMachineImpl).mode = value
       injector.listenersNotifier.notifyModeChanged(this, oldValue)
-
-      // TODO maybe it would be better to utilize modeListeners for this purpose?
-      updateCaretsVisual()
       doShowMode()
     }
 
@@ -165,9 +160,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     set(value) {
       if (value != vimStateMachine.isReplaceCharacter) {
         (vimStateMachine as VimStateMachineImpl).isReplaceCharacter = value
-
-        // TODO maybe it would be better to utilize listeners for this purpose?
-        updateCaretsVisual()
+        injector.listenersNotifier.notifyIsReplaceCharChanged(this)
       }
     }
 
@@ -182,18 +175,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       }
       doShowMode()
     }
-
-  private fun updateCaretsVisual() {
-    if (injector.globalOptions().ideaglobalmode) {
-      injector.application.localEditors().forEach { editor ->
-        editor.updateCaretsVisualAttributes()
-        editor.updateCaretsVisualPosition()
-      }
-    } else {
-      editor.updateCaretsVisualAttributes()
-      editor.updateCaretsVisualPosition()
-    }
-  }
 
   override fun resetState() {
     mode = Mode.NORMAL()
@@ -316,14 +297,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
         null
       }
     }
-  }
-
-  override fun updateCaretsVisualAttributes() {
-    editor.updateCaretsVisualAttributes()
-  }
-
-  override fun updateCaretsVisualPosition() {
-    editor.updateCaretsVisualPosition()
   }
 
   override fun offsetToVisualPosition(offset: Int): VimVisualPosition {

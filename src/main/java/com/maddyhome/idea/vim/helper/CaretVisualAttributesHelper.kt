@@ -18,14 +18,17 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.IsReplaceCharListener
+import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import com.maddyhome.idea.vim.state.mode.mode
 import org.jetbrains.annotations.TestOnly
 import java.awt.Color
 
@@ -134,3 +137,31 @@ private object AttributesCache {
 
 @TestOnly
 internal fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
+
+public class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener {
+  override fun isReplaceCharChanged(editor: VimEditor) {
+    updateCaretsVisual(editor)
+  }
+
+  override fun modeChanged(editor: VimEditor, oldMode: Mode) {
+    updateCaretsVisual(editor)
+  }
+
+  private fun updateCaretsVisual(editor: VimEditor) {
+    if (injector.globalOptions().ideaglobalmode) {
+      updateAllEditorsCaretsVisual()
+    } else {
+      val ijEditor = (editor as IjVimEditor).editor
+      ijEditor.updateCaretsVisualAttributes()
+      ijEditor.updateCaretsVisualPosition()
+    }
+  }
+
+  public fun updateAllEditorsCaretsVisual() {
+    injector.application.localEditors().forEach { editor ->
+      val ijEditor = (editor as IjVimEditor).editor
+      ijEditor.updateCaretsVisualAttributes()
+      ijEditor.updateCaretsVisualPosition()
+    }
+  }
+}
