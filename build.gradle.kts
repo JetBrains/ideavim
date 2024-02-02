@@ -429,6 +429,7 @@ kover {
 
 tasks.register("slackNotification") {
     doLast {
+        if (version.toString().last() != '0') return@doLast
         if (slackUrl.isBlank()) {
             println("Slack Url is not defined")
             return@doLast
