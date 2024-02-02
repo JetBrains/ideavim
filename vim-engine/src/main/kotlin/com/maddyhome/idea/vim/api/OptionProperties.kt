@@ -55,7 +55,6 @@ public open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase
   public var ideaglobalmode: Boolean by optionProperty(Options.ideaglobalmode)
   public var ideastrictmode: Boolean by optionProperty(Options.ideastrictmode)
   public var ideatracetime: Boolean by optionProperty(Options.ideatracetime)
-  public var octopushandler: Boolean by optionProperty(Options.octopushandler)
 }
 
 /**

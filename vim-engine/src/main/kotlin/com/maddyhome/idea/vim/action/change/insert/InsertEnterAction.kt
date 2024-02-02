@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.action.change.insert
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -21,24 +21,19 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-M>", "<CR>"], modes = [Mode.INSERT])
-public class InsertEnterAction : VimActionHandler.SingleExecution() {
+public class InsertEnterAction : VimActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
   override fun execute(
     editor: VimEditor,
+    caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (injector.globalOptions().octopushandler) {
-      editor.forEachNativeCaret({ caret ->
-        injector.changeGroup.processEnter(editor, caret, context)
-      })
-    } else {
-      injector.changeGroup.processEnter(editor, context)
-    }
+    injector.changeGroup.processEnter(editor, caret, context)
     injector.scroll.scrollCaretIntoView(editor)
     return true
   }

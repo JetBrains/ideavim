@@ -577,31 +577,6 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   /**
-   * Processes the Enter key by running the first successful action registered for "ENTER" keystroke.
-   *
-   * If this is REPLACE mode we need to turn off OVERWRITE before and then turn OVERWRITE back on after sending the
-   * "ENTER" key.
-   *
-   * @param editor  The editor to press "Enter" in
-   * @param context The data context
-   */
-  override fun processEnter(editor: VimEditor, context: ExecutionContext) {
-    if (editor.vimStateMachine.mode is Mode.REPLACE) {
-      editor.insertMode = true
-    }
-    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
-    val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
-    for (action in actions) {
-      if (injector.actionExecutor.executeAction(editor, action, context)) {
-        break
-      }
-    }
-    if (editor.vimStateMachine.mode is Mode.REPLACE) {
-      editor.insertMode = false
-    }
-  }
-
-  /**
    * Performs a mode switch after change action
    * @param editor   The editor to switch mode in
    * @param context  The data context

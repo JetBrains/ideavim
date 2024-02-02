@@ -302,7 +302,6 @@ public object Options {
   public val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", GLOBAL, "ideaglobalmode", false))
   public val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false))
   public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false))
-  public val octopushandler: ToggleOption = addOption(ToggleOption("octopushandler", GLOBAL, "octopushandler", true))
 }
 
 private class MultikeyMap(vararg entries: Option<VimDataType>) {
