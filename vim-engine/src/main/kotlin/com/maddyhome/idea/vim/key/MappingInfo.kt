@@ -222,7 +222,7 @@ public class ToHandlerMappingInfo(
             val vimSelection =
               create(caret.vimSelectionStart, caret.offset.point, editor.mode.selectionType ?: CHARACTER_WISE, editor)
             offsets[caret] = vimSelection
-            commandState.mode = Mode.NORMAL()
+            editor.mode = Mode.NORMAL()
           } else if (startOffset != null && startOffset.point != caret.offset.point) {
             // Command line motions are always characterwise exclusive
             var endOffset = caret.offset

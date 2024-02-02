@@ -116,7 +116,7 @@ public class KeyHandler {
         } else if (isEditorReset(key, editorState)) {
           handleEditorReset(editor, key, context, editorState)
         } else if (isExpectingCharArgument(commandBuilder)) {
-          handleCharArgument(key, chKey, editorState)
+          handleCharArgument(key, chKey, editorState, editor)
         } else if (editorState.isRegisterPending) {
           LOG.trace("Pending mode.")
           commandBuilder.addKey(key)
@@ -183,9 +183,9 @@ public class KeyHandler {
       executeCommand(editor, context, editorState)
     } else if (commandBuilder.isBad) {
       LOG.trace("Command builder is set to BAD")
-      editorState.resetOpPending()
+      editor.resetOpPending()
       editorState.resetRegisterPending()
-      editorState.resetReplaceCharacter()
+      editor.isReplaceCharacter = false
       injector.messages.indicateError()
       reset(editor)
     }
@@ -225,7 +225,7 @@ public class KeyHandler {
   ) {
     val commandBuilder = editorState.commandBuilder
     if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
-      editorState.resetReplaceCharacter()
+      editor.isReplaceCharacter = false
     }
     if (commandBuilder.isAtDefaultState) {
       val register = injector.registerGroup
@@ -312,7 +312,7 @@ public class KeyHandler {
     return expectingCharArgument
   }
 
-  private fun handleCharArgument(key: KeyStroke, chKey: Char, vimStateMachine: VimStateMachine) {
+  private fun handleCharArgument(key: KeyStroke, chKey: Char, vimStateMachine: VimStateMachine, editor: VimEditor) {
     var mutableChKey = chKey
     LOG.trace("Handling char argument")
     // We are expecting a character argument - is this a regular character the user typed?
@@ -333,7 +333,7 @@ public class KeyHandler {
       // Oops - this isn't a valid character argument
       commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     }
-    vimStateMachine.resetReplaceCharacter()
+    editor.isReplaceCharacter = false
   }
 
   private fun handleDigraph(
@@ -421,7 +421,7 @@ public class KeyHandler {
     )
 
     // If we were in "operator pending" mode, reset back to normal mode.
-    editorState.resetOpPending()
+    editor.resetOpPending()
 
     // Save off the command we are about to execute
     editorState.executingCommand = command
@@ -499,7 +499,7 @@ public class KeyHandler {
       val text = injector.processGroup.endSearchCommand()
       commandBuilder.popCommandPart() // Pop ProcessExEntryAction
       commandBuilder.completeCommandPart(Argument(text)) // Set search text on SearchEntry(Fwd|Rev)Action
-      editorState.mode = editorState.mode.returnTo()
+      editor.mode = editorState.mode.returnTo()
     }
   }
 
@@ -523,7 +523,7 @@ public class KeyHandler {
         if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
           commandBuilder.completeCommandPart(argumentCaptured!!)
         }
-        editorState.mode = Mode.OP_PENDING(editorState.mode.returnTo)
+        editor.mode = Mode.OP_PENDING(editorState.mode.returnTo)
       }
 
       Argument.Type.DIGRAPH -> // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
@@ -548,7 +548,7 @@ public class KeyHandler {
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
         val currentMode = editorState.mode
         check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
-        editorState.mode = Mode.CMD_LINE(currentMode)
+        editor.mode = Mode.CMD_LINE(currentMode)
       }
 
       else -> Unit
@@ -558,7 +558,7 @@ public class KeyHandler {
     // This was a typed solution
     // if (action is ChangeCharacterAction || action is ChangeVisualCharacterAction)
     if (action.id == "VimChangeCharacterAction" || action.id == "VimChangeVisualCharacterAction") {
-      editorState.isReplaceCharacter = true
+      editor.isReplaceCharacter = true
     }
   }
 
@@ -604,7 +604,7 @@ public class KeyHandler {
    */
   public fun fullReset(editor: VimEditor) {
     injector.messages.clearError()
-    VimStateMachine.getInstance(editor).reset()
+    editor.resetState()
     reset(editor)
     injector.registerGroupIfCreated?.resetRegister()
     editor.removeSelection()
@@ -653,11 +653,11 @@ public class KeyHandler {
       if (myMode is Mode.NORMAL && returnTo != null && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
         when (returnTo) {
           ReturnTo.INSERT -> {
-            editorState.mode = Mode.INSERT
+            editor.mode = Mode.INSERT
           }
 
           ReturnTo.REPLACE -> {
-            editorState.mode = Mode.REPLACE
+            editor.mode = Mode.REPLACE
           }
         }
       }

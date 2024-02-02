@@ -27,13 +27,13 @@ import javax.swing.KeyStroke
  */
 public interface VimStateMachine {
   public val commandBuilder: CommandBuilder
-  public var mode: Mode
+  public val mode: Mode
   public val mappingState: MappingState
   public val digraphSequence: DigraphSequence
-  public var isRecording: Boolean
+  public val isRecording: Boolean
   public var isDotRepeatInProgress: Boolean
   public var isRegisterPending: Boolean
-  public var isReplaceCharacter: Boolean
+  public val isReplaceCharacter: Boolean
 
   /**
    * The currently executing command
@@ -51,12 +51,9 @@ public interface VimStateMachine {
 
   public fun isDuplicateOperatorKeyStroke(key: KeyStroke?): Boolean
 
-  public fun resetOpPending()
-  public fun resetReplaceCharacter()
   public fun resetRegisterPending()
   public fun startLiteralSequence()
   public fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult
-  public fun resetDigraph()
 
   /**
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
@@ -64,16 +61,12 @@ public interface VimStateMachine {
    */
   public fun toggleInsertOverwrite()
 
-  /**
-   * Resets the command, mode, visual mode, and mapping mode to initial values.
-   */
-  public fun reset()
-  public fun getStatusString(): String
   public fun startDigraphSequence()
 
   public companion object {
-    private val globalState = VimStateMachineImpl(null)
+    private val globalState = VimStateMachineImpl()
 
+    // TODO do we really need this method? Can't we use editor.vimStateMachine?
     public fun getInstance(editor: Any?): VimStateMachine {
       return if (editor == null || injector.globalOptions().ideaglobalmode) {
         globalState

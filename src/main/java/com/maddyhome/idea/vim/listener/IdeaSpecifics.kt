@@ -124,7 +124,7 @@ internal object IdeaSpecifics {
       ) {
         editor?.let {
           val commandState = it.vim.vimStateMachine
-          commandState.mode = Mode.NORMAL()
+          it.vim.mode = Mode.NORMAL()
           VimPlugin.getChange().insertBeforeCursor(it.vim, event.dataContext.vim)
           KeyHandler.getInstance().reset(it.vim)
         }

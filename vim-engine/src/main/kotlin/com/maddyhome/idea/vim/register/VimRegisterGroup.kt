@@ -25,6 +25,8 @@ public interface VimRegisterGroup {
   public var lastRegisterChar: Char
   public val currentRegister: Char
 
+  public val recordRegister: Char
+
   /**
    * When we access last register, it can be e.g. " because of two reasons:
    * 1. Because the default register value was used

@@ -36,9 +36,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
 import javax.swing.KeyStroke
 
 public abstract class VimRegisterGroupBase : VimRegisterGroup {
-
-  @JvmField
-  protected var recordRegister: Char = 0.toChar()
+  public override var recordRegister: Char = 0.toChar()
 
   @JvmField
   protected var recordList: MutableList<KeyStroke>? = null
@@ -477,10 +475,9 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override fun startRecording(editor: VimEditor, register: Char): Boolean {
     return if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
-      VimStateMachine.getInstance(editor).isRecording = true
       recordRegister = register
+      editor.isRecording = true
       recordList = ArrayList()
-      injector.listenersNotifier.notifyMacroRecordingStarted(editor, register)
       true
     } else {
       false
@@ -522,11 +519,9 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
           reg.addKeys(myRecordList)
         }
       }
-      VimStateMachine.getInstance(editor).isRecording = false
-      injector.listenersNotifier.notifyMacroRecordingFinished(editor, recordRegister)
     }
-
     recordRegister = 0.toChar()
+    editor.isRecording = false
   }
 
   public companion object {

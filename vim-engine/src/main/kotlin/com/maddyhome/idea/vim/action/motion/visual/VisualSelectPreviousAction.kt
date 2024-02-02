@@ -37,7 +37,7 @@ public class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
 
     if (caretToSelectionInfo.any { it.second.start == null || it.second.end == null }) return false
 
-    editor.vimStateMachine.mode = com.maddyhome.idea.vim.state.mode.Mode.VISUAL(selectionType)
+    editor.mode = com.maddyhome.idea.vim.state.mode.Mode.VISUAL(selectionType)
 
     for ((caret, selectionInfo) in caretToSelectionInfo) {
       val startOffset = editor.bufferPositionToOffset(selectionInfo.start!!)

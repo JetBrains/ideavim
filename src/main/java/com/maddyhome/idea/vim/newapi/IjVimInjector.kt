@@ -207,7 +207,7 @@ internal class IjVimInjector : VimInjectorBase() {
   override fun commandStateFor(editor: VimEditor): VimStateMachine {
     var res = editor.ij.vimStateMachine
     if (res == null) {
-      res = VimStateMachineImpl(editor)
+      res = VimStateMachineImpl()
       editor.ij.vimStateMachine = res
     }
     return res

@@ -40,12 +40,12 @@ public class VimListenersNotifier {
     myEditorListeners.forEach { it.focusLost(editor) }
   }
 
-  public fun notifyMacroRecordingStarted(editor: VimEditor, register: Char) {
-    macroRecordingListeners.forEach { it.recordingStarted(editor, register) }
+  public fun notifyMacroRecordingStarted(editor: VimEditor) {
+    macroRecordingListeners.forEach { it.recordingStarted(editor) }
   }
   
-  public fun notifyMacroRecordingFinished(editor: VimEditor, register: Char) {
-    macroRecordingListeners.forEach { it.recordingFinished(editor, register) }
+  public fun notifyMacroRecordingFinished(editor: VimEditor) {
+    macroRecordingListeners.forEach { it.recordingFinished(editor) }
   }
 
   public fun notifyPluginTurnedOn() {

@@ -7,9 +7,7 @@
  */
 package com.maddyhome.idea.vim.impl.state
 
-import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandBuilder
@@ -18,13 +16,10 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
-import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.returnTo
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -32,37 +27,20 @@ import javax.swing.KeyStroke
 
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
- *
- * // TODO: 21.02.2022 This constructor should be empty
  */
-public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachine {
-  override val commandBuilder: CommandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
+public class VimStateMachineImpl : VimStateMachine {
+  override val commandBuilder: CommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL))
   override var mode: Mode = Mode.NORMAL()
     set(value) {
-      if (field == value) return
-
-      val oldValue = field
       field = value
       setMappingMode()
-      if (editor != null) {
-        injector.listenersNotifier.notifyModeChanged(editor, oldValue)
-      }
-      onModeChanged()
     }
   override val mappingState: MappingState = MappingState()
   override val digraphSequence: DigraphSequence = DigraphSequence()
   override var isRecording: Boolean = false
-    set(value) {
-      field = value
-      doShowMode()
-    }
   override var isDotRepeatInProgress: Boolean = false
   override var isRegisterPending: Boolean = false
   override var isReplaceCharacter: Boolean = false
-    set(value) {
-      field = value
-      onModeChanged()
-    }
 
   /**
    * The currently executing command
@@ -86,47 +64,11 @@ public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachi
   override val executingCommandFlags: EnumSet<CommandFlags>
     get() = executingCommand?.flags ?: noneOfEnum()
 
-  override fun resetOpPending() {
-    if (this.mode is Mode.OP_PENDING) {
-      val returnTo = this.mode.returnTo
-      mode = when (returnTo) {
-        ReturnTo.INSERT -> Mode.INSERT
-        ReturnTo.REPLACE -> Mode.INSERT
-        null -> Mode.NORMAL()
-      }
-    }
-  }
-
-  override fun resetReplaceCharacter() {
-    if (isReplaceCharacter) {
-      isReplaceCharacter = false
-    }
-  }
 
   override fun resetRegisterPending() {
     if (isRegisterPending) {
       isRegisterPending = false
     }
-  }
-
-  private fun resetModes() {
-//    modeStates.clear()
-    mode = Mode.NORMAL()
-    onModeChanged()
-    setMappingMode()
-  }
-
-  private fun onModeChanged() {
-    if (editor != null) {
-      editor.updateCaretsVisualAttributes()
-      editor.updateCaretsVisualPosition()
-    } else {
-      injector.application.localEditors().forEach { editor ->
-        editor.updateCaretsVisualAttributes()
-        editor.updateCaretsVisualPosition()
-      }
-    }
-    doShowMode()
   }
 
   private fun setMappingMode() {
@@ -143,10 +85,6 @@ public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachi
 
   override fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     return digraphSequence.processKey(key, editor)
-  }
-
-  override fun resetDigraph() {
-    digraphSequence.reset()
   }
 
   /**
@@ -166,74 +104,7 @@ public class VimStateMachineImpl(private val editor: VimEditor?) : VimStateMachi
     }
   }
 
-  /**
-   * Resets the command, mode, visual mode, and mapping mode to initial values.
-   */
-  override fun reset() {
-    executingCommand = null
-    resetModes()
-    commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.mappingMode))
-    digraphSequence.reset()
-  }
-
-  private fun doShowMode() {
-    val msg = StringBuilder()
-    if (injector.globalOptions().showmode) {
-      msg.append(getStatusString())
-    }
-    if (isRecording) {
-      if (msg.isNotEmpty()) {
-        msg.append(" - ")
-      }
-      msg.append(injector.messages.message("show.mode.recording"))
-    }
-    injector.messages.showMode(editor, msg.toString())
-  }
-
-  override fun getStatusString(): String {
-    val modeState = this.mode
-    return buildString {
-      when (modeState) {
-        is Mode.NORMAL -> {
-          if (modeState.returnTo != null) append("-- (insert) --")
-        }
-
-        Mode.INSERT -> append("-- INSERT --")
-        Mode.REPLACE -> append("-- REPLACE --")
-        is Mode.VISUAL -> {
-          val inInsert = if (modeState.returnTo != null) "(insert) " else ""
-          append("-- ${inInsert}VISUAL")
-          when (modeState.selectionType) {
-            SelectionType.LINE_WISE -> append(" LINE")
-            SelectionType.BLOCK_WISE -> append(" BLOCK")
-            else -> Unit
-          }
-          append(" --")
-        }
-
-        is Mode.SELECT -> {
-          val inInsert = if (modeState.returnTo != null) "(insert) " else ""
-          append("-- ${inInsert}SELECT")
-          when (modeState.selectionType) {
-            SelectionType.LINE_WISE -> append(" LINE")
-            SelectionType.BLOCK_WISE -> append(" BLOCK")
-            else -> Unit
-          }
-          append(" --")
-        }
-
-        else -> Unit
-      }
-    }
-  }
-
   public companion object {
-    private val logger = vimLogger<VimStateMachine>()
-
-    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> {
-      return injector.keyGroup.getKeyRoot(mappingMode)
-    }
-
     @Contract(pure = true)
     public fun modeToMappingMode(mode: Mode): MappingMode {
       return when (mode) {

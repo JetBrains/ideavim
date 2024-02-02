@@ -57,7 +57,7 @@ internal object IdeaRefactorModeHelper {
           }
 
           is Action.SetMode -> {
-            editor.vim.vimStateMachine.mode = correction.newMode
+            editor.vim.mode = correction.newMode
           }
         }
       }

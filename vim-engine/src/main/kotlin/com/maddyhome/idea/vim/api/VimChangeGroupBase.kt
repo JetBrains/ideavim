@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGI
 import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.toReturnTo
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
@@ -439,7 +438,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val cmd = state.executingCommand
     if (cmd != null && state.isDotRepeatInProgress) {
-      state.mode = mode
+      editor.mode = mode
       if (mode == Mode.REPLACE) {
         editor.insertMode = false
       }
@@ -465,7 +464,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       if (mode == Mode.REPLACE) {
         editor.insertMode = true
       }
-      state.mode = Mode.NORMAL()
+      editor.mode = Mode.NORMAL()
     } else {
       lastInsert = cmd
       strokes.clear()
@@ -480,7 +479,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       vimDocument!!.addChangeListener(myChangeListener)
       oldOffset = editor.currentCaret().offset.point
       editor.insertMode = mode == Mode.INSERT
-      state.mode = mode
+      editor.mode = mode
     }
     notifyListeners(editor)
   }
@@ -560,8 +559,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
 
     // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
     markGroup.setMark(editor, MARK_CHANGE_POS)
-    getInstance(editor).mode = Mode.NORMAL()
-    editor.vimStateMachine.mode = Mode.NORMAL()
+    editor.mode = Mode.NORMAL()
   }
 
   private fun updateLastInsertedTextRegister() {
@@ -640,7 +638,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   override fun processSingleCommand(editor: VimEditor) {
-    getInstance(editor).mode = Mode.NORMAL(returnTo = editor.mode.toReturnTo)
+    editor.mode = Mode.NORMAL(returnTo = editor.mode.toReturnTo)
     clearStrokes(editor)
   }
 

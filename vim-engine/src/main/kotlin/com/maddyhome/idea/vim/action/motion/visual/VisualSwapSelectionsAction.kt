@@ -53,7 +53,7 @@ private fun swapVisualSelections(editor: VimEditor): Boolean {
   editor.vimLastSelectionType = mode.selectionType
   injector.markService.setVisualSelectionMarks(primaryCaret, TextRange(vimSelectionStart, primaryCaret.offset.point))
 
-  editor.vimStateMachine.mode = mode.copy(selectionType = lastSelectionType)
+  editor.mode = mode.copy(selectionType = lastSelectionType)
   primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
 
   injector.scroll.scrollCaretIntoView(editor)

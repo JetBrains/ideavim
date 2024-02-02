@@ -85,7 +85,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     modeBeforeCommandProcessing = currentMode
     val initText = getRange(editor, cmd)
     injector.markService.setVisualSelectionMarks(editor)
-    editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
+    editor.mode = Mode.CMD_LINE(currentMode)
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, ":", initText, 1)
   }
@@ -101,7 +101,7 @@ public class ProcessGroup : VimProcessGroupBase() {
 
       return true
     } else {
-      getInstance(editor).mode = NORMAL()
+      editor.mode = NORMAL()
       getInstance().reset(editor)
       return false
     }
@@ -112,7 +112,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     panel.deactivate(true)
     var res = true
     try {
-      getInstance(editor).mode = NORMAL()
+      editor.mode = NORMAL()
 
       logger.debug("processing command")
 
@@ -152,7 +152,7 @@ public class ProcessGroup : VimProcessGroupBase() {
   }
 
   public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
-    editor.vimStateMachine.mode = NORMAL()
+    editor.mode = NORMAL()
     getInstance().reset(editor)
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true, resetCaret)
@@ -162,7 +162,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     val initText = getRange(editor, cmd) + "!"
     val currentMode = editor.mode
     check(currentMode is ReturnableFromCmd) { "Cannot enable cmd mode from $currentMode" }
-    editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
+    editor.mode = Mode.CMD_LINE(currentMode)
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, ":", initText, 1)
   }

@@ -34,15 +34,15 @@ internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   val returnTo = this.vim.vimStateMachine.mode.returnTo
   when (returnTo) {
     ReturnTo.INSERT -> {
-      this.vim.vimStateMachine.mode = Mode.INSERT
+      this.vim.mode = Mode.INSERT
     }
 
     ReturnTo.REPLACE -> {
-      this.vim.vimStateMachine.mode = Mode.REPLACE
+      this.vim.mode = Mode.REPLACE
     }
 
     null -> {
-      this.vim.vimStateMachine.mode = Mode.NORMAL()
+      this.vim.mode = Mode.NORMAL()
     }
   }
   SelectionVimListenerSuppressor.lock().use {
@@ -67,15 +67,15 @@ internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   val returnTo = this.vimStateMachine.mode.returnTo
   when (returnTo) {
     ReturnTo.INSERT -> {
-      this.vimStateMachine.mode = Mode.INSERT
+      this.mode = Mode.INSERT
     }
 
     ReturnTo.REPLACE -> {
-      this.vimStateMachine.mode = Mode.REPLACE
+      this.mode = Mode.REPLACE
     }
 
     null -> {
-      this.vimStateMachine.mode = Mode.NORMAL()
+      this.mode = Mode.NORMAL()
     }
   }
   SelectionVimListenerSuppressor.lock().use {

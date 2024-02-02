@@ -124,6 +124,9 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * ([VimVisualPosition] should be phased out if possible, as it is an IntelliJ concept, not a Vim concept.)
  */
 public interface VimEditor {
+  public var mode: Mode
+  public var isReplaceCharacter: Boolean
+  public var isRecording: Boolean
 
   public val lfMakesNewLine: Boolean
   public var vimChangeActionSwitchMode: Mode?
@@ -186,6 +189,9 @@ public interface VimEditor {
   public fun isWritable(): Boolean
   public fun isDocumentWritable(): Boolean
   public fun isOneLineMode(): Boolean
+
+  @Deprecated("It will be replaced by Vim Mode Widget")
+  public fun getStatusString(): String
 
   /**
    * public function for refactoring, get rid of it
@@ -276,6 +282,12 @@ public interface VimEditor {
    *   instance and need to search for a new version.
    */
   public fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T?
+
+  /**
+   * Resets the command, mode, visual mode, and mapping mode to initial values.
+   */
+  public fun resetState()
+  public fun resetOpPending()
 }
 
 public interface MutableVimEditor : VimEditor {

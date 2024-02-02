@@ -30,12 +30,13 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory, VimStatusBarWidget {
   private var content: String = ""
 
   private val macroRecordingListener = object : MacroRecordingListener {
-    override fun recordingStarted(editor: VimEditor, register: Char) {
+    override fun recordingStarted(editor: VimEditor) {
+      val register = injector.registerGroup.recordRegister
       content = "recording @$register"
       updateWidgetInStatusBar(ID, editor.ij.project)
     }
 
-    override fun recordingFinished(editor: VimEditor, register: Char) {
+    override fun recordingFinished(editor: VimEditor) {
       content = ""
       updateWidgetInStatusBar(ID, editor.ij.project)
     }
