@@ -7,8 +7,8 @@
  */
 package com.maddyhome.idea.vim.impl.state
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -27,10 +27,10 @@ import javax.swing.KeyStroke
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
 public class VimStateMachineImpl : VimStateMachine {
-  override val commandBuilder: CommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL))
+  override val commandBuilder: CommandBuilder = KeyHandler.getInstance().keyState.commandBuilder
   override var mode: Mode = Mode.NORMAL()
-  override val mappingState: MappingState = MappingState()
-  override val digraphSequence: DigraphSequence = DigraphSequence()
+  override val mappingState: MappingState = KeyHandler.getInstance().keyState.mappingState
+  override val digraphSequence: DigraphSequence = KeyHandler.getInstance().keyState.digraphSequence
   override var isDotRepeatInProgress: Boolean = false
   override var isRegisterPending: Boolean = false
   override var isReplaceCharacter: Boolean = false

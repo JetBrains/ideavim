@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.Node
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
@@ -48,6 +49,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
+  public val keyState: KeyHandlerState = KeyHandlerState()
 
   private var handleKeyRecursionCount = 0
 
