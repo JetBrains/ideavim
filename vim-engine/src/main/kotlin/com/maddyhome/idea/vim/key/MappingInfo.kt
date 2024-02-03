@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -158,7 +157,7 @@ public class ToHandlerMappingInfo(
     // Cache isOperatorPending in case the extension changes the mode while moving the caret
     // See CommonExtensionTest
     // TODO: Is this legal? Should we assert in this case?
-    val shouldCalculateOffsets: Boolean = vimStateMachine.isOperatorPending
+    val shouldCalculateOffsets: Boolean = vimStateMachine.isOperatorPending(editor.mode)
 
     val startOffsets: Map<ImmutableVimCaret, Offset> = editor.carets().associateWith { it.offset }
 
@@ -186,7 +185,7 @@ public class ToHandlerMappingInfo(
       }
     }
 
-    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending, vimStateMachine.commandBuilder.count, vimStateMachine.mode)
+    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending(editor.mode), vimStateMachine.commandBuilder.count, vimStateMachine.mode)
     injector.actionExecutor.executeCommand(
       editor,
       { extensionHandler.execute(editor, context, operatorArguments) },

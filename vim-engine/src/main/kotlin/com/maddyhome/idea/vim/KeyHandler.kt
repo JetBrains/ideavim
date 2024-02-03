@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyStack
@@ -152,7 +153,7 @@ public class KeyHandler {
             } else if (editorState.mode is Mode.SELECT) {
               LOG.trace("Process select")
               shouldRecord = injector.changeGroup.processKeyInSelectMode(editor, context, key) && shouldRecord
-            } else if (editorState.mappingState.mappingMode == MappingMode.CMD_LINE) {
+            } else if (editor.mode is Mode.CMD_LINE) {
               LOG.trace("Process cmd line")
               shouldRecord = injector.processGroup.processExKey(editor, key) && shouldRecord
             } else {
@@ -210,7 +211,7 @@ public class KeyHandler {
     node: Node<LazyVimCommand>?,
     editorState: VimStateMachine,
   ): Node<LazyVimCommand>? {
-    return if (editorState.isDuplicateOperatorKeyStroke(key)) {
+    return if (editorState.isDuplicateOperatorKeyStroke(key, editorState.mode)) {
       editorState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
     } else {
       node
@@ -290,7 +291,7 @@ public class KeyHandler {
     return if (editorState.isRegisterPending) {
       true
     } else {
-      key.keyChar == '"' && !editorState.isOperatorPending && editorState.commandBuilder.expectedArgumentType == null
+      key.keyChar == '"' && !editorState.isOperatorPending(editorState.mode) && editorState.commandBuilder.expectedArgumentType == null
     }
   }
 
@@ -415,7 +416,7 @@ public class KeyHandler {
     LOG.trace("Command execution")
     val command = editorState.commandBuilder.buildCommand()
     val operatorArguments = OperatorArguments(
-      editorState.mappingState.mappingMode == MappingMode.OP_PENDING,
+      editor.mode is Mode.OP_PENDING,
       command.rawCount,
       editorState.mode,
     )
@@ -578,7 +579,7 @@ public class KeyHandler {
   public fun partialReset(editor: VimEditor) {
     val editorState = VimStateMachine.getInstance(editor)
     editorState.mappingState.resetMappingSequence()
-    editorState.commandBuilder.resetInProgressCommandPart(getKeyRoot(editorState.mappingState.mappingMode))
+    editorState.commandBuilder.resetInProgressCommandPart(getKeyRoot(editor.mode.toMappingMode()))
   }
 
   /**
@@ -589,7 +590,7 @@ public class KeyHandler {
   public fun reset(editor: VimEditor) {
     partialReset(editor)
     val editorState = VimStateMachine.getInstance(editor)
-    editorState.commandBuilder.resetAll(getKeyRoot(editorState.mappingState.mappingMode))
+    editorState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
   }
 
   private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> {

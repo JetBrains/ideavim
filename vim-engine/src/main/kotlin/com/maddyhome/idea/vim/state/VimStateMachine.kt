@@ -45,10 +45,10 @@ public interface VimStateMachine {
    * This field is reset after the command has been executed.
    */
   public var executingCommand: Command?
-  public val isOperatorPending: Boolean
+  public fun isOperatorPending(mode: Mode): Boolean
   public val executingCommandFlags: EnumSet<CommandFlags>
 
-  public fun isDuplicateOperatorKeyStroke(key: KeyStroke?): Boolean
+  public fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode): Boolean
 
   public fun resetRegisterPending()
   public fun startLiteralSequence()

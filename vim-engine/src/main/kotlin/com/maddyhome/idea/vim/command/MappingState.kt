@@ -35,11 +35,6 @@ public class MappingState {
   public val keys: Iterable<KeyStroke>
     get() = keyList
 
-  public var mappingMode: MappingMode = MappingMode.NORMAL
-    set(value) {
-      field = value
-    }
-
   private val timer = Timer(injector.globalOptions().timeoutlen, null)
   private var keyList = mutableListOf<KeyStroke>()
 

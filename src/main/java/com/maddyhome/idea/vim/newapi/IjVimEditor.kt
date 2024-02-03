@@ -56,6 +56,7 @@ import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
+import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -167,7 +168,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     vimStateMachine.executingCommand = null
     vimStateMachine.digraphSequence.reset()
     vimStateMachine.commandBuilder.resetInProgressCommandPart(
-      injector.keyGroup.getKeyRoot(vimStateMachine.mappingState.mappingMode)
+      injector.keyGroup.getKeyRoot(mode.toMappingMode())
     )
   }
 

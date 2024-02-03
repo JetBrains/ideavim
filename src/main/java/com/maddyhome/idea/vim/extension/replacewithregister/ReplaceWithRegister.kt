@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -165,13 +164,14 @@ internal class ReplaceWithRegister : VimExtension {
         caretAfterInsertedText = false,
         putToLine = -1,
       )
+      val vimEditor = editor.vim
       ClipboardOptionHelper.IdeaputDisabler().use {
         VimPlugin.getPut().putText(
-          IjVimEditor(editor),
+          vimEditor,
           injector.executionContextManager.onEditor(editor.vim),
           putData,
           operatorArguments = OperatorArguments(
-            editor.vimStateMachine?.isOperatorPending ?: false,
+            editor.vimStateMachine?.isOperatorPending(vimEditor.mode) ?: false,
             0,
             editor.vim.mode,
           ),

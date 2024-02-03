@@ -99,7 +99,7 @@ internal class Matchit : VimExtension {
 
       // Normally we want to jump to the start of the matching pair. But when moving forward in operator
       // pending mode, we want to include the entire match. isInOpPending makes that distinction.
-      val isInOpPending = commandState.isOperatorPending
+      val isInOpPending = commandState.isOperatorPending(editor.mode)
 
       if (isInOpPending) {
         val matchitAction = MatchitAction()

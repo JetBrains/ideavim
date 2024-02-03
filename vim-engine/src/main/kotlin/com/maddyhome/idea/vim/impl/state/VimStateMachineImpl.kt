@@ -29,10 +29,6 @@ import javax.swing.KeyStroke
 public class VimStateMachineImpl : VimStateMachine {
   override val commandBuilder: CommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL))
   override var mode: Mode = Mode.NORMAL()
-    set(value) {
-      field = value
-      setMappingMode()
-    }
   override val mappingState: MappingState = MappingState()
   override val digraphSequence: DigraphSequence = DigraphSequence()
   override var isDotRepeatInProgress: Boolean = false
@@ -51,11 +47,12 @@ public class VimStateMachineImpl : VimStateMachine {
    */
   override var executingCommand: Command? = null
 
-  override val isOperatorPending: Boolean
-    get() = mappingState.mappingMode == MappingMode.OP_PENDING && !commandBuilder.isEmpty
+  override fun isOperatorPending(mode: Mode): Boolean {
+    return mode is Mode.OP_PENDING && !commandBuilder.isEmpty
+  }
 
-  override fun isDuplicateOperatorKeyStroke(key: KeyStroke?): Boolean {
-    return isOperatorPending && commandBuilder.isDuplicateOperatorKeyStroke(key!!)
+  override fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode): Boolean {
+    return isOperatorPending(mode) && commandBuilder.isDuplicateOperatorKeyStroke(key)
   }
 
   override val executingCommandFlags: EnumSet<CommandFlags>
@@ -66,10 +63,6 @@ public class VimStateMachineImpl : VimStateMachine {
     if (isRegisterPending) {
       isRegisterPending = false
     }
-  }
-
-  private fun setMappingMode() {
-    mappingState.mappingMode = modeToMappingMode(this.mode)
   }
 
   override fun startDigraphSequence() {
@@ -113,5 +106,16 @@ public class VimStateMachineImpl : VimStateMachine {
         is Mode.OP_PENDING -> MappingMode.OP_PENDING
       }
     }
+  }
+}
+
+public fun Mode.toMappingMode(): MappingMode {
+  return when (this) {
+    is Mode.NORMAL -> MappingMode.NORMAL
+    Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
+    is Mode.VISUAL -> MappingMode.VISUAL
+    is Mode.SELECT -> MappingMode.SELECT
+    is Mode.CMD_LINE -> MappingMode.CMD_LINE
+    is Mode.OP_PENDING -> MappingMode.OP_PENDING
   }
 }

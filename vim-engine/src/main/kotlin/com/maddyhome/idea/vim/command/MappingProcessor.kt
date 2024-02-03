@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.state.VimStateMachine
 import javax.swing.KeyStroke
@@ -48,8 +49,9 @@ public object MappingProcessor {
     // Save the unhandled keystrokes until we either complete or abandon the sequence.
     log.trace("Add key to mapping state")
     mappingState.addKey(key)
-    val mapping = injector.keyGroup.getKeyMappingLayer(mappingState.mappingMode)
-    log.trace { "Get keys for mapping mode. mode = " + mappingState.mappingMode }
+    val mappingMode = editor.mode.toMappingMode()
+    val mapping = injector.keyGroup.getKeyMappingLayer(mappingMode)
+    log.trace { "Get keys for mapping mode. mode = $mappingMode" }
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.

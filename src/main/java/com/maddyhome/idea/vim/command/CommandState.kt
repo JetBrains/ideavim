@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 public class CommandState(private val machine: VimStateMachine) {
 
   public val isOperatorPending: Boolean
-    get() = machine.isOperatorPending
+    get() = machine.isOperatorPending(machine.mode)
 
   public val mode: CommandState.Mode
     get() {
