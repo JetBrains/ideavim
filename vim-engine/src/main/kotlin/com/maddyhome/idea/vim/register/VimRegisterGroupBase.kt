@@ -36,7 +36,18 @@ import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
 import javax.swing.KeyStroke
 
 public abstract class VimRegisterGroupBase : VimRegisterGroup {
-  public override var recordRegister: Char = 0.toChar()
+  override val isRecording: Boolean
+    get() = recordRegister != null
+
+  public override var recordRegister: Char? = null
+    set(value) {
+      field = value
+      if (value != null) {
+        injector.listenersNotifier.notifyMacroRecordingStarted()
+      } else {
+        injector.listenersNotifier.notifyMacroRecordingFinished()
+      }
+    }
 
   @JvmField
   protected var recordList: MutableList<KeyStroke>? = null
@@ -125,7 +136,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override fun recordKeyStroke(key: KeyStroke) {
     val myRecordList = recordList
-    if (recordRegister != 0.toChar() && myRecordList != null) {
+    if (isRecording && myRecordList != null) {
       myRecordList.add(key)
     }
   }
@@ -473,10 +484,9 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     myRegisters[myR] = register
   }
 
-  override fun startRecording(editor: VimEditor, register: Char): Boolean {
+  override fun startRecording(register: Char): Boolean {
     return if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
       recordRegister = register
-      editor.isRecording = true
       recordList = ArrayList()
       true
     } else {
@@ -490,7 +500,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override fun recordText(text: String) {
     val myRecordList = recordList
-    if (recordRegister != 0.toChar() && myRecordList != null) {
+    if (isRecording && myRecordList != null) {
       myRecordList.addAll(injector.parser.stringToKeys(text))
     }
   }
@@ -503,25 +513,25 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     myRegisters[register] = Register(register, type, keys.toMutableList())
   }
 
-  override fun finishRecording(editor: VimEditor) {
-    if (recordRegister != 0.toChar()) {
+  override fun finishRecording() {
+    val register = recordRegister
+    if (register != null) {
       var reg: Register? = null
-      if (Character.isUpperCase(recordRegister)) {
-        reg = getRegister(recordRegister)
+      if (Character.isUpperCase(register)) {
+        reg = getRegister(register)
       }
 
       val myRecordList = recordList
       if (myRecordList != null) {
         if (reg == null) {
-          reg = Register(Character.toLowerCase(recordRegister), SelectionType.CHARACTER_WISE, myRecordList)
-          myRegisters[Character.toLowerCase(recordRegister)] = reg
+          reg = Register(Character.toLowerCase(register), SelectionType.CHARACTER_WISE, myRecordList)
+          myRegisters[Character.toLowerCase(register)] = reg
         } else {
           reg.addKeys(myRecordList)
         }
       }
     }
-    recordRegister = 0.toChar()
-    editor.isRecording = false
+    recordRegister = null
   }
 
   public companion object {

@@ -30,7 +30,6 @@ public interface VimStateMachine {
   public val mode: Mode
   public val mappingState: MappingState
   public val digraphSequence: DigraphSequence
-  public val isRecording: Boolean
   public var isDotRepeatInProgress: Boolean
   public var isRegisterPending: Boolean
   public val isReplaceCharacter: Boolean

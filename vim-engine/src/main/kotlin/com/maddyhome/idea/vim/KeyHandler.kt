@@ -103,7 +103,7 @@ public class KeyHandler {
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
 
     // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
-    var shouldRecord = handleKeyRecursionCount == 0 && editorState.isRecording
+    var shouldRecord = handleKeyRecursionCount == 0 && injector.registerGroup.isRecording
     handleKeyRecursionCount++
     try {
       LOG.trace("Start key processing...")
@@ -191,7 +191,7 @@ public class KeyHandler {
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
-    if (shouldRecord && editorState.isRecording && key != null) {
+    if (shouldRecord && injector.registerGroup.isRecording && key != null) {
       injector.registerGroup.recordKeyStroke(key)
       modalEntryKeys.forEach { injector.registerGroup.recordKeyStroke(it) }
       modalEntryKeys.clear()
@@ -506,7 +506,7 @@ public class KeyHandler {
   private fun stopMacroRecord(node: CommandNode<LazyVimCommand>, editorState: VimStateMachine): Boolean {
     // TODO
 //    return editorState.isRecording && node.actionHolder.getInstance() is ToggleRecordingAction
-    return editorState.isRecording && node.actionHolder.instance.id == "VimToggleRecordingAction"
+    return injector.registerGroup.isRecording && node.actionHolder.instance.id == "VimToggleRecordingAction"
   }
 
   private fun startWaitingForArgument(

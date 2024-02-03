@@ -152,7 +152,7 @@ public object VimExtensionFacade {
       LOG.trace("Unit test mode is active")
       val mappingStack = KeyHandler.getInstance().keyStack
       mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
-        if (editor.vim.vimStateMachine.isRecording) {
+        if (injector.registerGroup.isRecording) {
           KeyHandler.getInstance().modalEntryKeys += it
         }
       }

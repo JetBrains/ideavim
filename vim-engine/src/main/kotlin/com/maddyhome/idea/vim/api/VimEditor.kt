@@ -126,7 +126,6 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 public interface VimEditor {
   public var mode: Mode
   public var isReplaceCharacter: Boolean
-  public var isRecording: Boolean
 
   public val lfMakesNewLine: Boolean
   public var vimChangeActionSwitchMode: Mode?

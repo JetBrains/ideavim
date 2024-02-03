@@ -14,8 +14,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.ExceptionHandler
 import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -44,9 +42,8 @@ class MacroActionTest : VimTestCase() {
   // |q|
   @Test
   fun testRecordMacro() {
-    val editor = typeTextInFile(injector.parser.parseKeys("qa" + "3l" + "q"), "on<caret>e two three\n")
-    val commandState = editor.vim.vimStateMachine
-    kotlin.test.assertFalse(commandState.isRecording)
+    typeTextInFile(injector.parser.parseKeys("qa" + "3l" + "q"), "on<caret>e two three\n")
+    kotlin.test.assertFalse(injector.registerGroup.isRecording)
     assertRegister('a', "3l")
   }
 
@@ -101,7 +98,7 @@ class MacroActionTest : VimTestCase() {
 
     val register = VimPlugin.getRegister().getRegister('a')
     val registerSize = register!!.keys.size
-    kotlin.test.assertEquals(9, registerSize)
+    assertEquals(9, registerSize)
   }
 
   @Test

@@ -19,8 +19,6 @@ import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
-import com.maddyhome.idea.vim.state.mode.returnTo
 import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.KeyStroke
@@ -37,7 +35,6 @@ public class VimStateMachineImpl : VimStateMachine {
     }
   override val mappingState: MappingState = MappingState()
   override val digraphSequence: DigraphSequence = DigraphSequence()
-  override var isRecording: Boolean = false
   override var isDotRepeatInProgress: Boolean = false
   override var isRegisterPending: Boolean = false
   override var isReplaceCharacter: Boolean = false

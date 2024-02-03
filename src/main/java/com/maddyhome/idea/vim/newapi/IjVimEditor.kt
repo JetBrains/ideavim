@@ -164,18 +164,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       }
     }
 
-  override var isRecording: Boolean
-    get() = vimStateMachine.isRecording
-    set(value) {
-      (vimStateMachine as VimStateMachineImpl).isRecording = value
-      if (value) {
-        injector.listenersNotifier.notifyMacroRecordingStarted(this)
-      } else {
-        injector.listenersNotifier.notifyMacroRecordingFinished(this)
-      }
-      doShowMode()
-    }
-
   override fun resetState() {
     mode = Mode.NORMAL()
     vimStateMachine.executingCommand = null
@@ -597,7 +585,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     if (injector.globalOptions().showmode) {
       msg.append(getStatusString())
     }
-    if (vimStateMachine.isRecording) {
+    if (injector.registerGroup.isRecording) {
       if (msg.isNotEmpty()) {
         msg.append(" - ")
       }

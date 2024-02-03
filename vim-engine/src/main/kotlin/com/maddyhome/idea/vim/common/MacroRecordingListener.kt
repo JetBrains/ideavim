@@ -8,9 +8,7 @@
 
 package com.maddyhome.idea.vim.common
 
-import com.maddyhome.idea.vim.api.VimEditor
-
 public interface MacroRecordingListener {
-  public fun recordingStarted(editor: VimEditor)
-  public fun recordingFinished(editor: VimEditor)
+  public fun recordingStarted()
+  public fun recordingFinished()
 }

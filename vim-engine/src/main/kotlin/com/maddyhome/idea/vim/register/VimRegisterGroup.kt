@@ -25,7 +25,8 @@ public interface VimRegisterGroup {
   public var lastRegisterChar: Char
   public val currentRegister: Char
 
-  public val recordRegister: Char
+  public val isRecording: Boolean
+  public val recordRegister: Char?
 
   /**
    * When we access last register, it can be e.g. " because of two reasons:
@@ -81,13 +82,13 @@ public interface VimRegisterGroup {
   public fun getRegister(r: Char): Register?
   public fun getRegisters(): List<Register>
   public fun saveRegister(r: Char, register: Register)
-  public fun startRecording(editor: VimEditor, register: Char): Boolean
+  public fun startRecording(register: Char): Boolean
 
   public fun getPlaybackRegister(r: Char): Register?
   public fun recordText(text: String)
   public fun setKeys(register: Char, keys: List<KeyStroke>)
   public fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType)
-  public fun finishRecording(editor: VimEditor)
+  public fun finishRecording()
   public fun getCurrentRegisterForMulticaret(): Char // `set clipbaard+=unnamedplus` should not make system register the default one when working with multiple carets VIM-2804
   public fun isSystemClipboard(register: Char): Boolean
   public fun isPrimaryRegisterSupported(): Boolean
