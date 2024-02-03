@@ -35,7 +35,6 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.EditorLine
@@ -141,7 +140,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       val oldValue = vimStateMachine.mode
       (vimStateMachine as VimStateMachineImpl).mode = value
       injector.listenersNotifier.notifyModeChanged(this, oldValue)
-      doShowMode()
     }
 
   override fun resetOpPending() {
@@ -539,59 +537,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   override fun toString(): String {
     // We can't use Object.toString() as this includes hashcode, which produces an error
     return "IjVimEditor[$editor@${identityHashCode(editor).toString(16)}]"
-  }
-
-  @Deprecated("It will be replaced by Vim Mode Widget")
-  override fun getStatusString(): String {
-    val modeState = this.mode
-    return buildString {
-      when (modeState) {
-        is Mode.NORMAL -> {
-          if (modeState.returnTo != null) append("-- (insert) --")
-        }
-
-        Mode.INSERT -> append("-- INSERT --")
-        Mode.REPLACE -> append("-- REPLACE --")
-        is Mode.VISUAL -> {
-          val inInsert = if (modeState.returnTo != null) "(insert) " else ""
-          append("-- ${inInsert}VISUAL")
-          when (modeState.selectionType) {
-            SelectionType.LINE_WISE -> append(" LINE")
-            SelectionType.BLOCK_WISE -> append(" BLOCK")
-            else -> Unit
-          }
-          append(" --")
-        }
-
-        is Mode.SELECT -> {
-          val inInsert = if (modeState.returnTo != null) "(insert) " else ""
-          append("-- ${inInsert}SELECT")
-          when (modeState.selectionType) {
-            SelectionType.LINE_WISE -> append(" LINE")
-            SelectionType.BLOCK_WISE -> append(" BLOCK")
-            else -> Unit
-          }
-          append(" --")
-        }
-
-        else -> Unit
-      }
-    }
-  }
-
-  @Deprecated("It will be replaced by Vim Mode Widget")
-  private fun doShowMode() {
-    val msg = StringBuilder()
-    if (injector.globalOptions().showmode) {
-      msg.append(getStatusString())
-    }
-    if (injector.registerGroup.isRecording) {
-      if (msg.isNotEmpty()) {
-        msg.append(" - ")
-      }
-      msg.append(injector.messages.message("show.mode.recording"))
-    }
-    injector.messages.showMode(this, msg.toString())
   }
 }
 

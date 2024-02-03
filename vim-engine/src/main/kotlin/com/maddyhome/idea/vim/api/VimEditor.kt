@@ -189,9 +189,6 @@ public interface VimEditor {
   public fun isDocumentWritable(): Boolean
   public fun isOneLineMode(): Boolean
 
-  @Deprecated("It will be replaced by Vim Mode Widget")
-  public fun getStatusString(): String
-
   /**
    * public function for refactoring, get rid of it
    */

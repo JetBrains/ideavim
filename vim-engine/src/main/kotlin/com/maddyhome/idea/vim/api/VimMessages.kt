@@ -17,8 +17,4 @@ public interface VimMessages {
   public fun message(key: String, vararg params: Any): String
 
   public fun updateStatusBar(editor: VimEditor)
-
-  public fun showMode(editor: VimEditor?, msg: String) {
-    showStatusBarMessage(editor, msg)
-  }
 }
