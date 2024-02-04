@@ -20,7 +20,7 @@ public data class KeyHandlerState(
   public val mappingState: MappingState,
   public val digraphSequence: DigraphSequence,
   public val commandBuilder: CommandBuilder,
-) {
+): Cloneable {
   public constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)))
 
   public fun partialReset(mode: Mode) {
@@ -33,5 +33,13 @@ public data class KeyHandlerState(
     digraphSequence.reset()
     mappingState.resetMappingSequence()
     commandBuilder.resetAll(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
+  }
+
+  public override fun clone(): KeyHandlerState {
+    return KeyHandlerState(
+      mappingState.clone(),
+      digraphSequence.clone(),
+      commandBuilder.clone()
+    )
   }
 }

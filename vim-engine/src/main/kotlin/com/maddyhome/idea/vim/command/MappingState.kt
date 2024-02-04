@@ -16,7 +16,7 @@ import java.awt.event.ActionListener
 import javax.swing.KeyStroke
 import javax.swing.Timer
 
-public class MappingState {
+public class MappingState: Cloneable {
   // Map command depth. 0 - if it is not a map command. 1 - regular map command. 2+ - nested map commands
   private var mapDepth = 0
 
@@ -35,7 +35,7 @@ public class MappingState {
   public val keys: Iterable<KeyStroke>
     get() = keyList
 
-  private val timer = VimTimer(injector.globalOptions().timeoutlen)
+  private var timer = VimTimer(injector.globalOptions().timeoutlen)
   private var keyList = mutableListOf<KeyStroke>()
 
   init {
@@ -89,6 +89,14 @@ public class MappingState {
     var result = mapDepth
     result = 31 * result + timer.hashCode()
     result = 31 * result + keyList.hashCode()
+    return result
+  }
+
+  public override fun clone(): MappingState {
+    val result = MappingState()
+    result.timer = timer
+    result.mapDepth = mapDepth
+    result.keyList = keyList.toMutableList()
     return result
   }
 

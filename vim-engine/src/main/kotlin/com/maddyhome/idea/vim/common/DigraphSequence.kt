@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-public class DigraphSequence {
+public class DigraphSequence: Cloneable {
   private var digraphState = DIG_STATE_PENDING
   private var digraphChar = 0.toChar()
   private lateinit var codeChars: CharArray
@@ -245,6 +245,18 @@ public class DigraphSequence {
     result = 31 * result + codeCnt
     result = 31 * result + codeType
     result = 31 * result + codeMax
+    return result
+  }
+
+  public override fun clone(): DigraphSequence {
+    val result = DigraphSequence()
+    result.digraphState = digraphState
+    result.digraphChar = digraphChar
+    result.codeChars = codeChars.copyOf()
+    result.codeCnt = codeCnt
+    result.codeType = codeType
+    result.codeMax = codeMax
+
     return result
   }
 

@@ -49,7 +49,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  public val keyState: KeyHandlerState = KeyHandlerState()
+  public var keyState: KeyHandlerState = KeyHandlerState()
 
   private var handleKeyRecursionCount = 0
 
