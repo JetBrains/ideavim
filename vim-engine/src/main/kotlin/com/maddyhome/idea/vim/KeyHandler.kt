@@ -49,7 +49,8 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  public var keyState: KeyHandlerState = KeyHandlerState()
+  public var keyHandlerState: KeyHandlerState = KeyHandlerState()
+    private set
 
   private var handleKeyRecursionCount = 0
 
@@ -64,8 +65,12 @@ public class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  public fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext) {
-    handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false)
+  public fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState? = null) {
+    if (keyState == null) {
+      handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false)
+    } else {
+      handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false, keyState)
+    }
   }
 
   /**
@@ -75,6 +80,7 @@ public class KeyHandler {
    * @param mappingCompleted - if true, we don't check if the mapping is incomplete
    *
    * TODO mappingCompleted and recursionCounter - we should find a more beautiful way to use them
+   * TODO it should not receive editor at all and use the focused one. It will help to execute macro between multiple editors
    */
   public fun handleKey(
     editor: VimEditor,
@@ -82,6 +88,7 @@ public class KeyHandler {
     context: ExecutionContext,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
+    keyState: KeyHandlerState? = null,
   ) {
     LOG.trace {
       """
@@ -98,9 +105,10 @@ public class KeyHandler {
       return
     }
 
+    val newState = keyState ?: this.keyHandlerState
     injector.messages.clearError()
     val editorState = editor.vimStateMachine
-    val commandBuilder = editorState.commandBuilder
+    val commandBuilder = newState.commandBuilder
 
     // If this is a "regular" character keystroke, get the character
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
@@ -110,37 +118,37 @@ public class KeyHandler {
     handleKeyRecursionCount++
     try {
       LOG.trace("Start key processing...")
-      if (!allowKeyMappings || !MappingProcessor.handleKeyMapping(editor, key, context, mappingCompleted)) {
+      if (!allowKeyMappings || !MappingProcessor.handleKeyMapping(editor, key, newState, context, mappingCompleted)) {
         LOG.trace("Mappings processed, continue processing key.")
-        if (isCommandCountKey(chKey, editorState)) {
+        if (isCommandCountKey(chKey, newState, editorState)) {
           commandBuilder.addCountCharacter(key)
-        } else if (isDeleteCommandCountKey(key, editorState)) {
+        } else if (isDeleteCommandCountKey(key, newState, editorState.mode)) {
           commandBuilder.deleteCountCharacter()
         } else if (isEditorReset(key, editorState)) {
-          handleEditorReset(editor, key, context, editorState)
+          handleEditorReset(editor, key, newState, context)
         } else if (isExpectingCharArgument(commandBuilder)) {
-          handleCharArgument(key, chKey, editorState, editor)
+          handleCharArgument(key, chKey, newState, editor)
         } else if (editorState.isRegisterPending) {
           LOG.trace("Pending mode.")
           commandBuilder.addKey(key)
-          handleSelectRegister(editorState, chKey)
-        } else if (!handleDigraph(editor, key, context, editorState)) {
+          handleSelectRegister(editorState, chKey, newState)
+        } else if (!handleDigraph(editor, key, newState, context)) {
           LOG.debug("Digraph is NOT processed")
 
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
-          val node: Node<LazyVimCommand>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState)
+          val node: Node<LazyVimCommand>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState.mode, newState)
           LOG.trace("Get the node for the current mode")
 
           if (node is CommandNode<LazyVimCommand>) {
             LOG.trace("Node is a command node")
-            handleCommandNode(editor, context, key, node, editorState)
+            handleCommandNode(editor, context, key, node, newState, editorState)
             commandBuilder.addKey(key)
           } else if (node is CommandPartNode<LazyVimCommand>) {
             LOG.trace("Node is a command part node")
             commandBuilder.setCurrentCommandPartNode(node)
             commandBuilder.addKey(key)
-          } else if (isSelectRegister(key, editorState)) {
+          } else if (isSelectRegister(key, newState, editorState)) {
             LOG.trace("Select register")
             editorState.isRegisterPending = true
             commandBuilder.addKey(key)
@@ -162,35 +170,37 @@ public class KeyHandler {
               LOG.trace("Set command state to bad_command")
               commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
             }
-            partialReset(editor)
+            partialReset(newState, editorState.mode)
           }
         }
       }
-      finishedCommandPreparation(editor, context, editorState, commandBuilder, key, shouldRecord)
     } finally {
       handleKeyRecursionCount--
     }
+    finishedCommandPreparation(editor, context, editorState, key, shouldRecord, newState)
+    updateState(newState)
   }
 
   internal fun finishedCommandPreparation(
     editor: VimEditor,
     context: ExecutionContext,
     editorState: VimStateMachine,
-    commandBuilder: CommandBuilder,
     key: KeyStroke?,
     shouldRecord: Boolean,
+    keyState: KeyHandlerState,
   ) {
     // Do we have a fully entered command at this point? If so, let's execute it.
+    val commandBuilder = keyState.commandBuilder
     if (commandBuilder.isReady) {
       LOG.trace("Ready command builder. Execute command.")
-      executeCommand(editor, context, editorState)
+      executeCommand(editor, context, editorState, keyState)
     } else if (commandBuilder.isBad) {
       LOG.trace("Command builder is set to BAD")
       editor.resetOpPending()
       editorState.resetRegisterPending()
       editor.isReplaceCharacter = false
       injector.messages.indicateError()
-      reset(editor)
+      reset(keyState, editorState.mode)
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
@@ -211,22 +221,31 @@ public class KeyHandler {
   private fun mapOpCommand(
     key: KeyStroke,
     node: Node<LazyVimCommand>?,
-    editorState: VimStateMachine,
+    mode: Mode,
+    keyState: KeyHandlerState,
   ): Node<LazyVimCommand>? {
-    return if (editorState.isDuplicateOperatorKeyStroke(key, editorState.mode)) {
-      editorState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
+    return if (isDuplicateOperatorKeyStroke(key, mode, keyState)) {
+      keyState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
     } else {
       node
     }
   }
 
+  public fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode, keyState: KeyHandlerState): Boolean {
+    return isOperatorPending(mode, keyState) && keyState.commandBuilder.isDuplicateOperatorKeyStroke(key)
+  }
+
+  public fun isOperatorPending(mode: Mode, keyState: KeyHandlerState): Boolean {
+    return mode is Mode.OP_PENDING && !keyState.commandBuilder.isEmpty
+  }
+
   private fun handleEditorReset(
     editor: VimEditor,
     key: KeyStroke,
+    keyState: KeyHandlerState,
     context: ExecutionContext,
-    editorState: VimStateMachine,
   ) {
-    val commandBuilder = editorState.commandBuilder
+    val commandBuilder = keyState.commandBuilder
     if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
       editor.isReplaceCharacter = false
     }
@@ -249,12 +268,12 @@ public class KeyHandler {
         }
       }
     }
-    reset(editor)
+    reset(keyState, editor.mode)
   }
 
-  private fun isCommandCountKey(chKey: Char, editorState: VimStateMachine): Boolean {
+  private fun isCommandCountKey(chKey: Char, keyState: KeyHandlerState, editorState: VimStateMachine): Boolean {
     // Make sure to avoid handling '0' as the start of a count.
-    val commandBuilder = editorState.commandBuilder
+    val commandBuilder = keyState.commandBuilder
     val notRegisterPendingCommand = editorState.mode is Mode.NORMAL && !editorState.isRegisterPending
     val visualMode = editorState.mode is Mode.VISUAL && !editorState.isRegisterPending
     val opPendingMode = editorState.mode is Mode.OP_PENDING
@@ -269,11 +288,11 @@ public class KeyHandler {
     return false
   }
 
-  private fun isDeleteCommandCountKey(key: KeyStroke, editorState: VimStateMachine): Boolean {
+  private fun isDeleteCommandCountKey(key: KeyStroke, keyState: KeyHandlerState, mode: Mode): Boolean {
     // See `:help N<Del>`
-    val commandBuilder = editorState.commandBuilder
+    val commandBuilder = keyState.commandBuilder
     val isDeleteCommandKeyCount =
-      (editorState.mode is Mode.NORMAL || editorState.mode is Mode.VISUAL || editorState.mode is Mode.OP_PENDING) &&
+      (mode is Mode.NORMAL || mode is Mode.VISUAL || mode is Mode.OP_PENDING) &&
         commandBuilder.isExpectingCount && commandBuilder.count > 0 && key.keyCode == KeyEvent.VK_DELETE
 
     LOG.debug { "This is a delete command key count: $isDeleteCommandKeyCount" }
@@ -286,26 +305,26 @@ public class KeyHandler {
     return editorReset
   }
 
-  private fun isSelectRegister(key: KeyStroke, editorState: VimStateMachine): Boolean {
+  private fun isSelectRegister(key: KeyStroke, keyState: KeyHandlerState, editorState: VimStateMachine): Boolean {
     if (editorState.mode !is Mode.NORMAL && editorState.mode !is Mode.VISUAL) {
       return false
     }
     return if (editorState.isRegisterPending) {
       true
     } else {
-      key.keyChar == '"' && !editorState.isOperatorPending(editorState.mode) && editorState.commandBuilder.expectedArgumentType == null
+      key.keyChar == '"' && !isOperatorPending(editorState.mode, keyState) && keyState.commandBuilder.expectedArgumentType == null
     }
   }
 
-  private fun handleSelectRegister(vimStateMachine: VimStateMachine, chKey: Char) {
+  private fun handleSelectRegister(vimStateMachine: VimStateMachine, chKey: Char, keyState: KeyHandlerState) {
     LOG.trace("Handle select register")
     vimStateMachine.resetRegisterPending()
     if (injector.registerGroup.isValid(chKey)) {
       LOG.trace("Valid register")
-      vimStateMachine.commandBuilder.pushCommandPart(chKey)
+      keyState.commandBuilder.pushCommandPart(chKey)
     } else {
       LOG.trace("Invalid register, set command state to BAD_COMMAND")
-      vimStateMachine.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
+      keyState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     }
   }
 
@@ -315,7 +334,7 @@ public class KeyHandler {
     return expectingCharArgument
   }
 
-  private fun handleCharArgument(key: KeyStroke, chKey: Char, vimStateMachine: VimStateMachine, editor: VimEditor) {
+  private fun handleCharArgument(key: KeyStroke, chKey: Char, keyState: KeyHandlerState, editor: VimEditor) {
     var mutableChKey = chKey
     LOG.trace("Handling char argument")
     // We are expecting a character argument - is this a regular character the user typed?
@@ -326,7 +345,7 @@ public class KeyHandler {
         KeyEvent.VK_ENTER -> mutableChKey = '\n'
       }
     }
-    val commandBuilder = vimStateMachine.commandBuilder
+    val commandBuilder = keyState.commandBuilder
     if (mutableChKey.code != 0) {
       LOG.trace("Add character argument to the current command")
       // Create the character argument, add it to the current command, and signal we are ready to process the command
@@ -342,29 +361,30 @@ public class KeyHandler {
   private fun handleDigraph(
     editor: VimEditor,
     key: KeyStroke,
+    keyState: KeyHandlerState,
     context: ExecutionContext,
-    editorState: VimStateMachine,
   ): Boolean {
     LOG.debug("Handling digraph")
     // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
     // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
     // VimActions don't work as arguments for operators, so we have to special case here. Helpfully, Vim appears to
     // hardcode the shortcuts, and doesn't support mapping, so everything works nicely.
-    val commandBuilder = editorState.commandBuilder
+    val commandBuilder = keyState.commandBuilder
+    val digraphSequence = keyState.digraphSequence
     if (commandBuilder.expectedArgumentType == Argument.Type.DIGRAPH) {
       LOG.trace("Expected argument is digraph")
-      if (editorState.digraphSequence.isDigraphStart(key)) {
-        editorState.startDigraphSequence()
-        editorState.commandBuilder.addKey(key)
+      if (digraphSequence.isDigraphStart(key)) {
+        digraphSequence.startDigraphSequence()
+        commandBuilder.addKey(key)
         return true
       }
-      if (editorState.digraphSequence.isLiteralStart(key)) {
-        editorState.startLiteralSequence()
-        editorState.commandBuilder.addKey(key)
+      if (digraphSequence.isLiteralStart(key)) {
+        digraphSequence.startLiteralSequence()
+        commandBuilder.addKey(key)
         return true
       }
     }
-    val res = editorState.processDigraphKey(key, editor)
+    val res = digraphSequence.processKey(key, editor)
     if (injector.exEntryPanel.isActive()) {
       when (res.result) {
         DigraphResult.RES_HANDLED -> setPromptCharacterEx(if (commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
@@ -377,7 +397,7 @@ public class KeyHandler {
     }
     when (res.result) {
       DigraphResult.RES_HANDLED -> {
-        editorState.commandBuilder.addKey(key)
+        commandBuilder.addKey(key)
         return true
       }
       DigraphResult.RES_DONE -> {
@@ -385,8 +405,8 @@ public class KeyHandler {
           commandBuilder.fallbackToCharacterArgument()
         }
         val stroke = res.stroke ?: return false
-        editorState.commandBuilder.addKey(key)
-        handleKey(editor, stroke, context)
+        commandBuilder.addKey(key)
+        handleKey(editor, stroke, context, keyState)
         return true
       }
       DigraphResult.RES_BAD -> {
@@ -401,7 +421,7 @@ public class KeyHandler {
         // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
         if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
           commandBuilder.fallbackToCharacterArgument()
-          handleKey(editor, key, context)
+          handleKey(editor, key, context, keyState)
           return true
         }
         return false
@@ -414,9 +434,10 @@ public class KeyHandler {
     editor: VimEditor,
     context: ExecutionContext,
     editorState: VimStateMachine,
+    keyState: KeyHandlerState,
   ) {
     LOG.trace("Command execution")
-    val command = editorState.commandBuilder.buildCommand()
+    val command = keyState.commandBuilder.buildCommand()
     val operatorArguments = OperatorArguments(
       editor.mode is Mode.OP_PENDING,
       command.rawCount,
@@ -432,13 +453,13 @@ public class KeyHandler {
     if (type.isWrite) {
       if (!editor.isWritable()) {
         injector.messages.indicateError()
-        reset(editor)
+        reset(keyState, editorState.mode)
         LOG.warn("File is not writable")
         return
       }
     }
     if (injector.application.isMainThread()) {
-      val action: Runnable = ActionRunner(editor, context, command, operatorArguments)
+      val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments)
       val cmdAction = command.action
       val name = cmdAction.id
       if (type.isWrite) {
@@ -456,12 +477,13 @@ public class KeyHandler {
     context: ExecutionContext,
     key: KeyStroke,
     node: CommandNode<LazyVimCommand>,
+    keyState: KeyHandlerState,
     editorState: VimStateMachine,
   ) {
     LOG.trace("Handle command node")
     // The user entered a valid command. Create the command and add it to the stack.
     val action = node.actionHolder.instance
-    val commandBuilder = editorState.commandBuilder
+    val commandBuilder = keyState.commandBuilder
     val expectedArgumentType = commandBuilder.expectedArgumentType
     commandBuilder.pushCommandPart(action)
     if (!checkArgumentCompatibility(expectedArgumentType, action)) {
@@ -469,14 +491,14 @@ public class KeyHandler {
       commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
       return
     }
-    if (action.argumentType == null || stopMacroRecord(node, editorState)) {
+    if (action.argumentType == null || stopMacroRecord(node)) {
       LOG.trace("Set command state to READY")
       commandBuilder.commandState = CurrentCommandState.READY
     } else {
       LOG.trace("Set waiting for the argument")
       val argumentType = action.argumentType
-      startWaitingForArgument(editor, context, key.keyChar, action, argumentType!!, editorState)
-      partialReset(editor)
+      startWaitingForArgument(editor, context, key.keyChar, action, argumentType!!, keyState, editorState)
+      partialReset(keyState, editorState.mode)
     }
 
     // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
@@ -506,7 +528,7 @@ public class KeyHandler {
     }
   }
 
-  private fun stopMacroRecord(node: CommandNode<LazyVimCommand>, editorState: VimStateMachine): Boolean {
+  private fun stopMacroRecord(node: CommandNode<LazyVimCommand>): Boolean {
     // TODO
 //    return editorState.isRecording && node.actionHolder.getInstance() is ToggleRecordingAction
     return injector.registerGroup.isRecording && node.actionHolder.instance.id == "VimToggleRecordingAction"
@@ -518,9 +540,10 @@ public class KeyHandler {
     key: Char,
     action: EditorActionHandlerBase,
     argument: Argument.Type,
+    keyState: KeyHandlerState,
     editorState: VimStateMachine,
   ) {
-    val commandBuilder = editorState.commandBuilder
+    val commandBuilder = keyState.commandBuilder
     when (argument) {
       Argument.Type.MOTION -> {
         if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
@@ -537,10 +560,10 @@ public class KeyHandler {
         // TODO
 //        if (action is InsertCompletedDigraphAction) {
         if (action.id == "VimInsertCompletedDigraphAction") {
-          editorState.startDigraphSequence()
+          keyState.digraphSequence.startDigraphSequence()
           setPromptCharacterEx('?')
         } else if (action.id == "VimInsertCompletedLiteralAction") {
-          editorState.startLiteralSequence()
+          keyState.digraphSequence.startLiteralSequence()
           setPromptCharacterEx('^')
         }
 
@@ -579,9 +602,13 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public fun partialReset(editor: VimEditor) {
-    val editorState = VimStateMachine.getInstance(editor)
-    editorState.mappingState.resetMappingSequence()
-    editorState.commandBuilder.resetInProgressCommandPart(getKeyRoot(editor.mode.toMappingMode()))
+    partialReset(keyHandlerState, editor.mode)
+  }
+
+  // TODO replace with com.maddyhome.idea.vim.state.KeyHandlerState#partialReset
+  private fun partialReset(keyState: KeyHandlerState, mode: Mode) {
+    keyState.mappingState.resetMappingSequence()
+    keyState.commandBuilder.resetInProgressCommandPart(getKeyRoot(mode.toMappingMode()))
   }
 
   /**
@@ -589,14 +616,24 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
+  // TODO replace with com.maddyhome.idea.vim.state.KeyHandlerState#reset
   public fun reset(editor: VimEditor) {
-    partialReset(editor)
-    val editorState = VimStateMachine.getInstance(editor)
-    editorState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
+    partialReset(keyHandlerState, editor.mode)
+    keyHandlerState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
+  }
+
+  // TODO replace with com.maddyhome.idea.vim.state.KeyHandlerState#reset
+  public fun reset(keyState: KeyHandlerState, mode: Mode) {
+    partialReset(keyState, mode)
+    keyState.commandBuilder.resetAll(getKeyRoot(mode.toMappingMode()))
   }
 
   private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> {
     return injector.keyGroup.getKeyRoot(mappingMode)
+  }
+
+  private fun updateState(keyState: KeyHandlerState) {
+    this.keyHandlerState = keyState
   }
 
   /**
@@ -608,7 +645,7 @@ public class KeyHandler {
   public fun fullReset(editor: VimEditor) {
     injector.messages.clearError()
     editor.resetState()
-    reset(editor)
+    reset(keyHandlerState, editor.mode)
     injector.registerGroupIfCreated?.resetRegister()
     editor.removeSelection()
   }
@@ -627,11 +664,12 @@ public class KeyHandler {
     val editor: VimEditor,
     val context: ExecutionContext,
     val cmd: Command,
+    val keyState: KeyHandlerState,
     val operatorArguments: OperatorArguments,
   ) : Runnable {
     override fun run() {
       val editorState = VimStateMachine.getInstance(editor)
-      editorState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
+      keyState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
       val register = cmd.register
       if (register != null) {
         injector.registerGroup.selectRegister(register)
@@ -664,8 +702,8 @@ public class KeyHandler {
           }
         }
       }
-      if (editorState.commandBuilder.isDone()) {
-        getInstance().reset(editor)
+      if (keyState.commandBuilder.isDone()) {
+        getInstance().reset(keyState, editorState.mode)
       }
     }
   }

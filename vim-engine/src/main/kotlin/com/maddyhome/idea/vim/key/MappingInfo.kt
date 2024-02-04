@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
@@ -49,7 +49,7 @@ public sealed class MappingInfo(
   @VimNlsSafe
   abstract override fun getPresentableString(): String
 
-  abstract override fun execute(editor: VimEditor, context: ExecutionContext)
+  abstract override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState)
 
   override fun compareTo(other: MappingInfo): Int {
     val size = fromKeys.size
@@ -85,7 +85,7 @@ public class ToKeysMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = injector.parser.toKeyNotation(toKeys)
 
-  override fun execute(editor: VimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToKeys' mapping info...")
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
@@ -123,7 +123,7 @@ public class ToExpressionMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = originalString
 
-  override fun execute(editor: VimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToExpression' mapping info...")
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val toKeys = injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
@@ -150,7 +150,7 @@ public class ToHandlerMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
-  override fun execute(editor: VimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToHandler' mapping info...")
     val vimStateMachine = VimStateMachine.getInstance(editor)
 
@@ -168,24 +168,25 @@ public class ToHandlerMappingInfo(
     val handler = extensionHandler
     if (handler is ExtensionHandler.WithCallback) {
       handler._backingFunction = Runnable {
-        myFun(shouldCalculateOffsets, editor, startOffsets)
+        myFun(shouldCalculateOffsets, editor, startOffsets, keyState)
 
         if (shouldCalculateOffsets) {
           injector.application.invokeLater {
-            KeyHandler.getInstance().finishedCommandPreparation(
+            val keyHandler = KeyHandler.getInstance()
+            keyHandler.finishedCommandPreparation(
               editor,
               context,
               VimStateMachine.getInstance(editor),
-              VimStateMachine.getInstance(editor).commandBuilder,
               null,
               false,
+              keyState
             )
           }
         }
       }
     }
 
-    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending(editor.mode), vimStateMachine.commandBuilder.count, vimStateMachine.mode)
+    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending(editor.mode), keyState.commandBuilder.count, vimStateMachine.mode)
     injector.actionExecutor.executeCommand(
       editor,
       { extensionHandler.execute(editor, context, operatorArguments) },
@@ -200,7 +201,7 @@ public class ToHandlerMappingInfo(
     }
 
     if (handler !is ExtensionHandler.WithCallback) {
-      myFun(shouldCalculateOffsets, editor, startOffsets)
+      myFun(shouldCalculateOffsets, editor, startOffsets, keyState)
     }
   }
 
@@ -211,9 +212,9 @@ public class ToHandlerMappingInfo(
       shouldCalculateOffsets: Boolean,
       editor: VimEditor,
       startOffsets: Map<ImmutableVimCaret, Offset>,
+      keyState: KeyHandlerState,
     ) {
-      val commandState = editor.vimStateMachine
-      if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {
+      if (shouldCalculateOffsets && !keyState.commandBuilder.hasCurrentCommandPartArgument()) {
         val offsets: MutableMap<ImmutableVimCaret, VimSelection> = HashMap()
         for (caret in editor.carets()) {
           var startOffset = startOffsets[caret]
@@ -239,7 +240,7 @@ public class ToHandlerMappingInfo(
           }
         }
         if (offsets.isNotEmpty()) {
-          commandState.commandBuilder.completeCommandPart(Argument(offsets))
+          keyState.commandBuilder.completeCommandPart(Argument(offsets))
         }
       }
     }
@@ -254,7 +255,7 @@ public class ToActionMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "action $action"
 
-  override fun execute(editor: VimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToAction' mapping...")
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val dataContext = injector.executionContextManager.onCaret(editor.currentCaret(), editorDataContext)

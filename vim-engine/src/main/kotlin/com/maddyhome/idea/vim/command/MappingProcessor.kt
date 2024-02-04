@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyMappingLayer
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import javax.swing.KeyStroke
 
@@ -29,16 +30,17 @@ public object MappingProcessor {
   internal fun handleKeyMapping(
     editor: VimEditor,
     key: KeyStroke,
+    keyState: KeyHandlerState,
     context: ExecutionContext,
     mappingCompleted: Boolean,
   ): Boolean {
     log.debug("Start processing key mappings.")
     val commandState = editor.vimStateMachine
-    val mappingState = commandState.mappingState
-    val commandBuilder = commandState.commandBuilder
+    val mappingState = keyState.mappingState
+    val commandBuilder = keyState.commandBuilder
     if (commandBuilder.isAwaitingCharOrDigraphArgument() ||
       commandBuilder.isBuildingMultiKeyCommand() ||
-      isMappingDisabledForKey(key, commandState) ||
+      isMappingDisabledForKey(key, keyState) ||
       commandState.isRegisterPending
     ) {
       log.debug("Finish key processing, returning false")
@@ -56,25 +58,26 @@ public object MappingProcessor {
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
     val mappingProcessed =
-      handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted) ||
-        handleCompleteMappingSequence(editor, context, mappingState, mapping, key) ||
-        handleAbandonedMappingSequence(editor, mappingState, context)
+      handleUnfinishedMappingSequence(editor, keyState, mappingState, mapping, mappingCompleted) ||
+        handleCompleteMappingSequence(editor, keyState, context, mappingState, mapping, key) ||
+        handleAbandonedMappingSequence(editor, keyState, mappingState, context)
     log.debug { "Finish mapping processing. Return $mappingProcessed" }
 
     return mappingProcessed
   }
 
-  private fun isMappingDisabledForKey(key: KeyStroke, vimStateMachine: VimStateMachine): Boolean {
+  private fun isMappingDisabledForKey(key: KeyStroke, keyState: KeyHandlerState): Boolean {
     // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
     // entering a count.
     // See `:help :map-modes`
-    val isMappingDisabled = key.keyChar == '0' && vimStateMachine.commandBuilder.count > 0
+    val isMappingDisabled = key.keyChar == '0' && keyState.commandBuilder.count > 0
     log.debug { "Mapping disabled for key: $isMappingDisabled" }
     return isMappingDisabled
   }
 
   private fun handleUnfinishedMappingSequence(
     editor: VimEditor,
+    keyState: KeyHandlerState,
     mappingState: MappingState,
     mapping: KeyMappingLayer,
     mappingCompleted: Boolean,
@@ -130,6 +133,7 @@ public object MappingProcessor {
                 injector.executionContextManager.onEditor(editor),
                 allowKeyMappings = true,
                 mappingCompleted = lastKeyInSequence,
+                keyState,
               )
             }
           },
@@ -143,6 +147,7 @@ public object MappingProcessor {
 
   private fun handleCompleteMappingSequence(
     editor: VimEditor,
+    keyState: KeyHandlerState,
     context: ExecutionContext,
     mappingState: MappingState,
     mapping: KeyMappingLayer,
@@ -180,7 +185,7 @@ public object MappingProcessor {
     log.trace("Executing mapping info")
     try {
       mappingState.startMapExecution()
-      mappingInfo.execute(editor, context)
+      mappingInfo.execute(editor, context, keyState)
     } catch (e: Exception) {
       injector.messages.showStatusBarMessage(editor, e.message)
       injector.messages.indicateError()
@@ -208,7 +213,7 @@ public object MappingProcessor {
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo !== currentMappingInfo) {
       log.trace("Evaluating the current key")
-      KeyHandler.getInstance().handleKey(editor, key, currentContext, allowKeyMappings = true, false)
+      KeyHandler.getInstance().handleKey(editor, key, currentContext, allowKeyMappings = true, false, keyState)
     }
     log.trace("Success processing of mapping")
     return true
@@ -216,6 +221,7 @@ public object MappingProcessor {
 
   private fun handleAbandonedMappingSequence(
     editor: VimEditor,
+    keyState: KeyHandlerState,
     mappingState: MappingState,
     context: ExecutionContext,
   ): Boolean {
@@ -246,14 +252,15 @@ public object MappingProcessor {
         context,
         allowKeyMappings = true,
         mappingCompleted = false,
+        keyState,
       )
     } else {
       log.trace("Process abandoned keys.")
       KeyHandler.getInstance()
-        .handleKey(editor, unhandledKeyStrokes[0], context, allowKeyMappings = false, mappingCompleted = false)
+        .handleKey(editor, unhandledKeyStrokes[0], context, allowKeyMappings = false, mappingCompleted = false, keyState)
       for (keyStroke in unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size)) {
         KeyHandler.getInstance()
-          .handleKey(editor, keyStroke, context, allowKeyMappings = true, mappingCompleted = false)
+          .handleKey(editor, keyStroke, context, allowKeyMappings = true, mappingCompleted = false, keyState)
       }
     }
     log.trace("Return true from abandoned keys processing.")

@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.annotations.Contract
@@ -27,10 +28,14 @@ import javax.swing.KeyStroke
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
 public class VimStateMachineImpl : VimStateMachine {
-  override val commandBuilder: CommandBuilder = KeyHandler.getInstance().keyState.commandBuilder
+  @Deprecated("Please use KeyHandlerState instead")
+  override val commandBuilder: CommandBuilder = KeyHandler.getInstance().keyHandlerState.commandBuilder
+  @Deprecated("Please use KeyHandlerState instead")
+  override val mappingState: MappingState = KeyHandler.getInstance().keyHandlerState.mappingState
+  @Deprecated("Please use KeyHandlerState instead")
+  override val digraphSequence: DigraphSequence = KeyHandler.getInstance().keyHandlerState.digraphSequence
+
   override var mode: Mode = Mode.NORMAL()
-  override val mappingState: MappingState = KeyHandler.getInstance().keyState.mappingState
-  override val digraphSequence: DigraphSequence = KeyHandler.getInstance().keyState.digraphSequence
   override var isDotRepeatInProgress: Boolean = false
   override var isRegisterPending: Boolean = false
   override var isReplaceCharacter: Boolean = false
@@ -48,11 +53,13 @@ public class VimStateMachineImpl : VimStateMachine {
   override var executingCommand: Command? = null
 
   override fun isOperatorPending(mode: Mode): Boolean {
-    return mode is Mode.OP_PENDING && !commandBuilder.isEmpty
+    val keyHandler = KeyHandler.getInstance()
+    return keyHandler.isOperatorPending(mode, keyHandler.keyHandlerState)
   }
 
   override fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode): Boolean {
-    return isOperatorPending(mode) && commandBuilder.isDuplicateOperatorKeyStroke(key)
+    val keyHandler = KeyHandler.getInstance()
+    return keyHandler.isDuplicateOperatorKeyStroke(key, mode, keyHandler.keyHandlerState)
   }
 
   override val executingCommandFlags: EnumSet<CommandFlags>
@@ -66,15 +73,18 @@ public class VimStateMachineImpl : VimStateMachine {
   }
 
   override fun startDigraphSequence() {
-    digraphSequence.startDigraphSequence()
+    val keyHandler = KeyHandler.getInstance()
+    keyHandler.keyHandlerState.digraphSequence.startDigraphSequence()
   }
 
   override fun startLiteralSequence() {
-    digraphSequence.startLiteralSequence()
+    val keyHandler = KeyHandler.getInstance()
+    keyHandler.keyHandlerState.digraphSequence.startLiteralSequence()
   }
 
   override fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult {
-    return digraphSequence.processKey(key, editor)
+    val keyHandler = KeyHandler.getInstance()
+    return keyHandler.keyHandlerState.digraphSequence.processKey(key, editor)
   }
 
   /**
