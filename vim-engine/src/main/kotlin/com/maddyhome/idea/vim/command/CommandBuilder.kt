@@ -191,6 +191,33 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
 
   @TestOnly
   public fun getCurrentTrie(): CommandPartNode<LazyVimCommand> = currentCommandPartNode
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as CommandBuilder
+
+    if (currentCommandPartNode != other.currentCommandPartNode) return false
+    if (commandParts != other.commandParts) return false
+    if (keyList != other.keyList) return false
+    if (commandState != other.commandState) return false
+    if (count != other.count) return false
+    if (expectedArgumentType != other.expectedArgumentType) return false
+    if (prevExpectedArgumentType != other.prevExpectedArgumentType) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = currentCommandPartNode.hashCode()
+    result = 31 * result + commandParts.hashCode()
+    result = 31 * result + keyList.hashCode()
+    result = 31 * result + commandState.hashCode()
+    result = 31 * result + count
+    result = 31 * result + (expectedArgumentType?.hashCode() ?: 0)
+    result = 31 * result + (prevExpectedArgumentType?.hashCode() ?: 0)
+    return result
+  }
 
   public companion object {
     private val LOG = vimLogger<CommandBuilder>()

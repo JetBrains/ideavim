@@ -16,10 +16,12 @@ import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 
-public class KeyHandlerState {
-  public val mappingState: MappingState = MappingState()
-  public val digraphSequence: DigraphSequence = DigraphSequence()
-  public val commandBuilder: CommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL))
+public data class KeyHandlerState(
+  public val mappingState: MappingState,
+  public val digraphSequence: DigraphSequence,
+  public val commandBuilder: CommandBuilder,
+) {
+  public constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)))
 
   public fun partialReset(mode: Mode) {
     digraphSequence.reset()

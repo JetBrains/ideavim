@@ -42,10 +42,21 @@ import javax.swing.KeyStroke
 public interface Node<T>
 
 /** Represents a complete command */
-public class CommandNode<T>(public val actionHolder: T) : Node<T>
+public data class CommandNode<T>(public val actionHolder: T) : Node<T>
 
 /** Represents a part of the command */
-public open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>()
+public open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    if (!super.equals(other)) return false
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return super.hashCode()
+  }
+}
 
 /** Represents a root node for the mode */
 public class RootNode<T> : CommandPartNode<T>()
