@@ -56,6 +56,8 @@ public object IjOptions {
   })
   public val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
   public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
+  public val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
+  public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
   public val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))
   public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
 
