@@ -28,6 +28,9 @@ usual beta standards.
 ### Fixes:
 * [VIM-3055](https://youtrack.jetbrains.com/issue/VIM-3055) Fix the issue with double deleting after dot
 
+### Merged PRs:
+* [725](https://github.com/JetBrains/ideavim/pull/725) by [Emanuel Gestosa](https://github.com/emanuelgestosa): Regex
+
 ## 2.8.0, 2024-01-30
 
 ### Fixes:
