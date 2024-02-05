@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
 
 /**
@@ -59,7 +58,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && options(injector, new IjVimEditor(e.getEditor())).getRelativenumber()) {
+      if (requiresRepaint && ijOptions(injector, new IjVimEditor(e.getEditor())).getRelativenumber()) {
         repaintRelativeLineNumbers(e.getEditor());
       }
     }
@@ -107,7 +106,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
-    final EffectiveOptions options = options(injector, new IjVimEditor(editor));
+    final EffectiveIjOptions options = ijOptions(injector, new IjVimEditor(editor));
     final boolean relativeNumber = options.getRelativenumber();
     final boolean number = options.getNumber();
 
@@ -322,7 +321,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = options(injector, new IjVimEditor(editor)).getNumber();
+      final boolean number = ijOptions(injector, new IjVimEditor(editor)).getNumber();
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based

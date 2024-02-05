@@ -50,6 +50,8 @@ public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOpt
   public val colorcolumn: StringListOptionValue by optionProperty(IjOptions.colorcolumn)
   public var cursorline: Boolean by optionProperty(IjOptions.cursorline)
   public var list: Boolean by optionProperty(IjOptions.list)
+  public var number: Boolean by optionProperty(IjOptions.number)
+  public var relativenumber: Boolean by optionProperty(IjOptions.relativenumber)
   public var textwidth: Int by optionProperty(IjOptions.textwidth)
   public var wrap: Boolean by optionProperty(IjOptions.wrap)
 

@@ -57,16 +57,16 @@ class SetlocalCommandTest : VimTestCase() {
   @Test
   fun `test set toggle option local value`() {
     enterCommand("setlocal rnu")
-    assertTrue(options().relativenumber)  // Tests effective (i.e. local) value
+    assertTrue(optionsIj().relativenumber)  // Tests effective (i.e. local) value
 
     enterCommand("setlocal nornu")
-    assertFalse(options().relativenumber)
+    assertFalse(optionsIj().relativenumber)
 
     enterCommand("setlocal rnu!")
-    assertTrue(options().relativenumber)
+    assertTrue(optionsIj().relativenumber)
 
     enterCommand("setlocal invrnu")
-    assertFalse(options().relativenumber)
+    assertFalse(optionsIj().relativenumber)
   }
 
   @Test
@@ -129,10 +129,10 @@ class SetlocalCommandTest : VimTestCase() {
   @Test
   fun `test reset local toggle option value to global value`() {
     enterCommand("setlocal relativenumber") // Default global value is off
-    assertTrue(options().relativenumber)
+    assertTrue(optionsIj().relativenumber)
 
     enterCommand("setlocal relativenumber<")
-    assertFalse(options().relativenumber)
+    assertFalse(optionsIj().relativenumber)
   }
 
   @Test
@@ -157,10 +157,10 @@ class SetlocalCommandTest : VimTestCase() {
   @Test
   fun `test reset toggle option to default value`() {
     enterCommand("setlocal rnu")
-    assertTrue(options().relativenumber)  // Tests effective (i.e. local) value
+    assertTrue(optionsIj().relativenumber)  // Tests effective (i.e. local) value
 
     enterCommand("setlocal rnu&")
-    assertFalse(options().relativenumber)
+    assertFalse(optionsIj().relativenumber)
   }
 
   @Test

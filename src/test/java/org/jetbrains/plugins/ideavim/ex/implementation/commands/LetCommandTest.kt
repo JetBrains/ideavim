@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -137,11 +138,11 @@ class LetCommandTest : VimTestCase() {
 
     // 'number' is a local-to-window toggle option
     enterCommand("let &number = 12")
-    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL(fixture.editor.vim))
-    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.GLOBAL(fixture.editor.vim))
+    val localValue = injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(12, globalValue.value)
     assertEquals(12, localValue.value)
-    assertTrue(options().number)
+    assertTrue(optionsIj().number)
   }
 
   @Test
@@ -150,11 +151,11 @@ class LetCommandTest : VimTestCase() {
 
     // 'number' is a local-to-window option
     enterCommand("let &l:number = 12")
-    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL(fixture.editor.vim))
-    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.GLOBAL(fixture.editor.vim))
+    val localValue = injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(0, globalValue.value)
     assertEquals(12, localValue.value)
-    assertTrue(options().number)
+    assertTrue(optionsIj().number)
   }
 
   @Test
@@ -163,11 +164,11 @@ class LetCommandTest : VimTestCase() {
 
     // 'number' is a local-to-window option
     enterCommand("let &g:number = 12")
-    val globalValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL(fixture.editor.vim))
-    val localValue = injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim))
+    val globalValue = injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.GLOBAL(fixture.editor.vim))
+    val localValue = injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.LOCAL(fixture.editor.vim))
     assertEquals(12, globalValue.value)
     assertEquals(0, localValue.value)
-    assertFalse(options().number)
+    assertFalse(optionsIj().number)
   }
 
   @Test
