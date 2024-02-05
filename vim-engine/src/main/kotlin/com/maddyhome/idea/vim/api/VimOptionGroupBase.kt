@@ -666,6 +666,7 @@ private class OptionListenersImpl(private val optionStorage: OptionStorage, priv
       if (!optionStorage.isUnsetValue(option, editor)) affectedEditors.add(editor)
     }
     else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
+      // TODO: Should this be localEditors(doc)?
       affectedEditors.addAll(editorGroup.localEditors().filter { !optionStorage.isUnsetValue(option, it) })
     }
 
@@ -744,4 +745,3 @@ private class ParsedValuesCache(
     getStorage(option, editor).remove(option.name)
   }
 }
-

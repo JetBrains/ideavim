@@ -208,6 +208,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   public void editorCreated(@NotNull Editor editor) {
+    UserDataManager.setVimInitialised(editor, true);
+
     VimPlugin.getKey().registerRequiredShortcutKeys(new IjVimEditor(editor));
 
     initLineNumbers(editor);
@@ -326,10 +328,18 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
   }
 
+  @Override
+  public @NotNull Collection<VimEditor> getEditorsRaw() {
+    return getLocalEditors()
+      .map(IjVimEditor::new)
+      .collect(Collectors.toList());
+  }
+
   @NotNull
   @Override
   public Collection<VimEditor> localEditors() {
     return getLocalEditors()
+      .filter(UserDataManager::getVimInitialised)
       .map(IjVimEditor::new)
       .collect(Collectors.toList());
   }
@@ -339,7 +349,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   public Collection<VimEditor> localEditors(@NotNull VimDocument buffer) {
     final Document document = ((IjVimDocument)buffer).getDocument();
     return getLocalEditors()
-      .filter(editor -> editor.getDocument().equals(document))
+      .filter(editor -> UserDataManager.getVimInitialised(editor) && editor.getDocument().equals(document))
       .map(IjVimEditor::new)
       .collect(Collectors.toList());
   }

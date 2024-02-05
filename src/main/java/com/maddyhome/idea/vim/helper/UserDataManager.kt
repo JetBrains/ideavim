@@ -99,6 +99,8 @@ internal var Caret.registerStorage: CaretRegisterStorageBase? by userDataCaretTo
 internal var Caret.markStorage: LocalMarkStorage? by userDataCaretToEditor()
 internal var Caret.lastSelectionInfo: SelectionInfo? by userDataCaretToEditor()
 
+internal var Editor.vimInitialised: Boolean by userDataOr { false }
+
 // ------------------ Editor
 internal fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
@@ -106,6 +108,7 @@ internal fun unInitializeEditor(editor: Editor) {
   editor.vimMorePanel = null
   editor.vimExOutput = null
   editor.vimLastHighlighters = null
+  editor.vimInitialised = false
 }
 
 internal var Editor.vimLastSearch: String? by userData()
