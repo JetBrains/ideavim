@@ -37,7 +37,7 @@ internal object ShowCmd {
   private const val SHOWCMD_COLS = 10
 
   @NonNls
-  internal const val ID = "IdeaVim::ShowCmd"
+  internal const val ID = "IdeaVimShowCmd"
 
   @NlsSafe
   internal const val displayName = "IdeaVim showcmd"

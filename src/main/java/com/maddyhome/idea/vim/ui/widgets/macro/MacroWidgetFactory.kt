@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.ui.widgets.VimWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.mode.VimStatusBarWidget
 import java.awt.Component
 
-private const val ID = "IdeaVim::Macro"
+private const val ID = "IdeaVimMacro"
 
 internal class MacroWidgetFactory : StatusBarWidgetFactory, VimStatusBarWidget {
   private var content: String = ""

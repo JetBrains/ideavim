@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.ui.widgets.VimWidgetListener
 
 public class ModeWidgetFactory : StatusBarWidgetFactory {
   public companion object {
-    public const val ID: String = "IdeaVim::Mode"
+    public const val ID: String = "IdeaVimMode"
   }
 
   override fun getId(): String {

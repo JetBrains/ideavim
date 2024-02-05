@@ -64,10 +64,10 @@
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
-    <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory"/>
-    <statusBarWidgetFactory id="IdeaVim::Mode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory" order="last"/>
-    <statusBarWidgetFactory id="IdeaVim::ShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
-    <statusBarWidgetFactory id="IdeaVim::Macro" implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory"/>
+    <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory" order="last, before Memory"/>
+    <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory" order="last, before IdeaVimMode"/>
+    <statusBarWidgetFactory id="IdeaVimShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
+    <statusBarWidgetFactory id="IdeaVimMacro" implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory" order="first, after IdeaVimShowCmd"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
