@@ -337,7 +337,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   @NotNull
   @Override
-  public Collection<VimEditor> localEditors() {
+  public Collection<VimEditor> getEditors() {
     return getLocalEditors()
       .filter(UserDataManager::getVimInitialised)
       .map(IjVimEditor::new)
@@ -346,7 +346,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   @NotNull
   @Override
-  public Collection<VimEditor> localEditors(@NotNull VimDocument buffer) {
+  public Collection<VimEditor> getEditors(@NotNull VimDocument buffer) {
     final Document document = ((IjVimDocument)buffer).getDocument();
     return getLocalEditors()
       .filter(editor -> UserDataManager.getVimInitialised(editor) && editor.getDocument().equals(document))

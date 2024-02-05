@@ -136,7 +136,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun getAllMarksForFile(editor: VimEditor): List<Pair<ImmutableVimCaret?, Set<Mark>>> {
-    val localMarks = injector.editorGroup.localEditors()
+    val localMarks = injector.editorGroup.getEditors()
       .filter { it.getPath() == editor.getPath() }
       .flatMap { it.carets() }
       .map { Pair(it, getAllLocalMarks(it)) }
@@ -413,7 +413,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun resetAllMarks() {
-    for (editor in injector.editorGroup.localEditors()) {
+    for (editor in injector.editorGroup.getEditors()) {
       editor.carets().forEach {
         resetAllMarksForCaret(it)
       }

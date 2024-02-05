@@ -135,7 +135,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     resetAllOptions(injector.fallbackWindow)
 
     // During testing, we do not expect to have any editors, so this collection is usually empty
-    injector.editorGroup.localEditors().forEach { resetAllOptions(it) }
+    injector.editorGroup.getEditors().forEach { resetAllOptions(it) }
   }
 
   override fun addOption(option: Option<out VimDataType>) {
@@ -192,7 +192,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     if (option.declaredScope != LOCAL_TO_WINDOW) {
       storage.setOptionValue(option, OptionAccessScope.GLOBAL(null), option.defaultValue)
     }
-    injector.editorGroup.localEditors().forEach { editor ->
+    injector.editorGroup.getEditors().forEach { editor ->
       when (option.declaredScope) {
         GLOBAL -> { }
         LOCAL_TO_BUFFER,
@@ -612,7 +612,7 @@ private class OptionListenersImpl(private val optionStorage: OptionStorage, priv
    */
   private fun onGlobalOptionChanged(optionName: String) {
     globalOptionListeners[optionName]?.forEach { it.onGlobalOptionChanged() }
-    fireEffectiveValueChanged(optionName, editorGroup.localEditors())
+    fireEffectiveValueChanged(optionName, editorGroup.getEditors())
   }
 
   /**
@@ -621,7 +621,7 @@ private class OptionListenersImpl(private val optionStorage: OptionStorage, priv
    * Notifies all open editors for the current buffer (document).
    */
   private fun onLocalToBufferOptionChanged(option: Option<out VimDataType>, editor: VimEditor) {
-    fireEffectiveValueChanged(option.name, editorGroup.localEditors(editor.document))
+    fireEffectiveValueChanged(option.name, editorGroup.getEditors(editor.document))
   }
 
   /**
@@ -639,7 +639,7 @@ private class OptionListenersImpl(private val optionStorage: OptionStorage, priv
    * This will notify all open editors where the option is not locally set.
    */
   private fun onGlobalLocalOptionGlobalValueChanged(option: Option<out VimDataType>) {
-    val affectedEditors = editorGroup.localEditors().filter { optionStorage.isUnsetValue(option, it) }
+    val affectedEditors = editorGroup.getEditors().filter { optionStorage.isUnsetValue(option, it) }
     fireEffectiveValueChanged(option.name, affectedEditors)
   }
 
@@ -659,13 +659,13 @@ private class OptionListenersImpl(private val optionStorage: OptionStorage, priv
     // We could get essentially the same behaviour by calling onGlobalLocalOptionGlobalValueChanged followed by
     // onLocalXxxOptionChanged, but that would notify editors for string-based options twice.
     val affectedEditors = mutableListOf<VimEditor>()
-    affectedEditors.addAll(editorGroup.localEditors().filter { optionStorage.isUnsetValue(option, it) })
+    affectedEditors.addAll(editorGroup.getEditors().filter { optionStorage.isUnsetValue(option, it) })
 
     if (option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
       if (!optionStorage.isUnsetValue(option, editor)) affectedEditors.add(editor)
     }
     else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
-      affectedEditors.addAll(editorGroup.localEditors(editor.document).filter { !optionStorage.isUnsetValue(option, it) })
+      affectedEditors.addAll(editorGroup.getEditors(editor.document).filter { !optionStorage.isUnsetValue(option, it) })
     }
 
     fireEffectiveValueChanged(option.name, affectedEditors)

@@ -111,7 +111,7 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
   }
 
   private fun buildJump(place: PlaceInfo): Jump? {
-    val editor = injector.editorGroup.localEditors().firstOrNull { it.ij.virtualFile == place.file } ?: return null
+    val editor = injector.editorGroup.getEditors().firstOrNull { it.ij.virtualFile == place.file } ?: return null
     val offset = place.caretPosition?.startOffset ?: return null
 
     val bufferPosition = editor.offsetToBufferPosition(offset)

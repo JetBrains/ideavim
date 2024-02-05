@@ -14,7 +14,7 @@ public interface VimEditorGroup {
   /**
    * Get a collection of all editors, including those that have not yet been initialised.
    *
-   * You probably don't want to use this - use [localEditors]!
+   * You probably don't want to use this - use [getEditors]!
    *
    * This function is only useful during plugin initialisation. It will return all currently open editors, including
    * those that have not yet been initialised, so the plugin can correctly initialise them. When the plugin starts, the
@@ -40,7 +40,7 @@ public interface VimEditorGroup {
    *
    * Also note that it is possible for multiple editors in different projects to open the same file (document/buffer).
    */
-  public fun localEditors(): Collection<VimEditor>
+  public fun getEditors(): Collection<VimEditor>
 
   /**
    * Get a collection of all initialised editors for the given buffer
@@ -54,5 +54,5 @@ public interface VimEditorGroup {
    * Implementors should take care to only return "local" editors. I.e. for IntelliJ, this function will not include
    * hidden editors that are used to handle requests from Code With Me guests.
    */
-  public fun localEditors(buffer: VimDocument): Collection<VimEditor>
+  public fun getEditors(buffer: VimDocument): Collection<VimEditor>
 }

@@ -98,7 +98,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   @Override
   public void updateShortcutKeysRegistration() {
-    for (VimEditor editor : injector.getEditorGroup().localEditors()) {
+    for (VimEditor editor : injector.getEditorGroup().getEditors()) {
       unregisterShortcutKeys(editor);
       registerRequiredShortcutKeys(editor);
     }

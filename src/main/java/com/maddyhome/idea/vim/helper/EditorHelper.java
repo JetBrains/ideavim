@@ -208,7 +208,7 @@ public class EditorHelper {
     if (doc == null) {
       return null;
     }
-    return injector.getEditorGroup().localEditors(new IjVimDocument(doc)).stream().findFirst().orElse(null);
+    return injector.getEditorGroup().getEditors(new IjVimDocument(doc)).stream().findFirst().orElse(null);
   }
 
   public static @NotNull String pad(final @NotNull Editor editor,
