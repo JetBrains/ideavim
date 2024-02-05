@@ -369,7 +369,7 @@ public class ExOutputPanel extends JPanel {
 
       // This listener is only invoked for local scenarios, and we only need to update local editor UI. This will invoke
       // updateUI on the output pane and it's child components
-      for (VimEditor vimEditor : injector.getEditorGroup().localEditors()) {
+      for (VimEditor vimEditor : injector.getEditorGroup().getEditors()) {
         Editor editor = ((IjVimEditor)vimEditor).getEditor();
         if (!ExOutputPanel.isPanelActive(editor)) continue;
         IJSwingUtilities.updateComponentTreeUI(ExOutputPanel.getInstance(editor));

@@ -232,7 +232,7 @@ internal object VimListenerManager {
     }
 
     fun removeAll() {
-      injector.editorGroup.localEditors().forEach { editor ->
+      injector.editorGroup.getEditors().forEach { editor ->
         remove(editor.ij)
       }
     }

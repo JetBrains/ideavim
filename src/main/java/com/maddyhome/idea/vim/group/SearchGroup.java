@@ -1208,7 +1208,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       // ClientId.current will be a guest ID), but we don't care - we still need to add/remove highlights for the
       // changed text. Make sure we only update local editors, though.
       final Document document = event.getDocument();
-      for (VimEditor vimEditor : injector.getEditorGroup().localEditors(new IjVimDocument(document))) {
+      for (VimEditor vimEditor : injector.getEditorGroup().getEditors(new IjVimDocument(document))) {
         final Editor editor = ((IjVimEditor)vimEditor).getEditor();
         Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
         if (hls == null) {

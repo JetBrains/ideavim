@@ -232,7 +232,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
      * Get any editor for the given document
      *
      * We need an editor to help calculate offsets for marks, and it doesn't matter which one we use, because they would
-     * all return the same results. However, we cannot use [VimEditorGroup.localEditors] because the change might have
+     * all return the same results. However, we cannot use [VimEditorGroup.getEditors] because the change might have
      * come from a remote guest and there might not be an open local editor.
      */
     private fun getAnyEditorForDocument(doc: Document) =

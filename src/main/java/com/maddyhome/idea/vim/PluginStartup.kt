@@ -38,7 +38,7 @@ internal class PyNotebooksCloseWorkaround : ProjectManagerListener {
   override fun projectClosingBeforeSave(project: Project) {
     // TODO: Confirm context in CWM scenario
     if (injector.globalIjOptions().closenotebooks) {
-      injector.editorGroup.localEditors().forEach { vimEditor ->
+      injector.editorGroup.getEditors().forEach { vimEditor ->
         val editor = (vimEditor as IjVimEditor).editor
         val virtualFile = EditorHelper.getVirtualFile(editor)
         if (virtualFile?.extension == "ipynb") {

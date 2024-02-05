@@ -98,7 +98,7 @@ private fun updateSearchHighlights(
 
   for (project in projectManager.openProjects) {
     val current = FileEditorManager.getInstance(project).selectedTextEditor ?: continue
-    val editors = injector.editorGroup.localEditors(IjVimDocument(current.document))
+    val editors = injector.editorGroup.getEditors(IjVimDocument(current.document))
     for (vimEditor in editors) {
       val editor = (vimEditor as IjVimEditor).editor
       if (editor.project != project) {
