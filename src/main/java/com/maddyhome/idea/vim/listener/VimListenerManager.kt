@@ -222,7 +222,8 @@ internal object VimListenerManager {
 
       // We could have a split window in this list, but since they're all being initialised from the same opening editor
       // there's no need to use the SPLIT scenario
-      injector.editorGroup.localEditors().forEach { vimEditor ->
+      // Make sure we get all editors, including uninitialised
+      injector.editorGroup.getEditorsRaw().forEach { vimEditor ->
         val editor = vimEditor.ij
         if (!initialisedEditors.contains(editor)) {
           add(editor, getOpeningEditor(editor)?.vim ?: injector.fallbackWindow, LocalOptionInitialisationScenario.NEW)
@@ -273,7 +274,6 @@ internal object VimListenerManager {
       eventFacade.addCaretListener(editor, EditorCaretHandler, listenersDisposable)
 
       VimPlugin.getEditor().editorCreated(editor)
-
       VimPlugin.getChange().editorCreated(editor, listenersDisposable)
 
       injector.listenersNotifier.notifyEditorCreated(vimEditor)
