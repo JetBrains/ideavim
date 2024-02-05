@@ -350,19 +350,20 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setglobal all", """
       |--- Global option values ---
-      |noargtextobj        noideatracetime       scroll=0          nosurround
-      |  closenotebooks      ideawrite=all       scrolljump=1      notextobj-entire
-      |nocommentary        noignorecase          scrolloff=0       notextobj-indent
-      |nodigraph           noincsearch           selectmode=         timeout
-      |noexchange          nomatchit             shellcmdflag=-x     timeoutlen=1000
-      |nogdefault            maxmapdepth=20      shellxescape=@    notrackactionids
-      |nohighlightedyank     more                shellxquote={       undolevels=1000
-      |  history=50        nomultiple-cursors    showcmd             unifyjumps
-      |nohlsearch          noNERDTree            showmode            virtualedit=
-      |noideaglobalmode      nrformats=hex       sidescroll=0      novisualbell
-      |noideajoin          nonumber              sidescrolloff=0     visualdelay=100
-      |  ideamarks           octopushandler    nosmartcase           whichwrap=b,s
-      |  ideastrictmode    norelativenumber      startofline         wrapscan
+      |noargtextobj          ideawrite=all       scrolloff=0       notextobj-indent
+      |  closenotebooks    noignorecase          selectmode=         timeout
+      |nocommentary        noincsearch           shellcmdflag=-x     timeoutlen=1000
+      |nodigraph           nomatchit             shellxescape=@    notrackactionids
+      |noexchange            maxmapdepth=20      shellxquote={       undolevels=1000
+      |nogdefault            more                showcmd             unifyjumps
+      |nohighlightedyank   nomultiple-cursors    showmode            virtualedit=
+      |  history=50        noNERDTree            sidescroll=0      novisualbell
+      |nohlsearch            nrformats=hex       sidescrolloff=0     visualdelay=100
+      |noideaglobalmode    nonumber            nosmartcase           whichwrap=b,s
+      |noideajoin            octopushandler    nosneak               wrapscan
+      |  ideamarks         norelativenumber      startofline
+      |  ideastrictmode      scroll=0          nosurround
+      |noideatracetime       scrolljump=1      notextobj-entire
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  excommandannotation
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -459,6 +460,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  sidescroll=0
       |  sidescrolloff=0
       |nosmartcase
+      |nosneak
       |  startofline
       |nosurround
       |notextobj-entire

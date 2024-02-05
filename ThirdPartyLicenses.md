@@ -84,3 +84,8 @@ IV)  It is not allowed to remove this license from the distribution of the Vim
      license for previous Vim releases instead of the license that they came
      with, at your option.
 ```
+
+---
+
+File [sneakIcon.png](doc/images/sneakIcon.svg), which is originally an icon of the ideavim-sneak plugin,
+is merged icons of IdeaVim plugin and a random sneaker by FreePic from flaticon.com.

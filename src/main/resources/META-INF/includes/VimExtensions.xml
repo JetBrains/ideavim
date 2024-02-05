@@ -124,6 +124,14 @@
         <alias name="chrisbra/matchit"/>
       </aliases>
     </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.sneak.IdeaVimSneakExtension" name="sneak">
+      <aliases>
+        <alias name="https://github.com/justinmk/vim-sneak"/>
+        <alias name="justinmk/vim-sneak"/>
+        <alias name="vim-sneak"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 
   <!--  IdeaVim extensions-->
