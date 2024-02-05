@@ -70,8 +70,6 @@ public open class EffectiveOptions(scope: OptionAccessScope.EFFECTIVE): GlobalOp
   public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
   public val matchpairs: StringListOptionValue by optionProperty(Options.matchpairs)
   public val nrformats: StringListOptionValue by optionProperty(Options.nrformats)
-  public var number: Boolean by optionProperty(Options.number)
-  public var relativenumber: Boolean by optionProperty(Options.relativenumber)
   public var scroll: Int by optionProperty(Options.scroll)
   public var scrolloff: Int by optionProperty(Options.scrolloff)
   public var sidescrolloff: Int by optionProperty(Options.sidescrolloff)

@@ -177,8 +177,8 @@ internal object VimListenerManager {
       }
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.addEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addEffectiveOptionValueChangeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addEffectiveOptionValueChangeListener(IjOptions.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addEffectiveOptionValueChangeListener(IjOptions.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
@@ -209,8 +209,8 @@ internal object VimListenerManager {
       EventFacade.getInstance().restoreTypedActionHandler()
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.removeEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeEffectiveOptionValueChangeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeEffectiveOptionValueChangeListener(IjOptions.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeEffectiveOptionValueChangeListener(IjOptions.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
