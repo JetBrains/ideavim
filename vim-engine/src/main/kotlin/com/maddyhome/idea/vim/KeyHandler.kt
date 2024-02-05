@@ -632,7 +632,7 @@ public class KeyHandler {
     return injector.keyGroup.getKeyRoot(mappingMode)
   }
 
-  private fun updateState(keyState: KeyHandlerState) {
+  public fun updateState(keyState: KeyHandlerState) {
     this.keyHandlerState = keyState
   }
 
@@ -727,5 +727,56 @@ public class KeyHandler {
 
     @JvmStatic
     public fun getInstance(): KeyHandler = instance
+  }
+}
+
+/**
+ * This class was created to manage Fleet input processing.
+ * Fleet needs to synchronously determine if the key will be handled by the plugin or should be passed elsewhere.
+ * The key processing itself will be executed asynchronously at a later time.
+ */
+public sealed interface KeyProcessResult {
+  /**
+   * Key input that is not recognized by IdeaVim and should be passed to IDE.
+   */
+  public object Unknown: KeyProcessResult
+
+  /**
+   * Key input that is recognized by IdeaVim and can be processed.
+   * Key handling is a two-step process:
+   * 1. Determine if the key should be processed and how (is it a command, mapping, or something else).
+   * 2. Execute the recognized command.
+   * This class should be returned after the first step is complete.
+   * It will continue the key handling and finish the process.
+   */
+  public class Processable(
+    private val originalState: KeyHandlerState,
+    private val preProcessState: KeyHandlerState,
+    private val processing: (
+      key: KeyStroke,
+      keyState: KeyHandlerState,
+      editor: VimEditor,
+      context: ExecutionContext,
+      allowKeyMappings: Boolean,
+      mappingCompleted: Boolean,
+    ) -> KeyHandlerState
+  ): KeyProcessResult {
+
+    public companion object {
+      private val logger = vimLogger<KeyProcessResult>()
+      private val lock = Object()
+    }
+
+    // TODO add concurrency to other places
+    public fun processKey(key: KeyStroke, editor: VimEditor, context: ExecutionContext, allowKeyMappings: Boolean, mappingCompleted: Boolean) {
+      synchronized(lock) {
+        val keyHandler = KeyHandler.getInstance()
+        if (keyHandler.keyHandlerState != originalState) {
+          logger.warn("Unexpected editor state. Aborting command execution.")
+        }
+        val newState = processing(key, preProcessState, editor, context, allowKeyMappings, mappingCompleted)
+        keyHandler.updateState(newState)
+      }
+    }
   }
 }
