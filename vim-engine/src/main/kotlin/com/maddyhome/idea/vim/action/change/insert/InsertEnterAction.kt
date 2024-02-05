@@ -33,9 +33,14 @@ public class InsertEnterAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (injector.globalOptions().octopushandler) {
-      editor.forEachNativeCaret({ caret ->
-        injector.changeGroup.processEnter(editor, caret, context)
-      })
+      if (editor.isInForEachCaretScope()) {
+        editor.removeSecondaryCarets()
+        injector.changeGroup.processEnter(editor, editor.primaryCaret(), context)
+      } else {
+        editor.forEachNativeCaret({ caret ->
+          injector.changeGroup.processEnter(editor, caret, context)
+        })
+      }
     } else {
       injector.changeGroup.processEnter(editor, context)
     }
