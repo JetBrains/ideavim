@@ -53,6 +53,11 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
   @Synchronized
   private fun registerExtension(extensionBean: ExtensionBeanClass) {
     val name = extensionBean.name ?: extensionBean.instance.name
+    if (name == "sneak" && extensionBean.name == null) {
+      // Filter out the old ideavim-sneak extension that used to be a separate plugin
+      // https://github.com/Mishkun/ideavim-sneak
+      return
+    }
     if (name in registeredExtensions) return
 
     registeredExtensions.add(name)

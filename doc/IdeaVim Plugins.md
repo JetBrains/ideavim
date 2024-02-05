@@ -44,16 +44,21 @@ All commands with the mappings are supported. See the [full list of supported co
 
 <details>
 <summary><h2>sneak</h2></summary>
-   
+
+<img src="images/sneakIcon.svg" width="80" height="80" alt="icon"/>  
+
+By [Mikhail Levchenko](https://github.com/Mishkun)  
+Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak  
 Original plugin: [vim-sneak](https://github.com/justinmk/vim-sneak).
    
 ### Setup:
-- Install [IdeaVim-sneak](https://plugins.jetbrains.com/plugin/15348-ideavim-sneak) plugin.
-- Add the following command to `~/.ideavimrc`: `set sneak`
+- Add the following command to `~/.ideavimrc`: `Plug 'justinmk/vim-sneak'`
    
 ### Instructions
-   
-See the [docs](https://github.com/Mishkun/ideavim-sneak#usage)
+
+* Type `s` and two chars to start sneaking in forward direction
+* Type `S` and two chars to start sneaking in backward direction
+* Type `;` or `,` to proceed with sneaking just as if you were using `f` or `t` commands
 
 </details>
 
