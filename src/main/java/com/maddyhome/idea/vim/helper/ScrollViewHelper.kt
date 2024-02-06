@@ -8,6 +8,7 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.editor.textarea.TextComponentEditor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
@@ -39,6 +40,9 @@ import kotlin.math.roundToInt
 internal object ScrollViewHelper {
   @JvmStatic
   fun scrollCaretIntoView(editor: Editor) {
+    // TextComponentEditor doesn't support scrolling. We only support TextComponentEditor for the fallback window
+    if (editor is TextComponentEditor) return
+
     val position = editor.caretModel.visualPosition
     scrollCaretIntoViewVertically(editor, position.line)
     scrollCaretIntoViewHorizontally(editor, position)

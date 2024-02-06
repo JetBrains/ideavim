@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.application.options.CodeStyle
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
@@ -51,6 +52,8 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
     addOptionValueOverride(IjOptions.colorcolumn, ColorColumnOptionValueProvider(IjOptions.colorcolumn))
     addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper(IjOptions.cursorline))
     addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list))
+    addOptionValueOverride(IjOptions.number, NumberOptionMapper(IjOptions.number))
+    addOptionValueOverride(IjOptions.relativenumber, RelativeNumberOptionMapper(IjOptions.number))
     addOptionValueOverride(IjOptions.textwidth, TextWidthOptionMapper(IjOptions.textwidth))
     addOptionValueOverride(IjOptions.wrap, WrapOptionMapper(IjOptions.wrap))
   }
@@ -270,6 +273,104 @@ private class ListOptionMapper(listOption: ToggleOption)
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
     editor.ij.settings.isWhitespacesShown = value.asBoolean()
   }
+}
+
+
+/**
+ * Maps the `'number'` local-to-window option to the IntelliJ's existing (global-local) line number feature
+ *
+ * Note that this must work with `'relativenumber'` to correctly handle the hybrid modes.
+ */
+private class NumberOptionMapper(numberOption: ToggleOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(numberOption) {
+
+  override fun getGlobalExternalValue(editor: VimEditor): VimInt {
+    return (EditorSettingsExternalizable.getInstance().isLineNumbersShown
+      && isShowingAbsoluteLineNumbers(EditorSettingsExternalizable.getInstance().lineNumeration)).asVimInt()
+  }
+
+  override fun getEffectiveExternalValue(editor: VimEditor): VimInt {
+    return (editor.ij.settings.isLineNumbersShown && isShowingAbsoluteLineNumbers(editor.ij.settings.lineNumerationType)).asVimInt()
+  }
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    if (value.asBoolean()) {
+      if (editor.ij.settings.isLineNumbersShown) {
+        if (isShowingRelativeLineNumbers(editor.ij.settings.lineNumerationType)) {
+          editor.ij.settings.lineNumerationType = LineNumerationType.HYBRID
+        }
+      }
+      else {
+        editor.ij.settings.isLineNumbersShown = true
+        editor.ij.settings.lineNumerationType = LineNumerationType.ABSOLUTE
+      }
+    }
+    else {
+      // Turn off 'number'. Hide lines if 'relativenumber' is not set, else switch to relative
+      if (editor.ij.settings.isLineNumbersShown) {
+        if (isShowingRelativeLineNumbers(editor.ij.settings.lineNumerationType)) {
+          editor.ij.settings.lineNumerationType = LineNumerationType.RELATIVE
+        } else {
+          editor.ij.settings.isLineNumbersShown = false
+        }
+      }
+    }
+  }
+}
+
+
+/**
+ * Maps the `'relativenumber'` local-to-window option to the IntelliJ's existing (global-local) line number feature
+ *
+ * Note that this must work with `'number'` to correctly handle the hybrid modes.
+ */
+private class RelativeNumberOptionMapper(relativeNumberOption: ToggleOption)
+  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(relativeNumberOption) {
+
+  override fun getGlobalExternalValue(editor: VimEditor): VimInt {
+    return (EditorSettingsExternalizable.getInstance().isLineNumbersShown
+      && isShowingRelativeLineNumbers(EditorSettingsExternalizable.getInstance().lineNumeration)).asVimInt()
+  }
+
+  override fun getEffectiveExternalValue(editor: VimEditor): VimInt {
+    return (editor.ij.settings.isLineNumbersShown && isShowingRelativeLineNumbers(editor.ij.settings.lineNumerationType)).asVimInt()
+  }
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    if (value.asBoolean()) {
+      if (editor.ij.settings.isLineNumbersShown) {
+        if (isShowingAbsoluteLineNumbers(editor.ij.settings.lineNumerationType)) {
+          editor.ij.settings.lineNumerationType = LineNumerationType.HYBRID
+        }
+      }
+      else {
+        editor.ij.settings.isLineNumbersShown = true
+        editor.ij.settings.lineNumerationType = LineNumerationType.RELATIVE
+      }
+    }
+    else {
+      // Turn off 'relativenumber'. Hide lines if 'number' is not set, else switch to relative
+      if (editor.ij.settings.isLineNumbersShown) {
+        if (isShowingAbsoluteLineNumbers(editor.ij.settings.lineNumerationType)) {
+          editor.ij.settings.lineNumerationType = LineNumerationType.ABSOLUTE
+        } else {
+          editor.ij.settings.isLineNumbersShown = false
+        }
+      }
+    }
+  }
+}
+
+private fun isShowingAbsoluteLineNumbers(lineNumerationType: LineNumerationType) = when (lineNumerationType) {
+  LineNumerationType.ABSOLUTE -> true
+  LineNumerationType.RELATIVE -> false
+  LineNumerationType.HYBRID -> true
+}
+
+private fun isShowingRelativeLineNumbers(lineNumerationType: LineNumerationType) = when (lineNumerationType) {
+  LineNumerationType.ABSOLUTE -> false
+  LineNumerationType.RELATIVE -> true
+  LineNumerationType.HYBRID -> true
 }
 
 

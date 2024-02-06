@@ -66,6 +66,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollGroup
@@ -300,7 +301,7 @@ internal object VimListenerManager {
       injector.listenersNotifier.notifyEditorCreated(vimEditor)
 
       Disposer.register(listenersDisposable) {
-        VimPlugin.getEditor().editorDeinit(editor, true)
+        VimPlugin.getEditor().editorDeinit(editor)
       }
     }
 
