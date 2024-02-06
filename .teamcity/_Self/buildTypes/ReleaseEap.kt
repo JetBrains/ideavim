@@ -5,6 +5,7 @@ import _Self.Constants.RELEASE_EAP
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
@@ -29,6 +30,11 @@ object ReleaseEap : IdeaVimBuildType({
       "env.ORG_GRADLE_PROJECT_slackUrl",
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
       label = "Slack Token"
+    )
+    password(
+      "env.ORG_GRADLE_PROJECT_youtrackToken",
+      "credentialsJSON:3cd3e867-282c-451f-b958-bc95d56a8450",
+      display = ParameterDisplay.HIDDEN
     )
   }
 
