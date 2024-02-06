@@ -32,7 +32,7 @@ object ReleaseEap : IdeaVimBuildType({
       label = "Slack Token"
     )
     password(
-      "env.ORG_GRADLE_PROJECT_youtrackToken",
+      "env.ORG_GRADLE_PROJECT_YOUTRACK_TOKEN",
       "credentialsJSON:3cd3e867-282c-451f-b958-bc95d56a8450",
       display = ParameterDisplay.HIDDEN
     )
