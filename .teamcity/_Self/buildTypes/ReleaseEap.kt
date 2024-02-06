@@ -76,6 +76,10 @@ object ReleaseEap : IdeaVimBuildType({
       git push origin %build.number%
       """.trimIndent()
     }
+    gradle {
+      name = "Add release tag"
+      tasks = "scripts:eapReleaseActions"
+    }
   }
 
   features {
