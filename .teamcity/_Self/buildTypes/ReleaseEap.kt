@@ -61,6 +61,7 @@ object ReleaseEap : IdeaVimBuildType({
       tasks = "scripts:addReleaseTag"
     }
     gradle {
+      name = "Publish plugin"
       tasks = "publishPlugin"
     }
     script {
@@ -77,7 +78,7 @@ object ReleaseEap : IdeaVimBuildType({
       """.trimIndent()
     }
     gradle {
-      name = "Add release tag"
+      name = "YouTrack post release actions"
       tasks = "scripts:eapReleaseActions"
     }
   }
