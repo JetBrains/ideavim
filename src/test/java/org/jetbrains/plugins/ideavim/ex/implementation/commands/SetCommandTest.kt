@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -68,16 +69,16 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test toggle option as a number`() {
-    enterCommand("set number&")   // Local to window. Reset local + per-window "global" value to default: nonu
-    assertEquals(0, injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
-    assertCommandOutput("set number?", "nonumber\n")
+    enterCommand("set digraph&")   // Local to window. Reset local + per-window "global" value to default: nodigraph
+    assertEquals(0, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertCommandOutput("set digraph?", "nodigraph\n")
 
     // Should have the same effect as `:set` (although `:set` doesn't allow assigning a number to a boolean)
     // I.e. this sets the local value and the per-window "global" value
-    enterCommand("let &nu=1000")
-    assertEquals(1000, injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble().toInt())
-    assertEquals(1000, injector.optionGroup.getOptionValue(IjOptions.number, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
-    assertCommandOutput("set number?", "  number\n")
+    enterCommand("let &dg=1000")
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble().toInt())
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertCommandOutput("set digraph?", "  digraph\n")
   }
 
   @Test
