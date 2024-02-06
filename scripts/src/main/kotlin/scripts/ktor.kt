@@ -32,7 +32,7 @@ fun httpClient(): HttpClient {
     install(Auth) {
       bearer {
         loadTokens {
-          val accessToken = System.getenv("YOUTRACK_TOKEN")!!
+          val accessToken = System.getenv("YOUTRACK_TOKEN") ?: error("Missing YOUTRACK_TOKEN")
           BearerTokens(accessToken, "")
         }
       }
