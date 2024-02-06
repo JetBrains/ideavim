@@ -491,6 +491,10 @@ Contributors:
   [![icon][github]](https://github.com/Infonautica)
   &nbsp;
   Leonid Danilov
+* [![icon][mail]](mailto:emanuel-367@hotmail.com)
+  [![icon][github]](https://github.com/emanuelgestosa)
+  &nbsp;
+  Emanuel Gestosa
 
 Previous contributors:
 
