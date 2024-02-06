@@ -8,8 +8,12 @@
 
 package scripts.releaseEap
 
+import kotlinx.coroutines.runBlocking
+import scripts.httpClient
+
 fun main(args: Array<String>) {
-//  runBlocking {
+  runBlocking {
+    val client = httpClient()
 //    val (newVersion, _, _) = readArgs(args)
 //
 //    // Search for Ready to release, but without "IdeaVim Released In EAP" tag
@@ -25,5 +29,5 @@ fun main(args: Array<String>) {
 //      """.trimIndent()
 //      )
 //    }
-//  }
+  }
 }
