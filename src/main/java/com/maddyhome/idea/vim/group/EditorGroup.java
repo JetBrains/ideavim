@@ -57,8 +57,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private final CaretListener myLineNumbersCaretListener = new CaretListener() {
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
-      final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && ijOptions(injector, new IjVimEditor(e.getEditor())).getRelativenumber()) {
+      // For relative numbers, repaint on all caret moves so that we repaint when visual line changes, but not logical
+      if (ijOptions(injector, new IjVimEditor(e.getEditor())).getRelativenumber()) {
         repaintRelativeLineNumbers(e.getEditor());
       }
     }
@@ -321,17 +321,18 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = ijOptions(injector, new IjVimEditor(editor)).getNumber();
+      final IjVimEditor ijVimEditor = new IjVimEditor(editor);
+      final boolean number = ijOptions(injector, ijVimEditor).getNumber();
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based
-      if (number && (lineNumber - 1) == caretLine) {
-        return lineNumber;
+      if ((lineNumber - 1) == caretLine) {
+        return number ? lineNumber : 0;
       }
       else {
-        final int visualLine = new IjVimEditor(editor).bufferLineToVisualLine(lineNumber - 1);
-        final int currentVisualLine = new IjVimEditor(editor).bufferLineToVisualLine(caretLine);
-        return Math.abs(currentVisualLine - visualLine);
+        final int visualLine = ijVimEditor.bufferLineToVisualLine(lineNumber - 1);
+        final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
+        return Math.abs(caretVisualLine - visualLine);
       }
     }
 
