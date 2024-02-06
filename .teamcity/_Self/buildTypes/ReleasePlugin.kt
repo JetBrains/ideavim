@@ -138,14 +138,14 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
         git checkout master
       fi
       
-      git push origin --tags
       git push origin
       
       git checkout release
       echo checkout release branch
       git branch --set-upstream-to=origin/release release
       git push origin --force
-      git push --tags
+      # Push tag
+      git push origin %build.number%
       """.trimIndent()
     }
     gradle {
