@@ -152,6 +152,7 @@ abstract class VimTestCase {
       isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.asBoolean()
       isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
       isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
+      isLineNumbersShown = IjOptions.number.defaultValue.asBoolean()
       softWrapFileMasks = "*"
       isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
     }

@@ -121,7 +121,6 @@ internal var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
 internal var Editor.vimLastSelectionType: SelectionType? by userData()
 internal var Editor.vimStateMachine: VimStateMachine? by userData()
 internal var Editor.vimEditorGroup: Boolean by userDataOr { false }
-internal var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
 internal var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
 internal var Editor.vimMorePanel: ExOutputPanel? by userData()
 internal var Editor.vimExOutput: ExOutputModel? by userData()
