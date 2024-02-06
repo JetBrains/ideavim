@@ -62,27 +62,27 @@ object ReleaseEap : IdeaVimBuildType({
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
     }
-//    gradle {
-//      name = "Add release tag"
-//      tasks = "scripts:addReleaseTag"
-//    }
-//    gradle {
-//      name = "Publish plugin"
-//      tasks = "publishPlugin"
-//    }
-//    script {
-//      name = "Push changes to the repo"
-//      scriptContent = """
-//      branch=$(git branch --show-current)
-//      echo current branch is ${'$'}branch
-//      if [ "master" != "${'$'}branch" ];
-//      then
-//        exit 1
-//      fi
-//
-//      git push origin %build.number%
-//      """.trimIndent()
-//    }
+    gradle {
+      name = "Add release tag"
+      tasks = "scripts:addReleaseTag"
+    }
+    gradle {
+      name = "Publish plugin"
+      tasks = "publishPlugin"
+    }
+    script {
+      name = "Push changes to the repo"
+      scriptContent = """
+      branch=$(git branch --show-current)
+      echo current branch is ${'$'}branch
+      if [ "master" != "${'$'}branch" ];
+      then
+        exit 1
+      fi
+
+      git push origin %build.number%
+      """.trimIndent()
+    }
     gradle {
       name = "YouTrack post release actions"
       tasks = "scripts:eapReleaseActions"
