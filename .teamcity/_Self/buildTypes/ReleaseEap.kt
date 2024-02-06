@@ -74,19 +74,6 @@ object ReleaseEap : IdeaVimBuildType({
       fi
       
       git push origin %build.number%
-      
-      # Reset release branch
-      commit=${'$'}(git rev-parse HEAD)
-      git checkout release
-      echo Checked out release branch
-      git reset --hard ${'$'}commit
-      echo Release branch reset
-      git branch --set-upstream-to=origin/release release
-      git push --tags
-      git push origin --force
-      
-      git checkout master
-      echo Checked out master
       """.trimIndent()
     }
   }

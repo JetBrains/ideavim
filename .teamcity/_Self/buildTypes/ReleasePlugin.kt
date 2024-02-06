@@ -66,10 +66,23 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       scriptContent = "git fetch --unshallow"
     }
     script {
-      name = "Checkout release branch"
+      name = "Reset release branch"
       scriptContent = """
-      echo Checkout release
-      git checkout release
+        if [ "major" = "$releaseType" ] || [ "minor" = "$releaseType" ]
+        then
+          echo Resetting the release branch because the release type is $releaseType
+          git checkout master
+          latest_eap=${'$'}(git describe --tags --match="[0-9].[0-9]*.[0-9]-eap.[0-9]*" --abbrev=0 HEAD)
+          echo Latest EAP: ${'$'}latest_eap
+          commit_of_latest_eap=${'$'}(git rev-list -n 1 ${'$'}latest_eap)
+          echo Commit of latest EAP: ${'$'}commit_of_latest_eap
+          git checkout release
+          git reset --hard ${'$'}commit_of_latest_eap
+        else
+          git checkout release
+          echo Do not reset the release branch because the release type is $releaseType
+        fi
+        echo Checked out release branch
       """.trimIndent()
     }
     gradle {
@@ -79,25 +92,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
-    }
-    script {
-      name = "Checkout master branch"
-      scriptContent = """
-      echo Checkout master
-      git checkout master
-      """.trimIndent()
-    }
-    gradle {
-      name = "Update change log in master"
-      tasks = "scripts:changelogUpdateUnreleased"
-    }
-    gradle {
-      name = "Commit preparation changes in master"
-      tasks = "scripts:commitChanges"
-    }
-    gradle {
-      name = "Select branch"
-      tasks = "scripts:selectBranch"
     }
     gradle {
       name = "Update change log"
@@ -111,10 +105,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
     }
-//    gradle {
-//      name = "Run tests"
-//      tasks = "test"
-//    }
     script {
       name = "Run tests"
       scriptContent = "./gradlew test"
@@ -124,10 +114,25 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       tasks = "publishPlugin"
     }
     script {
+      name = "Checkout master branch"
+      scriptContent = """
+        echo Checkout master
+        git checkout master
+      """.trimIndent()
+    }
+    gradle {
+      name = "Update change log in master"
+      tasks = "scripts:changelogUpdateUnreleased"
+    }
+    gradle {
+      name = "Commit preparation changes in master"
+      tasks = "scripts:commitChanges"
+    }
+    script {
       name = "Push changes to the repo"
       scriptContent = """
       branch=$(git branch --show-current)  
-      echo current branch is ${'$'}branch
+      echo Current branch is ${'$'}branch
       if [ "master" != "${'$'}branch" ];
       then
         git checkout master
@@ -139,11 +144,8 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       git checkout release
       echo checkout release branch
       git branch --set-upstream-to=origin/release release
+      git push origin --force
       git push --tags
-      git push origin
-      
-      echo Checkout master
-      git checkout ${'$'}branch
       """.trimIndent()
     }
     gradle {
