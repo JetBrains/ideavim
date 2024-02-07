@@ -44,7 +44,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.21")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
         classpath("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
@@ -66,7 +66,7 @@ buildscript {
 plugins {
     antlr
     java
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.9.22"
     application
 
     id("org.jetbrains.intellij") version "1.17.0"
@@ -78,7 +78,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
     id("com.dorongold.task-tree") version "2.1.1"
 
-    id("com.google.devtools.ksp") version "1.8.21-1.0.11"
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
 ksp {
@@ -233,7 +233,9 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
-            apiVersion = "1.6"
+            // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+            // For the list of bundled versions
+            apiVersion = "1.9"
             freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
 //            allWarningsAsErrors = true
         }
@@ -241,7 +243,7 @@ tasks {
     compileTestKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
-            apiVersion = "1.6"
+            apiVersion = "1.9"
 //            allWarningsAsErrors = true
         }
     }

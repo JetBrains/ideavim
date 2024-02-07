@@ -10,7 +10,7 @@ plugins {
     java
     kotlin("jvm")
 //    id("org.jlleitschuh.gradle.ktlint")
-    id("com.google.devtools.ksp") version "1.8.21-1.0.11"
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
     `maven-publish`
     antlr
 }
@@ -77,7 +77,7 @@ tasks {
 
     compileKotlin {
         kotlinOptions {
-            apiVersion = "1.5"
+            apiVersion = "1.9"
             freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
         }
     }
