@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.extension.matchit
 
 import com.intellij.ide.highlighter.HtmlFileType
-import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
@@ -29,42 +28,6 @@ class MatchitGeneralTest : VimTestCase() {
   /*
    * Tests to make sure we didn't break the default % motion
    */
-
-  @Test
-  fun `test jump from Java comment start to end`() {
-    doTest(
-      "%",
-      """
-        /$c**
-         *
-         */
-      """.trimIndent(),
-      """
-        /**
-         *
-         *$c/
-      """.trimIndent(),
-      fileType = JavaFileType.INSTANCE,
-    )
-  }
-
-  @Test
-  fun `test jump from Java comment end to start`() {
-    doTest(
-      "%",
-      """
-        /**
-         *
-         *$c/
-      """.trimIndent(),
-      """
-        $c/**
-         *
-         */
-      """.trimIndent(),
-      fileType = JavaFileType.INSTANCE,
-    )
-  }
 
   @Test
   fun `test 25 percent jump`() {

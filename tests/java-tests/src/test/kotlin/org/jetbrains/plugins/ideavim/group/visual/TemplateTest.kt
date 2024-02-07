@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.state.mode.inSelectMode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.jetbrains.plugins.ideavim.assertDoesntChange
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
@@ -45,7 +45,7 @@ import org.junit.jupiter.api.TestInfo
  * @author Alex Plate
  */
 @TraceOptions(TestIjOptionConstants.idearefactormode)
-class TemplateTest : VimTestCase() {
+class TemplateTest : VimJavaTestCase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

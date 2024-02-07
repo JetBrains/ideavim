@@ -79,44 +79,6 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     doTest("o", before, after, Mode.INSERT)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
-  @Test
-  fun `test insert new line below matches indent for java`() {
-    val before = """public class C {
-      |  ${c}Integer a;
-      |  Integer b;
-      |}
-    """.trimMargin()
-    val after = """public class C {
-      |  Integer a;
-      |  $c
-      |  Integer b;
-      |}
-    """.trimMargin()
-    configureByJavaText(before)
-    typeText("o")
-    assertState(after)
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
-  @Test
-  fun `test insert new line below matches indent for java 1`() {
-    val before = """public class C {
-      |$c  Integer a;
-      |  Integer b;
-      |}
-    """.trimMargin()
-    val after = """public class C {
-      |  Integer a;
-      |  $c
-      |  Integer b;
-      |}
-    """.trimMargin()
-    configureByJavaText(before)
-    typeText("o")
-    assertState(after)
-  }
-
   @Test
   fun `test insert new line below with multiple carets`() {
     val before = """    I fou${c}nd it in a legendary land

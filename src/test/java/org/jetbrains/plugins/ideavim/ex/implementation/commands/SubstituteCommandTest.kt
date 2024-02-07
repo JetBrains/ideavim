@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
@@ -359,60 +359,6 @@ class SubstituteCommandTest : VimTestCase() {
       "aaa\naa${c}a\naaa\naaa\naaa\n",
       "aaa\nbbb\nbbb\nbbb\naaa\n",
     )
-  }
-
-  @OptionTest(
-    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  fun `test multiple carets`() {
-    val before = """public class C {
-      |  Stri${c}ng a;
-      |$c  String b;
-      |  Stri${c}ng c;
-      |  String d;
-      |}
-    """.trimMargin()
-    configureByJavaText(before)
-
-    enterCommand("s/String/Integer")
-
-    val after = """public class C {
-      |  ${c}Integer a;
-      |  ${c}Integer b;
-      |  ${c}Integer c;
-      |  String d;
-      |}
-    """.trimMargin()
-    assertState(after)
-  }
-
-  @OptionTest(
-    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  fun `test multiple carets substitute all occurrences`() {
-    val before = """public class C {
-      |  Stri${c}ng a; String e;
-      |$c  String b;
-      |  Stri${c}ng c; String f;
-      |  String d;
-      |}
-    """.trimMargin()
-    configureByJavaText(before)
-
-    enterCommand("s/String/Integer/g")
-
-    val after = """public class C {
-      |  ${c}Integer a; Integer e;
-      |  ${c}Integer b;
-      |  ${c}Integer c; Integer f;
-      |  String d;
-      |}
-    """.trimMargin()
-    assertState(after)
   }
 
   @OptionTest(

@@ -1,4 +1,10 @@
-// Copyright 2000-2023 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license.
+/*
+ * Copyright 2003-2024 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
 package org.jetbrains.plugins.ideavim
 
 import com.intellij.testFramework.LoggedErrorProcessor
@@ -16,7 +22,7 @@ import org.junit.jupiter.api.fail
  *   look like the exception is not processed.
  * I don't see a need for printing these caught exceptions, so we can use this processor to only rethrow them.
  */
-internal object OnlyThrowLoggedErrorProcessor : LoggedErrorProcessor() {
+object OnlyThrowLoggedErrorProcessor : LoggedErrorProcessor() {
   override fun processError(category: String, message: String, details: Array<out String>, t: Throwable?): Set<Action> {
     return setOf(Action.RETHROW)
   }
@@ -25,7 +31,7 @@ internal object OnlyThrowLoggedErrorProcessor : LoggedErrorProcessor() {
 /**
  * Asserts that [T] was thrown via `LOG.error("message", e)` call where `e` has a type of [T].
  */
-internal inline fun <reified T: Throwable> assertThrowsLogError(crossinline action: () -> Unit): T {
+inline fun <reified T: Throwable> assertThrowsLogError(crossinline action: () -> Unit): T {
   val exception = assertThrows<TestLoggerAssertionError> {
     LoggedErrorProcessor.executeWith<Throwable>(OnlyThrowLoggedErrorProcessor) {
       action()

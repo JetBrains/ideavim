@@ -8,25 +8,15 @@
 
 package org.jetbrains.plugins.ideavim
 
-import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.testFramework.EditorTestUtil
-import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.mode
-import org.junit.jupiter.params.provider.Arguments
-import kotlin.test.fail
 
 /**
  * @author Alex Plate
@@ -61,43 +51,6 @@ fun Editor.rangeOf(first: String, nLinesDown: Int): TextRange {
   return TextRange(starts.toIntArray(), ends.toIntArray())
 }
 
-inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
-  val end = System.currentTimeMillis() + timeInMillis
-  while (end > System.currentTimeMillis()) {
-    Thread.sleep(10)
-    IdeEventQueue.getInstance().flushQueue()
-    if (condition()) return
-  }
-  fail()
-}
-
-fun waitAndAssertMode(
-  fixture: CodeInsightTestFixture,
-  mode: Mode,
-  timeInMillis: Int? = null,
-) {
-  val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + 1000)
-  waitAndAssert(timeout) { fixture.editor.vim.mode == mode }
-}
-
-fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
-  val end = System.currentTimeMillis() + timeInMillis
-  while (end > System.currentTimeMillis()) {
-    if (!condition()) {
-      fail()
-    }
-
-    Thread.sleep(10)
-    IdeEventQueue.getInstance().flushQueue()
-  }
-}
-
-fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Boolean) {
-  assertDoesntChange(timeInMillis - precision) { !condition() }
-
-  waitAndAssert(precision * 2) { condition() }
-}
-
 @Suppress("unused")
 fun waitCondition(
   durationMillis: Long,
@@ -113,26 +66,6 @@ fun waitCondition(
     }
   }
   return false
-}
-
-internal fun <T, S, V> Collection<T>.cartesianProduct(other: Iterable<S>, transformer: (first: T, second: S) -> V): List<V> {
-  return this.flatMap { first -> other.map { second -> transformer.invoke(first, second) } }
-}
-
-// Cartesian product of multiple lists. Useful for making parameterized tests with all available combinations.
-// Can be used instead of @Theory from JUnit 4
-internal fun productForArguments(vararg elements: List<String>): List<Arguments> {
-  val res = product(*elements)
-  return res.map { Arguments.of(*it.toArray(emptyArray())) }
-}
-
-internal fun <T> product(vararg elements: List<T>): List<List<T>> {
-  val res = elements.fold(listOf<List<T>>(emptyList())) { acc, items ->
-    acc.cartesianProduct(items) { accItems, item ->
-      accItems + item
-    }
-  }
-  return res
 }
 
 internal class ExceptionHandler : ExtensionHandler {

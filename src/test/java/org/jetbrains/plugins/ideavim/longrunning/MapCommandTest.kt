@@ -25,7 +25,7 @@ class MapCommandTest : VimTestCase() {
           abcde
           -----
     """.trimIndent()
-    configureByJavaText(text)
+    configureByText(text)
 
     typeText(commandToKeys("map b wbb"))
     typeText(injector.parser.parseKeys("b"))

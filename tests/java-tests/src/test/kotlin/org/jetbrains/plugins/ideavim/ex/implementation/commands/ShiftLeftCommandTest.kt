@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,16 +10,16 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class ShiftRightCommandTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
+class ShiftLeftCommandTest : VimJavaTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   @Test
-  fun `test simple right shift`() {
+  fun `test simple left shift`() {
     val before = """        Lorem ipsum dolor sit amet,
                       |        ${c}consectetur adipiscing elit
                       |        Sed in orci mauris.
@@ -27,19 +27,19 @@ class ShiftRightCommandTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(commandToKeys(">"))
+    typeText(commandToKeys("<"))
 
     val after = """        Lorem ipsum dolor sit amet,
-                      |            ${c}consectetur adipiscing elit
+                      |    ${c}consectetur adipiscing elit
                       |        Sed in orci mauris.
                       |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   @Test
-  fun `test double right shift`() {
+  fun `test double left shift`() {
     val before = """        Lorem ipsum dolor sit amet,
                       |        ${c}consectetur adipiscing elit
                       |        Sed in orci mauris.
@@ -47,19 +47,39 @@ class ShiftRightCommandTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(commandToKeys(">>"))
+    typeText(commandToKeys("<<"))
 
     val after = """        Lorem ipsum dolor sit amet,
-                      |                ${c}consectetur adipiscing elit
+                      |${c}consectetur adipiscing elit
                       |        Sed in orci mauris.
                       |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   @Test
-  fun `test range right shift`() {
+  fun `test left shift no space`() {
+    val before = """Lorem ipsum dolor sit amet,
+                      |${c}consectetur adipiscing elit
+                      |Sed in orci mauris.
+                      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    configureByJavaText(before)
+
+    typeText(commandToKeys("<"))
+
+    val after = """Lorem ipsum dolor sit amet,
+                      |${c}consectetur adipiscing elit
+                      |Sed in orci mauris.
+                      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
+  @Test
+  fun `test range left shift`() {
     val before = """        Lorem ipsum dolor sit amet,
                       |        ${c}consectetur adipiscing elit
                       |        Sed in orci mauris.
@@ -67,12 +87,12 @@ class ShiftRightCommandTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(commandToKeys("3,4>"))
+    typeText(commandToKeys("3,4<"))
 
     val after = """        Lorem ipsum dolor sit amet,
                       |        consectetur adipiscing elit
-                      |            ${c}Sed in orci mauris.
-                      |            Cras id tellus in ex imperdiet egestas.
+                      |    ${c}Sed in orci mauris.
+                      |    Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     assertState(after)
   }
@@ -86,12 +106,12 @@ class ShiftRightCommandTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(commandToKeys(">"))
+    typeText(commandToKeys("<"))
 
     val after = """    I found it in a legendary land
-                      |    ${c}all rocks and lavender and tufted grass,
-                      |        ${c}where it was settled on some sodden sand
-                      |        ${c}hard by the torrent of a mountain pass.
+                      |${c}all rocks and lavender and tufted grass,
+                      |${c}where it was settled on some sodden sand
+                      |${c}hard by the torrent of a mountain pass.
     """.trimMargin()
     assertState(after)
   }

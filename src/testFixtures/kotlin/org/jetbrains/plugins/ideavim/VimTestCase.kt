@@ -9,7 +9,6 @@ package org.jetbrains.plugins.ideavim
 
 import com.intellij.ide.ClipboardSynchronizer
 import com.intellij.ide.bookmark.BookmarksManager
-import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.json.JsonFileType
 import com.intellij.openapi.actionSystem.ActionManager
@@ -216,7 +215,6 @@ abstract class VimTestCase {
   }
 
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
-  protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
   protected fun configureByJsonText(@Suppress("SameParameterValue") content: String) =
     configureByText(JsonFileType.INSTANCE, content)
@@ -254,7 +252,7 @@ abstract class VimTestCase {
     return ranges
   }
 
-  private fun configureByText(fileType: FileType, content: String): Editor {
+  protected fun configureByText(fileType: FileType, content: String): Editor {
     fixture.configureByText(fileType, content)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)

@@ -79,25 +79,6 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     doTest("O", before, after, Mode.INSERT)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
-  @Test
-  fun `test insert new line above matches indent for java`() {
-    val before = """public class C {
-      |  Integer a;
-      |  ${c}Integer b;
-      |}
-    """.trimMargin()
-    val after = """public class C {
-      |  Integer a;
-      |  $c
-      |  Integer b;
-      |}
-    """.trimMargin()
-    configureByJavaText(before)
-    typeText("O")
-    assertState(after)
-  }
-
   @Test
   fun `test insert new line above with multiple carets`() {
     val before = """    I fou${c}nd it in a legendary land

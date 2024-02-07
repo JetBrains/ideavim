@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -57,7 +57,7 @@ import kotlin.test.fail
  */
 @ExtendWith(OptionsVerificator::class)
 @Target(AnnotationTarget.CLASS)
-internal annotation class TraceOptions(vararg val optionNames: String)
+annotation class TraceOptions(vararg val optionNames: String)
 
 /**
  * Defines values of options for tests. Test will be started multiple times with all possible combinations
@@ -67,7 +67,7 @@ internal annotation class TraceOptions(vararg val optionNames: String)
 @ExtendWith(VimOptionsInvocator::class)
 @TestTemplate
 @Target(AnnotationTarget.FUNCTION)
-internal annotation class OptionTest(vararg val value: VimOption)
+annotation class OptionTest(vararg val value: VimOption)
 
 /**
  * Defines the values that will be used for the option.
@@ -102,7 +102,7 @@ internal annotation class OptionTest(vararg val value: VimOption)
  *   - Without bounded list:
  *     - Not supported, please specify possible values using [limitedValues]
  */
-internal annotation class VimOption(
+public annotation class VimOption(
   val name: String,
   val limitedValues: Array<String> = [],
   val doesntAffectTest: Boolean = false,

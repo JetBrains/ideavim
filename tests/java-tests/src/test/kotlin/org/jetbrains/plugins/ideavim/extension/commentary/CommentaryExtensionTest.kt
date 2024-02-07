@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,14 +12,14 @@ import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.jetbrains.yaml.YAMLFileType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
 @Suppress("SpellCheckingInspection")
-class CommentaryExtensionTest : VimTestCase() {
+class CommentaryExtensionTest : VimJavaTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

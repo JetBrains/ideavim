@@ -116,59 +116,6 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertState("$c<!-- foo -->")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
-  @Test
-  fun `test percent match java comment start`() {
-    configureByJavaText("/$c* foo */")
-    typeText("%")
-    assertState("/* foo *$c/")
-  }
-
-  @Test
-  fun `test percent doesnt match partial java comment`() {
-    configureByJavaText("$c/* ")
-    typeText("%")
-    assertState("$c/* ")
-  }
-
-  @Test
-  fun `test percent match java comment end`() {
-    configureByJavaText("/* foo $c*/")
-    typeText("%")
-    assertState("$c/* foo */")
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  fun `test percent match java doc comment start`() {
-    configureByJavaText("/*$c* foo */")
-    typeText("%")
-    assertState("/** foo *$c/")
-  }
-
-  @Test
-  fun `test percent match java doc comment end`() {
-    configureByJavaText("/** foo *$c/")
-    typeText("%")
-    assertState("$c/** foo */")
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
-  @Test
-  fun `test percent doesnt match after comment start`() {
-    configureByJavaText("/*$c foo */")
-    typeText("%")
-    assertState("/*$c foo */")
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
-  @Test
-  fun `test percent doesnt match before comment end`() {
-    configureByJavaText("/* foo $c */")
-    typeText("%")
-    assertState("/* foo $c */")
-  }
-
   @Test
   fun `test motion with quote on the way`() {
     doTest(

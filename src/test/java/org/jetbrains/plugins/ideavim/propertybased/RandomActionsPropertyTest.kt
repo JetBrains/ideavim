@@ -20,8 +20,8 @@ import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.propertybased.samples.javaText
 import org.jetbrains.plugins.ideavim.propertybased.samples.loremText
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -63,18 +63,19 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
   }
 
   @Test
+  @Disabled
   fun testRandomActionsOnJavaCode() {
-    PropertyChecker.checkScenarios {
-      ImperativeCommand { env ->
-        val editor = configureByJavaText(javaText)
-        try {
-          moveCaretToRandomPlace(env, editor)
-          env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
-        } finally {
-          reset(editor)
-        }
-      }
-    }
+//    PropertyChecker.checkScenarios {
+//      ImperativeCommand { env ->
+//        val editor = configureByJavaText(javaText)
+//        try {
+//          moveCaretToRandomPlace(env, editor)
+//          env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
+//        } finally {
+//          reset(editor)
+//        }
+//      }
+//    }
   }
 
   companion object {
