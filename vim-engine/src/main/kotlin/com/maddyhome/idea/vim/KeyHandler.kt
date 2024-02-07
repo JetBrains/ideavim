@@ -91,7 +91,7 @@ public class KeyHandler {
     }
   }
 
-  private fun processKey(
+  public fun processKey(
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
