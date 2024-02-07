@@ -68,6 +68,7 @@ plugins {
     java
     kotlin("jvm") version "1.9.22"
     application
+    id("java-test-fixtures")
 
     id("org.jetbrains.intellij") version "1.17.0"
     id("org.jetbrains.changelog") version "2.2.0"
@@ -91,6 +92,8 @@ ksp {
 afterEvaluate {
 //  tasks.named("kspKotlin").configure { dependsOn("clean") }
   tasks.named("kspKotlin").configure { dependsOn("generateGrammarSource") }
+  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
+  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
   tasks.named("kspTestKotlin").configure { enabled = false }
 }
 
@@ -115,15 +118,30 @@ repositories {
 }
 
 dependencies {
+    api(project(":vim-engine"))
+    ksp(project(":annotation-processors"))
+    implementation(project(":annotation-processors"))
+
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
     compileOnly("org.jetbrains:annotations:24.1.0")
+    runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
+    antlr("org.antlr:antlr4:$antlrVersion")
+
+    // --------- Test dependencies ----------
+
+    testImplementation(testFixtures(project(":")))
+
+    testApi("com.squareup.okhttp3:okhttp:4.12.0")
 
     // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
     testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
     testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
+    testFixturesImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
+    testFixturesImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+    testFixturesImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 
     // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
@@ -132,19 +150,13 @@ dependencies {
     testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
     testImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
     testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
-    runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
-    antlr("org.antlr:antlr4:$antlrVersion")
-
-    api(project(":vim-engine"))
-
-    ksp(project(":annotation-processors"))
-    implementation(project(":annotation-processors"))
-
-    testApi("com.squareup.okhttp3:okhttp:4.12.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
 }
 
 configurations {
@@ -325,6 +337,9 @@ tasks {
     }
     named("compileTestKotlin") {
         dependsOn("generateTestGrammarSource")
+    }
+    named("compileTestFixturesKotlin") {
+        dependsOn("generateTestFixturesGrammarSource")
     }
 
     // Add plugin open API sources to the plugin ZIP

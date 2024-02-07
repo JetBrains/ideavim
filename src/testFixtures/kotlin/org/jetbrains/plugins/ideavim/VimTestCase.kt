@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -79,9 +79,7 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import org.assertj.core.api.Assertions
 import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.plugins.ideavim.impl.EmptyTransferable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
@@ -90,6 +88,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.roundToInt
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -603,7 +602,7 @@ abstract class VimTestCase {
   }
 
   fun assertPluginErrorMessageContains(message: String) {
-    Assertions.assertThat(VimPlugin.getMessage()).contains(message)
+    assertContains(VimPlugin.getMessage(), message)
   }
 
   protected fun assertCaretsVisualAttributes() {
