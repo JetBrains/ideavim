@@ -41,6 +41,7 @@ tasks.test {
 
 intellij {
   version.set(ideaVersion)
+  type.set("IC")
   // Yaml is only used for testing. It's part of the IdeaIC distribution, but needs to be included as a reference
   plugins.set(listOf("java", "yaml"))
 }

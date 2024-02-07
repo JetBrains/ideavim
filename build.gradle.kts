@@ -101,6 +101,7 @@ afterEvaluate {
 val javaVersion: String by project
 val kotlinVersion: String by project
 val ideaVersion: String by project
+val ideaType: String by project
 val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
