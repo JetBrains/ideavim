@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.vimscript.model.LazyInstance
 import javax.swing.KeyStroke
 
-public class LazyVimCommand(
+public open class LazyVimCommand(
   public val keys: Set<List<KeyStroke>>,
   public val modes: Set<MappingMode>,
   className: String,
