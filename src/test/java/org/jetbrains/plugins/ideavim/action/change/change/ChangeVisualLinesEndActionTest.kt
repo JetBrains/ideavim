@@ -11,7 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 

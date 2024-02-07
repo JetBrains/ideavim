@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel

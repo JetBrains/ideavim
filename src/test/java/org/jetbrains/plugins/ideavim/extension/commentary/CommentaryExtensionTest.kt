@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.extension.commentary
 import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.yaml.YAMLFileType
 import org.junit.jupiter.api.BeforeEach

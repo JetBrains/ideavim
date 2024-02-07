@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.helper
+package org.jetbrains.plugins.ideavim
 
 /**
  * This annotation is created for test functions (methods).

@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.ui
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import com.maddyhome.idea.vim.ui.ShowCmd
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim

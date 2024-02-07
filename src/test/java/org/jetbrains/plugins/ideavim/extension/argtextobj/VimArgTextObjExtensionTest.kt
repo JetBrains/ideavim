@@ -8,7 +8,7 @@
 package org.jetbrains.plugins.ideavim.extension.argtextobj
 
 import com.google.common.collect.Lists
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase

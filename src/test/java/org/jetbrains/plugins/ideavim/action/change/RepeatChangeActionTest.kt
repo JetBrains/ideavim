@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action.change
 
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
