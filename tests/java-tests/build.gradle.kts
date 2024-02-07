@@ -21,6 +21,7 @@ repositories {
 
 val kotlinVersion: String by project
 val ideaVersion: String by project
+val javaVersion: String by project
 
 repositories {
   mavenCentral()
@@ -44,4 +45,16 @@ intellij {
   type.set("IC")
   // Yaml is only used for testing. It's part of the IdeaIC distribution, but needs to be included as a reference
   plugins.set(listOf("java", "yaml"))
+}
+
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(javaVersion))
+  }
+}
+
+kotlin {
+  jvmToolchain {
+    languageVersion.set(JavaLanguageVersion.of(javaVersion))
+  }
 }
