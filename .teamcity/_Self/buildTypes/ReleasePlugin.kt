@@ -47,7 +47,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     )
     password(
       "env.ORG_GRADLE_PROJECT_youtrackToken",
-      "credentialsJSON:3cd3e867-282c-451f-b958-bc95d56a8450",
+      "credentialsJSON:7bc0eb3a-b86a-4ebd-b622-d4ef12d7e1d3",
       display = ParameterDisplay.HIDDEN
     )
     param("env.ORG_GRADLE_PROJECT_releaseType", releaseType)

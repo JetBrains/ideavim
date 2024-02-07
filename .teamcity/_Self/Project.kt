@@ -15,7 +15,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
 object Project : Project({
-  description = "Vim engine for IDEs based on the IntelliJ platform"
+  description = "Vim engine for JetBrains IDEs"
 
   subProjects(Releases, OldTests, GitHub)
 

@@ -20,8 +20,8 @@ object PublishVimEngine : IdeaVimBuildType({
   params {
     param("env.ORG_GRADLE_PROJECT_engineVersion", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_uploadUrl", "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
-    password("env.ORG_GRADLE_PROJECT_spacePassword", "credentialsJSON:790b4e43-ee83-4184-b81b-678afab60409", display = ParameterDisplay.HIDDEN)
-    param("env.ORG_GRADLE_PROJECT_spaceUsername", "Aleksei.Plate")
+    password("env.ORG_GRADLE_PROJECT_spacePassword", "credentialsJSON:5ea56f8c-efe7-4e1e-83de-0c02bcc39d0b", display = ParameterDisplay.HIDDEN)
+    param("env.ORG_GRADLE_PROJECT_spaceUsername", "a121c67e-39ac-40e6-bf82-649855ec27b6")
   }
 
   vcs {
