@@ -133,45 +133,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     editor.document.replaceString(start, end, newString)
   }
 
-  override var mode: Mode
-    get() = vimStateMachine.mode
-    set(value) {
-      if (vimStateMachine.mode == value) return
-
-      val oldValue = vimStateMachine.mode
-      (vimStateMachine as VimStateMachineImpl).mode = value
-      injector.listenersNotifier.notifyModeChanged(this, oldValue)
-    }
-
-  override fun resetOpPending() {
-    if (this.mode is Mode.OP_PENDING) {
-      val returnTo = this.mode.returnTo
-      mode = when (returnTo) {
-        ReturnTo.INSERT -> Mode.INSERT
-        ReturnTo.REPLACE -> Mode.INSERT
-        null -> Mode.NORMAL()
-      }
-    }
-  }
-
-  override var isReplaceCharacter: Boolean
-    get() = vimStateMachine.isReplaceCharacter
-    set(value) {
-      if (value != vimStateMachine.isReplaceCharacter) {
-        (vimStateMachine as VimStateMachineImpl).isReplaceCharacter = value
-        injector.listenersNotifier.notifyIsReplaceCharChanged(this)
-      }
-    }
-
-  override fun resetState() {
-    mode = Mode.NORMAL()
-    vimStateMachine.executingCommand = null
-    vimStateMachine.digraphSequence.reset()
-    vimStateMachine.commandBuilder.resetInProgressCommandPart(
-      injector.keyGroup.getKeyRoot(mode.toMappingMode())
-    )
-  }
-
   // TODO: 30.12.2021 Is end offset inclusive?
   override fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset> {
     // TODO: 30.12.2021 getLineEndOffset returns the same value for "xyz" and "xyz\n"
