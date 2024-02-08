@@ -23,7 +23,7 @@ class BasicStringFunctions : VimTestCase() {
   @Test
   fun `test tolower`() {
     configureByText("\n")
-    typeText(commandToKeys("echo toupper('Vim is awesome')"))
+    typeText(commandToKeys("echo tolower('Vim is awesome')"))
     assertExOutput("vim is awesome\n")
   }
 
