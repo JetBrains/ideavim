@@ -101,7 +101,6 @@ val ideaVersion: String by project
 val ideaType: String by project
 val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
-val remoteRobotVersion: String by project
 val antlrVersion: String by project
 
 val publishChannels: String by project
@@ -143,11 +142,6 @@ dependencies {
 
   // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
-
-  testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
-  testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
-  testImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
-  testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
@@ -244,10 +238,6 @@ intellij {
 }
 
 tasks {
-  downloadRobotServerPlugin {
-    version.set(remoteRobotVersion)
-  }
-
   publishPlugin {
     channels.set(publishChannels.split(","))
     token.set(publishToken)
@@ -257,14 +247,6 @@ tasks {
     certificateChain.set(providers.environmentVariable("CERTIFICATE_CHAIN"))
     privateKey.set(providers.environmentVariable("PRIVATE_KEY"))
     password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD"))
-  }
-
-  runIdeForUiTests {
-    systemProperty("robot-server.port", "8082")
-    systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-    systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-    systemProperty("jb.consents.confirmation.enabled", "false")
-    systemProperty("ide.show.tips.on.startup.default.value", "false")
   }
 
   runPluginVerifier {
@@ -348,12 +330,6 @@ tasks {
   }
 }
 
-tasks.register<Test>("testUi") {
-  group = "verification"
-  useJUnitPlatform()
-  include("/ui/**")
-}
-
 // --- Changelog
 
 changelog {
@@ -370,13 +346,6 @@ changelog {
 
 koverMerged {
   enable()
-}
-
-kover {
-  instrumentation {
-    // set of test tasks names to exclude from instrumentation. The results of their execution will not be presented in the report
-    excludeTasks += "testUi"
-  }
 }
 
 // --- Slack notification
