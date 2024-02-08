@@ -41,7 +41,7 @@ jobs:
         run: gradle :tests:ij-ui-tests:testUi
       - name: Move video
         if: always()
-        run: mv video tests/ij-ui-tests/build/reports
+        run: mv tests/ij-ui-tests/video build/reports
       - name: Move sandbox logs
         if: always()
         run: mv build/idea-sandbox/system/log sandbox-idea-log
