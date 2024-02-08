@@ -80,6 +80,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.annotations.ApiStatus
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.assertThrows
@@ -794,6 +795,12 @@ abstract class VimTestCase {
     const val c = EditorTestUtil.CARET_TAG
     const val s = EditorTestUtil.SELECTION_START_TAG
     const val se = EditorTestUtil.SELECTION_END_TAG
+
+    @BeforeAll
+    @JvmStatic
+    fun beforeAll() {
+      println("Neovim testing: ${NeovimTesting.isNeovimTestingEnabled()}")
+    }
 
     fun typeText(keys: List<KeyStroke?>, editor: Editor, project: Project?) {
       val keyHandler = KeyHandler.getInstance()
