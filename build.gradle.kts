@@ -162,7 +162,6 @@ configurations {
 tasks.register<Test>("testWithNeovim") {
   group = "verification"
   systemProperty("ideavim.nvim.test", "true")
-  exclude("/ui/**")
   useJUnitPlatform()
 }
 
@@ -326,7 +325,6 @@ tasks {
 tasks {
   test {
     useJUnitPlatform()
-    exclude("/ui/**")
   }
 }
 
