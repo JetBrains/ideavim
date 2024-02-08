@@ -39,7 +39,7 @@ object Nvim : IdeaVimBuildType({
               """.trimIndent()
     }
     gradle {
-      tasks = "clean testWithNeovim"
+      tasks = "clean test -Dnvim"
       buildFile = ""
       enableStacktrace = true
     }

@@ -157,14 +157,6 @@ configurations {
   }
 }
 
-// --- Compilation
-// This can be moved to other test registration when issue with tests in gradle will be fixed
-tasks.register<Test>("testWithNeovim") {
-  group = "verification"
-  systemProperty("ideavim.nvim.test", "true")
-  useJUnitPlatform()
-}
-
 tasks {
   test {
     // Set teamcity env variable locally to run additional tests for leaks.
@@ -174,6 +166,8 @@ tasks {
       println("Set env TEAMCITY_VERSION to X to enable project leak checks from the platform")
       environment("TEAMCITY_VERSION" to "X")
     }
+
+    systemProperty("ideavim.nvim.test", System.getProperty("nvim") ?: false)
   }
 
   compileJava {
