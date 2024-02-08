@@ -7,8 +7,6 @@
  */
 package com.maddyhome.idea.vim.group
 
-import com.intellij.codeInsight.completion.CompletionPhase
-import com.intellij.codeInsight.completion.impl.CompletionServiceImpl
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -78,7 +76,7 @@ internal class MacroGroup : VimMacroBase() {
                 ProgressManager.getInstance().executeNonCancelableSection {
                   // Prevent autocompletion during macros.
                   // See https://github.com/JetBrains/ideavim/pull/772 for details
-                  CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
+//                  CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
                   getInstance().handleKey(editor, key, context)
                 }
                 if (injector.messages.isError()) return@runnable
