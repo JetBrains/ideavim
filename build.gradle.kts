@@ -175,32 +175,15 @@ tasks.register<Test>("testWithNeovim") {
     useJUnitPlatform()
 }
 
-tasks {
-    // Issue in gradle 7.3
-    val test by getting(Test::class) {
-        isScanForTestClasses = false
-        // Only run tests from classes that end with "Test"
-        include("**/*Test.class")
-        include("**/*test.class")
-        include("**/*Tests.class")
-        exclude("**/ParserTest.class")
-
+  tasks {
+    test {
         // Set teamcity env variable locally to run additional tests for leaks.
         // By default, this test runs on TC only, but this test doesn't take a lot of time,
         //   so we can turn it on for local development
         if (environment["TEAMCITY_VERSION"] == null) {
-            println("Set env TEAMCITY_VERSION to X")
+            println("Set env TEAMCITY_VERSION to X to enable project leak checks from the platform")
             environment("TEAMCITY_VERSION" to "X")
         }
-    }
-
-    val testWithNeovim by getting(Test::class) {
-        isScanForTestClasses = false
-        // Only run tests from classes that end with "Test"
-        include("**/*Test.class")
-        include("**/*test.class")
-        include("**/*Tests.class")
-        exclude("**/ParserTest.class")
     }
 
     compileJava {
