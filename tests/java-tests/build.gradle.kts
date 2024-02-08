@@ -12,13 +12,6 @@ plugins {
   id("org.jetbrains.intellij")
 }
 
-group = "org.example"
-version = "SNAPSHOT"
-
-repositories {
-  mavenCentral()
-}
-
 val kotlinVersion: String by project
 val ideaVersion: String by project
 val javaVersion: String by project
@@ -29,9 +22,8 @@ repositories {
 }
 
 dependencies {
-  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-  testImplementation(platform("org.junit:junit-bom:5.10.0"))
   testImplementation("org.junit.jupiter:junit-jupiter")
+  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
   testImplementation(testFixtures(project(":"))) // The root project
 }
