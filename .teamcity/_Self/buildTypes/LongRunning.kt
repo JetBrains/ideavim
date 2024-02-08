@@ -25,7 +25,7 @@ object LongRunning : IdeaVimBuildType({
 
   steps {
     gradle {
-      tasks = "clean testLongRunning"
+      tasks = "clean :tests:long-running-tests:testLongRunning"
       buildFile = ""
       enableStacktrace = true
     }

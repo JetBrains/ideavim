@@ -23,11 +23,11 @@ dependencies {
 // This task is disabled because it should be excluded from `gradle test` run (because it's slow)
 // I didn't find a better way to exclude except disabling and defining a new task with a different name
 tasks.test {
-  useJUnitPlatform()
   enabled = false
+  useJUnitPlatform()
 }
 
-tasks.register<Test>("testPropertyBased") {
+tasks.register<Test>("testLongRunning") {
   group = "verification"
   useJUnitPlatform()
 }
