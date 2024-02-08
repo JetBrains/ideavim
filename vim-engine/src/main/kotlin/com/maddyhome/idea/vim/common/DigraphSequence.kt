@@ -252,7 +252,9 @@ public class DigraphSequence: Cloneable {
     val result = DigraphSequence()
     result.digraphState = digraphState
     result.digraphChar = digraphChar
-    result.codeChars = codeChars.copyOf()
+    if (::codeChars.isInitialized) {
+      result.codeChars = codeChars.copyOf()
+    }
     result.codeCnt = codeCnt
     result.codeType = codeType
     result.codeMax = codeMax
