@@ -173,13 +173,6 @@ tasks.register<Test>("testWithNeovim") {
     systemProperty("ideavim.nvim.test", "true")
     exclude("/ui/**")
     exclude("**/longrunning/**")
-    exclude("**/propertybased/**")
-    useJUnitPlatform()
-}
-
-tasks.register<Test>("testPropertyBased") {
-    group = "verification"
-//    include("**/propertybased/**")
     useJUnitPlatform()
 }
 
@@ -216,15 +209,6 @@ tasks {
         include("**/*Tests.class")
         exclude("**/ParserTest.class")
         exclude("**/longrunning/**")
-        exclude("**/propertybased/**")
-    }
-
-    val testPropertyBased by getting(Test::class) {
-        isScanForTestClasses = false
-        // Only run tests from classes that end with "Test"
-        include("**/propertybased/*Test.class")
-        include("**/propertybased/*test.class")
-        include("**/propertybased/*Tests.class")
     }
 
     val testLongRunning by getting(Test::class) {
@@ -403,7 +387,6 @@ tasks {
 tasks {
     test {
         useJUnitPlatform()
-        exclude("**/propertybased/**")
         exclude("**/longrunning/**")
         exclude("/ui/**")
     }
@@ -436,7 +419,6 @@ koverMerged {
 kover {
     instrumentation {
         // set of test tasks names to exclude from instrumentation. The results of their execution will not be presented in the report
-        excludeTasks += "testPropertyBased"
         excludeTasks += "testLongRunning"
         excludeTasks += "testWithNeovim"
         excludeTasks += "testUi"

@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.state.mode.toVimNotation
 import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.TestInfo
 
-internal object NeovimTesting {
+object NeovimTesting {
   private lateinit var neovimApi: NeovimApi
   private lateinit var neovim: Process
 

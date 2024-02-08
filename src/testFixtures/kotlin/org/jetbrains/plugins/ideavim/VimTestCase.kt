@@ -105,7 +105,7 @@ import kotlin.test.assertTrue
 abstract class VimTestCase {
   protected lateinit var fixture: CodeInsightTestFixture
 
-  internal lateinit var testInfo: TestInfo
+  lateinit var testInfo: TestInfo
 
   @BeforeEach
   open fun setUp(testInfo: TestInfo) {

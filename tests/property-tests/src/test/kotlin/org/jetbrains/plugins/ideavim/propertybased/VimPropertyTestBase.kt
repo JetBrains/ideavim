@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.propertybased
 
+import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -35,4 +36,6 @@ abstract class VimPropertyTestBase : VimTestCase() {
     VimPlugin.getSearch().resetState()
     VimPlugin.getChange().reset()
   }
+
+  protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
 }

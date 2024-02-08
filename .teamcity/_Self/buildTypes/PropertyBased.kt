@@ -24,7 +24,7 @@ object PropertyBased : IdeaVimBuildType({
 
   steps {
     gradle {
-      tasks = "clean testPropertyBased"
+      tasks = "clean :tests:property-tests:testPropertyBased"
       buildFile = ""
       enableStacktrace = true
     }

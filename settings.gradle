@@ -13,4 +13,4 @@ include 'vim-engine'
 include 'scripts'
 include 'annotation-processors'
 include 'tests:java-tests'
-
+include 'tests:property-tests'
