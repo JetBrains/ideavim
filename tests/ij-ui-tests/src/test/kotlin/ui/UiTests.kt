@@ -240,13 +240,31 @@ class UiTests {
     step("Create $fileName file") {
       with(projectViewTree) {
         setExpandTimeout(30_000)
-        expand(projectName, "src")
+        myExpand(projectName, "src")
         findText("src").click(MouseButton.RIGHT_BUTTON)
       }
       remoteRobot.actionMenu("New").click()
       remoteRobot.actionMenuItem("File").click()
       keyboard { enterText(fileName); enter() }
     }
+  }
+
+  // This is a replacement of a standard `expand` function. The only change is that it has increased time in
+  //   `blockingGet(30_000)`
+  // This should be replaced with a standard `expand` once the release with the following fix will be available:
+  //   https://github.com/JetBrains/intellij-ui-test-robot/pull/392
+  private fun IdeaFrame.myExpand(vararg path: String) {
+    runJs(
+      """
+            const expandingPathNodes = [${path.joinToString(",") { "\"${it}\"" }}]
+            const ignoreRoot = component.isRootVisible() === false
+            const treePath = com.intellij.ui.tree.TreePathUtil.convertArrayToTreePath(expandingPathNodes)
+            const toStringConverter = function(obj) {return java.util.Objects.toString(obj)}
+            const visitor = new com.intellij.ui.tree.TreeVisitor.ByTreePath(ignoreRoot, treePath, toStringConverter);
+            
+            com.intellij.util.ui.tree.TreeUtil.promiseExpand(component, visitor).blockingGet(30_000)
+        """
+    )
   }
 
   private fun IdeaFrame.reenableIdeaVim(editor: Editor) {
