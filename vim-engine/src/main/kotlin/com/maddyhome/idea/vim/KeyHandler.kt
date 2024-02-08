@@ -140,6 +140,7 @@ public class KeyHandler {
           // Key wasn't processed by any of the consumers, so we reset our key state
           // and tell IDE that the key is Unknown (handle key for us)
           onUnknownKey(editor, processBuilder.state)
+          updateState(processBuilder.state)
           return KeyProcessResult.Unknown.apply {
             handleKeyRecursionCount-- // because onFinish will now be executed for unknown
           }
