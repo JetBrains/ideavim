@@ -73,9 +73,6 @@ plugins {
     id("org.jetbrains.intellij") version "1.17.0"
     id("org.jetbrains.changelog") version "2.2.0"
 
-    // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
-//    id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
-
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
     id("com.dorongold.task-tree") version "2.1.1"
 
@@ -341,12 +338,6 @@ tasks {
         )
     }
 }
-
-// --- Linting
-
-//ktlint {
-//    version.set("0.48.2")
-//}
 
 // --- Tests
 
