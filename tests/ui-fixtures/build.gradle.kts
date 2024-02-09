@@ -2,6 +2,7 @@ plugins {
   java
   kotlin("jvm")
   id("org.jetbrains.intellij")
+  id("java-test-fixtures")
 }
 
 repositories {
@@ -15,16 +16,15 @@ val javaVersion: String by project
 val remoteRobotVersion: String by project
 
 dependencies {
-  testImplementation("org.junit.jupiter:junit-jupiter")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter")
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-  testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
-  testImplementation(testFixtures(project(":"))) // The root project
-  testImplementation(testFixtures(project(":tests:ui-fixtures")))
+  testFixturesImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+  testFixturesImplementation(testFixtures(project(":"))) // The root project
 
-  testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
-  testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
-  testImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
-  testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
+  testFixturesImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
+  testFixturesImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
+  testFixturesImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
+  testFixturesImplementation("com.automation-remarks:video-recorder-junit5:2.0")
 }
 
 tasks {
@@ -55,7 +55,7 @@ tasks {
 
 intellij {
   version.set(ideaVersion)
-  type.set("PY")
+  type.set("IC")
 }
 
 java {

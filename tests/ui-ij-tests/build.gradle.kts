@@ -19,6 +19,7 @@ dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
   testImplementation(testFixtures(project(":"))) // The root project
+  testImplementation(testFixtures(project(":tests:ui-fixtures"))) // The root project
 
   testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
   testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")

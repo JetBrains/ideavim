@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test
 import ui.pages.IdeaFrame
 import ui.pages.idea
 import ui.pages.welcomeFrame
+import ui.utils.StepsLogger
+import ui.utils.uiTest
 
 class PyCharmTest {
   init {
