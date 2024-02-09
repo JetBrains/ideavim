@@ -54,8 +54,7 @@ tasks {
 
 intellij {
   version.set(ideaVersion)
-  type.set("IC")
-  plugins.set(listOf("java"))
+  type.set("PY")
 }
 
 java {
