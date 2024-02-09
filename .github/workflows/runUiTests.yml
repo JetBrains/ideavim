@@ -27,7 +27,7 @@ jobs:
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle :tests:ij-ui-tests:runIdeForUiTests > build/reports/idea.log &
+          gradle :tests:ui-ij-tests:runIdeForUiTests > build/reports/idea.log &
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
@@ -35,7 +35,7 @@ jobs:
           max-attempts: 20
           retry-delay: 10s
       - name: Tests
-        run: gradle :tests:ij-ui-tests:testUi
+        run: gradle :tests:ui-ij-tests:testUi
       - name: Move video
         if: always()
         run: mv tests/ij-ui-tests/video build/reports
