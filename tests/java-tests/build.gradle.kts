@@ -28,8 +28,14 @@ dependencies {
   testImplementation(testFixtures(project(":"))) // The root project
 }
 
-tasks.test {
-  useJUnitPlatform()
+tasks {
+  test {
+    useJUnitPlatform()
+  }
+
+  verifyPlugin {
+    enabled = false
+  }
 }
 
 intellij {

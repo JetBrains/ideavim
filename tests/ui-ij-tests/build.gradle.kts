@@ -51,6 +51,10 @@ tasks {
     systemProperty("jb.consents.confirmation.enabled", "false")
     systemProperty("ide.show.tips.on.startup.default.value", "false")
   }
+
+  verifyPlugin {
+    enabled = false
+  }
 }
 
 intellij {

@@ -52,6 +52,10 @@ tasks {
     systemProperty("ide.show.tips.on.startup.default.value", "false")
     systemProperty("eap.require.license", "false")
   }
+
+  verifyPlugin {
+    enabled = false
+  }
 }
 
 intellij {

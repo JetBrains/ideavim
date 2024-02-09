@@ -20,16 +20,22 @@ dependencies {
   testImplementation(testFixtures(project(":"))) // The root project
 }
 
-// This task is disabled because it should be excluded from `gradle test` run (because it's slow)
-// I didn't find a better way to exclude except disabling and defining a new task with a different name
-tasks.test {
-  enabled = false
-  useJUnitPlatform()
-}
+tasks {
+  // This task is disabled because it should be excluded from `gradle test` run (because it's slow)
+  // I didn't find a better way to exclude except disabling and defining a new task with a different name
+  test {
+    enabled = false
+    useJUnitPlatform()
+  }
 
-tasks.register<Test>("testLongRunning") {
-  group = "verification"
-  useJUnitPlatform()
+  register<Test>("testLongRunning") {
+    group = "verification"
+    useJUnitPlatform()
+  }
+
+  verifyPlugin {
+    enabled = false
+  }
 }
 
 intellij {
