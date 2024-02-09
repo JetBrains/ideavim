@@ -50,6 +50,7 @@ tasks {
     systemProperty("jb.privacy.policy.text", "<!--999.999-->")
     systemProperty("jb.consents.confirmation.enabled", "false")
     systemProperty("ide.show.tips.on.startup.default.value", "false")
+    systemProperty("eap.require.license", "false")
   }
 }
 
