@@ -11,6 +11,7 @@ plugins {
     kotlin("jvm")
 //    id("org.jlleitschuh.gradle.ktlint")
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+    kotlin("plugin.serialization") version "1.9.22"
     `maven-publish`
     antlr
 }
@@ -51,7 +52,7 @@ dependencies {
     antlr("org.antlr:antlr4:4.10.1")
 
     ksp(project(":annotation-processors"))
-    implementation(project(":annotation-processors"))
+    compileOnly(project(":annotation-processors"))
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinxSerializationVersion")
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
