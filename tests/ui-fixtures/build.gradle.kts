@@ -16,7 +16,7 @@ val javaVersion: String by project
 val remoteRobotVersion: String by project
 
 dependencies {
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   testFixturesImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
   testFixturesImplementation(testFixtures(project(":"))) // The root project
