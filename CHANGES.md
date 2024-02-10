@@ -30,6 +30,7 @@ usual beta standards.
 
 ### Merged PRs:
 * [725](https://github.com/JetBrains/ideavim/pull/725) by [Emanuel Gestosa](https://github.com/emanuelgestosa): Regex
+* [805](https://github.com/JetBrains/ideavim/pull/805) by [chylex](https://github.com/chylex): VIM-3238 Fix recording a macro that replays another macro
 
 ## 2.8.0, 2024-01-30
 
