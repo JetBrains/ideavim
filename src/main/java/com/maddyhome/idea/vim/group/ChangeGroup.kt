@@ -68,6 +68,8 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -577,46 +579,60 @@ public class ChangeGroup : VimChangeGroupBase() {
     }
     val startOffset = editor.getLineStartOffset(startLine)
     val endOffset = editor.getLineEndOffset(endLine)
-    return sortTextRange(editor, caret, startOffset, endOffset, lineComparator, sortOptions)
-  }
 
-  /**
-   * Sorts a text range with a comparator. Returns true if a replace was performed, false otherwise.
-   *
-   * @param editor         The editor to replace text in
-   * @param start          The starting position for the sort
-   * @param end            The ending position for the sort
-   * @param lineComparator The comparator to use to sort
-   * @param sortOption     The option to sort the range
-   * @return true if able to sort the text, false if not
-   */
-  private fun sortTextRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    start: Int,
-    end: Int,
-    lineComparator: Comparator<String>,
-    sortOption: SortOption,
-  ): Boolean {
-    val selectedText = (editor as IjVimEditor).editor.document.getText(TextRangeInterval(start, end))
-    val lines: MutableList<String> = selectedText.split("\n").sortedWith(lineComparator).toMutableList()
-    if (sortOption.unique) {
-      val iterator = lines.iterator()
+    val selectedText = (editor as IjVimEditor).editor.document.getText(TextRangeInterval(startOffset, endOffset))
+    val lines = selectedText.split("\n")
+    val modifiedLines = sortOptions.pattern?.let {
+      if (sortOptions.sortOnPattern) {
+        extractPatternFromLines(editor, lines, startLine, it)
+      } else {
+        deletePatternFromLines(editor, lines, startLine, it)
+      }
+    } ?: lines
+    val sortedLines = lines.zip(modifiedLines)
+      .sortedWith { l1, l2 -> lineComparator.compare(l1.second, l2.second) }
+      .map {it.first}
+      .toMutableList()
+
+    if (sortOptions.unique) {
+      val iterator = sortedLines.iterator()
       var previous: String? = null
       while (iterator.hasNext()) {
         val current = iterator.next()
-        if (current == previous || sortOption.ignoreCase && current.equals(previous, ignoreCase = true)) {
+        if (current == previous || sortOptions.ignoreCase && current.equals(previous, ignoreCase = true)) {
           iterator.remove()
         } else {
           previous = current
         }
       }
     }
-    if (lines.size < 1) {
+    if (sortedLines.isEmpty()) {
       return false
     }
-    replaceText(editor, caret, start, end, StringUtil.join(lines, "\n"))
+    replaceText(editor, caret, startOffset, endOffset, StringUtil.join(sortedLines, "\n"))
     return true
+  }
+
+  private fun extractPatternFromLines(editor: VimEditor, lines: List<String>, startLine: Int, pattern: String): List<String> {
+    val regex = VimRegex(pattern)
+    return lines.mapIndexed { i: Int, line: String ->
+      val result = regex.findInLine(editor, startLine + i, 0)
+      when (result) {
+        is VimMatchResult.Success -> result.value
+        is VimMatchResult.Failure -> line
+      }
+    }
+  }
+
+  private fun deletePatternFromLines(editor: VimEditor, lines: List<String>, startLine: Int, pattern: String): List<String> {
+    val regex = VimRegex(pattern)
+    return lines.mapIndexed { i: Int, line: String ->
+      val result = regex.findInLine(editor, startLine + i, 0)
+      when (result) {
+        is VimMatchResult.Success -> line.substring(result.value.length, line.length)
+        is VimMatchResult.Failure -> line
+      }
+    }
   }
 
   /**

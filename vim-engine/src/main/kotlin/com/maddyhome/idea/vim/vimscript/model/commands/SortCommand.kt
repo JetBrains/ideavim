@@ -32,14 +32,7 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
 
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val arg = argument
-    val nonEmptyArg = arg.trim().isNotEmpty()
-    val sortOption = SortOption(
-      reverse = nonEmptyArg && "!" in arg,
-      ignoreCase = nonEmptyArg && "i" in arg,
-      numeric = nonEmptyArg && "n" in arg,
-      unique = nonEmptyArg && "u" in arg,
-    )
+    val sortOption = parseSortOption(argument)
     val lineComparator = LineComparator(sortOption.ignoreCase, sortOption.numeric, sortOption.reverse)
     if (editor.inBlockSelection) {
       val primaryCaret = editor.primaryCaret()
@@ -89,6 +82,29 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
     return normalizedRange
   }
 
+  private fun parseSortOption(arg: String): SortOption {
+    val patternRange = extractPattern(arg)
+    val pattern = patternRange?.let { arg.substring(it) }
+    val flags = patternRange?.let { arg.removeRange(patternRange)} ?: arg
+    return SortOption(
+      reverse = "!" in flags,
+      ignoreCase = "i" in flags,
+      numeric = "n" in flags,
+      unique = "u" in flags,
+      sortOnPattern = "r" in flags,
+      pattern = pattern
+    )
+  }
+
+  private fun extractPattern(arg: String): IntRange? {
+    val startIndex = arg.indexOf('/',)
+    val endIndex = arg.indexOf('/', startIndex + 2)
+    if (startIndex >= 0 && endIndex >= 0) {
+      return IntRange(startIndex + 1, endIndex - 1)
+    }
+    return null
+  }
+
   private class LineComparator(
     private val ignoreCase: Boolean,
     private val numeric: Boolean,
@@ -131,4 +147,6 @@ public data class SortOption(
   val numeric: Boolean,
   val reverse: Boolean,
   val unique: Boolean,
+  val sortOnPattern: Boolean,
+  val pattern: String? = null
 )
