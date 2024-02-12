@@ -164,20 +164,21 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set all",
       """
         |--- Options ---
-        |noargtextobj          ideamarks           scroll=0          nosurround
-        |nobreakindent         ideawrite=all       scrolljump=1      notextobj-entire
-        |  colorcolumn=      noignorecase          scrolloff=0       notextobj-indent
-        |nocommentary        noincsearch           selectmode=         textwidth=0
-        |nocursorline        nolist                shellcmdflag=-x     timeout
-        |nodigraph           nomatchit             shellxescape=@      timeoutlen=1000
-        |noexchange            maxmapdepth=20      shellxquote={     notrackactionids
-        |  fileformat=unix     more                showcmd             undolevels=1000
-        |nogdefault          nomultiple-cursors    showmode            virtualedit=
-        |nohighlightedyank   noNERDTree            sidescroll=0      novisualbell
-        |  history=50          nrformats=hex       sidescrolloff=0     visualdelay=100
-        |nohlsearch          nonumber            nosmartcase           whichwrap=b,s
-        |noideaglobalmode      operatorfunc=     nosneak               wrap
-        |noideajoin          norelativenumber      startofline         wrapscan
+        |noargtextobj          ideamarks           scrolljump=1      notextobj-indent
+        |nobomb                ideawrite=all       scrolloff=0         textwidth=0
+        |nobreakindent       noignorecase          selectmode=         timeout
+        |  colorcolumn=      noincsearch           shellcmdflag=-x     timeoutlen=1000
+        |nocommentary        nolist                shellxescape=@    notrackactionids
+        |nocursorline        nomatchit             shellxquote={       undolevels=1000
+        |nodigraph             maxmapdepth=20      showcmd             virtualedit=
+        |noexchange            more                showmode          novisualbell
+        |  fileformat=unix   nomultiple-cursors    sidescroll=0        visualdelay=100
+        |nogdefault          noNERDTree            sidescrolloff=0     whichwrap=b,s
+        |nohighlightedyank     nrformats=hex     nosmartcase           wrap
+        |  history=50        nonumber            nosneak               wrapscan
+        |nohlsearch            operatorfunc=       startofline
+        |noideaglobalmode    norelativenumber    nosurround
+        |noideajoin            scroll=0          notextobj-entire
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
         |  ide=IntelliJ IDEA Community Edition
@@ -224,6 +225,7 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set! all", """
       |--- Options ---
       |noargtextobj
+      |nobomb
       |nobreakindent
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  colorcolumn=

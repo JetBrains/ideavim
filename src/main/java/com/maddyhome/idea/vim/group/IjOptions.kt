@@ -56,10 +56,17 @@ public object IjOptions {
     }
   })
   public val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
+  public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
+  public val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
+  public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
+  public val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))
+  public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
 
-  // `fileformat` is not explicitly listed as local-noglobal in Vim's help, but is set when a new buffer is edited,
-  // according to the value of `fileformats`. To prevent unexpected file conversion, we'll treat is as local-noglobal.
-  // See `:help fileformats`
+  // These options are not explicitly listed as local-noglobal in Vim's help, but are set when a new buffer is edited,
+  // based on the value of 'fileformats' or 'fileencodings'. To prevent unexpected file cnversion, we treat them as
+  // local-noglobal. See `:help local-noglobal`, `:help 'fileformats'` and `:help 'fileencodings'`
+  public val bomb: ToggleOption =
+    addOption(ToggleOption("bomb", LOCAL_TO_BUFFER, "bomb", false, isLocalNoGlobal = true))
   public val fileformat: StringOption = addOption(
     StringOption(
       "fileformat",
@@ -70,11 +77,6 @@ public object IjOptions {
       isLocalNoGlobal = true
     )
   )
-  public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
-  public val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
-  public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
-  public val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))
-  public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
 
   // IntelliJ specific functionality - custom options
   public val ide: StringOption = addOption(

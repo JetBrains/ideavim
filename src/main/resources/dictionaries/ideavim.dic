@@ -44,6 +44,7 @@ visualbell
 visualdelay
 wrapscan
 
+nobomb
 nobreakindent
 nocursorline
 nodigraph
