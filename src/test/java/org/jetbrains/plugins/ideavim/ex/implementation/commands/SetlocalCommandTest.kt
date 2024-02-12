@@ -381,20 +381,21 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setlocal all", """
       |--- Local option values ---
-      |noargtextobj          ideamarks         norelativenumber      startofline
-      |nobreakindent         idearefactormode=   scroll=0          nosurround
-      |  colorcolumn=        ideawrite=all       scrolljump=1      notextobj-entire
-      |nocommentary        noignorecase          scrolloff=-1      notextobj-indent
-      |nocursorline        noincsearch           selectmode=         textwidth=0
-      |nodigraph           nolist                shellcmdflag=-x     timeout
-      |noexchange          nomatchit             shellxescape=@      timeoutlen=1000
-      |  fileformat=unix     maxmapdepth=20      shellxquote={     notrackactionids
-      |nogdefault            more                showcmd             virtualedit=
-      |nohighlightedyank   nomultiple-cursors    showmode          novisualbell
-      |  history=50        noNERDTree            sidescroll=0        visualdelay=100
-      |nohlsearch            nrformats=hex       sidescrolloff=-1    whichwrap=b,s
-      |noideaglobalmode    nonumber            nosmartcase           wrap
-      |--ideajoin            operatorfunc=     nosneak               wrapscan
+      |noargtextobj          ideamarks           scroll=0          notextobj-entire
+      |nobomb                idearefactormode=   scrolljump=1      notextobj-indent
+      |nobreakindent         ideawrite=all       scrolloff=-1        textwidth=0
+      |  colorcolumn=      noignorecase          selectmode=         timeout
+      |nocommentary        noincsearch           shellcmdflag=-x     timeoutlen=1000
+      |nocursorline        nolist                shellxescape=@    notrackactionids
+      |nodigraph           nomatchit             shellxquote={       virtualedit=
+      |noexchange            maxmapdepth=20      showcmd           novisualbell
+      |  fileformat=unix     more                showmode            visualdelay=100
+      |nogdefault          nomultiple-cursors    sidescroll=0        whichwrap=b,s
+      |nohighlightedyank   noNERDTree            sidescrolloff=-1    wrap
+      |  history=50          nrformats=hex     nosmartcase           wrapscan
+      |nohlsearch          nonumber            nosneak
+      |noideaglobalmode      operatorfunc=       startofline
+      |--ideajoin          norelativenumber    nosurround
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -443,6 +444,7 @@ class SetlocalCommandTest : VimTestCase() {
     assertCommandOutput("setlocal! all", """
       |--- Local option values ---
       |noargtextobj
+      |nobomb
       |nobreakindent
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  colorcolumn=
