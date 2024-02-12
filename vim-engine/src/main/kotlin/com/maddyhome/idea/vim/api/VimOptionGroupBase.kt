@@ -817,7 +817,13 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
     val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
     forEachOption(LOCAL_TO_BUFFER) { option ->
-      val value = storage.getOptionValue(option, sourceLocalScope)
+      // Some local options are not initialised by copying their global value. See `:help local-noglobal`
+      val value = if (option.isLocalNoGlobal) {
+        OptionValue.Default(option.defaultValue)
+      }
+      else {
+        storage.getOptionValue(option, sourceLocalScope)
+      }
       storage.setOptionValue(option, targetLocalScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_BUFFER) { option ->
@@ -830,7 +836,13 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val globalScope = OptionAccessScope.GLOBAL(editor)
     val localScope = OptionAccessScope.LOCAL(editor)
     forEachOption(LOCAL_TO_WINDOW) { option ->
-      val value = storage.getOptionValue(option, globalScope)
+      // Some local options are not initialised by copying their global value. See `:help local-noglobal`
+      val value = if (option.isLocalNoGlobal) {
+        OptionValue.Default(option.defaultValue)
+      }
+      else {
+        storage.getOptionValue(option, globalScope)
+      }
       storage.setOptionValue(option, localScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_WINDOW) { option ->

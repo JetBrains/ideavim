@@ -36,6 +36,9 @@ import java.util.*
  * @param abbrev  An abbreviated name for the option, recognised by `:set`
  * @param defaultValue  The default value of the option, if not set by the user
  * @param unsetValue    The value of the local part of a global-local option, if the local part has not been set
+ * @param isLocalNoGlobal Most local options are initialised by copying the global value from the opening window. If
+ *                        this value is true, this value is not copied and the local option is set to default.
+ *                        See `:help local-noglobal`
  * @param isHidden   True for feature-toggle options that will be reviewed in future releases.
  *                      Such options won't be printed in the output to `:set`
  */
@@ -44,6 +47,7 @@ public abstract class Option<T : VimDataType>(public val name: String,
                                               public val abbrev: String,
                                               defaultValue: T,
                                               public val unsetValue: T,
+                                              public val isLocalNoGlobal: Boolean = false,
                                               public val isHidden: Boolean = false) {
   private var defaultValueField = defaultValue
 
@@ -84,7 +88,8 @@ public open class StringOption(
   defaultValue: VimString,
   unsetValue: VimString = VimString.EMPTY,
   public val boundedValues: Collection<String>? = null,
-) : Option<VimString>(name, declaredScope, abbrev, defaultValue, unsetValue) {
+  isLocalNoGlobal: Boolean = false
+) : Option<VimString>(name, declaredScope, abbrev, defaultValue, unsetValue, isLocalNoGlobal = isLocalNoGlobal) {
 
   public constructor(
     name: String,
@@ -92,7 +97,8 @@ public open class StringOption(
     abbrev: String,
     defaultValue: String,
     boundedValues: Collection<String>? = null,
-  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues = boundedValues)
+    isLocalNoGlobal: Boolean = false
+  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues = boundedValues, isLocalNoGlobal = isLocalNoGlobal)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -303,7 +309,7 @@ public class ToggleOption(
   abbrev: String,
   defaultValue: VimInt,
   isHidden: Boolean = false,
-) : Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE, isHidden) {
+) : Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE, isHidden = isHidden) {
 
   public constructor(
     name: String,
@@ -311,7 +317,7 @@ public class ToggleOption(
     abbrev: String,
     defaultValue: Boolean,
     isHidden: Boolean = false,
-  ) : this(name, declaredScope, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO, isHidden)
+  ) : this(name, declaredScope, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO, isHidden = isHidden)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimInt) throw exExceptionMessage("E474", token)
