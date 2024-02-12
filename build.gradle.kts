@@ -102,6 +102,7 @@ val ideaType: String by project
 val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
 val antlrVersion: String by project
+val remoteRobotVersion: String by project
 
 val publishChannels: String by project
 val publishToken: String by project
@@ -187,12 +188,25 @@ tasks {
 //            allWarningsAsErrors = true
     }
   }
+
   compileTestKotlin {
     kotlinOptions {
       jvmTarget = javaVersion
       apiVersion = "1.9"
 //            allWarningsAsErrors = true
     }
+  }
+
+  downloadRobotServerPlugin {
+    version.set(remoteRobotVersion)
+  }
+
+  runIdeForUiTests {
+    systemProperty("robot-server.port", "8082")
+    systemProperty("ide.mac.message.dialogs.as.sheets", "false")
+    systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+    systemProperty("jb.consents.confirmation.enabled", "false")
+    systemProperty("ide.show.tips.on.startup.default.value", "false")
   }
 }
 
