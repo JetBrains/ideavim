@@ -34,6 +34,7 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("setlocal fileformat=unix")
     enterCommand("setlocal shell=/dummy/path/to/bash")
     enterCommand("setlocal shellcmdflag=-x")
     enterCommand("setlocal shellxescape=@")
@@ -380,20 +381,20 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setlocal all", """
       |--- Local option values ---
-      |noargtextobj          idearefactormode=   scroll=0          nosurround
-      |nobreakindent         ideawrite=all       scrolljump=1      notextobj-entire
-      |  colorcolumn=      noignorecase          scrolloff=-1      notextobj-indent
-      |nocommentary        noincsearch           selectmode=         textwidth=0
-      |nocursorline        nolist                shellcmdflag=-x     timeout
-      |nodigraph           nomatchit             shellxescape=@      timeoutlen=1000
-      |noexchange            maxmapdepth=20      shellxquote={     notrackactionids
+      |noargtextobj          ideamarks         norelativenumber      startofline
+      |nobreakindent         idearefactormode=   scroll=0          nosurround
+      |  colorcolumn=        ideawrite=all       scrolljump=1      notextobj-entire
+      |nocommentary        noignorecase          scrolloff=-1      notextobj-indent
+      |nocursorline        noincsearch           selectmode=         textwidth=0
+      |nodigraph           nolist                shellcmdflag=-x     timeout
+      |noexchange          nomatchit             shellxescape=@      timeoutlen=1000
+      |  fileformat=unix     maxmapdepth=20      shellxquote={     notrackactionids
       |nogdefault            more                showcmd             virtualedit=
       |nohighlightedyank   nomultiple-cursors    showmode          novisualbell
       |  history=50        noNERDTree            sidescroll=0        visualdelay=100
       |nohlsearch            nrformats=hex       sidescrolloff=-1    whichwrap=b,s
       |noideaglobalmode    nonumber            nosmartcase           wrap
       |--ideajoin            operatorfunc=     nosneak               wrapscan
-      |  ideamarks         norelativenumber      startofline
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -449,6 +450,7 @@ class SetlocalCommandTest : VimTestCase() {
       |nocursorline
       |nodigraph
       |noexchange
+      |  fileformat=unix
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |nohighlightedyank

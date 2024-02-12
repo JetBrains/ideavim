@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
@@ -55,6 +56,20 @@ public object IjOptions {
     }
   })
   public val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
+
+  // `fileformat` is not explicitly listed as local-noglobal in Vim's help, but is set when a new buffer is edited,
+  // according to the value of `fileformats`. To prevent unexpected file conversion, we'll treat is as local-noglobal.
+  // See `:help fileformats`
+  public val fileformat: StringOption = addOption(
+    StringOption(
+      "fileformat",
+      LOCAL_TO_BUFFER,
+      "ff",
+      if (injector.systemInfoService.isWindows) "dos" else "unix",
+      boundedValues = setOf("dos", "unix", "mac"),
+      isLocalNoGlobal = true
+    )
+  )
   public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
   public val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
   public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
