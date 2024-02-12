@@ -308,16 +308,34 @@ public class ToggleOption(
   declaredScope: OptionDeclaredScope,
   abbrev: String,
   defaultValue: VimInt,
+  isLocalNoGlobal: Boolean = false,
   isHidden: Boolean = false,
-) : Option<VimInt>(name, declaredScope, abbrev, defaultValue, VimInt.MINUS_ONE, isHidden = isHidden) {
+) :
+  Option<VimInt>(
+    name,
+    declaredScope,
+    abbrev,
+    defaultValue,
+    VimInt.MINUS_ONE,
+    isLocalNoGlobal = isLocalNoGlobal,
+    isHidden = isHidden
+  ) {
 
   public constructor(
     name: String,
     declaredScope: OptionDeclaredScope,
     abbrev: String,
     defaultValue: Boolean,
+    isLocalNoGlobal: Boolean = false,
     isHidden: Boolean = false,
-  ) : this(name, declaredScope, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO, isHidden = isHidden)
+  ) : this(
+    name,
+    declaredScope,
+    abbrev,
+    if (defaultValue) VimInt.ONE else VimInt.ZERO,
+    isLocalNoGlobal = isLocalNoGlobal,
+    isHidden = isHidden
+  )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimInt) throw exExceptionMessage("E474", token)

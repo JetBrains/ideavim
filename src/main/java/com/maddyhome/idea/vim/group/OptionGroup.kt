@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.NumberOption
@@ -53,6 +54,7 @@ internal interface IjVimOptionGroup: VimOptionGroup {
 
 internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
   init {
+    addOptionValueOverride(IjOptions.bomb, BombOptionMapper())
     addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper(IjOptions.breakindent))
     addOptionValueOverride(IjOptions.colorcolumn, ColorColumnOptionValueProvider(IjOptions.colorcolumn))
     addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper(IjOptions.cursorline))
@@ -134,6 +136,47 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  * IntelliJ settings. Options that do not have an IdeaVim implementation should be registered in the host-specific
  * module.
  */
+
+
+/**
+ * Maps the `'bomb'` local-to-buffer Vim option to the file's current byte order mark
+ *
+ * Note that this behaves slightly differently to Vim's `'bomb'` option, which will set the buffer as modified and
+ * update the BOM when the file is saved. IdeaVim's `'bomb'` option maps directly to the current state of the file's
+ * BOM and updates the file immediately on being set.
+ *
+ * To prevent unexpected conversions, we treat the option as local-noglobal, so we don't apply the global value as the
+ * new local value during window initialisation. See `':help local-noglobal'`.
+ */
+private class BombOptionMapper : OptionValueOverride<VimInt> {
+  override fun getLocalValue(storedValue: OptionValue<VimInt>?, editor: VimEditor): OptionValue<VimInt> {
+    // TODO: When would we not have a virtual file? (Other than the fallback window)
+    val virtualFile = editor.ij.virtualFile ?: return OptionValue.Default(VimInt.ZERO)
+
+    // It doesn't matter if this is user/external/default - it's the only value it can be
+    return OptionValue.User((virtualFile.bom == null).not().asVimInt())
+  }
+
+  override fun setLocalValue(
+    storedValue: OptionValue<VimInt>?,
+    newValue: OptionValue<VimInt>,
+    editor: VimEditor,
+  ): Boolean {
+    // Do nothing if we're setting the initial default
+    if (newValue is OptionValue.Default && storedValue == null) return false
+
+    val hasBom = getLocalValue(storedValue, editor).value.asBoolean()
+    if (hasBom == newValue.value.asBoolean()) return false
+
+    // Use IntelliJ's own actions to modify the BOM. This will change the BOM stored in the virtual file, update the
+    // file contents and save it
+    val actionId = if (hasBom) "RemoveBom" else "AddBom"
+    val action = injector.actionExecutor.getAction(actionId) ?: throw ExException("Cannot find native action: $actionId")
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    injector.actionExecutor.executeAction(editor, action, context)
+    return true
+  }
+}
 
 
 /**
