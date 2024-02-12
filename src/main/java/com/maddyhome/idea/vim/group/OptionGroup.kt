@@ -9,17 +9,22 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.application.options.CodeStyle
+import com.intellij.codeStyle.AbstractConvertLineSeparatorsAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.impl.LoadTextUtil
 import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.util.LineSeparator
 import com.intellij.util.PatternUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.LocalOptionToGlobalLocalExternalSettingMapper
+import com.maddyhome.idea.vim.api.OptionValue
+import com.maddyhome.idea.vim.api.OptionValueOverride
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
@@ -51,6 +56,7 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
     addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper(IjOptions.breakindent))
     addOptionValueOverride(IjOptions.colorcolumn, ColorColumnOptionValueProvider(IjOptions.colorcolumn))
     addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper(IjOptions.cursorline))
+    addOptionValueOverride(IjOptions.fileformat, FileFormatOptionMapper())
     addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list))
     addOptionValueOverride(IjOptions.number, NumberOptionMapper(IjOptions.number))
     addOptionValueOverride(IjOptions.relativenumber, RelativeNumberOptionMapper(IjOptions.number))
@@ -254,6 +260,67 @@ private class CursorLineOptionMapper(cursorLineOption: ToggleOption)
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
     editor.ij.settings.isCaretRowShown = value.asBoolean()
+  }
+}
+
+
+/**
+ * Maps the `'fileformat'` local-to-buffer Vim option to the current line separators for the file
+ *
+ * Note that this behaves slightly differently to Vim's `'fileformat'` option. Vim will set the option, and it only
+ * applies when the file is saved. IdeaVim's `'fileformat'` maps directly to the current value of the file's line
+ * separators and applies immediately.
+ *
+ * Vim will set this option when editing a new buffer, based on the value of the `'fileformats'` option, and potentially
+ * the contents of the buffer. We don't support `'fileformats'`, we just let IntelliJ auto-detect the value. As such, we
+ * don't want the global value of `'fileformat'` being copied over during initialisation and unexpectedly converting
+ * line numbers. So we treat the option as `local-noglobal` (see `:help local-noglobal`) even though Vim does't list it
+ * as such.
+ *
+ * Since this is such a simple mapping, we can implement [OptionValueOverride] directly.
+ */
+private class FileFormatOptionMapper : OptionValueOverride<VimString> {
+  override fun getLocalValue(storedValue: OptionValue<VimString>?, editor: VimEditor): OptionValue<VimString> {
+    // We should have a virtual file for most scenarios, e.g., scratch files, commit message dialog, etc.
+    // The fallback window (TextComponentEditorImpl) does not have a virtual file
+    val separator = editor.ij.virtualFile?.let { LoadTextUtil.detectLineSeparator(it, false) }
+    val value = VimString(when (separator) {
+      LineSeparator.LF.separatorString -> "unix"
+      LineSeparator.CR.separatorString -> "mac"
+      LineSeparator.CRLF.separatorString -> "dos"
+      else -> if (injector.systemInfoService.isWindows) "dos" else "unix"
+    })
+
+    // There is no difference between user/external/default - the file is always just one format
+    return OptionValue.User(value)
+  }
+
+  override fun setLocalValue(
+    storedValue: OptionValue<VimString>?,
+    newValue: OptionValue<VimString>,
+    editor: VimEditor,
+  ): Boolean {
+    // Do nothing if we're setting the initial default
+    if (newValue is OptionValue.Default && storedValue == null) return false
+
+    // TODO: If project is null (why would it be? Scratch files?) we could use LoadTextUtil.changeLineSeparators
+    // We would have to investigate if we need to wrap it in a write command, etc.
+    // Would need a repro to test before implementing.
+    val project = editor.ij.project ?: return false
+    val virtualFile = editor.ij.virtualFile ?: return false
+
+    val newSeparator = when (newValue.value.value) {
+      "dos" -> LineSeparator.CRLF.separatorString
+      "mac" -> LineSeparator.CR.separatorString
+      "unix" -> LineSeparator.LF.separatorString
+      else -> LineSeparator.LF.separatorString
+    }
+    if (LoadTextUtil.detectLineSeparator(virtualFile, false) != newSeparator) {
+      AbstractConvertLineSeparatorsAction.changeLineSeparators(project, virtualFile, newSeparator)
+      return true
+    }
+
+    return false
   }
 }
 

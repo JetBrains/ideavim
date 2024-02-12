@@ -32,6 +32,7 @@ class SetCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("set fileformat=unix")
     enterCommand("set shell=/dummy/path/to/bash")
     enterCommand("set shellcmdflag=-x")
     enterCommand("set shellxescape=@")
@@ -163,20 +164,20 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set all",
       """
         |--- Options ---
-        |noargtextobj          ideawrite=all       scrolljump=1      notextobj-entire
-        |nobreakindent       noignorecase          scrolloff=0       notextobj-indent
-        |  colorcolumn=      noincsearch           selectmode=         textwidth=0
-        |nocommentary        nolist                shellcmdflag=-x     timeout
-        |nocursorline        nomatchit             shellxescape=@      timeoutlen=1000
-        |nodigraph             maxmapdepth=20      shellxquote={     notrackactionids
-        |noexchange            more                showcmd             undolevels=1000
+        |noargtextobj          ideamarks           scroll=0          nosurround
+        |nobreakindent         ideawrite=all       scrolljump=1      notextobj-entire
+        |  colorcolumn=      noignorecase          scrolloff=0       notextobj-indent
+        |nocommentary        noincsearch           selectmode=         textwidth=0
+        |nocursorline        nolist                shellcmdflag=-x     timeout
+        |nodigraph           nomatchit             shellxescape=@      timeoutlen=1000
+        |noexchange            maxmapdepth=20      shellxquote={     notrackactionids
+        |  fileformat=unix     more                showcmd             undolevels=1000
         |nogdefault          nomultiple-cursors    showmode            virtualedit=
         |nohighlightedyank   noNERDTree            sidescroll=0      novisualbell
         |  history=50          nrformats=hex       sidescrolloff=0     visualdelay=100
         |nohlsearch          nonumber            nosmartcase           whichwrap=b,s
         |noideaglobalmode      operatorfunc=     nosneak               wrap
         |noideajoin          norelativenumber      startofline         wrapscan
-        |  ideamarks           scroll=0          nosurround
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
         |  ide=IntelliJ IDEA Community Edition
@@ -230,6 +231,7 @@ class SetCommandTest : VimTestCase() {
       |nocursorline
       |nodigraph
       |noexchange
+      |  fileformat=unix
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |nohighlightedyank

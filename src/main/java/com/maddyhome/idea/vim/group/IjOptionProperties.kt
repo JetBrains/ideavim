@@ -49,6 +49,7 @@ public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOpt
   public var breakindent: Boolean by optionProperty(IjOptions.breakindent)
   public val colorcolumn: StringListOptionValue by optionProperty(IjOptions.colorcolumn)
   public var cursorline: Boolean by optionProperty(IjOptions.cursorline)
+  public var fileformat: String by optionProperty(IjOptions.fileformat)
   public var list: Boolean by optionProperty(IjOptions.list)
   public var number: Boolean by optionProperty(IjOptions.number)
   public var relativenumber: Boolean by optionProperty(IjOptions.relativenumber)
