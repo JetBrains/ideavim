@@ -353,9 +353,11 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified local option and unset global-local values`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     assertCommandOutput("setlocal", """
       |--- Local option values ---
       |--ideajoin            idearefactormode=   scrolloff=-1        sidescrolloff=-1
+      |  fileencoding=utf-8
       |--ideacopypreprocess
       |  undolevels=-123456
       |""".trimMargin()
@@ -364,11 +366,13 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified local option and unset global-local values 2`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("setlocal number relativenumber scrolloff=10 nrformats=alpha,hex,octal sidescrolloff=10")
     assertCommandOutput("setlocal", """
       |--- Local option values ---
       |--ideajoin            number              scrolloff=10
       |  idearefactormode=   relativenumber      sidescrolloff=10
+      |  fileencoding=utf-8
       |--ideacopypreprocess
       |  nrformats=alpha,hex,octal
       |  undolevels=-123456
@@ -378,6 +382,7 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all local option values`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setlocal all", """
       |--- Local option values ---
@@ -397,6 +402,7 @@ class SetlocalCommandTest : VimTestCase() {
       |noideaglobalmode      operatorfunc=       startofline
       |--ideajoin          norelativenumber    nosurround
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  fileencoding=utf-8
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
       |--ideacopypreprocess
@@ -426,8 +432,10 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified local option values in single column`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     assertCommandOutput("setlocal!", """
       |--- Local option values ---
+      |  fileencoding=utf-8
       |--ideacopypreprocess
       |--ideajoin
       |  idearefactormode=
@@ -440,6 +448,7 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all local option values in single column`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setlocal! all", """
       |--- Local option values ---
@@ -452,6 +461,7 @@ class SetlocalCommandTest : VimTestCase() {
       |nocursorline
       |nodigraph
       |noexchange
+      |  fileencoding=utf-8
       |  fileformat=unix
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175

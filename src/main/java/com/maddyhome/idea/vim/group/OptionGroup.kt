@@ -14,11 +14,22 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.impl.LoadTextUtil
 import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectLocator
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.openapi.util.text.StringUtilRt
+import com.intellij.openapi.vfs.CharsetToolkit
+import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.encoding.ChangeFileEncodingAction
+import com.intellij.openapi.vfs.encoding.EncodingUtil.Magic8
+import com.intellij.util.ArrayUtil
 import com.intellij.util.LineSeparator
 import com.intellij.util.PatternUtil
 import com.maddyhome.idea.vim.VimPlugin
@@ -39,6 +50,10 @@ import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
+import java.io.IOException
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+import java.util.*
 
 internal interface IjVimOptionGroup: VimOptionGroup {
   /**
@@ -58,6 +73,7 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
     addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper(IjOptions.breakindent))
     addOptionValueOverride(IjOptions.colorcolumn, ColorColumnOptionValueProvider(IjOptions.colorcolumn))
     addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper(IjOptions.cursorline))
+    addOptionValueOverride(IjOptions.fileencoding, FileEncodingOptionMapper())
     addOptionValueOverride(IjOptions.fileformat, FileFormatOptionMapper())
     addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list))
     addOptionValueOverride(IjOptions.number, NumberOptionMapper(IjOptions.number))
@@ -303,6 +319,126 @@ private class CursorLineOptionMapper(cursorLineOption: ToggleOption)
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
     editor.ij.settings.isCaretRowShown = value.asBoolean()
+  }
+}
+
+
+/**
+ * Maps the `'fileencoding'` local-to-buffer Vim option to the file's current encoding
+ *
+ * Note that this behaves somewhat differently to Vim's `'fileencoding'` option. Vim will set the option, but it only
+ * applies when the file is written - it just sets the file modified. IdeaVim's option maps directly to the current file
+ * encoding and when set, will use IntelliJ's own actions to change the encoding.
+ *
+ * Vim will set this option when editing a new buffer, based on the value of `'fileencodings'` and the contents of the
+ * buffer. We don't support `'fileencodings'`. Instead, IntelliJ will auto-detect the encoding. To prevent unexpected
+ * conversions, we mark this option as local-noglobal, even though it's not in Vim's list of local-noglobal options
+ * (see `:help local-noglobal`). This prevents the global value being applied to the local value during window
+ * initialisation.
+ */
+private class FileEncodingOptionMapper : OptionValueOverride<VimString> {
+  override fun getLocalValue(storedValue: OptionValue<VimString>?, editor: VimEditor): OptionValue<VimString> {
+    val virtualFile = editor.ij.virtualFile ?: return OptionValue.External(VimString.EMPTY)
+
+    return OptionValue.External(VimString(virtualFile.charset.name().lowercase(Locale.getDefault())))
+  }
+
+  override fun setLocalValue(
+    storedValue: OptionValue<VimString>?,
+    newValue: OptionValue<VimString>,
+    editor: VimEditor,
+  ): Boolean {
+    // Do nothing if we're setting the initial default
+    if (newValue is OptionValue.Default && storedValue == null) return false
+
+    // TODO: When would virtual file be null?
+    val virtualFile = editor.ij.virtualFile ?: return false
+
+    val charsetName = newValue.value.asString()
+    if (charsetName.isBlank()) return false   // Default value is "", which is an illegal charset name
+    if (!Charset.isSupported(charsetName)) {
+      // This is usually reported when writing the file with `:w`
+      throw ExException("E213: Cannot convert")
+    }
+
+    val bytes: ByteArray?
+    try {
+      bytes = if (!virtualFile.isDirectory) VfsUtilCore.loadBytes(virtualFile) else return false
+    } catch (e: IOException) {
+      return false
+    }
+
+    val charset = Charset.forName(charsetName)
+    val document = editor.ij.document
+    val text = document.text
+    val isSafeToConvert = isSafeToConvertTo(virtualFile, text, bytes, charset)
+    val isSafeToReload = isSafeToReloadIn(virtualFile, text, bytes, charset)
+
+    val project = editor.ij.project ?: ProjectLocator.getInstance().guessProjectForFile(virtualFile)
+    return ChangeFileEncodingAction.changeTo(
+      Objects.requireNonNull<Project?>(project),
+      document,
+      editor.ij,
+      virtualFile,
+      charset,
+      isSafeToConvert,
+      isSafeToReload
+    )
+  }
+
+  // Based on EncodingUtil.isSafeToConvertTo (copied all over the place...)
+  private fun isSafeToConvertTo(
+    virtualFile: VirtualFile,
+    text: CharSequence,
+    bytesOnDisk: ByteArray,
+    charset: Charset,
+  ): Magic8 {
+    try {
+      val lineSeparator = FileDocumentManager.getInstance().getLineSeparator(virtualFile, null)
+      val textToSave = if (lineSeparator == "\n") text else StringUtilRt.convertLineSeparators(text, lineSeparator)
+
+      val chosen = LoadTextUtil.chooseMostlyHarmlessCharset(virtualFile.charset, charset, textToSave.toString())
+      val saved = chosen.second
+      val textLoadedBack = LoadTextUtil.getTextByBinaryPresentation(saved, charset)
+
+      return when {
+        !StringUtil.equals(text, textLoadedBack) -> Magic8.NO_WAY
+        saved.contentEquals(bytesOnDisk) -> Magic8.ABSOLUTELY
+        else -> Magic8.WELL_IF_YOU_INSIST
+      }
+    } catch (e: UnsupportedOperationException) { // unsupported encoding
+      return Magic8.NO_WAY
+    }
+  }
+
+  private fun isSafeToReloadIn(virtualFile: VirtualFile, text: CharSequence, bytes: ByteArray, charset: Charset): Magic8 {
+    val bom = virtualFile.bom
+    if (bom != null && !CharsetToolkit.canHaveBom(charset, bom)) return Magic8.NO_WAY
+
+    val mandatoryBom = CharsetToolkit.getMandatoryBom(charset)
+    if (mandatoryBom != null && !ArrayUtil.startsWith(bytes, mandatoryBom)) return Magic8.NO_WAY
+    val loaded = LoadTextUtil.getTextByBinaryPresentation(bytes, charset).toString()
+    val separator = FileDocumentManager.getInstance().getLineSeparator(virtualFile, null)
+    val failReason = LoadTextUtil.getCharsetAutoDetectionReason(virtualFile)
+    if (failReason != null && StandardCharsets.UTF_8 == virtualFile.charset && StandardCharsets.UTF_8 != charset) return Magic8.NO_WAY
+
+    var bytesToSave: ByteArray?
+    bytesToSave = try {
+      StringUtil.convertLineSeparators(loaded, separator).toByteArray(charset)
+    }
+    catch (e: UnsupportedOperationException) {
+      return Magic8.NO_WAY
+    }
+    catch (e: NullPointerException) {
+      return Magic8.NO_WAY
+    }
+    if (bom != null && !ArrayUtil.startsWith(bytesToSave, bom)) {
+      bytesToSave = ArrayUtil.mergeArrays(bom, bytesToSave)
+    }
+
+    return if (!bytesToSave.contentEquals(bytes)) Magic8.NO_WAY
+    else if (StringUtil.equals(loaded, text)) Magic8.ABSOLUTELY
+    else Magic8.WELL_IF_YOU_INSIST
   }
 }
 
