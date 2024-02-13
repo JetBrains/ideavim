@@ -1,7 +1,6 @@
 plugins {
   java
   kotlin("jvm")
-  id("org.jetbrains.intellij")
   id("java-test-fixtures")
 }
 
@@ -24,7 +23,6 @@ dependencies {
   testFixturesImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
   testFixturesImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
   testFixturesImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
-  testFixturesImplementation("com.automation-remarks:video-recorder-junit5:2.0")
 }
 
 tasks {
@@ -34,36 +32,6 @@ tasks {
     useJUnitPlatform()
     enabled = false
   }
-
-  register<Test>("testUi") {
-    group = "verification"
-    useJUnitPlatform()
-  }
-
-  downloadRobotServerPlugin {
-    version.set(remoteRobotVersion)
-  }
-
-  runIdeForUiTests {
-    systemProperty("robot-server.port", "8082")
-    systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-    systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-    systemProperty("jb.consents.confirmation.enabled", "false")
-    systemProperty("ide.show.tips.on.startup.default.value", "false")
-  }
-
-  verifyPlugin {
-    enabled = false
-  }
-
-  publishPlugin {
-    enabled = false
-  }
-}
-
-intellij {
-  version.set(ideaVersion)
-  type.set("IC")
 }
 
 java {

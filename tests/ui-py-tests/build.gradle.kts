@@ -1,7 +1,6 @@
 plugins {
   java
   kotlin("jvm")
-  id("org.jetbrains.intellij")
 }
 
 repositories {
@@ -38,29 +37,12 @@ tasks {
   register<Test>("testUi") {
     group = "verification"
     useJUnitPlatform()
-  }
 
-  downloadRobotServerPlugin {
-    version.set(remoteRobotVersion)
+    // This is needed for the robot to access the message of the exception
+    // Usually these opens are provided by the intellij gradle plugin
+    // https://github.com/JetBrains/gradle-intellij-plugin/blob/b21e3f382e9885948a6427001d5e64234c602613/src/main/kotlin/org/jetbrains/intellij/utils/OpenedPackages.kt#L26
+    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
   }
-
-  runIdeForUiTests {
-    systemProperty("robot-server.port", "8082")
-    systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-    systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-    systemProperty("jb.consents.confirmation.enabled", "false")
-    systemProperty("ide.show.tips.on.startup.default.value", "false")
-    systemProperty("eap.require.license", "false")
-  }
-
-  verifyPlugin {
-    enabled = false
-  }
-}
-
-intellij {
-  version.set(ideaVersion)
-  type.set("PY")
 }
 
 java {
