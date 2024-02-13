@@ -67,6 +67,15 @@ public object IjOptions {
   // local-noglobal. See `:help local-noglobal`, `:help 'fileformats'` and `:help 'fileencodings'`
   public val bomb: ToggleOption =
     addOption(ToggleOption("bomb", LOCAL_TO_BUFFER, "bomb", false, isLocalNoGlobal = true))
+  public val fileencoding: StringOption = addOption(
+    StringOption(
+      "fileencoding",
+      LOCAL_TO_BUFFER,
+      "fenc",
+      VimString.EMPTY,
+      isLocalNoGlobal = true
+    )
+  )
   public val fileformat: StringOption = addOption(
     StringOption(
       "fileformat",

@@ -348,21 +348,21 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setglobal all", """
       |--- Global option values ---
-      |noargtextobj          ideamarks           scrolljump=1      notextobj-indent
-      |nobomb                ideawrite=all       scrolloff=0         textwidth=0
-      |nobreakindent       noignorecase          selectmode=         timeout
-      |  colorcolumn=      noincsearch           shellcmdflag=-x     timeoutlen=1000
-      |nocommentary        nolist                shellxescape=@    notrackactionids
-      |nocursorline        nomatchit             shellxquote={       undolevels=1000
-      |nodigraph             maxmapdepth=20      showcmd             virtualedit=
-      |noexchange            more                showmode          novisualbell
+      |noargtextobj        noideajoin            scroll=0          notextobj-entire
+      |nobomb                ideamarks           scrolljump=1      notextobj-indent
+      |nobreakindent         ideawrite=all       scrolloff=0         textwidth=0
+      |  colorcolumn=      noignorecase          selectmode=         timeout
+      |nocommentary        noincsearch           shellcmdflag=-x     timeoutlen=1000
+      |nocursorline        nolist                shellxescape=@    notrackactionids
+      |nodigraph           nomatchit             shellxquote={       undolevels=1000
+      |noexchange            maxmapdepth=20      showcmd             virtualedit=
+      |  fileencoding=       more                showmode          novisualbell
       |  fileformat=unix   nomultiple-cursors    sidescroll=0        visualdelay=100
       |nogdefault          noNERDTree            sidescrolloff=0     whichwrap=b,s
       |nohighlightedyank     nrformats=hex     nosmartcase           wrap
       |  history=50        nonumber            nosneak               wrapscan
       |nohlsearch            operatorfunc=       startofline
       |noideaglobalmode    norelativenumber    nosurround
-      |noideajoin            scroll=0          notextobj-entire
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -427,6 +427,7 @@ class SetglobalCommandTest : VimTestCase() {
       |nocursorline
       |nodigraph
       |noexchange
+      |  fileencoding=
       |  fileformat=unix
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175

@@ -8,6 +8,7 @@ setlocal
 breakindent
 colorcolumn
 cursorline
+fileencoding
 fileformat
 gdefault
 guicursor
