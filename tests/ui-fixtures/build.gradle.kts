@@ -55,6 +55,10 @@ tasks {
   verifyPlugin {
     enabled = false
   }
+
+  publishPlugin {
+    enabled = false
+  }
 }
 
 intellij {
