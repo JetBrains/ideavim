@@ -149,17 +149,20 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified effective option values`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
     assertCommandOutput("set",
       """
         |--- Options ---
         |  number              relativenumber
+        |  fileencoding=utf-8
         |
       """.trimMargin())
   }
 
   @Test
   fun `test show all effective option values`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("set all",
       """
@@ -180,6 +183,7 @@ class SetCommandTest : VimTestCase() {
         |noideaglobalmode    norelativenumber    nosurround
         |noideajoin            scroll=0          notextobj-entire
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
+        |  fileencoding=utf-8
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
         |  ide=IntelliJ IDEA Community Edition
         |noideacopypreprocess
@@ -209,10 +213,12 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified option values in single column`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
     assertCommandOutput("set!",
       """
       |--- Options ---
+      |  fileencoding=utf-8
       |  number
       |  relativenumber
       |""".trimMargin()
@@ -221,6 +227,7 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all option values in single column`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("set! all", """
       |--- Options ---
@@ -233,6 +240,7 @@ class SetCommandTest : VimTestCase() {
       |nocursorline
       |nodigraph
       |noexchange
+      |  fileencoding=utf-8
       |  fileformat=unix
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
