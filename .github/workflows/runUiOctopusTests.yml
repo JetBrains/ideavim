@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Apply Patch
         run: |
-          git apply tests/ij-ui-tests/src/test/kotlin/ui/octopus.patch
+          git apply tests/ui-ij-tests/src/test/kotlin/ui/octopus.patch
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
