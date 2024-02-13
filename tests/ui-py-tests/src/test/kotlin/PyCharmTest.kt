@@ -43,7 +43,7 @@ class PyCharmTest {
   private fun IdeaFrame.testEnterWorksInPyConsole() {
     findText("Python Console").click()
 
-    Thread.sleep(1000)
+    Thread.sleep(10_000)
 
     keyboard {
       enterText("print(123 + 321)")
