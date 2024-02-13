@@ -234,6 +234,7 @@ gradle.projectsEvaluated {
 
 intellij {
   version.set(ideaVersion)
+  type.set(ideaType)
   pluginName.set("IdeaVim")
 
   updateSinceUntilBuild.set(false)
