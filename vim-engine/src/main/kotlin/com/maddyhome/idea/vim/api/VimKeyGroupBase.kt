@@ -48,6 +48,10 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
     return this.getKeyMapping(mode).hasmapto(toKeys)
   }
 
+  override fun hasmapfrom(mode: MappingMode, fromKeys: List<KeyStroke>): Boolean {
+    return this.getKeyMapping(mode).hasmapfrom(fromKeys)
+  }
+
   override fun getKeyMapping(mode: MappingMode): KeyMapping {
     return keyMappings.getOrPut(mode) { KeyMapping() }
   }

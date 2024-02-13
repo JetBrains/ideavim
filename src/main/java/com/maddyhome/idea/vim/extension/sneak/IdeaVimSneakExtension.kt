@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.extension.sneak
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.colors.EditorColors
@@ -19,6 +18,7 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -30,16 +30,16 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.newapi.ij
 import java.awt.Font
 import java.awt.event.KeyEvent
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import javax.swing.Timer
 
 
-private const val DEFAULT_HIGHLIGHT_DURATION_SNEAK: Long = 300
+private const val DEFAULT_HIGHLIGHT_DURATION_SNEAK = 300
 
 // By [Mikhail Levchenko](https://github.com/Mishkun)
 // Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak
@@ -250,11 +250,13 @@ internal class IdeaVimSneakExtension : VimExtension {
     }
 
     private fun setClearHighlightRangeTimer(highlighter: RangeHighlighter) {
-      Executors.newSingleThreadScheduledExecutor().schedule({
-        ApplicationManager.getApplication().invokeLater {
-          editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
+      val timer = Timer(DEFAULT_HIGHLIGHT_DURATION_SNEAK) {
+        if (editor?.isDisposed != true) {
+          editor?.markupModel?.removeHighlighter(highlighter)
         }
-      }, DEFAULT_HIGHLIGHT_DURATION_SNEAK, TimeUnit.MILLISECONDS)
+      }
+      timer.isRepeats = false
+      timer.start()
     }
 
     private fun getHighlightTextAttributes() = TextAttributes(
@@ -279,13 +281,41 @@ private fun VimExtension.mapToFunctionAndProvideKeys(keys: String, handler: Exte
     handler,
     false
   )
-  VimExtensionFacade.putKeyMapping(
+  VimExtensionFacade.putExtensionHandlerMapping(
     MappingMode.NXO,
-    injector.parser.parseKeys(keys),
+    injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     owner,
-    injector.parser.parseKeys(command(keys)),
+    handler,
+    false
+  )
+
+  // This is a combination to meet the following requirements:
+  //  - Now we should support mappings from sneak `Sneak_s` and mappings from the previous version of the plugin `(sneak-s)`
+  //  - The shortcut should not be registered if any of these mappings is overridden in .ideavimrc
+  //  - The shortcut should not be registered if some other shortcut for this key exists
+  val fromKeys = injector.parser.parseKeys(keys)
+  val filteredModes = MappingMode.NXO.filterNotTo(HashSet()) {
+    VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(command(keys)))
+  }
+  val filteredModes2 = MappingMode.NXO.filterNotTo(HashSet()) {
+    VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(commandFromOriginalPlugin(keys)))
+  }
+  val filteredFromModes = MappingMode.NXO.filterNotTo(HashSet()) {
+    injector.keyGroup.hasmapfrom(it, fromKeys)
+  }
+
+  val doubleFiltered = MappingMode.NXO
+    .filter { it in filteredModes2 && it in filteredModes && it in filteredFromModes }
+    .toSet()
+  putKeyMapping(doubleFiltered, fromKeys, owner, injector.parser.parseKeys(command(keys)), true)
+  putKeyMapping(
+    doubleFiltered,
+    fromKeys,
+    owner,
+    injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     true
   )
 }
 
 private fun command(keys: String) = "<Plug>(sneak-$keys)"
+private fun commandFromOriginalPlugin(keys: String) = "<Plug>Sneak_$keys"

@@ -106,6 +106,10 @@ public class ToKeysMappingInfo(
     }
   }
 
+  override fun toString(): String {
+    return "Mapping[$fromKeys -> $toKeys]"
+  }
+
   public companion object {
     private val LOG = vimLogger<ToKeysMappingInfo>()
   }

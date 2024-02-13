@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.sneak
 
+import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -161,5 +162,27 @@ class IdeaVimSneakTest : VimTestCase() {
     val after = "some ${c}dwarf"
 
     doTest("sa<ESC>sdw", before, after, Mode.NORMAL())
+  }
+
+  @Test
+  fun testSneakForwardFromMapping() {
+    val before = "som${c}e text"
+    val after = "some te${c}xt"
+
+    doTest("fxt", before, after, Mode.NORMAL()) {
+      // This should be fixed, but now we process `<Plug>` as a single key
+      typeText(keys(":map f <") + keys("Plug>Sneak_s<CR>"))
+    }
+  }
+
+  @Test
+  fun testSneakForwardFromMappingWithOldMappings() {
+    val before = "som${c}e text"
+    val after = "some te${c}xt"
+
+    doTest("fxt", before, after, Mode.NORMAL()) {
+      // This should be fixed, but now we process `<Plug>` as a single key
+      typeText(keys(":map f <") + keys("Plug>(sneak-s)<CR>"))
+    }
   }
 }

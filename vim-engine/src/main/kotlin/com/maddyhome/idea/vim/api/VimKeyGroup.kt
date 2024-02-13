@@ -62,6 +62,7 @@ public interface VimKeyGroup {
   public fun unregisterCommandActions()
   public fun resetKeyMappings()
   public fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
+  public fun hasmapfrom(mode: MappingMode, fromKeys: List<KeyStroke>): Boolean
 
   public val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
   public val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>

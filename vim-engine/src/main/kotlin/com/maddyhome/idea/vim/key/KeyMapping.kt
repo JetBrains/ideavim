@@ -163,6 +163,11 @@ public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
       .anyMatch { o: MappingInfo? -> o is ToKeysMappingInfo && o.toKeys == toKeys }
   }
 
+  public fun hasmapfrom(fromKeys: List<KeyStroke?>): Boolean {
+    return myKeys.values.stream()
+      .anyMatch { o: MappingInfo? -> o is ToKeysMappingInfo && o.fromKeys == fromKeys }
+  }
+
   public fun getMapTo(toKeys: List<KeyStroke?>): List<Pair<List<KeyStroke>, MappingInfo>> {
     return myKeys.entries.stream()
       .filter { (_, value): Map.Entry<List<KeyStroke>, MappingInfo> -> value is ToKeysMappingInfo && value.toKeys == toKeys }
