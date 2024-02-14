@@ -169,7 +169,7 @@ public object Options {
   )
   public val showcmd: ToggleOption = addOption(ToggleOption("showcmd", GLOBAL, "sc", true))
   public val showmode: ToggleOption = addOption(ToggleOption("showmode", GLOBAL, "smd", true))
-  public val sidescroll: NumberOption = addOption(NumberOption("sidescroll", GLOBAL, "ss", 0))
+  public val sidescroll: NumberOption = addOption(UnsignedNumberOption("sidescroll", GLOBAL, "ss", 0))
   public val sidescrolloff: NumberOption = addOption(
     NumberOption("sidescrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "siso", 0)
   )

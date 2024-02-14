@@ -33,9 +33,12 @@ import com.intellij.util.ArrayUtil
 import com.intellij.util.LineSeparator
 import com.intellij.util.PatternUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.GlobalOptionToGlobalLocalExternalSettingMapper
 import com.maddyhome.idea.vim.api.LocalOptionToGlobalLocalExternalSettingMapper
+import com.maddyhome.idea.vim.api.LocalOptionValueOverride
 import com.maddyhome.idea.vim.api.OptionValue
 import com.maddyhome.idea.vim.api.OptionValueOverride
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
@@ -80,6 +83,9 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
     addOptionValueOverride(IjOptions.relativenumber, RelativeNumberOptionMapper(IjOptions.number))
     addOptionValueOverride(IjOptions.textwidth, TextWidthOptionMapper(IjOptions.textwidth))
     addOptionValueOverride(IjOptions.wrap, WrapOptionMapper(IjOptions.wrap))
+
+    addOptionValueOverride(Options.scrolljump, ScrollJumpOptionMapper())
+    addOptionValueOverride(Options.sidescroll, SideScrollOptionMapper())
   }
 
   override fun initialiseOptions() {
@@ -164,7 +170,7 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  * To prevent unexpected conversions, we treat the option as local-noglobal, so we don't apply the global value as the
  * new local value during window initialisation. See `':help local-noglobal'`.
  */
-private class BombOptionMapper : OptionValueOverride<VimInt> {
+private class BombOptionMapper : LocalOptionValueOverride<VimInt> {
   override fun getLocalValue(storedValue: OptionValue<VimInt>?, editor: VimEditor): OptionValue<VimInt> {
     // TODO: When would we not have a virtual file? (Other than the fallback window)
     val virtualFile = editor.ij.virtualFile ?: return OptionValue.Default(VimInt.ZERO)
@@ -336,7 +342,7 @@ private class CursorLineOptionMapper(cursorLineOption: ToggleOption)
  * (see `:help local-noglobal`). This prevents the global value being applied to the local value during window
  * initialisation.
  */
-private class FileEncodingOptionMapper : OptionValueOverride<VimString> {
+private class FileEncodingOptionMapper : LocalOptionValueOverride<VimString> {
   override fun getLocalValue(storedValue: OptionValue<VimString>?, editor: VimEditor): OptionValue<VimString> {
     val virtualFile = editor.ij.virtualFile ?: return OptionValue.External(VimString.EMPTY)
 
@@ -458,7 +464,7 @@ private class FileEncodingOptionMapper : OptionValueOverride<VimString> {
  *
  * Since this is such a simple mapping, we can implement [OptionValueOverride] directly.
  */
-private class FileFormatOptionMapper : OptionValueOverride<VimString> {
+private class FileFormatOptionMapper : LocalOptionValueOverride<VimString> {
   override fun getLocalValue(storedValue: OptionValue<VimString>?, editor: VimEditor): OptionValue<VimString> {
     // We should have a virtual file for most scenarios, e.g., scratch files, commit message dialog, etc.
     // The fallback window (TextComponentEditorImpl) does not have a virtual file
@@ -617,6 +623,58 @@ private fun isShowingRelativeLineNumbers(lineNumerationType: LineNumerationType)
   LineNumerationType.ABSOLUTE -> false
   LineNumerationType.RELATIVE -> true
   LineNumerationType.HYBRID -> true
+}
+
+
+/**
+ * Maps the `'scrolljump'` global Vim option to IntelliJ's global-to-local vertical scroll jump setting
+ *
+ * Note that `'scrolljump'` is a global Vim option, mapped to a global-local IDE setting. Since IdeaVim handles all
+ * scrolling, we should ideally be able to ignore the IDE settings completely. However, when typing, IntelliJ will
+ * update the scroll position before IdeaVim gets a chance. If the IDE setting is greater than the IdeaVim value, the
+ * editor will be updated to the wrong scroll position. Therefore, we update the local value of all editors (and all new
+ * editors) to mimic a global value.
+ *
+ * We can also clear the overridden IDE setting value by setting it to `-1`. So when the user resets the Vim option to
+ * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
+ */
+private class ScrollJumpOptionMapper : GlobalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+  override fun getGlobalExternalValue() = EditorSettingsExternalizable.getInstance().verticalScrollJump.asVimInt()
+  override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.verticalScrollJump.asVimInt()
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    editor.ij.settings.verticalScrollJump = value.value
+  }
+
+  override fun resetLocalExternalValue(editor: VimEditor, defaultValue: VimInt) {
+    editor.ij.settings.verticalScrollJump = -1
+  }
+}
+
+
+/**
+ * Maps the `'sidescroll'` global Vim option to IntelliJ's global-local horizontal scroll jump setting
+ *
+ * Note that `'sidescroll'` is a global Vim option, mapped to a global-local IDE setting. Since IdeaVim handles all
+ * scrolling, we should ideally be able to ignore the IDE settings completely. However, when typing, IntelliJ will
+ * update the scroll position before IdeaVim gets a chance. If the IDE setting is greater than the IdeaVim value, the
+ * editor will be updated to the wrong scroll position. Therefore, we update the local value of all editors (and all new
+ * editors) to mimic a global value.
+ *
+ * We can also clear the overridden IDE setting value by setting it to `-1`. So when the user resets the Vim option to
+ * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
+ */
+private class SideScrollOptionMapper : GlobalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+  override fun getGlobalExternalValue() = EditorSettingsExternalizable.getInstance().horizontalScrollJump.asVimInt()
+  override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.horizontalScrollJump.asVimInt()
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    editor.ij.settings.horizontalScrollJump = value.value
+  }
+
+  override fun resetLocalExternalValue(editor: VimEditor, defaultValue: VimInt) {
+    editor.ij.settings.horizontalScrollJump = -1
+  }
 }
 
 
