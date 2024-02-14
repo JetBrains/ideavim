@@ -224,6 +224,45 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 }
 
+public interface OptionValueOverride<T : VimDataType>
+
+/**
+ * Used to override the effective value of a global Vim option, typically with the value of an IDE setting
+ *
+ * The sweet spot for mapping Vim options and IDE settings is local Vim options and local (or global-local) IDE
+ * settings. However, some Vim options are global, which can make sensible behaviour tricky. The important rule is that
+ * we don't want to write to persistent IDE settings, so typically, the behaviour will (probably) be like this:
+ *
+ * * If the IDE setting is local or global-local, then get the local IDE value. Set should set the local value of ALL
+ *   editors (if different)
+ * * If the IDE setting is global, then get the value. Set will be on a case-by-case basis. Ideally, we don't set at
+ *   all - we don't want to write to persistent settings. If the Vim option's behaviour is implemented by IdeaVim, then
+ *   this just works. If it's not, then we have to figure out what's the best way.
+ */
+public interface GlobalOptionValueOverride<T : VimDataType> : OptionValueOverride<T> {
+
+  /**
+   * Gets an overridden value of a global Vim option
+   *
+   * @param storedValue The current value of the Vim option. This will always be valid, possibly the default value.
+   * @param editor      The current editor. Can be null as global options don't require an editor
+   * @return Return the overridden value of the option, or [storedValue] if there are no changes
+   */
+  public fun getGlobalValue(storedValue: OptionValue<T>, editor: VimEditor?): OptionValue<T>
+
+  /**
+   * Sets the overridden value of a global Vim option
+   *
+   * The behaviour of this method is heavily dependent on the scope of the related IDE setting.
+   *
+   * @param storedValue The current value of the Vim option. This will always be valid, possibly the default value.
+   * @param newValue    The new value set by IdeaVim
+   * @param editor      The current editor. Can be null as global options don't require an editor
+   * @return Returns `true` if the applied new value is different to the current stored value. If the function does
+   *         nothing else, it needs to return this value.
+   */
+  public fun setGlobalValue(storedValue: OptionValue<T>, newValue: OptionValue<T>, editor: VimEditor?): Boolean
+}
 
 /**
  * Used to override the local/effective value of an option in order to allow IDE backed option values
@@ -232,13 +271,10 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
  * value of a stored Vim option. When getting the local value, an override provider can return the current state of an
  * IDE setting, and when setting the value, it can change the IDE setting.
  *
- * Note that this interface doesn't currently support global option values. It is not clear if this is necessary, but
- * can be added easily.
- *
  * Ideally, this class would be a protected nested class of [VimOptionGroupBase], since it should only be applicable to
  * implementors, but it's used by private helper classes, so needs to be public.
  */
-public interface OptionValueOverride<T : VimDataType> {
+public interface LocalOptionValueOverride<T : VimDataType> : OptionValueOverride<T> {
   /**
    * Gets an overridden local/effective value for the current option
    *
@@ -296,7 +332,7 @@ public interface OptionValueOverride<T : VimDataType> {
  * Vim-only value used to initialise new windows.
  */
 public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(private val option: Option<T>)
-  : OptionValueOverride<T> {
+  : LocalOptionValueOverride<T> {
 
   override fun getLocalValue(storedValue: OptionValue<T>?, editor: VimEditor): OptionValue<T> {
     // Always return the current effective IntelliJ editor setting, regardless of the current IdeaVim value - the user
@@ -441,6 +477,74 @@ public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataT
 }
 
 /**
+ * A base class for a global Vim option that is mapped to an IntelliJ global-local setting
+ *
+ * If we can't rely on IdeaVim's implementation for this option, we need to make sure that the IDE setting is correctly
+ * updated to reflect the global value. We don't want to modify the global, persistent IDE setting, so we instead update
+ * the local value of all editors (new editors are also correctly modified when they're initialised). By setting the
+ * local value of all editors, we effectively mimic the behaviour of a global option. If we reset the option back to
+ * default, we can reset all editors back to default too, either by copying the global IDE value, or by clearing the
+ * global-local IDE setting override (if possible).
+ */
+public abstract class GlobalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>
+  : GlobalOptionValueOverride<T> {
+
+  final override fun getGlobalValue(storedValue: OptionValue<T>, editor: VimEditor?): OptionValue<T> {
+    return if (storedValue is OptionValue.Default) {
+      // If we have an editor, return the local value. Since the IDE setting is global-local, this local value will
+      // either be unset, and therefore the global value, or will be the locally set value, which we set when the user
+      // explicitly sets the IdeaVim option
+      val ideValue = editor?.let { getEffectiveExternalValue(it) } ?: getGlobalExternalValue()
+      OptionValue.Default(ideValue)
+    }
+    else {
+      storedValue
+    }
+  }
+
+  final override fun setGlobalValue(storedValue: OptionValue<T>, newValue: OptionValue<T>, editor: VimEditor?): Boolean {
+    if (newValue is OptionValue.Default) {
+      val globalValue = getGlobalValue(storedValue, null)
+      injector.editorGroup.getEditors().forEach { resetLocalExternalValue(it, globalValue.value) }
+    }
+    else {
+      val globalValue = getGlobalValue(storedValue, null)
+      if (globalValue.value != newValue.value) {
+        injector.editorGroup.getEditors().forEach { setLocalExternalValue(it, newValue.value) }
+      }
+      else {
+        injector.editorGroup.getEditors().forEach { resetLocalExternalValue(it, globalValue.value) }
+      }
+    }
+
+    return storedValue.value != newValue.value
+  }
+
+  /**
+   * Return the global persistent value for the external setting
+   */
+  protected abstract fun getGlobalExternalValue(): T
+
+  /**
+   * Return the current effective value of the external setting
+   *
+   * For a global-local external setting, this will be the local value if explicitly set, otherwise the global value.
+   */
+  protected abstract fun getEffectiveExternalValue(editor: VimEditor): T
+
+  /**
+   * Set the local value of the external setting
+   */
+  protected abstract fun setLocalExternalValue(editor: VimEditor, value: T)
+
+  /**
+   * Reset the local value of the external setting, either by removing the local setting, or setting to the given
+   * default value
+   */
+  protected abstract fun resetLocalExternalValue(editor: VimEditor, defaultValue: T)
+}
+
+/**
  * A wrapper class for an option value that also tracks how it was set
  *
  * This is required in order to implement Vim options that are either completely or partially backed by IDE settings.
@@ -536,9 +640,14 @@ private class OptionStorage {
   fun isLocalToBufferOptionStorageInitialised(editor: VimEditor) =
     injector.vimStorageService.getDataFromBuffer(editor, localOptionsKey) != null
 
-  private fun <T : VimDataType> getOptionValueOverride(option: Option<T>): OptionValueOverride<T>? {
+  private fun <T : VimDataType> getGlobalOptionValueOverride(option: Option<T>): GlobalOptionValueOverride<T>? {
     @Suppress("UNCHECKED_CAST")
-    return overrides[option.name] as? OptionValueOverride<T>
+    return overrides[option.name] as? GlobalOptionValueOverride<T>
+  }
+
+  private fun <T : VimDataType> getLocalOptionValueOverride(option: Option<T>): LocalOptionValueOverride<T>? {
+    @Suppress("UNCHECKED_CAST")
+    return overrides[option.name] as? LocalOptionValueOverride<T>
   }
 
   private fun <T : VimDataType> getEffectiveValue(option: Option<T>, editor: VimEditor): OptionValue<T> {
@@ -565,7 +674,7 @@ private class OptionStorage {
     else {
       globalValues
     }
-    return getStoredValue(values, option) ?: OptionValue.Default(option.defaultValue)
+    return getOverriddenGlobalValue(option, getStoredValue(values, option) ?: OptionValue.Default(option.defaultValue), editor)
   }
 
   private fun <T : VimDataType> getLocalValue(option: Option<T>, editor: VimEditor): OptionValue<T> {
@@ -590,12 +699,23 @@ private class OptionStorage {
     return value ?: getEmergencyFallbackLocalValue(option, editor)
   }
 
+  private fun <T : VimDataType> getOverriddenGlobalValue(
+    option: Option<T>,
+    storedValue: OptionValue<T>,
+    editor: VimEditor?,
+  ): OptionValue<T> {
+    getGlobalOptionValueOverride(option)?.let {
+      return it.getGlobalValue(storedValue, editor)
+    }
+    return storedValue
+  }
+
   private fun <T : VimDataType> getOverriddenLocalValue(
     option: Option<T>,
     storedValue: OptionValue<T>?,
     editor: VimEditor,
   ): OptionValue<T>? {
-    getOptionValueOverride(option)?.let {
+    getLocalOptionValueOverride(option)?.let {
       return it.getLocalValue(storedValue, editor)
     }
     return storedValue
@@ -626,6 +746,12 @@ private class OptionStorage {
     else {
       globalValues
     }
+    getGlobalOptionValueOverride(option)?.let {
+      val storedValue = getStoredValue(values, option) ?: OptionValue.Default(option.defaultValue)
+      val changed = it.setGlobalValue(storedValue, value, editor)
+      setStoredValue(values, option.name, value)
+      return changed
+    }
     return setStoredValue(values, option.name, value)
   }
 
@@ -645,7 +771,7 @@ private class OptionStorage {
     editor: VimEditor,
     value: OptionValue<T>,
   ): Boolean {
-    getOptionValueOverride(option)?.let {
+    getLocalOptionValueOverride(option)?.let {
       val storedValue = getStoredValue(values, option) // Will be null during initialisation!
       val changed = it.setLocalValue(storedValue, value, editor)
       setStoredValue(values, option.name, value)
