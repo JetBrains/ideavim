@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.GlobalOptions
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -155,6 +156,9 @@ abstract class VimTestCase {
       isLineNumbersShown = IjOptions.number.defaultValue.asBoolean()
       softWrapFileMasks = "*"
       isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
+
+      verticalScrollJump = Options.scrolljump.defaultValue.value
+      horizontalScrollJump = Options.sidescroll.defaultValue.value
     }
 
     CodeStyle.getDefaultSettings().getCommonSettings(null as Language?).apply {
@@ -386,7 +390,10 @@ abstract class VimTestCase {
   protected fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
-    val editor = fixture.editor
+    return typeText(fixture.editor, keys)
+  }
+
+  protected fun typeText(editor: Editor, keys: List<KeyStroke?>): Editor {
     NeovimTesting.typeCommand(
       keys.filterNotNull().joinToString(separator = "") { injector.parser.toKeyNotation(it) },
       testInfo,
