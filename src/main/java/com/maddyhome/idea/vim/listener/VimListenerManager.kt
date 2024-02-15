@@ -66,11 +66,9 @@ import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollGroup
-import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
-import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.correctorRequester
 import com.maddyhome.idea.vim.handler.keyCheckRequests
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
@@ -433,8 +431,6 @@ internal object VimListenerManager {
   }
 
   private object EditorSelectionHandler : SelectionListener {
-    private var myMakingChanges = false
-
     /**
      * This event is executed for each caret using [com.intellij.openapi.editor.CaretModel.runForEachCaret]
      */
@@ -483,21 +479,8 @@ internal object VimListenerManager {
         IdeaSelectionControl.controlNonVimSelectionChange(editor)
       }
 
-      if (myMakingChanges || document is DocumentEx && document.isInEventsHandling) {
+      if (document is DocumentEx && document.isInEventsHandling) {
         return
-      }
-
-      myMakingChanges = true
-      try {
-        // Synchronize selections between editors
-        val newRange = selectionEvent.newRange
-        for (e in localEditors(document)) {
-          if (e != editor) {
-            e.selectionModel.vimSetSystemSelectionSilently(newRange.startOffset, newRange.endOffset)
-          }
-        }
-      } finally {
-        myMakingChanges = false
       }
     }
   }
