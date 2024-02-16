@@ -460,7 +460,7 @@ val fixVersionsElementType = "VersionBundleElement"
 tasks.register("releaseActions") {
   group = "other"
   doLast {
-    val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D")
+    val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D%20and%20tag:%20%7BIdeaVim%20Released%20In%20EAP%7D%20")
     if (tickets.isNotEmpty()) {
       println("Updating statuses for tickets: $tickets")
       setYoutrackStatus(tickets, "Fixed")
