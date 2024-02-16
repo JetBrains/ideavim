@@ -249,13 +249,7 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public fun partialReset(editor: VimEditor) {
-    partialReset(keyHandlerState, editor.mode)
-  }
-
-  // TODO replace with com.maddyhome.idea.vim.state.KeyHandlerState#partialReset
-  private fun partialReset(keyState: KeyHandlerState, mode: Mode) {
-    keyState.mappingState.resetMappingSequence()
-    keyState.commandBuilder.resetInProgressCommandPart(getKeyRoot(mode.toMappingMode()))
+    keyHandlerState.partialReset(editor.mode)
   }
 
   /**
@@ -263,15 +257,13 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  // TODO replace with com.maddyhome.idea.vim.state.KeyHandlerState#reset
   public fun reset(editor: VimEditor) {
-    partialReset(keyHandlerState, editor.mode)
+    keyHandlerState.partialReset(editor.mode)
     keyHandlerState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
   }
 
-  // TODO replace with com.maddyhome.idea.vim.state.KeyHandlerState#reset
   public fun reset(keyState: KeyHandlerState, mode: Mode) {
-    partialReset(keyState, mode)
+    keyHandlerState.partialReset(mode)
     keyState.commandBuilder.resetAll(getKeyRoot(mode.toMappingMode()))
   }
 
