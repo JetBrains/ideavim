@@ -14,6 +14,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import javax.swing.KeyStroke
 
 public interface KeyConsumer {
+  /**
+   * @return true if consumed key and could do something meaningful wit it
+   */
   public fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,

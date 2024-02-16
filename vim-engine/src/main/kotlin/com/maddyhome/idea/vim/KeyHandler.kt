@@ -46,7 +46,7 @@ import javax.swing.KeyStroke
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
  * actions. This is a singleton.
  */
-// TODO for future refactorings (PR are welcome)
+// TODO for future refactorings (PRs are welcome)
 // 1. avoid using handleKeyRecursionCount & shouldRecord
 // 2. maybe we can live without allowKeyMappings: Boolean & mappingCompleted: Boolean
 public class KeyHandler {
@@ -91,6 +91,13 @@ public class KeyHandler {
     }
   }
 
+  /**
+   * This method determines whether IdeaVim can handle the passed key or not.
+   * For instance, if there is no mapping for <F5>, we should return 'KeyProcessResult.Unknown' to inform the IDE that
+   * we did not process the keypress, and therefore need to propagate it further.
+   * Alternatively, if we understand the key, we return a 'KeyProcessResult.Executable', which contains a runnable that
+   * could execute the key if needed.
+   */
   public fun processKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -123,14 +130,7 @@ public class KeyHandler {
       handleKeyRecursionCount++
       try {
         val isProcessed = keyConsumers.any {
-          it.consumeKey(
-            key,
-            editor,
-            allowKeyMappings,
-            mappingCompleted,
-            processBuilder,
-            shouldRecord
-          )
+          it.consumeKey(key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord)
         }
         if (isProcessed) {
           processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
@@ -138,7 +138,6 @@ public class KeyHandler {
           }
         } else {
           // Key wasn't processed by any of the consumers, so we reset our key state
-          // and tell IDE that the key is Unknown (handle key for us)
           onUnknownKey(editor, processBuilder.state)
           updateState(processBuilder.state)
           return KeyProcessResult.Unknown.apply {
@@ -422,6 +421,20 @@ public sealed interface KeyProcessResult {
     }
   }
 
+  /**
+   * This class serves as a wrapper around the key handling algorithm and should be used with care:
+   * We process keys in two steps:
+   * 1. We first determine if IdeaVim can handle the key or not. At this stage, you should avoid modifying anything
+   *    except state: KeyHandlerState. This is because it is not guaranteed that the key will be handled by IdeaVim at
+   *    all, and we want to minimize possible side effects.
+   * 2. If it's confirmed that the key will be handled, add all the key handling processes as execution steps,
+   *    slated for later execution.
+   *
+   * Please note that execution steps could depend on KeyHandlerState, and because of that we cannot change the state
+   * after adding an execution step. This is because an execution step does not anticipate changes to the state.
+   * If there's need to alter the state following any of the execution steps, wrap the state modification as an
+   * execution step. This will allow state modification to occur later rather than immediately.
+   */
   public abstract class KeyProcessResultBuilder {
     public abstract val state: KeyHandlerState
     protected val processings: MutableList<KeyProcessing> = mutableListOf()
@@ -451,8 +464,8 @@ public sealed interface KeyProcessResult {
     }
   }
 
-  // Created new state, nothing is modified during the builder work (key processing)
-  // The new state will be applied later, when we run KeyProcess (it may not be run at all)
+  // Works with a clone of current state, nothing is modified during the builder work (key processing)
+  // The new state will be applied later, when we run Executable.execute() (it may not be run at all)
   public class AsyncKeyProcessBuilder(originalState: KeyHandlerState): KeyProcessResultBuilder() {
     private val originalState: KeyHandlerState = KeyHandler.getInstance().keyHandlerState
     public override val state: KeyHandlerState = originalState.clone()
