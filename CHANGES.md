@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-3055](https://youtrack.jetbrains.com/issue/VIM-3055) Fix the issue with double deleting after dot
+* [VIM-3291](https://youtrack.jetbrains.com/issue/VIM-3291) Remove sync of editor selection between different opened editors
 
 ### Merged PRs:
 * [725](https://github.com/JetBrains/ideavim/pull/725) by [Emanuel Gestosa](https://github.com/emanuelgestosa): Regex
