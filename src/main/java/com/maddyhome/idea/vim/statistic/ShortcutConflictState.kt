@@ -72,7 +72,7 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
   }
 
   companion object {
-    private val GROUP = EventLogGroup("vim.handlers", 1)
+    private val GROUP = EventLogGroup("vim.handlers", 1, "FUS")
 
     private val keyStrokes = listOf(
       KeyStroke.getKeyStroke('1'.code, CTRL_DOWN_MASK),
