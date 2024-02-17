@@ -48,7 +48,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
   }
 
   companion object {
-    private val GROUP = EventLogGroup("vim.options", 1)
+    private val GROUP = EventLogGroup("vim.options", 1, "FUS")
 
     private val IDEAJOIN = BooleanEventField(IjOptions.ideajoin.name)
     private val IDEAMARKS = BooleanEventField(IjOptions.ideamarks.name)
