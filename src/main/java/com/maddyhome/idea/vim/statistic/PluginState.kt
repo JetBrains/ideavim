@@ -31,7 +31,7 @@ internal class PluginState : ApplicationUsagesCollector() {
   }
 
   companion object {
-    private val GROUP = EventLogGroup("vim.common", 1)
+    private val GROUP = EventLogGroup("vim.common", 1, "FUS")
 
     val extensionNames = listOf("textobj-entire", "argtextobj", "ReplaceWithRegister", "vim-paragraph-motion", "highlightedyank", "multiple-cursors", "exchange", "NERDTree", "surround", "commentary", "matchit", "textobj-indent")
     val enabledExtensions = HashSet<String>()
