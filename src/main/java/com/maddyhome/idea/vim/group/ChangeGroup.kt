@@ -535,7 +535,7 @@ public class ChangeGroup : VimChangeGroupBase() {
         val soff = editor.getLineStartOffset(l)
         val eoff = editor.getLineEndOffset(l, true)
         val woff = injector.motion.moveCaretToLineStartSkipLeading(editor, l)
-        val col = editor.offsetToVisualPosition(woff).column
+        val col = editor.offsetToBufferPosition(woff).column
         val limit = max(0.0, (col + dir * indentConfig.getTotalIndent(count)).toDouble())
           .toInt()
         if (col > 0 || soff != eoff) {
