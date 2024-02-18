@@ -405,7 +405,7 @@ public sealed interface KeyProcessResult {
       synchronized(KeyHandler.lock) {
         val keyHandler = KeyHandler.getInstance()
         if (keyHandler.keyHandlerState != originalState) {
-          logger.warn("Unexpected editor state. Aborting command execution.")
+          logger.error("Unexpected editor state. Aborting command execution.")
         }
         processing(preProcessState, editor, context)
         keyHandler.updateState(preProcessState)
