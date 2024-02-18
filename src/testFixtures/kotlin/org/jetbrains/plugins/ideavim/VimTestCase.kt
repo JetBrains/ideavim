@@ -157,6 +157,7 @@ abstract class VimTestCase {
     bookmarksManager?.bookmarks?.forEach { bookmark ->
       bookmarksManager.remove(bookmark)
     }
+    fixture.editor?.let { injector.messages.showStatusBarMessage(it.vim, "") }
     SelectionVimListenerSuppressor.lock().use { fixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
     VimPlugin.getVariableService().clear()

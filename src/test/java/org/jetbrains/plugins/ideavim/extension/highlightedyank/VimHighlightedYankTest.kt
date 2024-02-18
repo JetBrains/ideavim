@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.extension.highlightedyank
 
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertHappened
@@ -31,7 +30,6 @@ class VimHighlightedYankTest : VimTestCase() {
 
     assertAllHighlightersCount(1)
     assertHighlighterRange(1, 40, getFirstHighlighter())
-    clearMessage()
   }
 
   @Test
@@ -40,7 +38,6 @@ class VimHighlightedYankTest : VimTestCase() {
 
     assertAllHighlightersCount(1)
     assertHighlighterRange(5, 8, getFirstHighlighter())
-    clearMessage()
   }
 
   @Test
@@ -48,7 +45,6 @@ class VimHighlightedYankTest : VimTestCase() {
     doTest("yyi", code, code, Mode.INSERT)
 
     assertAllHighlightersCount(0)
-    clearMessage()
   }
 
   @Test
@@ -65,7 +61,6 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(12, 15, highlighters[1])
     assertHighlighterRange(20, 23, highlighters[0])
     assertHighlighterRange(28, 31, highlighters[2])
-    clearMessage()
   }
 
   @Test
@@ -78,7 +73,6 @@ Mode.INSERT,
     )
 
     assertAllHighlightersCount(0)
-    clearMessage()
   }
 
   @Test
@@ -88,7 +82,6 @@ Mode.INSERT,
     assertHappened(DEFAULT_HIGHLIGHT_DURATION.toInt(), 200) {
       getAllHighlightersCount() == 0
     }
-    clearMessage()
   }
 
   private val code = """
