@@ -20,7 +20,7 @@ changeBuildType(RelativeId("IdeaVimTests_Latest_EAP")) {
     artifactRules = """
         +:build/reports => build/reports
         +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
-        +:/mnt/agent/work/ => /mnt/agent/work
+        +:tests/java-tests/build/reports => tests/java-tests/build/reports
     """.trimIndent()
 
     expectSteps {
