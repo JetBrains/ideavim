@@ -31,7 +31,10 @@ val knownPlugins = listOf(
   "com.github.copilot",
   "com.github.dankinsoid.multicursor",
   "com.joshestein.ideavim-quickscope",
+
   "ca.alexgirard.HarpoonIJ",
+  "me.kyren223.harpoonforjb", // https://plugins.jetbrains.com/plugin/23771-harpoonforjb
+
   "com.protoseo.input-source-auto-converter",
 
 //   "cc.implicated.intellij.plugins.bunny", // I don't want to include this plugin in the list of IdeaVim plugins as I don't understand what this is for
