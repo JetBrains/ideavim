@@ -34,5 +34,5 @@ public object StringHelper {
 
   @JvmStatic
   @Deprecated("Use key.isCloseKeyStroke()", ReplaceWith("key.isCloseKeyStroke()"))
-  public fun isCloseKey(key: KeyStroke): Boolean = key.isCloseKeyStroke()
+  public fun isCloseKeyStroke(key: KeyStroke): Boolean = key.isCloseKeyStroke()
 }
