@@ -12,6 +12,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.diagnostic.logger
@@ -159,8 +160,8 @@ internal class ReloadVimRc : DumbAwareAction() {
 internal class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   override val autoHideable: Boolean = false
 
-  override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
-    super.register(component, parentDisposable)
+  override fun register(dataContext: DataContext, component: FloatingToolbarComponent, parentDisposable: Disposable) {
+    super.register(dataContext, component, parentDisposable)
     val action = {
       component.scheduleShow()
     }
