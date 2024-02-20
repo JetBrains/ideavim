@@ -46,7 +46,6 @@ object Qodana : IdeaVimBuildType({
         version = Qodana.JVMVersion.LATEST
       }
       reportAsTests = true
-      additionalDockerArguments = "-e"
       additionalQodanaArguments = "--baseline qodana.sarif.json"
       cloudToken = "credentialsJSON:6b79412e-9198-4862-9223-c5019488f903"
     }
