@@ -52,6 +52,7 @@ jobs:
           name: ui-test-fails-report-mac
           path: |
             build/reports
+            tests/ui-ij-tests/build/reports
             sandbox-idea-log
 #  build-for-ui-test-linux:
 #    runs-on: ubuntu-latest
