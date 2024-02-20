@@ -23,6 +23,7 @@ exclude:
       - src/main/java/com/maddyhome/idea/vim/package-info.java
       - vim-engine/src/main/java/com/maddyhome/idea/vim/regexp/parser/generated
       - src/main/java/com/maddyhome/idea/vim/group/SearchGroup.java
+      - tests/ui-fixtures
 dependencyIgnores:
   - name: "acejump"
   - name: "icu4j"
