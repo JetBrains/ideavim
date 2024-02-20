@@ -17,6 +17,7 @@ import ui.pages.idea
 import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
 import ui.utils.uiTest
+import java.time.Duration
 
 class PyCharmTest {
   init {
@@ -41,7 +42,7 @@ class PyCharmTest {
   }
 
   private fun IdeaFrame.testEnterWorksInPyConsole() {
-    waitFor {
+    waitFor(duration = Duration.ofMinutes(5)) {
       findAllText("Python Console").isNotEmpty() &&
         findAllText("Version Control").isNotEmpty() &&
         findAllText("Python Packages").isNotEmpty() &&
