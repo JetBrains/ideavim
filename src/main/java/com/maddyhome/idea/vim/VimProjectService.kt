@@ -14,7 +14,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.group.EditorHolderService
 
-@Service
+@Service(Service.Level.PROJECT)
 internal class VimProjectService(val project: Project) : Disposable {
   override fun dispose() {
     // Not sure if this is a best solution
