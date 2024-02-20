@@ -39,7 +39,8 @@ changeBuildType(RelativeId("Qodana")) {
     steps {
         update<Qodana>(1) {
             clearConditions()
-            additionalDockerArguments = "-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzb0RycCIsInByb2plY3QiOiIzb0pRNyIsInRva2VuIjoiQVJEMGsifQ.ZXGyTl_rZgr4ccavv_K_QiWqdOiVfpCIHauQCu6aEF0"
+            additionalDockerArguments = "-e"
+            cloudToken = "credentialsJSON:6b79412e-9198-4862-9223-c5019488f903"
         }
     }
 
