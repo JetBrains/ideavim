@@ -31,4 +31,8 @@ public object StringHelper {
     return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).stream() }
       .collect(Collectors.toList())
   }
+
+  @JvmStatic
+  @Deprecated("Use key.isCloseKeyStroke()", ReplaceWith("key.isCloseKeyStroke()"))
+  public fun isCloseKey(key: KeyStroke): Boolean = key.isCloseKeyStroke()
 }
