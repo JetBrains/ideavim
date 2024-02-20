@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
@@ -85,7 +86,10 @@ private fun Editor.updatePrimaryCaretVisualAttributes() {
   caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
 
   // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
-  (this as? EditorEx)?.setCaretVisible(true)
+  // NOTE: At the moment, this causes project leak in tests
+  if (!ApplicationManager.getApplication().isUnitTestMode) {
+    (this as? EditorEx)?.setCaretVisible(true)
+  }
 }
 
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
