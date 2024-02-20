@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 import com.intellij.codeInsight.completion.CompletionPhase
 import com.intellij.codeInsight.completion.impl.CompletionServiceImpl
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
@@ -25,6 +26,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 /**
  * Used to handle playback of macros
  */
+@Service
 internal class MacroGroup : VimMacroBase() {
 
   // If it's null, this is the top macro (as in most cases). If it's not null, this macro is executed from top macro

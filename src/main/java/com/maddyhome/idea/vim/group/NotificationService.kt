@@ -21,6 +21,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.keymap.KeymapUtil
@@ -55,6 +56,7 @@ import javax.swing.KeyStroke
  * This service is can be used as application level and as project level service.
  * If project is null, this means that this is an application level service and notification will be shown for all projects
  */
+@Service(Service.Level.PROJECT, Service.Level.APP)
 internal class NotificationService(private val project: Project?) {
   // This constructor is used to create an applicationService
   @Suppress("unused")

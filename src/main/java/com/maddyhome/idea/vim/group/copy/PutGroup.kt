@@ -14,6 +14,7 @@ import com.intellij.ide.DataManager
 import com.intellij.ide.PasteProvider
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.ex.EditorEx
@@ -51,6 +52,7 @@ import com.maddyhome.idea.vim.state.mode.isChar
 import com.maddyhome.idea.vim.state.mode.isLine
 import java.awt.datatransfer.DataFlavor
 
+@Service
 internal class PutGroup : VimPutBase() {
 
   override fun getProviderForPasteViaIde(
