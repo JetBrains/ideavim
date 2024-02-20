@@ -10,9 +10,7 @@ package org.jetbrains.plugins.ideavim.regex
 
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.regexp.VimRegex

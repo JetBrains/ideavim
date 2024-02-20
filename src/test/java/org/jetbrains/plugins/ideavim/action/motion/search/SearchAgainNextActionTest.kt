@@ -8,11 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.search
 
-import com.maddyhome.idea.vim.api.getVisualLineCount
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 class SearchAgainNextActionTest : VimTestCase() {
   @Test

@@ -28,7 +28,7 @@ class BufferListCommandTest : VimTestCase() {
 
     val output = getInstance(fixture.editor).text
     kotlin.test.assertNotNull<Any>(output)
-    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals(DEFAULT_LS_OUTPUT, displayedLines[0])
 
     assertPluginError(false)
@@ -41,7 +41,7 @@ class BufferListCommandTest : VimTestCase() {
 
     val output = getInstance(fixture.editor).text
     kotlin.test.assertNotNull<Any>(output)
-    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals("   1 %a   \"/src/aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt\" line: 1", displayedLines[0])
 
     assertPluginError(false)
@@ -69,7 +69,7 @@ class BufferListCommandTest : VimTestCase() {
 
     val output = getInstance(fixture.editor).text
     kotlin.test.assertNotNull<Any>(output)
-    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    val displayedLines = output.split("\n".toRegex()).toTypedArray()
 
     // Ignore buffer number because IJ sometimes returns different order of buffers
     val line = displayedLines[0].replaceRange(3, 4, "_")
@@ -85,7 +85,7 @@ class BufferListCommandTest : VimTestCase() {
 
     val output = getInstance(fixture.editor).text
     kotlin.test.assertNotNull<Any>(output)
-    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals("", displayedLines[0])
 
     assertPluginError(false)
@@ -98,7 +98,7 @@ class BufferListCommandTest : VimTestCase() {
 
     val output = getInstance(fixture.editor).text
     kotlin.test.assertNotNull<Any>(output)
-    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals(DEFAULT_LS_OUTPUT, displayedLines[0])
 
     assertPluginError(false)

@@ -10,10 +10,10 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.vimSelectionStart
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test

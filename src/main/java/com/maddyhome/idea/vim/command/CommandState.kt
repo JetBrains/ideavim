@@ -23,17 +23,17 @@ public class CommandState(private val machine: VimStateMachine) {
   public val isOperatorPending: Boolean
     get() = machine.isOperatorPending
 
-  public val mode: CommandState.Mode
+  public val mode: Mode
     get() {
       val myMode = machine.mode
       return when (myMode) {
-        is com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE -> CommandState.Mode.CMD_LINE
-        com.maddyhome.idea.vim.state.mode.Mode.INSERT -> CommandState.Mode.INSERT
-        is com.maddyhome.idea.vim.state.mode.Mode.NORMAL -> CommandState.Mode.COMMAND
-        is com.maddyhome.idea.vim.state.mode.Mode.OP_PENDING -> CommandState.Mode.OP_PENDING
-        com.maddyhome.idea.vim.state.mode.Mode.REPLACE -> CommandState.Mode.REPLACE
-        is com.maddyhome.idea.vim.state.mode.Mode.SELECT -> CommandState.Mode.SELECT
-        is com.maddyhome.idea.vim.state.mode.Mode.VISUAL -> CommandState.Mode.VISUAL
+        is com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE -> Mode.CMD_LINE
+        com.maddyhome.idea.vim.state.mode.Mode.INSERT -> Mode.INSERT
+        is com.maddyhome.idea.vim.state.mode.Mode.NORMAL -> Mode.COMMAND
+        is com.maddyhome.idea.vim.state.mode.Mode.OP_PENDING -> Mode.OP_PENDING
+        com.maddyhome.idea.vim.state.mode.Mode.REPLACE -> Mode.REPLACE
+        is com.maddyhome.idea.vim.state.mode.Mode.SELECT -> Mode.SELECT
+        is com.maddyhome.idea.vim.state.mode.Mode.VISUAL -> Mode.VISUAL
       }
     }
 

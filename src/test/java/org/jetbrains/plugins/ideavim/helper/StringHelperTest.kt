@@ -19,7 +19,7 @@ class StringHelperTest : VimTestCase() {
   fun testFalseSpecialKey() {
     val expectedKeys = injector.parser.parseKeys("move '<-2").toMutableList()
     expectedKeys.addAll(injector.parser.parseKeys("<CR>"))
-    kotlin.test.assertEquals(expectedKeys, injector.parser.parseKeys("move '<-2<CR>"))
+    assertEquals(expectedKeys, injector.parser.parseKeys("move '<-2<CR>"))
   }
 
   @Test
@@ -103,15 +103,15 @@ class StringHelperTest : VimTestCase() {
   }
 
   private fun assertPressedKeyStroke(expected: String, actual: String) {
-    kotlin.test.assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
+    assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
   }
 
   private fun assertKeyStroke(expected: KeyStroke, actual: String) {
-    kotlin.test.assertEquals(expected, parseKeyStroke(actual))
+    assertEquals(expected, parseKeyStroke(actual))
   }
 
   private fun assertTypedKeyStroke(expected: Char, actual: String) {
-    kotlin.test.assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
+    assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
   }
 
   private fun parseKeyStroke(s: String): KeyStroke {
