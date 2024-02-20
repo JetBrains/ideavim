@@ -31,6 +31,7 @@ usual beta standards.
 * 
 ### Merged PRs:
 * [805](https://github.com/JetBrains/ideavim/pull/805) by [chylex](https://github.com/chylex): VIM-3238 Fix recording a macro that replays another macro
+* [806](https://github.com/JetBrains/ideavim/pull/806) by [chylex](https://github.com/chylex): Enforce LF line separator in project code style
 
 ## 2.9.0, 2024-02-20
 
