@@ -117,13 +117,44 @@ class SetglobalCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test reset global toggle option value to default value`() {
+    enterCommand("setglobal rnu") // Local option, global value
+    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
+
+    enterCommand("setglobal rnu&")
+    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
+  }
+
+  @Test
   fun `test reset global toggle option value to global value does nothing`() {
-    enterCommand("setglobal relativenumber") // Default global value is off
+    enterCommand("setglobal relativenumber") // Local option, global value
     assertCommandOutput("setglobal rnu?", "  relativenumber\n")
 
     // Copies the global value to itself, doesn't change anything
     enterCommand("setglobal relativenumber<")
     assertCommandOutput("setglobal rnu?", "  relativenumber\n")
+  }
+
+  @Test
+  fun `test reset global-local toggle option to default value`() {
+    val option = ToggleOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", false)
+    try {
+      injector.optionGroup.addOption(option)
+
+      enterCommand("setglobal test")
+      enterCommand("setlocal notest")
+      assertCommandOutput("setglobal test?", "  test\n")
+      assertCommandOutput("setlocal test?", "notest\n")
+
+      // Reset global value to default
+      enterCommand("setglobal test&")
+
+      assertCommandOutput("setglobal test?", "notest\n")
+      assertCommandOutput("setlocal test?", "notest\n")
+    }
+    finally {
+      injector.optionGroup.removeOption(option.name)
+    }
   }
 
   @Test
@@ -133,25 +164,19 @@ class SetglobalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       enterCommand("setglobal test")
+      enterCommand("setlocal notest")
       assertCommandOutput("setglobal test?", "  test\n")
+      assertCommandOutput("setlocal test?", "notest\n")
 
       // Copies the global value to the target scope (i.e. global, this is a no-op)
       enterCommand("setglobal test<")
 
       assertCommandOutput("setglobal test?", "  test\n")
+      assertCommandOutput("setlocal test?", "notest\n")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
     }
-  }
-
-  @Test
-  fun `test reset toggle option to default value`() {
-    enterCommand("setglobal rnu")
-    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
-
-    enterCommand("setglobal rnu&")
-    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
   }
 
   @Test
@@ -213,7 +238,15 @@ class SetglobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test reset global number option value to global value does nothing`() {
+  fun `test reset number global option value to default value`() {
+    enterCommand("setglobal scroll=10")  // Default global value is 0
+
+    enterCommand("setglobal scroll&")
+    assertCommandOutput("setglobal scroll?", "  scroll=0\n")
+  }
+
+  @Test
+  fun `test reset number global option value to global value does nothing`() {
     enterCommand("setglobal scroll=10")  // Default global value is 0
 
     enterCommand("setglobal scroll<")
@@ -221,18 +254,43 @@ class SetglobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test reset global-local number option to global value does nothing`() {
+  fun `test reset number global-local option to default value`() {
     val option = NumberOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", 10)
     try {
       injector.optionGroup.addOption(option)
 
       enterCommand("setglobal test=20")
+      enterCommand("setlocal test=30")
       assertCommandOutput("setglobal test?", "  test=20\n")
+      assertCommandOutput("setlocal test?", "  test=30\n")
 
-      // setglobal {option}< copies the global value to the local value
+      // setglobal {option}< copies the global value to the target scope
+      enterCommand("setglobal test&")
+
+      assertCommandOutput("setglobal test?", "  test=10\n")
+      assertCommandOutput("setlocal test?", "  test=30\n")
+    }
+    finally {
+      injector.optionGroup.removeOption(option.name)
+    }
+  }
+
+  @Test
+  fun `test reset number global-local option to global value does nothing`() {
+    val option = NumberOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", 10)
+    try {
+      injector.optionGroup.addOption(option)
+
+      enterCommand("setglobal test=20")
+      enterCommand("setlocal test=30")
+      assertCommandOutput("setglobal test?", "  test=20\n")
+      assertCommandOutput("setlocal test?", "  test=30\n")
+
+      // setglobal {option}< copies the global value to the target scope
       enterCommand("setglobal test<")
 
       assertCommandOutput("setglobal test?", "  test=20\n")
+      assertCommandOutput("setlocal test?", "  test=30\n")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -295,22 +353,51 @@ class SetglobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test reset global string option value to global value does nothing`() {
+  fun `test reset string global option value to default value`() {
+    enterCommand("setglobal nrformats=alpha")
+    enterCommand("setglobal nrformats&")
+    assertCommandOutput("setglobal nrformats?", "  nrformats=hex\n")
+  }
+
+  @Test
+  fun `test reset string global option value to global value does nothing`() {
     enterCommand("setglobal nrformats=alpha")
     enterCommand("setglobal nrformats<")
     assertCommandOutput("setglobal nrformats?", "  nrformats=alpha\n")
   }
 
   @Test
-  fun `test reset global-local string option to global value does nothing`() {
+  fun `test reset string global-local option to default value`() {
     val option = StringOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", "testValue")
     try {
       injector.optionGroup.addOption(option)
 
-      // Copies the global value to the target scope (i.e. global, this is a no-op)
-      enterCommand("setlocal test<")
+      enterCommand("setglobal test=globalValue")
+      enterCommand("setlocal test=localValue")
 
-      assertCommandOutput("setlocal test?", "  test=testValue\n")
+      // Copies the default value to the target scope
+      enterCommand("setglobal test&")
+
+      assertCommandOutput("setglobal test?", "  test=testValue\n")
+    }
+    finally {
+      injector.optionGroup.removeOption(option.name)
+    }
+  }
+
+  @Test
+  fun `test reset string global-local option to global value does nothing`() {
+    val option = StringOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", "testValue")
+    try {
+      injector.optionGroup.addOption(option)
+
+      enterCommand("setglobal test=globalValue")
+      enterCommand("setlocal test=localValue")
+
+      // Copies the global value to the target scope (i.e. global, this is a no-op)
+      enterCommand("setglobal test<")
+
+      assertCommandOutput("setglobal test?", "  test=globalValue\n")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
