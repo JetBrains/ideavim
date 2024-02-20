@@ -21,6 +21,7 @@ exclude:
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/SimpleText.kt
       - src/main/java/com/maddyhome/idea/vim/vimscript/parser/generated
       - src/main/java/com/maddyhome/idea/vim/package-info.java
+      - vim-engine/src/main/java/com/maddyhome/idea/vim/regexp/parser/generated
 dependencyIgnores:
   - name: "acejump"
   - name: "icu4j"
