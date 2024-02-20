@@ -86,13 +86,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun <T : VimDataType> resetToDefaultValue(option: Option<T>, scope: OptionAccessScope) {
-    val optionValue = if (scope is OptionAccessScope.LOCAL && option.declaredScope.isGlobalLocal()) {
-      OptionValue.Default(option.unsetValue)
-    }
-    else {
-      OptionValue.Default(option.defaultValue)
-    }
-    doSetOptionValue(option, scope, optionValue)
+    doSetOptionValue(option, scope, OptionValue.Default(option.defaultValue))
   }
 
   private fun <T : VimDataType> doSetOptionValue(
@@ -100,21 +94,17 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     scope: OptionAccessScope,
     optionValue: OptionValue<T>,
   ) {
-    when (scope) {
-      is OptionAccessScope.EFFECTIVE -> {
-        if (storage.setOptionValue(option, scope, optionValue)) {
+    if (storage.setOptionValue(option, scope, optionValue)) {
+      when (scope) {
+        is OptionAccessScope.EFFECTIVE -> {
           parsedValuesCache.reset(option, scope.editor)
           listeners.onEffectiveValueChanged(option, scope.editor)
         }
-      }
-      is OptionAccessScope.LOCAL -> {
-        if (storage.setOptionValue(option, scope, optionValue)) {
+        is OptionAccessScope.LOCAL -> {
           parsedValuesCache.reset(option, scope.editor)
           listeners.onLocalValueChanged(option, scope.editor)
         }
-      }
-      is OptionAccessScope.GLOBAL -> {
-        if (storage.setOptionValue(option, scope, optionValue)) {
+        is OptionAccessScope.GLOBAL -> {
           if (option.declaredScope == GLOBAL) {
             // Don't reset the parsed effective value if we change the global value of local options
             parsedValuesCache.reset(option, scope.editor)
