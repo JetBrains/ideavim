@@ -46,8 +46,9 @@ object Qodana : IdeaVimBuildType({
         version = Qodana.JVMVersion.LATEST
       }
       reportAsTests = true
-      additionalDockerArguments = "-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzUFZrQSIsInByb2plY3QiOiIzN1FlQSIsInRva2VuIjoiM0t2bXoifQ.uohp81tM7iAfvvB6k8faarfpV-OjusAaEbWQ8iNrOgs"
+      additionalDockerArguments = "-e"
       additionalQodanaArguments = "--baseline qodana.sarif.json"
+      cloudToken = "credentialsJSON:6b79412e-9198-4862-9223-c5019488f903"
     }
   }
 
@@ -63,7 +64,6 @@ object Qodana : IdeaVimBuildType({
         timezone = "SERVER"
       }
       param("dayOfWeek", "Sunday")
-      enabled = false
     }
   }
 
