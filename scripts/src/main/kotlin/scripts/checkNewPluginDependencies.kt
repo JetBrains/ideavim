@@ -34,6 +34,7 @@ val knownPlugins = listOf(
 
   "ca.alexgirard.HarpoonIJ",
   "me.kyren223.harpoonforjb", // https://plugins.jetbrains.com/plugin/23771-harpoonforjb
+  "com.github.erotourtes.harpoon", // https://plugins.jetbrains.com/plugin/21796-harpooner
 
   "com.protoseo.input-source-auto-converter",
 
