@@ -62,7 +62,6 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
-    <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
     <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory" order="last, before Memory"/>
     <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory" order="last, before IdeaVimMode"/>
