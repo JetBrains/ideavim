@@ -41,6 +41,12 @@ class PyCharmTest {
   }
 
   private fun IdeaFrame.testEnterWorksInPyConsole() {
+    waitFor {
+      findAllText("Python Console").isNotEmpty() &&
+        findAllText("Version Control").isNotEmpty() &&
+        findAllText("Python Packages").isNotEmpty() &&
+        isSmartMode()
+    }
     findText("Python Console").click()
 
     Thread.sleep(10_000)
