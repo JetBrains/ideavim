@@ -91,7 +91,7 @@ public enum class BinaryOperator(public val value: String, public val handler: B
 
   public companion object {
     public fun getByValue(value: String): BinaryOperator? {
-      return values().firstOrNull { it.value == value }
+      return entries.firstOrNull { it.value == value }
     }
   }
 }

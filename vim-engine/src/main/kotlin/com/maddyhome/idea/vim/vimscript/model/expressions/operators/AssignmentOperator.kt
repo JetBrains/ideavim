@@ -29,7 +29,7 @@ public enum class AssignmentOperator(public val value: String) {
 
   public companion object {
     public fun getByValue(value: String): AssignmentOperator {
-      return values().first { it.value == value }
+      return entries.first { it.value == value }
     }
   }
 

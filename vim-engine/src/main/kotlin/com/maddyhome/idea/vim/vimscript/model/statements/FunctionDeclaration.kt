@@ -70,7 +70,7 @@ public enum class FunctionFlag(public val abbrev: String) {
 
   public companion object {
     public fun getByName(abbrev: String): FunctionFlag? {
-      return values().firstOrNull { it.abbrev == abbrev }
+      return entries.firstOrNull { it.abbrev == abbrev }
     }
   }
 }

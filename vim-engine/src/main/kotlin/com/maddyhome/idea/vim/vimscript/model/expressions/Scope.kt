@@ -22,7 +22,7 @@ public enum class Scope(public val c: String) {
 
   public companion object {
     public fun getByValue(s: String): Scope? {
-      return values().firstOrNull { it.c == s }
+      return entries.firstOrNull { it.c == s }
     }
   }
 

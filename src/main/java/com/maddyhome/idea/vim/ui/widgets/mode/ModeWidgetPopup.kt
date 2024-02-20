@@ -153,7 +153,7 @@ public class ModeWidgetPopup : AnAction() {
         group {
           row {
             label(MessageHelper.getMessage("widget.mode.popup.field.theme"))
-            comboBox(ModeWidgetTheme.values().toList()).bindItem(modeColors::theme.toNullableProperty())
+            comboBox(ModeWidgetTheme.entries).bindItem(modeColors::theme.toNullableProperty())
           }
           row { browserLink("Suggest your theme", "https://youtrack.jetbrains.com/issue/VIM-1377/Normal-mode-needs-to-be-more-obvious") }
         }.topGap(TopGap.NONE).visibleIf(!advancedSettings.selected)
@@ -360,7 +360,7 @@ public enum class ModeWidgetTheme(private var value: String) {
 
   public companion object {
     public fun parseString(string: String): ModeWidgetTheme? {
-      return ModeWidgetTheme.values().firstOrNull { it.value == string }
+      return entries.firstOrNull { it.value == string }
     }
 
     public fun getDefaultTheme(): ModeWidgetTheme = TERM

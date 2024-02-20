@@ -170,7 +170,7 @@ internal class VimEmulationConfigurable : Configurable {
       return getColumnModel().getColumn(column.index)
     }
 
-    private class ShortcutOwnerRenderer : ComboBoxTableRenderer<ShortcutOwner>(ShortcutOwner.values()) {
+    private class ShortcutOwnerRenderer : ComboBoxTableRenderer<ShortcutOwner>(ShortcutOwner.entries.toTypedArray()) {
       override fun customizeComponent(owner: ShortcutOwner, table: JTable, isSelected: Boolean) {
         super.customizeComponent(owner, table, isSelected)
         if (owner == ShortcutOwner.UNDEFINED) {
@@ -193,7 +193,7 @@ internal class VimEmulationConfigurable : Configurable {
         private val ourMembers: MutableMap<Int, Column> = HashMap()
 
         init {
-          for (column in values()) {
+          for (column in entries) {
             ourMembers[column.index] = column
           }
         }
@@ -225,7 +225,7 @@ internal class VimEmulationConfigurable : Configurable {
       }
 
       override fun getColumnCount(): Int {
-        return Column.values().size
+        return Column.entries.size
       }
 
       override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {

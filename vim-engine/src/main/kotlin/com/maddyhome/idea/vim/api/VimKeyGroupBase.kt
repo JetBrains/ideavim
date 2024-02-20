@@ -164,7 +164,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   private var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
 
   override fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> {
-    return MappingMode.values().map { getKeyMapping(it) }.flatMap { it.getByOwner(owner) }
+    return MappingMode.entries.map { getKeyMapping(it) }.flatMap { it.getByOwner(owner) }
   }
 
   private fun registerKeyMapping(fromKeys: List<KeyStroke>, owner: MappingOwner) {
@@ -194,7 +194,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun removeKeyMapping(owner: MappingOwner) {
-    MappingMode.values().map { getKeyMapping(it) }.forEach { it.delete(owner) }
+    MappingMode.entries.map { getKeyMapping(it) }.forEach { it.delete(owner) }
     unregisterKeyMapping(owner)
   }
 
