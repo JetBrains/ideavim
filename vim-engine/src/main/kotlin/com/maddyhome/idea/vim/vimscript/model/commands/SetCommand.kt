@@ -152,12 +152,27 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessS
         token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
         token.endsWith("&") -> optionGroup.resetToDefaultValue(getValidOption(token.dropLast(1), token), scope)
         token.endsWith("<") -> {
-          // Copy the global value to the target scope. If the target scope is global, this is a no-op. When copying a
-          // string global-local option to effective scope, Vim's behaviour matches setting that option at effective
-          // scope. That is, it sets the global value (a no-op) and resets the local value.
+          // Copy the global value to the target scope. If the target scope is global, this is a no-op.
+          // Behaviour is inconsistent with global-local options:
+          // If called at effective scope, the behaviour is the same as setting the option, using the global value. The
+          // global value is set (a no-op), and the local value is also set for number or toggle options. For string
+          // options, the local value is unset.
+          // But if called at local scope, a string option will have its local value reset to the global value, while
+          // number and toggle options will have their local values unset.
+          // I.e., the behaviour of `:set {option}<` and `:setlocal {option}<` is opposite for string and number-based
+          // options.
+          // See `:help :setlocal` and https://github.com/vim/vim/issues/14062
           val option = getValidOption(token.dropLast(1), token)
-          val globalValue = optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(editor))
-          optionGroup.setOptionValue(option, scope, globalValue)
+          val newValue = if (scope is OptionAccessScope.LOCAL && option.declaredScope.isGlobalLocal()
+//             && (option is NumberOption || option is ToggleOption)  // This fails with ToggleOption due to generics
+            && option.defaultValue is VimInt  // We're interested in number-based options, so this works ok
+          ) {
+            option.unsetValue
+          }
+          else {
+            optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(editor))
+          }
+          optionGroup.setOptionValue(option, scope, newValue)
         }
         else -> {
           // `getOption` returns `Option<VimDataType>?`, but we need to treat it as `Option<out VimDataType>?` because

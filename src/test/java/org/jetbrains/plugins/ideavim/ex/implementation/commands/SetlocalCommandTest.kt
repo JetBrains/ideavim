@@ -128,12 +128,46 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test reset local toggle option value to global value`() {
+  fun `test reset local toggle option value to default value`() {
     enterCommand("setlocal relativenumber") // Default global value is off
-    assertTrue(optionsIj().relativenumber)
+    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
+    assertCommandOutput("setlocal rnu?", "  relativenumber\n")
+
+    enterCommand("setlocal relativenumber&")
+    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
+    assertCommandOutput("setlocal rnu?", "norelativenumber\n")
+  }
+
+  @Test
+  fun `test reset local toggle option value to global value`() {
+    enterCommand("setlocal relativenumber")
+    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
+    assertCommandOutput("setlocal rnu?", "  relativenumber\n")
 
     enterCommand("setlocal relativenumber<")
-    assertFalse(optionsIj().relativenumber)
+    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
+    assertCommandOutput("setlocal rnu?", "norelativenumber\n")
+  }
+
+  @Test
+  fun `test reset global-local toggle option to default value`() {
+    val option = ToggleOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", false)
+    try {
+      injector.optionGroup.addOption(option)
+
+      enterCommand("setlocal test")
+      assertCommandOutput("setglobal test?", "notest\n")
+      assertCommandOutput("setlocal test?", "  test\n")
+
+      // Reset local value to default
+      enterCommand("setlocal test&")
+
+      assertCommandOutput("setglobal test?", "notest\n")
+      assertCommandOutput("setlocal test?", "notest\n")
+    }
+    finally {
+      injector.optionGroup.removeOption(option.name)
+    }
   }
 
   @Test
@@ -143,25 +177,21 @@ class SetlocalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       enterCommand("setlocal test")
-
+      assertCommandOutput("setglobal test?", "notest\n")
       assertCommandOutput("setlocal test?", "  test\n")
 
-      enterCommand("setlocal test<")  // setlocal {option}< copies the global value to the local value
+      // Vim's docs state this should copy global value to local scope, but it actually unsets the value instead. Use
+      // `:set {option}<` to copy global value to local
+      // This only seems to apply for number-based options (including toggle options)
+      // https://github.com/vim/vim/issues/14062
+      enterCommand("setlocal test<")
 
-      assertCommandOutput("setlocal test?", "notest\n")
+      assertCommandOutput("setglobal test?", "notest\n")
+      assertCommandOutput("setlocal test?", "--test\n")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
     }
-  }
-
-  @Test
-  fun `test reset toggle option to default value`() {
-    enterCommand("setlocal rnu")
-    assertTrue(optionsIj().relativenumber)  // Tests effective (i.e. local) value
-
-    enterCommand("setlocal rnu&")
-    assertFalse(optionsIj().relativenumber)
   }
 
   @Test
@@ -232,26 +262,64 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test reset local number option value to global value`() {
-    enterCommand("setlocal scroll=10")  // Default global value is 0
+  fun `test reset number local option value to default value`() {
+    enterCommand("setlocal scroll=10")
 
-    enterCommand("setlocal scroll<")
-    assertEquals(0, options().scroll)
+    enterCommand("setlocal scroll&")
+    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
   }
 
   @Test
-  fun `test reset global-local number option to global value`() {
+  fun `test reset number local option value to global value`() {
+    enterCommand("setlocal scroll=10")  // Default global value is 0
+
+    enterCommand("setlocal scroll<")
+    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
+  }
+
+  @Test
+  fun `test reset number global-local option to default value`() {
     val option = NumberOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", 10)
     try {
       injector.optionGroup.addOption(option)
 
+      enterCommand("setglobal test=15")
       enterCommand("setlocal test=20")
 
+      assertCommandOutput("setglobal test?", "  test=15\n")
       assertCommandOutput("setlocal test?", "  test=20\n")
 
-      enterCommand("setlocal test<")  // setlocal {option}< copies the global value to the local value
+      // Reset local value to default
+      enterCommand("setlocal test&")
 
+      assertCommandOutput("setglobal test?", "  test=15\n")
       assertCommandOutput("setlocal test?", "  test=10\n")
+    }
+    finally {
+      injector.optionGroup.removeOption(option.name)
+    }
+  }
+
+  @Test
+  fun `test reset number global-local option to global value`() {
+    val option = NumberOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", 10)
+    try {
+      injector.optionGroup.addOption(option)
+
+      enterCommand("setglobal test=15")
+      enterCommand("setlocal test=20")
+
+      assertCommandOutput("setglobal test?", "  test=15\n")
+      assertCommandOutput("setlocal test?", "  test=20\n")
+
+      // Vim's docs state this should copy global value to local scope, but it actually unsets the value instead. Use
+      // `:set {option}<` to copy global value to local
+      // This only seems to apply for number-based options (including toggle options)
+      // https://github.com/vim/vim/issues/14062
+      enterCommand("setlocal test<")
+
+      assertCommandOutput("setglobal test?", "  test=15\n")
+      assertCommandOutput("setlocal test?", "  test=-1\n")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -310,7 +378,7 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test show unset global-local string option value`() {
+  fun `test show unset string global-local option value`() {
     val option = StringOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", "testValue")
     try {
       injector.optionGroup.addOption(option)
@@ -323,20 +391,32 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test reset local string option value to global value`() {
+  fun `test reset string local option value to default value`() {
     enterCommand("setlocal nrformats=alpha")
-    enterCommand("setlocal nrformats<")
-    assertEquals("hex", options().nrformats.value)
+    enterCommand("setlocal nrformats&")
+    assertCommandOutput("setlocal nrformats?", "  nrformats=hex\n")
   }
 
   @Test
-  fun `test reset global-local string option to global value`() {
+  fun `test reset string local option value to global value`() {
+    enterCommand("setlocal nrformats=alpha")
+    enterCommand("setlocal nrformats<")
+    assertCommandOutput("setlocal nrformats?", "  nrformats=hex\n")
+  }
+
+  @Test
+  fun `test reset string global-local option to default value`() {
     val option = StringOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", "testValue")
     try {
       injector.optionGroup.addOption(option)
 
-      enterCommand("setlocal test<")
+      enterCommand("setglobal test=globalValue")
+      enterCommand("setlocal test=localValue")
 
+      // Copies the default value to target scope
+      enterCommand("setlocal test&")
+
+      assertCommandOutput("setglobal test?", "  test=globalValue\n")
       assertCommandOutput("setlocal test?", "  test=testValue\n")
     }
     finally {
@@ -345,10 +425,26 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test reset string option to default value`() {
-    enterCommand("setlocal nrformats=alpha")
-    enterCommand("setlocal nrformats&")
-    assertEquals("hex", options().nrformats.value)
+  fun `test reset string global-local option to global value`() {
+    val option = StringOption("test", OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW, "test", "testValue")
+    try {
+      injector.optionGroup.addOption(option)
+
+      enterCommand("setglobal test=globalValue")
+      enterCommand("setlocal test=localValue")
+
+      // Copies the global value to target scope
+      // Note that this is different behaviour to `:setlocal {option}<` when option is a number-based global-local. For
+      // string values, this matches the documented behaviour. For number-based options, the docs are reversed.
+      // https://github.com/vim/vim/issues/14062
+      enterCommand("setlocal test<")
+
+      assertCommandOutput("setglobal test?", "  test=globalValue\n")
+      assertCommandOutput("setlocal test?", "  test=globalValue\n")
+    }
+    finally {
+      injector.optionGroup.removeOption(option.name)
+    }
   }
 
   @Test
