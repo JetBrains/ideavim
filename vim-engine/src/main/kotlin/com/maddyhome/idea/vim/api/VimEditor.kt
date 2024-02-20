@@ -130,7 +130,23 @@ import com.maddyhome.idea.vim.state.mode.returnTo
  */
 public interface VimEditor {
   public var mode: Mode
-  public var isReplaceCharacter: Boolean
+    get() = vimStateMachine.mode
+    set(value) {
+      if (vimStateMachine.mode == value) return
+
+      val oldValue = vimStateMachine.mode
+      (vimStateMachine as VimStateMachineImpl).mode = value
+      injector.listenersNotifier.notifyModeChanged(this, oldValue)
+    }
+
+  public  var isReplaceCharacter: Boolean
+    get() = vimStateMachine.isReplaceCharacter
+    set(value) {
+      if (value != vimStateMachine.isReplaceCharacter) {
+        (vimStateMachine as VimStateMachineImpl).isReplaceCharacter = value
+        injector.listenersNotifier.notifyIsReplaceCharChanged(this)
+      }
+    }
 
   public val lfMakesNewLine: Boolean
   public var vimChangeActionSwitchMode: Mode?
@@ -284,35 +300,16 @@ public interface VimEditor {
   /**
    * Resets the command, mode, visual mode, and mapping mode to initial values.
    */
-  public fun resetState()
-  public fun resetOpPending()
-}
+  public fun resetState() {
+    mode = Mode.NORMAL()
+    vimStateMachine.executingCommand = null
+    vimStateMachine.digraphSequence.reset()
+    vimStateMachine.commandBuilder.resetInProgressCommandPart(
+      injector.keyGroup.getKeyRoot(mode.toMappingMode())
+    )
+  }
 
-public interface MutableVimEditor : VimEditor {
-  public fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer?
-  public fun insertText(atPosition: Offset, text: CharSequence)
-  public fun replaceString(start: Int, end: Int, newString: String)
-
-  override var mode: Mode
-    get() = vimStateMachine.mode
-    set(value) {
-      if (vimStateMachine.mode == value) return
-
-      val oldValue = vimStateMachine.mode
-      (vimStateMachine as VimStateMachineImpl).mode = value
-      injector.listenersNotifier.notifyModeChanged(this, oldValue)
-    }
-
-  override var isReplaceCharacter: Boolean
-    get() = vimStateMachine.isReplaceCharacter
-    set(value) {
-      if (value != vimStateMachine.isReplaceCharacter) {
-        (vimStateMachine as VimStateMachineImpl).isReplaceCharacter = value
-        injector.listenersNotifier.notifyIsReplaceCharChanged(this)
-      }
-    }
-
-  public override fun resetOpPending() {
+  public fun resetOpPending() {
     if (this.mode is Mode.OP_PENDING) {
       val returnTo = this.mode.returnTo
       mode = when (returnTo) {
@@ -322,15 +319,12 @@ public interface MutableVimEditor : VimEditor {
       }
     }
   }
+}
 
-  override fun resetState() {
-    mode = Mode.NORMAL()
-    vimStateMachine.executingCommand = null
-    vimStateMachine.digraphSequence.reset()
-    vimStateMachine.commandBuilder.resetInProgressCommandPart(
-      injector.keyGroup.getKeyRoot(mode.toMappingMode())
-    )
-  }
+public interface MutableVimEditor : VimEditor {
+  public fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer?
+  public fun insertText(atPosition: Offset, text: CharSequence)
+  public fun replaceString(start: Int, end: Int, newString: String)
 }
 
 public abstract class LinearEditor : VimEditor {
