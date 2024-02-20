@@ -4,6 +4,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -38,6 +40,26 @@ changeBuildType(RelativeId("Qodana")) {
         update<Qodana>(1) {
             clearConditions()
             additionalDockerArguments = "-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzb0RycCIsInByb2plY3QiOiIzb0pRNyIsInRva2VuIjoiQVJEMGsifQ.ZXGyTl_rZgr4ccavv_K_QiWqdOiVfpCIHauQCu6aEF0"
+        }
+    }
+
+    triggers {
+        val trigger1 = find<ScheduleTrigger> {
+            schedule {
+                enabled = false
+                schedulingPolicy = daily {
+                    hour = 12
+                    minute = 0
+                    timezone = "SERVER"
+                }
+                triggerBuild = always()
+                param("dayOfWeek", "Sunday")
+            }
+        }
+        trigger1.apply {
+            enabled = true
+            triggerBuild = always()
+
         }
     }
 }
