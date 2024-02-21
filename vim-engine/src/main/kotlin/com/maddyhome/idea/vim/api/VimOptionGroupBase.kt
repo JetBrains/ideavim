@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.NumberOption
@@ -89,6 +90,17 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     doSetOptionValue(option, scope, OptionValue.Default(option.defaultValue))
   }
 
+  override fun <T : VimDataType> resetToGlobalValue(option: Option<T>, scope: OptionAccessScope, editor: VimEditor) {
+    val newValue = if (scope is OptionAccessScope.LOCAL && option.declaredScope.isGlobalLocal()
+      && (option is NumberOption || option is ToggleOption)) {
+      OptionValue.Default(option.unsetValue)
+    }
+    else {
+      storage.getOptionValue(option, OptionAccessScope.GLOBAL(editor))
+    }
+    doSetOptionValue(option, scope, newValue)
+  }
+
   private fun <T : VimDataType> doSetOptionValue(
     option: Option<T>,
     scope: OptionAccessScope,
@@ -127,11 +139,17 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   override fun getAllOptions(): Set<Option<VimDataType>> = Options.getAllOptions()
 
   override fun resetAllOptions(editor: VimEditor) {
-    // Reset all options to default values at global and local scope. This will fire any listeners and clear any caches
+    // Reset all options to default values at effective scope. This will fire any listeners and clear any caches
+    // Note that this is NOT the equivalent of calling `:set {option}&` on each option in turn. For number-based
+    // global-local options that have previously set the local value, `:set {option}&` will copy the global value to the
+    // local value. `:set all&` resets back to the original defaults, and global-local options will have a local value
+    // of `-1`. We have to implement this manually
+    val effectiveScope = OptionAccessScope.EFFECTIVE(editor)
+    val localScope = OptionAccessScope.LOCAL(editor)
     Options.getAllOptions().forEach { option ->
-      resetToDefaultValue(option, OptionAccessScope.GLOBAL(editor))
-      if (option.declaredScope != GLOBAL) {
-        resetToDefaultValue(option, OptionAccessScope.LOCAL(editor))
+      resetToDefaultValue(option, effectiveScope)
+      if (option.declaredScope.isGlobalLocal()) {
+        setOptionValue(option, localScope, option.unsetValue)
       }
     }
   }
@@ -244,6 +262,10 @@ public interface GlobalOptionValueOverride<T : VimDataType> : OptionValueOverrid
    * Sets the overridden value of a global Vim option
    *
    * The behaviour of this method is heavily dependent on the scope of the related IDE setting.
+   *
+   * Note that this method does not get called during initialisation, since we don't explicitly or eagerly initialise
+   * global values. This doesn't cause problems with current implementations because we always initialise to defaults,
+   * and we never need to do anything with the initial default value, but we might want to address this at some point.
    *
    * @param storedValue The current value of the Vim option. This will always be valid, possibly the default value.
    * @param newValue    The new value set by IdeaVim
@@ -534,6 +556,150 @@ public abstract class GlobalOptionToGlobalLocalExternalSettingMapper<T : VimData
   protected abstract fun resetLocalExternalValue(editor: VimEditor, defaultValue: T)
 }
 
+
+/**
+ * Provides a base implementation to map a global-local Vim option to a global-local external setting
+ *
+ * This class will map a global-local Vim option to a global-local external setting. This isn't as easy as it sounds,
+ * because we don't want to modify the global external value, as it is a persistent setting. Instead, we fake it by
+ * setting the local external value for all editors, unless the editor has overridden the local Vim value.
+ */
+public abstract class GlobalLocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(private val option: Option<T>)
+  : GlobalOptionValueOverride<T>, LocalOptionValueOverride<T> {
+
+  private var storedGlobalValue: OptionValue<T>? = null
+
+  override fun getGlobalValue(storedValue: OptionValue<T>, editor: VimEditor?): OptionValue<T> {
+    if (editor != null && storedValue is OptionValue.Default) {
+      // IdeaVim thinks the global value is default, so return the global external value
+      return OptionValue.Default(getGlobalExternalValue())
+    }
+
+    // Return the stored Vim value. Since this is a global-local value, we can't just return the current effective
+    // external value, as it might represent the global or local value. Fortunately, we assume/know that the user cannot
+    // change the local external value through the UI, so we don't need to worry about what the external value is. We
+    // can just return what IdeaVim _thinks_ it is, and be confident that it's correct.
+    return storedValue
+  }
+
+  override fun setGlobalValue(storedValue: OptionValue<T>, newValue: OptionValue<T>, editor: VimEditor?): Boolean {
+    // Set the external value to reflect the new global Vim value. We don't want to set the global external value, as
+    // this is a persistent setting, so we fake it by setting the local external setting of all editors. However, we
+    // want to skip editors that have a local Vim value, which is also copied to the local external value when set.
+    // Fortunately, the stored global Vim value tells us what the local external value should be. If the stored value is
+    // default, then the local external value should match the current global external value, unless it's been
+    // overridden locally. If the stored value isn't a default, then the local external value should match the stored
+    // value. If the editor doesn't match either of these, then it's been set as a local value.
+    val globalVimValue = if (storedValue is OptionValue.Default) getGlobalExternalValue() else storedValue.value
+    injector.editorGroup.getEditors().forEach {
+      if (getEffectiveExternalValue(it) == globalVimValue) {
+        // This editor has an external value that matches the existing global value. Update the external value to
+        // reflect the new external value, removing the local external value if we're resetting to default.
+        if (newValue is OptionValue.Default) {
+          removeLocalExternalValue(it)
+        } else {
+          setLocalExternalValue(it, newValue.value)
+        }
+      }
+    }
+
+    // Remember the new global Vim value - we need this when resetting the local Vim value back to global
+    storedGlobalValue = newValue
+    return storedValue.value != newValue.value
+  }
+
+  override fun getLocalValue(storedValue: OptionValue<T>?, editor: VimEditor): OptionValue<T> {
+    if (storedValue == null) {
+      // The local IdeaVim value hasn't been initialised yet. All we can do is use the local/effective external value
+      return OptionValue.External(getEffectiveExternalValue(editor))
+    }
+
+    if (storedValue is OptionValue.Default && storedValue.value != option.unsetValue) {
+      // If the stored value is default, but not the initial "unset" value, that means the user has reset the option to
+      // the global value with `:set[local] {option}<`, and the global value was a default value. The local external
+      // value will already have been set to reflect this change, so we can just return the effective (local) external
+      // value.
+      return OptionValue.Default(getEffectiveExternalValue(editor))
+    }
+
+    // The stored value is either explicitly set by the user, or the unset value. Since we assume that the user cannot
+    // modify the local external value, the only way it can be modified is by setting the IdeaVim value; then we can
+    // also assume that the stored IdeaVim value correctly reflects the local external value. (And when unset, it will
+    // correctly reflect the magic unset value rather than the effective value of the global value)
+    return storedValue
+  }
+
+  override fun setLocalValue(storedValue: OptionValue<T>?, newValue: OptionValue<T>, editor: VimEditor): Boolean {
+    if (newValue is OptionValue.Default) {
+      // The option is being set to a default value. During initialisation, this will be unsetValue, and we don't want
+      // to modify the external value (storedValue will be null only during initialisation).
+      // But we do want to modify the external value if the option is being reset either to default or unset due to
+      // `:set[local] {option}&` or `:set[local] {option}<`. Unfortunately, we don't always know what the external value
+      // should be.
+      // Specifically, if the user first explicitly sets the global Vim value, the local external value of all editors
+      // is set to the new global value, to avoid setting the persistent global external value. Then, if the user
+      // explicitly sets the local Vim value, the local external value of the current editor is updated.
+      // Finally, if the user then tries to unset the local Vim value, the local external value should be reset back to
+      // the global Vim value, which we don't have. Therefore, we must keep track of the stored Vim global value.
+      if (storedValue != null) {
+        val storedGlobalValue = this.storedGlobalValue
+        if (newValue.value == option.unsetValue && storedGlobalValue != null && storedGlobalValue !is OptionValue.Default) {
+          doForAllAffectedEditors(option, editor) { setLocalExternalValue(it, storedGlobalValue.value) }
+        }
+        else {
+          doForAllAffectedEditors(option, editor) { removeLocalExternalValue(it) }
+        }
+      }
+    }
+    else {
+      // The new value isn't default. It's been explicitly set by the user, so we should update the local external
+      // value. We expect it to be OptionValue.User, rather than OptionValue.External, because global-local options do
+      // not initialise values from the current value. But even so, just set the local external value.
+      doForAllAffectedEditors(option, editor) { setLocalExternalValue(it, newValue.value) }
+    }
+
+    return storedValue?.value != newValue.value
+  }
+
+  private fun doForAllAffectedEditors(option: Option<T>, editor: VimEditor, action: (editor: VimEditor) -> Unit) {
+    when (option.declaredScope) {
+      GLOBAL_OR_LOCAL_TO_BUFFER -> injector.editorGroup.getEditors(editor.document).forEach { action(it) }
+      GLOBAL_OR_LOCAL_TO_WINDOW -> action(editor)
+      else -> StrictMode.fail("IdeaVim option must be global-local")
+    }
+  }
+
+  /**
+   * Get the current global external value
+   */
+  protected abstract fun getGlobalExternalValue(): T
+
+  /**
+   * Get the effective external value
+   *
+   * This value is the global external value, unless the local external value has been set as overriding the global
+   * value.
+   */
+  protected abstract fun getEffectiveExternalValue(editor: VimEditor): T
+
+  /**
+   * Set the local external value
+   *
+   * Sets the local external value to the given value for the given editor
+   *
+   * Note that there is no global external value; we don't modify this value because it's a persistent value.
+   */
+  protected abstract fun setLocalExternalValue(editor: VimEditor, value: T)
+
+  /**
+   * Remove the local external value, leaving the global value as the effective value
+   *
+   * This method assumes that the implementation is able to remove the local value. No provision is made for a
+   * workaround.
+   */
+  protected abstract fun removeLocalExternalValue(editor: VimEditor)
+}
+
 /**
  * A wrapper class for an option value that also tracks how it was set
  *
@@ -751,7 +917,7 @@ private class OptionStorage {
       LOCAL_TO_BUFFER,
       GLOBAL_OR_LOCAL_TO_BUFFER -> setLocalValue(getBufferLocalOptionStorage(editor), option, editor, value)
       LOCAL_TO_WINDOW,
-      GLOBAL_OR_LOCAL_TO_WINDOW -> setLocalValue(getWindowLocalOptionStorage(editor) ,option, editor, value)
+      GLOBAL_OR_LOCAL_TO_WINDOW -> setLocalValue(getWindowLocalOptionStorage(editor), option, editor, value)
     }
   }
 

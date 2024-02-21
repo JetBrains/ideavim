@@ -12,6 +12,7 @@ import com.intellij.application.options.CodeStyle
 import com.intellij.codeStyle.AbstractConvertLineSeparatorsAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
+import com.intellij.openapi.editor.ScrollPositionCalculator
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -33,7 +34,9 @@ import com.intellij.util.ArrayUtil
 import com.intellij.util.LineSeparator
 import com.intellij.util.PatternUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.GlobalLocalOptionToGlobalLocalExternalSettingMapper
 import com.maddyhome.idea.vim.api.GlobalOptionToGlobalLocalExternalSettingMapper
+import com.maddyhome.idea.vim.api.GlobalOptionValueOverride
 import com.maddyhome.idea.vim.api.LocalOptionToGlobalLocalExternalSettingMapper
 import com.maddyhome.idea.vim.api.LocalOptionValueOverride
 import com.maddyhome.idea.vim.api.OptionValue
@@ -86,6 +89,8 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
 
     addOptionValueOverride(Options.scrolljump, ScrollJumpOptionMapper())
     addOptionValueOverride(Options.sidescroll, SideScrollOptionMapper())
+    addOptionValueOverride(Options.scrolloff, ScrollOffOptionMapper(Options.scrolloff))
+    addOptionValueOverride(Options.sidescrolloff, SideScrollOffOptionMapper(Options.sidescrolloff))
   }
 
   override fun initialiseOptions() {
@@ -674,6 +679,112 @@ private class SideScrollOptionMapper : GlobalOptionToGlobalLocalExternalSettingM
 
   override fun resetLocalExternalValue(editor: VimEditor, defaultValue: VimInt) {
     editor.ij.settings.horizontalScrollJump = -1
+  }
+}
+
+
+/**
+ * Map the `'scrolloff'` global-local Vim option to the IntelliJ global-local vertical scroll offset setting
+ *
+ * This is a global-local Vim option, mapped to a global-local IntelliJ setting. We don't set the persistent global
+ * setting value, and there is no UI to modify the local IntelliJ settings. Once the value has been set in IdeaVim, it
+ * takes precedence over the global, persistent setting until the option is reset with either `:set scrolloff&` or
+ * `:setlocal scrolloff<`.
+ */
+private class ScrollOffOptionMapper(option: NumberOption)
+  : GlobalLocalOptionToGlobalLocalExternalSettingMapper<VimInt>(option) {
+
+  override fun getGlobalExternalValue() = EditorSettingsExternalizable.getInstance().verticalScrollOffset.asVimInt()
+  override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.verticalScrollOffset.asVimInt()
+
+  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    editor.ij.settings.verticalScrollOffset = value.value
+  }
+
+  override fun removeLocalExternalValue(editor: VimEditor) {
+    // Unexpectedly, verticalScrollOffset accepts `-1` as a value to clear any local overrides, and this will reset the
+    // effective value to return the global value
+    editor.ij.settings.verticalScrollOffset = -1
+  }
+}
+
+
+/**
+ * Map the `'sidescrolloff'` global-local Vim option to the IntelliJ global-local horizontal scroll offset setting
+ *
+ * Ideally, we would implement this in a similar manner to [SideScrollOptionMapper], setting the external local
+ * horizontal scroll offset value when the user explicitly sets the Vim value, so that IntelliJ could also use the
+ * value. Unfortunately, IntelliJ's scrolling calculation logic is based on integer font width maths, which causes
+ * problems with fractional font widths (such as on a Mac when running tests).
+ *
+ * For example, given a `'sidescrolloff'` value of `10`, and a fractional font width of `7.8`, IntelliJ will scroll `80`
+ * pixels instead of `78`. This is a very minor difference, but because it overshoots, it means that IdeaVim doesn't
+ * need to scroll, which in turn can cause issues with `'sidescroll'`, because IntelliJ doesn't support `sidescroll=0`,
+ * which would scroll to position the caret in the middle of the display.
+ *
+ * It also causes precision problems in the tests. The display is scrolled to a couple of pixels _before_ the leftmost
+ * column, which means the rightmost column ends a couple of pixels _after_ the rightmost edge of the display. The tests
+ * are quite strict about expecting IdeaVim to scroll to character boundaries, and this can cause failures, e.g.
+ * `InsertBackspaceActionTest`.
+ *
+ * Therefore, this mapping does not update the local external horizontal scroll offset value to match the current Vim
+ * value. But it can't ignore it, either - if the IntelliJ value is ever greater than the Vim value, the IntelliJ value
+ * will be incorrectly applied to scrolling. Instead, we always set the local external value to `0`, so IntelliJ won't
+ * try to apply horizontal scrolling offsets. This means IdeaVim will adjust the scroll position, correctly handling
+ * fractional font width, horizontal scroll jump and also handling inlay hints.
+ *
+ * We should consider implementing [ScrollPositionCalculator] which would allow IdeaVim to completely take over
+ * scrolling from IntelliJ. This would be a non-trivial change, and it might be better to move the scrolling to
+ * vim-engine so it can also work in Fleet.
+ */
+private class SideScrollOffOptionMapper(private val sideScrollOffOption: NumberOption)
+  : GlobalOptionValueOverride<VimInt>, LocalOptionValueOverride<VimInt> {
+
+  override fun getGlobalValue(storedValue: OptionValue<VimInt>, editor: VimEditor?): OptionValue<VimInt> {
+    if (storedValue is OptionValue.Default) {
+      return OptionValue.Default(EditorSettingsExternalizable.getInstance().horizontalScrollOffset.asVimInt())
+    }
+
+    // If it's not the default value, it's got to be the stored value
+    return storedValue
+  }
+
+  override fun setGlobalValue(
+    storedValue: OptionValue<VimInt>,
+    newValue: OptionValue<VimInt>,
+    editor: VimEditor?,
+  ): Boolean {
+    editor?.let { it.ij.settings.horizontalScrollOffset = 0 }
+    return storedValue.value != newValue.value
+  }
+
+  override fun getLocalValue(storedValue: OptionValue<VimInt>?, editor: VimEditor): OptionValue<VimInt> {
+    if (storedValue == null) {
+      // Initialisation. Report the global value of the setting. We ignore the local value because the user doesn't have
+      // a way to set it, and we set it to 0 so that it doesn't affect our scroll calculations (because IntelliJ doesn't
+      // handle sidescroll=0 to mean half a page)
+      return OptionValue.Default(EditorSettingsExternalizable.getInstance().horizontalScrollOffset.asVimInt())
+    }
+
+    if (storedValue is OptionValue.Default && storedValue.value != sideScrollOffOption.unsetValue) {
+      // The local value is set to the default value (as a copy of the global value), so return the global external
+      // value as a default
+      return OptionValue.Default(EditorSettingsExternalizable.getInstance().horizontalScrollOffset.asVimInt())
+    }
+
+    // Whatever is left is either explicitly set by the user, or option.unsetValue
+    return storedValue
+  }
+
+  override fun setLocalValue(
+    storedValue: OptionValue<VimInt>?,
+    newValue: OptionValue<VimInt>,
+    editor: VimEditor,
+  ): Boolean {
+    // This is setting the Vim local value. We do nothing but reset the local horizontal scroll jump so IntelliJ's
+    // scrolling doesn't affect our scrolling
+    editor.ij.settings.horizontalScrollOffset = 0
+    return storedValue?.value != newValue.value
   }
 }
 
