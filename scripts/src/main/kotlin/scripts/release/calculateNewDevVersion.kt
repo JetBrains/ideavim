@@ -26,6 +26,7 @@ fun main(args: Array<String>) {
     "We should be on master branch"
   }
   val mergeBaseCommit = getMergeBaseWithMaster(projectDir, objectId)
+  println("Base commit $mergeBaseCommit")
   withGit(projectDir) { git ->
     val log = git.log().setMaxCount(500).call().toList()
     println("First commit hash in log: " + log.first().name + " log size: ${log.size}")
