@@ -158,7 +158,9 @@ abstract class VimTestCase {
       isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
 
       verticalScrollJump = Options.scrolljump.defaultValue.value
+      verticalScrollOffset = Options.scrolloff.defaultValue.value
       horizontalScrollJump = Options.sidescroll.defaultValue.value
+      horizontalScrollOffset = Options.sidescrolloff.defaultValue.value
     }
 
     CodeStyle.getDefaultSettings().getCommonSettings(null as Language?).apply {

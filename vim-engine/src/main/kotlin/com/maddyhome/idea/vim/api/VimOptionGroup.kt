@@ -80,6 +80,20 @@ public interface VimOptionGroup {
   public fun <T : VimDataType> resetToDefaultValue(option: Option<T>, scope: OptionAccessScope)
 
   /**
+   * Resets the option's target scope's value back to its global value
+   *
+   * This is the equivalent of `:set {option}<`, `:setglobal {option}<` and `:setlocal {option}<`.
+   *
+   * For local options, this will copy the global value to the local value. For global options, or called at global
+   * scope (`:setglobal {option}<`), this is a no-op, as copying the global value to the global value obviously does
+   * nothing. For global-local options called at effective scope, this will also copy the current global value to the
+   * local value, but when called at local scope (`:setlocal {option}<`) then number-based options are unset,
+   * effectively resetting the local value to the global value. This is the only way to unset global-local toggle
+   * options.
+   */
+  public fun <T : VimDataType> resetToGlobalValue(option: Option<T>, scope: OptionAccessScope, editor: VimEditor)
+
+  /**
    * Get or create cached, parsed data for the option value effective for the editor
    *
    * The parsed data is created by the given [provider], based on the effective value of the option in the given
