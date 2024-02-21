@@ -22,7 +22,7 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 
 @Suppress("SpellCheckingInspection")
-val knownPlugins = listOf(
+val knownPlugins = setOf(
   "IdeaVimExtension",
   "github.zgqq.intellij-enhance",
   "org.jetbrains.IdeaVim-EasyMotion",
@@ -46,7 +46,7 @@ suspend fun main() {
     parameter("dependency", "IdeaVIM")
     parameter("includeOptional", true)
   }
-  val output = response.body<List<String>>()
+  val output = response.body<List<String>>().toSet()
   println(output)
   if (knownPlugins != output) {
     val newPlugins = (output - knownPlugins).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
