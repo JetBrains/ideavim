@@ -33,6 +33,12 @@ class InsertBackspaceActionTest : VimTestCase() {
     enterCommand("set sidescrolloff=10")
 
     typeText("70zl", "i", "<BS>")
+
+    // Note that because 'sidescroll' has the default value of 0, we scroll the caret to the middle of the screen, as
+    // well as applying sidescrolloff. Leftmost column was 69 (zero-based), and the caret is on column 80. Deleting a
+    // character moves the caret to column 79, which is within 'sidescrolloff' of the left edge of the screen. The
+    // screen is scrolled by 'sidescroll', which has the default value of 0, so we scroll until the caret is in the
+    // middle of the screen, which is 80 characters wide: 79-(80/2)=39
     assertVisibleLineBounds(0, 39, 118)
   }
 }
