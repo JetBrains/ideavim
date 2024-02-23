@@ -32,8 +32,10 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.Node
+import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -49,6 +51,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -125,16 +128,15 @@ public class KeyHandler {
 
     // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
     val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
-    var isProcessed = false
     handleKeyRecursionCount++
     try {
       LOG.trace("Start key processing...")
-      if (!MappingProcessor.consumeKey(key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord)) {
+      var isProcessed = keyConsumers.any {
+        it.consumeKey( key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord )
+      }
+      if (!isProcessed) {
         LOG.trace("Mappings processed, continue processing key.")
-        if (isCommandCountKey(chKey, processBuilder.state, editorState)) {
-          commandBuilder.addCountCharacter(key)
-          isProcessed = true
-        } else if (isDeleteCommandCountKey(key, processBuilder.state, editorState.mode)) {
+        if (isDeleteCommandCountKey(key, processBuilder.state, editorState.mode)) {
           commandBuilder.deleteCountCharacter()
           isProcessed = true
         } else if (isEditorReset(key, editorState)) {
@@ -197,8 +199,6 @@ public class KeyHandler {
         } else {
           isProcessed = true
         }
-      } else {
-        isProcessed = true
       }
       if (isProcessed) {
         processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
@@ -321,23 +321,6 @@ public class KeyHandler {
       }
     }
     reset(keyState, editor.mode)
-  }
-
-  private fun isCommandCountKey(chKey: Char, keyState: KeyHandlerState, editorState: VimStateMachine): Boolean {
-    // Make sure to avoid handling '0' as the start of a count.
-    val commandBuilder = keyState.commandBuilder
-    val notRegisterPendingCommand = editorState.mode is Mode.NORMAL && !editorState.isRegisterPending
-    val visualMode = editorState.mode is Mode.VISUAL && !editorState.isRegisterPending
-    val opPendingMode = editorState.mode is Mode.OP_PENDING
-
-    if (notRegisterPendingCommand || visualMode || opPendingMode) {
-      if (commandBuilder.isExpectingCount && Character.isDigit(chKey) && (commandBuilder.count > 0 || chKey != '0')) {
-        LOG.debug("This is a command key count")
-        return true
-      }
-    }
-    LOG.debug("This is NOT a command key count")
-    return false
   }
 
   private fun isDeleteCommandCountKey(key: KeyStroke, keyState: KeyHandlerState, mode: Mode): Boolean {
