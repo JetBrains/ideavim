@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
+import com.maddyhome.idea.vim.key.consumers.RegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -54,7 +55,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -139,12 +140,7 @@ public class KeyHandler {
       }
       if (!isProcessed) {
         LOG.trace("Mappings processed, continue processing key.")
-        if (editorState.isRegisterPending) {
-          LOG.trace("Pending mode.")
-          commandBuilder.addKey(key)
-          handleSelectRegister(editorState, chKey, processBuilder.state)
-          isProcessed = true
-        } else if (!handleDigraph(editor, key, processBuilder)) {
+        if (!handleDigraph(editor, key, processBuilder)) {
           LOG.debug("Digraph is NOT processed")
 
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
@@ -293,18 +289,6 @@ public class KeyHandler {
       true
     } else {
       key.keyChar == '"' && !isOperatorPending(editorState.mode, keyState) && keyState.commandBuilder.expectedArgumentType == null
-    }
-  }
-
-  private fun handleSelectRegister(vimStateMachine: VimStateMachine, chKey: Char, keyState: KeyHandlerState) {
-    LOG.trace("Handle select register")
-    vimStateMachine.resetRegisterPending()
-    if (injector.registerGroup.isValid(chKey)) {
-      LOG.trace("Valid register")
-      keyState.commandBuilder.pushCommandPart(chKey)
-    } else {
-      LOG.trace("Invalid register, set command state to BAD_COMMAND")
-      keyState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     }
   }
 
