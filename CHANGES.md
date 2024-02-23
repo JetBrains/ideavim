@@ -25,6 +25,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Use `]s` and `[s` to go to the next or previous misspelled word | [VIM-330](https://youtrack.jetbrains.com/issue/VIM-330)
+
 ### Fixes:
 * [VIM-3291](https://youtrack.jetbrains.com/issue/VIM-3291) Remove sync of editor selection between different opened editors
 * [VIM-3234](https://youtrack.jetbrains.com/issue/VIM-3234) The space character won't mix in the tab chars after >> and << commands
