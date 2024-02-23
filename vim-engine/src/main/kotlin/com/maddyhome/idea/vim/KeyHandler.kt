@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
+import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -52,7 +53,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -137,10 +138,7 @@ public class KeyHandler {
       }
       if (!isProcessed) {
         LOG.trace("Mappings processed, continue processing key.")
-        if (isEditorReset(key, editorState)) {
-          processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext -> handleEditorReset(lambdaEditor, key, lambdaKeyState, lambdaContext) }
-          isProcessed = true
-        } else if (isExpectingCharArgument(commandBuilder)) {
+        if (isExpectingCharArgument(commandBuilder)) {
           handleCharArgument(key, chKey, processBuilder.state, editor)
           isProcessed = true
         } else if (editorState.isRegisterPending) {
@@ -287,44 +285,6 @@ public class KeyHandler {
 
   public fun isOperatorPending(mode: Mode, keyState: KeyHandlerState): Boolean {
     return mode is Mode.OP_PENDING && !keyState.commandBuilder.isEmpty
-  }
-
-  private fun handleEditorReset(
-    editor: VimEditor,
-    key: KeyStroke,
-    keyState: KeyHandlerState,
-    context: ExecutionContext,
-  ) {
-    val commandBuilder = keyState.commandBuilder
-    if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
-      editor.isReplaceCharacter = false
-    }
-    if (commandBuilder.isAtDefaultState) {
-      val register = injector.registerGroup
-      if (register.currentRegister == register.defaultRegister) {
-        var indicateError = true
-        if (key.keyCode == KeyEvent.VK_ESCAPE) {
-          val executed = arrayOf<Boolean?>(null)
-          injector.actionExecutor.executeCommand(
-            editor,
-            { executed[0] = injector.actionExecutor.executeEsc(context) },
-            "",
-            null,
-          )
-          indicateError = !executed[0]!!
-        }
-        if (indicateError) {
-          injector.messages.indicateError()
-        }
-      }
-    }
-    reset(keyState, editor.mode)
-  }
-
-  private fun isEditorReset(key: KeyStroke, editorState: VimStateMachine): Boolean {
-    val editorReset = editorState.mode is Mode.NORMAL && key.isCloseKeyStroke()
-    LOG.debug { "This is editor reset: $editorReset" }
-    return editorReset
   }
 
   private fun isSelectRegister(key: KeyStroke, keyState: KeyHandlerState, editorState: VimStateMachine): Boolean {
