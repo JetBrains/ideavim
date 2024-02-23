@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
+import com.maddyhome.idea.vim.key.consumers.ModeInputConsumer
 import com.maddyhome.idea.vim.key.consumers.RegisterConsumer
 import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
@@ -46,7 +47,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -115,38 +116,14 @@ public class KeyHandler {
     }
 
     injector.messages.clearError()
-    val editorState = editor.vimStateMachine
-    val commandBuilder = processBuilder.state.commandBuilder
 
     // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
     val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
     handleKeyRecursionCount++
     try {
       LOG.trace("Start key processing...")
-      var isProcessed = keyConsumers.any {
+      val isProcessed = keyConsumers.any {
         it.consumeKey( key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord )
-      }
-      if (!isProcessed) {
-        LOG.trace("We are not able to find a node for this key")
-
-        // If we are in insert/replace mode send this key in for processing
-        if (editorState.mode == Mode.INSERT || editorState.mode == Mode.REPLACE) {
-          LOG.trace("Process insert or replace")
-          shouldRecord.value = injector.changeGroup.processKey(editor, key, processBuilder) && shouldRecord.value
-          isProcessed = true
-        } else if (editorState.mode is Mode.SELECT) {
-          LOG.trace("Process select")
-          shouldRecord.value = injector.changeGroup.processKeyInSelectMode(editor, key, processBuilder) && shouldRecord.value
-          isProcessed = true
-        } else if (editor.mode is Mode.CMD_LINE) {
-          LOG.trace("Process cmd line")
-          shouldRecord.value = injector.processGroup.processExKey(editor, key, processBuilder) && shouldRecord.value
-          isProcessed = true
-        } else {
-          LOG.trace("Set command state to bad_command")
-          commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-        }
-        partialReset(processBuilder.state, editorState.mode)
       }
       if (isProcessed) {
         processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
