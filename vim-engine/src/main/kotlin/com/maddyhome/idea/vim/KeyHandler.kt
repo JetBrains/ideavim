@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
+import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -51,7 +52,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -136,10 +137,7 @@ public class KeyHandler {
       }
       if (!isProcessed) {
         LOG.trace("Mappings processed, continue processing key.")
-        if (isDeleteCommandCountKey(key, processBuilder.state, editorState.mode)) {
-          commandBuilder.deleteCountCharacter()
-          isProcessed = true
-        } else if (isEditorReset(key, editorState)) {
+        if (isEditorReset(key, editorState)) {
           processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext -> handleEditorReset(lambdaEditor, key, lambdaKeyState, lambdaContext) }
           isProcessed = true
         } else if (isExpectingCharArgument(commandBuilder)) {
@@ -321,17 +319,6 @@ public class KeyHandler {
       }
     }
     reset(keyState, editor.mode)
-  }
-
-  private fun isDeleteCommandCountKey(key: KeyStroke, keyState: KeyHandlerState, mode: Mode): Boolean {
-    // See `:help N<Del>`
-    val commandBuilder = keyState.commandBuilder
-    val isDeleteCommandKeyCount =
-      (mode is Mode.NORMAL || mode is Mode.VISUAL || mode is Mode.OP_PENDING) &&
-        commandBuilder.isExpectingCount && commandBuilder.count > 0 && key.keyCode == KeyEvent.VK_DELETE
-
-    LOG.debug { "This is a delete command key count: $isDeleteCommandKeyCount" }
-    return isDeleteCommandKeyCount
   }
 
   private fun isEditorReset(key: KeyStroke, editorState: VimStateMachine): Boolean {
