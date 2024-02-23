@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.Node
+import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
@@ -53,7 +54,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -138,10 +139,7 @@ public class KeyHandler {
       }
       if (!isProcessed) {
         LOG.trace("Mappings processed, continue processing key.")
-        if (isExpectingCharArgument(commandBuilder)) {
-          handleCharArgument(key, chKey, processBuilder.state, editor)
-          isProcessed = true
-        } else if (editorState.isRegisterPending) {
+        if (editorState.isRegisterPending) {
           LOG.trace("Pending mode.")
           commandBuilder.addKey(key)
           handleSelectRegister(editorState, chKey, processBuilder.state)
@@ -308,36 +306,6 @@ public class KeyHandler {
       LOG.trace("Invalid register, set command state to BAD_COMMAND")
       keyState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     }
-  }
-
-  private fun isExpectingCharArgument(commandBuilder: CommandBuilder): Boolean {
-    val expectingCharArgument = commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
-    LOG.debug { "Expecting char argument: $expectingCharArgument" }
-    return expectingCharArgument
-  }
-
-  private fun handleCharArgument(key: KeyStroke, chKey: Char, keyState: KeyHandlerState, editor: VimEditor) {
-    var mutableChKey = chKey
-    LOG.trace("Handling char argument")
-    // We are expecting a character argument - is this a regular character the user typed?
-    // Some special keys can be handled as character arguments - let's check for them here.
-    if (mutableChKey.code == 0) {
-      when (key.keyCode) {
-        KeyEvent.VK_TAB -> mutableChKey = '\t'
-        KeyEvent.VK_ENTER -> mutableChKey = '\n'
-      }
-    }
-    val commandBuilder = keyState.commandBuilder
-    if (mutableChKey.code != 0) {
-      LOG.trace("Add character argument to the current command")
-      // Create the character argument, add it to the current command, and signal we are ready to process the command
-      commandBuilder.completeCommandPart(Argument(mutableChKey))
-    } else {
-      LOG.trace("This is not a valid character argument. Set command state to BAD_COMMAND")
-      // Oops - this isn't a valid character argument
-      commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-    }
-    editor.isReplaceCharacter = false
   }
 
   private fun handleDigraph(
