@@ -46,12 +46,15 @@ import javax.swing.KeyStroke
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
  * actions. This is a singleton.
  */
+// TODO for future refactorings (PR are welcome)
+// 1. avoid using handleKeyRecursionCount & shouldRecord
+// 2. maybe we can live without allowKeyMappings: Boolean & mappingCompleted: Boolean
 public class KeyHandler {
   private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
+  private var handleKeyRecursionCount = 0
+
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
-
-  private var handleKeyRecursionCount = 0
 
   public val keyStack: KeyStack = KeyStack()
   public val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
@@ -73,9 +76,6 @@ public class KeyHandler {
    *
    * @param allowKeyMappings - If we allow key mappings or not
    * @param mappingCompleted - if true, we don't check if the mapping is incomplete
-   *
-   * TODO mappingCompleted and recursionCounter - we should find a more beautiful way to use them
-   * TODO it should not receive editor at all and use the focused one. It will help to execute macro between multiple editors
    */
   public fun handleKey(
     editor: VimEditor,
@@ -117,14 +117,20 @@ public class KeyHandler {
       }
 
       injector.messages.clearError()
-
       // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
       val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
+
       handleKeyRecursionCount++
       try {
-        LOG.trace("Start key processing...")
         val isProcessed = keyConsumers.any {
-          it.consumeKey( key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord )
+          it.consumeKey(
+            key,
+            editor,
+            allowKeyMappings,
+            mappingCompleted,
+            processBuilder,
+            shouldRecord
+          )
         }
         if (isProcessed) {
           processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
@@ -153,8 +159,8 @@ public class KeyHandler {
     keyState: KeyHandlerState,
   ) {
     // Do we have a fully entered command at this point? If so, let's execute it.
-    val editorState = editor.vimStateMachine
     val commandBuilder = keyState.commandBuilder
+
     if (commandBuilder.isReady) {
       LOG.trace("Ready command builder. Execute command.")
       executeCommand(editor, context, editor.vimStateMachine, keyState)

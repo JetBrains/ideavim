@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.NORMAL
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.io.BufferedWriter

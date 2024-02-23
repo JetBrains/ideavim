@@ -710,7 +710,6 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * This processes all "regular" keystrokes entered while in insert/replace mode
    *
    * @param editor  The editor the character was typed into
-   * @param context The data context
    * @param key     The user entered keystroke
    * @return true if this was a regular character, false if not
    */
