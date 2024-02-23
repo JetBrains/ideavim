@@ -12,29 +12,20 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingProcessor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.CurrentCommandState
-import com.maddyhome.idea.vim.common.DigraphResult
-import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.toMappingMode
-import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
-import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
@@ -42,14 +33,12 @@ import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
 import com.maddyhome.idea.vim.key.consumers.RegisterConsumer
+import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
-import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.returnTo
-import java.awt.event.InputEvent
-import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 /**
@@ -57,7 +46,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -129,9 +118,6 @@ public class KeyHandler {
     val editorState = editor.vimStateMachine
     val commandBuilder = processBuilder.state.commandBuilder
 
-    // If this is a "regular" character keystroke, get the character
-    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
-
     // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
     val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
     handleKeyRecursionCount++
@@ -141,34 +127,26 @@ public class KeyHandler {
         it.consumeKey( key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord )
       }
       if (!isProcessed) {
-        if (isSelectRegister(key, processBuilder.state, editorState)) {
-          LOG.trace("Select register")
-          editorState.isRegisterPending = true
-          commandBuilder.addKey(key)
+        LOG.trace("We are not able to find a node for this key")
+
+        // If we are in insert/replace mode send this key in for processing
+        if (editorState.mode == Mode.INSERT || editorState.mode == Mode.REPLACE) {
+          LOG.trace("Process insert or replace")
+          shouldRecord.value = injector.changeGroup.processKey(editor, key, processBuilder) && shouldRecord.value
+          isProcessed = true
+        } else if (editorState.mode is Mode.SELECT) {
+          LOG.trace("Process select")
+          shouldRecord.value = injector.changeGroup.processKeyInSelectMode(editor, key, processBuilder) && shouldRecord.value
+          isProcessed = true
+        } else if (editor.mode is Mode.CMD_LINE) {
+          LOG.trace("Process cmd line")
+          shouldRecord.value = injector.processGroup.processExKey(editor, key, processBuilder) && shouldRecord.value
           isProcessed = true
         } else {
-          // node == null
-          LOG.trace("We are not able to find a node for this key")
-
-          // If we are in insert/replace mode send this key in for processing
-          if (editorState.mode == Mode.INSERT || editorState.mode == Mode.REPLACE) {
-            LOG.trace("Process insert or replace")
-            shouldRecord.value = injector.changeGroup.processKey(editor, key, processBuilder) && shouldRecord.value
-            isProcessed = true
-          } else if (editorState.mode is Mode.SELECT) {
-            LOG.trace("Process select")
-            shouldRecord.value = injector.changeGroup.processKeyInSelectMode(editor, key, processBuilder) && shouldRecord.value
-            isProcessed = true
-          } else if (editor.mode is Mode.CMD_LINE) {
-            LOG.trace("Process cmd line")
-            shouldRecord.value = injector.processGroup.processExKey(editor, key, processBuilder) && shouldRecord.value
-            isProcessed = true
-          } else {
-            LOG.trace("Set command state to bad_command")
-            commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-          }
-          partialReset(processBuilder.state, editorState.mode)
+          LOG.trace("Set command state to bad_command")
+          commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
         }
+        partialReset(processBuilder.state, editorState.mode)
       }
       if (isProcessed) {
         processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
@@ -242,17 +220,6 @@ public class KeyHandler {
 
   public fun isOperatorPending(mode: Mode, keyState: KeyHandlerState): Boolean {
     return mode is Mode.OP_PENDING && !keyState.commandBuilder.isEmpty
-  }
-
-  private fun isSelectRegister(key: KeyStroke, keyState: KeyHandlerState, editorState: VimStateMachine): Boolean {
-    if (editorState.mode !is Mode.NORMAL && editorState.mode !is Mode.VISUAL) {
-      return false
-    }
-    return if (editorState.isRegisterPending) {
-      true
-    } else {
-      key.keyChar == '"' && !isOperatorPending(editorState.mode, keyState) && keyState.commandBuilder.expectedArgumentType == null
-    }
   }
 
   private fun executeCommand(
