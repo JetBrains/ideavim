@@ -19,6 +19,7 @@ public class VimListenersNotifier {
   public val myEditorListeners: MutableCollection<EditorListener> = ConcurrentLinkedDeque()
   public val macroRecordingListeners: MutableCollection<MacroRecordingListener> = ConcurrentLinkedDeque()
   public val vimPluginListeners: MutableCollection<VimPluginListener> = ConcurrentLinkedDeque()
+  public val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
   
   public fun notifyModeChanged(editor: VimEditor, oldMode: Mode) {
     modeChangeListeners.forEach { it.modeChanged(editor, oldMode) }
@@ -40,12 +41,12 @@ public class VimListenersNotifier {
     myEditorListeners.forEach { it.focusLost(editor) }
   }
 
-  public fun notifyMacroRecordingStarted(editor: VimEditor, register: Char) {
-    macroRecordingListeners.forEach { it.recordingStarted(editor, register) }
+  public fun notifyMacroRecordingStarted() {
+    macroRecordingListeners.forEach { it.recordingStarted() }
   }
   
-  public fun notifyMacroRecordingFinished(editor: VimEditor, register: Char) {
-    macroRecordingListeners.forEach { it.recordingFinished(editor, register) }
+  public fun notifyMacroRecordingFinished() {
+    macroRecordingListeners.forEach { it.recordingFinished() }
   }
 
   public fun notifyPluginTurnedOn() {
@@ -54,5 +55,17 @@ public class VimListenersNotifier {
 
   public fun notifyPluginTurnedOff() {
     vimPluginListeners.forEach { it.turnedOff() }
+  }
+
+  public fun notifyIsReplaceCharChanged(editor: VimEditor) {
+    isReplaceCharListeners.forEach { it.isReplaceCharChanged(editor) }
+  }
+
+  public fun reset() {
+    modeChangeListeners.clear()
+    myEditorListeners.clear()
+    macroRecordingListeners.clear()
+    vimPluginListeners.clear()
+    isReplaceCharListeners.clear()
   }
 }

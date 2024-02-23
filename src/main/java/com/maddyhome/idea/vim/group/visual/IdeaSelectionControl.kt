@@ -77,7 +77,7 @@ internal object IdeaSelectionControl {
 
         logger.debug("Some carets have selection. State before adjustment: ${editor.vim.mode}")
 
-        editor.vim.vimStateMachine.mode = Mode.NORMAL()
+        editor.vim.mode = Mode.NORMAL()
 
         activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {

@@ -13,11 +13,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
+import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MacroRecordingListener
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.ui.widgets.VimWidgetListener
@@ -26,21 +28,7 @@ import java.awt.Component
 
 private const val ID = "IdeaVimMacro"
 
-internal class MacroWidgetFactory : StatusBarWidgetFactory, VimStatusBarWidget {
-  private var content: String = ""
-
-  private val macroRecordingListener = object : MacroRecordingListener {
-    override fun recordingStarted(editor: VimEditor, register: Char) {
-      content = "recording @$register"
-      updateWidgetInStatusBar(ID, editor.ij.project)
-    }
-
-    override fun recordingFinished(editor: VimEditor, register: Char) {
-      content = ""
-      updateWidgetInStatusBar(ID, editor.ij.project)
-    }
-  }
-
+internal class MacroWidgetFactory : StatusBarWidgetFactory {
   override fun getId(): String {
     return ID
   }
@@ -50,22 +38,23 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory, VimStatusBarWidget {
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
-    injector.listenersNotifier.macroRecordingListeners.add(macroRecordingListener)
     return VimMacroWidget()
   }
 
   override fun isAvailable(project: Project): Boolean {
     return VimPlugin.isEnabled() && injector.globalIjOptions().showmodewidget
   }
+}
 
-  private inner class VimMacroWidget : StatusBarWidget {
-    override fun ID(): String {
-      return ID
-    }
+public class VimMacroWidget : StatusBarWidget, VimStatusBarWidget {
+  public var content: String = ""
 
-    override fun getPresentation(): StatusBarWidget.WidgetPresentation {
-      return VimModeWidgetPresentation()
-    }
+  override fun ID(): String {
+    return ID
+  }
+
+  override fun getPresentation(): StatusBarWidget.WidgetPresentation {
+    return VimModeWidgetPresentation()
   }
 
   private inner class VimModeWidgetPresentation : StatusBarWidget.TextPresentation {
@@ -88,6 +77,32 @@ public fun updateMacroWidget() {
   for (project in ProjectManager.getInstance().openProjects) {
     val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
     statusBarWidgetsManager.updateWidget(factory)
+  }
+}
+
+// TODO: At the moment recording macro & RegisterGroup is bound to application, so macro will be recorded even if we
+// move between projects. BUT it's not a good idea. Maybe RegisterGroup should have it's own project scope instances
+public class MacroWidgetListener : MacroRecordingListener, VimWidgetListener({ updateMacroWidget() }) {
+  override fun recordingStarted() {
+    for (project in ProjectManager.getInstance().openProjects) {
+      val macroWidget = getWidget(project) ?: continue
+      val register = injector.registerGroup.recordRegister
+      macroWidget.content = "recording @$register"
+      macroWidget.updateWidgetInStatusBar(ID, project)
+    }
+  }
+
+  override fun recordingFinished() {
+    for (project in ProjectManager.getInstance().openProjects) {
+      val macroWidget = getWidget(project) ?: continue
+      macroWidget.content = ""
+      macroWidget.updateWidgetInStatusBar(ID, project)
+    }
+  }
+
+  private fun getWidget(project: Project): VimMacroWidget? {
+    val statusBar = WindowManager.getInstance()?.getStatusBar(project) ?: return null
+    return statusBar.getWidget(ID) as? VimMacroWidget
   }
 }
 

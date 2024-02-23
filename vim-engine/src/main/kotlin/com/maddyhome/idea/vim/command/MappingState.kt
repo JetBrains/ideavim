@@ -16,7 +16,7 @@ import java.awt.event.ActionListener
 import javax.swing.KeyStroke
 import javax.swing.Timer
 
-public class MappingState {
+public class MappingState: Cloneable {
   // Map command depth. 0 - if it is not a map command. 1 - regular map command. 2+ - nested map commands
   private var mapDepth = 0
 
@@ -35,12 +35,7 @@ public class MappingState {
   public val keys: Iterable<KeyStroke>
     get() = keyList
 
-  public var mappingMode: MappingMode = MappingMode.NORMAL
-    set(value) {
-      field = value
-    }
-
-  private val timer = Timer(injector.globalOptions().timeoutlen, null)
+  private var timer = VimTimer(injector.globalOptions().timeoutlen)
   private var keyList = mutableListOf<KeyStroke>()
 
   init {
@@ -77,7 +72,54 @@ public class MappingState {
     // NOTE: We intentionally don't reset mapping mode here
   }
 
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as MappingState
+
+    if (mapDepth != other.mapDepth) return false
+    if (timer != other.timer) return false
+    if (keyList != other.keyList) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = mapDepth
+    result = 31 * result + timer.hashCode()
+    result = 31 * result + keyList.hashCode()
+    return result
+  }
+
+  public override fun clone(): MappingState {
+    val result = MappingState()
+    result.timer = timer
+    result.mapDepth = mapDepth
+    result.keyList = keyList.toMutableList()
+    return result
+  }
+
   public companion object {
     private val LOG = vimLogger<MappingState>()
+  }
+
+  public class VimTimer(delay: Int) : Timer(delay, null) {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+
+      other as VimTimer
+
+      if (delay != other.delay) return false
+      if (initialDelay != other.initialDelay) return false
+      if (isRunning != other.isRunning) return false
+
+      return true
+    }
+
+    override fun hashCode(): Int {
+      return javaClass.hashCode()
+    }
   }
 }

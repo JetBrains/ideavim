@@ -13,6 +13,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import java.awt.KeyEventDispatcher
@@ -60,7 +61,7 @@ public object ModalEntry {
         } else {
           return true
         }
-        if (editor.vimStateMachine.isRecording) {
+        if (injector.registerGroup.isRecording) {
           KeyHandler.getInstance().modalEntryKeys += stroke
         }
         if (!processor(stroke)) {

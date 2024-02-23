@@ -211,20 +211,20 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   public static void setEnabled(final boolean enabled) {
     if (isEnabled() == enabled) return;
 
-    if (!enabled) {
-      getInstance().turnOffPlugin(true);
-    }
-
     getInstance().enabled = enabled;
-
-    if (enabled) {
-      getInstance().turnOnPlugin();
-    }
 
     if (enabled) {
       VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOn();
     } else {
       VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOff();
+    }
+
+    if (!enabled) {
+      getInstance().turnOffPlugin(true);
+    }
+
+    if (enabled) {
+      getInstance().turnOnPlugin();
     }
 
     StatusBarIconFactory.Util.INSTANCE.updateIcon();

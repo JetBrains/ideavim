@@ -8,11 +8,11 @@
 
 package com.maddyhome.idea.vim.action
 
-import com.intellij.vim.processors.CommandBean
 import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.InputStream
@@ -44,3 +44,6 @@ public interface CommandProvider {
       ?: throw RuntimeException("Failed to fetch ex commands from ${javaClass.name}")
   }
 }
+
+@Serializable
+public data class CommandBean(val keys: String, val `class`: String, val modes: String)

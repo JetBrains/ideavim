@@ -32,7 +32,7 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     get() = if (exclusiveSelection) 0 else 1
 
   override fun enterSelectMode(editor: VimEditor, subMode: SelectionType): Boolean {
-    editor.vimStateMachine.setSelectMode(subMode)
+    editor.setSelectMode(subMode)
     editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     return true
   }
@@ -55,7 +55,7 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       // Enable visual subMode
       if (rawCount > 0) {
         val primarySubMode = editor.primaryCaret().vimLastVisualOperatorRange?.type ?: selectionType
-        editor.vimStateMachine.pushVisualMode(primarySubMode)
+        editor.pushVisualMode(primarySubMode)
 
         editor.forEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(selectionType)
@@ -71,7 +71,7 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
           it.vimLastColumn = intendedColumn
         }
       } else {
-        editor.vimStateMachine.mode = Mode.VISUAL(
+        editor.mode = Mode.VISUAL(
           selectionType,
           returnTo ?: editor.vimStateMachine.mode.returnTo
         )
@@ -90,7 +90,7 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     check(mode is Mode.VISUAL)
 
     // Update visual subMode with new sub subMode
-    editor.vimStateMachine.mode = mode.copy(selectionType = selectionType)
+    editor.mode = mode.copy(selectionType = selectionType)
     for (caret in editor.carets()) {
       if (!caret.isValid) continue
       caret.vimUpdateEditorSelection()
@@ -162,7 +162,7 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
    */
   override fun enterVisualMode(editor: VimEditor, subMode: SelectionType?): Boolean {
     val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
-    editor.vimStateMachine.mode = Mode.VISUAL(autodetectedSubMode)
+    editor.mode = Mode.VISUAL(autodetectedSubMode)
     //    editor.vimStateMachine.setMode(VimStateMachine.Mode.VISUAL, autodetectedSubMode)
     if (autodetectedSubMode == SelectionType.BLOCK_WISE) {
       editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }

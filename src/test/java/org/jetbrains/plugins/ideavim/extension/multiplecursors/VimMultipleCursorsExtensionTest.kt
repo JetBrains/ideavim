@@ -190,7 +190,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.vim.vimStateMachine.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-p>"))
 
@@ -273,7 +273,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.vim.vimStateMachine.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-x>"))
     assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
@@ -363,7 +363,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   fun `test ignores regex in search pattern`() {
     val before = "test ${s}t.*st${c}$se toast tallest t.*st"
     val editor = configureByText(before)
-    editor.vim.vimStateMachine.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-n><A-n>"))
     val after = "test ${s}t.*st$se toast tallest ${s}t.*st$se"

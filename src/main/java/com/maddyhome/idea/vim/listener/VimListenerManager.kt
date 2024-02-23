@@ -76,6 +76,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.handler.correctorRequester
 import com.maddyhome.idea.vim.handler.keyCheckRequests
+import com.maddyhome.idea.vim.helper.CaretVisualAttributesListener
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.VimStandalonePluginUpdateChecker
@@ -93,11 +94,12 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.macro.macroWidgetOptionListener
+import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.mode.modeWidgetOptionListener
 import com.maddyhome.idea.vim.vimDisposable
 import java.awt.event.MouseAdapter
@@ -137,11 +139,27 @@ internal object VimListenerManager {
     EditorListeners.addAll()
     check(correctorRequester.tryEmit(Unit))
     check(keyCheckRequests.tryEmit(Unit))
+
+    val caretVisualAttributesListener = CaretVisualAttributesListener()
+    injector.listenersNotifier.modeChangeListeners.add(caretVisualAttributesListener)
+    injector.listenersNotifier.isReplaceCharListeners.add(caretVisualAttributesListener)
+    caretVisualAttributesListener.updateAllEditorsCaretsVisual()
+
+    val modeWidgetListener = ModeWidgetListener()
+    injector.listenersNotifier.modeChangeListeners.add(modeWidgetListener)
+    injector.listenersNotifier.myEditorListeners.add(modeWidgetListener)
+    injector.listenersNotifier.vimPluginListeners.add(modeWidgetListener)
+
+    val macroWidgetListener = MacroWidgetListener()
+    injector.listenersNotifier.macroRecordingListeners.add(macroWidgetListener)
+    injector.listenersNotifier.vimPluginListeners.add(macroWidgetListener)
   }
 
   fun turnOff() {
     GlobalListeners.disable()
     EditorListeners.removeAll()
+    injector.listenersNotifier.reset()
+
     check(correctorRequester.tryEmit(Unit))
   }
 

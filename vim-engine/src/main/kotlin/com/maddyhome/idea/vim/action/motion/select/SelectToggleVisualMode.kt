@@ -45,7 +45,7 @@ public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
       val commandState = editor.vimStateMachine
       val myMode = commandState.mode
       if (myMode is com.maddyhome.idea.vim.state.mode.Mode.VISUAL) {
-        commandState.setSelectMode(myMode.selectionType)
+        editor.setSelectMode(myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {
           editor.nativeCarets().forEach {
             if (it.offset.point + injector.visualMotionGroup.selectionAdj == it.selectionEnd) {
@@ -54,7 +54,7 @@ public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
           }
         }
       } else if (myMode is com.maddyhome.idea.vim.state.mode.Mode.SELECT) {
-        commandState.pushVisualMode(myMode.selectionType)
+        editor.pushVisualMode(myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {
           editor.nativeCarets().forEach {
             if (it.offset.point == it.selectionEnd && it.visualLineStart <= it.offset.point - injector.visualMotionGroup.selectionAdj) {

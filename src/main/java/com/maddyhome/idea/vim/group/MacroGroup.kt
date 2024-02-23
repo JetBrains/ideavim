@@ -15,6 +15,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.util.PotemkinProgress
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -77,11 +78,12 @@ internal class MacroGroup : VimMacroBase() {
                 } catch (e: ProcessCanceledException) {
                   return@runnable
                 }
+                val keyHandler = KeyHandler.getInstance()
                 ProgressManager.getInstance().executeNonCancelableSection {
                   // Prevent autocompletion during macros.
                   // See https://github.com/JetBrains/ideavim/pull/772 for details
                   CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
-                  getInstance().handleKey(editor, key, context)
+                  keyHandler.handleKey(editor, key, context, keyHandler.keyHandlerState)
                 }
                 if (injector.messages.isError()) return@runnable
               }

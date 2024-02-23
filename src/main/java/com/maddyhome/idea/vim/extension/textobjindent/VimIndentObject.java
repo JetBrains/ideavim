@@ -267,7 +267,7 @@ public class VimIndentObject implements VimExtension {
 
       final IndentObjectHandler textObjectHandler = new IndentObjectHandler(includeAbove, includeBelow);
 
-      if (!vimStateMachine.isOperatorPending()) {
+      if (!vimStateMachine.isOperatorPending(editor.getMode())) {
         ((IjVimEditor)editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
           final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0);
           if (range != null) {

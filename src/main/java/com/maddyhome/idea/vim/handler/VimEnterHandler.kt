@@ -339,7 +339,8 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
   override fun executeHandler(editor: Editor, caret: Caret?, dataContext: DataContext?) {
     val enterKey = key(key)
     val context = injector.executionContextManager.onEditor(editor.vim, dataContext?.vim)
-    KeyHandler.getInstance().handleKey(editor.vim, enterKey, context)
+    val keyHandler = KeyHandler.getInstance()
+    keyHandler.handleKey(editor.vim, enterKey, context, keyHandler.keyHandlerState)
   }
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {

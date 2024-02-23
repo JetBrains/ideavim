@@ -75,7 +75,7 @@ internal object IdeaSpecifics {
         }
       }
 
-      if (hostEditor != null && action is ChooseItemAction && hostEditor.vimStateMachine?.isRecording == true) {
+      if (hostEditor != null && action is ChooseItemAction && injector.registerGroup.isRecording) {
         val lookup = LookupManager.getActiveLookup(hostEditor)
         if (lookup != null) {
           val charsToRemove = hostEditor.caretModel.primaryCaret.offset - lookup.lookupStart
@@ -96,7 +96,7 @@ internal object IdeaSpecifics {
       if (VimPlugin.isNotEnabled()) return
 
       val editor = editor
-      if (editor != null && action is ChooseItemAction && editor.vimStateMachine?.isRecording == true) {
+      if (editor != null && action is ChooseItemAction && injector.registerGroup.isRecording) {
         val prevDocumentLength = completionPrevDocumentLength
         val prevDocumentOffset = completionPrevDocumentOffset
 
@@ -125,7 +125,7 @@ internal object IdeaSpecifics {
       ) {
         editor?.let {
           val commandState = it.vim.vimStateMachine
-          commandState.mode = Mode.NORMAL()
+          it.vim.mode = Mode.NORMAL()
           VimPlugin.getChange().insertBeforeCursor(it.vim, event.dataContext.vim)
           KeyHandler.getInstance().reset(it.vim)
         }

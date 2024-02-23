@@ -10,8 +10,9 @@ package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.state.KeyHandlerState
 
 public interface MappingInfoLayer {
   public fun getPresentableString(): String
-  public fun execute(editor: VimEditor, context: ExecutionContext)
+  public fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState)
 }

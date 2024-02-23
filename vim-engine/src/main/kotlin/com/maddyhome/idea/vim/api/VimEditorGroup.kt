@@ -55,4 +55,8 @@ public interface VimEditorGroup {
    * hidden editors that are used to handle requests from Code With Me guests.
    */
   public fun getEditors(buffer: VimDocument): Collection<VimEditor>
+
+  // TODO find a better place for methods below. Maybe make CaretVisualAttributesHelper abstract?
+  public fun updateCaretsVisualAttributes(editor: VimEditor)
+  public fun updateCaretsVisualPosition(editor: VimEditor)
 }

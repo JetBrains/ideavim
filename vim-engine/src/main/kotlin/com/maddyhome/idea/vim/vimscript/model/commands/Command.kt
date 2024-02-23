@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.ex.NoRangeAllowedException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.Executable
@@ -71,7 +70,7 @@ public sealed class Command(public var commandRanges: Ranges, public val command
     }
 
     val operatorArguments = OperatorArguments(
-      editor.vimStateMachine.isOperatorPending,
+      editor.vimStateMachine.isOperatorPending(editor.mode),
       0,
       editor.mode,
     )

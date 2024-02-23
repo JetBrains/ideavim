@@ -36,10 +36,12 @@ internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : Dum
     val keyStroke = getKeyStroke(e)
     if (keyStroke != null) {
       val editor = exEntryPanel.entry.editor
-      KeyHandler.getInstance().handleKey(
+      val keyHandler = KeyHandler.getInstance()
+      keyHandler.handleKey(
         editor.vim,
         keyStroke,
         injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim),
+        keyHandler.keyHandlerState
       )
     }
   }

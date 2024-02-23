@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
@@ -51,13 +52,16 @@ import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
-import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
-import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
+import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
+import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.returnTo
 import org.jetbrains.annotations.ApiStatus
 import java.lang.System.identityHashCode
 
@@ -241,14 +245,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
         null
       }
     }
-  }
-
-  override fun updateCaretsVisualAttributes() {
-    editor.updateCaretsVisualAttributes()
-  }
-
-  override fun updateCaretsVisualPosition() {
-    editor.updateCaretsVisualPosition()
   }
 
   override fun offsetToVisualPosition(offset: Int): VimVisualPosition {

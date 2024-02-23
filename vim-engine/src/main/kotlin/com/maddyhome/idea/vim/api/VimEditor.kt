@@ -14,8 +14,13 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
+import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.returnTo
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -124,6 +129,24 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * ([VimVisualPosition] should be phased out if possible, as it is an IntelliJ concept, not a Vim concept.)
  */
 public interface VimEditor {
+  public var mode: Mode
+    get() = vimStateMachine.mode
+    set(value) {
+      if (vimStateMachine.mode == value) return
+
+      val oldValue = vimStateMachine.mode
+      (vimStateMachine as VimStateMachineImpl).mode = value
+      injector.listenersNotifier.notifyModeChanged(this, oldValue)
+    }
+
+  public  var isReplaceCharacter: Boolean
+    get() = vimStateMachine.isReplaceCharacter
+    set(value) {
+      if (value != vimStateMachine.isReplaceCharacter) {
+        (vimStateMachine as VimStateMachineImpl).isReplaceCharacter = value
+        injector.listenersNotifier.notifyIsReplaceCharChanged(this)
+      }
+    }
 
   public val lfMakesNewLine: Boolean
   public var vimChangeActionSwitchMode: Mode?
@@ -195,9 +218,6 @@ public interface VimEditor {
     editor: VimEditor,
     shiftType: LineDeleteShift,
   ): Pair<Pair<Offset, Offset>, LineDeleteShift>?
-
-  public fun updateCaretsVisualAttributes()
-  public fun updateCaretsVisualPosition()
 
   public fun offsetToBufferPosition(offset: Int): BufferPosition
   public fun bufferPositionToOffset(position: BufferPosition): Int
@@ -276,6 +296,29 @@ public interface VimEditor {
    *   instance and need to search for a new version.
    */
   public fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T?
+
+  /**
+   * Resets the command, mode, visual mode, and mapping mode to initial values.
+   */
+  public fun resetState() {
+    mode = Mode.NORMAL()
+    vimStateMachine.executingCommand = null
+    vimStateMachine.digraphSequence.reset()
+    vimStateMachine.commandBuilder.resetInProgressCommandPart(
+      injector.keyGroup.getKeyRoot(mode.toMappingMode())
+    )
+  }
+
+  public fun resetOpPending() {
+    if (this.mode is Mode.OP_PENDING) {
+      val returnTo = this.mode.returnTo
+      mode = when (returnTo) {
+        ReturnTo.INSERT -> Mode.INSERT
+        ReturnTo.REPLACE -> Mode.INSERT
+        null -> Mode.NORMAL()
+      }
+    }
+  }
 }
 
 public interface MutableVimEditor : VimEditor {

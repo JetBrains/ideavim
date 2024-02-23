@@ -20,14 +20,9 @@ import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.util.width
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.mode
-import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetFocusListener
-import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetModeListener
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.MouseAdapter
@@ -53,11 +48,6 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
   init {
     val mode = getFocusedEditor(project)?.vim?.mode
     updateLabel(mode)
-
-    injector.listenersNotifier.apply {
-      modeChangeListeners.add(ModeWidgetModeListener(this@VimModeWidget))
-      myEditorListeners.add(ModeWidgetFocusListener(this@VimModeWidget))
-    }
 
     label.addMouseListener(object : MouseAdapter() {
       override fun mouseClicked(e: MouseEvent) {

@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -65,9 +66,9 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  public fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
+  public fun processKey(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
-  public fun processKeyInSelectMode(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
+  public fun processKeyInSelectMode(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
   public fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 

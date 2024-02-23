@@ -73,7 +73,6 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -119,6 +118,7 @@ abstract class VimTestCase {
     if (editor != null) {
       KeyHandler.getInstance().fullReset(editor.vim)
     }
+    KeyHandler.getInstance().keyHandlerState.reset(Mode.NORMAL())
     VimPlugin.getOptionGroup().resetAllOptionsForTesting()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
@@ -157,6 +157,7 @@ abstract class VimTestCase {
     bookmarksManager?.bookmarks?.forEach { bookmark ->
       bookmarksManager.remove(bookmark)
     }
+    fixture.editor?.let { injector.messages.showStatusBarMessage(it.vim, "") }
     SelectionVimListenerSuppressor.lock().use { fixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
     VimPlugin.getVariableService().clear()
@@ -817,7 +818,7 @@ abstract class VimTestCase {
           val inputModel = TestInputModel.getInstance(editor)
           var key = inputModel.nextKeyStroke()
           while (key != null) {
-            keyHandler.handleKey(editor.vim, key, dataContext)
+            keyHandler.handleKey(editor.vim, key, dataContext, keyHandler.keyHandlerState)
             key = inputModel.nextKeyStroke()
           }
         },

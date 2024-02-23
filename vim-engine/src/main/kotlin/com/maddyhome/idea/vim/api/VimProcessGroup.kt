@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
@@ -18,7 +19,7 @@ public interface VimProcessGroup {
 
   public fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char)
   public fun endSearchCommand(): String
-  public fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean
+  public fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
   public fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
   public fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
   public fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean

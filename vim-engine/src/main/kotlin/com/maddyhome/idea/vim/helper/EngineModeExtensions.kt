@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.state.mode.selectionType
 
@@ -37,15 +36,15 @@ public fun VimEditor.exitVisualMode() {
     val returnTo = this.vimStateMachine.mode.returnTo
     when (returnTo) {
       ReturnTo.INSERT -> {
-        this.vimStateMachine.mode = Mode.INSERT
+        this.mode = Mode.INSERT
       }
 
       ReturnTo.REPLACE -> {
-        this.vimStateMachine.mode = Mode.REPLACE
+        this.mode = Mode.REPLACE
       }
 
       null -> {
-        this.vimStateMachine.mode = Mode.NORMAL()
+        this.mode = Mode.NORMAL()
       }
     }
   }

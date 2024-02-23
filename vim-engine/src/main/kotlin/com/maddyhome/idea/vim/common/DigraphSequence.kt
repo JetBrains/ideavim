@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-public class DigraphSequence {
+public class DigraphSequence: Cloneable {
   private var digraphState = DIG_STATE_PENDING
   private var digraphChar = 0.toChar()
   private lateinit var codeChars: CharArray
@@ -220,6 +220,46 @@ public class DigraphSequence {
   public fun reset() {
     digraphState = DIG_STATE_PENDING
     codeChars = CharArray(8)
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as DigraphSequence
+
+    if (digraphState != other.digraphState) return false
+    if (digraphChar != other.digraphChar) return false
+    if (!codeChars.contentEquals(other.codeChars)) return false
+    if (codeCnt != other.codeCnt) return false
+    if (codeType != other.codeType) return false
+    if (codeMax != other.codeMax) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = digraphState
+    result = 31 * result + digraphChar.hashCode()
+    result = 31 * result + codeChars.contentHashCode()
+    result = 31 * result + codeCnt
+    result = 31 * result + codeType
+    result = 31 * result + codeMax
+    return result
+  }
+
+  public override fun clone(): DigraphSequence {
+    val result = DigraphSequence()
+    result.digraphState = digraphState
+    result.digraphChar = digraphChar
+    if (::codeChars.isInitialized) {
+      result.codeChars = codeChars.copyOf()
+    }
+    result.codeCnt = codeCnt
+    result.codeType = codeType
+    result.codeMax = codeMax
+
+    return result
   }
 
   public companion object {

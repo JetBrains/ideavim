@@ -32,7 +32,6 @@ abstract class VimPropertyTestBase : VimTestCase() {
     VimPlugin.getRegister().resetRegisters()
     editor.caretModel.runForEachCaret { it.moveToOffset(0) }
 
-    editor.vim.vimStateMachine.resetDigraph()
     VimPlugin.getSearch().resetState()
     VimPlugin.getChange().reset()
   }

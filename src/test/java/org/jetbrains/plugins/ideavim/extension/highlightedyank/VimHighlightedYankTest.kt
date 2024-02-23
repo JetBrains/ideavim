@@ -84,7 +84,6 @@ Mode.INSERT,
     }
   }
 
-
   private val code = """
 fun ${c}sum(x: Int, y: Int, z: Int): Int {
   return x + y + z

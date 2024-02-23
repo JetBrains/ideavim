@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -36,7 +37,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGI
 import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.toReturnTo
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
@@ -439,7 +439,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val cmd = state.executingCommand
     if (cmd != null && state.isDotRepeatInProgress) {
-      state.mode = mode
+      editor.mode = mode
       if (mode == Mode.REPLACE) {
         editor.insertMode = false
       }
@@ -465,7 +465,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       if (mode == Mode.REPLACE) {
         editor.insertMode = true
       }
-      state.mode = Mode.NORMAL()
+      editor.mode = Mode.NORMAL()
     } else {
       lastInsert = cmd
       strokes.clear()
@@ -480,7 +480,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       vimDocument!!.addChangeListener(myChangeListener)
       oldOffset = editor.currentCaret().offset.point
       editor.insertMode = mode == Mode.INSERT
-      state.mode = mode
+      editor.mode = mode
     }
     notifyListeners(editor)
   }
@@ -560,8 +560,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
 
     // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
     markGroup.setMark(editor, MARK_CHANGE_POS)
-    getInstance(editor).mode = Mode.NORMAL()
-    editor.vimStateMachine.mode = Mode.NORMAL()
+    editor.mode = Mode.NORMAL()
   }
 
   private fun updateLastInsertedTextRegister() {
@@ -640,7 +639,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   override fun processSingleCommand(editor: VimEditor) {
-    getInstance(editor).mode = Mode.NORMAL(returnTo = editor.mode.toReturnTo)
+    editor.mode = Mode.NORMAL(returnTo = editor.mode.toReturnTo)
     clearStrokes(editor)
   }
 
@@ -711,24 +710,23 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * This processes all "regular" keystrokes entered while in insert/replace mode
    *
    * @param editor  The editor the character was typed into
-   * @param context The data context
    * @param key     The user entered keystroke
    * @return true if this was a regular character, false if not
    */
   override fun processKey(
     editor: VimEditor,
-    context: ExecutionContext,
     key: KeyStroke,
+    processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.debug { "processKey($key)" }
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-      type(editor, context, key.keyChar)
+      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext -> type(lambdaEditor, lambdaContext, key.keyChar) }
       return true
     }
 
     // Shift-space
     if (key.keyCode == 32 && key.modifiers and KeyEvent.SHIFT_DOWN_MASK != 0) {
-      type(editor, context, ' ')
+      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext -> type(lambdaEditor, lambdaContext, ' ') }
       return true
     }
     return false
@@ -736,16 +734,18 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun processKeyInSelectMode(
     editor: VimEditor,
-    context: ExecutionContext,
     key: KeyStroke,
+    processResultBuilder: KeyProcessResult.KeyProcessResultBuilder
   ): Boolean {
     var res: Boolean
     SelectionVimListenerSuppressor.lock().use {
-      res = processKey(editor, context, key)
-      editor.exitSelectModeNative(false)
-      KeyHandler.getInstance().reset(editor)
-      if (isPrintableChar(key.keyChar) || activeTemplateWithLeftRightMotion(editor, key)) {
-        injector.changeGroup.insertBeforeCursor(editor, context)
+      res = processKey(editor, key, processResultBuilder)
+      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext ->
+        lambdaEditor.exitSelectModeNative(false)
+        KeyHandler.getInstance().reset(lambdaEditor)
+        if (isPrintableChar(key.keyChar) || activeTemplateWithLeftRightMotion(lambdaEditor, key)) {
+          injector.changeGroup.insertBeforeCursor(lambdaEditor, lambdaContext)
+        }
       }
     }
     return res

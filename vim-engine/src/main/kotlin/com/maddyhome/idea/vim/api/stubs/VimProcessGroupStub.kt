@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api.stubs
 
+import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
@@ -36,7 +37,7 @@ public class VimProcessGroupStub : VimProcessGroupBase() {
     TODO("Not yet implemented")
   }
 
-  override fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean {
+  override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     TODO("Not yet implemented")
   }
 

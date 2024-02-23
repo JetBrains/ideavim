@@ -20,6 +20,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -37,7 +38,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.NORMAL
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.io.BufferedWriter
@@ -85,24 +85,27 @@ public class ProcessGroup : VimProcessGroupBase() {
     modeBeforeCommandProcessing = currentMode
     val initText = getRange(editor, cmd)
     injector.markService.setVisualSelectionMarks(editor)
-    editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
+    editor.mode = Mode.CMD_LINE(currentMode)
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, ":", initText, 1)
   }
 
-  public override fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean {
+  public override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
     val panel = ExEntryPanel.getInstance()
     if (panel.isActive) {
-      requestFocus(panel.entry)
-      panel.handleKey(stroke)
-
+      processResultBuilder.addExecutionStep { _, _, _ ->
+        requestFocus(panel.entry)
+        panel.handleKey(stroke)
+      }
       return true
     } else {
-      getInstance(editor).mode = NORMAL()
-      getInstance().reset(editor)
+      processResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
+        lambdaEditor.mode = NORMAL()
+        getInstance().reset(lambdaEditor)
+      }
       return false
     }
   }
@@ -112,7 +115,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     panel.deactivate(true)
     var res = true
     try {
-      getInstance(editor).mode = NORMAL()
+      editor.mode = NORMAL()
 
       logger.debug("processing command")
 
@@ -152,7 +155,7 @@ public class ProcessGroup : VimProcessGroupBase() {
   }
 
   public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
-    editor.vimStateMachine.mode = NORMAL()
+    editor.mode = NORMAL()
     getInstance().reset(editor)
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true, resetCaret)
@@ -162,7 +165,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     val initText = getRange(editor, cmd) + "!"
     val currentMode = editor.mode
     check(currentMode is ReturnableFromCmd) { "Cannot enable cmd mode from $currentMode" }
-    editor.vimStateMachine.mode = Mode.CMD_LINE(currentMode)
+    editor.mode = Mode.CMD_LINE(currentMode)
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, ":", initText, 1)
   }

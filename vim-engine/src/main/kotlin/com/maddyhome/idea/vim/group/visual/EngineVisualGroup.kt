@@ -51,7 +51,7 @@ public fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Vim
       editor.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 
       // We've just added secondary carets again, hide them to better emulate block selection
-      editor.updateCaretsVisualAttributes()
+      injector.editorGroup.updateCaretsVisualAttributes(editor)
 
       for (aCaret in editor.nativeCarets()) {
         if (!aCaret.isValid) continue

@@ -251,7 +251,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
           switchToInsertMode.run();
         }
       });
-    updateCaretsVisualAttributes(editor);
+    updateCaretsVisualAttributes(new IjVimEditor(editor));
   }
 
   public void editorDeinit(@NotNull Editor editor, boolean isReleased) {
@@ -286,6 +286,18 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   @Override
   public void notifyIdeaJoin(@NotNull VimEditor editor) {
     notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject(), editor);
+  }
+
+  @Override
+  public void updateCaretsVisualAttributes(@NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor) editor).getEditor();
+    CaretVisualAttributesHelperKt.updateCaretsVisualAttributes(ijEditor);
+  }
+
+  @Override
+  public void updateCaretsVisualPosition(@NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor) editor).getEditor();
+    CaretVisualAttributesHelperKt.updateCaretsVisualAttributes(ijEditor);
   }
 
   public static class NumberChangeListener implements EffectiveOptionValueChangeListener {

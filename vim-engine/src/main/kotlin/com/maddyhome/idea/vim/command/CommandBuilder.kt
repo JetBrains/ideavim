@@ -17,11 +17,10 @@ import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
 import org.jetbrains.annotations.TestOnly
-import java.util.*
 import javax.swing.KeyStroke
 
-public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<LazyVimCommand>) {
-  private val commandParts = ArrayDeque<Command>()
+public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<LazyVimCommand>): Cloneable {
+  private var commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
   public var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
@@ -66,7 +65,7 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
 
   public fun popCommandPart(): Command {
     val command = commandParts.removeLast()
-    expectedArgumentType = if (commandParts.size > 0) commandParts.peekLast().action.argumentType else null
+    expectedArgumentType = if (commandParts.size > 0) commandParts.last().action.argumentType else null
     return command
   }
 
@@ -107,7 +106,7 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
 
   public fun isAwaitingCharOrDigraphArgument(): Boolean {
     if (commandParts.size == 0) return false
-    val argumentType = commandParts.peekLast().action.argumentType
+    val argumentType = commandParts.last().action.argumentType
     val awaiting = argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
     LOG.debug { "Awaiting char of digraph: $awaiting" }
     return awaiting
@@ -125,7 +124,7 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
   }
 
   public fun isPuttingLiteral(): Boolean {
-    return !commandParts.isEmpty() && commandParts.last.action.id == "VimInsertCompletedLiteralAction"
+    return !commandParts.isEmpty() && commandParts.last().action.id == "VimInsertCompletedLiteralAction"
   }
 
   public fun isDone(): Boolean {
@@ -133,21 +132,21 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
   }
 
   public fun completeCommandPart(argument: Argument) {
-    commandParts.peekLast().argument = argument
+    commandParts.last().argument = argument
     commandState = CurrentCommandState.READY
   }
 
   public fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
-    val action = commandParts.peekLast().action as? DuplicableOperatorAction
+    val action = commandParts.last().action as? DuplicableOperatorAction
     return action?.duplicateWith == key.keyChar
   }
 
   public fun hasCurrentCommandPartArgument(): Boolean {
-    return commandParts.peek()?.argument != null
+    return commandParts.firstOrNull()?.argument != null
   }
 
   public fun buildCommand(): Command {
-    if (commandParts.last.action.id == "VimInsertCompletedDigraphAction" || commandParts.last.action.id == "VimResetModeAction") {
+    if (commandParts.last().action.id == "VimInsertCompletedDigraphAction" || commandParts.last().action.id == "VimResetModeAction") {
       expectedArgumentType = prevExpectedArgumentType
       prevExpectedArgumentType = null
       return commandParts.removeLast()
@@ -191,6 +190,45 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
 
   @TestOnly
   public fun getCurrentTrie(): CommandPartNode<LazyVimCommand> = currentCommandPartNode
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as CommandBuilder
+
+    if (currentCommandPartNode != other.currentCommandPartNode) return false
+    if (commandParts != other.commandParts) return false
+    if (keyList != other.keyList) return false
+    if (commandState != other.commandState) return false
+    if (count != other.count) return false
+    if (expectedArgumentType != other.expectedArgumentType) return false
+    if (prevExpectedArgumentType != other.prevExpectedArgumentType) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = currentCommandPartNode.hashCode()
+    result = 31 * result + commandParts.hashCode()
+    result = 31 * result + keyList.hashCode()
+    result = 31 * result + commandState.hashCode()
+    result = 31 * result + count
+    result = 31 * result + (expectedArgumentType?.hashCode() ?: 0)
+    result = 31 * result + (prevExpectedArgumentType?.hashCode() ?: 0)
+    return result
+  }
+
+  public override fun clone(): CommandBuilder {
+    val result = CommandBuilder(currentCommandPartNode)
+    result.commandParts = ArrayDeque(commandParts)
+    result.keyList = keyList.toMutableList()
+    result.commandState = commandState
+    result.count = count
+    result.expectedArgumentType = expectedArgumentType
+    result.prevExpectedArgumentType = prevExpectedArgumentType
+
+    return result
+  }
 
   public companion object {
     private val LOG = vimLogger<CommandBuilder>()
