@@ -82,7 +82,7 @@ public fun getModeForeground(mode: Mode?): Color {
     val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.asString() ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     return when (theme) {
-      ModeWidgetTheme.TERM -> UIUtil.getPanelBackground()
+      ModeWidgetTheme.TERM -> if (isLight) Color.WHITE else Color.BLACK
       ModeWidgetTheme.COLORLESS -> UIUtil.getLabelForeground()
     }
   } else {
