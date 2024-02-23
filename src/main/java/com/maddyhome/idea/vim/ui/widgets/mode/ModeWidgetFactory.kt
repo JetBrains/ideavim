@@ -13,8 +13,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.ui.widgets.VimWidgetListener
 
 public class ModeWidgetFactory : StatusBarWidgetFactory {
@@ -36,7 +36,7 @@ public class ModeWidgetFactory : StatusBarWidgetFactory {
 
   override fun isAvailable(project: Project): Boolean {
     return VimPlugin.isEnabled()
-      && injector.globalIjOptions().showmodewidget
+      && injector.globalOptions().showmode
       && !project.isDisposed
       && FileEditorManager.getInstance(project).hasOpenFiles()
   }

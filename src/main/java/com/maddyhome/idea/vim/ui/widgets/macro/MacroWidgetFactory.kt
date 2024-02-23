@@ -16,12 +16,9 @@ import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MacroRecordingListener
-import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.ui.widgets.VimWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.mode.VimStatusBarWidget
 import java.awt.Component
@@ -42,7 +39,7 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory {
   }
 
   override fun isAvailable(project: Project): Boolean {
-    return VimPlugin.isEnabled() && injector.globalIjOptions().showmodewidget
+    return VimPlugin.isEnabled() && injector.globalOptions().showmode
   }
 }
 
