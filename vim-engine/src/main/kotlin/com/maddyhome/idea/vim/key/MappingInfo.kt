@@ -176,10 +176,9 @@ public class ToHandlerMappingInfo(
             keyHandler.finishedCommandPreparation(
               editor,
               context,
-              VimStateMachine.getInstance(editor),
               null,
-              false,
-              keyState
+              KeyHandler.MutableBoolean(false),
+              keyState,
             )
           }
         }
