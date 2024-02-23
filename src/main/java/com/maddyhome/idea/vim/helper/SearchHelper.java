@@ -1611,9 +1611,15 @@ public class SearchHelper {
     }
     else {
       IntIterator offsetIterator = offsets.iterator();
-      offsetIterator.skip(skipCount);
+      skip(offsetIterator, skipCount);
       return offsetIterator.nextInt();
     }
+  }
+
+  private static void skip(IntIterator iterator, final int n) {
+    if (n < 0) throw new IllegalArgumentException("Argument must be nonnegative: " + n);
+    int i = n;
+    while (i-- != 0 && iterator.hasNext()) iterator.nextInt();
   }
 
   private static @NotNull String parseMatchPairsOption(final VimEditor vimEditor) {
