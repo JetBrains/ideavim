@@ -313,9 +313,9 @@ tasks {
     // Don't forget to update plugin.xml
     sinceBuild.set("233.11799.30")
 
-    changeNotes.set("""
-      Changelog: https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}
-    """.trimIndent())
+    changeNotes.set(
+      """<a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>"""
+    )
   }
 }
 
