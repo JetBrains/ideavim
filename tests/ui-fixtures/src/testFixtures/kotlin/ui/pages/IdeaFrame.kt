@@ -65,7 +65,7 @@ class IdeaFrame(
 
   fun isSmartMode(): Boolean {
     return callJs(
-      "component.project == null ? false : com.intellij.openapi. project.DumbService.isDumb(component.project);",
+      "component.project == null ? false : !com.intellij.openapi. project.DumbService.isDumb(component.project);",
       true
     )
   }
