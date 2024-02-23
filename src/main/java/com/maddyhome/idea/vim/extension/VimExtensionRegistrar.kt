@@ -67,7 +67,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(option) {
       if (injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).asBoolean()) {
         initExtension(extensionBean, name)
-        PluginState.enabledExtensions.add(name)
+        PluginState.Util.enabledExtensions.add(name)
       } else {
         extensionBean.instance.dispose()
       }

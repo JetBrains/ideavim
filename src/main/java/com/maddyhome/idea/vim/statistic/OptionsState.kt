@@ -47,28 +47,28 @@ internal class OptionsState : ApplicationUsagesCollector() {
     )
   }
 
-  companion object {
-    private val GROUP = EventLogGroup("vim.options", 1)
-
-    private val IDEAJOIN = BooleanEventField(IjOptions.ideajoin.name)
-    private val IDEAMARKS = BooleanEventField(IjOptions.ideamarks.name)
-    private val IDEAREFACTOR = EventFields.String(IjOptions.idearefactormode.name, IjOptionConstants.ideaRefactorModeValues.toList())
-    private val IDEAPUT = BooleanEventField(OptionConstants.clipboard_ideaput)
-    private val IDEASTATUSICON = EventFields.String(IjOptions.ideastatusicon.name, IjOptionConstants.ideaStatusIconValues.toList())
-    private val IDEAWRITE = EventFields.String(IjOptions.ideawrite.name, IjOptionConstants.ideaWriteValues.toList())
-    private val IDEASELECTION = BooleanEventField(OptionConstants.selectmode_ideaselection)
-    private val IDEAVIMSUPPORT = EventFields.StringList(IjOptions.ideavimsupport.name, IjOptionConstants.ideavimsupportValues.toList())
-
-    private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(
-      "vim.options",
-      IDEAJOIN,
-      IDEAMARKS,
-      IDEAREFACTOR,
-      IDEAPUT,
-      IDEASTATUSICON,
-      IDEAWRITE,
-      IDEASELECTION,
-      IDEAVIMSUPPORT,
-    )
-  }
 }
+
+private val GROUP = EventLogGroup("vim.options", 1)
+private val IDEAJOIN = BooleanEventField(IjOptions.ideajoin.name)
+private val IDEAMARKS = BooleanEventField(IjOptions.ideamarks.name)
+private val IDEAREFACTOR =
+  EventFields.String(IjOptions.idearefactormode.name, IjOptionConstants.ideaRefactorModeValues.toList())
+private val IDEAPUT = BooleanEventField(OptionConstants.clipboard_ideaput)
+private val IDEASTATUSICON =
+  EventFields.String(IjOptions.ideastatusicon.name, IjOptionConstants.ideaStatusIconValues.toList())
+private val IDEAWRITE = EventFields.String(IjOptions.ideawrite.name, IjOptionConstants.ideaWriteValues.toList())
+private val IDEASELECTION = BooleanEventField(OptionConstants.selectmode_ideaselection)
+private val IDEAVIMSUPPORT =
+  EventFields.StringList(IjOptions.ideavimsupport.name, IjOptionConstants.ideavimsupportValues.toList())
+private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(
+  "vim.options",
+  IDEAJOIN,
+  IDEAMARKS,
+  IDEAREFACTOR,
+  IDEAPUT,
+  IDEASTATUSICON,
+  IDEAWRITE,
+  IDEASELECTION,
+  IDEAVIMSUPPORT,
+)

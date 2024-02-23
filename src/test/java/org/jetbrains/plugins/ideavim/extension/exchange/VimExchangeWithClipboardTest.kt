@@ -357,7 +357,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   private fun assertHighlighter(start: Int, end: Int, area: HighlighterTargetArea) {
-    val currentExchange = fixture.editor.getUserData(VimExchangeExtension.EXCHANGE_KEY)!!
+    val currentExchange = fixture.editor.getUserData(VimExchangeExtension.Util.EXCHANGE_KEY)!!
     val highlighter = currentExchange.getHighlighter()!!
     kotlin.test.assertEquals(start, highlighter.startOffset)
     kotlin.test.assertEquals(end, highlighter.endOffset)

@@ -55,10 +55,7 @@ import java.util.*
 
 internal class CommentaryExtension : VimExtension {
 
-  companion object {
-
-    private const val OPERATOR_FUNC = "CommentaryOperatorFunc"
-
+  object Util {
     fun doCommentary(
       editor: VimEditor,
       context: ExecutionContext,
@@ -124,6 +121,10 @@ internal class CommentaryExtension : VimExtension {
     }
   }
 
+  companion object {
+    private const val OPERATOR_FUNC = "CommentaryOperatorFunc"
+  }
+
   override fun getName() = "commentary"
 
   override fun init() {
@@ -158,7 +159,7 @@ internal class CommentaryExtension : VimExtension {
     // todo make it multicaret
     override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val range = injector.markService.getChangeMarks(editor.primaryCaret()) ?: return false
-      return doCommentary(editor, context, range, selectionType ?: SelectionType.CHARACTER_WISE, true)
+      return Util.doCommentary(editor, context, range, selectionType ?: SelectionType.CHARACTER_WISE, true)
     }
   }
 
@@ -248,7 +249,7 @@ internal class CommentaryExtension : VimExtension {
    */
   private class CommentaryCommandAliasHandler : CommandAliasHandler {
     override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
-      doCommentary(editor, context, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
+      Util.doCommentary(editor, context, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
     }
   }
 }

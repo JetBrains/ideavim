@@ -130,15 +130,15 @@ internal class NerdTree : VimExtension {
     addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
     addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
 
-    synchronized(monitor) {
-      commandsRegistered = true
+    synchronized(Util.monitor) {
+      Util.commandsRegistered = true
       ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
     }
   }
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
     override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
-      callAction(editor, actionId, context)
+      Util.callAction(editor, actionId, context)
     }
   }
 
@@ -149,7 +149,7 @@ internal class NerdTree : VimExtension {
       if (toolWindow.isVisible) {
         toolWindow.hide()
       } else {
-        callAction(editor, "ActivateProjectToolWindow", context)
+        Util.callAction(editor, "ActivateProjectToolWindow", context)
       }
     }
   }
@@ -187,8 +187,8 @@ internal class NerdTree : VimExtension {
   // TODO I'm not sure is this activity runs at all? Should we use [RunOnceUtil] instead?
   class NerdStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
-      synchronized(monitor) {
-        if (!commandsRegistered) return
+      synchronized(Util.monitor) {
+        if (!Util.commandsRegistered) return
         installDispatcher(project)
       }
     }
@@ -214,7 +214,7 @@ internal class NerdTree : VimExtension {
 
           val action = nextNode.actionHolder
           when (action) {
-            is NerdAction.ToIj -> callAction(null, action.name, e.dataContext.vim)
+            is NerdAction.ToIj -> Util.callAction(null, action.name, e.dataContext.vim)
             is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
           }
         }
@@ -356,7 +356,7 @@ internal class NerdTree : VimExtension {
         currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
 
         // FIXME: 22.01.2021 This solution bouncing a bit
-        callAction(null, "ActivateProjectToolWindow", context.vim)
+        Util.callAction(null, "ActivateProjectToolWindow", context.vim)
       },
     )
     registerCommand(
@@ -368,7 +368,7 @@ internal class NerdTree : VimExtension {
         val currentWindow = splitters.currentWindow
         currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
 
-        callAction(null, "ActivateProjectToolWindow", context.vim)
+        Util.callAction(null, "ActivateProjectToolWindow", context.vim)
       },
     )
     registerCommand(
@@ -504,14 +504,9 @@ internal class NerdTree : VimExtension {
     )
   }
 
-  companion object {
-    const val pluginName = "NERDTree"
-
+  object Util {
     internal val monitor = Any()
     internal var commandsRegistered = false
-
-    private val LOG = logger<NerdTree>()
-
     fun callAction(editor: VimEditor?, name: String, context: ExecutionContext) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
         VimPlugin.showMessage(MessageHelper.message("action.not.found.0", name))
@@ -526,45 +521,51 @@ internal class NerdTree : VimExtension {
         }
       }
     }
-
-    private fun addCommand(alias: String, handler: CommandAliasHandler) {
-      VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
-    }
-
-    private fun registerCommand(variable: String, default: String, action: NerdAction) {
-      val variableValue = VimPlugin.getVariableService().getGlobalVariableValue(variable)
-      val mappings = if (variableValue is VimString) {
-        variableValue.value
-      } else {
-        default
-      }
-      actionsRoot.addLeafs(mappings, action)
-    }
-
-    private fun registerCommand(default: String, action: NerdAction) {
-      actionsRoot.addLeafs(default, action)
-    }
-
-    private val actionsRoot: RootNode<NerdAction> = RootNode()
-    private var currentNode: CommandPartNode<NerdAction> = actionsRoot
-
-    private fun collectShortcuts(node: Node<NerdAction>): Set<KeyStroke> {
-      return if (node is CommandPartNode<NerdAction>) {
-        val res = node.keys.toMutableSet()
-        res += node.values.map { collectShortcuts(it) }.flatten()
-        res
-      } else {
-        emptySet()
-      }
-    }
-
-    private fun installDispatcher(project: Project) {
-      val dispatcher = NerdDispatcher.getInstance(project)
-      val shortcuts = collectShortcuts(actionsRoot).map { RequiredShortcut(it, MappingOwner.Plugin.get(pluginName)) }
-      dispatcher.registerCustomShortcutSet(
-        KeyGroup.toShortcutSet(shortcuts),
-        (ProjectView.getInstance(project) as ProjectViewImpl).component,
-      )
-    }
   }
+
+  companion object {
+    const val pluginName = "NERDTree"
+    private val LOG = logger<NerdTree>()
+  }
+}
+
+private fun addCommand(alias: String, handler: CommandAliasHandler) {
+  VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
+}
+
+private fun registerCommand(variable: String, default: String, action: NerdAction) {
+  val variableValue = VimPlugin.getVariableService().getGlobalVariableValue(variable)
+  val mappings = if (variableValue is VimString) {
+    variableValue.value
+  } else {
+    default
+  }
+  actionsRoot.addLeafs(mappings, action)
+}
+
+private fun registerCommand(default: String, action: NerdAction) {
+  actionsRoot.addLeafs(default, action)
+}
+
+
+private val actionsRoot: RootNode<NerdAction> = RootNode()
+private var currentNode: CommandPartNode<NerdAction> = actionsRoot
+private fun collectShortcuts(node: Node<NerdAction>): Set<KeyStroke> {
+  return if (node is CommandPartNode<NerdAction>) {
+    val res = node.keys.toMutableSet()
+    res += node.values.map { collectShortcuts(it) }.flatten()
+    res
+  } else {
+    emptySet()
+  }
+}
+
+private fun installDispatcher(project: Project) {
+  val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
+  val shortcuts =
+    collectShortcuts(actionsRoot).map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
+  dispatcher.registerCustomShortcutSet(
+    KeyGroup.toShortcutSet(shortcuts),
+    (ProjectView.getInstance(project) as ProjectViewImpl).component,
+  )
 }

@@ -35,7 +35,7 @@ internal class HasFunctionHandler : FunctionHandler() {
   ): VimDataType {
     val feature = argumentValues[0].evaluate(editor, context, vimContext).asString()
     if (feature == "ide") {
-      VimscriptState.isIDESpecificConfigurationUsed = true
+      VimscriptState.Util.isIDESpecificConfigurationUsed = true
     }
     return if (supportedFeatures.contains(feature)) {
       VimInt.ONE

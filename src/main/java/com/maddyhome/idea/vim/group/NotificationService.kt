@@ -278,7 +278,7 @@ internal class NotificationService(private val project: Project?) {
       }
 
       if (id != null) {
-        ActionTracker.logTrackedAction(id)
+        ActionTracker.Util.logTrackedAction(id)
       }
     }
 
@@ -286,7 +286,7 @@ internal class NotificationService(private val project: Project?) {
       override fun actionPerformed(e: AnActionEvent) {
         CopyPasteManager.getInstance().setContents(StringSelection(id ?: ""))
         if (id != null) {
-          ActionTracker.logCopiedAction(id)
+          ActionTracker.Util.logCopiedAction(id)
         }
         notification?.expire()
 

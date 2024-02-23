@@ -24,8 +24,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -37,7 +35,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.helper.fileSize
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.key.OperatorFunction
@@ -46,6 +43,8 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -77,23 +76,8 @@ internal class VimExchangeExtension : VimExtension {
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
 
-  companion object {
-    @NonNls private const val EXCHANGE_CMD = "<Plug>(Exchange)"
-    @NonNls private const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
-    @NonNls private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
-    @NonNls private const val OPERATOR_FUNC = "ExchangeOperatorFunc"
-
+  object Util {
     val EXCHANGE_KEY = Key<Exchange>("exchange")
-
-    // End mark has always greater of eq offset than start mark
-    class Exchange(val type: SelectionType, val start: Mark, val end: Mark, val text: String) {
-      private var myHighlighter: RangeHighlighter? = null
-      fun setHighlighter(highlighter: RangeHighlighter) {
-        myHighlighter = highlighter
-      }
-
-      fun getHighlighter(): RangeHighlighter? = myHighlighter
-    }
 
     fun clearExchange(editor: Editor) {
       editor.getUserData(EXCHANGE_KEY)?.getHighlighter()?.let {
@@ -101,6 +85,13 @@ internal class VimExchangeExtension : VimExtension {
       }
       editor.putUserData(EXCHANGE_KEY, null)
     }
+  }
+
+  companion object {
+    @NonNls private const val EXCHANGE_CMD = "<Plug>(Exchange)"
+    @NonNls private const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+    @NonNls private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
+    @NonNls private const val OPERATOR_FUNC = "ExchangeOperatorFunc"
   }
 
   private class ExchangeHandler(private val isLine: Boolean) : ExtensionHandler {
@@ -114,7 +105,7 @@ internal class VimExchangeExtension : VimExtension {
 
   private class ExchangeClearHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      clearExchange(editor.ij)
+      Util.clearExchange(editor.ij)
     }
   }
 
@@ -158,11 +149,11 @@ internal class VimExchangeExtension : VimExtension {
       }
 
       val currentExchange = getExchange(ijEditor, isVisual, selectionType ?: SelectionType.CHARACTER_WISE)
-      val exchange1 = ijEditor.getUserData(EXCHANGE_KEY)
+      val exchange1 = ijEditor.getUserData(Util.EXCHANGE_KEY)
       if (exchange1 == null) {
         val highlighter = highlightExchange(currentExchange)
         currentExchange.setHighlighter(highlighter)
-        ijEditor.putUserData(EXCHANGE_KEY, currentExchange)
+        ijEditor.putUserData(Util.EXCHANGE_KEY, currentExchange)
         return true
       } else {
         val cmp = compareExchanges(exchange1, currentExchange)
@@ -188,7 +179,7 @@ internal class VimExchangeExtension : VimExtension {
           }
         }
         exchange(ijEditor, ex1, ex2, reverse, expand)
-        clearExchange(ijEditor)
+        Util.clearExchange(ijEditor)
         return true
       }
     }
@@ -352,5 +343,15 @@ internal class VimExchangeExtension : VimExtension {
         Exchange(selectionType, selectionEnd, selectionStart, text)
       }
     }
+  }
+
+  // End mark has always greater of eq offset than start mark
+  class Exchange(val type: SelectionType, val start: Mark, val end: Mark, val text: String) {
+    private var myHighlighter: RangeHighlighter? = null
+    fun setHighlighter(highlighter: RangeHighlighter) {
+      myHighlighter = highlighter
+    }
+
+    fun getHighlighter(): RangeHighlighter? = myHighlighter
   }
 }

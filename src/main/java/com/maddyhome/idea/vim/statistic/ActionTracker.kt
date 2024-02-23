@@ -14,17 +14,7 @@ import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.service.fus.collectors.CounterUsagesCollector
 
 internal class ActionTracker : CounterUsagesCollector() {
-  companion object {
-    private val GROUP = EventLogGroup("vim.actions", 1)
-    private val TRACKED_ACTIONS = GROUP.registerEvent(
-      "tracked",
-      EventFields.StringValidatedByCustomRule("action_id", ActionRuleValidator::class.java),
-    )
-    private val COPIED_ACTIONS = GROUP.registerEvent(
-      "copied",
-      EventFields.StringValidatedByCustomRule("action_id", ActionRuleValidator::class.java),
-    )
-
+  object Util {
     fun logTrackedAction(actionId: String) {
       TRACKED_ACTIONS.log(actionId)
     }
@@ -36,3 +26,14 @@ internal class ActionTracker : CounterUsagesCollector() {
 
   override fun getGroup(): EventLogGroup = GROUP
 }
+
+private val GROUP = EventLogGroup("vim.actions", 1)
+private val TRACKED_ACTIONS = GROUP.registerEvent(
+  "tracked",
+  EventFields.StringValidatedByCustomRule("action_id", ActionRuleValidator::class.java),
+)
+private val COPIED_ACTIONS = GROUP.registerEvent(
+  "copied",
+  EventFields.StringValidatedByCustomRule("action_id", ActionRuleValidator::class.java),
+)
+

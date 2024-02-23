@@ -17,11 +17,7 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.isLine
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -38,6 +34,10 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.isLine
+import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
 
 internal class ReplaceWithRegister : VimExtension {
@@ -137,45 +137,45 @@ internal class ReplaceWithRegister : VimExtension {
     @NonNls private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
     @NonNls private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
     @NonNls private const val OPERATOR_FUNC = "ReplaceWithRegisterOperatorFunc"
+  }
+}
 
-    private fun doReplace(editor: Editor, caret: ImmutableVimCaret, visualSelection: PutData.VisualSelection) {
-      val registerGroup = injector.registerGroup
-      val lastRegisterChar = if (editor.caretModel.caretCount == 1) registerGroup.currentRegister else registerGroup.getCurrentRegisterForMulticaret()
-      val savedRegister = caret.registerStorage.getRegister(lastRegisterChar) ?: return
+private fun doReplace(editor: Editor, caret: ImmutableVimCaret, visualSelection: PutData.VisualSelection) {
+  val registerGroup = injector.registerGroup
+  val lastRegisterChar = if (editor.caretModel.caretCount == 1) registerGroup.currentRegister else registerGroup.getCurrentRegisterForMulticaret()
+  val savedRegister = caret.registerStorage.getRegister(lastRegisterChar) ?: return
 
-      var usedType = savedRegister.type
-      var usedText = savedRegister.text
-      if (usedType.isLine && usedText?.endsWith('\n') == true) {
-        // Code from original plugin implementation. Correct text for linewise selected text
-        usedText = usedText.dropLast(1)
-        usedType = SelectionType.CHARACTER_WISE
-      }
+  var usedType = savedRegister.type
+  var usedText = savedRegister.text
+  if (usedType.isLine && usedText?.endsWith('\n') == true) {
+    // Code from original plugin implementation. Correct text for linewise selected text
+    usedText = usedText.dropLast(1)
+    usedType = SelectionType.CHARACTER_WISE
+  }
 
-      val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData, savedRegister.name)
+  val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData, savedRegister.name)
 
-      val putData = PutData(
-        textData,
-        visualSelection,
-        1,
-        insertTextBeforeCaret = true,
-        rawIndent = true,
-        caretAfterInsertedText = false,
-        putToLine = -1,
-      )
-      val vimEditor = editor.vim
-      ClipboardOptionHelper.IdeaputDisabler().use {
-        VimPlugin.getPut().putText(
-          vimEditor,
-          injector.executionContextManager.onEditor(editor.vim),
-          putData,
-          operatorArguments = OperatorArguments(
-            editor.vimStateMachine?.isOperatorPending(vimEditor.mode) ?: false,
-            0,
-            editor.vim.mode,
-          ),
-          saveToRegister = false
-        )
-      }
-    }
+  val putData = PutData(
+    textData,
+    visualSelection,
+    1,
+    insertTextBeforeCaret = true,
+    rawIndent = true,
+    caretAfterInsertedText = false,
+    putToLine = -1,
+  )
+  val vimEditor = editor.vim
+  ClipboardOptionHelper.IdeaputDisabler().use {
+    VimPlugin.getPut().putText(
+      vimEditor,
+      injector.executionContextManager.onEditor(editor.vim),
+      putData,
+      operatorArguments = OperatorArguments(
+        editor.vimStateMachine?.isOperatorPending(vimEditor.mode) ?: false,
+        0,
+        editor.vim.mode,
+      ),
+      saveToRegister = false
+    )
   }
 }
