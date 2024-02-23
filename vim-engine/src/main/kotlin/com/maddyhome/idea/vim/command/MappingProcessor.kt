@@ -19,21 +19,23 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.toMappingMode
+import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfoLayer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
-public object MappingProcessor {
+public object MappingProcessor: KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()
 
-  internal fun handleKeyMapping(
+  public override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     if (!allowKeyMappings) return false
 

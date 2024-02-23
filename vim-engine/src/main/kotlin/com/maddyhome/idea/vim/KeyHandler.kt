@@ -129,7 +129,7 @@ public class KeyHandler {
     handleKeyRecursionCount++
     try {
       LOG.trace("Start key processing...")
-      if (!MappingProcessor.handleKeyMapping(key, editor, allowKeyMappings, mappingCompleted, processBuilder)) {
+      if (!MappingProcessor.consumeKey(key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord)) {
         LOG.trace("Mappings processed, continue processing key.")
         if (isCommandCountKey(chKey, processBuilder.state, editorState)) {
           commandBuilder.addCountCharacter(key)
