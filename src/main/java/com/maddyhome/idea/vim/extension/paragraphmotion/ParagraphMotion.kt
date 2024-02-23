@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.paragraphmotion
 
 import com.intellij.openapi.editor.Caret
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -20,8 +21,10 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import javax.swing.KeyStroke
 
 internal class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
@@ -30,8 +33,8 @@ internal class ParagraphMotion : VimExtension {
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)"), owner, ParagraphMotionHandler(1), false)
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), owner, ParagraphMotionHandler(-1), false)
 
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("}"), owner, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)"), true)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("{"), owner, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), true)
+    putKeyMappingIfMissingFromAndToKeys(MappingMode.NXO, injector.parser.parseKeys("}"), owner, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)"), true)
+    putKeyMappingIfMissingFromAndToKeys(MappingMode.NXO, injector.parser.parseKeys("{"), owner, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), true)
   }
 
   private class ParagraphMotionHandler(private val count: Int) : ExtensionHandler {
@@ -48,5 +51,18 @@ internal class ParagraphMotion : VimExtension {
       return injector.searchHelper.findNextParagraph(editor, caret.vim, count, true)
         ?.let { editor.normalizeOffset(it, true) }
     }
+  }
+
+  // For VIM-3306
+  @Suppress("SameParameterValue")
+  private fun putKeyMappingIfMissingFromAndToKeys(
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean,
+  ) {
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapfrom(it, fromKeys) }
+    putKeyMappingIfMissing(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
   }
 }
