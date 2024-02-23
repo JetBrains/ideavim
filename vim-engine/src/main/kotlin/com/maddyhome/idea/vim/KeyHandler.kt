@@ -738,41 +738,81 @@ public sealed interface KeyProcessResult {
   public object Unknown: KeyProcessResult
 
   /**
-   * Key input that is recognized by IdeaVim and can be processed.
+   * Key input that is recognized by IdeaVim and can be executed.
    * Key handling is a two-step process:
    * 1. Determine if the key should be processed and how (is it a command, mapping, or something else).
    * 2. Execute the recognized command.
    * This class should be returned after the first step is complete.
    * It will continue the key handling and finish the process.
    */
-  public class Processable(
+  public class Executable(
     private val originalState: KeyHandlerState,
     private val preProcessState: KeyHandlerState,
-    private val processing: (
-      key: KeyStroke,
-      keyState: KeyHandlerState,
-      editor: VimEditor,
-      context: ExecutionContext,
-      allowKeyMappings: Boolean,
-      mappingCompleted: Boolean,
-    ) -> KeyHandlerState
+    private val processing: KeyProcessing,
   ): KeyProcessResult {
 
     public companion object {
       private val logger = vimLogger<KeyProcessResult>()
-      private val lock = Object()
     }
 
-    // TODO add concurrency to other places
-    public fun processKey(key: KeyStroke, editor: VimEditor, context: ExecutionContext, allowKeyMappings: Boolean, mappingCompleted: Boolean) {
-      synchronized(lock) {
-        val keyHandler = KeyHandler.getInstance()
-        if (keyHandler.keyHandlerState != originalState) {
-          logger.warn("Unexpected editor state. Aborting command execution.")
+    public fun execute(editor: VimEditor, context: ExecutionContext) {
+      val keyHandler = KeyHandler.getInstance()
+      if (keyHandler.keyHandlerState != originalState) {
+        logger.warn("Unexpected editor state. Aborting command execution.")
+      }
+      processing(preProcessState, editor, context)
+      keyHandler.updateState(preProcessState)
+    }
+  }
+
+  public abstract class KeyProcessResultBuilder {
+    public abstract val state: KeyHandlerState
+    protected val processings: MutableList<KeyProcessing> = mutableListOf()
+    public var onFinish: (() -> Unit)? = null // FIXME I'm a dirty hack to support recursion counter
+
+    public fun addExecutionStep(keyProcessing: KeyProcessing) {
+      processings.add(keyProcessing)
+    }
+
+    public abstract fun build(): KeyProcessResult
+  }
+
+  // Works with existing state and modifies it during execution
+  // It's the way IdeaVim worked for the long time and for this class we do not create
+  // unnecessary objects and assume that the code will be executed immediately
+  public class SynchronousKeyProcessBuilder(public override val state: KeyHandlerState): KeyProcessResultBuilder() {
+    public override fun build(): KeyProcessResult {
+      return Executable(state, state) { keyHandlerState, vimEditor, executionContext ->
+        try {
+          for (processing in processings) {
+            processing(keyHandlerState, vimEditor, executionContext)
+          }
+        } finally {
+          onFinish?.let { it() }
         }
-        val newState = processing(key, preProcessState, editor, context, allowKeyMappings, mappingCompleted)
-        keyHandler.updateState(newState)
+      }
+    }
+  }
+
+  // Created new state, nothing is modified during the builder work (key processing)
+  // The new state will be applied later, when we run KeyProcess (it may not be run at all)
+  public class AsyncKeyProcessBuilder(originalState: KeyHandlerState): KeyProcessResultBuilder() {
+    private val originalState: KeyHandlerState = KeyHandler.getInstance().keyHandlerState
+    public override val state: KeyHandlerState = originalState.clone()
+
+    public override fun build(): KeyProcessResult {
+      return Executable(originalState, state) { keyHandlerState, vimEditor, executionContext ->
+        try {
+          for (processing in processings) {
+            processing(keyHandlerState, vimEditor, executionContext)
+          }
+        } finally {
+          onFinish?.let { it() }
+          KeyHandler.getInstance().updateState(state)
+        }
       }
     }
   }
 }
+
+public typealias KeyProcessing = (KeyHandlerState, VimEditor, ExecutionContext) -> Unit
