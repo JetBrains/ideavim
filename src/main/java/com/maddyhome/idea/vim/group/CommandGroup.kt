@@ -8,9 +8,11 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.VimCommandGroupBase
 
 /**
  * @author Elliot Courant
  */
+@Service
 internal class CommandGroup : VimCommandGroupBase()

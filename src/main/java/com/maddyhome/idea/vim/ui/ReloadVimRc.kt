@@ -12,8 +12,10 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider
@@ -108,7 +110,7 @@ internal object VimRcFileState : VimrcFileState {
   }
 }
 
-internal class ReloadVimRc : DumbAwareAction() {
+internal class ReloadVimRc : DumbAwareAction(), ActionRemoteBehaviorSpecification.Disabled {
   override fun update(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: run {
       e.presentation.isEnabledAndVisible = false
@@ -159,8 +161,8 @@ internal class ReloadVimRc : DumbAwareAction() {
 internal class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   override val autoHideable: Boolean = false
 
-  override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
-    super.register(component, parentDisposable)
+  override fun register(dataContext: DataContext, component: FloatingToolbarComponent, parentDisposable: Disposable) {
+    super.register(dataContext, component, parentDisposable)
     val action = {
       component.scheduleShow()
     }
@@ -171,7 +173,7 @@ internal class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GR
   }
 }
 
-internal class ReloadFloatingToolbarActionGroup : DefaultActionGroup() {
+internal class ReloadFloatingToolbarActionGroup : DefaultActionGroup(), ActionRemoteBehaviorSpecification.Disabled {
   companion object {
     const val ACTION_GROUP = "IdeaVim.ReloadVimRc.group"
   }

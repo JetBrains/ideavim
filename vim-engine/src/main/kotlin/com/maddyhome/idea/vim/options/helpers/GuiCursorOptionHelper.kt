@@ -128,7 +128,7 @@ public object GuiCursorOptionHelper {
     }
 
     fun updateAllModes(entry: GuiCursorEntry) {
-      GuiCursorMode.values().filter { it != GuiCursorMode.ALL }.forEach {
+      GuiCursorMode.entries.filter { it != GuiCursorMode.ALL }.forEach {
         updateMode(it, entry)
       }
     }
@@ -154,13 +154,13 @@ public enum class GuiCursorMode(public val token: String) {
   public override fun toString(): String = token
 
   public companion object {
-    public fun fromString(s: String): GuiCursorMode? = values().firstOrNull { it.token == s }
+    public fun fromString(s: String): GuiCursorMode? = entries.firstOrNull { it.token == s }
 
     // Also used in FleetVim as direct call
     public fun fromMode(mode: Mode, isReplaceCharacter: Boolean): GuiCursorMode {
       if (isReplaceCharacter) {
         // Can be true for NORMAL and VISUAL
-        return GuiCursorMode.REPLACE
+        return REPLACE
       }
 
       // Note that Vim does not change the caret for SELECT mode and continues to use VISUAL or VISUAL_EXCLUSIVE. IdeaVim
@@ -168,14 +168,14 @@ public enum class GuiCursorMode(public val token: String) {
       // to more visually distinguish VISUAL and SELECT. So we use INSERT; a selection and the insert caret is intuitively
       // the same as SELECT
       return when (mode) {
-        is Mode.NORMAL -> GuiCursorMode.NORMAL
-        is Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
-        Mode.INSERT -> GuiCursorMode.INSERT
-        Mode.REPLACE -> GuiCursorMode.REPLACE
-        is Mode.SELECT -> GuiCursorMode.INSERT
-        is Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
+        is Mode.NORMAL -> NORMAL
+        is Mode.OP_PENDING -> OP_PENDING
+        Mode.INSERT -> INSERT
+        Mode.REPLACE -> REPLACE
+        is Mode.SELECT -> INSERT
+        is Mode.VISUAL -> VISUAL // TODO: VISUAL_EXCLUSIVE
         // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
-        is Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
+        is Mode.CMD_LINE -> CMD_LINE
       }
     }
   }

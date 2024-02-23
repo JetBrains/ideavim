@@ -8,9 +8,11 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.components.Service
 import org.apache.commons.codec.binary.Base64
 import org.jdom.Element
 
+@Service
 internal class XMLGroup {
   /**
    * Set the text of an XML element, safely encode it if needed.

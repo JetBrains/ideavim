@@ -43,6 +43,10 @@ internal class IjVimApplication : VimApplicationBase() {
     return ApplicationManager.getApplication().isUnitTestMode
   }
 
+  override fun isInternal(): Boolean {
+    return ApplicationManager.getApplication().isInternal
+  }
+
   override fun postKey(stroke: KeyStroke, editor: VimEditor) {
     val component: Component = SwingUtilities.getAncestorOfClass(Window::class.java, editor.ij.component)
     val event = createKeyEvent(stroke, component)
@@ -52,10 +56,6 @@ internal class IjVimApplication : VimApplicationBase() {
       }
       Toolkit.getDefaultToolkit().systemEventQueue.postEvent(event)
     }
-  }
-
-  override fun localEditors(): List<VimEditor> {
-    return com.maddyhome.idea.vim.helper.localEditors().map { IjVimEditor(it) }
   }
 
   override fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
@@ -80,6 +80,12 @@ internal class IjVimApplication : VimApplicationBase() {
 
   override fun runAfterGotFocus(runnable: Runnable) {
     com.maddyhome.idea.vim.helper.runAfterGotFocus(runnable)
+  }
+
+  override fun isOctopusEnabled(): Boolean {
+    val property = System.getProperty("octopus.handler") ?: "true"
+    if (property.isBlank()) return true
+    return property.toBoolean()
   }
 
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {

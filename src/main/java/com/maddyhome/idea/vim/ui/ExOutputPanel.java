@@ -18,8 +18,8 @@ import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.diagnostic.VimLogger;
-import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
@@ -104,7 +104,7 @@ public class ExOutputPanel extends JPanel {
   }
 
   private static int countLines(@NotNull String text) {
-    if (text.length() == 0) {
+    if (text.isEmpty()) {
       return 0;
     }
 
@@ -139,14 +139,14 @@ public class ExOutputPanel extends JPanel {
   }
 
   public void setText(@NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String data) {
-    if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
+    if (!data.isEmpty() && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
     }
 
     myText.setText(data);
     myText.setFont(UiHelper.selectFont(data));
     myText.setCaretPosition(0);
-    if (data.length() > 0) {
+    if (!data.isEmpty()) {
       activate();
     }
   }
@@ -366,8 +366,11 @@ public class ExOutputPanel extends JPanel {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
       if (VimPlugin.isNotEnabled()) return;
-      // Calls updateUI on this and child components
-      for (Editor editor : HelperKt.localEditors()) {
+
+      // This listener is only invoked for local scenarios, and we only need to update local editor UI. This will invoke
+      // updateUI on the output pane and it's child components
+      for (VimEditor vimEditor : injector.getEditorGroup().getEditors()) {
+        Editor editor = ((IjVimEditor)vimEditor).getEditor();
         if (!ExOutputPanel.isPanelActive(editor)) continue;
         IJSwingUtilities.updateComponentTreeUI(ExOutputPanel.getInstance(editor));
       }

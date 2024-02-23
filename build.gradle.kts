@@ -32,7 +32,6 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.jetbrains.changelog.Changelog
-import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.kohsuke.github.GHUser
 import java.net.HttpURLConnection
 import java.net.URL
@@ -52,11 +51,11 @@ buildscript {
     classpath("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.8.0.202311291450-r")
     classpath("org.kohsuke:github-api:1.305")
 
-    classpath("io.ktor:ktor-client-core:2.3.7")
-    classpath("io.ktor:ktor-client-cio:2.3.7")
-    classpath("io.ktor:ktor-client-auth:2.3.7")
-    classpath("io.ktor:ktor-client-content-negotiation:2.3.7")
-    classpath("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+    classpath("io.ktor:ktor-client-core:2.3.8")
+    classpath("io.ktor:ktor-client-cio:2.3.8")
+    classpath("io.ktor:ktor-client-auth:2.3.8")
+    classpath("io.ktor:ktor-client-content-negotiation:2.3.8")
+    classpath("io.ktor:ktor-serialization-kotlinx-json:2.3.8")
 
     // This comes from the changelog plugin
 //        classpath("org.jetbrains:markdown:0.3.1")
@@ -70,7 +69,7 @@ plugins {
   application
   id("java-test-fixtures")
 
-  id("org.jetbrains.intellij") version "1.17.0"
+  id("org.jetbrains.intellij") version "1.17.2"
   id("org.jetbrains.changelog") version "2.2.0"
 
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
@@ -144,12 +143,12 @@ dependencies {
   // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-  testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
-  testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+  testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+  testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
 }
 
 configurations {
@@ -207,6 +206,11 @@ tasks {
     systemProperty("jb.privacy.policy.text", "<!--999.999-->")
     systemProperty("jb.consents.confirmation.enabled", "false")
     systemProperty("ide.show.tips.on.startup.default.value", "false")
+    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
+  }
+
+  runIde {
+    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
   }
 }
 
@@ -305,26 +309,12 @@ tasks {
     from(createOpenApiSourceJar) { into("lib/src") }
   }
 
-  val pluginVersion = version
-  // Don't forget to update plugin.xml
   patchPluginXml {
+    // Don't forget to update plugin.xml
     sinceBuild.set("233.11799.30")
 
-    // Get the latest available change notes from the changelog file
     changeNotes.set(
-      provider {
-        with(changelog) {
-          val log = try {
-            getUnreleased()
-          } catch (e: MissingVersionException) {
-            getOrNull(pluginVersion.toString()) ?: getLatest()
-          }
-          renderItem(
-            log,
-            org.jetbrains.changelog.Changelog.OutputType.HTML,
-          )
-        }
-      },
+      """<a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>"""
     )
   }
 }
@@ -431,12 +421,14 @@ val prId: String by project
 
 tasks.register("updateMergedPr") {
   doLast {
-    if (project.hasProperty("prId")) {
-      println("Got pr id: $prId")
-      updateMergedPr(prId.toInt())
-    } else {
-      error("Cannot get prId")
-    }
+    val x = changelog.getUnreleased()
+    println("x")
+//    if (project.hasProperty("prId")) {
+//      println("Got pr id: $prId")
+//      updateMergedPr(prId.toInt())
+//    } else {
+//      error("Cannot get prId")
+//    }
   }
 }
 

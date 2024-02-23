@@ -10,6 +10,8 @@
   <applicationListeners>
     <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
@@ -18,8 +20,6 @@
               topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
   </applicationListeners>
   <projectListeners>
-    <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
-              topic="com.intellij.ide.ui.LafManagerListener"/>
 
     <listener class="com.maddyhome.idea.vim.listener.VimListenerManager$VimFileEditorManagerListener"
               topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>

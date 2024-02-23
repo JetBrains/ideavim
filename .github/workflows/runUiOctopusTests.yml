@@ -9,9 +9,6 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply Patch
-        run: |
-          git apply tests/ui-ij-tests/src/test/kotlin/ui/octopus.patch
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -30,7 +27,7 @@ jobs:
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle runIdeForUiTests > build/reports/idea.log &
+          gradle runIdeForUiTests -Doctopus.handler=false > build/reports/idea.log &
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
@@ -52,6 +49,7 @@ jobs:
           name: ui-test-fails-report-mac
           path: |
             build/reports
+            tests/ui-ij-tests/build/reports
             sandbox-idea-log
 #  build-for-ui-test-linux:
 #    runs-on: ubuntu-latest

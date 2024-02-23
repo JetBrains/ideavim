@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -83,6 +84,7 @@ import kotlin.math.min
 /**
  * This handles all motion related commands and marks
  */
+@Service
 internal class MotionGroup : VimMotionGroupBase() {
   override fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int) {
     AppCodeTemplates.onMovement(editor.ij, caret.ij, oldOffset < offset)

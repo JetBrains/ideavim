@@ -17,7 +17,6 @@ import com.intellij.openapi.editor.actionSystem.EditorActionHandlerBean
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.testFramework.ExtensionTestUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -47,7 +46,7 @@ class InsertEnterActionTest : VimTestCase() {
     forEachBean.action = "EditorEnter"
     forEachBean.setPluginDescriptor(PluginManagerCore.getPlugin(VimPlugin.getPluginId())!!)
 
-    if (injector.globalOptions().octopushandler) {
+    if (injector.application.isOctopusEnabled()) {
       if (repetitionInfo.currentRepetition == 1) {
         ExtensionTestUtil.maskExtensions(
           ExtensionPointName("com.intellij.editorActionHandler"),

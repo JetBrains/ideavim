@@ -39,8 +39,8 @@ afterEvaluate {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
@@ -48,8 +48,8 @@ dependencies {
 
     compileOnly("org.jetbrains:annotations:24.1.0")
 
-    runtimeOnly("org.antlr:antlr4-runtime:4.10.1")
-    antlr("org.antlr:antlr4:4.10.1")
+    runtimeOnly("org.antlr:antlr4-runtime:4.13.1")
+    antlr("org.antlr:antlr4:4.13.1")
 
     ksp(project(":annotation-processors"))
     compileOnly(project(":annotation-processors"))

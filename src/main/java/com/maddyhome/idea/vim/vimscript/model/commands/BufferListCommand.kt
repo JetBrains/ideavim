@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import org.jetbrains.annotations.NonNls
 
@@ -68,10 +67,10 @@ internal data class BufferListCommand(val ranges: Ranges, val argument: String) 
     for ((file, displayFileName) in virtualFileDisplayMap) {
       val editor = EditorHelper.getEditor(file) ?: continue
 
-      val bufStatus = getBufferStatus(editor.vim, file, currentFile, previousFile)
+      val bufStatus = getBufferStatus(editor, file, currentFile, previousFile)
 
       if (bufStatusMatchesFilter(filter, bufStatus)) {
-        val lineNum = editor.vimLine
+        val lineNum = editor.ij.vimLine
         val lineNumPad =
           if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
 

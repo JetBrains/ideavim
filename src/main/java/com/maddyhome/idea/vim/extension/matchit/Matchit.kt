@@ -217,6 +217,8 @@ private object FileTypePatterns {
 
     return if (fileTypeName in htmlLikeFileTypes) {
       this.htmlPatterns
+    } else if (fileTypeName == "JAVA" || fileExtension == "java") {
+      this.javaPatterns
     } else if (fileTypeName == "Ruby" || fileExtension == "rb") {
       this.rubyPatterns
     } else if (fileTypeName == "RHTML" || fileExtension == "erb") {
@@ -242,6 +244,7 @@ private object FileTypePatterns {
   )
 
   private val htmlPatterns = createHtmlPatterns()
+  private val javaPatterns = createJavaPatterns()
   private val rubyPatterns = createRubyPatterns()
   private val rubyAndHtmlPatterns = rubyPatterns + htmlPatterns
   private val phpPatterns = createPhpPatterns()
@@ -268,6 +271,14 @@ private object FileTypePatterns {
     return (
       LanguagePatterns("<", ">") +
         LanguagePatterns(linkedMapOf(openingTagPattern to htmlSearchPair), linkedMapOf(closingTagPattern to htmlSearchPair))
+      )
+  }
+  
+  private fun createJavaPatterns(): LanguagePatterns {
+    return (
+        LanguagePatterns("\\b(?<!else\\s+)if\\b", "\\belse\\s+if\\b", "\\belse(?!\\s+if)\\b") +
+          LanguagePatterns("\\bdo\\b", "\\bwhile\\b") +
+          LanguagePatterns("\\btry\\b", "\\bcatch\\b", "\\bfinally\\b")
       )
   }
 

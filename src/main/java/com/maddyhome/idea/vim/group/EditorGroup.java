@@ -11,6 +11,9 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.find.EditorSearchSession;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.client.ClientAppSession;
+import com.intellij.openapi.client.ClientKind;
+import com.intellij.openapi.client.ClientSessionsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -34,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
@@ -204,7 +208,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   public void editorCreated(@NotNull Editor editor) {
-    DocumentManager.INSTANCE.addListeners(editor.getDocument());
+    UserDataManager.setVimInitialised(editor, true);
+
     VimPlugin.getKey().registerRequiredShortcutKeys(new IjVimEditor(editor));
 
     initLineNumbers(editor);
@@ -253,7 +258,6 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(new IjVimEditor(editor));
-    DocumentManager.INSTANCE.removeListeners(editor.getDocument());
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
   }
 
@@ -336,20 +340,45 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
   }
 
-  @NotNull
   @Override
-  public Collection<VimEditor> localEditors() {
-    return HelperKt.localEditors().stream()
+  public @NotNull Collection<VimEditor> getEditorsRaw() {
+    return getLocalEditors()
       .map(IjVimEditor::new)
       .collect(Collectors.toList());
   }
 
   @NotNull
   @Override
-  public Collection<VimEditor> localEditors(@NotNull VimDocument buffer) {
-    final Document document = ((IjVimDocument)buffer).getDocument();
-    return HelperKt.localEditors(document).stream()
+  public Collection<VimEditor> getEditors() {
+    return getLocalEditors()
+      .filter(UserDataManager::getVimInitialised)
       .map(IjVimEditor::new)
       .collect(Collectors.toList());
+  }
+
+  @NotNull
+  @Override
+  public Collection<VimEditor> getEditors(@NotNull VimDocument buffer) {
+    final Document document = ((IjVimDocument)buffer).getDocument();
+    return getLocalEditors()
+      .filter(editor -> UserDataManager.getVimInitialised(editor) && editor.getDocument().equals(document))
+      .map(IjVimEditor::new)
+      .collect(Collectors.toList());
+  }
+
+  private Stream<Editor> getLocalEditors() {
+    // Always fetch local editors. If we're hosting a Code With Me session, any connected guests will create hidden
+    // editors to handle syntax highlighting, completion requests, etc. We need to make sure that IdeaVim only makes
+    // changes (e.g. adding search highlights) to local editors, so things don't incorrectly flow through to any Clients.
+    // In non-CWM scenarios, or if IdeaVim is installed on the Client, there are only ever local editors, so this will
+    // also work there. In Gateway remote development scenarios, IdeaVim should not be installed on the host, only the
+    // Client, so all should work there too.
+    // Note that most IdeaVim operations are in response to interactive keystrokes, which would mean that
+    // ClientEditorManager.getCurrentInstance would return local editors. However, some operations are in response to
+    // events such as document change (to update search highlights) and these can come from CWM guests, and we'd get the
+    // remote editors.
+    // This invocation will always get local editors, regardless of current context.
+    final ClientAppSession localSession = ClientSessionsManager.getAppSessions(ClientKind.LOCAL).get(0);
+    return localSession.getService(ClientEditorManager.class).editors();
   }
 }

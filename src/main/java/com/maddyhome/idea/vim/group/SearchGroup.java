@@ -21,8 +21,6 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
@@ -35,6 +33,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
+import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener;
@@ -59,7 +58,6 @@ import java.text.ParsePosition;
 import java.util.*;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
-import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
@@ -1200,47 +1198,50 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     public static DocumentSearchListener INSTANCE = new DocumentSearchListener();
 
     @Contract(pure = true)
-    private DocumentSearchListener () {
+    private DocumentSearchListener() {
     }
 
     @Override
     public void documentChanged(@NotNull DocumentEvent event) {
-      for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-        final Document document = event.getDocument();
+      // Loop over all local editors for the changed document, across all projects, and update search highlights.
+      // Note that the change may have come from a remote guest in Code With Me scenarios (in which case
+      // ClientId.current will be a guest ID), but we don't care - we still need to add/remove highlights for the
+      // changed text. Make sure we only update local editors, though.
+      final Document document = event.getDocument();
+      for (VimEditor vimEditor : injector.getEditorGroup().getEditors(new IjVimDocument(document))) {
+        final Editor editor = ((IjVimEditor)vimEditor).getEditor();
+        Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
+        if (hls == null) {
+          continue;
+        }
 
-        for (Editor editor : localEditors(document, project)) {
-          Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
-          if (hls == null) {
-            continue;
+        if (logger.isDebugEnabled()) {
+          logger.debug("hls=" + hls);
+          logger.debug("event=" + event);
+        }
+
+        // We can only re-highlight whole lines, so clear any highlights in the affected lines
+        final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
+        final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
+        final int startLineOffset = document.getLineStartOffset(startPosition.line);
+        final int endLineOffset = document.getLineEndOffset(endPosition.line);
+
+        final Iterator<RangeHighlighter> iter = hls.iterator();
+        while (iter.hasNext()) {
+          final RangeHighlighter highlighter = iter.next();
+          if (!highlighter.isValid() ||
+              (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
+            iter.remove();
+            editor.getMarkupModel().removeHighlighter(highlighter);
           }
+        }
 
-          if (logger.isDebugEnabled()) {
-            logger.debug("hls=" + hls);
-            logger.debug("event=" + event);
-          }
+        VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
 
-          // We can only re-highlight whole lines, so clear any highlights in the affected lines
-          final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
-          final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
-          final int startLineOffset = document.getLineStartOffset(startPosition.line);
-          final int endLineOffset = document.getLineEndOffset(endPosition.line);
-
-          final Iterator<RangeHighlighter> iter = hls.iterator();
-          while (iter.hasNext()) {
-            final RangeHighlighter highlighter = iter.next();
-            if (!highlighter.isValid() || (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
-              iter.remove();
-              editor.getMarkupModel().removeHighlighter(highlighter);
-            }
-          }
-
-          VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
-
-          if (logger.isDebugEnabled()) {
-            hls = UserDataManager.getVimLastHighlighters(editor);
-            logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
-            logger.debug("hls=" + hls);
-          }
+        if (logger.isDebugEnabled()) {
+          hls = UserDataManager.getVimLastHighlighters(editor);
+          logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
+          logger.debug("hls=" + hls);
         }
       }
     }

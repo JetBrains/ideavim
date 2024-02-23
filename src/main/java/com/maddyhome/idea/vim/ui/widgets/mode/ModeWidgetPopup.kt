@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.ui.widgets.mode
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -44,7 +45,7 @@ import javax.swing.JPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-public class ModeWidgetPopup : AnAction() {
+public class ModeWidgetPopup : AnAction(), ActionRemoteBehaviorSpecification.Disabled {
   public override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
     val popup = createPopup() ?: return
@@ -153,7 +154,7 @@ public class ModeWidgetPopup : AnAction() {
         group {
           row {
             label(MessageHelper.getMessage("widget.mode.popup.field.theme"))
-            comboBox(ModeWidgetTheme.values().toList()).bindItem(modeColors::theme.toNullableProperty())
+            comboBox(ModeWidgetTheme.entries).bindItem(modeColors::theme.toNullableProperty())
           }
           row { browserLink("Suggest your theme", "https://youtrack.jetbrains.com/issue/VIM-1377/Normal-mode-needs-to-be-more-obvious") }
         }.topGap(TopGap.NONE).visibleIf(!advancedSettings.selected)
@@ -360,7 +361,7 @@ public enum class ModeWidgetTheme(private var value: String) {
 
   public companion object {
     public fun parseString(string: String): ModeWidgetTheme? {
-      return ModeWidgetTheme.values().firstOrNull { it.value == string }
+      return entries.firstOrNull { it.value == string }
     }
 
     public fun getDefaultTheme(): ModeWidgetTheme = TERM

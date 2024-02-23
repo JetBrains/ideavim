@@ -31,7 +31,7 @@ internal class Troubleshooter {
 
   fun findIncorrectMappings(): List<Problem> {
     val problems = ArrayList<Problem>()
-    MappingMode.values().forEach { mode ->
+    MappingMode.entries.forEach { mode ->
       injector.keyGroup.getKeyMapping(mode).getByOwner(MappingOwner.IdeaVim.InitScript).forEach { (_, to) ->
         if (to is ToKeysMappingInfo) {
           if (":action" in to.toKeys.joinToString { it.keyChar.toString() }) {

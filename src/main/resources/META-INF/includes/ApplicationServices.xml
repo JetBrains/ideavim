@@ -8,24 +8,20 @@
 
 <idea-plugin>
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MotionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ScrollGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimScrollGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ChangeGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimChangeGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CommandGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"
                         serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.XMLGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.SearchGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MacroGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.DigraphGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimDigraphGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
@@ -38,7 +34,6 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.visual.VisualMotionGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimVisualMotionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.yank.YankGroupBase"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVariableService"
                         serviceInterface="com.maddyhome.idea.vim.vimscript.services.VariableService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjStatisticsService"
@@ -53,6 +48,5 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimSystemInfoService"
                         serviceInterface="com.maddyhome.idea.vim.api.SystemInfoService"/>
 
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
   </extensions>
 </idea-plugin>

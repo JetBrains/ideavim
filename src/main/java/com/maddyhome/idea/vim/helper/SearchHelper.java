@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.google.common.collect.Lists;
+import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx;
 import com.intellij.lang.CodeDocumentationAwareCommenter;
 import com.intellij.lang.Commenter;
 import com.intellij.lang.Language;
@@ -16,22 +17,28 @@ import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.spellchecker.SpellCheckerSeveritiesProvider;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.regexp.*;
-import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
-import com.maddyhome.idea.vim.state.mode.Mode;
-import com.maddyhome.idea.vim.state.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.regexp.*;
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
+import com.maddyhome.idea.vim.state.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
+import it.unimi.dsi.fastutil.ints.IntComparator;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -1571,6 +1578,48 @@ public class SearchHelper {
    */
   public static int findMethodEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return PsiHelper.findMethodEnd(editor, caret.getOffset(), count);
+  }
+
+  public static int findMisspelledWords(@NotNull Editor editor,
+                                       int startOffset,
+                                       int endOffset,
+                                       int skipCount,
+                                       IntComparator offsetOrdering) {
+    Project project = editor.getProject();
+    if (project == null) {
+      return -1;
+    }
+
+    IntSortedSet offsets = new IntRBTreeSet(offsetOrdering);
+    DaemonCodeAnalyzerEx.processHighlights(editor.getDocument(), project, SpellCheckerSeveritiesProvider.TYPO,
+                                           startOffset, endOffset, highlight -> {
+        if (highlight.getSeverity() == SpellCheckerSeveritiesProvider.TYPO) {
+          int offset = highlight.getStartOffset();
+          if (offset >= startOffset && offset <= endOffset) {
+            offsets.add(offset);
+          }
+        }
+        return true;
+      });
+
+    if (offsets.isEmpty()) {
+      return -1;
+    }
+
+    if (skipCount >= offsets.size()) {
+      return offsets.lastInt();
+    }
+    else {
+      IntIterator offsetIterator = offsets.iterator();
+      skip(offsetIterator, skipCount);
+      return offsetIterator.nextInt();
+    }
+  }
+
+  private static void skip(IntIterator iterator, final int n) {
+    if (n < 0) throw new IllegalArgumentException("Argument must be nonnegative: " + n);
+    int i = n;
+    while (i-- != 0 && iterator.hasNext()) iterator.nextInt();
   }
 
   private static @NotNull String parseMatchPairsOption(final VimEditor vimEditor) {

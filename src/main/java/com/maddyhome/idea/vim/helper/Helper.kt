@@ -9,19 +9,12 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.codeInsight.template.TemplateManager
-import com.intellij.codeWithMe.ClientId
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.ClientEditorManager
-import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import java.util.stream.Collectors
 
 internal fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
@@ -35,34 +28,6 @@ internal inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
 }
 
 internal fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
-
-/**
- * Return list of editors for local host (for code with me plugin)
- */
-public fun localEditors(): List<Editor> {
-  return ClientEditorManager.getCurrentInstance().editors().collect(Collectors.toList())
-}
-
-public fun localEditors(doc: Document): List<Editor> {
-  return EditorFactory.getInstance().getEditors(doc)
-    .filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
-}
-
-public fun localEditors(doc: Document, project: Project): List<Editor> {
-  return EditorFactory.getInstance().getEditors(doc, project)
-    .filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
-}
-
-private val Editor.editorClientId: ClientId?
-  get() {
-    if (editorClientKey == null) {
-      @Suppress("DEPRECATION")
-      editorClientKey = Key.findKeyByName("editorClientIdby userData()") ?: return null
-    }
-    return editorClientKey?.let { this.getUserData(it) as? ClientId }
-  }
-
-private var editorClientKey: Key<*>? = null
 
 @Suppress("IncorrectParentDisposable")
 internal fun Editor.isTemplateActive(): Boolean {

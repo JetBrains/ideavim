@@ -8,6 +8,12 @@
 
 package scripts.release
 
+import org.eclipse.jgit.lib.ObjectId
+import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.revwalk.filter.RevFilter
+
+
 fun main(args: Array<String>) {
   println("HI!")
   val projectDir = args[0]
@@ -19,10 +25,12 @@ fun main(args: Array<String>) {
   check(branch == "master") {
     "We should be on master branch"
   }
+  val mergeBaseCommit = getMergeBaseWithMaster(projectDir, objectId)
+  println("Base commit $mergeBaseCommit")
   withGit(projectDir) { git ->
     val log = git.log().setMaxCount(500).call().toList()
     println("First commit hash in log: " + log.first().name + " log size: ${log.size}")
-    val logDiff = log.takeWhile { it.id.name != objectId.name }
+    val logDiff = log.takeWhile { it.id.name != mergeBaseCommit }
     val numCommits = logDiff.size
     println("Log diff size is $numCommits")
     check(numCommits < 450) {
@@ -33,5 +41,20 @@ fun main(args: Array<String>) {
 
     println("Next dev version: $nextVersion")
     println("##teamcity[setParameter name='env.ORG_GRADLE_PROJECT_version' value='$nextVersion']")
+  }
+}
+
+private fun getMergeBaseWithMaster(projectDir: String, tag: ObjectId): String {
+  withRepo(projectDir) { repo ->
+    val master = repo.resolve("master")
+    RevWalk(repo).use { walk ->
+      val tagRevCommit = walk.parseCommit(tag)
+      val masterRevCommit = walk.parseCommit(master)
+      walk.setRevFilter(RevFilter.MERGE_BASE)
+      walk.markStart(tagRevCommit)
+      walk.markStart(masterRevCommit)
+      val mergeBase: RevCommit = walk.next()
+      return mergeBase.name
+    }
   }
 }

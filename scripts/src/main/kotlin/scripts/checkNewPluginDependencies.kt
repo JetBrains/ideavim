@@ -22,7 +22,7 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 
 @Suppress("SpellCheckingInspection")
-val knownPlugins = listOf(
+val knownPlugins = setOf(
   "IdeaVimExtension",
   "github.zgqq.intellij-enhance",
   "org.jetbrains.IdeaVim-EasyMotion",
@@ -31,7 +31,12 @@ val knownPlugins = listOf(
   "com.github.copilot",
   "com.github.dankinsoid.multicursor",
   "com.joshestein.ideavim-quickscope",
+
   "ca.alexgirard.HarpoonIJ",
+  "me.kyren223.harpoonforjb", // https://plugins.jetbrains.com/plugin/23771-harpoonforjb
+  "com.github.erotourtes.harpoon", // https://plugins.jetbrains.com/plugin/21796-harpooner
+  "me.kyren223.trident", // https://plugins.jetbrains.com/plugin/23818-trident
+
   "com.protoseo.input-source-auto-converter",
 
 //   "cc.implicated.intellij.plugins.bunny", // I don't want to include this plugin in the list of IdeaVim plugins as I don't understand what this is for
@@ -42,7 +47,7 @@ suspend fun main() {
     parameter("dependency", "IdeaVIM")
     parameter("includeOptional", true)
   }
-  val output = response.body<List<String>>()
+  val output = response.body<List<String>>().toSet()
   println(output)
   if (knownPlugins != output) {
     val newPlugins = (output - knownPlugins).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }

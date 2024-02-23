@@ -20,8 +20,8 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
-import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
@@ -55,9 +55,7 @@ internal object IdeaSelectionControl {
     selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER,
   ) {
     VimVisualTimer.singleTask(editor.vim.mode) { initialMode ->
-
-      if (VimPlugin.isNotEnabled()) return@singleTask
-      if (editor.isIdeaVimDisabledHere) return@singleTask
+      if (vimDisabled(editor)) return@singleTask
 
       logger.debug("Adjust non-vim selection. Source: $selectionSource, initialMode: $initialMode")
 

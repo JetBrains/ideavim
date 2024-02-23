@@ -114,7 +114,7 @@ public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: 
 
     companion object {
       fun fromString(s: String): SpecialArgument? {
-        for (argument in values()) {
+        for (argument in entries) {
           if (s == argument.myName) {
             return argument
           }

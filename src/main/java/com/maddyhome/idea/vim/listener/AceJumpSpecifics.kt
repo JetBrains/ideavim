@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.listener
 
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import org.acejump.session.SessionManager
 
@@ -16,12 +16,11 @@ import org.acejump.session.SessionManager
  * Key handling for IdeaVim should be updated to editorHandler usage. In this case this class can be safely removed.
  */
 
-@Suppress("DEPRECATION")
 internal interface AceJumpService {
   fun isActive(editor: Editor): Boolean
 
   companion object {
-    fun getInstance(): AceJumpService? = ServiceManager.getService(AceJumpService::class.java)
+    fun getInstance(): AceJumpService? = ApplicationManager.getApplication().getService(AceJumpService::class.java)
   }
 }
 

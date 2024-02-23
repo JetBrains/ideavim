@@ -17,6 +17,7 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.common.IndentConfig;
+import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import kotlin.Pair;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
@@ -197,7 +199,7 @@ public class EditorHelper {
    * @param file The virtual file get the editor for
    * @return The matching editor or null if no match was found
    */
-  public static @Nullable Editor getEditor(final @Nullable VirtualFile file) {
+  public static @Nullable VimEditor getEditor(final @Nullable VirtualFile file) {
     if (file == null) {
       return null;
     }
@@ -206,12 +208,7 @@ public class EditorHelper {
     if (doc == null) {
       return null;
     }
-    final List<Editor> editors = HelperKt.localEditors(doc);
-    if (editors.size() > 0) {
-      return editors.get(0);
-    }
-
-    return null;
+    return injector.getEditorGroup().getEditors(new IjVimDocument(doc)).stream().findFirst().orElse(null);
   }
 
   public static @NotNull String pad(final @NotNull Editor editor,

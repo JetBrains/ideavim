@@ -17,14 +17,17 @@ import com.intellij.remoterobot.fixtures.FixtureName
 import com.intellij.remoterobot.search.locators.byXpath
 import ui.utils.escape
 import java.awt.Point
+import java.time.Duration
 
 @JvmOverloads
 fun ContainerFixture.editor(title: String, function: Editor.() -> Unit = {}): Editor {
   find<ComponentFixture>(
     byXpath("//div[@class='EditorTabs']//div[@accessiblename='$title' and @class='SimpleColoredComponent']"),
+    Duration.ofSeconds(30),
   ).click()
   return find<Editor>(
     byXpath("title '$title'", "//div[@accessiblename='Editor for $title' and @class='EditorComponentImpl']"),
+    Duration.ofSeconds(30),
   )
     .apply { runJs("robot.moveMouse(component);") }
     .apply(function)

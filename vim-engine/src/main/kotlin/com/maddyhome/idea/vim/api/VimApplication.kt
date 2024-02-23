@@ -15,9 +15,8 @@ public interface VimApplication {
   public fun invokeLater(action: () -> Unit, editor: VimEditor)
   public fun invokeLater(action: () -> Unit)
   public fun isUnitTest(): Boolean
+  public fun isInternal(): Boolean
   public fun postKey(stroke: KeyStroke, editor: VimEditor)
-
-  public fun localEditors(): List<VimEditor>
 
   public fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
   public fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
@@ -27,4 +26,5 @@ public interface VimApplication {
 
   public fun currentStackTrace(): String
   public fun runAfterGotFocus(runnable: Runnable)
+  public fun isOctopusEnabled(): Boolean
 }

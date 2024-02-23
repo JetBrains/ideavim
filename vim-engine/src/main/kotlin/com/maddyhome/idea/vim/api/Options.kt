@@ -253,6 +253,24 @@ public object Options {
       }
     })
 
+  public val operatorfunc: StringOption = addOption(object : StringOption("operatorfunc", GLOBAL, "opfunc", VimString.EMPTY) {
+    override fun parseValue(value: String, token: String): VimString {
+      // TODO: Support script local functions
+      // If this value is a function name, it should be a global function. It's possible to use a local function by
+      // adding the correct `<SNR>#_` prefix for the script context. Setting the option should automatically expand the
+      // `<SID>` prefix to `<SNR>#_`.
+      // If using the `funcref('...')` or `function('...')` expressions, `<SID>` is also expanded, but it's not clear if
+      // setting the option does a simple find/replace inside the string option value, or if the expression is parsed
+      // and the string literal is expanded (this might not affect the end result, but it does have implications for
+      // IdeaVim's implementation).
+      // The `s:` prefix is not supported, and using it will result in all of the following errors:
+      // * E81: Using <SID> not in a script context
+      // * E475: Invalid argument: s:MyFunc
+      // * E474: Invalid argument: opfunc=funcref('s:MyFunc')
+      return super.parseValue(value, token)
+    }
+  })
+
   public val scrolljump: NumberOption = addOption(object : NumberOption("scrolljump", GLOBAL, "sj", 1) {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
@@ -300,9 +318,10 @@ public object Options {
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
   public val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", GLOBAL, "ideaglobalmode", false))
-  public val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false))
-  public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false))
-  public val octopushandler: ToggleOption = addOption(ToggleOption("octopushandler", GLOBAL, "octopushandler", true))
+
+  // Temporary feature flags for work-in-progress behaviour, diagnostic switches, etc. Hidden from the output of `:set all`
+  public val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))
+  public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false, isHidden = true))
 }
 
 private class MultikeyMap(vararg entries: Option<VimDataType>) {

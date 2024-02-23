@@ -14,21 +14,34 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.Extension
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ModalEntry
+import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.KeyStroke
 
 /**
@@ -120,12 +133,6 @@ public object VimExtensionFacade {
       .setAlias(name, CommandAlias.Call(minimumNumberOfArguments, maximumNumberOfArguments, name, handler))
   }
 
-  /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
-  @JvmStatic
-  public fun setOperatorFunction(function: OperatorFunction) {
-    VimPlugin.getKey().operatorFunction = function
-  }
-
   /**
    * Runs normal mode commands similar to ':normal! {commands}'.
    * Mappings doesn't work with this function
@@ -208,4 +215,65 @@ public object VimExtensionFacade {
   public fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
     VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList(), type)
   }
+
+  @JvmStatic
+  public fun exportScriptFunction(
+    scope: Scope?,
+    name: String,
+    args: List<String>,
+    defaultArgs: List<Pair<String, Expression>>,
+    hasOptionalArguments: Boolean,
+    flags: EnumSet<FunctionFlag>,
+    function: ScriptFunction
+  ) {
+    var functionDeclaration: FunctionDeclaration? = null
+    val body = listOf(object : Executable {
+      // This context is set to the function declaration during initialisation and then set to the function execution
+      // context during execution
+      override lateinit var vimContext: VimLContext
+      override var rangeInScript: TextRange = TextRange(0, 0)
+
+      override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+        return function.execute(editor, context, functionDeclaration!!.functionVariables)
+      }
+    })
+    functionDeclaration = FunctionDeclaration(
+      scope,
+      name,
+      args,
+      defaultArgs,
+      body,
+      replaceExisting = true,
+      flags,
+      hasOptionalArguments
+    )
+    functionDeclaration.rangeInScript = TextRange(0, 0)
+    body.forEach { it.vimContext = functionDeclaration }
+    injector.functionService.storeFunction(functionDeclaration)
+  }
+}
+
+public fun VimExtensionFacade.exportOperatorFunction(name: String, function: OperatorFunction) {
+  exportScriptFunction(null, name, listOf("type"), emptyList(), false, noneOfEnum()) {
+    editor, context, args ->
+
+    val type = args["type"]?.asString()
+    val selectionType = when (type) {
+      "line" -> SelectionType.LINE_WISE
+      "block" -> SelectionType.BLOCK_WISE
+      "char" -> SelectionType.CHARACTER_WISE
+      else -> return@exportScriptFunction ExecutionResult.Error
+    }
+
+    if (function.apply(editor, context, selectionType)) {
+      ExecutionResult.Success
+    }
+    else {
+      ExecutionResult.Error
+    }
+  }
+}
+
+public fun interface ScriptFunction {
+  public fun execute(editor: VimEditor, context: ExecutionContext, args: Map<String, VimDataType>): ExecutionResult
 }

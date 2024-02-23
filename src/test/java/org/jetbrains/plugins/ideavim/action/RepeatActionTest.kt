@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class RepeatActionTest : VimTestCase() {
@@ -109,5 +110,21 @@ class RepeatActionTest : VimTestCase() {
         false
       )
     }
+  }
+
+  @Test
+  @Disabled("This test throws `Recursive runForEachCaret invocations are not allowed`")
+  fun `repeat command with execution of ij action`() {
+    doTest(
+      "c<C-End><C-I><esc>.",
+      """
+        ${c}1234567890
+        ${c}1234567890
+        """.trimIndent(),
+      """
+        ${c}1234567890
+        ${c}1234567890
+        """.trimIndent()
+    )
   }
 }

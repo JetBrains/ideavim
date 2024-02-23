@@ -27,7 +27,6 @@ import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.removeUserData
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.group.IjOptionConstants
@@ -363,4 +362,4 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
 }
 
 internal val enableOctopus: Boolean
-  get() = injector.globalOptions().octopushandler
+  get() = injector.application.isOctopusEnabled()

@@ -104,12 +104,17 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessS
   when {
     argument.isEmpty() -> {
       // No arguments mean we show only changed values
-      val changedOptions = optionGroup.getAllOptions().filter { !optionGroup.isDefaultValue(it, scope) && !it.isTemporary }
-      showOptions(editor, changedOptions.map { Pair(it.name, it.name) }, scope, true, columnFormat)
+      val changedOptions = optionGroup.getAllOptions()
+        .filter { !optionGroup.isDefaultValue(it, scope) && (!it.isHidden || (injector.application.isInternal() && !injector.application.isUnitTest())) }
+        .map { Pair(it.name, it.name) }
+      showOptions(editor, changedOptions, scope, true, columnFormat)
       return
     }
     argument == "all" -> {
-      showOptions(editor, optionGroup.getAllOptions().filter { !it.isTemporary }.map { Pair(it.name, it.name) }, scope, true, columnFormat)
+      val options = optionGroup.getAllOptions()
+        .filter { !it.isHidden || (injector.application.isInternal() && !injector.application.isUnitTest()) }
+        .map { Pair(it.name, it.name) }
+      showOptions(editor, options, scope, true, columnFormat)
       return
     }
     argument == "all&" -> {

@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.Contract
@@ -86,11 +87,24 @@ private fun updateSearchHighlights(
 ): Int {
   var currentMatchOffset = -1
   val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentMatchOffset
+
+  // TODO: This implementation needs rethinking
+  // It's a bit weird that we update search highlights across all open projects. It would make more sense to treat top
+  // level project frame windows as separate applications, but we can't do this because IdeaVim does not maintain state
+  // per-project.
+  // So, to be clear, this will loop over each project, and therefore, for each project top-level frame, will update
+  // search highlights in all editors for the document of the currently selected editor. It does not update highlights
+  // for editors for the document that are in other projects.
+
   for (project in projectManager.openProjects) {
     val current = FileEditorManager.getInstance(project).selectedTextEditor ?: continue
-    // [VERSION UPDATE] 202+ Use editors
-    val editors = localEditors(current.document, project)
-    for (editor in editors) {
+    val editors = injector.editorGroup.getEditors(IjVimDocument(current.document))
+    for (vimEditor in editors) {
+      val editor = (vimEditor as IjVimEditor).editor
+      if (editor.project != project) {
+        continue
+      }
+
       // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
       // Force update for the situations where the text is the same, but the ignore case values have changed.
       // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,

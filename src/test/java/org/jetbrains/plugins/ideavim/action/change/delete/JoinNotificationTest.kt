@@ -11,7 +11,6 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.intellij.notification.ActionCenter
-import com.intellij.notification.EventLog
 import com.intellij.notification.Notification
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -21,6 +20,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
+import kotlin.test.assertTrue
 
 /**
  * @author Alex Plate
@@ -29,15 +29,16 @@ import org.jetbrains.plugins.ideavim.impl.VimOption
 class JoinNotificationTest : VimTestCase() {
   @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["false"]))
   fun `test notification shown for no ideajoin`() {
-    val before = "I found${c} it\n in a legendary land"
-    configureByText(before)
-    appReadySetup(false)
-    typeText(injector.parser.parseKeys("J"))
+    val notification = newNotifications {
+      val before = "I found${c} it\n in a legendary land"
+      configureByText(before)
+      appReadySetup(false)
+      typeText(injector.parser.parseKeys("J"))
+    }.last()
 
-    val notification = notifications().last()
     try {
       kotlin.test.assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-      kotlin.test.assertTrue(TestIjOptionConstants.ideajoin in notification.content)
+      assertTrue(TestIjOptionConstants.ideajoin in notification.content)
       kotlin.test.assertEquals(3, notification.actions.size)
     } finally {
       notification.expire()
@@ -46,32 +47,36 @@ class JoinNotificationTest : VimTestCase() {
 
   @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["true"]))
   fun `test notification not shown for ideajoin`() {
-    val before = "I found${c} it\n in a legendary land"
-    configureByText(before)
-    appReadySetup(false)
-    typeText(injector.parser.parseKeys("J"))
-
-    val notifications = notifications()
-    kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || TestIjOptionConstants.ideajoin !in notifications.last().content)
-  }
-
-  private fun notifications(): MutableList<Notification> {
-    return ActionCenter.getNotifications(fixture.project)
+    val notifications = newNotifications {
+      val before = "I found${c} it\n in a legendary land"
+      configureByText(before)
+      appReadySetup(false)
+      typeText(injector.parser.parseKeys("J"))
+    }
+    assertTrue(notifications.isEmpty() || notifications.last().isExpired || TestIjOptionConstants.ideajoin !in notifications.last().content)
   }
 
   @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["false"]))
   fun `test notification not shown if was shown already`() {
-    val before = "I found${c} it\n in a legendary land"
-    configureByText(before)
-    appReadySetup(true)
-    typeText(injector.parser.parseKeys("J"))
-
-    val notifications = EventLog.getLogModel(fixture.project).notifications
-    kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || TestIjOptionConstants.ideajoin !in notifications.last().content)
+    val notifications = newNotifications {
+      val before = "I found${c} it\n in a legendary land"
+      configureByText(before)
+      appReadySetup(true)
+      typeText(injector.parser.parseKeys("J"))
+    }
+    assertTrue(
+      notifications.isEmpty() || notifications.last().isExpired || TestIjOptionConstants.ideajoin !in notifications.last().content,
+      "$notifications"
+    )
   }
 
   private fun appReadySetup(notifierEnabled: Boolean) {
-//    EventLog.markAllAsRead(fixture.project)
     VimPlugin.getVimState().isIdeaJoinNotified = notifierEnabled
+  }
+
+  private fun newNotifications(action: () -> Unit): List<Notification> {
+    val beforeIds = ActionCenter.getNotifications(fixture.project).map { it.id }.toSet()
+    action()
+    return ActionCenter.getNotifications(fixture.project).filter { it.id !in beforeIds }
   }
 }

@@ -90,7 +90,8 @@ internal class IjActionExecutor : VimActionExecutor {
     //   because rider use async update method. See VIM-1819.
     // This method executes inside of lastUpdateAndCheckDumb
     // Another related issue: VIM-2604
-    if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
+    ijAction.beforeActionPerformedUpdate(event)
+    if (!event.presentation.isEnabled) return false
     if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
       // Some ActionGroups should not be performed, but shown as a popup
       val popup = JBPopupFactory.getInstance()

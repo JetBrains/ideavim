@@ -21,7 +21,7 @@ public enum class UnaryOperator(public val value: String, public val handler: Un
 
   public companion object {
     public fun getByValue(value: String): UnaryOperator {
-      return values().first { it.value == value }
+      return entries.first { it.value == value }
     }
   }
 }

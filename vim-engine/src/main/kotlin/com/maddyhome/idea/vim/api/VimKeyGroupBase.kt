@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -33,8 +32,6 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   public val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
   public val keyRoots: MutableMap<MappingMode, CommandPartNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
   public val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
-
-  override var operatorFunction: OperatorFunction? = null
 
   override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>) {
     modes.map { getKeyMapping(it) }.forEach { it.delete(keys) }
@@ -164,7 +161,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   private var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
 
   override fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> {
-    return MappingMode.values().map { getKeyMapping(it) }.flatMap { it.getByOwner(owner) }
+    return MappingMode.entries.map { getKeyMapping(it) }.flatMap { it.getByOwner(owner) }
   }
 
   private fun registerKeyMapping(fromKeys: List<KeyStroke>, owner: MappingOwner) {
@@ -172,7 +169,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
     for (key in fromKeys) {
       if (key.keyChar == KeyEvent.CHAR_UNDEFINED) {
         if (
-          !injector.globalOptions().octopushandler ||
+          !injector.application.isOctopusEnabled() ||
           !(key.keyCode == KeyEvent.VK_ESCAPE && key.modifiers == 0) &&
           !(key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0)
         ) {
@@ -194,7 +191,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun removeKeyMapping(owner: MappingOwner) {
-    MappingMode.values().map { getKeyMapping(it) }.forEach { it.delete(owner) }
+    MappingMode.entries.map { getKeyMapping(it) }.forEach { it.delete(owner) }
     unregisterKeyMapping(owner)
   }
 

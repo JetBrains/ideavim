@@ -60,4 +60,184 @@ class MatchitJavaTest : VimJavaTestCase() {
       fileType = JavaFileType.INSTANCE,
     )
   }
+
+  @Test
+  fun `jump from if to else`() {
+    doTest(
+      "%",
+      """
+         ${c}if (true) {
+         } else {
+         }
+      """.trimIndent(),
+      """
+         if (true) {
+         } ${c}else {
+         }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `just from else to if`() {
+    doTest(
+      "%",
+      """
+         if (true) {
+         } ${c}else {
+         }
+      """.trimIndent(),
+      """
+         ${c}if (true) {
+         } else {
+         }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `just from if to if else`() {
+    doTest(
+      "%",
+      """
+         ${c}if (true) {
+         } else if(false) {
+         }
+      """.trimIndent(),
+      """
+         if (true) {
+         } ${c}else if(false) {
+         }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `just from if to if else to else`() {
+    doTest(
+      "%%",
+      """
+         ${c}if (true) {
+         } else if(false) {
+         } else {
+         }
+      """.trimIndent(),
+      """
+         if (true) {
+         } else if(false) {
+         } ${c}else {
+         }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `just from do to while`() {
+    doTest(
+      "%",
+      """
+          ${c}do {
+            System.out.println("Hey");
+          } while (true);
+      """.trimIndent(),
+      """
+          do {
+            System.out.println("Hey");
+          } ${c}while (true);
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `jump from while to do`() {
+    doTest(
+      "%",
+      """
+          do {
+            System.out.println("Hey");
+          } ${c}while (true);
+      """.trimIndent(),
+      """
+          ${c}do {
+            System.out.println("Hey");
+          } while (true);
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `jump from try to catch`() {
+    doTest(
+      "%",
+      """
+          ${c}try {
+            System.out.println("Hey");
+          } catch (Exception ex) {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      """
+          try {
+            System.out.println("Hey");
+          } ${c}catch (Exception ex) {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `jump from try to finally`() {
+    doTest(
+      "%",
+      """
+          ${c}try {
+            System.out.println("Hey");
+          } finally {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      """
+          try {
+            System.out.println("Hey");
+          } ${c}finally {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `jump from try to catch then finally`() {
+    doTest(
+      "%%",
+      """
+          ${c}try {
+            System.out.println("Hey");
+          } catch (Exception ex) {
+            System.out.println("SomeIssue");
+          } finally {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      """
+          try {
+            System.out.println("Hey");
+          } catch (Exception ex) {
+            System.out.println("SomeIssue");
+          } ${c}finally {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
 }

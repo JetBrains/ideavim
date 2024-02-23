@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -99,9 +98,9 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   @Override
   public void updateShortcutKeysRegistration() {
-    for (Editor editor : HelperKt.localEditors()) {
-      unregisterShortcutKeys(new IjVimEditor(editor));
-      registerRequiredShortcutKeys(new IjVimEditor(editor));
+    for (VimEditor editor : injector.getEditorGroup().getEditors()) {
+      unregisterShortcutKeys(editor);
+      registerRequiredShortcutKeys(editor);
     }
   }
 
@@ -228,7 +227,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
     for (KeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        if (!injector.getOptionGroup().getGlobalOptions().getOctopushandler() ||
+        if (!injector.getApplication().isOctopusEnabled() ||
             !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
             !(key.getKeyCode() == KeyEvent.VK_ENTER && key.getModifiers() == 0)) {
           getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));

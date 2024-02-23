@@ -121,16 +121,11 @@ public class ExTextField extends JTextField {
   }
 
   void setType(@NotNull String type) {
-    String hkey = null;
-    switch (type.charAt(0)) {
-      case '/':
-      case '?':
-        hkey = HistoryConstants.SEARCH;
-        break;
-      case ':':
-        hkey = HistoryConstants.COMMAND;
-        break;
-    }
+    String hkey = switch (type.charAt(0)) {
+      case '/', '?' -> HistoryConstants.SEARCH;
+      case ':' -> HistoryConstants.COMMAND;
+      default -> null;
+    };
 
     if (hkey != null) {
       history = VimPlugin.getHistory().getEntries(hkey, 0, 0);
@@ -140,7 +135,7 @@ public class ExTextField extends JTextField {
 
   /**
    * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
-   *
+   * <p>
    * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
    */
   void saveLastEntry() {
@@ -304,7 +299,10 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    VimPlugin.getProcess().cancelExEntry(new IjVimEditor(EditorHolderService.getInstance().getEditor()), true);
+    Editor editor = EditorHolderService.getInstance().getEditor();
+    if (editor != null) {
+      VimPlugin.getProcess().cancelExEntry(new IjVimEditor(editor), true);
+    }
   }
 
   public void setCurrentAction(@NotNull MultiStepAction action, char pendingIndicator) {
@@ -322,7 +320,7 @@ public class ExTextField extends JTextField {
 
   /**
    * Text to show while composing a digraph or inserting a literal or register
-   *
+   * <p>
    * The prompt character is inserted directly into the text of the text field, rather than drawn over the top of the
    * current character. When the action has been completed, the new character(s) are either inserted or overwritten,
    * depending on the insert/overwrite status of the text field. This mimics Vim's behaviour.
@@ -491,7 +489,7 @@ public class ExTextField extends JTextField {
 
     /**
      * Updates the bounds of the caret and repaints those bounds.
-     *
+     * <p>
      * This method is not guaranteed to be called before paint(). The bounds are for use by repaint().
      *
      * @param r The current location of the caret, usually provided by MapToView. The x and y appear to be the upper

@@ -23,15 +23,19 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## End of changelog file maintenance
+
+Since version 2.9.0, the changelog can be found on YouTrack
+
+To Be Released: https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20
+Latest Fixes: https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20updated%20
+
+## 2.9.0, 2024-02-20
 
 ### Fixes:
 * [VIM-3055](https://youtrack.jetbrains.com/issue/VIM-3055) Fix the issue with double deleting after dot
-* [VIM-3291](https://youtrack.jetbrains.com/issue/VIM-3291) Remove sync of editor selection between different opened editors
-* [VIM-3234](https://youtrack.jetbrains.com/issue/VIM-3234) The space character won't mix in the tab chars after >> and << commands
 
 ### Merged PRs:
-* [725](https://github.com/JetBrains/ideavim/pull/725) by [Emanuel Gestosa](https://github.com/emanuelgestosa): Regex
 * [805](https://github.com/JetBrains/ideavim/pull/805) by [chylex](https://github.com/chylex): VIM-3238 Fix recording a macro that replays another macro
 
 ## 2.8.0, 2024-01-30
