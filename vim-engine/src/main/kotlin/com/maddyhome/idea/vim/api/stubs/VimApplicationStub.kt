@@ -69,4 +69,8 @@ public class VimApplicationStub : VimApplicationBase() {
   override fun runAfterGotFocus(runnable: Runnable) {
     TODO("Not yet implemented")
   }
+
+  override fun isOctopusEnabled(): Boolean {
+    TODO("Not yet implemented")
+  }
 }

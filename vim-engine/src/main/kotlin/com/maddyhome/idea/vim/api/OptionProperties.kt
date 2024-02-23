@@ -58,7 +58,6 @@ public open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase
   // Temporary flags for work-in-progress behaviour. Hidden from the output of `:set all`
   public var ideastrictmode: Boolean by optionProperty(Options.ideastrictmode)
   public var ideatracetime: Boolean by optionProperty(Options.ideatracetime)
-  public var octopushandler: Boolean by optionProperty(Options.octopushandler)
 }
 
 /**

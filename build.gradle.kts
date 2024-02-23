@@ -206,6 +206,11 @@ tasks {
     systemProperty("jb.privacy.policy.text", "<!--999.999-->")
     systemProperty("jb.consents.confirmation.enabled", "false")
     systemProperty("ide.show.tips.on.startup.default.value", "false")
+    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
+  }
+
+  runIde {
+    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
   }
 }
 

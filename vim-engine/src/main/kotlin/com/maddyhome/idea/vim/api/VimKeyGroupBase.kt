@@ -169,7 +169,7 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
     for (key in fromKeys) {
       if (key.keyChar == KeyEvent.CHAR_UNDEFINED) {
         if (
-          !injector.globalOptions().octopushandler ||
+          !injector.application.isOctopusEnabled() ||
           !(key.keyCode == KeyEvent.VK_ESCAPE && key.modifiers == 0) &&
           !(key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0)
         ) {

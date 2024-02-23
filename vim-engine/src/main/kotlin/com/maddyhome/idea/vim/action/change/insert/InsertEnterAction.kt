@@ -11,7 +11,6 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -32,7 +31,7 @@ public class InsertEnterAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (injector.globalOptions().octopushandler) {
+    if (injector.application.isOctopusEnabled()) {
       if (editor.isInForEachCaretScope()) {
         editor.removeSecondaryCarets()
         injector.changeGroup.processEnter(editor, editor.primaryCaret(), context)
