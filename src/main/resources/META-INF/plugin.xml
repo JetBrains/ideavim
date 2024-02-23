@@ -94,6 +94,8 @@
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.VimscriptState"/>
     <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.ShortcutConflictState"/>
+    <!--suppress PluginXmlValidity -->
+    <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.WidgetState"/>
 
     <statistics.counterUsagesCollector implementationClass="com.maddyhome.idea.vim.statistic.ActionTracker"/>
 
