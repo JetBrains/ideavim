@@ -157,14 +157,7 @@ public class KeyHandler {
     val commandBuilder = keyState.commandBuilder
     if (commandBuilder.isReady) {
       LOG.trace("Ready command builder. Execute command.")
-      executeCommand(editor, context, editorState, keyState)
-    } else if (commandBuilder.isBad) {
-      LOG.trace("Command builder is set to BAD")
-      editor.resetOpPending()
-      editorState.resetRegisterPending()
-      editor.isReplaceCharacter = false
-      injector.messages.indicateError()
-      reset(keyState, editorState.mode)
+      executeCommand(editor, context, editor.vimStateMachine, keyState)
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
