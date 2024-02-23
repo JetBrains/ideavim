@@ -124,7 +124,7 @@ public class KeyHandler {
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
 
     // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
-    var shouldRecord = handleKeyRecursionCount == 0 && injector.registerGroup.isRecording
+    val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
     var isProcessed = false
     handleKeyRecursionCount++
     try {
@@ -178,15 +178,15 @@ public class KeyHandler {
             // If we are in insert/replace mode send this key in for processing
             if (editorState.mode == Mode.INSERT || editorState.mode == Mode.REPLACE) {
               LOG.trace("Process insert or replace")
-              shouldRecord = injector.changeGroup.processKey(editor, key, processBuilder) && shouldRecord
+              shouldRecord.value = injector.changeGroup.processKey(editor, key, processBuilder) && shouldRecord.value
               isProcessed = true
             } else if (editorState.mode is Mode.SELECT) {
               LOG.trace("Process select")
-              shouldRecord = injector.changeGroup.processKeyInSelectMode(editor, key, processBuilder) && shouldRecord
+              shouldRecord.value = injector.changeGroup.processKeyInSelectMode(editor, key, processBuilder) && shouldRecord.value
               isProcessed = true
             } else if (editor.mode is Mode.CMD_LINE) {
               LOG.trace("Process cmd line")
-              shouldRecord = injector.processGroup.processExKey(editor, key, processBuilder) && shouldRecord
+              shouldRecord.value = injector.processGroup.processExKey(editor, key, processBuilder) && shouldRecord.value
               isProcessed = true
             } else {
               LOG.trace("Set command state to bad_command")
@@ -222,7 +222,7 @@ public class KeyHandler {
     editor: VimEditor,
     context: ExecutionContext,
     key: KeyStroke?,
-    shouldRecord: Boolean,
+    shouldRecord: MutableBoolean,
     keyState: KeyHandlerState,
   ) {
     // Do we have a fully entered command at this point? If so, let's execute it.
@@ -241,7 +241,7 @@ public class KeyHandler {
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
-    if (shouldRecord && injector.registerGroup.isRecording && key != null) {
+    if (shouldRecord.value && injector.registerGroup.isRecording && key != null) {
       injector.registerGroup.recordKeyStroke(key)
       modalEntryKeys.forEach { injector.registerGroup.recordKeyStroke(it) }
       modalEntryKeys.clear()
@@ -805,6 +805,8 @@ public class KeyHandler {
     @JvmStatic
     public fun getInstance(): KeyHandler = instance
   }
+
+  public data class MutableBoolean(public var value: Boolean)
 }
 
 /**
