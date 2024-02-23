@@ -214,4 +214,30 @@ class MatchitJavaTest : VimJavaTestCase() {
       fileType = JavaFileType.INSTANCE,
     )
   }
+
+  @Test
+  fun `jump from try to catch then finally`() {
+    doTest(
+      "%%",
+      """
+          ${c}try {
+            System.out.println("Hey");
+          } catch (Exception ex) {
+            System.out.println("SomeIssue");
+          } finally {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      """
+          try {
+            System.out.println("Hey");
+          } catch (Exception ex) {
+            System.out.println("SomeIssue");
+          } ${c}finally {
+            System.out.println("Failed");
+          }
+      """.trimIndent(),
+      fileType = JavaFileType.INSTANCE,
+    )
+  }
 }
