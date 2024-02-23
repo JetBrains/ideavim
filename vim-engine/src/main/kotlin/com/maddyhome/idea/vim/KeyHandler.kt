@@ -65,12 +65,8 @@ public class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  public fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState? = null) {
-    if (keyState == null) {
-      handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false)
-    } else {
-      handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false, keyState)
-    }
+  public fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
+    handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false, keyState)
   }
 
   /**
@@ -88,7 +84,7 @@ public class KeyHandler {
     context: ExecutionContext,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
-    keyState: KeyHandlerState? = null,
+    keyState: KeyHandlerState,
   ) {
     LOG.trace {
       """

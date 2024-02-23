@@ -73,7 +73,7 @@ public data class NormalCommand(val ranges: Ranges, val argument: String) : Comm
       val keyHandler = KeyHandler.getInstance()
       keyHandler.reset(editor)
       for (key in keys) {
-        keyHandler.handleKey(editor, key, context, useMappings, true)
+        keyHandler.handleKey(editor, key, context, useMappings, true, keyHandler.keyHandlerState)
       }
 
       // Exit if state leaves as insert or cmd_line

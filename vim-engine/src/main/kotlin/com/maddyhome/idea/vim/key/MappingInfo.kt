@@ -97,7 +97,7 @@ public class ToKeysMappingInfo(
       while (keyHandler.keyStack.hasStroke()) {
         val keyStroke = keyHandler.keyStack.feedStroke()
         val recursive = isRecursive && !(first && fromIsPrefix)
-        keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+        keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false, keyState)
         first = false
       }
     } finally {
@@ -132,7 +132,7 @@ public class ToExpressionMappingInfo(
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false, keyState)
       first = false
     }
   }
