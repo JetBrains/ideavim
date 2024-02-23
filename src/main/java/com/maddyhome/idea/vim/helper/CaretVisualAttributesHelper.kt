@@ -162,7 +162,7 @@ public class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeLi
   }
 
   public fun updateAllEditorsCaretsVisual() {
-    injector.application.localEditors().forEach { editor ->
+    injector.editorGroup.getEditors().forEach { editor ->
       val ijEditor = (editor as IjVimEditor).editor
       ijEditor.updateCaretsVisualAttributes()
       ijEditor.updateCaretsVisualPosition()
