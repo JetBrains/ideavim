@@ -10,6 +10,8 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -17,6 +19,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * @author vlan
@@ -144,7 +147,7 @@ class CopyActionTest : VimTestCase() {
      
       """.trimIndent(),
     )
-    assertPluginError(true)
+    assertTrue(fixture.editor.vim.vimStateMachine.commandBuilder.isEmpty)
   }
 
   @Test
