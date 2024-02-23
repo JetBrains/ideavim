@@ -20,6 +20,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -90,19 +91,22 @@ public class ProcessGroup : VimProcessGroupBase() {
     panel.activate(editor.ij, context.ij, ":", initText, 1)
   }
 
-  public override fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean {
+  public override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
     val panel = ExEntryPanel.getInstance()
     if (panel.isActive) {
-      requestFocus(panel.entry)
-      panel.handleKey(stroke)
-
+      processResultBuilder.addExecutionStep { _, _, _ ->
+        requestFocus(panel.entry)
+        panel.handleKey(stroke)
+      }
       return true
     } else {
-      editor.mode = NORMAL()
-      getInstance().reset(editor)
+      processResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
+        lambdaEditor.mode = NORMAL()
+        getInstance().reset(lambdaEditor)
+      }
       return false
     }
   }

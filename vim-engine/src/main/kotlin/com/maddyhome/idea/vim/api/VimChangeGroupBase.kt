@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -715,18 +716,18 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun processKey(
     editor: VimEditor,
-    context: ExecutionContext,
     key: KeyStroke,
+    processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.debug { "processKey($key)" }
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-      type(editor, context, key.keyChar)
+      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext -> type(lambdaEditor, lambdaContext, key.keyChar) }
       return true
     }
 
     // Shift-space
     if (key.keyCode == 32 && key.modifiers and KeyEvent.SHIFT_DOWN_MASK != 0) {
-      type(editor, context, ' ')
+      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext -> type(lambdaEditor, lambdaContext, ' ') }
       return true
     }
     return false
@@ -734,16 +735,18 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun processKeyInSelectMode(
     editor: VimEditor,
-    context: ExecutionContext,
     key: KeyStroke,
+    processResultBuilder: KeyProcessResult.KeyProcessResultBuilder
   ): Boolean {
     var res: Boolean
     SelectionVimListenerSuppressor.lock().use {
-      res = processKey(editor, context, key)
-      editor.exitSelectModeNative(false)
-      KeyHandler.getInstance().reset(editor)
-      if (isPrintableChar(key.keyChar) || activeTemplateWithLeftRightMotion(editor, key)) {
-        injector.changeGroup.insertBeforeCursor(editor, context)
+      res = processKey(editor, key, processResultBuilder)
+      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext ->
+        lambdaEditor.exitSelectModeNative(false)
+        KeyHandler.getInstance().reset(lambdaEditor)
+        if (isPrintableChar(key.keyChar) || activeTemplateWithLeftRightMotion(lambdaEditor, key)) {
+          injector.changeGroup.insertBeforeCursor(lambdaEditor, lambdaContext)
+        }
       }
     }
     return res
