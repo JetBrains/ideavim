@@ -24,7 +24,6 @@ public data class KeyHandlerState(
   public constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)))
 
   public fun partialReset(mode: Mode) {
-    digraphSequence.reset()
     mappingState.resetMappingSequence()
     commandBuilder.resetInProgressCommandPart(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
   }
