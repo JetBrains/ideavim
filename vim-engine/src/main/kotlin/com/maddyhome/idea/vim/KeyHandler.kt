@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
+import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
 import com.maddyhome.idea.vim.key.consumers.RegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
@@ -55,7 +56,7 @@ import javax.swing.KeyStroke
  * actions. This is a singleton.
  */
 public class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer())
   public var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
@@ -139,55 +140,48 @@ public class KeyHandler {
         it.consumeKey( key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord )
       }
       if (!isProcessed) {
-        LOG.trace("Mappings processed, continue processing key.")
-        if (!handleDigraph(editor, key, processBuilder)) {
-          LOG.debug("Digraph is NOT processed")
+        // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
+        // return the node matching this keystroke
+        val node: Node<LazyVimCommand>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState.mode, processBuilder.state)
+        LOG.trace("Get the node for the current mode")
 
-          // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
-          // return the node matching this keystroke
-          val node: Node<LazyVimCommand>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState.mode, processBuilder.state)
-          LOG.trace("Get the node for the current mode")
+        if (node is CommandNode<LazyVimCommand>) {
+          LOG.trace("Node is a command node")
+          handleCommandNode(key, node, processBuilder)
+          commandBuilder.addKey(key)
+          isProcessed = true
+        } else if (node is CommandPartNode<LazyVimCommand>) {
+          LOG.trace("Node is a command part node")
+          commandBuilder.setCurrentCommandPartNode(node)
+          commandBuilder.addKey(key)
+          isProcessed = true
+        } else if (isSelectRegister(key, processBuilder.state, editorState)) {
+          LOG.trace("Select register")
+          editorState.isRegisterPending = true
+          commandBuilder.addKey(key)
+          isProcessed = true
+        } else {
+          // node == null
+          LOG.trace("We are not able to find a node for this key")
 
-          if (node is CommandNode<LazyVimCommand>) {
-            LOG.trace("Node is a command node")
-            handleCommandNode(key, node, processBuilder)
-            commandBuilder.addKey(key)
+          // If we are in insert/replace mode send this key in for processing
+          if (editorState.mode == Mode.INSERT || editorState.mode == Mode.REPLACE) {
+            LOG.trace("Process insert or replace")
+            shouldRecord.value = injector.changeGroup.processKey(editor, key, processBuilder) && shouldRecord.value
             isProcessed = true
-          } else if (node is CommandPartNode<LazyVimCommand>) {
-            LOG.trace("Node is a command part node")
-            commandBuilder.setCurrentCommandPartNode(node)
-            commandBuilder.addKey(key)
+          } else if (editorState.mode is Mode.SELECT) {
+            LOG.trace("Process select")
+            shouldRecord.value = injector.changeGroup.processKeyInSelectMode(editor, key, processBuilder) && shouldRecord.value
             isProcessed = true
-          } else if (isSelectRegister(key, processBuilder.state, editorState)) {
-            LOG.trace("Select register")
-            editorState.isRegisterPending = true
-            commandBuilder.addKey(key)
+          } else if (editor.mode is Mode.CMD_LINE) {
+            LOG.trace("Process cmd line")
+            shouldRecord.value = injector.processGroup.processExKey(editor, key, processBuilder) && shouldRecord.value
             isProcessed = true
           } else {
-            // node == null
-            LOG.trace("We are not able to find a node for this key")
-
-            // If we are in insert/replace mode send this key in for processing
-            if (editorState.mode == Mode.INSERT || editorState.mode == Mode.REPLACE) {
-              LOG.trace("Process insert or replace")
-              shouldRecord.value = injector.changeGroup.processKey(editor, key, processBuilder) && shouldRecord.value
-              isProcessed = true
-            } else if (editorState.mode is Mode.SELECT) {
-              LOG.trace("Process select")
-              shouldRecord.value = injector.changeGroup.processKeyInSelectMode(editor, key, processBuilder) && shouldRecord.value
-              isProcessed = true
-            } else if (editor.mode is Mode.CMD_LINE) {
-              LOG.trace("Process cmd line")
-              shouldRecord.value = injector.processGroup.processExKey(editor, key, processBuilder) && shouldRecord.value
-              isProcessed = true
-            } else {
-              LOG.trace("Set command state to bad_command")
-              commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-            }
-            partialReset(processBuilder.state, editorState.mode)
+            LOG.trace("Set command state to bad_command")
+            commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
           }
-        } else {
-          isProcessed = true
+          partialReset(processBuilder.state, editorState.mode)
         }
       }
       if (isProcessed) {
@@ -290,98 +284,6 @@ public class KeyHandler {
     } else {
       key.keyChar == '"' && !isOperatorPending(editorState.mode, keyState) && keyState.commandBuilder.expectedArgumentType == null
     }
-  }
-
-  private fun handleDigraph(
-    editor: VimEditor,
-    key: KeyStroke,
-    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-  ): Boolean {
-    // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
-    // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
-    // VimActions don't work as arguments for operators, so we have to special case here. Helpfully, Vim appears to
-    // hardcode the shortcuts, and doesn't support mapping, so everything works nicely.
-    val keyState = keyProcessResultBuilder.state
-    val commandBuilder = keyState.commandBuilder
-    val digraphSequence = keyState.digraphSequence
-    if (commandBuilder.expectedArgumentType == Argument.Type.DIGRAPH) {
-      if (digraphSequence.isDigraphStart(key)) {
-        digraphSequence.startDigraphSequence()
-        commandBuilder.addKey(key)
-        return true
-      }
-      if (digraphSequence.isLiteralStart(key)) {
-        digraphSequence.startLiteralSequence()
-        commandBuilder.addKey(key)
-        return true
-      }
-    }
-    val res = digraphSequence.processKey(key, editor)
-    when (res.result) {
-      DigraphResult.RES_HANDLED -> {
-        keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ ->
-          if (injector.exEntryPanel.isActive()) {
-            setPromptCharacterEx(if (lambdaKeyState.commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
-          }
-          lambdaKeyState.commandBuilder.addKey(key)
-        }
-        return true
-      }
-      DigraphResult.RES_DONE -> {
-        if (injector.exEntryPanel.isActive()) {
-          if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
-            return false
-          } else {
-            keyProcessResultBuilder.addExecutionStep { _, _, _ ->
-              injector.exEntryPanel.clearCurrentAction()
-            }
-          }
-        }
-
-        keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ ->
-          if (lambdaKeyState.commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
-            lambdaKeyState.commandBuilder.fallbackToCharacterArgument()
-          }
-        }
-        val stroke = res.stroke ?: return false
-        keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditorState, lambdaContext ->
-          lambdaKeyState.commandBuilder.addKey(key)
-          handleKey(lambdaEditorState, stroke, lambdaContext, lambdaKeyState)
-        }
-        return true
-      }
-      DigraphResult.RES_BAD -> {
-        if (injector.exEntryPanel.isActive()) {
-          if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
-            return false
-          } else {
-            keyProcessResultBuilder.addExecutionStep { _, _, _ ->
-              injector.exEntryPanel.clearCurrentAction()
-            }
-          }
-        }
-        keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, _ ->
-          // BAD is an error. We were expecting a valid character, and we didn't get it.
-          if (lambdaKeyState.commandBuilder.expectedArgumentType != null) {
-            setBadCommand(lambdaEditor, lambdaKeyState)
-          }
-        }
-        return true
-      }
-      DigraphResult.RES_UNHANDLED -> {
-        // UNHANDLED means the keystroke made no sense in the context of a digraph, but isn't an error in the current
-        // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
-        if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
-          commandBuilder.fallbackToCharacterArgument()
-          keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
-            handleKey(lambdaEditor, key, lambdaContext, lambdaKeyState)
-          }
-          return true
-        }
-        return false
-      }
-    }
-    return false
   }
 
   private fun executeCommand(
@@ -609,7 +511,7 @@ public class KeyHandler {
     editor.removeSelection()
   }
 
-  private fun setPromptCharacterEx(promptCharacter: Char) {
+  public fun setPromptCharacterEx(promptCharacter: Char) {
     val exEntryPanel = injector.exEntryPanel
     if (exEntryPanel.isActive()) {
       exEntryPanel.setCurrentActionPromptCharacter(promptCharacter)
