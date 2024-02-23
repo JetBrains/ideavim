@@ -592,6 +592,194 @@ class SortCommandTest : VimTestCase() {
         )
       )
     }
+
+    @JvmStatic
+    fun patternTestCases(): List<TestCase> {
+      return listOf(
+        TestCase(
+          // skip first character
+          sortCommand = "sort /./",
+          content = """
+          '
+          a
+          ab
+          aBc
+          a122
+          b123
+          c121
+        """.trimIndent(),
+          expected = """
+           '
+           a
+           c121
+           a122
+           b123
+           aBc
+           ab
+        """.trimIndent()
+        ),
+        TestCase(
+          // skip first character reversed
+          sortCommand = "sort! /./",
+          content = """
+          '
+          a
+          ab
+          abc
+          a122
+          b123
+          c121
+        """.trimIndent(),
+          expected = """
+           abc
+           ab
+           b123
+           a122
+           c121
+           '
+           a
+        """.trimIndent()
+        ),
+        TestCase(
+          // skip first character case-insensitive
+          sortCommand = "sort /./ i",
+          content = """
+          '
+          a
+          ab
+          aBc
+          a122
+          b123
+          c121
+        """.trimIndent(),
+          expected = """
+           '
+           a
+           c121
+           a122
+           b123
+           ab
+           aBc
+        """.trimIndent()
+        ),
+        TestCase(
+          // skip first character numeric sort
+          sortCommand = "sort /./ n",
+          content = """
+          '
+          a
+          a122
+          b2
+          c121
+        """.trimIndent(),
+          expected = """
+           '
+           a
+           b2
+           c121
+           a122
+        """.trimIndent()
+        ),
+        TestCase(
+          // sort on first character
+          sortCommand = "sort /./ r",
+          content = """
+          '
+          baa
+          azz
+          abb
+          aaa
+        """.trimIndent(),
+          expected = """
+           '
+           azz
+           abb
+           aaa
+           baa
+        """.trimIndent()
+        ),
+        TestCase(
+          // numeric sort skip first digit
+          sortCommand = "sort /\\d/ n",
+          content = """
+           190
+           270
+           350
+           410
+        """.trimIndent(),
+          expected = """
+           410
+           350
+           270
+           190
+        """.trimIndent()
+        ),
+        TestCase(
+          // numeric sort on first digit
+          sortCommand = "sort /\\d/ nr",
+          content = """
+           10
+           90
+           100
+           700
+        """.trimIndent(),
+          expected = """
+           10
+           100
+           700
+           90
+        """.trimIndent()
+        ),
+        TestCase(
+          // sort on third virtual column
+          sortCommand = "sort /.*\\%3v/",
+          content = """
+            aad
+            bbc
+            ccb
+            dda
+        """.trimIndent(),
+          expected = """
+            dda
+            ccb
+            bbc
+            aad
+        """.trimIndent()
+        ),
+        TestCase(
+          // sort on second comma separated field
+          sortCommand = "sort /[^,]*/",
+          content = """
+            aaa,ddd
+            bbb,ccc
+            ccc,bbb
+            ddd,aaa
+        """.trimIndent(),
+          expected = """
+            ddd,aaa
+            ccc,bbb
+            bbb,ccc
+            aaa,ddd
+        """.trimIndent()
+        ),
+        TestCase(
+          // sort on first number in line
+          sortCommand = "sort /.\\{-}\\ze\\d/ n",
+          content = """
+            aaaa9
+            b10
+            ccccc7
+            dd3
+        """.trimIndent(),
+          expected = """
+            dd3
+            ccccc7
+            aaaa9
+            b10
+        """.trimIndent()
+        )
+      )
+    }
   }
 
 
@@ -636,6 +824,12 @@ class SortCommandTest : VimTestCase() {
   @ParameterizedTest
   @MethodSource("numericCaseInsensitiveReverseUniqueSortTestCases")
   fun `test numeric, case insensitive, reverse and unique sort is case insensitive, numeric, descending and unique`(
+    testCase: TestCase,
+  ) = assertSort(testCase)
+
+  @ParameterizedTest
+  @MethodSource("patternTestCases")
+  fun `test sort with pattern`(
     testCase: TestCase,
   ) = assertSort(testCase)
 
