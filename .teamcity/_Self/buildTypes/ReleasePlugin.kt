@@ -97,14 +97,14 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
     }
-    gradle {
-      name = "Update change log"
-      tasks = "scripts:changelogUpdateUnreleased"
-    }
-    gradle {
-      name = "Commit preparation changes"
-      tasks = "scripts:commitChanges"
-    }
+//    gradle {
+//      name = "Update change log"
+//      tasks = "scripts:changelogUpdateUnreleased"
+//    }
+//    gradle {
+//      name = "Commit preparation changes"
+//      tasks = "scripts:commitChanges"
+//    }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
@@ -117,33 +117,24 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Publish release"
       tasks = "publishPlugin"
     }
-    script {
-      name = "Checkout master branch"
-      scriptContent = """
-        echo Checkout master
-        git checkout master
-      """.trimIndent()
-    }
-    gradle {
-      name = "Update change log in master"
-      tasks = "scripts:changelogUpdateUnreleased"
-    }
-    gradle {
-      name = "Commit preparation changes in master"
-      tasks = "scripts:commitChanges"
-    }
+//    script {
+//      name = "Checkout master branch"
+//      scriptContent = """
+//        echo Checkout master
+//        git checkout master
+//      """.trimIndent()
+//    }
+//    gradle {
+//      name = "Update change log in master"
+//      tasks = "scripts:changelogUpdateUnreleased"
+//    }
+//    gradle {
+//      name = "Commit preparation changes in master"
+//      tasks = "scripts:commitChanges"
+//    }
     script {
       name = "Push changes to the repo"
       scriptContent = """
-      branch=$(git branch --show-current)  
-      echo Current branch is ${'$'}branch
-      if [ "master" != "${'$'}branch" ];
-      then
-        git checkout master
-      fi
-      
-      git push origin
-      
       git checkout release
       echo checkout release branch
       git branch --set-upstream-to=origin/release release

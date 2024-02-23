@@ -32,7 +32,6 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.jetbrains.changelog.Changelog
-import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.kohsuke.github.GHUser
 import java.net.HttpURLConnection
 import java.net.URL
@@ -305,27 +304,13 @@ tasks {
     from(createOpenApiSourceJar) { into("lib/src") }
   }
 
-  val pluginVersion = version
-  // Don't forget to update plugin.xml
   patchPluginXml {
+    // Don't forget to update plugin.xml
     sinceBuild.set("233.11799.30")
 
-    // Get the latest available change notes from the changelog file
-    changeNotes.set(
-      provider {
-        with(changelog) {
-          val log = try {
-            getUnreleased()
-          } catch (e: MissingVersionException) {
-            getOrNull(pluginVersion.toString()) ?: getLatest()
-          }
-          renderItem(
-            log,
-            org.jetbrains.changelog.Changelog.OutputType.HTML,
-          )
-        }
-      },
-    )
+    changeNotes.set("""
+      Changelog: https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}
+    """.trimIndent())
   }
 }
 

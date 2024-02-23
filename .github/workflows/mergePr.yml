@@ -11,7 +11,7 @@ on:
 jobs:
   build:
 
-    if: github.event.pull_request.merged == true && github.repository == 'JetBrains/ideavim'
+    if: false
     runs-on: ubuntu-latest
 
     steps:
