@@ -37,7 +37,7 @@ internal class VimscriptState : ApplicationUsagesCollector() {
   }
 
   companion object {
-    private val GROUP = EventLogGroup("vim.vimscript", 1, "FUS")
+    private val GROUP = EventLogGroup("vim.vimscript", 1)
 
     val sourcedFiles = HashSet<String>()
     val extensionsEnabledWithPlug = HashSet<String>()

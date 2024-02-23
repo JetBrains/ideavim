@@ -15,7 +15,7 @@ import com.intellij.internal.statistic.service.fus.collectors.CounterUsagesColle
 
 internal class ActionTracker : CounterUsagesCollector() {
   companion object {
-    private val GROUP = EventLogGroup("vim.actions", 1, "FUS")
+    private val GROUP = EventLogGroup("vim.actions", 1)
     private val TRACKED_ACTIONS = GROUP.registerEvent(
       "tracked",
       EventFields.StringValidatedByCustomRule("action_id", ActionRuleValidator::class.java),
