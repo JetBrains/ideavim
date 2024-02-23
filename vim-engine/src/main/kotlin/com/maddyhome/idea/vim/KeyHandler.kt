@@ -98,49 +98,51 @@ public class KeyHandler {
     mappingCompleted: Boolean,
     processBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): KeyProcessResult {
-    LOG.trace {
-      """
+    synchronized(lock) {
+      LOG.trace {
+        """
         ------- Key Handler -------
         Start key processing. allowKeyMappings: $allowKeyMappings, mappingCompleted: $mappingCompleted
         Key: $key
       """.trimIndent()
-    }
-    val maxMapDepth = injector.globalOptions().maxmapdepth
-    if (handleKeyRecursionCount >= maxMapDepth) {
-      processBuilder.addExecutionStep { _, lambdaEditor, _ ->
-        LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
-        injector.messages.showStatusBarMessage(lambdaEditor, injector.messages.message("E223"))
-        injector.messages.indicateError()
+      }
+      val maxMapDepth = injector.globalOptions().maxmapdepth
+      if (handleKeyRecursionCount >= maxMapDepth) {
+        processBuilder.addExecutionStep { _, lambdaEditor, _ ->
+          LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
+          injector.messages.showStatusBarMessage(lambdaEditor, injector.messages.message("E223"))
+          injector.messages.indicateError()
+        }
+        return processBuilder.build()
+      }
+
+      injector.messages.clearError()
+
+      // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
+      val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
+      handleKeyRecursionCount++
+      try {
+        LOG.trace("Start key processing...")
+        val isProcessed = keyConsumers.any {
+          it.consumeKey( key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord )
+        }
+        if (isProcessed) {
+          processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
+            finishedCommandPreparation(lambdaEditor, lambdaContext, key, shouldRecord, lambdaKeyState)
+          }
+        } else {
+          // Key wasn't processed by any of the consumers, so we reset our key state
+          // and tell IDE that the key is Unknown (handle key for us)
+          onUnknownKey(editor, processBuilder.state)
+          return KeyProcessResult.Unknown.apply {
+            handleKeyRecursionCount-- // because onFinish will now be executed for unknown
+          }
+        }
+      } finally {
+        processBuilder.onFinish = { handleKeyRecursionCount-- }
       }
       return processBuilder.build()
     }
-
-    injector.messages.clearError()
-
-    // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
-    val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
-    handleKeyRecursionCount++
-    try {
-      LOG.trace("Start key processing...")
-      val isProcessed = keyConsumers.any {
-        it.consumeKey( key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord )
-      }
-      if (isProcessed) {
-        processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
-          finishedCommandPreparation(lambdaEditor, lambdaContext, key, shouldRecord, lambdaKeyState)
-        }
-      } else {
-        // Key wasn't processed by any of the consumers, so we reset our key state
-        // and tell IDE that the key is Unknown (handle key for us)
-        onUnknownKey(editor, processBuilder.state)
-        return KeyProcessResult.Unknown.apply {
-          handleKeyRecursionCount-- // because onFinish will now be executed for unknown
-        }
-      }
-    } finally {
-      processBuilder.onFinish = { handleKeyRecursionCount-- }
-    }
-    return processBuilder.build()
   }
 
   internal fun finishedCommandPreparation(
@@ -355,6 +357,7 @@ public class KeyHandler {
   }
 
   public companion object {
+    public val lock: Any = Object()
     private val LOG: VimLogger = vimLogger<KeyHandler>()
 
     internal fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
@@ -408,12 +411,14 @@ public sealed interface KeyProcessResult {
     }
 
     public fun execute(editor: VimEditor, context: ExecutionContext) {
-      val keyHandler = KeyHandler.getInstance()
-      if (keyHandler.keyHandlerState != originalState) {
-        logger.warn("Unexpected editor state. Aborting command execution.")
+      synchronized(KeyHandler.lock) {
+        val keyHandler = KeyHandler.getInstance()
+        if (keyHandler.keyHandlerState != originalState) {
+          logger.warn("Unexpected editor state. Aborting command execution.")
+        }
+        processing(preProcessState, editor, context)
+        keyHandler.updateState(preProcessState)
       }
-      processing(preProcessState, editor, context)
-      keyHandler.updateState(preProcessState)
     }
   }
 
