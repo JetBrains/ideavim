@@ -495,6 +495,14 @@ Contributors:
   [![icon][github]](https://github.com/emanuelgestosa)
   &nbsp;
   Emanuel Gestosa
+* [![icon][mail]](mailto:81118900+lippfi@users.noreply.github.com)
+  [![icon][github]](https://github.com/lippfi)
+  &nbsp;
+  lippfi, 
+* [![icon][mail]](mailto:fillipser143@gmail.com)
+  [![icon][github]](https://github.com/Parker7123)
+  &nbsp;
+  FilipParker
 
 Previous contributors:
 
