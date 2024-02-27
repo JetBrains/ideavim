@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt

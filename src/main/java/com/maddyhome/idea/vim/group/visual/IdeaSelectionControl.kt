@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.vimDisabled
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -30,7 +29,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeSelect

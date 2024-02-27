@@ -45,7 +45,6 @@ import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent

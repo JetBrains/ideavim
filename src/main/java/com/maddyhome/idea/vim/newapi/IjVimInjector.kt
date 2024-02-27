@@ -80,11 +80,11 @@ import com.maddyhome.idea.vim.helper.UndoRedoHelper
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.history.VimHistory
+import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.VimStateMachine
-import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.ui.VimRcFileState
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor

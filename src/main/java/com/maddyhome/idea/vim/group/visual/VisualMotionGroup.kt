@@ -13,10 +13,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.command.engine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * @author Alex Plate

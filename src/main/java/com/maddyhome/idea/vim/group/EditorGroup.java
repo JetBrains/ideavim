@@ -25,7 +25,10 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener;
@@ -41,7 +44,6 @@ import java.util.stream.Stream;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
-import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretsVisualAttributes;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
 
 /**

@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.newapi.actionStartedFromVim
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 

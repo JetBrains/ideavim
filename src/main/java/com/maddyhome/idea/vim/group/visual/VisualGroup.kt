@@ -12,13 +12,13 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 
 internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: Mode) {
   if (predictedMode !is Mode.VISUAL) {

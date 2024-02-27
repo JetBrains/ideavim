@@ -20,12 +20,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
 
 public val VimEditor.isIdeaRefactorModeKeep: Boolean

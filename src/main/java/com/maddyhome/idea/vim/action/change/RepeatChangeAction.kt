@@ -7,9 +7,9 @@
  */
 package com.maddyhome.idea.vim.action.change
 
+import com.intellij.openapi.command.CommandProcessor
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.intellij.openapi.command.CommandProcessor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor

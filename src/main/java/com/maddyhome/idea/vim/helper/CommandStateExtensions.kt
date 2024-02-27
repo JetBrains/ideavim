@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
 
 internal val Mode.hasVisualSelection
   get() = when (this) {

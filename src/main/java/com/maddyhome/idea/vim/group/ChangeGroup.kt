@@ -73,7 +73,6 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.TestOnly
 import java.math.BigInteger

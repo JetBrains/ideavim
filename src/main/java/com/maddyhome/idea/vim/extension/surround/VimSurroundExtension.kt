@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -41,7 +40,6 @@ import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent

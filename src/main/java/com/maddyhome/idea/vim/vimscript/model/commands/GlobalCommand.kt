@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineStartForOffset

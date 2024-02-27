@@ -21,13 +21,13 @@ import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

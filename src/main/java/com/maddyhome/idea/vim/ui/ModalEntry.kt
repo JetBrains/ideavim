@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.Toolkit
