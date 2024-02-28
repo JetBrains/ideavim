@@ -14,6 +14,7 @@ import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
+import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.junit.jupiter.api.Test
 import ui.pages.Editor
@@ -39,6 +40,7 @@ import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.Point
 import java.awt.event.KeyEvent
+import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -76,6 +78,7 @@ class UiTests {
           injectText(testTextForEditor)
         }
       }
+      waitFor(Duration.ofMinutes(1)) { editor.findAllText("One").isNotEmpty() }
       testSelectTextWithDelay(editor)
       testExtendSelection(editor)
       testLargerDragSelection(editor)
