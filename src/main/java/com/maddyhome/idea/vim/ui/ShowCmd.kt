@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.ui
 
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -21,11 +20,14 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import org.jetbrains.annotations.NonNls
@@ -130,11 +132,18 @@ internal class Widget(project: Project) :
   override fun copy(): StatusBarWidget = Widget(project)
 }
 
-internal class WidgetUpdater : FileEditorManagerListener {
-  override fun selectionChanged(event: FileEditorManagerEvent) {
-    // Update when changing selected editor
+internal class ShowCmdWidgetUpdater : EditorListener {
+  override fun focusGained(editor: VimEditor) {
+    editor.ij.project?.let { selectionChanged(it) }
+  }
+
+  override fun focusLost(editor: VimEditor) {
+    editor.ij.project?.let { selectionChanged(it) }
+  }
+
+  private fun selectionChanged(project: Project) {
     val windowManager = WindowManager.getInstance()
-    val statusBar = windowManager.getStatusBar(event.manager.project)
+    val statusBar = windowManager.getStatusBar(project)
     statusBar.updateWidget(ShowCmd.ID)
   }
 }

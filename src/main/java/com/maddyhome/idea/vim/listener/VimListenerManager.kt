@@ -52,6 +52,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ExceptionUtil
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.KeyHandlerStateResetter
 import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
@@ -94,6 +95,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
+import com.maddyhome.idea.vim.ui.ShowCmdWidgetUpdater
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.macro.macroWidgetOptionListener
@@ -151,6 +153,9 @@ internal object VimListenerManager {
     val macroWidgetListener = MacroWidgetListener()
     injector.listenersNotifier.macroRecordingListeners.add(macroWidgetListener)
     injector.listenersNotifier.vimPluginListeners.add(macroWidgetListener)
+
+    injector.listenersNotifier.myEditorListeners.add(KeyHandlerStateResetter())
+    injector.listenersNotifier.myEditorListeners.add(ShowCmdWidgetUpdater())
   }
 
   fun turnOff() {
