@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -337,5 +338,29 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       """.trimIndent()
     )
     assertOffset(10)
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3294"])
+  fun `test matching with braces inside of string`() {
+    configureByText("""
+$c("("")")
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+("("")"$c)
+    """.trimIndent())
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3294"])
+  fun `test matching with braces inside of string 2`() {
+    configureByText("""
+("("")"$c)
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+$c("("")")
+    """.trimIndent())
   }
 }
