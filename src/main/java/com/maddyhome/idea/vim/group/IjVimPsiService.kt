@@ -37,11 +37,11 @@ public class IjVimPsiService: VimPsiService {
     val docCommentSuffix = (commenter as? CodeDocumentationAwareCommenter)?.documentationCommentSuffix
 
     val prefixToSuffix: Pair<String, String>? =
-      if (blockCommentPrefix != null && blockCommentSuffix != null && commentText.startsWith(blockCommentPrefix) && commentText.endsWith(blockCommentSuffix)) {
-        blockCommentPrefix to blockCommentSuffix
-      }
-      else if (docCommentPrefix != null && docCommentSuffix != null && commentText.startsWith(docCommentPrefix) && commentText.endsWith(docCommentSuffix)) {
+      if (docCommentPrefix != null && docCommentSuffix != null && commentText.startsWith(docCommentPrefix) && commentText.endsWith(docCommentSuffix)) {
         docCommentPrefix to docCommentSuffix
+      }
+      else if (blockCommentPrefix != null && blockCommentSuffix != null && commentText.startsWith(blockCommentPrefix) && commentText.endsWith(blockCommentSuffix)) {
+        blockCommentPrefix to blockCommentSuffix
       }
       else {
         null

@@ -105,7 +105,7 @@ internal class MotionGroup : VimMotionGroupBase() {
     VimPlugin.getFile().selectEditor(project, file)
 
   override fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Motion {
-    return SearchHelper.findMatchingPairOnCurrentLine(editor.ij, caret.ij).toMotionOrError()
+    return findMatchingPairOnCurrentLine(editor, caret)?.toMotionOrError() ?: Motion.Error
   }
 
   override fun moveCaretToFirstDisplayLine(
