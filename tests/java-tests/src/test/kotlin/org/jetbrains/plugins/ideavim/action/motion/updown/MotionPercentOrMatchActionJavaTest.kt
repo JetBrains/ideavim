@@ -117,4 +117,48 @@ class MotionPercentOrMatchActionJavaTest : VimJavaTestCase() {
     $c}
     """.trimIndent())
   }
+
+  @Test
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test matching works with a sequence of single-line comments`() {
+    configureByJavaText("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // $c{
+      // result = new LowerCaseFilter(result);
+      // }
+      return result;
+    }
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // {
+      // result = new LowerCaseFilter(result);
+      // $c}
+      return result;
+    }
+    """.trimIndent())
+  }
+
+  @Test
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test matching doesn't work if a sequence of single-line comments is broken`() {
+    configureByJavaText("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // $c{
+        result = new LowerCaseFilter(result);
+      // }
+      return result;
+    }
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // $c{
+        result = new LowerCaseFilter(result);
+      // }
+      return result;
+    }
+    """.trimIndent())
+  }
 }

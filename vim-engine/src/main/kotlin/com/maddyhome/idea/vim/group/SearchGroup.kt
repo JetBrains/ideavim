@@ -150,13 +150,70 @@ private fun parsMatchPairsOption(editor: VimEditor): Map<Char, Char> {
  * If the first brace is inside string or comment, then the second one should be also in the same string or comment; otherwise there is no match.
  */
 public fun findMatchingChar(editor: VimEditor, start: Int, charToMatch: Char, pairChar: Char, direction: Direction): Int? {
-  // TODO enhance implementation with IDE's built in code to go to the matching brace to speed up search
-  val rangeForSearch = getStringAtPos(editor, start, true) ?: injector.psiService.getCommentAtPos(editor, start)?.first
-  return if (rangeForSearch != null && start in rangeForSearch) {
-    findBlockLocation(editor, rangeForSearch, start, charToMatch, pairChar, direction)
-  } else {
-    findBlockLocation(editor, start, charToMatch, pairChar, direction, 0)
+  // If we are inside string, we search for the pair inside the string only
+  val stringRange = getStringAtPos(editor, start, true)
+  if (stringRange != null && start in stringRange) {
+    return findBlockLocation(editor, stringRange, start, charToMatch, pairChar, direction)
   }
+
+  val comment = injector.psiService.getCommentAtPos(editor, start)
+  if (comment != null && start in comment.first) {
+    val prefixToSuffix = comment.second
+    return if (prefixToSuffix != null) {
+      // If it is a block comment (has prefix & suffix), we search for the pair inside the block only
+      findBlockLocation(editor, comment.first, start, charToMatch, pairChar, direction)
+    } else {
+      // If it is not a block comment, that there may be a sequence of single line comments, and we want to iterate over
+      // all of them in an attempt to find a matching char
+      val commentRange = getRangeOfNonBlockComments(editor, comment.first, direction)
+      findBlockLocation(editor, commentRange, start, charToMatch, pairChar, direction)
+    }
+  }
+
+  return findBlockLocation(editor, start, charToMatch, pairChar, direction, 0)
+}
+
+private fun getRangeOfNonBlockComments(editor: VimEditor, startComment: TextRange, direction: Direction): TextRange {
+  var lastComment: TextRange = startComment
+
+  while (true) {
+    val nextNonWhitespaceChar = if (direction == Direction.FORWARDS) {
+      findNextNonWhitespaceChar(editor.text(), lastComment.endOffset)
+    } else {
+      findPreviousNonWhitespaceChar(editor.text(), lastComment.startOffset - 1)
+    } ?: break
+
+    val nextComment = injector.psiService.getCommentAtPos(editor, nextNonWhitespaceChar)
+    if (nextComment != null && nextComment.second == null) {
+      lastComment = nextComment.first
+    } else {
+      break
+    }
+  }
+
+  return if (direction == Direction.FORWARDS) {
+    TextRange(startComment.startOffset, lastComment.endOffset)
+  } else {
+    TextRange(lastComment.startOffset, startComment.endOffset)
+  }
+}
+
+private fun findNextNonWhitespaceChar(chars: CharSequence, startIndex: Int): Int? {
+  for (i in startIndex .. chars.lastIndex) {
+    if (!chars[i].isWhitespace()) {
+      return i
+    }
+  }
+  return null
+}
+
+private fun findPreviousNonWhitespaceChar(chars: CharSequence, startIndex: Int): Int? {
+  for (i in startIndex downTo 0) {
+    if (!chars[i].isWhitespace()) {
+      return i
+    }
+  }
+  return null
 }
 
 /**
