@@ -484,7 +484,8 @@ public class KeyHandlerStateResetter : EditorListener {
   }
 
   override fun focusLost(editor: VimEditor) {
-    KeyHandler.getInstance().reset(editor)
+    // We do not reset the KeyHandler state here, because a command or a search prompt is not considered to be part of the
+    // editor, and resetting state would break the search functionality.
   }
 }
 
