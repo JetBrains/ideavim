@@ -247,6 +247,7 @@ enum class SkipNeovimReason {
   CTRL_CODES,
 
   BUG_IN_NEOVIM,
+  PSI,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

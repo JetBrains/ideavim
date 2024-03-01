@@ -204,7 +204,7 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
   val escapedRestriction = if (strictEscapeMatching) isEscaped(chars, start) else null
   var i: Int? = start
   while (i != null) {
-    val rangeToSkip = getStringAtPos(editor, i, false) ?: injector.psiService.getCommentAtPos(editor, start)?.first
+    val rangeToSkip = getStringAtPos(editor, i, false) ?: injector.psiService.getCommentAtPos(editor, i)?.first
     if (rangeToSkip != null) {
       val searchStart = if (direction == Direction.FORWARDS) rangeToSkip.endOffset else rangeToSkip.startOffset - 1
       i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), searchStart, escapedRestriction, direction)
