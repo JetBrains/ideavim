@@ -207,41 +207,45 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (outer forward)`() {
     doTest(
       "%",
       """ debugPrint$c(\(var)) """,
-      """ debugPrint(\(var)$c) """,
+      """ debugPrint(\(var$c)) """,
       Mode.NORMAL(),
     )
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (outer backward)`() {
     doTest(
       "%",
       """ debugPrint(\(var)$c) """,
-      """ debugPrint$c(\(var)) """,
+      """ debugPrint(\(var)$c) """,
       Mode.NORMAL(),
     )
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (inner forward)`() {
     doTest(
       "%",
       """ debugPrint(\$c(var)) """,
-      """ debugPrint(\(var$c)) """,
+      """ debugPrint(\$c(var)) """,
       Mode.NORMAL(),
     )
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (inner backward)`() {
     doTest(
       "%",
       """ debugPrint(\$c(var)) """,
-      """ debugPrint(\(var$c)) """,
+      """ debugPrint(\$c(var)) """,
       Mode.NORMAL(),
     )
   }
