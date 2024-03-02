@@ -84,22 +84,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     return PsiHelper.findMethodStart(editor.ij, caret.ij.offset, count)
   }
 
-  override fun findUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, type: Char, count: Int): Int {
-    val chars: CharSequence = editor.ij.document.charsSequence
-    var pos: Int = caret.ij.offset
-    val loc = BLOCK_CHARS.indexOf(type)
-    // What direction should we go now (-1 is backward, 1 is forward)
-    val dir = if (loc % 2 == 0) Direction.BACKWARDS else Direction.FORWARDS
-    // Which character did we find and which should we now search for
-    val match = BLOCK_CHARS[loc]
-    val found = BLOCK_CHARS[loc - dir.toInt()]
-
-    if (pos < chars.length && chars[pos] == type) {
-      pos += dir.toInt()
-    }
-    return findBlockLocation(chars, found, match, dir, pos, count)
-  }
-
   private fun findBlockLocation(
     chars: CharSequence,
     found: Char,

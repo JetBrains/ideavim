@@ -229,8 +229,8 @@ public fun findUnmatchedBlock(editor: VimEditor, pos: Int, type: Char, count: In
   val charToMatch = BLOCK_CHARS[loc]
   val pairChar = BLOCK_CHARS[loc - direction.toInt()]
 
-  val start = if (pos < chars.length && chars[pos] == type) pos + direction.toInt() else pos
-  return findBlockLocation(editor, start, pairChar, charToMatch, direction, count)
+  val start = if (pos < chars.length && (chars[pos] == type || chars[pos] == pairChar)) pos + direction.toInt() else pos
+  return findBlockLocation(editor, start, charToMatch, pairChar, direction, count)
 }
 
 private fun findBlockLocation(editor: VimEditor, range: TextRange, start: Int, charToMatch: Char, pairChar: Char, direction: Direction): Int? {
@@ -257,6 +257,8 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
   val strictEscapeMatching = true // Vim's default behavior, see `help cpoptions`
   val chars = editor.text()
 
+  var result: Int? = null
+
   var depth = 0
   val escapedRestriction = if (strictEscapeMatching) isEscaped(chars, start) else null
   var i: Int? = start
@@ -267,14 +269,23 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
       i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), searchStart, escapedRestriction, direction)
     } else {
       when (chars[i]) {
-        charToMatch -> depth++
-        pairChar -> depth--
+        charToMatch -> {
+          depth++
+          if (delta > 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
+        }
+        pairChar -> {
+          depth--
+          if (delta < 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
+        }
       }
-      if (depth == delta) return i
+      if (depth == delta) {
+        result = i // For standard `%` motion, which should return [result] only if we succeeded to match
+        break
+      }
       i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), i + direction.toInt(), escapedRestriction, direction)
     }
   }
-  return null
+  return result
 }
 
 private fun CharSequence.indexOfAnyOrNullInDirection(chars: CharArray, startIndex: Int, escaped: Boolean?, direction: Direction): Int? {
