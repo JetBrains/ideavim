@@ -97,13 +97,6 @@ public interface VimSearchHelper {
     count: Int,
   ): Int
 
-  public fun findUnmatchedBlock(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    type: Char,
-    count: Int,
-  ): Int
-
   /**
    * Find the next word in the editor's document, from the given starting point
    *
