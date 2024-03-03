@@ -632,6 +632,113 @@ public class SearchHelper {
     return new TextRange(bstart, bend + 1);
   }
 
+  private static int findMatchingBlockCommentPair(@NotNull PsiComment comment,
+                                                  int pos,
+                                                  @Nullable String prefix,
+                                                  @Nullable String suffix) {
+    if (prefix != null && suffix != null) {
+      // TODO: Try to get rid of `getText()` because it takes a lot of time to calculate the string
+      final String commentText = comment.getText();
+      if (commentText.startsWith(prefix) && commentText.endsWith(suffix)) {
+        final int endOffset = comment.getTextOffset() + comment.getTextLength();
+        if (pos < comment.getTextOffset() + prefix.length()) {
+          return endOffset;
+        }
+        else if (pos >= endOffset - suffix.length()) {
+          return comment.getTextOffset();
+        }
+      }
+    }
+    return -1;
+  }
+
+  private static int findMatchingBlockCommentPair(@NotNull PsiElement element, int pos) {
+    final Language language = element.getLanguage();
+    final Commenter commenter = LanguageCommenters.INSTANCE.forLanguage(language);
+    final PsiComment comment = PsiTreeUtil.getParentOfType(element, PsiComment.class, false);
+    if (comment != null) {
+      final int ret = findMatchingBlockCommentPair(comment, pos, commenter.getBlockCommentPrefix(),
+                                                   commenter.getBlockCommentSuffix());
+      if (ret >= 0) {
+        return ret;
+      }
+      if (commenter instanceof CodeDocumentationAwareCommenter docCommenter) {
+        return findMatchingBlockCommentPair(comment, pos, docCommenter.getDocumentationCommentPrefix(),
+                                            docCommenter.getDocumentationCommentSuffix());
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * This looks on the current line, starting at the cursor position for one of {, }, (, ), [, or ]. It then searches
+   * forward or backward, as appropriate for the associated match pair. String in double quotes are skipped over.
+   * Single characters in single quotes are skipped too.
+   *
+   * @param editor The editor to search in
+   * @return The offset within the editor of the found character or -1 if no match was found or none of the characters
+   * were found on the remainder of the current line.
+   */
+  public static int findMatchingPairOnCurrentLine(@NotNull Editor editor, @NotNull Caret caret) {
+    int pos = caret.getOffset();
+
+    final int commentPos = findMatchingComment(editor, pos);
+    if (commentPos >= 0) {
+      return commentPos;
+    }
+
+    int line = caret.getLogicalPosition().line;
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
+    int end = EngineEditorHelperKt.getLineEndOffset(vimEditor, line, true);
+
+    // To handle the case where visual mode allows the user to go past the end of the line,
+    // which will prevent loc from finding a pairable character below
+    if (pos > 0 && pos == end) {
+      pos = end - 1;
+    }
+
+    final String pairChars = parseMatchPairsOption(vimEditor);
+
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    int loc = -1;
+    // Search the remainder of the current line for one of the candidate characters
+    while (pos < end) {
+      loc = pairChars.indexOf(chars.charAt(pos));
+      if (loc >= 0) {
+        break;
+      }
+
+      pos++;
+    }
+
+    int res = -1;
+    // If we found one ...
+    if (loc >= 0) {
+      // What direction should we go now (-1 is backward, 1 is forward)
+      Direction dir = loc % 2 == 0 ? Direction.FORWARDS : Direction.BACKWARDS;
+      // Which character did we find and which should we now search for
+      char found = pairChars.charAt(loc);
+      char match = pairChars.charAt(loc + dir.toInt());
+      res = findBlockLocation(chars, found, match, dir, pos, 1, true);
+    }
+
+    return res;
+  }
+
+  /**
+   * If on the start/end of a block comment, jump to the matching of that comment, or vice versa.
+   */
+  private static int findMatchingComment(@NotNull Editor editor, int pos) {
+    final PsiFile psiFile = PsiHelper.getFile(editor);
+    if (psiFile != null) {
+      final PsiElement element = psiFile.findElementAt(pos);
+      if (element != null) {
+        return findMatchingBlockCommentPair(element, pos);
+      }
+    }
+    return -1;
+  }
+
   private static int findBlockLocation(@NotNull CharSequence chars,
                                        char found,
                                        char match,

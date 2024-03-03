@@ -500,6 +500,3 @@ public val Editor.vim: VimEditor
   get() = IjVimEditor(this)
 public val VimEditor.ij: Editor
   get() = (this as IjVimEditor).editor
-
-public val com.intellij.openapi.util.TextRange.vim: TextRange
-  get() = TextRange(this.startOffset, this.endOffset)

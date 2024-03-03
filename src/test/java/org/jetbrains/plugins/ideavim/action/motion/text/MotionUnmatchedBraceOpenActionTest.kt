@@ -98,6 +98,15 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
     )
   }
 
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+      class Xxx $c{
+        int main() {
+          
+        }
+      }
+  """,
+  )
   @Test
   fun `test go to next next bracket with great count`() {
     doTest(
@@ -110,9 +119,9 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
       }
       """.trimIndent(),
       """
-      class Xxx $c{
+      class Xxx {
         int main() {
-          
+          $c
         }
       }
       """.trimIndent(),

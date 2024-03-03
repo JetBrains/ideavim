@@ -12,12 +12,12 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.findUnmatchedBlock
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
@@ -36,7 +36,8 @@ public sealed class MotionUnmatchedAction(private val motionChar: Char) : Motion
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)?.toMotionOrError() ?: Motion.Error
+    return moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)
+      .toMotionOrError()
   }
 }
 
@@ -52,11 +53,14 @@ public class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
 @CommandOrMotion(keys = ["[("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 public class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
-private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int? {
+private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int {
   return if (editor.currentCaret().offset.point == 0 && count < 0 || editor.currentCaret().offset.point >= editor.fileSize() - 1 && count > 0) {
-    null
+    -1
   } else {
-    val res = findUnmatchedBlock(editor, caret.offset.point, type, count) ?: return null
-    return editor.normalizeOffset(res, false)
+    var res = injector.searchHelper.findUnmatchedBlock(editor, caret, type, count)
+    if (res != -1) {
+      res = editor.normalizeOffset(res, false)
+    }
+    res
   }
 }
