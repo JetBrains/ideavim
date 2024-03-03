@@ -167,6 +167,8 @@ public interface VimInjector {
   // !! in progress
   public val undo: VimUndoRedo
 
+  public val psiService: VimPsiService
+
   // !! in progress
   public val commandLineHelper: VimCommandLineHelper
 
