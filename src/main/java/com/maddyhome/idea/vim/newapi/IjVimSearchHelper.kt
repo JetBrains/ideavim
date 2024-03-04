@@ -15,33 +15,27 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchHelperBase
 import com.maddyhome.idea.vim.api.anyNonWhitespace
 import com.maddyhome.idea.vim.api.getLineEndOffset
-import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
-import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
-import com.maddyhome.idea.vim.helper.checkInString
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import it.unimi.dsi.fastutil.ints.IntComparator
 import it.unimi.dsi.fastutil.ints.IntComparators
 import java.util.*
-import java.util.function.Function
 import java.util.regex.Pattern
 import kotlin.math.abs
-import kotlin.math.max
 
 @Service
 internal class IjVimSearchHelper : VimSearchHelperBase() {
 
   companion object {
-    private const val BLOCK_CHARS = "{}()[]<>"
     private val logger = Logger.getInstance(IjVimSearchHelper::class.java.name)
   }
   override fun findSection(
@@ -82,57 +76,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
 
   override fun findMethodStart(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     return PsiHelper.findMethodStart(editor.ij, caret.ij.offset, count)
-  }
-
-  private fun findBlockLocation(
-    chars: CharSequence,
-    found: Char,
-    match: Char,
-    dir: Direction,
-    pos: Int,
-    cnt: Int,
-  ): Int {
-    var position = pos
-    var count = cnt
-    var res = -1
-    val initialPos = position
-    val initialInString = checkInString(chars, position, true)
-    val inCheckPosF =
-      Function { x: Int -> if (dir === Direction.BACKWARDS && x > 0) x - 1 else x + 1 }
-    val inCheckPos = inCheckPosF.apply(position)
-    var inString = checkInString(chars, inCheckPos, true)
-    var inChar = checkInString(chars, inCheckPos, false)
-    var stack = 0
-    // Search to start or end of file, as appropriate
-    val charsToSearch: Set<Char> = HashSet(listOf('\'', '"', '\n', match, found))
-    while (position >= 0 && position < chars.length && count > 0) {
-      val (c, second) = SearchHelper.findPositionOfFirstCharacter(chars, position, charsToSearch, true, dir) ?: return -1
-      position = second
-      // If we found a match and we're not in a string...
-      if (c == match && (!inString) && !inChar) {
-        // We found our match
-        if (stack == 0) {
-          res = position
-          count--
-        } else {
-          stack--
-        }
-      } else if (c == '\n') {
-        inString = false
-        inChar = false
-      } else if (position != initialPos) {
-        // We found another character like our original - belongs to another pair
-        if (!inString && !inChar && c == found) {
-          stack++
-        } else if (!inChar) {
-          inString = checkInString(chars, inCheckPosF.apply(position), true)
-        } else if (!inString) {
-          inChar = checkInString(chars, inCheckPosF.apply(position), false)
-        }
-      }
-      position += dir.toInt()
-    }
-    return res
   }
 
   override fun findPattern(
@@ -532,148 +475,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
       }
     }
     return null
-  }
-
-  override fun findBlockRange(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    type: Char,
-    count: Int,
-    isOuter: Boolean,
-  ): TextRange? {
-    val chars: CharSequence = editor.ij.document.charsSequence
-    var pos: Int = caret.ij.offset
-    var start: Int = caret.ij.selectionStart
-    var end: Int = caret.ij.selectionEnd
-
-    val loc = BLOCK_CHARS.indexOf(type)
-    val close = BLOCK_CHARS[loc + 1]
-
-    // extend the range for blank line after type and before close, as they are excluded when inner match
-    if (!isOuter) {
-      if (start > 1 && chars[start - 2] == type && chars[start - 1] == '\n') {
-        start--
-      }
-      if (end < chars.length && chars[end] == '\n') {
-        var isSingleLineAllWhiteSpaceUntilClose = false
-        var countWhiteSpaceCharacter = 1
-        while (end + countWhiteSpaceCharacter < chars.length) {
-          if (Character.isWhitespace(chars[end + countWhiteSpaceCharacter]) &&
-            chars[end + countWhiteSpaceCharacter] != '\n'
-          ) {
-            countWhiteSpaceCharacter++
-            continue
-          }
-          if (chars[end + countWhiteSpaceCharacter] == close) {
-            isSingleLineAllWhiteSpaceUntilClose = true
-          }
-          break
-        }
-        if (isSingleLineAllWhiteSpaceUntilClose) {
-          end += countWhiteSpaceCharacter
-        }
-      }
-    }
-
-    var rangeSelection = end - start > 1
-    if (rangeSelection && start == 0) // early return not only for optimization
-    {
-      return null // but also not to break the interval semantic on this edge case (see below)
-    }
-
-    /* In case of successive inner selection. We want to break out of
-     * the block delimiter of the current inner selection.
-     * In other terms, for the rest of the algorithm, a previous inner selection of a block
-     * if equivalent to an outer one. */
-
-    /* In case of successive inner selection. We want to break out of
-     * the block delimiter of the current inner selection.
-     * In other terms, for the rest of the algorithm, a previous inner selection of a block
-     * if equivalent to an outer one. */if (!isOuter && start - 1 >= 0 && type == chars[start - 1] && end < chars.length && close == chars[end]) {
-      start -= 1
-      pos = start
-      rangeSelection = true
-    }
-
-    /* when one char is selected, we want to find the enclosing block of (start,end]
-     * although when a range of characters is selected, we want the enclosing block of [start, end]
-     * shifting the position allow to express which kind of interval we work on */
-
-    /* when one char is selected, we want to find the enclosing block of (start,end]
-     * although when a range of characters is selected, we want the enclosing block of [start, end]
-     * shifting the position allow to express which kind of interval we work on */if (rangeSelection) pos =
-      max(0.0, (start - 1).toDouble()).toInt()
-
-    val initialPosIsInString = checkInString(chars, pos, true)
-
-    var bstart = -1
-    var bend = -1
-
-    var startPosInStringFound = false
-
-    if (initialPosIsInString) {
-      val quoteRange = injector.searchHelper
-        .findBlockQuoteInLineRange(editor, caret, '"', false)
-      if (quoteRange != null) {
-        val startOffset = quoteRange.startOffset
-        val endOffset = quoteRange.endOffset
-        val subSequence = chars.subSequence(startOffset, endOffset)
-        val inQuotePos = pos - startOffset
-        var inQuoteStart =
-          findBlockLocation(subSequence, close, type, Direction.BACKWARDS, inQuotePos, count)
-        if (inQuoteStart == -1) {
-          inQuoteStart =
-            findBlockLocation(subSequence, close, type, Direction.FORWARDS, inQuotePos, count)
-        }
-        if (inQuoteStart != -1) {
-          startPosInStringFound = true
-          val inQuoteEnd =
-            findBlockLocation(subSequence, type, close, Direction.FORWARDS, inQuoteStart, 1)
-          if (inQuoteEnd != -1) {
-            bstart = inQuoteStart + startOffset
-            bend = inQuoteEnd + startOffset
-          }
-        }
-      }
-    }
-
-    if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, Direction.BACKWARDS, pos, count)
-      if (bstart == -1) {
-        bstart = findBlockLocation(chars, close, type, Direction.FORWARDS, pos, count)
-      }
-      if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, Direction.FORWARDS, bstart, 1)
-      }
-    }
-
-    if (bstart == -1 || bend == -1) {
-      return null
-    }
-
-    if (!isOuter) {
-      bstart++
-      // exclude first line break after start for inner match
-      if (chars[bstart] == '\n') {
-        bstart++
-      }
-      val o = editor.getLineStartForOffset(bend)
-      var allWhite = true
-      for (i in o until bend) {
-        if (!Character.isWhitespace(chars[i])) {
-          allWhite = false
-          break
-        }
-      }
-      if (allWhite) {
-        bend = o - 2
-      } else {
-        bend--
-      }
-    }
-
-    // End offset exclusive
-    return TextRange(bstart, bend + 1)
   }
 
   override fun findMisspelledWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {

@@ -10,10 +10,12 @@ package com.maddyhome.idea.vim.group
 
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
+import kotlin.math.max
 
 public const val BLOCK_CHARS: String = "{}()[]<>"
 
@@ -233,7 +235,8 @@ public fun findUnmatchedBlock(editor: VimEditor, pos: Int, type: Char, count: In
   return findBlockLocation(editor, start, charToMatch, pairChar, direction, count)
 }
 
-private fun findBlockLocation(editor: VimEditor, range: TextRange, start: Int, charToMatch: Char, pairChar: Char, direction: Direction): Int? {
+// TODO support delta & refactor me (mb use method below)
+private fun findBlockLocation(editor: VimEditor, range: TextRange, start: Int, charToMatch: Char, pairChar: Char, direction: Direction, delta: Int = 0): Int? {
   val strictEscapeMatching = true // Vim's default behavior, see `help cpoptions`
   val chars = editor.text()
 
@@ -246,14 +249,14 @@ private fun findBlockLocation(editor: VimEditor, range: TextRange, start: Int, c
       charToMatch -> depth++
       pairChar -> depth--
     }
-    if (depth == 0) return i
+    if (depth == delta && (c == charToMatch || c == pairChar)) return i
     // TODO what should we do inside strings?
     i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), i + direction.toInt(), escapedRestriction, direction)
   }
   return null
 }
 
-private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, pairChar: Char, direction: Direction, delta: Int): Int? {
+private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, pairChar: Char, direction: Direction, delta: Int, rangeToSearch: TextRange? = null): Int? {
   val strictEscapeMatching = true // Vim's default behavior, see `help cpoptions`
   val chars = editor.text()
 
@@ -262,30 +265,186 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
   var depth = 0
   val escapedRestriction = if (strictEscapeMatching) isEscaped(chars, start) else null
   var i: Int? = start
-  while (i != null) {
-    val rangeToSkip = getStringAtPos(editor, i, false) ?: injector.psiService.getCommentAtPos(editor, i)?.first
-    if (rangeToSkip != null) {
-      val searchStart = if (direction == Direction.FORWARDS) rangeToSkip.endOffset else rangeToSkip.startOffset - 1
-      i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), searchStart, escapedRestriction, direction)
-    } else {
-      when (chars[i]) {
-        charToMatch -> {
-          depth++
-          if (delta > 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
-        }
-        pairChar -> {
-          depth--
-          if (delta < 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
-        }
+  while (i != null && (rangeToSearch == null || rangeToSearch.contains(i))) {
+    if (rangeToSearch == null) {
+      val rangeToSkip = getStringAtPos(editor, i, false) ?: injector.psiService.getCommentAtPos(editor, i)?.first
+      if (rangeToSkip != null) {
+        val searchStart = if (direction == Direction.FORWARDS) rangeToSkip.endOffset else rangeToSkip.startOffset - 1
+        i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), searchStart, escapedRestriction, direction)
+        continue
       }
-      if (depth == delta) {
-        result = i // For standard `%` motion, which should return [result] only if we succeeded to match
-        break
-      }
-      i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), i + direction.toInt(), escapedRestriction, direction)
     }
+
+    when (chars[i]) {
+      charToMatch -> {
+        depth++
+        if (delta > 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
+      }
+      pairChar -> {
+        depth--
+        if (delta < 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
+      }
+    }
+
+    if (depth == delta && (chars[i] == charToMatch || chars[i] == pairChar)) {
+      result = i // For standard `%` motion, which should return [result] only if we succeeded to match
+      break
+    }
+
+    i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), i + direction.toInt(), escapedRestriction, direction)
   }
   return result
+}
+
+/**
+ * Find block enclosing the caret
+ *
+ * @param editor  The editor to search in
+ * @param caret   The caret currently at
+ * @param type    The type of block, e.g. (, [, {, <
+ * @param count   Find the nth next occurrence of the block
+ * @param isOuter Control whether the match includes block character
+ * @return When the block is found, return text range matching where end offset is exclusive, otherwise return null
+ */
+// TODO please refactor me
+public fun findBlockRange(
+  editor: VimEditor,
+  caret: ImmutableVimCaret,
+  type: Char,
+  count: Int,
+  isOuter: Boolean,
+): TextRange? {
+  val chars: CharSequence = editor.text()
+  var pos: Int = caret.offset.point
+  var start: Int = caret.selectionStart
+  var end: Int = caret.selectionEnd
+
+  val loc = BLOCK_CHARS.indexOf(type)
+  val close = BLOCK_CHARS[loc + 1]
+
+  // extend the range for blank line after type and before close, as they are excluded when inner match
+  if (!isOuter) {
+    if (start > 1 && chars[start - 2] == type && chars[start - 1] == '\n') {
+      start--
+    }
+    if (end < chars.length && chars[end] == '\n') {
+      var isSingleLineAllWhiteSpaceUntilClose = false
+      var countWhiteSpaceCharacter = 1
+      while (end + countWhiteSpaceCharacter < chars.length) {
+        if (Character.isWhitespace(chars[end + countWhiteSpaceCharacter]) &&
+          chars[end + countWhiteSpaceCharacter] != '\n'
+        ) {
+          countWhiteSpaceCharacter++
+          continue
+        }
+        if (chars[end + countWhiteSpaceCharacter] == close) {
+          isSingleLineAllWhiteSpaceUntilClose = true
+        }
+        break
+      }
+      if (isSingleLineAllWhiteSpaceUntilClose) {
+        end += countWhiteSpaceCharacter
+      }
+    }
+  }
+
+  var rangeSelection = end - start > 1
+  if (rangeSelection && start == 0) // early return not only for optimization
+  {
+    return null // but also not to break the interval semantic on this edge case (see below)
+  }
+
+  /* In case of successive inner selection. We want to break out of
+   * the block delimiter of the current inner selection.
+   * In other terms, for the rest of the algorithm, a previous inner selection of a block
+   * if equivalent to an outer one. */
+
+  /* In case of successive inner selection. We want to break out of
+   * the block delimiter of the current inner selection.
+   * In other terms, for the rest of the algorithm, a previous inner selection of a block
+   * if equivalent to an outer one. */if (!isOuter && start - 1 >= 0 && type == chars[start - 1] && end < chars.length && close == chars[end]) {
+    start -= 1
+    pos = start
+    rangeSelection = true
+  }
+
+  /* when one char is selected, we want to find the enclosing block of (start,end]
+   * although when a range of characters is selected, we want the enclosing block of [start, end]
+   * shifting the position allow to express which kind of interval we work on */
+
+  /* when one char is selected, we want to find the enclosing block of (start,end]
+   * although when a range of characters is selected, we want the enclosing block of [start, end]
+   * shifting the position allow to express which kind of interval we work on */if (rangeSelection) pos =
+    max(0.0, (start - 1).toDouble()).toInt()
+
+  var (blockStart, blockEnd) = findBlock(editor, pos, type, close, count) ?: return null
+
+  if (!isOuter) {
+    blockStart++
+    // exclude first line break after start for inner match
+    if (chars[blockStart] == '\n') {
+      blockStart++
+    }
+    val o = editor.getLineStartForOffset(blockEnd)
+    var allWhite = true
+    for (i in o until blockEnd) {
+      if (!Character.isWhitespace(chars[i])) {
+        allWhite = false
+        break
+      }
+    }
+    if (allWhite) {
+      blockEnd = o - 2
+    } else {
+      blockEnd--
+    }
+  }
+
+  // End offset exclusive
+  return TextRange(blockStart, blockEnd + 1)
+}
+
+private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: Char, count: Int): Pair<Int, Int>? {
+  val stringAtPos = getStringAtPos(editor, pos, true)
+
+  var blockStart: Int?
+  var blockEnd: Int?
+
+  // There are three cases of "blocks" in Vim:
+  //   1. There is a string containing a pair of [charToMatch] to [pairChar] and caret is located between them
+  if (stringAtPos != null) {
+    blockStart = findBlockLocation(editor, pos, charToMatch, pairChar, Direction.BACKWARDS, if (editor.text()[pos] == pairChar) count - 1 else count, stringAtPos)
+    if (blockStart != null) {
+      blockEnd = findBlockLocation(editor, blockStart, pairChar, charToMatch, Direction.FORWARDS, 0, stringAtPos)
+      if (blockEnd != null && blockEnd >= pos) return blockStart to blockEnd
+    }
+  }
+
+  //   2. Code contains [charToMatch] to [pairChar] and caret is located between them
+  blockStart = findBlockLocation(editor, pos, charToMatch, pairChar, Direction.BACKWARDS, if (editor.text()[pos] == pairChar) count - 1 else count)
+  if (blockStart != null) {
+    blockEnd = findBlockLocation(editor, blockStart, charToMatch, pairChar, Direction.FORWARDS, 0)
+    if (blockEnd != null && blockEnd >= pos) return blockStart to blockEnd
+  }
+
+  if (count > 1) return null // There are no [charToMatch] to [pairChar] around caret at all
+
+  //   3. There is a pair [charToMatch] to [pairChar] somewhere after the caret
+  blockStart = editor.text().indexOfOrNull(charToMatch, pos)
+  while (blockStart != null) {
+    val containingString = getStringAtPos(editor, blockStart, false)
+    if (containingString != null) {
+      blockEnd = findMatchingChar(editor, blockStart, charToMatch, pairChar, Direction.FORWARDS)
+      if (blockEnd != null) return blockStart to blockEnd
+      blockStart = editor.text().indexOfOrNull(charToMatch, blockStart + 1)
+    } else {
+      blockEnd = findMatchingChar(editor, blockStart, charToMatch, pairChar, Direction.FORWARDS)
+      if (blockEnd != null) return blockStart to blockEnd
+      break
+    }
+  }
+
+  return null
 }
 
 private fun CharSequence.indexOfAnyOrNullInDirection(chars: CharArray, startIndex: Int, escaped: Boolean?, direction: Direction): Int? {
