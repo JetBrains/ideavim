@@ -1110,6 +1110,32 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test set 'hlsearch' option after nohlsearch command shows highlights`() {
+    configureByText(
+      """I found it in a legendary land
+         |${c}all rocks and lavender and tufted grass,
+         |where it was settled on some sodden sand
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch")
+
+    val pattern = "and"
+    enterSearch(pattern)
+    enterCommand("nohlsearch")
+    enterCommand("set hlsearch")
+
+    assertSearchHighlights(
+      pattern,
+      """I found it in a legendary l«and»
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
   fun `test find next after nohlsearch command shows highlights`() {
     configureByText(
       """I found it in a legendary land
