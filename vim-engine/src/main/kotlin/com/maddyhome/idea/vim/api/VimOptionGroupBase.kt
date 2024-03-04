@@ -22,12 +22,30 @@ import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 public abstract class VimOptionGroupBase : VimOptionGroup {
   private val storage = OptionStorage()
   private val listeners = OptionListenersImpl(storage, injector.editorGroup)
   private val parsedValuesCache = ParsedValuesCache(storage, injector.vimStorageService)
   private var inInitVimRc = false
+
+  init {
+    addOptionValueOverride(Options.hlsearch, object : GlobalOptionValueOverride<VimInt> {
+      override fun getGlobalValue(storedValue: OptionValue<VimInt>, editor: VimEditor?) = storedValue
+
+      override fun setGlobalValue(
+        storedValue: OptionValue<VimInt>,
+        newValue: OptionValue<VimInt>,
+        editor: VimEditor?,
+      ): Boolean {
+        // We normally only notify of changes if the option value has actually changed, but we want to refresh search
+        // highlights if we search, call `:nohlsearch` and then `:set hlsearch`. The value of 'hlsearch' hasn't changed,
+        // but we still want to notify
+        return true
+      }
+    })
+  }
 
   override fun initialiseOptions() {
     Options.initialise()
