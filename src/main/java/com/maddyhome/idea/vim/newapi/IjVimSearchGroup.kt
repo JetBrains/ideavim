@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -135,13 +137,19 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
     return result.get()
   }
 
-  override fun addSubstitutionConfirmationHighlight(editor: VimEditor, startOffset: Int, endOffset: Int) {
-    val hl = addSubstitutionConfirmationHighlight(
-      (editor as IjVimEditor).editor,
+  override fun addSubstitutionConfirmationHighlight(
+    editor: VimEditor,
+    startOffset: Int,
+    endOffset: Int,
+  ): SearchHighlight {
+
+    val ijEditor = (editor as IjVimEditor).editor
+    val highlighter = addSubstitutionConfirmationHighlight(
+      ijEditor,
       startOffset,
       endOffset
     )
-    editor.editor.markupModel.removeHighlighter(hl)
+    return IjSearchHighlight(ijEditor, highlighter)
   }
 
   override fun setLatestMatch(match: String) {
@@ -172,5 +180,13 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
   override fun clearSearchHighlight() {
     showSearchHighlight = false
     updateSearchHighlights(false)
+  }
+
+  private class IjSearchHighlight(private val editor: Editor, private val highlighter: RangeHighlighter) :
+    SearchHighlight() {
+
+    override fun remove() {
+      editor.markupModel.removeHighlighter(highlighter)
+    }
   }
 }
