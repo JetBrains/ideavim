@@ -99,9 +99,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
    *
    * @param force Whether to force this update.
    */
-  protected abstract fun updateSearchHighlights(
-    force: Boolean,
-  )
+  protected abstract fun updateSearchHighlights(force: Boolean)
 
   /**
    * Reset the search highlights to the last used pattern after highlighting incsearch results.
@@ -137,7 +135,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     editor: VimEditor,
     startOffset: Int,
     endOffset: Int,
-  )
+  ) : SearchHighlight
 
   /**
    * Saves the latest matched string, for Vimscript purposes.
@@ -613,8 +611,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       if (doAll || line != editor.lineCount()) {
         var doReplace = true
         if (doAsk) {
-          addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
-
+          val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
           val choice: ReplaceConfirmationChoice = confirmChoice(editor, context, match, caret, matchRange.startOffset)
           when (choice) {
             ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
@@ -630,6 +627,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
               line2 = line
             }
           }
+          highlight.remove()
         }
         if (doReplace) {
           setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
@@ -1043,7 +1041,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   }
 
   /**
-   * Sets the last search state, purely for tests
+   * Sets the last search state purely for tests
    *
    * @param pattern         The pattern to save. This is the last search pattern, not the last substitute pattern
    * @param patternOffset   The pattern offset, e.g. `/{pattern}/{offset}`
@@ -1074,6 +1072,10 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     lastDirection = Direction.FORWARDS
   }
 
+
+  protected abstract class SearchHighlight {
+    public abstract fun remove()
+  }
 
   protected enum class PatternType {
     SEARCH,
