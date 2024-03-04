@@ -16,6 +16,7 @@ import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.Option
@@ -376,6 +377,18 @@ class OptionDeclaredScopeTest : VimTestCase() {
     }
 
     TODO("Not implemented. This is Vim behaviour, but this data is not saved by IdeaVim")
+  }
+
+  @Test
+  fun `test options are not reset when disabling and re-enabling the IdeaVim plugin`() {
+    withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
+      setEffectiveValue(fixture.editor)
+
+      VimPlugin.setEnabled(false)
+      VimPlugin.setEnabled(true)
+
+      assertEffectiveValueChanged(fixture.editor)
+    }
   }
 
   private inline fun withOption(declaredScope: OptionDeclaredScope, action: Option<VimString>.() -> Unit) {

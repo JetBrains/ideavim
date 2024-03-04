@@ -37,6 +37,11 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     // values of local-to-window options. Note that global options are not eagerly initialised - the value is the
     // default value unless explicitly set.
 
+    // Don't do anything if we're previously initialised the editor. Otherwise we'll reset options back to defaults
+    if (storage.isOptionStorageInitialised(editor)) {
+      return
+    }
+
     val strategy = OptionInitialisationStrategy(storage)
     if (scenario == LocalOptionInitialisationScenario.DEFAULTS) {
       check(sourceEditor == null) { "sourceEditor must be null when initialising the default options" }
@@ -452,9 +457,6 @@ public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataT
    * value, rather than leaving the local value "unset".
    */
   protected open fun resetLocalExternalValueToGlobal(editor: VimEditor) {
-    // TODO: If we disable and re-enable the plugin, we reinitialise the options, and set defaults again
-    // This leads to incorrectly resetting the IntelliJ value if the current effective IntelliJ value doesn't
-    // match the global IntelliJ value.
     val global = getGlobalExternalValue(editor)
     if (getEffectiveExternalValue(editor) != global) {
       doSetLocalExternalValue(editor, global)
@@ -791,6 +793,11 @@ private class OptionStorage {
       is OptionAccessScope.GLOBAL -> setGlobalValue(option, scope.editor, value)
       is OptionAccessScope.LOCAL -> setLocalValue(option, scope.editor, value)
     }
+  }
+
+  fun isOptionStorageInitialised(editor: VimEditor): Boolean {
+    // Local window option storage will exist if we've previously initialised this editor
+    return injector.vimStorageService.getDataFromWindow(editor, localOptionsKey) != null
   }
 
   fun isLocalToBufferOptionStorageInitialised(editor: VimEditor) =
