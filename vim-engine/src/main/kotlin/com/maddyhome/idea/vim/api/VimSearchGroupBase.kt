@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.history.HistoryConstants
-import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
@@ -124,16 +123,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     caret: VimCaret,
     startOffset: Int,
   ): ReplaceConfirmationChoice
-
-  /**
-   * Parses a string representing a Vimscript expression.
-   *
-   * @param expressionString A string representing a VimScript expression.
-   * @return An internal representation of a VimScript expression.
-   */
-  protected abstract fun parseVimScriptExpression(
-    expressionString: String,
-  ): Expression?
 
   /**
    * Highlights the string that would be replaced (pending user confimation) in
@@ -609,7 +598,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       var expression: Expression? = null
       if (hasExpression) {
         val exprString = substituteString.substring(2)
-        expression = parseVimScriptExpression(exprString)
+        expression = injector.vimscriptParser.parseExpression(exprString)
         if (expression == null) {
           exceptions.add(ExException("E15: Invalid expression: $exprString"))
           expression = SimpleExpression(VimString(""))
