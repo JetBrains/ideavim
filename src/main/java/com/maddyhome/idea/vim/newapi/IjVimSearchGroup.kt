@@ -36,12 +36,8 @@ import javax.swing.KeyStroke
 public open class IjVimSearchGroup : VimSearchGroupBase() {
 
   init {
-    // TODO: Investigate migrating these listeners to use the effective value change listener
-    // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
-    // the highlights in that project's current document's open editors (see VIM-2779).
-    // However, we probably only want to update the editors associated with the current document, so maybe the whole
-    // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
-    // changes in the search options.
+    // We use the global option listener instead of the effective listener that gets called for each affected editor
+    // because we handle updating the affected editors ourselves (e.g., we can filter for visible windows).
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch) {
       resetSearchHighlight()
       updateSearchHighlights(true)
