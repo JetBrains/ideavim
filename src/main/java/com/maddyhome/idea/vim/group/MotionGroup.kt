@@ -22,7 +22,6 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.VirtualFileSystem
-import com.intellij.util.MathUtil.clamp
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.BufferPosition
@@ -40,12 +39,9 @@ import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.normalizeColumn
-import com.maddyhome.idea.vim.api.normalizeLine
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.api.normalizeVisualLine
-import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -54,12 +50,10 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
-import com.maddyhome.idea.vim.handler.Motion.AdjustedOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
@@ -103,10 +97,6 @@ internal class MotionGroup : VimMotionGroupBase() {
 
   private fun selectEditor(project: Project?, file: VirtualFile) =
     VimPlugin.getFile().selectEditor(project, file)
-
-  override fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Motion {
-    return findMatchingPairOnCurrentLine(editor, caret)?.toMotionOrError() ?: Motion.Error
-  }
 
   override fun moveCaretToFirstDisplayLine(
     editor: VimEditor,
@@ -198,17 +188,6 @@ internal class MotionGroup : VimMotionGroupBase() {
     return moveCaretToColumn(editor, caret, max(0, min(len - 1, width)), false)
   }
 
-  override fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion {
-    val line = caret.getLine().line
-    val column = editor.normalizeColumn(line, count, allowEnd)
-    val offset = editor.bufferPositionToOffset(BufferPosition(line, column, false))
-    return if (column != count) {
-      AdjustedOffset(offset, count)
-    } else {
-      AbsoluteOffset(offset)
-    }
-  }
-
   override fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: ImmutableVimCaret): Motion {
     val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, caret.getVisualPosition().line)
     return moveCaretToColumn(editor, caret, col, false)
@@ -230,36 +209,6 @@ internal class MotionGroup : VimMotionGroupBase() {
   ): Motion {
     val col = EditorHelper.getVisualColumnAtRightOfDisplay(editor.ij, caret.getVisualPosition().line)
     return moveCaretToColumn(editor, caret, col, allowEnd)
-  }
-
-  override fun moveCaretToLineWithSameColumn(
-    editor: VimEditor,
-    line: Int,
-    caret: ImmutableVimCaret,
-  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    var c = caret.vimLastColumn
-    var l = line
-    if (l < 0) {
-      l = 0
-      c = 0
-    } else if (l >= editor.lineCount()) {
-      l = editor.normalizeLine(editor.lineCount() - 1)
-      c = editor.lineLength(l)
-    }
-    val newPos = BufferPosition(l, editor.normalizeColumn(l, c, false))
-    return editor.bufferPositionToOffset(newPos)
-  }
-
-  override fun moveCaretToLineWithStartOfLineOption(
-    editor: VimEditor,
-    line: Int,
-    caret: ImmutableVimCaret,
-  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    return if (injector.options(editor).startofline) {
-      moveCaretToLineStartSkipLeading(editor, line)
-    } else {
-      moveCaretToLineWithSameColumn(editor, line, caret)
-    }
   }
 
   /**
@@ -291,18 +240,6 @@ internal class MotionGroup : VimMotionGroupBase() {
     val currentWindow = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow
     switchEditorTab(currentWindow, if (absolute) rawCount - 1 else 1, absolute)
     return editor.currentCaret().offset.point
-  }
-
-  override fun moveCaretToLinePercent(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    count: Int,
-  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    return moveCaretToLineWithStartOfLineOption(
-      editor,
-      editor.normalizeLine((editor.lineCount() * clamp(count, 0, 100) + 99) / 100 - 1),
-      caret,
-    )
   }
 
   private enum class ScreenLocation {
