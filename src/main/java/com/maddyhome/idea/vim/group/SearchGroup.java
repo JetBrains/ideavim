@@ -60,23 +60,19 @@ import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
 
+/**
+ * @deprecated Replace with IjVimSearchGroup
+ */
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 @Deprecated
-/**
- * @deprecated Replace with IjVimSearchGroup
- */
 public class SearchGroup extends IjVimSearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
     super();
     if (!globalIjOptions(injector).getUseNewRegex()) {
-      // TODO: Investigate migrating these listeners to use the effective value change listener
-      // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
-      // the highlights in that project's current document's open editors (see VIM-2779).
-      // However, we probably only want to update the editors associated with the current document, so maybe the whole
-      // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
-      // changes in the search options.
+      // We use the global option listener instead of the effective listener that gets called for each affected editor
+      // because we handle updating the affected editors ourselves (e.g., we can filter for visible windows).
       VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch, () -> {
         resetShowSearchHighlight();
         forceUpdateSearchHighlights();
@@ -150,11 +146,11 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
   @Override
   protected @Nullable String getLastUsedPattern() {
     if (globalIjOptions(injector).getUseNewRegex()) return super.getLastUsedPattern();
-    switch (lastPatternIdx) {
-      case RE_SEARCH: return lastSearch;
-      case RE_SUBST:  return lastSubstitute;
-    }
-    return null;
+    return switch (lastPatternIdx) {
+      case RE_SEARCH -> lastSearch;
+      case RE_SUBST -> lastSubstitute;
+      default -> null;
+    };
   }
 
   /**
@@ -284,7 +280,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     final char type = dir == Direction.FORWARDS ? '/' : '?';
 
-    if (command.length() > 0) {
+    if (!command.isEmpty()) {
       if (command.charAt(0) != type) {
         CharPointer p = new CharPointer(command);
         CharPointer end = RegExp.skip_regexp(p.ref(0), type, true);
@@ -336,13 +332,13 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     // Direction is saved in do_search
     // IgnoreSmartCase is only ever set for searching words (`*`, `#`, `g*`, etc.) and is reset for all other operations
 
-    if (pattern == null || pattern.length() == 0) {
+    if (pattern == null || pattern.isEmpty()) {
       pattern = getLastSearchPattern();
       patternOffset = lastPatternOffset;
-      if (pattern == null || pattern.length() == 0) {
+      if (pattern == null || pattern.isEmpty()) {
         isNewPattern = true;
         pattern = getLastSubstitutePattern();
-        if (pattern == null || pattern.length() == 0) {
+        if (pattern == null || pattern.isEmpty()) {
           VimPlugin.showMessage(MessageHelper.message("e_noprevre"));
           return -1;
         }
@@ -952,17 +948,17 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       if (which_pat == RE_LAST) {
         which_pat = lastPatternIdx;
       }
-      String errorMessage = null;
-      switch (which_pat) {
-        case RE_SEARCH:
+      String errorMessage = switch (which_pat) {
+        case RE_SEARCH -> {
           pattern = lastSearch;
-          errorMessage = MessageHelper.message("e_nopresub");
-          break;
-        case RE_SUBST:
+          yield MessageHelper.message("e_nopresub");
+        }
+        case RE_SUBST -> {
           pattern = lastSubstitute;
-          errorMessage = MessageHelper.message("e_noprevre");
-          break;
-      }
+          yield MessageHelper.message("e_noprevre");
+        }
+        default -> null;
+      };
 
       // Pattern was never defined
       if (pattern == null) {
@@ -1281,7 +1277,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     ParsePosition pp = new ParsePosition(0);
 
-    if (lastPatternOffset.length() > 0) {
+    if (!lastPatternOffset.isEmpty()) {
       if (Character.isDigit(lastPatternOffset.charAt(0)) || lastPatternOffset.charAt(0) == '+' || lastPatternOffset.charAt(0) == '-') {
         offsetIsLineOffset = true;
 
@@ -1390,7 +1386,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     addOptionalTextElement(search, "last-search", lastSearch);
     addOptionalTextElement(search, "last-substitute", lastSubstitute);
-    addOptionalTextElement(search, "last-offset", lastPatternOffset.length() > 0 ? lastPatternOffset : null);
+    addOptionalTextElement(search, "last-offset", !lastPatternOffset.isEmpty() ? lastPatternOffset : null);
     addOptionalTextElement(search, "last-replace", lastReplace);
     addOptionalTextElement(search, "last-pattern", lastPatternIdx == RE_SEARCH ? lastSearch : lastSubstitute);
     addOptionalTextElement(search, "last-dir", Integer.toString(lastDir.toInt()));
