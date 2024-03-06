@@ -18,8 +18,6 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.ColorUtil
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
@@ -27,7 +25,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -84,7 +81,7 @@ internal fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, en
 }
 
 /**
- * Refreshes current search highlights for all editors of currently active text editor/document
+ * Refreshes current search highlights for all visible editors
  */
 private fun updateSearchHighlights(
   currentEditor: VimEditor?,
@@ -97,78 +94,75 @@ private fun updateSearchHighlights(
   forceUpdate: Boolean,
 ): Int {
   var currentEditorCurrentMatchOffset = -1
-  val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentEditorCurrentMatchOffset
 
-  // TODO: This implementation needs rethinking
-  // It's a bit weird that we update search highlights across all open projects. It would make more sense to treat top
-  // level project frame windows as separate applications, but we can't do this because IdeaVim does not maintain state
-  // per-project.
-  // So, to be clear, this will loop over each project, and therefore, for each project top-level frame, will update
-  // search highlights in all editors for the document of the currently selected editor. It does not update highlights
-  // for editors for the document that are in other projects.
+  // TODO: 'nohlsearch' should not show highlight in other editors
 
-  for (project in projectManager.openProjects) {
-    val current = FileEditorManager.getInstance(project).selectedTextEditor ?: continue
-    val editors = injector.editorGroup.getEditors(IjVimDocument(current.document))
-    for (vimEditor in editors) {
-      val editor = (vimEditor as IjVimEditor).editor
-      if (editor.project != project) {
-        continue
-      }
+  // Update highlights in all visible editors. We update non-visible editors when they get focus.
+  // Note that this now includes all editors - main, diff windows, even toolwindows like the Commit editor and consoles
+  val editors = injector.editorGroup.getEditors().filter {
+    injector.application.isUnitTest() || it.ij.component.isShowing
+  }
 
-      var currentMatchOffset = -1
+  editors.forEach {
+    val editor = it.ij
+    var currentMatchOffset = -1
 
-      // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
-      // Force update for the situations where the text is the same, but the ignore case values have changed.
-      // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
-      // which will match smartcase. Or changing the smartcase/ignorecase settings
-      if (shouldRemoveSearchHighlights(editor, pattern, showHighlights) || forceUpdate) {
-        removeSearchHighlights(editor)
-      }
+    // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
+    // Force update for the situations where the text is the same, but the ignore case values have changed.
+    // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
+    // which will match smartcase. Or changing the smartcase/ignorecase settings
+    if (shouldRemoveSearchHighlights(editor, pattern, showHighlights) || forceUpdate) {
+      removeSearchHighlights(editor)
+    }
 
-      if (pattern == null) continue
+    if (pattern == null) return@forEach
 
-      if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
-        // hlsearch (+ incsearch/noincsearch)
-        val startLine = searchRange?.startLine ?: 0
-        val endLine = searchRange?.endLine ?: -1
-        val results =
-          injector.searchHelper.findAll(IjVimEditor(editor), pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
-        if (results.isNotEmpty()) {
-          if (editor === currentEditor?.ij) {
-            currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
-          }
-          highlightSearchResults(editor, pattern, results, currentMatchOffset)
+    if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
+      // hlsearch (+ incsearch/noincsearch)
+      val startLine = searchRange?.startLine ?: 0
+      val endLine = searchRange?.endLine ?: -1
+      val results =
+        injector.searchHelper.findAll(
+          IjVimEditor(editor),
+          pattern,
+          startLine,
+          endLine,
+          shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+        )
+      if (results.isNotEmpty()) {
+        if (editor === currentEditor?.ij) {
+          currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
         }
-        editor.vimLastSearch = pattern
-      } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
-        // nohlsearch + incsearch
-        val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (injector.globalOptions().wrapscan) {
-          searchOptions.add(SearchOptions.WRAP)
-        }
-        if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
-        if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
-        val result = injector.searchHelper.findPattern(IjVimEditor(editor), pattern, initialOffset, 1, searchOptions)
-        if (result != null) {
-          if (editor === currentEditor?.ij) {
-            currentMatchOffset = result.startOffset
-          }
-          val results = listOf(result)
-          highlightSearchResults(editor, pattern, results, currentMatchOffset)
-        }
-      } else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) {
-        // incsearch. If nothing has changed (e.g. we've edited offset values in `/foo/e+2`) make sure we return the
-        // current match offset so the caret remains at the current incsarch match
-        val offset = editor.vimIncsearchCurrentMatchOffset
-        if (offset != null && editor === currentEditor?.ij) {
-          currentMatchOffset = offset
-        }
+        highlightSearchResults(editor, pattern, results, currentMatchOffset)
       }
+      editor.vimLastSearch = pattern
+    } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
+      // nohlsearch + incsearch
+      val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
+      if (injector.globalOptions().wrapscan) {
+        searchOptions.add(SearchOptions.WRAP)
+      }
+      if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
+      if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
+      val result = injector.searchHelper.findPattern(IjVimEditor(editor), pattern, initialOffset, 1, searchOptions)
+      if (result != null) {
+        if (editor === currentEditor?.ij) {
+          currentMatchOffset = result.startOffset
+        }
+        val results = listOf(result)
+        highlightSearchResults(editor, pattern, results, currentMatchOffset)
+      }
+    } else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) {
+      // incsearch. If nothing has changed (e.g. we've edited offset values in `/foo/e+2`) make sure we return the
+      // current match offset so the caret remains at the current incsarch match
+      val offset = editor.vimIncsearchCurrentMatchOffset
+      if (offset != null && editor === currentEditor?.ij) {
+        currentMatchOffset = offset
+      }
+    }
 
-      if (editor === currentEditor?.ij) {
-        currentEditorCurrentMatchOffset = currentMatchOffset
-      }
+    if (editor === currentEditor?.ij) {
+      currentEditorCurrentMatchOffset = currentMatchOffset
     }
   }
 
