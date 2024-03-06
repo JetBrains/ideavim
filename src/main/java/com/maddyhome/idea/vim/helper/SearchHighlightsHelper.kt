@@ -49,7 +49,12 @@ internal fun updateIncsearchHighlights(
   caretOffset: Int,
   searchRange: LineRange?,
 ): Int {
-  val searchStartOffset = if (searchRange != null) editor.vim.getLineStartOffset(searchRange.startLine) else caretOffset
+  val searchStartOffset = if (searchRange != null && searchRange.startLine < editor.document.lineCount) {
+    editor.vim.getLineStartOffset(searchRange.startLine)
+  }
+  else {
+    caretOffset
+  }
   val showHighlights = injector.options(editor.vim).hlsearch
   return updateSearchHighlights(
     editor.vim,
@@ -119,29 +124,33 @@ private fun updateSearchHighlights(
 
     if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
       // hlsearch (+ incsearch/noincsearch)
-      val startLine = searchRange?.startLine ?: 0
-      val endLine = searchRange?.endLine ?: -1
-      val results =
-        injector.searchHelper.findAll(
-          IjVimEditor(editor),
-          pattern,
-          startLine,
-          endLine,
-          shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
-        )
-      if (results.isNotEmpty()) {
-        if (editor === currentEditor?.ij) {
-          currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
+      // Make sure the range fits this editor. Note that Vim will use the same range for all windows. E.g., given
+      // `:1,5s/foo`, Vim will highlight all occurrences of `foo` in the first five lines of all visible windows
+      val vimEditor = editor.vim
+      val editorLastLine = vimEditor.lineCount() - 1
+      val searchStartLine = searchRange?.startLine ?: 0
+      val searchEndLine = (searchRange?.endLine ?: -1).coerceAtMost(editorLastLine)
+      if (searchStartLine <= editorLastLine) {
+        val results =
+          injector.searchHelper.findAll(
+            vimEditor,
+            pattern,
+            searchStartLine,
+            searchEndLine,
+            shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+          )
+        if (results.isNotEmpty()) {
+          if (editor === currentEditor?.ij) {
+            currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
+          }
+          highlightSearchResults(editor, pattern, results, currentMatchOffset)
         }
-        highlightSearchResults(editor, pattern, results, currentMatchOffset)
       }
       editor.vimLastSearch = pattern
     } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
       // nohlsearch + incsearch
       val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-      if (injector.globalOptions().wrapscan) {
-        searchOptions.add(SearchOptions.WRAP)
-      }
+      if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
       if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
       if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
       val result = injector.searchHelper.findPattern(IjVimEditor(editor), pattern, initialOffset, 1, searchOptions)
