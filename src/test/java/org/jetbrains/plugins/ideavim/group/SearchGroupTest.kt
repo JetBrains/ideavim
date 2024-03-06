@@ -895,6 +895,86 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch highlights for substitute command if range larger than file`() {
+    configureByText(
+      """
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |${c}hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+
+    typeText(":", "1,300s/and")
+
+    assertSearchHighlights(
+      "and",
+      """I found it in a legendary l‷and‴
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent «and» rush of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test incsearch highlights for substitute command with reversed range`() {
+    configureByText(
+      """
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |${c}hard by the torrent and rush of a mountain pass.
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+
+    typeText(":", "8,2s/and")
+
+    assertSearchHighlights(
+      "and",
+      """
+        |I found it in a legendary land
+        |all rocks ‷and‴ lavender «and» tufted grass,
+        |where it was settled on some sodden s«and»
+        |hard by the torrent «and» rush of a mountain pass.
+        |I found it in a legendary l«and»
+        |all rocks «and» lavender «and» tufted grass,
+        |where it was settled on some sodden s«and»
+        |hard by the torrent «and» rush of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test incsearch highlights nothing for substitute with range after end of file`() {
+    configureByText(
+      """I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |${c}hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+
+    typeText(":", "100,300s/and")
+
+    assertSearchHighlights(
+      "and",
+      """I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
   fun `test incsearch highlights for substitute command in current line with no range`() {
     configureByText(
       """I found it in a legendary land
