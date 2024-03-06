@@ -260,6 +260,64 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
     return moveCaretToLineStartSkipLeading(editor, line)
   }
 
+  override fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Motion {
+    val markService = injector.markService
+    val mark = markService.getMark(caret, ch) ?: return Motion.Error
+
+    val editor = caret.editor
+
+    val line = mark.line
+
+    if (editor.getPath() == mark.filepath) {
+      val offset = if (toLineStart) {
+        moveCaretToLineStartSkipLeading(editor, line)
+      } else {
+        editor.bufferPositionToOffset(BufferPosition(line, mark.col, false))
+      }
+      return offset.toMotionOrError()
+    }
+
+    // TODO [vakhitov] It is super super super wrong.
+    // TODO [vakhitov] We should remove all of the secondary carets and return an offset of the primary one
+    val markEditor = injector.file.selectEditor(editor.projectId, mark.filepath, mark.protocol) ?: return Motion.Error
+    // todo should we move all the carets or only one?
+    for (carett in markEditor.carets()) {
+      val offset = if (toLineStart) {
+        moveCaretToLineStartSkipLeading(markEditor, line)
+      } else {
+        // todo should it be the same as getting offset above?
+        markEditor.bufferPositionToOffset(BufferPosition(line, mark.col))
+      }
+      carett.moveToOffset(offset)
+    }
+    // TODO remove secondary carets and return result for primary caret
+    return Motion.Error
+  }
+
+  override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+    val jumpService = injector.jumpService
+    val spot = jumpService.getJumpSpot(editor)
+    val (line, col, fileName) = jumpService.getJump(editor, count) ?: return Motion.Error
+    val lp = BufferPosition(line, col, false)
+    return if (editor.getPath() != fileName) {
+      // TODO [vakhitov] come up with a more gentle way to handle protocol
+      injector.file.selectEditor(editor.projectId, fileName, "file")?.let { newEditor ->
+        if (spot == -1) {
+          jumpService.addJump(editor, false)
+        }
+        newEditor.let {
+          it.currentCaret().moveToOffset(it.normalizeOffset(newEditor.bufferPositionToOffset(lp), false))
+        }
+      }
+      Motion.Error
+    } else {
+      if (spot == -1) {
+        jumpService.addJump(editor, false)
+      }
+      editor.bufferPositionToOffset(lp).toMotionOrError()
+    }
+  }
+
   override fun getMotionRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,

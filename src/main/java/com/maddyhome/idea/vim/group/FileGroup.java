@@ -22,9 +22,12 @@ import com.intellij.openapi.fileEditor.impl.EditorsSplitters;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
@@ -44,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
@@ -444,5 +448,29 @@ public class FileGroup extends VimFileBase {
     if (event.getOldFile() != null) {
       LastTabService.getInstance(event.getManager().getProject()).setLastTab(event.getOldFile());
     }
+  }
+
+  @Nullable
+  @Override
+  public VimEditor selectEditor(@NotNull String projectId, @NotNull String documentPath, @Nullable String protocol) {
+    VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol);
+    if (fileSystem == null) return null;
+    VirtualFile virtualFile = fileSystem.findFileByPath(documentPath);
+    if (virtualFile == null) return null;
+
+    Project project = Arrays.stream(ProjectManager.getInstance().getOpenProjects())
+      .filter(p -> injector.getFile().getProjectId(p).equals(projectId))
+      .findFirst().orElseThrow();
+
+    Editor editor = selectEditor(project, virtualFile);
+    if (editor == null) return null;
+    return new IjVimEditor(editor);
+  }
+
+  @NotNull
+  @Override
+  public String getProjectId(@NotNull Object project) {
+    if (!(project instanceof Project)) throw new IllegalArgumentException();
+    return ((Project) project).getName();
   }
 }

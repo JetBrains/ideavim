@@ -11,35 +11,22 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorWindow
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.openapi.vfs.VirtualFileSystem
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
-import com.maddyhome.idea.vim.api.addJump
 import com.maddyhome.idea.vim.api.anyNonWhitespace
-import com.maddyhome.idea.vim.api.getJump
-import com.maddyhome.idea.vim.api.getJumpSpot
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
@@ -52,7 +39,6 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.fileSize
@@ -61,17 +47,13 @@ import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.AppCodeTemplates
-import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.annotations.Range
-import java.io.File
 import kotlin.math.max
 import kotlin.math.min
 
@@ -83,20 +65,6 @@ internal class MotionGroup : VimMotionGroupBase() {
   override fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int) {
     AppCodeTemplates.onMovement(editor.ij, caret.ij, oldOffset < offset)
   }
-
-  private fun selectEditor(project: Project, mark: Mark): Editor? {
-    val virtualFile = markToVirtualFile(mark) ?: return null
-    return selectEditor(project, virtualFile)
-  }
-
-  private fun markToVirtualFile(mark: Mark): VirtualFile? {
-    val protocol = mark.protocol
-    val fileSystem: VirtualFileSystem? = VirtualFileManager.getInstance().getFileSystem(protocol)
-    return fileSystem?.findFileByPath(mark.filepath)
-  }
-
-  private fun selectEditor(project: Project?, file: VirtualFile) =
-    VimPlugin.getFile().selectEditor(project, file)
 
   override fun moveCaretToFirstDisplayLine(
     editor: VimEditor,
@@ -118,68 +86,6 @@ internal class MotionGroup : VimMotionGroupBase() {
 
   override fun moveCaretToMiddleDisplayLine(editor: VimEditor, caret: ImmutableVimCaret): Int {
     return moveCaretToScreenLocation(editor.ij, caret.ij, ScreenLocation.MIDDLE, 0, false)
-  }
-
-  override fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Motion {
-    val markService = injector.markService
-    val mark = markService.getMark(caret, ch) ?: return Motion.Error
-
-    val caretEditor = caret.editor
-    val caretVirtualFile = EditorHelper.getVirtualFile((caretEditor as IjVimEditor).editor)
-
-    val line = mark.line
-
-    if (caretVirtualFile!!.path == mark.filepath) {
-      val offset = if (toLineStart) {
-        moveCaretToLineStartSkipLeading(caretEditor, line)
-      } else {
-        caretEditor.bufferPositionToOffset(BufferPosition(line, mark.col, false))
-      }
-      return offset.toMotionOrError()
-    }
-
-    val project = caretEditor.editor.project
-    val markEditor = selectEditor(project!!, mark)
-    if (markEditor != null) {
-      // todo should we move all the carets or only one?
-      for (carett in markEditor.caretModel.allCarets) {
-        val offset = if (toLineStart) {
-          moveCaretToLineStartSkipLeading(IjVimEditor(markEditor), line)
-        } else {
-          // todo should it be the same as getting offset above?
-          markEditor.logicalPositionToOffset(LogicalPosition(line, mark.col))
-        }
-        IjVimCaret(carett!!).moveToOffset(offset)
-      }
-    }
-    return Motion.Error
-  }
-
-  override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
-    val jumpService = injector.jumpService
-    val spot = jumpService.getJumpSpot(editor)
-    val (line, col, fileName) = jumpService.getJump(editor, count) ?: return Motion.Error
-    val vf = EditorHelper.getVirtualFile(editor.ij) ?: return Motion.Error
-    val lp = BufferPosition(line, col, false)
-    val lpNative = LogicalPosition(line, col, false)
-    return if (vf.path != fileName) {
-      val newFile = LocalFileSystem.getInstance().findFileByPath(fileName.replace(File.separatorChar, '/'))
-        ?: return Motion.Error
-      selectEditor(editor.ij.project, newFile)?.let { newEditor ->
-        if (spot == -1) {
-          jumpService.addJump(editor, false)
-        }
-        newEditor.vim.let {
-          it.currentCaret().moveToOffset(it.normalizeOffset(newEditor.logicalPositionToOffset(lpNative), false))
-        }
-      }
-      Motion.Error
-    } else {
-      if (spot == -1) {
-        jumpService.addJump(editor, false)
-      }
-      editor.bufferPositionToOffset(lp).toMotionOrError()
-    }
   }
 
   override fun moveCaretToCurrentDisplayLineMiddle(editor: VimEditor, caret: ImmutableVimCaret): Motion {
