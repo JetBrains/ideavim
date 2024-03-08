@@ -248,25 +248,29 @@ internal fun highlightSearchResults(editor: Editor, pattern: String, results: Li
 }
 
 private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolean, tooltip: String): RangeHighlighter {
-  var attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
-  if (current) {
-    // This mimics what IntelliJ does with the Find live preview
-    attributes = attributes.clone()
-    attributes.effectType = EffectType.ROUNDED_BOX
-    attributes.effectColor = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
+  val layer = HighlighterLayer.SELECTION - 1
+  val targetArea = HighlighterTargetArea.EXACT_RANGE
+  if (!current) {
+    // If we use text attribute key, it will update automatically when the editor's colour scheme changes
+    val highlighter =
+      editor.markupModel.addRangeHighlighter(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES, start, end, layer, targetArea)
+    highlighter.errorStripeTooltip = tooltip
+    return highlighter
   }
-  if (attributes.errorStripeColor == null) {
-    attributes.errorStripeColor = getFallbackErrorStripeColor(attributes, editor.colorsScheme)
+
+  // There isn't a text attribute key for current selection. This means we won't update automatically when the editor's
+  // colour scheme changes. However, this is only used during incsearch, so it should be replaced pretty quickly. It's a
+  // small visual glitch that will fix itself quickly. Let's not bother implementing an editor colour scheme listener
+  // just for this.
+  // These are the same modifications that the Find live preview does. We could look at using LivePreviewPresentation,
+  // which might also be useful for text attributes in selection (if we supported that)
+  val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES).clone().apply {
+    effectType = EffectType.ROUNDED_BOX
+    effectColor = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
   }
-  val highlighter = editor.markupModel.addRangeHighlighter(
-    start,
-    end,
-    HighlighterLayer.SELECTION - 1,
-    attributes,
-    HighlighterTargetArea.EXACT_RANGE,
-  )
-  highlighter.errorStripeTooltip = tooltip
-  return highlighter
+  return editor.markupModel.addRangeHighlighter(start, end, layer, attributes, targetArea).apply {
+    errorStripeTooltip = tooltip
+  }
 }
 
 /**
