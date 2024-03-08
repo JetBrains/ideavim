@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.Contract
@@ -100,8 +99,6 @@ private fun updateSearchHighlights(
 ): Int {
   var currentEditorCurrentMatchOffset = -1
 
-  // TODO: 'nohlsearch' should not show highlight in other editors
-
   // Update highlights in all visible editors. We update non-visible editors when they get focus.
   // Note that this now includes all editors - main, diff windows, even toolwindows like the Commit editor and consoles
   val editors = injector.editorGroup.getEditors().filter {
@@ -148,18 +145,18 @@ private fun updateSearchHighlights(
       }
       editor.vimLastSearch = pattern
     } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
-      // nohlsearch + incsearch
-      val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-      if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
-      if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
-      if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
-      val result = injector.searchHelper.findPattern(IjVimEditor(editor), pattern, initialOffset, 1, searchOptions)
-      if (result != null) {
-        if (editor === currentEditor?.ij) {
+      // nohlsearch + incsearch. Only highlight the current editor
+      if (editor === currentEditor?.ij) {
+        val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
+        if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
+        if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
+        if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
+        val result = injector.searchHelper.findPattern(it, pattern, initialOffset, 1, searchOptions)
+        if (result != null) {
+          val results = listOf(result)
+          highlightSearchResults(editor, pattern, results, result.startOffset)
           currentMatchOffset = result.startOffset
         }
-        val results = listOf(result)
-        highlightSearchResults(editor, pattern, results, currentMatchOffset)
       }
     } else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) {
       // incsearch. If nothing has changed (e.g. we've edited offset values in `/foo/e+2`) make sure we return the
