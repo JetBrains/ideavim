@@ -38,9 +38,17 @@ public class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     if (argument == null) return Motion.Error
-    return injector.searchGroup
-      .processSearchCommand(editor, argument.string, caret.offset, Direction.BACKWARDS).toMotionOrError()
+    val offsetAndMotion = injector.searchGroup.processSearchCommand(
+      editor,
+      argument.string,
+      caret.offset,
+      Direction.BACKWARDS
+    )
+    if (offsetAndMotion == null) return Motion.Error
+    motionType = offsetAndMotion.second
+    return offsetAndMotion.first.toMotionOrError()
   }
 
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+  // Default to EXCLUSIVE, but override in `execute`, based on the search offset
+  override var motionType: MotionType = MotionType.EXCLUSIVE
 }

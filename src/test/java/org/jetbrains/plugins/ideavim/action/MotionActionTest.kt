@@ -9,7 +9,6 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -685,11 +684,126 @@ class MotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun testDeleteToSearchResult() {
+    val before = "Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit"
+    val after = "Lorem ${c}sit amet, consectetur adipiscing elit"
+    doTest("d/sit<CR>", before, after)
+  }
+
+  @Test
+  fun testDeleteToLastSearchResult() {
+    val before = "Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit"
+    val after = "Lorem ${c}sit amet, consectetur adipiscing elit"
+    doTest("dn", before, after) {
+      enterSearch("sit")
+      typeText("0w")  // Cursor back on first "ipsum"
+    }
+  }
+
+  @Test
+  fun testDeleteToSearchResultWithLinewiseOffset() {
+    val before = """
+      |First line
+      |Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      |Last line
+      """.trimMargin()
+    val after = """
+      |First line
+      |${c}Last line
+      """.trimMargin()
+    doTest("d/sit/3<CR>", before, after)
+  }
+
+  @Test
+  fun testDeleteToEndOfSearchResultInclusive() {
+    val before = "Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit"
+    val after = "Lorem ${c} amet, consectetur adipiscing elit"
+    doTest("d/sit/e<CR>", before, after)
+  }
+
+  @Test
+  fun testDeleteToEndOfSearchResultWithOffset() {
+    val before = "Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit"
+    val after = "Lorem ${c}et, consectetur adipiscing elit"
+    doTest("d/sit/e+3<CR>", before, after)
+  }
+
+  @Test
+  fun testDeleteToSearchResultWithIncsearch() {
+    val before = "Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit"
+    val after = "Lorem ${c}sit amet, consectetur adipiscing elit"
+    doTest("d/sit<CR>", before, after) {
+      enterCommand("set incsearch")
+    }
+  }
+
+  @Test
   fun testDeleteToDigraph() {
     val keys = listOf("d/<C-K>O:<CR>")
     val before = "ab${c}cdÖef"
     val after = "abÖef"
     doTest(keys, before, after, Mode.NORMAL())
+  }
+
+  @Test
+  fun testDeleteBackwardsToSearchResult() {
+    val before = "Lorem ipsum dolor sit amet, ${c}consectetur adipiscing elit"
+    val after = "Lorem ipsum dolor ${c}consectetur adipiscing elit"
+    doTest("d/sit<CR>", before, after)
+  }
+
+  @Test
+  fun testDeleteBackwardsToLastSearchResult() {
+    val before = "Lorem ipsum dolor sit amet, ${c}consectetur adipiscing elit"
+    val after = "Lorem ipsum dolor ${c}elit"
+    doTest("dn", before, after) {
+      enterSearch("sit", false)
+      typeText("\$b") // Cursor to start of "elit"
+    }
+  }
+
+  @Test
+  fun testDeleteBackwardsToSearchResultWithLinewiseOffset() {
+    val before = """
+      |First line
+      |Lorem ipsum dolor sit amet, consectetur ${c}adipiscing elit
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      |Last line
+      """.trimMargin()
+    val after = """
+      |First line
+      |${c}Last line
+      """.trimMargin()
+    doTest("d?sit?3<CR>", before, after)
+  }
+
+  @Suppress("SpellCheckingInspection")
+  @Test
+  fun testDeleteBackwardsToEndOfSearchResultInclusive() {
+    val before = "Lorem ipsum dolor sit amet, ${c}consectetur adipiscing elit"
+    val after = "Lorem ipsum dolor si${c}onsectetur adipiscing elit"
+    doTest("d?sit?e<CR>", before, after)
+  }
+
+  @Test
+  fun testDeleteBackwardsToEndOfSearchResultWithOffset() {
+    val before = "Lorem ipsum dolor sit amet, ${c}consectetur adipiscing elit"
+    val after = "Lorem ipsum dolor sit a${c}onsectetur adipiscing elit"
+    doTest("d?sit?e+3<CR>", before, after)
+  }
+
+  @Test
+  fun testDeleteBackwardsToSearchResultWithIncsearch() {
+    val before = "Lorem ipsum dolor sit amet, ${c}consectetur adipiscing elit"
+    val after = "Lorem ipsum dolor ${c}consectetur adipiscing elit"
+    doTest("d?sit<CR>", before, after) {
+      enterCommand("set incsearch")
+    }
   }
 
   // |[(|
@@ -1212,14 +1326,14 @@ two
   @Test
   fun `test gv after backwards selection`() {
     configureByText("${c}Oh, hi Mark\n")
-    typeText(parseKeys("yw" + "$" + "vb" + "p" + "gv"))
+    typeText("yw", "$", "vb", "p", "gv")
     assertSelection("Oh")
   }
 
   @Test
   fun `test gv after linewise selection`() {
     configureByText("${c}Oh, hi Mark\nOh, hi Markus\n")
-    typeText(parseKeys("V" + "y" + "j" + "V" + "p" + "gv"))
+    typeText("V", "y", "j", "V", "p", "gv")
     assertSelection("Oh, hi Mark\n")
   }
 }
