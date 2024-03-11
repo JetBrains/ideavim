@@ -418,7 +418,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     dir: Direction,
   ): Int {
     resetSearchHighlight()
-    updateSearchHighlights(true)
+    updateSearchHighlights(false)
 
     val startOffset: Int = caret.offset.point
     var offset = findItOffset(editor, startOffset, count, dir)
