@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
-import com.intellij.openapi.util.Disposer
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
@@ -41,14 +40,6 @@ import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
-
-  init {
-    if (caret.isValid) {
-      Disposer.register(caret) {
-        (registerStorage as CaretRegisterStorageBase).clearListener()
-      }
-    }
-  }
 
   override val registerStorage: CaretRegisterStorage
     get() {

@@ -37,6 +37,10 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 
+  public RegisterGroup() {
+    this.initClipboardOptionListener();
+  }
+
   public void saveData(final @NotNull Element element) {
     logger.debug("Save registers data");
     final Element registersElement = new Element("registers");

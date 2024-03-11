@@ -14,8 +14,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
@@ -33,6 +31,8 @@ import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import javax.swing.KeyStroke
 
 public abstract class VimRegisterGroupBase : VimRegisterGroup {
@@ -96,13 +96,9 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     lastRegisterChar = defaultRegisterChar
   }
 
-  init {
+  public fun initClipboardOptionListener() {
     injector.optionGroup.addGlobalOptionChangeListener(Options.clipboard, onClipboardChanged)
     onClipboardChanged()
-  }
-
-  public fun clearListener() {
-    injector.optionGroup.removeGlobalOptionChangeListener(Options.clipboard, onClipboardChanged)
   }
 
   override fun isValid(reg: Char): Boolean = VALID_REGISTERS.indexOf(reg) != -1
