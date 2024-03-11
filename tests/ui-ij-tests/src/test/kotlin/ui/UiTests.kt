@@ -220,7 +220,7 @@ class UiTests {
     editor.findText("class").click()
     remoteRobot.invokeActionJs("EditorPaste")
 
-    assertEquals(
+    waitFor {
       """
                 |EditorEscapeclass MyTest {
                 |  public static void main() {
@@ -229,12 +229,11 @@ class UiTests {
                 |      }
                 |  }
                 |}
-      """.trimMargin(),
-      editor.text,
-    )
+      """.trimMargin() == editor.text
+    }
 
     remoteRobot.invokeActionJs("GotoAction")
-    assertFalse(hasText("Copy Action Id"))
+    waitFor { !hasText("Copy Action Id") }
 
     vimExit()
   }
@@ -528,27 +527,27 @@ class UiTests {
 
     commonSteps.invokeAction("EditorStartNewLineBefore")
 
-    assertEquals(
+    waitFor {
       """
       |
       |One Two
       |Three Four
       |Five
-    """.trimMargin(), editor.text
-    )
+    """.trimMargin() == editor.text
+    }
 
     editor.injectText(testTextForEditor)
 
     commonSteps.invokeAction("EditorStartNewLine")
 
-    assertEquals(
+    waitFor {
       """
       |One Two
       |
       |Three Four
       |Five
-    """.trimMargin(), editor.text
-    )
+    """.trimMargin() == editor.text
+    }
 
     editor.injectText(testTextForEditor)
 
