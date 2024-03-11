@@ -68,8 +68,8 @@ internal class BacktrackingStrategy : SimulationStrategy {
     possibleCursors: MutableList<VimCaret>,
     maxIndex: Int = editor.text().length
   ): NFASimulationResult {
-    val stack = emptyList<SimulationStackFrame>().toMutableList()
-    stack.add(SimulationStackFrame(index, state, emptySet()))
+    val stack = mutableListOf<SimulationStackFrame>()
+    stack.add(SimulationStackFrame(index, state, NfaStateList.empty))
 
     while (stack.isNotEmpty()) {
       val currFrame = stack.removeLast()
@@ -78,16 +78,18 @@ internal class BacktrackingStrategy : SimulationStrategy {
       if (currFrame.currentState === targetState) return NFASimulationResult(true, currFrame.currentIndex)
       currFrame.currentState.assertion?.let {
         val assertionResult = handleAssertion(editor, currFrame.currentIndex, isCaseInsensitive, it, possibleCursors)
-        if (assertionResult.simulationResult) stack.add(SimulationStackFrame(assertionResult.index, currFrame.currentState.assertion!!.jumpTo, emptySet()))
+        if (assertionResult.simulationResult) stack.add(SimulationStackFrame(assertionResult.index, currFrame.currentState.assertion!!.jumpTo, NfaStateList.empty))
       }
 
-      for (transition in currFrame.currentState.transitions.reversed()) {
+
+      for (i in currFrame.currentState.transitions.lastIndex downTo 0) {
+        val transition = currFrame.currentState.transitions[i]
         val transitionMatcherResult = transition.matcher.matches(editor, currFrame.currentIndex, groups, isCaseInsensitive, possibleCursors)
         if (transitionMatcherResult !is MatcherResult.Success) continue
         val destState = transition.destState
         if (transitionMatcherResult.consumed == 0 && currFrame.epsilonVisited.contains(destState)) continue
         val nextIndex = currFrame.currentIndex + transitionMatcherResult.consumed
-        val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !currFrame.epsilonVisited.contains(destState)) currFrame.epsilonVisited.plusElement(currFrame.currentState) else HashSet()
+        val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !currFrame.epsilonVisited.contains(destState)) NfaStateList(currFrame.currentState, currFrame.epsilonVisited) else NfaStateList.empty
         stack.add(SimulationStackFrame(nextIndex, destState, epsilonVisitedCopy))
       }
     }
@@ -222,5 +224,18 @@ private data class NFASimulationResult(
 private data class SimulationStackFrame(
   val currentIndex: Int,
   val currentState: NFAState,
-  val epsilonVisited: Set<NFAState>
+  val epsilonVisited: NfaStateList,
 )
+
+private class NfaStateList(
+  val item: NFAState,
+  val tail: NfaStateList?,
+) {
+  fun contains(item: NFAState): Boolean {
+    return this.item == item || this.tail?.contains(item) == true
+  }
+
+  companion object {
+    val empty = NfaStateList(NFAState(), null)
+  }
+}
