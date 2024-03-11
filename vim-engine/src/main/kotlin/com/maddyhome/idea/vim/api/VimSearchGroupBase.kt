@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
@@ -276,7 +277,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     // Set lastPatternOffset AFTER searching, so it doesn't affect the result
     lastPatternTrailing = if (patternOffset != 0) patternOffset.toString() else ""
 
-    return result
+    return result?.first ?: -1
   }
 
   override fun searchNext(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
@@ -286,12 +287,14 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   override fun searchPrevious(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     return searchNextWithDirection(editor, caret, count, lastDirection.reverse())
   }
+
   override fun processSearchCommand(
     editor: VimEditor,
     command: String,
     startOffset: Int,
     dir: Direction,
-  ): Int {
+  ): Pair<Int, MotionType>? {
+
     var isNewPattern = false
     var pattern: String? = null
     var patternOffset: String? = null
@@ -319,7 +322,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
         pattern = lastSubstitutePattern
         if (pattern.isNullOrEmpty()) {
           injector.messages.showStatusBarMessage(null, "E35: No previous regular expression")
-          return -1
+          return null
         }
       }
     }
@@ -363,7 +366,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     resetSearchHighlight()
     updateSearchHighlights(true)
 
-    val offset = findItOffset(editor, range.startOffset, count, lastDirection)
+    val offset = findItOffset(editor, range.startOffset, count, lastDirection)?.first ?: -1
     return if (offset == -1) range.startOffset else offset
   }
 
@@ -410,12 +413,12 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     updateSearchHighlights(false)
 
     val startOffset: Int = caret.offset
-    var offset = findItOffset(editor, startOffset, count, dir)
+    var offset = findItOffset(editor, startOffset, count, dir)?.first ?: -1
     if (offset == startOffset) {
       /* Avoid getting stuck on the current cursor position, which can
        * happen when an offset is given and the cursor is on the last char
        * in the buffer: Repeat with count + 1. */
-      offset = findItOffset(editor, startOffset, count + 1, dir)
+      offset = findItOffset(editor, startOffset, count + 1, dir)?.first ?: -1
     }
     return offset
   }
@@ -946,14 +949,16 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
    * @param startOffset   The offset to search from
    * @param count         Find the nth occurrence
    * @param dir           The direction to search in
-   * @return              The offset to the occurrence or -1 if not found
+   * @return              Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based
+   *                      on the search offset. The value will be `null` if no result is found.
    */
   private fun findItOffset(
     editor: VimEditor,
     startOffset: Int,
     count: Int,
     dir: Direction,
-  ): Int {
+  ): Pair<Int, MotionType>? {
+
     var startOffsetMutable = startOffset
     var offset = 0
     var offsetIsLineOffset = false
@@ -993,6 +998,13 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       }
     }
 
+    // `/{pattern}/{offset}` is inclusive if offset contains `e`, and linewise if there's a line offset
+    val motionType = when {
+      offset != 0 && !hasEndOffset -> MotionType.LINE_WISE
+      hasEndOffset -> MotionType.INCLUSIVE
+      else -> MotionType.EXCLUSIVE
+    }
+
     /*
      * If there is a character offset, subtract it from the current
      * position, so we don't get stuck at "?pat?e+2" or "/pat/s-2".
@@ -1010,14 +1022,12 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS)
 
     // Uses last pattern. We know this is always set before being called
-    val range = injector.searchHelper.findPattern(editor, getLastUsedPattern(), startOffsetMutable, count, searchOptions) ?: return -1
+    val range = injector.searchHelper.findPattern(editor, getLastUsedPattern(), startOffsetMutable, count, searchOptions) ?: return null
 
     var res = range.startOffset
     if (offsetIsLineOffset) {
       val line: Int = editor.offsetToBufferPosition(range.startOffset).line
       val newLine: Int = editor.normalizeLine(line + offset)
-
-      // TODO: Don't move the caret!
       res = injector.motion.moveCaretToLineStart(editor, newLine)
     } else if (hasEndOffset || offset != 0) {
       val base = if (hasEndOffset) range.endOffset - 1 else range.startOffset
@@ -1030,14 +1040,14 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       } else if (lastPatternTrailing!![ppos + 1] == '?') {
         Direction.BACKWARDS
       } else {
-        return res
+        return if (res == -1) null else Pair(res, motionType)
       }
       if (lastPatternTrailing!!.length - ppos > 2) {
         ppos++
       }
-      res = processSearchCommand(editor, lastPatternTrailing!!.substring(ppos + 1), res, nextDir)
+      res = processSearchCommand(editor, lastPatternTrailing!!.substring(ppos + 1), res, nextDir)?.first ?: -1
     }
-    return res
+    return if (res == -1) null else Pair(res, motionType)
   }
 
   /**

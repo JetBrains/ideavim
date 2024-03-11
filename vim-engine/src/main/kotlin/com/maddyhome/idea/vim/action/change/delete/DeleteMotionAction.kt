@@ -35,9 +35,9 @@ public class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), Dupl
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (argument == null) return false
-    val (first, second) = injector.changeGroup
+    val (range, selectionType) = injector.changeGroup
       .getDeleteRangeAndType(editor, caret, context, argument, false, operatorArguments)
       ?: return false
-    return injector.changeGroup.deleteRange(editor, caret, first, second, false, operatorArguments)
+    return injector.changeGroup.deleteRange(editor, caret, range, selectionType, false, operatorArguments)
   }
 }

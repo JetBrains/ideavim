@@ -24,6 +24,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -268,10 +269,16 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
    * @param dir         The direction to search
-   * @return            Offset to the next occurrence of the pattern or -1 if not found
+   * @return            Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based on
+   *                    the search offset. The value will be `null` if no result is found.
    */
+  @Nullable
   @Override
-  public int processSearchCommand(@NotNull VimEditor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
+  public Pair<Integer, MotionType> processSearchCommand(@NotNull VimEditor editor,
+                                                        @NotNull String command,
+                                                        int startOffset,
+                                                        @NotNull Direction dir) {
+
     if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchCommand(editor, command, startOffset, dir);
 
     boolean isNewPattern = false;
@@ -340,7 +347,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         pattern = getLastSubstitutePattern();
         if (pattern == null || pattern.isEmpty()) {
           VimPlugin.showMessage(MessageHelper.message("e_noprevre"));
-          return -1;
+          return null;
         }
       }
     }
@@ -403,7 +410,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    final int result = findItOffset(editor, startOffset, 1, lastDir);
+    final Pair<Integer, MotionType> result = findItOffset(editor, startOffset, 1, lastDir);
 
     // Set lastPatternOffset AFTER searching so it doesn't affect the result
     lastPatternOffset = patternOffset != 0 ? Integer.toString(patternOffset) : "";
@@ -414,7 +421,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       logger.debug("lastDir=" + lastDir);
     }
 
-    return result;
+    return result != null ? result.getFirst() : -1;
   }
 
   /**
@@ -459,8 +466,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    final int offset = findItOffset(((IjVimEditor)editor).getEditor(), range.getStartOffset(), count, lastDir);
-    return offset == -1 ? range.getStartOffset() : offset;
+    final Pair<Integer, MotionType> offsetAndMotion =
+      findItOffset(((IjVimEditor)editor).getEditor(), range.getStartOffset(), count, lastDir);
+    return offsetAndMotion == null ? range.getStartOffset() : offsetAndMotion.getFirst();
   }
 
   /**
@@ -503,14 +511,14 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     updateSearchHighlights();
     final int startOffset = caret.getOffset();
-    int offset = findItOffset(editor, startOffset, count, dir);
-    if (offset == startOffset) {
+    Pair<Integer, MotionType> offsetAndMotion = findItOffset(editor, startOffset, count, dir);
+    if (offsetAndMotion != null && offsetAndMotion.getFirst() == startOffset) {
       /* Avoid getting stuck on the current cursor position, which can
        * happen when an offset is given and the cursor is on the last char
        * in the buffer: Repeat with count + 1. */
-      offset = findItOffset(editor, startOffset, count + 1, dir);
+      offsetAndMotion = findItOffset(editor, startOffset, count + 1, dir);
     }
-    return offset;
+    return offsetAndMotion != null ? offsetAndMotion.getFirst() : -1;
   }
 
 
@@ -1265,9 +1273,11 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    * @param startOffset   The offset to search from
    * @param count         Find the nth occurrence
    * @param dir           The direction to search in
-   * @return              The offset to the occurrence or -1 if not found
+   * @return              Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based
+   *                      on the search offset. The value will be `null` if no result is found.
    */
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
+  @Nullable
+  private Pair<Integer, MotionType> findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
     boolean wrap = globalOptions(injector).getWrapscan();
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
@@ -1313,6 +1323,18 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       }
     }
 
+    // `/{pattern}/{offset}` is inclusive if offset contains `e`, and linewise if there's a line offset
+    final MotionType motionType;
+    if (offset != 0 && !hasEndOffset) {
+      motionType = MotionType.LINE_WISE;
+    }
+    else if (hasEndOffset) {
+      motionType = MotionType.INCLUSIVE;
+    }
+    else {
+      motionType = MotionType.EXCLUSIVE;
+    }
+
     /*
      * If there is a character offset, subtract it from the current
      * position, so we don't get stuck at "?pat?e+2" or "/pat/s-2".
@@ -1334,7 +1356,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     TextRange range = injector.getSearchHelper().findPattern(new IjVimEditor(editor), getLastUsedPattern(), startOffset, count, searchOptions);
     if (range == null) {
       logger.warn("No range is found");
-      return -1;
+      return null;
     }
 
     int res = range.getStartOffset();
@@ -1361,16 +1383,19 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         nextDir = Direction.BACKWARDS;
       }
       else {
-        return res;
+        return new Pair(res, motionType);
       }
 
       if (lastPatternOffset.length() - ppos > 2) {
         ppos++;
       }
 
-      res = processSearchCommand(new IjVimEditor(editor), lastPatternOffset.substring(ppos + 1), res, nextDir);
+      Pair<Integer, MotionType> offsetAndMotion =
+        processSearchCommand(new IjVimEditor(editor), lastPatternOffset.substring(ppos + 1), res, nextDir);
+      res = offsetAndMotion != null ? offsetAndMotion.getFirst() : -1;
     }
-    return res;
+
+    return new Pair<Integer, MotionType>(res, motionType);
   }
 
 
