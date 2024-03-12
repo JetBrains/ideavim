@@ -20,6 +20,9 @@ public class MappingState: Cloneable {
   // Map command depth. 0 - if it is not a map command. 1 - regular map command. 2+ - nested map commands
   private var mapDepth = 0
 
+  @Deprecated("This function is created only for binary compatibility")
+  public fun getMappingMode(): MappingMode = MappingMode.NORMAL
+
   public fun isExecutingMap(): Boolean {
     return mapDepth > 0
   }
