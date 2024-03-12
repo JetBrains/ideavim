@@ -16,6 +16,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
@@ -156,6 +157,27 @@ class DeleteVisualActionTest : VimTestCase() {
             al|
             wh|
             ha|
+    """.trimIndent()
+    doTest(keys, before, after, Mode.NORMAL())
+  }
+
+  // This test causes a bug, but it's minor, and I'm not sure how to fix it properly
+  //  It happens because we do perform sequential deletions on editor that is mutated.
+  //  I think, we should firstly collect operations and then apply them at once. However,
+  //    this will require to much effort at the moment for a tiny bug
+  @Test
+  @Disabled
+  fun `test delete on empty lines`() {
+    val keys = listOf("Vd")
+    val before = """
+            1
+            ${c}
+            ${c}
+    """.trimIndent()
+    val after = """
+            1
+            ${c}
+            ${c}
     """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
   }
