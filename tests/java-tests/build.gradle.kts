@@ -44,6 +44,10 @@ tasks {
   runIde {
     enabled = false
   }
+
+  runPluginVerifier {
+    enabled = false
+  }
 }
 
 intellij {
