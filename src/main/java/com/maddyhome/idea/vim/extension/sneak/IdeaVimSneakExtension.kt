@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.newapi.ij
 import java.awt.Font
 import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.Timer
 
 
@@ -48,17 +49,20 @@ internal class IdeaVimSneakExtension : VimExtension {
 
   override fun init() {
     val highlightHandler = HighlightHandler()
-    mapToFunctionAndProvideKeys("s", SneakHandler(highlightHandler, Direction.FORWARD))
-    mapToFunctionAndProvideKeys("S", SneakHandler(highlightHandler, Direction.BACKWARD))
+    mapToFunctionAndProvideKeys("s", SneakHandler(highlightHandler, Direction.FORWARD), MappingMode.NXO)
+
+    // vim-sneak uses `Z` for visual mode because `S` conflict with vim-sneak plugin VIM-3330
+    mapToFunctionAndProvideKeys("S", SneakHandler(highlightHandler, Direction.BACKWARD), MappingMode.NO)
+    mapToFunctionAndProvideKeys("Z", SneakHandler(highlightHandler, Direction.BACKWARD), MappingMode.X)
 
     // workaround to support ; and , commands
-    mapToFunctionAndProvideKeys("f", SneakMemoryHandler("f"))
-    mapToFunctionAndProvideKeys("F", SneakMemoryHandler("F"))
-    mapToFunctionAndProvideKeys("t", SneakMemoryHandler("t"))
-    mapToFunctionAndProvideKeys("T", SneakMemoryHandler("T"))
+    mapToFunctionAndProvideKeys("f", SneakMemoryHandler("f"), MappingMode.NXO)
+    mapToFunctionAndProvideKeys("F", SneakMemoryHandler("F"), MappingMode.NXO)
+    mapToFunctionAndProvideKeys("t", SneakMemoryHandler("t"), MappingMode.NXO)
+    mapToFunctionAndProvideKeys("T", SneakMemoryHandler("T"), MappingMode.NXO)
 
-    mapToFunctionAndProvideKeys(";", SneakRepeatHandler(highlightHandler, RepeatDirection.IDENTICAL))
-    mapToFunctionAndProvideKeys(",", SneakRepeatHandler(highlightHandler, RepeatDirection.REVERSE))
+    mapToFunctionAndProvideKeys(";", SneakRepeatHandler(highlightHandler, RepeatDirection.IDENTICAL), MappingMode.NXO)
+    mapToFunctionAndProvideKeys(",", SneakRepeatHandler(highlightHandler, RepeatDirection.REVERSE), MappingMode.NXO)
   }
 
   private class SneakHandler(
@@ -273,16 +277,18 @@ internal class IdeaVimSneakExtension : VimExtension {
  * Map some <Plug>(keys) command to given handler
  *  and create mapping to <Plug>(prefix)[keys]
  */
-private fun VimExtension.mapToFunctionAndProvideKeys(keys: String, handler: ExtensionHandler) {
+private fun VimExtension.mapToFunctionAndProvideKeys(
+  keys: String, handler: ExtensionHandler, mappingModes: EnumSet<MappingMode>
+) {
   VimExtensionFacade.putExtensionHandlerMapping(
-    MappingMode.NXO,
+    mappingModes,
     injector.parser.parseKeys(command(keys)),
     owner,
     handler,
     false
   )
   VimExtensionFacade.putExtensionHandlerMapping(
-    MappingMode.NXO,
+    mappingModes,
     injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     owner,
     handler,
@@ -294,17 +300,17 @@ private fun VimExtension.mapToFunctionAndProvideKeys(keys: String, handler: Exte
   //  - The shortcut should not be registered if any of these mappings is overridden in .ideavimrc
   //  - The shortcut should not be registered if some other shortcut for this key exists
   val fromKeys = injector.parser.parseKeys(keys)
-  val filteredModes = MappingMode.NXO.filterNotTo(HashSet()) {
+  val filteredModes = mappingModes.filterNotTo(HashSet()) {
     VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(command(keys)))
   }
-  val filteredModes2 = MappingMode.NXO.filterNotTo(HashSet()) {
+  val filteredModes2 = mappingModes.filterNotTo(HashSet()) {
     VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(commandFromOriginalPlugin(keys)))
   }
-  val filteredFromModes = MappingMode.NXO.filterNotTo(HashSet()) {
+  val filteredFromModes = mappingModes.filterNotTo(HashSet()) {
     injector.keyGroup.hasmapfrom(it, fromKeys)
   }
 
-  val doubleFiltered = MappingMode.NXO
+  val doubleFiltered = mappingModes
     .filter { it in filteredModes2 && it in filteredModes && it in filteredFromModes }
     .toSet()
   putKeyMapping(doubleFiltered, fromKeys, owner, injector.parser.parseKeys(command(keys)), true)
