@@ -206,6 +206,7 @@ public object Options {
   )
   public val wrapscan: ToggleOption = addOption(ToggleOption("wrapscan", GLOBAL, "ws", true))
 
+  public val fixdeadkeys: ToggleOption= addOption(ToggleOption("fixdeadkeys", GLOBAL, "fdk", false))
 
   // More complex options, with additional validation, etc.
   public val guicursor: StringListOption = addOption(object : StringListOption(

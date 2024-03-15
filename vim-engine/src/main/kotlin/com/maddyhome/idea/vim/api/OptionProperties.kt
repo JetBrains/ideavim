@@ -51,6 +51,9 @@ public open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
 
+  // I really tried to put this in IjOptionProperties, but I don't have access to it where I need it.
+  public val fixdeadkeys: Boolean by optionProperty(Options.fixdeadkeys)
+
   // This is an experimental option that enables global mode for the editor. However,
   //   for the moment it has issues and there is no quality garantee if this option is enabled
   public var ideaglobalmode: Boolean by optionProperty(Options.ideaglobalmode)
