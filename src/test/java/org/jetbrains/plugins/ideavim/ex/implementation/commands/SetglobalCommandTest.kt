@@ -348,10 +348,11 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("setglobal all", """
       |--- Global option values ---
-      |noargtextobj        noincsearch           selectmode=       notextobj-indent
-      |nocommentary        nomatchit             shellcmdflag=-x     timeout
-      |nodigraph             maxmapdepth=20      shellxescape=@      timeoutlen=1000
-      |noexchange            more                shellxquote={     notrackactionids
+      |noargtextobj        noignorecase          scrolloff=0       notextobj-entire
+      |nocommentary        noincsearch           selectmode=       notextobj-indent
+      |nodigraph           nomatchit             shellcmdflag=-x     timeout
+      |noexchange            maxmapdepth=20      shellxescape=@      timeoutlen=1000
+      |nofixdeadkeys         more                shellxquote={     notrackactionids
       |nogdefault          nomultiple-cursors    showcmd             undolevels=1000
       |nohighlightedyank   noNERDTree            showmode            virtualedit=
       |  history=50          nrformats=hex       sidescroll=0      novisualbell
@@ -360,7 +361,6 @@ class SetglobalCommandTest : VimTestCase() {
       |noideajoin          norelativenumber    nosneak               wrapscan
       |  ideamarks           scroll=0            startofline
       |  ideawrite=all       scrolljump=1      nosurround
-      |noignorecase          scrolloff=0       notextobj-entire
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -421,6 +421,7 @@ class SetglobalCommandTest : VimTestCase() {
       |nocommentary
       |nodigraph
       |noexchange
+      |nofixdeadkeys
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |nohighlightedyank
