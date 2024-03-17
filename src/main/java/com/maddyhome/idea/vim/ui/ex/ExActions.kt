@@ -297,21 +297,22 @@ internal class ToggleInsertReplaceAction : TextAction(ExEditorKit.ToggleInsertRe
   }
 }
 
-class AutocompleteAction: TextAction(ExEditorKit.Autocomplete){
+internal class AutocompleteAction: TextAction(ExEditorKit.Autocomplete){
   override fun actionPerformed(e: ActionEvent) {
-    val editor = ExEntryPanel.getInstance().entry.editor
+    val currentEditor = ExEntryPanel.getInstance().entry.editor
     val target = getTextComponent(e) as ExTextField
     val text = target.actualText
-    // TODO: also handle other cases
-    if(text.startsWith("e ")){
-      val fileStart = text.substring(2)
-      // find potentional  files
-      val project = editor!!.project!!
+    // autocomplete for edit
+    if(text.startsWith("e ") || text.startsWith("edit ")){
+      // split after first space to get filename to autocomplete
+      val fileStart = text.substring(text.indexOf(' ', 0) + 1)
+      // find potential files
+      val project = currentEditor!!.project!!
 
       // find all files in the folders that are open
-      val editors = FileEditorManager.getInstance(editor.project!!).getAllEditors()
-      val names = CollectionFactory.createSmallMemoryFootprintSet<String>();
-      val parents = CollectionFactory.createSmallMemoryFootprintSet<VirtualFile>();
+      val editors = FileEditorManager.getInstance(project).getAllEditors()
+      val names = CollectionFactory.createSmallMemoryFootprintSet<String>()
+      val parents = CollectionFactory.createSmallMemoryFootprintSet<VirtualFile>()
       for(editor in editors){
         val parent = editor.file.parent
         // we need to check a parent file only one time
@@ -336,7 +337,7 @@ class AutocompleteAction: TextAction(ExEditorKit.Autocomplete){
       if(names.size > 0){
         val first = names.first()
         // find the common starting string
-        var common = "";
+        var common = ""
         for((i,c) in first.withIndex()){
           var allSame = true
           for(name in names){
@@ -352,9 +353,7 @@ class AutocompleteAction: TextAction(ExEditorKit.Autocomplete){
           }
         }
         // append common starting string
-        val prevLength = target.text.length
         target.text += common.substring(fileStart.length)
-//        target.select(prevLength, target.text.length)
       }
     }
   }
