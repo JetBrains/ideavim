@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,52 +14,60 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.FromDataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.productForArguments
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@RunWith(Theories::class)
-class FunctionDeclarationTests {
+class FunctionDeclarationTests : VimTestCase() {
 
   companion object {
     @JvmStatic
     val spaces = listOf("", " ")
-      @DataPoints("spaces") get
 
     @JvmStatic
     val functionAlias = listOf("fu", "fun", "func", "funct", "functi", "functio", "function")
-      @DataPoints("function") get
 
     @JvmStatic
     val endfunctionAlias =
       listOf("endf", "endfu", "endfun", "endfunc", "endfunct", "endfuncti", "endfunctio", "endfunction")
-      @DataPoints("endfunction") get
 
     @JvmStatic
     val flagAlias = listOf("range", "abort", "dict", "closure")
-      @DataPoints("flags") get
+
+    @JvmStatic
+    fun spaces5(): List<Arguments> = productForArguments(spaces, spaces, spaces, spaces, spaces)
+
+    @JvmStatic
+    fun spaces9(): List<Arguments> = productForArguments(spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces)
+
+    @JvmStatic
+    fun function(): List<Arguments> = productForArguments(functionAlias, endfunctionAlias, spaces, spaces)
+
+    @JvmStatic
+    fun flags(): List<Arguments> = productForArguments(flagAlias, spaces, spaces, spaces)
+
+    @JvmStatic
+    fun flagsFlags(): List<Arguments> = productForArguments(flagAlias, flagAlias, spaces, spaces, spaces)
   }
 
-  @Theory
-  fun `function with no arguments`(
-    @FromDataPoints("spaces") sp1: String,
-    @FromDataPoints("spaces") sp2: String,
-    @FromDataPoints("spaces") sp3: String,
-    @FromDataPoints("spaces") sp4: String,
-    @FromDataPoints("spaces") sp5: String,
-  ) {
+  @ParameterizedTest
+  @MethodSource("spaces5")
+  fun `function with no arguments`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String) {
     val script = VimscriptParser.parse(
       """
         function helloWorld$sp1($sp2)$sp3
             echo 'hello world'$sp4
         endfunction$sp5
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -72,17 +80,18 @@ class FunctionDeclarationTests {
     assertTrue(f.body[0] is EchoCommand)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("spaces9")
   fun `function with arguments and replace flag`(
-    @FromDataPoints("spaces") sp1: String,
-    @FromDataPoints("spaces") sp2: String,
-    @FromDataPoints("spaces") sp3: String,
-    @FromDataPoints("spaces") sp4: String,
-    @FromDataPoints("spaces") sp5: String,
-    @FromDataPoints("spaces") sp6: String,
-    @FromDataPoints("spaces") sp7: String,
-    @FromDataPoints("spaces") sp8: String,
-    @FromDataPoints("spaces") sp9: String,
+    sp1: String,
+    sp2: String,
+    sp3: String,
+    sp4: String,
+    sp5: String,
+    sp6: String,
+    sp7: String,
+    sp8: String,
+    sp9: String,
   ) {
     val script = VimscriptParser.parse(
       """
@@ -93,7 +102,7 @@ class FunctionDeclarationTests {
             $sp7
             return 'true'$sp8
         endfunction$sp9
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -107,35 +116,37 @@ class FunctionDeclarationTests {
     assertTrue(f.body[1] is ReturnStatement)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("function")
   fun `function keyword test`(
-    @FromDataPoints("function") functionAlias: String,
-    @FromDataPoints("endfunction") endfunctionAlias: String,
-    @FromDataPoints("spaces") sp1: String,
-    @FromDataPoints("spaces") sp2: String,
+    functionAlias: String,
+    endfunctionAlias: String,
+    sp1: String,
+    sp2: String,
   ) {
     val script = VimscriptParser.parse(
       """
         $functionAlias F1()$sp1
         $endfunctionAlias$sp2
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("flags")
   fun `function flag test`(
-    @FromDataPoints("flags") flag1: String,
-    @FromDataPoints("spaces") sp1: String,
-    @FromDataPoints("spaces") sp2: String,
-    @FromDataPoints("spaces") sp3: String,
+    flag1: String,
+    sp1: String,
+    sp2: String,
+    sp3: String,
   ) {
     val script = VimscriptParser.parse(
       """
         fun F1()$sp1$flag1$sp2
         endf$sp3
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -143,19 +154,20 @@ class FunctionDeclarationTests {
     assertEquals(f.flags, setOf(FunctionFlag.getByName(flag1)))
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("flagsFlags")
   fun `function with multiple flags test`(
-    @FromDataPoints("flags") flag1: String,
-    @FromDataPoints("flags") flag2: String,
-    @FromDataPoints("spaces") sp1: String,
-    @FromDataPoints("spaces") sp2: String,
-    @FromDataPoints("spaces") sp3: String,
+    flag1: String,
+    flag2: String,
+    sp1: String,
+    sp2: String,
+    sp3: String,
   ) {
     val script = VimscriptParser.parse(
       """
         fun F1()$sp1$flag1 $flag2$sp2
         endf$sp3
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -163,7 +175,7 @@ class FunctionDeclarationTests {
     assertEquals(f.flags, setOf(FunctionFlag.getByName(flag1), FunctionFlag.getByName(flag2)))
   }
 
-  @Theory
+  @org.junit.jupiter.api.Test
   fun `dictionary function`() {
     val script = VimscriptParser.parse(
       """
@@ -171,28 +183,29 @@ class FunctionDeclarationTests {
         function! s:dict.something.Initialize()
             return 'true'
         endfunction
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
   }
 
-//  // https://youtrack.jetbrains.com/issue/VIM-2654
-//  @Theory
-//  fun `return with omitted expression`() {
-//    VimscriptParser.parse(
-//      """
-//        func! Paste_on_off()
-//           if g:paste_mode == 0
-//              set paste
-//              let g:paste_mode = 1
-//           else
-//              set nopaste
-//              let g:paste_mode = 0
-//           endif
-//           return
-//        endfunc
-//      """.trimIndent()
-//    )
-//    assertEmpty(IdeavimErrorListener.testLogger)
-//  }
+  // https://youtrack.jetbrains.com/issue/VIM-2654
+  @Test
+  @Disabled
+  fun `return with omitted expression`() {
+    VimscriptParser.parse(
+      """
+        func! Paste_on_off()
+           if g:paste_mode == 0
+              set paste
+              let g:paste_mode = 1
+           else
+              set nopaste
+              let g:paste_mode = 0
+           endif
+           return
+        endfunc
+      """.trimIndent(),
+    )
+    assertEmpty(IdeavimErrorListener.testLogger)
+  }
 }

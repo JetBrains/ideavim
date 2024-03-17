@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,8 +21,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :@"
  */
-data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED)
+@ExCommand(command = "@")
+public data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED)
 
   private var lastArg = ':'
 
@@ -30,7 +32,7 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     var arg = argument[0]
     if (arg == '@') arg = lastArg
@@ -38,15 +40,19 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
 
     val line = getLine(editor, caret)
     caret.moveToOffset(
-      injector.motion.moveCaretToLineWithSameColumn(editor, line, editor.primaryCaret())
+      injector.motion.moveCaretToLineWithSameColumn(editor, line, editor.primaryCaret()),
     )
 
     if (arg == ':') {
       return if (injector.vimscriptExecutor.executeLastCommand(
           editor,
-          context
+          context,
         )
-      ) ExecutionResult.Success else ExecutionResult.Error
+      ) {
+        ExecutionResult.Success
+      } else {
+        ExecutionResult.Error
+      }
     }
 
     val reg = injector.registerGroup.getPlaybackRegister(arg) ?: return ExecutionResult.Error
@@ -58,7 +64,7 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
       context,
       skipHistory = false,
       indicateErrors = true,
-      this.vimContext
+      this.vimContext,
     )
     return ExecutionResult.Success
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,33 +16,35 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
+import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMarkConstants
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -56,7 +58,7 @@ import org.jetbrains.annotations.NonNls
  *        It just won't work if the binding is defined after `set exchange`.
  */
 
-class VimExchangeExtension : VimExtension {
+internal class VimExchangeExtension : VimExtension {
 
   override fun getName() = "exchange"
 
@@ -70,29 +72,12 @@ class VimExchangeExtension : VimExtension {
     putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("X"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
     putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxc"), owner, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), true)
     putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxx"), owner, injector.parser.parseKeys(EXCHANGE_LINE_CMD), true)
+
+    VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
 
-  companion object {
-    @NonNls
-    const val EXCHANGE_CMD = "<Plug>(Exchange)"
-
-    @NonNls
-    const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
-
-    @NonNls
-    const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
-
+  object Util {
     val EXCHANGE_KEY = Key<Exchange>("exchange")
-
-    // End mark has always greater of eq offset than start mark
-    class Exchange(val type: VimStateMachine.SubMode, val start: Mark, val end: Mark, val text: String) {
-      private var myHighlighter: RangeHighlighter? = null
-      fun setHighlighter(highlighter: RangeHighlighter) {
-        myHighlighter = highlighter
-      }
-
-      fun getHighlighter(): RangeHighlighter? = myHighlighter
-    }
 
     fun clearExchange(editor: Editor) {
       editor.getUserData(EXCHANGE_KEY)?.getHighlighter()?.let {
@@ -102,66 +87,73 @@ class VimExchangeExtension : VimExtension {
     }
   }
 
+  companion object {
+    @NonNls private const val EXCHANGE_CMD = "<Plug>(Exchange)"
+    @NonNls private const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+    @NonNls private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
+    @NonNls private const val OPERATOR_FUNC = "ExchangeOperatorFunc"
+  }
+
   private class ExchangeHandler(private val isLine: Boolean) : ExtensionHandler {
     override val isRepeatable = true
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
-      setOperatorFunction(Operator(false))
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      injector.globalOptions().operatorfunc = OPERATOR_FUNC
       executeNormalWithoutMapping(injector.parser.parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
     }
   }
 
   private class ExchangeClearHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
-      clearExchange(editor.ij)
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      Util.clearExchange(editor.ij)
     }
   }
 
   private class VExchangeHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       runWriteAction {
-        val subMode = editor.subMode
+        val mode = editor.mode
         // Leave visual mode to create selection marks
         executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
-        Operator(true).apply(editor, context, SelectionType.fromSubMode(subMode))
+        Operator(true).apply(editor, context, mode.selectionType ?: SelectionType.CHARACTER_WISE)
       }
     }
   }
 
-  private class Operator(private val isVisual: Boolean) : OperatorFunction {
+  private class Operator(private val isVisual: Boolean = false) : OperatorFunction {
     fun Editor.getMarkOffset(mark: Mark) = IjVimEditor(this).getOffset(mark.line, mark.col)
-    fun VimStateMachine.SubMode.getString() = when (this) {
-      VimStateMachine.SubMode.VISUAL_CHARACTER -> "v"
-      VimStateMachine.SubMode.VISUAL_LINE -> "V"
-      VimStateMachine.SubMode.VISUAL_BLOCK -> "\\<C-V>"
-      else -> error("Invalid SubMode: $this")
+    fun SelectionType.getString() = when (this) {
+      SelectionType.CHARACTER_WISE -> "v"
+      SelectionType.LINE_WISE -> "V"
+      SelectionType.BLOCK_WISE -> "\\<C-V>"
     }
 
-    override fun apply(vimEditor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
-      val editor = vimEditor.ij
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
+      val ijEditor = editor.ij
       fun highlightExchange(ex: Exchange): RangeHighlighter {
-        val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
+        val attributes = ijEditor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
         val hlArea = when (ex.type) {
-          VimStateMachine.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
+          SelectionType.LINE_WISE -> HighlighterTargetArea.LINES_IN_RANGE
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
         }
-        val endAdj = if (hlArea == HighlighterTargetArea.EXACT_RANGE || (isVisual)) 1 else 0
-        return editor.markupModel.addRangeHighlighter(
-          editor.getMarkOffset(ex.start),
-          (editor.getMarkOffset(ex.end) + endAdj).coerceAtMost(editor.fileSize),
+        val isVisualLine = ex.type == SelectionType.LINE_WISE
+        val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || isVisual)) 1 else 0
+        return ijEditor.markupModel.addRangeHighlighter(
+          ijEditor.getMarkOffset(ex.start),
+          (ijEditor.getMarkOffset(ex.end) + endAdj).coerceAtMost(ijEditor.fileSize),
           HighlighterLayer.SELECTION - 1,
           attributes,
-          hlArea
+          hlArea,
         )
       }
 
-      val currentExchange = getExchange(editor, isVisual, selectionType)
-      val exchange1 = editor.getUserData(EXCHANGE_KEY)
+      val currentExchange = getExchange(ijEditor, isVisual, selectionType ?: SelectionType.CHARACTER_WISE)
+      val exchange1 = ijEditor.getUserData(Util.EXCHANGE_KEY)
       if (exchange1 == null) {
         val highlighter = highlightExchange(currentExchange)
         currentExchange.setHighlighter(highlighter)
-        editor.putUserData(EXCHANGE_KEY, currentExchange)
+        ijEditor.putUserData(Util.EXCHANGE_KEY, currentExchange)
         return true
       } else {
         val cmp = compareExchanges(exchange1, currentExchange)
@@ -186,20 +178,22 @@ class VimExchangeExtension : VimExtension {
             Pair(exchange1, currentExchange)
           }
         }
-        exchange(editor, ex1, ex2, reverse, expand)
-        clearExchange(editor)
+        exchange(ijEditor, ex1, ex2, reverse, expand)
+        Util.clearExchange(ijEditor)
         return true
       }
     }
 
+    // todo make it multicaret
     private fun exchange(editor: Editor, ex1: Exchange, ex2: Exchange, reverse: Boolean, expand: Boolean) {
       fun pasteExchange(sourceExchange: Exchange, targetExchange: Exchange) {
-        VimPlugin.getMark().setChangeMarks(
-          editor.vim,
-          TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1)
+        val vimEditor = editor.vim
+        injector.markService.setChangeMarks(
+          vimEditor.primaryCaret(),
+          TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1),
         )
         // do this instead of direct text manipulation to set change marks
-        setRegister('z', injector.parser.stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
+        setRegister('z', injector.parser.stringToKeys(sourceExchange.text), sourceExchange.type)
         executeNormalWithoutMapping(injector.parser.stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
       }
 
@@ -213,16 +207,16 @@ class VimExchangeExtension : VimExtension {
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
                 ex1.start.line,
-                ex1.start.col - horizontalOffset
-              )
+                ex1.start.col - horizontalOffset,
+              ),
             )
           } else if (ex1.end.line - ex1.start.line != ex2.end.line - ex2.start.line) {
             val verticalOffset = ex1.end.line - ex2.end.line
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
                 ex1.start.line - verticalOffset,
-                ex1.start.col
-              )
+                ex1.start.col,
+              ),
             )
           }
         }
@@ -265,7 +259,7 @@ class VimExchangeExtension : VimExtension {
           x.line - y.line
         }
 
-      return if (x.type == VimStateMachine.SubMode.VISUAL_BLOCK && y.type == VimStateMachine.SubMode.VISUAL_BLOCK) {
+      return if (x.type == SelectionType.BLOCK_WISE && y.type == SelectionType.BLOCK_WISE) {
         when {
           intersects(x, y) -> {
             ExchangeCompareResult.OVERLAP
@@ -304,7 +298,6 @@ class VimExchangeExtension : VimExtension {
     }
 
     private fun getExchange(editor: Editor, isVisual: Boolean, selectionType: SelectionType): Exchange {
-
       // TODO: improve KeyStroke list to sting conversion
       fun getRegisterText(reg: Char): String = getRegister(reg)?.map { it.keyChar }?.joinToString("") ?: ""
       fun getMarks(isVisual: Boolean): Pair<Mark, Mark> {
@@ -314,8 +307,10 @@ class VimExchangeExtension : VimExtension {
           } else {
             Pair(VimMarkConstants.MARK_CHANGE_START, VimMarkConstants.MARK_CHANGE_END)
           }
-        val marks = VimPlugin.getMark()
-        return Pair(marks.getMark(editor.vim, startMark)!!, marks.getMark(editor.vim, endMark)!!)
+        val marks = injector.markService
+        val vimEditor = editor.vim
+        // todo make it multicaret
+        return Pair(marks.getMark(vimEditor.primaryCaret(), startMark)!!, marks.getMark(vimEditor.primaryCaret(), endMark)!!)
       }
 
       val unnRegText = getRegister('"')
@@ -343,10 +338,20 @@ class VimExchangeExtension : VimExtension {
       setRegister('+', plusRegText)
 
       return if (selectionStart.offset(editor.vim) <= selectionEnd.offset(editor.vim)) {
-        Exchange(selectionType.toSubMode(), selectionStart, selectionEnd, text)
+        Exchange(selectionType, selectionStart, selectionEnd, text)
       } else {
-        Exchange(selectionType.toSubMode(), selectionEnd, selectionStart, text)
+        Exchange(selectionType, selectionEnd, selectionStart, text)
       }
     }
+  }
+
+  // End mark has always greater of eq offset than start mark
+  class Exchange(val type: SelectionType, val start: Mark, val end: Mark, val text: String) {
+    private var myHighlighter: RangeHighlighter? = null
+    fun setHighlighter(highlighter: RangeHighlighter) {
+      myHighlighter = highlighter
+    }
+
+    fun getHighlighter(): RangeHighlighter? = myHighlighter
   }
 }

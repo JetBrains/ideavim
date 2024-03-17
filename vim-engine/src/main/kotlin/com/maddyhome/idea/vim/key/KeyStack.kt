@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.trace
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
 /**
@@ -19,14 +21,18 @@ import javax.swing.KeyStroke
  *   solves an issus of passing a keystroke to modal entry.
  *   However, some more advanced solution may be necessary in the future.
  */
-class KeyStack {
+public class KeyStack {
   private val stack = ArrayDeque<Frame>()
 
-  fun hasStroke(): Boolean {
+  public fun hasStroke(): Boolean {
     return stack.isNotEmpty() && stack.first().hasStroke()
   }
 
-  fun feedSomeStroke(): KeyStroke? {
+  public fun isEmpty(): Boolean {
+    return stack.none { it.hasStroke() }
+  }
+
+  public fun feedSomeStroke(): KeyStroke? {
     stack.forEach {
       if (it.hasStroke()) {
         return it.feed()
@@ -35,26 +41,44 @@ class KeyStack {
     return null
   }
 
-  fun feedStroke(): KeyStroke {
+  public fun feedStroke(): KeyStroke {
     val frame = stack.first()
     val key = frame.feed()
     return key
   }
 
-  fun addKeys(keyStrokes: List<KeyStroke>) {
+  public fun addKeys(keyStrokes: List<KeyStroke>) {
+    LOG.trace { "Got new keys to key stack: $keyStrokes" }
     stack.addFirst(Frame(keyStrokes))
   }
 
-  fun removeFirst() {
+  public fun removeFirst() {
     if (stack.isNotEmpty()) {
       stack.removeFirst()
     }
   }
 
-  fun resetFirst() {
+  public fun resetFirst() {
     if (stack.isNotEmpty()) {
       stack.first().resetPointer()
     }
+  }
+
+  public fun dump(): String {
+    return buildString {
+      this.appendLine("KeyStack:")
+      this.appendLine("Stack size: ${stack.size}")
+      stack.forEachIndexed { index, frame ->
+        this.appendLine("Frame $index:")
+        this.appendLine("Keys: ${frame.keys}")
+        this.appendLine("Pointer: ${frame.pointer}")
+        this.appendLine()
+      }
+    }
+  }
+
+  private companion object {
+    private val LOG = vimLogger<KeyStack>()
   }
 }
 

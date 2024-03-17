@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,44 +13,47 @@ import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.EditorDataContext
-import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isTemplateActive
-import com.maddyhome.idea.vim.helper.popAllModes
-import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inNormalMode
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeSelect
 
-object IdeaSelectionControl {
+internal object IdeaSelectionControl {
   /**
    * This method should be in sync with [predictMode]
    *
    * Control unexpected (non vim) selection change and adjust a mode to it. The new mode is not enabled immediately,
-   *   but with some delay (using [VimVisualTimer])
+   *   but with some delay (using [VimVisualTimer]). The delay is used because some platform functionality
+   *   makes features by using selection. E.g. PyCharm unindent firstly select the indenting then applies delete action.
+   *   Such "quick" selection breaks IdeaVim behaviour.
    *
    * See [VimVisualTimer] to more info.
+   *
+   * XXX: This method can be split into "change calculation" and "change apply". In this way, we would be able
+   *   to calculate if we need to make a change or not and reduce the number of these calls.
+   *   If this refactoring ever is applied, please add `assertNull(VimVisualTimer.timer)` to `tearDown` of VimTestCase.
    */
   fun controlNonVimSelectionChange(
     editor: Editor,
     selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER,
   ) {
-    VimVisualTimer.singleTask(editor.editorMode) { initialMode ->
-
-      if (editor.isIdeaVimDisabledHere) return@singleTask
+    VimVisualTimer.singleTask(editor.vim.mode) { initialMode ->
+      if (vimDisabled(editor)) return@singleTask
 
       logger.debug("Adjust non-vim selection. Source: $selectionSource, initialMode: $initialMode")
 
@@ -70,23 +73,23 @@ object IdeaSelectionControl {
           return@singleTask
         }
 
-        logger.debug("Some carets have selection. State before adjustment: ${editor.vim.vimStateMachine.toSimpleString()}")
+        logger.debug("Some carets have selection. State before adjustment: ${editor.vim.mode}")
 
-        editor.popAllModes()
+        editor.vim.mode = Mode.NORMAL()
 
         activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {
-        logger.debug("None of carets have selection. State before adjustment: ${editor.vim.vimStateMachine.toSimpleString()}")
-        if (editor.inVisualMode) editor.vim.exitVisualMode()
-        if (editor.inSelectMode) editor.exitSelectMode(false)
+        logger.debug("None of carets have selection. State before adjustment: ${editor.vim.mode}")
+        if (editor.vim.inVisualMode) editor.vim.exitVisualMode()
+        if (editor.vim.inSelectMode) editor.exitSelectMode(false)
 
-        if (editor.inNormalMode) {
+        if (editor.vim.inNormalMode) {
           activateMode(editor, chooseNonSelectionMode(editor))
         }
       }
 
       KeyHandler.getInstance().reset(editor.vim)
-      logger.debug("${editor.editorMode} is enabled")
+      logger.debug("${editor.vim.mode} is enabled")
     }
   }
 
@@ -100,68 +103,65 @@ object IdeaSelectionControl {
    * This method is created to improve user experience. It allows avoiding delay in some operations
    *   (because [controlNonVimSelectionChange] is not executed immediately)
    */
-  fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): VimStateMachine.Mode {
+  fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): Mode {
     if (editor.selectionModel.hasSelection(true)) {
-      if (dontChangeMode(editor)) return editor.editorMode
+      if (dontChangeMode(editor)) return editor.vim.mode
       return chooseSelectionMode(editor, selectionSource, false)
     } else {
       return chooseNonSelectionMode(editor)
     }
   }
 
-  private fun activateMode(editor: Editor, mode: VimStateMachine.Mode) {
+  private fun activateMode(editor: Editor, mode: Mode) {
     when (mode) {
-      VimStateMachine.Mode.VISUAL -> VimPlugin.getVisualMotion()
-        .enterVisualMode(editor.vim, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
-      VimStateMachine.Mode.SELECT -> VimPlugin.getVisualMotion()
-        .enterSelectMode(editor.vim, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
-      VimStateMachine.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(
-        editor.vim,
-        EditorDataContext.init(editor).vim
-      )
-      VimStateMachine.Mode.COMMAND -> Unit
+      is Mode.VISUAL -> VimPlugin.getVisualMotion().enterVisualMode(editor.vim, mode.selectionType)
+      is Mode.SELECT -> VimPlugin.getVisualMotion().enterSelectMode(editor.vim, mode.selectionType)
+      is Mode.INSERT -> VimPlugin.getChange()
+        .insertBeforeCursor(editor.vim, injector.executionContextManager.onEditor(editor.vim))
+
+      is Mode.NORMAL -> Unit
       else -> error("Unexpected mode: $mode")
     }
   }
 
-  private fun dontChangeMode(editor: Editor): Boolean =
-    editor.isTemplateActive() && (IdeaRefactorModeHelper.keepMode() || editor.editorMode.hasVisualSelection)
+  private fun dontChangeMode(editor: Editor): Boolean {
+    return editor.isTemplateActive() && (editor.vim.isIdeaRefactorModeKeep || editor.vim.mode.hasVisualSelection)
+  }
 
-  private fun chooseNonSelectionMode(editor: Editor): VimStateMachine.Mode {
+  private fun chooseNonSelectionMode(editor: Editor): Mode {
     val templateActive = editor.isTemplateActive()
-    if (templateActive && editor.inNormalMode || editor.inInsertMode) {
-      return VimStateMachine.Mode.INSERT
+    if (templateActive && editor.vim.mode.inNormalMode || editor.inInsertMode) {
+      return Mode.INSERT
     }
-    return VimStateMachine.Mode.COMMAND
+    return Mode.NORMAL()
   }
 
   private fun chooseSelectionMode(
     editor: Editor,
     selectionSource: VimListenerManager.SelectionSource,
     logReason: Boolean,
-  ): VimStateMachine.Mode {
-    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectmodeName) as VimString).value
+  ): Mode {
+    val selectmode = injector.options(editor.vim).selectmode
     return when {
       editor.isOneLineMode -> {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")
-        VimStateMachine.Mode.SELECT
+        Mode.SELECT(VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
       }
       selectionSource == VimListenerManager.SelectionSource.MOUSE && OptionConstants.selectmode_mouse in selectmode -> {
         if (logReason) logger.debug("Enter select mode. Selection source is mouse and selectMode option has mouse")
-        VimStateMachine.Mode.SELECT
+        Mode.SELECT(VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
       }
-      editor.isTemplateActive() && IdeaRefactorModeHelper.selectMode() -> {
+      editor.isTemplateActive() && editor.vim.isIdeaRefactorModeSelect -> {
         if (logReason) logger.debug("Enter select mode. Template is active and selectMode has template")
-        VimStateMachine.Mode.SELECT
+        Mode.SELECT(VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
       }
-      selectionSource == VimListenerManager.SelectionSource.OTHER &&
-        OptionConstants.selectmode_ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value -> {
+      selectionSource == VimListenerManager.SelectionSource.OTHER && OptionConstants.selectmode_ideaselection in selectmode -> {
         if (logReason) logger.debug("Enter select mode. Selection source is OTHER and selectMode has refactoring")
-        VimStateMachine.Mode.SELECT
+        Mode.SELECT(VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
       }
       else -> {
         if (logReason) logger.debug("Enter visual mode")
-        VimStateMachine.Mode.VISUAL
+        Mode.VISUAL(VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
       }
     }
   }

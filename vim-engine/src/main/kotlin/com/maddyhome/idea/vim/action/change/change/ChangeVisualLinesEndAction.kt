@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.change
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -15,11 +17,9 @@ import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandFlags.FLAG_EXIT_VISUAL
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MOT_LINEWISE
-import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MULTIKEY_UNDO
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
@@ -29,10 +29,11 @@ import java.util.*
 /**
  * @author vlan
  */
-class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["C"], modes = [Mode.VISUAL])
+public class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE, FLAG_MULTIKEY_UNDO, FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE)
 
   override fun executeAction(
     editor: VimEditor,
@@ -58,7 +59,7 @@ class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
       val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
       val lineRange = TextRange(
         editor.getLineStartForOffset(vimTextRange.startOffset),
-        lineEndForOffset + endsWithNewLine
+        lineEndForOffset + endsWithNewLine,
       )
       injector.changeGroup.changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context, operatorArguments)
     }

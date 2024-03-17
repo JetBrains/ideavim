@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,9 +18,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBracesName, val arguments: MutableList<Expression>) :
+public data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBracesName, val arguments: MutableList<Expression>) :
   Expression() {
-  constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
+  public constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
     this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
@@ -30,7 +30,7 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBrac
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
         throw ExException(
           "E725: Calling dict function without Dictionary: " +
-            (scope?.toString() ?: "") + functionName.evaluate(editor, context, vimContext)
+            (scope?.toString() ?: "") + functionName.evaluate(editor, context, vimContext),
         )
       }
       return handler.executeFunction(this.arguments, editor, context, vimContext)

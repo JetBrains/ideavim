@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -30,30 +30,31 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.EditorHelperRt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.newapi.ExecuteExtensionKt;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
+import com.maddyhome.idea.vim.state.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Collection;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
+
 public class FileGroup extends VimFileBase {
   public boolean openFile(@NotNull String filename, @NotNull ExecutionContext context) {
     if (logger.isDebugEnabled()) {
       logger.debug("openFile(" + filename + ")");
     }
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext()); // API change - don't merge
+    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext()); // API change - don't merge
     if (project == null) return false;
 
     VirtualFile found = findFile(filename, project);
@@ -87,15 +88,18 @@ public class FileGroup extends VimFileBase {
   }
 
   @Nullable VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
-    VirtualFile found = null;
-    if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
-      String homefile = filename.substring(2);
+    VirtualFile found;
+    // Vim supports both ~/ and ~\ (tested on Mac and Windows). On Windows, it supports forward- and back-slashes, but
+    // it only supports forward slash on Unix (tested on Mac)
+    // VFS works with both directory separators (tested on Mac and Windows)
+    if (filename.startsWith("~/") || filename.startsWith("~\\")) {
+      String relativePath = filename.substring(2);
       String dir = System.getProperty("user.home");
       if (logger.isDebugEnabled()) {
         logger.debug("home dir file");
-        logger.debug("looking for " + homefile + " in " + dir);
+        logger.debug("looking for " + relativePath + " in " + dir);
       }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
+      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, relativePath));
     }
     else {
       found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
@@ -147,14 +151,20 @@ public class FileGroup extends VimFileBase {
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final VirtualFile virtualFile = EditorHelper.getVirtualFile(((IjVimEditor)editor).getEditor());
+      final VirtualFile virtualFile = fileEditorManager.getCurrentFile();
 
       if (virtualFile != null && window != null) {
+        // During the work on VIM-2912 I've changed the close function to this one.
+        //   However, the function with manager seems to work weirdly and it causes VIM-2953
+        //window.getManager().closeFile(virtualFile, true, false);
         window.closeFile(virtualFile);
-      }
-      if (!ApplicationManager.getApplication().isUnitTestMode()) {
-        // This thing doesn't have an implementation in test mode
-        EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+
+        // Get focus after closing tab
+        window.requestFocus(true);
+        if (!ApplicationManager.getApplication().isUnitTestMode()) {
+          // This thing doesn't have an implementation in test mode
+          EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+        }
       }
     }
   }
@@ -164,15 +174,16 @@ public class FileGroup extends VimFileBase {
    */
   @Override
   public void closeFile(int number, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext());
+    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
     if (project == null) return;
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
     final EditorWindow window = fileEditorManager.getCurrentWindow();
     VirtualFile[] editors = fileEditorManager.getOpenFiles();
-    if (number >= 0 && number < editors.length) {
-      fileEditorManager.closeFile(editors[number], window);
-    }
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+    if (window != null) {
+      if (number >= 0 && number < editors.length) {
+        fileEditorManager.closeFile(editors[number], window);
+      }
+    } if (!ApplicationManager.getApplication().isUnitTestMode()) {
       // This thing doesn't have an implementation in test mode
       EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
     }
@@ -184,11 +195,11 @@ public class FileGroup extends VimFileBase {
   @Override
   public void saveFile(@NotNull ExecutionContext context) {
     NativeAction action;
-    if (IjVimOptionService.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideawriteName, IjVimOptionService.ideawriteName)).getValue())) {
-      action = VimInjectorKt.getInjector().getNativeActionManager().getSaveAll();
+    if (globalIjOptions(injector).getIdeawrite().contains(IjOptionConstants.ideawrite_all)) {
+      action = injector.getNativeActionManager().getSaveAll();
     }
     else {
-      action = VimInjectorKt.getInjector().getNativeActionManager().getSaveCurrent();
+      action = injector.getNativeActionManager().getSaveCurrent();
     }
     ExecuteExtensionKt.execute(action, context);
   }
@@ -196,7 +207,7 @@ public class FileGroup extends VimFileBase {
   /**
    * Saves all files in the project.
    */
-  public void saveFiles(ExecutionContext context) {
+  public void saveFiles(@NotNull ExecutionContext context) {
     ExecuteExtensionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(), context);
   }
 
@@ -205,7 +216,7 @@ public class FileGroup extends VimFileBase {
    */
   @Override
   public boolean selectFile(int count, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext());
+    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
     if (project == null) return false;
     FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
@@ -225,7 +236,7 @@ public class FileGroup extends VimFileBase {
    * Selects then next or previous editor.
    */
   public void selectNextFile(int count, @NotNull ExecutionContext context) {
-    Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext());
+    Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
     if (project == null) return;
     FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
@@ -289,7 +300,7 @@ public class FileGroup extends VimFileBase {
     StringBuilder msg = new StringBuilder();
     Document doc = editor.getDocument();
 
-    if (VimStateMachine.getInstance(new IjVimEditor(editor)).getMode() != VimStateMachine.Mode.VISUAL) {
+    if (!(VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode() instanceof Mode.VISUAL)) {
       LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
       int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lp.line);
       int endoff = doc.getLineEndOffset(lp.line);
@@ -427,14 +438,11 @@ public class FileGroup extends VimFileBase {
   private static final @NotNull Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
-   * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.
+   * Respond to editor tab selection and remember the last used tab
    */
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
-    // The user has changed the editor they are working with - exit insert/replace mode, and complete any
-    // appropriate repeat
     if (event.getOldFile() != null) {
       LastTabService.getInstance(event.getManager().getProject()).setLastTab(event.getOldFile());
     }
   }
 }
-

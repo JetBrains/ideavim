@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,17 +8,14 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 // |X|
 class DeleteCharacterLeftActionTest : VimTestCase() {
+  @Test
   fun `test delete single character`() {
-    val keys = injector.parser.parseKeys("X")
+    val keys = "X"
     val before = "I f${c}ound it in a legendary land"
     val after = "I ${c}ound it in a legendary land"
     configureByText(before)
@@ -26,8 +23,9 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test delete multiple characters`() {
-    val keys = injector.parser.parseKeys("5X")
+    val keys = "5X"
     val before = "I found$c it in a legendary land"
     val after = "I $c it in a legendary land"
     configureByText(before)
@@ -35,31 +33,33 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test deletes min of count and start of line`() {
-    val keys = injector.parser.parseKeys("25X")
+    val keys = "25X"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I found$c it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             $c it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(before)
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test delete with inlay relating to preceding text`() {
-    val keys = injector.parser.parseKeys("X")
+    val keys = "X"
     val before = "I fo${c}und it in a legendary land"
     val after = "I f${c}und it in a legendary land"
     configureByText(before)
@@ -83,9 +83,10 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertVisualPosition(0, 4)
   }
 
+  @Test
   fun `test delete with inlay relating to following text`() {
     // This should have the same behaviour as related to preceding text
-    val keys = injector.parser.parseKeys("X")
+    val keys = "X"
     val before = "I fo${c}und it in a legendary land"
     val after = "I f${c}und it in a legendary land"
     configureByText(before)
@@ -108,16 +109,17 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertVisualPosition(0, 4)
   }
 
+  @Test
   fun `test deleting characters scrolls caret into view`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(5))
     configureByText("Hello world".repeat(200))
+    enterCommand("set sidescrolloff=5")
 
     // Scroll 70 characters to the left. First character on line should now be 71. sidescrolloff puts us at 76
-    typeText(injector.parser.parseKeys("70zl"))
+    typeText("70zl")
     assertVisualPosition(0, 75)
     assertVisibleLineBounds(0, 70, 149)
 
-    typeText(injector.parser.parseKeys("20X"))
+    typeText("20X")
 
     // Deleting 20 characters to the left would move us 20 characters to the left, which will force a scroll.
     // sidescroll=0 scrolls half a page

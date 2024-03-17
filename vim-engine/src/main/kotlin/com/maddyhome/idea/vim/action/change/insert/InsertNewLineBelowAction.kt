@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,24 +7,21 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
+import com.maddyhome.idea.vim.state.mode.Mode
 
-class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["o"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
+public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
     editor: VimEditor,
@@ -33,21 +30,14 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-//    if (experimentalApi()) {
-    @Suppress("ConstantConditionIf")
-    if (false) {
-      injector.changeGroup.insertLineAround(editor, context, 1)
-    } else {
-      insertNewLineBelow(editor, context)
-    }
+    insertNewLineBelow(editor, context)
     return true
   }
 }
 
-class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["O"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
+public class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
     editor: VimEditor,
@@ -56,13 +46,7 @@ class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-//    if (experimentalApi()) {
-    @Suppress("ConstantConditionIf")
-    if (false) {
-      injector.changeGroup.insertLineAround(editor, context, 0)
-    } else {
-      insertNewLineAbove(editor, context)
-    }
+    insertNewLineAbove(editor, context)
     return true
   }
 }
@@ -76,7 +60,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
   // However, we'll use EditorStartNewLineBefore in PyCharm notebooks where the last character of the previous line
   //   may be locked with a guard
 
-  // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unncessary
+  // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unnecessary
   // scrolling
   val firstLiners: MutableSet<VimCaret> = HashSet()
   val moves: MutableSet<Pair<VimCaret, Int>> = HashSet()
@@ -97,15 +81,15 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
   val hasGuards = moves.stream().anyMatch { (_, second): Pair<VimCaret?, Int?> ->
     editor.document.getOffsetGuard(
       Offset(
-        second!!
-      )
+        second!!,
+      ),
     ) != null
   }
   if (!hasGuards) {
     for ((first, second) in moves) {
       first.moveToOffsetNative(second)
     }
-    injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    injector.changeGroup.initInsert(editor, context, Mode.INSERT)
     injector.changeGroup.runEnterAction(editor, context)
     for (caret in editor.nativeCarets()) {
       if (firstLiners.contains(caret)) {
@@ -114,10 +98,10 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
       }
     }
   } else {
-    injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
+    injector.changeGroup.initInsert(editor, context, Mode.INSERT)
     injector.changeGroup.runEnterAboveAction(editor, context)
   }
-  injector.motion.scrollCaretIntoView(editor)
+  injector.scroll.scrollCaretIntoView(editor)
 }
 
 /**
@@ -132,7 +116,7 @@ private fun insertNewLineBelow(editor: VimEditor, context: ExecutionContext) {
     caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
   }
 
-  injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
+  injector.changeGroup.initInsert(editor, context, Mode.INSERT)
   injector.changeGroup.runEnterAction(editor, context)
-  injector.motion.scrollCaretIntoView(editor)
+  injector.scroll.scrollCaretIntoView(editor)
 }

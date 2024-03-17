@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,37 +9,116 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.StringOption
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.api.options
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertEquals
 
+@TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
 class StringListOptionTest : VimTestCase() {
-  private val optionName = "myOpt"
-
-  init {
-    injector.optionService.addOption(StringOption(optionName, optionName, "", true, null))
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    configureByText("\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  fun `test append existing value`() {
-    injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "123")
-    injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "456")
-    injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "123")
-
-    assertEquals("123,456", (injector.optionService.getOptionValue(OptionScope.GLOBAL, optionName) as VimString).value)
-    injector.optionService.resetDefault(OptionScope.GLOBAL, optionName)
+  @AfterEach
+  override fun tearDown(testInfo: TestInfo) {
+    super.tearDown(super.testInfo)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  fun `test prepend existing value`() {
-    injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "456")
-    injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "123")
-    injector.optionService.prependValue(OptionScope.GLOBAL, optionName, "123")
+  private fun getOptionValue() = injector.options(fixture.editor.vim).virtualedit.value
 
-    assertEquals("456,123", (injector.optionService.getOptionValue(OptionScope.GLOBAL, optionName) as VimString).value)
-    injector.optionService.resetDefault(OptionScope.GLOBAL, optionName)
+  @Test
+  fun `test set value`() {
+    enterCommand("set virtualedit=all")
+    assertEquals("all", getOptionValue())
+  }
+
+  @Test
+  fun `test set repeated value`() {
+    enterCommand("set virtualedit=all,all,all")
+    assertEquals("all,all,all", getOptionValue())
+  }
+
+  @Test
+  fun `test append value`() {
+    enterCommand("set virtualedit=all")
+    enterCommand("set virtualedit+=onemore")
+    assertEquals("all,onemore", getOptionValue())
+  }
+
+  @Test
+  fun `test append existing value does not modify`() {
+    enterCommand("set virtualedit=all")
+    enterCommand("set virtualedit+=all")
+
+    assertEquals("all", getOptionValue())
+  }
+
+  @Test
+  fun `test append matching sublist does not modify`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit+=all,onemore")
+
+    assertEquals("all,onemore,block", getOptionValue())
+  }
+
+  @Test
+  fun `test append matching sublist with different order will modify even if causes repeated items`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit+=onemore,all")
+
+    assertEquals("all,onemore,block,onemore,all", getOptionValue())
+  }
+
+  @Test
+  fun `test prepend value`() {
+    enterCommand("set virtualedit=all")
+    enterCommand("set virtualedit^=onemore")
+    assertEquals("onemore,all", getOptionValue())
+  }
+
+  @Test
+  fun `test prepend matching sublist does not modify`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit^=onemore,block")
+
+    assertEquals("all,onemore,block", getOptionValue())
+  }
+
+  @Test
+  fun `test prepend matching sublist with different order will modify even if causes repeated items`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit^=onemore,all")
+
+    assertEquals("onemore,all,all,onemore,block", getOptionValue())
+  }
+
+  @Test
+  fun `test remove value`() {
+    enterCommand("set virtualedit=all,onemore")
+    enterCommand("set virtualedit-=onemore")
+    assertEquals("all", getOptionValue())
+  }
+
+  @Test
+  fun `test remove matching sublist`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit-=onemore,block")
+    assertEquals("all", getOptionValue())
+  }
+
+  @Test
+  fun `test remove matching sublist with different order does not modify`() {
+    enterCommand("set virtualedit=all,onemore,block")
+    enterCommand("set virtualedit-=block,onemore")
+    assertEquals("all,onemore,block", getOptionValue())
   }
 }

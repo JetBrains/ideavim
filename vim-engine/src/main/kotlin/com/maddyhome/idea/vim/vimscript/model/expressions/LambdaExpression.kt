@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 
-data class LambdaExpression(val args: List<String>, val expr: Expression) : Expression() {
+public data class LambdaExpression(val args: List<String>, val expr: Expression) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimFuncref {
     val function = FunctionDeclaration(null, getFunctionName(), args, listOf(), buildBody(), false, setOf(FunctionFlag.CLOSURE), true)
@@ -39,12 +39,15 @@ data class LambdaExpression(val args: List<String>, val expr: Expression) : Expr
     for (argument in args) {
       body.add(
         LetCommand(
-          Ranges(), Variable(Scope.LOCAL_VARIABLE, argument), AssignmentOperator.ASSIGNMENT,
+          Ranges(),
+          Variable(Scope.LOCAL_VARIABLE, argument),
+          AssignmentOperator.ASSIGNMENT,
           Variable(
-            Scope.FUNCTION_VARIABLE, argument
+            Scope.FUNCTION_VARIABLE,
+            argument,
           ),
-          true
-        )
+          true,
+        ),
       )
     }
     body.add(ReturnStatement(expr))

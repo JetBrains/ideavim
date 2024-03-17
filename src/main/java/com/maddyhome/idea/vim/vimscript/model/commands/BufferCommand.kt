@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -18,7 +19,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -26,7 +26,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  *
  * @author John Weigel
  */
-data class BufferCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+@ExCommand(command = "b[uffer]")
+internal data class BufferCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -79,7 +80,7 @@ data class BufferCommand(val ranges: Ranges, val argument: String) : Command.Sin
     for (file in FileEditorManager.getInstance(project).openFiles) {
       if (file.name.contains(fileName)) {
         val editor = EditorHelper.getEditor(file) ?: continue
-        matchedFiles.add(editor.vim)
+        matchedFiles.add(editor)
       }
     }
 

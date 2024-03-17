@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,17 +8,19 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class SelectKeyHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test type in select mode`() {
     val typed = "Hello"
     this.doTest(
@@ -39,12 +41,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode on empty line`() {
     val typed = "Hello"
     this.doTest(
@@ -65,12 +67,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode backspace`() {
     this.doTest(
       listOf("gh", "<BS>"),
@@ -90,12 +92,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode delete`() {
     this.doTest(
       listOf("gh", "<DEL>"),
@@ -115,12 +117,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode multicaret`() {
     val typed = "Hello"
     this.doTest(
@@ -141,12 +143,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test line mode`() {
     val typed = "Hello"
     this.doTest(
@@ -167,12 +169,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test line mode empty line`() {
     val typed = "Hello"
     this.doTest(
@@ -193,12 +195,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test line mode multicaret`() {
     val typed = "Hello"
     this.doTest(
@@ -219,12 +221,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test type in select block mode`() {
     val typed = "Hello"
     this.doTest(
@@ -245,8 +247,7 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
@@ -258,9 +259,10 @@ class SelectKeyHandlerTest : VimTestCase() {
                 Hellol rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test block mode empty line`() {
     val typed = "Hello"
     this.doTest(
@@ -281,12 +283,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test block mode longer line`() {
     val typed = "Hello"
     this.doTest(
@@ -307,12 +309,12 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+Mode.INSERT,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test block mode longer line with esc`() {
     val typed = "Hello"
     this.doTest(
@@ -333,10 +335,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
     assertCaretsVisualAttributes()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 }

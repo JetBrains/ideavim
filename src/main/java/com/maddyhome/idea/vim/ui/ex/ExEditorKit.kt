@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.ui.ex
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 import java.awt.event.ActionEvent
@@ -21,7 +21,7 @@ import javax.swing.text.DefaultEditorKit
 import javax.swing.text.Document
 import javax.swing.text.TextAction
 
-object ExEditorKit : DefaultEditorKit() {
+internal object ExEditorKit : DefaultEditorKit() {
 
   @NonNls
   val CancelEntry: String = "cancel-entry"
@@ -129,7 +129,13 @@ object ExEditorKit : DefaultEditorKit() {
             if (target.useHandleKeyFromEx) {
               val entry = ExEntryPanel.getInstance().entry
               val editor = entry.editor
-              KeyHandler.getInstance().handleKey(editor.vim, key, EditorDataContext.init(editor, entry.context).vim)
+              val keyHandler = KeyHandler.getInstance()
+              keyHandler.handleKey(
+                editor.vim,
+                key,
+                injector.executionContextManager.onEditor(editor.vim, entry.context.vim),
+                keyHandler.keyHandlerState,
+              )
             } else {
               val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
               super.actionPerformed(event)

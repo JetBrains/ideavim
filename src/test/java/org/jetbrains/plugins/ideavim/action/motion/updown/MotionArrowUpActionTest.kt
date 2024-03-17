@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,23 +10,21 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import org.jetbrains.plugins.ideavim.OptionValueType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 
-class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+@TraceOptions(TestOptionConstants.keymodel)
+class MotionArrowUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test visual default options`() {
     doTest(
       listOf("v", "<Up>"),
@@ -46,18 +44,12 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopsel
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopsel]))
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Up>"),
@@ -77,18 +69,11 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Up>"),
@@ -108,18 +93,12 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Up>"),
@@ -139,18 +118,11 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Up>"),
@@ -170,18 +142,11 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test char select simple move`() {
     doTest(
       listOf("gH", "<Up>"),
@@ -201,13 +166,11 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Up>"),
@@ -227,19 +190,12 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test select multiple carets`() {
     doTest(
       listOf("gH", "<Up>"),
@@ -259,20 +215,18 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test arrow up in insert mode scrolls caret at scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(5))
     configureByPages(5)
+    enterCommand("set scrolljump=10")
+    enterCommand("set scrolloff=5")
     setPositionAndScroll(19, 24)
 
-    typeText(injector.parser.parseKeys("i" + "<Up>"))
+    typeText("i", "<Up>")
 
     assertPosition(23, 0)
     assertVisibleArea(9, 43)

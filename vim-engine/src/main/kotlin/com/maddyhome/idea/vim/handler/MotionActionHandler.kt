@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.handler
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,11 +21,12 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.options.helpers.StrictMode
 
 /**
  * @author Alex Plate
@@ -32,7 +34,11 @@ import com.maddyhome.idea.vim.options.helpers.StrictMode
  * Base class for motion handlers.
  * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
-sealed class MotionActionHandler : EditorActionHandlerBase(false) {
+public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
+  /**
+   * By default, we unfold collapsed regions after caret movement inside the fold
+   */
+  public open val keepFold: Boolean = false
 
   /**
    * Base class for motion handlers.
@@ -40,7 +46,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    *   called 5 times.
    * @see [MotionActionHandler.SingleExecution] for only one execution
    */
-  abstract class ForEachCaret : MotionActionHandler() {
+  public abstract class ForEachCaret : MotionActionHandler() {
 
     /**
      * This method should return new offset for [caret]
@@ -48,9 +54,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      *   called 5 times.
      * The method executes only once it there is block selection.
      */
-    abstract fun getOffset(
+    public abstract fun getOffset(
       editor: VimEditor,
-      caret: VimCaret,
+      caret: ImmutableVimCaret,
       context: ExecutionContext,
       argument: Argument?,
       operatorArguments: OperatorArguments,
@@ -63,27 +69,27 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    *   [getOffset] will be called 1 time.
    * @see [MotionActionHandler.ForEachCaret] for per-caret execution
    */
-  abstract class SingleExecution : MotionActionHandler() {
+  public abstract class SingleExecution : MotionActionHandler() {
     /**
      * This method should return new offset for primary caret
      * It executes once for all carets. That means that if you have 5 carets, [getOffset] will be
      *   called 1 time.
      */
-    abstract fun getOffset(
+    public abstract fun getOffset(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
-      operatorArguments: OperatorArguments
+      operatorArguments: OperatorArguments,
     ): Motion
   }
 
-  abstract val motionType: MotionType
+  public abstract val motionType: MotionType
 
   final override val type: Command.Type = Command.Type.MOTION
 
-  fun getHandlerOffset(
+  public fun getHandlerOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
@@ -101,7 +107,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val blockSubmodeActive = editor.inBlockSubMode
+    val blockSubmodeActive = editor.inBlockSelection
 
     when (this) {
       is SingleExecution -> run {
@@ -130,7 +136,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
                   caret,
                   context,
                   cmd,
-                  operatorArguments
+                  operatorArguments,
                 )
               }
             } finally {
@@ -149,7 +155,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ) {
     val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
     when (offset) {
@@ -169,7 +175,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     // Block selection mode is emulated with multiple carets. We should only be operating on the primary caret. Note
     // that moving the primary caret to modify the selection can cause IntelliJ to invalidate, replace or add a new
     // primary caret
-    if (editor.inBlockSubMode) {
+    if (editor.inBlockSelection) {
       StrictMode.assert(caret.isPrimary, "Block selection mode must only operate on primary caret")
     }
 
@@ -186,7 +192,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     // We've moved the caret, so reset the intended column. Visual block movement can replace the primary caret when
     // moving the selection up, so make sure we've got a valid caret
-    val validCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caretAfterMove
+    val validCaret = if (editor.inBlockSelection) editor.primaryCaret() else caretAfterMove
     validCaret.vimLastColumn = offset.intendedColumn
   }
 
@@ -198,25 +204,35 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   private fun prepareMoveToAbsoluteOffset(
     editor: VimEditor,
     cmd: Command,
-    offset: Motion.AbsoluteOffset
+    offset: Motion.AbsoluteOffset,
   ): Int {
     var resultOffset = offset.offset
     if (resultOffset < 0) {
       logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
     }
     if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-      injector.markGroup.saveJumpLocation(editor)
+      injector.jumpService.saveJumpLocation(editor)
     }
 
     // TODO: This should be normalised by the action
     if (!editor.isEndAllowed) {
       resultOffset = editor.normalizeOffset(resultOffset, false)
     }
+
+    val foldRegion = editor.getFoldRegionAtOffset(resultOffset)
+    if (foldRegion != null && !foldRegion.isExpanded) {
+      if (keepFold) {
+        resultOffset = foldRegion.startOffset.point
+      } else {
+        foldRegion.isExpanded = true
+      }
+    }
+
     return resultOffset
   }
 
   private object CaretMergingWatcher : VimCaretListener {
-    override fun caretRemoved(caret: VimCaret?) {
+    override fun caretRemoved(caret: ImmutableVimCaret?) {
       caret ?: return
       val editor = caret.editor
       val caretToDelete = caret
@@ -236,7 +252,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     }
   }
 
-  companion object {
-    val logger = vimLogger<MotionActionHandler>()
+  public companion object {
+    public val logger: VimLogger = vimLogger<MotionActionHandler>()
   }
 }

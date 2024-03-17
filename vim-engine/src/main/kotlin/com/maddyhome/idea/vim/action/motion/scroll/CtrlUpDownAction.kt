@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.scroll
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -19,7 +21,8 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 // FIXME: 2019-07-05 Workaround to make jump through methods work
-class CtrlDownAction : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["<C-Down>"], modes = [Mode.NORMAL])
+public class CtrlDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Down>")
 
@@ -34,13 +37,14 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
     val keyStroke = keySet.first().first()
     val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action, context)) break
+      if (injector.actionExecutor.executeAction(editor, action, context)) break
     }
     return true
   }
 }
 
-class CtrlUpAction : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["<C-Up>"], modes = [Mode.NORMAL])
+public class CtrlUpAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Up>")
 
@@ -55,7 +59,7 @@ class CtrlUpAction : VimActionHandler.SingleExecution() {
     val keyStroke = keySet.first().first()
     val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action, context)) break
+      if (injector.actionExecutor.executeAction(editor, action, context)) break
     }
     return true
   }

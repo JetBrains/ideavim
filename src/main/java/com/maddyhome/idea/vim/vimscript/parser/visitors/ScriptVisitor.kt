@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,14 +12,16 @@ import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 
-object ScriptVisitor : VimscriptBaseVisitor<Script>() {
+internal object ScriptVisitor : VimscriptBaseVisitor<Script>() {
 
   override fun visitScript(ctx: VimscriptParser.ScriptContext): Script {
-    return if (ctx.children != null) {
+    val script = if (ctx.children != null) {
       val statements = ctx.children.mapNotNull { ExecutableVisitor.visit(it) }
       Script(statements)
     } else {
       Script(emptyList())
     }
+    script.rangeInScript = ctx.getTextRange()
+    return script
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,102 +9,104 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.state.mode.Mode
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class JoinLinesCommandTest : VimTestCase() {
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test simple join`() {
     doTest(
       exCommand("j"),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land$c all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test simple join full command`() {
     doTest(
       exCommand("join"),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land$c all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test join with range`() {
     doTest(
       exCommand("4,6j"),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land
-                all rocks and lavender and tufted grass, where it was settled on some sodden sand$c hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit Sed in orci mauris.$c Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test join multicaret`() {
     configureByText(
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-      """.trimIndent()
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("Vjj"))
     typeText(commandToKeys("join"))
     assertState(
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land all rocks and lavender and tufted grass,$c where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-      """.trimIndent()
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit$c Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
   }
 }

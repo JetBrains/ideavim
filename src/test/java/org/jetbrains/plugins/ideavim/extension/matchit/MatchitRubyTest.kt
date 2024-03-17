@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,14 +9,19 @@
 package org.jetbrains.plugins.ideavim.extension.matchit
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class MatchitRubyTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("matchit")
   }
 
+  @Test
   fun `test basic jump from if to end`() {
     doTest(
       "%",
@@ -30,28 +35,31 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from whitespace before if to end`() {
     doTest(
       "%",
       """ $c  if some_boolean puts "result is true" end""",
       """   if some_boolean puts "result is true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from whitespace before class to end`() {
     doTest(
       "%",
       """ $c class Foo end""",
       """  class Foo ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic jump from end to if`() {
     doTest(
       "%",
@@ -65,10 +73,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic jump from if to else`() {
     doTest(
       "%",
@@ -86,10 +95,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic jump from else to end`() {
     doTest(
       "%",
@@ -107,10 +117,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to if in if-else structure`() {
     doTest(
       "%",
@@ -128,10 +139,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from if to elsif`() {
     doTest(
       "%",
@@ -153,10 +165,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from elsif to else`() {
     doTest(
       "%",
@@ -178,10 +191,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from elsif to end`() {
     doTest(
       "%",
@@ -199,10 +213,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "second value is true"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from elsif to elsif`() {
     doTest(
       "%",
@@ -228,10 +243,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "all values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from for to end`() {
     doTest(
       "%",
@@ -253,10 +269,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from for to end and ignore inner if blocks`() {
     doTest(
       "%",
@@ -286,10 +303,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from if to break`() {
     doTest(
       "%",
@@ -311,10 +329,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from break to end`() {
     doTest(
       "%",
@@ -336,10 +355,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to if`() {
     doTest(
       "%",
@@ -361,10 +381,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to for`() {
     doTest(
       "%",
@@ -386,10 +407,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic jump from class to end`() {
     doTest(
       "%",
@@ -407,10 +429,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic jump from end to class`() {
     doTest(
       "%",
@@ -428,10 +451,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic jump from def to end`() {
     doTest(
       "%",
@@ -449,10 +473,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic jump from end to def`() {
     doTest(
       "%",
@@ -470,10 +495,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from class to end ignoring nested class`() {
     doTest(
       "%",
@@ -507,10 +533,11 @@ class MatchitRubyTest : VimTestCase() {
 
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from if to end over inner loop`() {
     doTest(
       "%",
@@ -536,10 +563,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to if ignoring malformed code`() {
     doTest(
       "%",
@@ -557,64 +585,71 @@ class MatchitRubyTest : VimTestCase() {
           puts some_boolean
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from if to end after a semicolon`() {
     doTest(
       "%",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to if after a semicolon`() {
     doTest(
       "%",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from before if and semicolon to end`() {
     doTest(
       "%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from unless to end after a semicolon`() {
     doTest(
       "%",
       """puts "This line has two statements"; ${c}unless nil then puts "not nil" end""",
       """puts "This line has two statements"; unless nil then puts "not nil" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from one line condition to if`() {
     doTest(
       "%",
       """if tr${c}ue puts "true" end""",
       """${c}if true puts "true" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to unless after a semicolon`() {
     doTest(
       "%",
       """puts "This line has two statements"; unless nil then puts "not nill" ${c}end""",
       """puts "This line has two statements"; ${c}unless nil then puts "not nill" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to do when no other opening keyword is present`() {
     doTest(
       "%",
@@ -632,10 +667,11 @@ class MatchitRubyTest : VimTestCase() {
        
         [1, 2, 3].each ${c}do |x| puts x end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from do to end`() {
     doTest(
       "%",
@@ -657,10 +693,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from module to end`() {
     doTest(
       "%",
@@ -678,10 +715,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to module`() {
     doTest(
       "%",
@@ -699,10 +737,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from while to end`() {
     doTest(
       "%",
@@ -722,10 +761,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from begin to rescue`() {
     doTest(
       "%",
@@ -751,10 +791,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from rescue to ensure`() {
     doTest(
       "%",
@@ -780,10 +821,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from ensure to end`() {
     doTest(
       "%",
@@ -809,10 +851,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to begin`() {
     doTest(
       "%",
@@ -838,10 +881,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from rescue to retry`() {
     doTest(
       "%",
@@ -861,10 +905,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}retry
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from retry to end`() {
     doTest(
       "%",
@@ -884,10 +929,11 @@ class MatchitRubyTest : VimTestCase() {
           retry
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to while`() {
     doTest(
       "%",
@@ -907,10 +953,11 @@ class MatchitRubyTest : VimTestCase() {
           end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from case to when`() {
     doTest(
       "%",
@@ -934,10 +981,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from when to when`() {
     doTest(
       "%",
@@ -961,10 +1009,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from else to end in case block`() {
     doTest(
       "%",
@@ -988,10 +1037,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end to case`() {
     doTest(
       "%",
@@ -1015,10 +1065,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from until to end`() {
     doTest(
       "%",
@@ -1032,10 +1083,11 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from if to redo`() {
     doTest(
       "%",
@@ -1059,10 +1111,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from redo to elsif`() {
     doTest(
       "%",
@@ -1086,10 +1139,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from elsif to next`() {
     doTest(
       "%",
@@ -1113,10 +1167,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from next to end`() {
     doTest(
       "%",
@@ -1140,10 +1195,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from =begin to =end`() {
     doTest(
       "%",
@@ -1157,10 +1213,11 @@ class MatchitRubyTest : VimTestCase() {
           end comment
         =${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from =end to =begin`() {
     doTest(
       "%",
@@ -1174,10 +1231,11 @@ class MatchitRubyTest : VimTestCase() {
           begin comment
         =end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from middle of cucumber test to end`() {
     doTest(
       "%",
@@ -1203,10 +1261,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test jump from end of cucumber test to do`() {
     doTest(
       "%",
@@ -1232,7 +1291,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1240,6 +1299,7 @@ class MatchitRubyTest : VimTestCase() {
    * Tests for reverse g% motion
    */
 
+  @Test
   fun `test basic reverse jump from end to if `() {
     doTest(
       "g%",
@@ -1253,10 +1313,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic reverse jump from end to if`() {
     doTest(
       "g%",
@@ -1270,10 +1331,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic reverse jump from else to if`() {
     doTest(
       "g%",
@@ -1291,10 +1353,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic reverse jump from end to else`() {
     doTest(
       "g%",
@@ -1312,10 +1375,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from if to end in if-else structure`() {
     doTest(
       "g%",
@@ -1333,10 +1397,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from elsif to if`() {
     doTest(
       "g%",
@@ -1358,10 +1423,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from else to elsif`() {
     doTest(
       "g%",
@@ -1383,10 +1449,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to elsif`() {
     doTest(
       "g%",
@@ -1404,10 +1471,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "second value is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from elsif to elsif`() {
     doTest(
       "g%",
@@ -1433,10 +1501,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "all values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to for and ignore inner if blocks`() {
     doTest(
       "g%",
@@ -1466,10 +1535,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from break to if`() {
     doTest(
       "g%",
@@ -1491,10 +1561,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to break`() {
     doTest(
       "g%",
@@ -1516,10 +1587,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from if to end ignoring break`() {
     doTest(
       "g%",
@@ -1541,10 +1613,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from for to end ignoring nested if`() {
     doTest(
       "g%",
@@ -1566,10 +1639,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic reverse jump from end to class`() {
     doTest(
       "g%",
@@ -1587,10 +1661,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test basic reverse jump from class to end`() {
     doTest(
       "g%",
@@ -1608,10 +1683,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from def to end`() {
     doTest(
       "g%",
@@ -1629,10 +1705,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to def across multiple functions`() {
     doTest(
       "g%",
@@ -1662,10 +1739,11 @@ class MatchitRubyTest : VimTestCase() {
           puts "I am func_three"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to def`() {
     doTest(
       "g%",
@@ -1683,10 +1761,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to class ignoring nested class`() {
     doTest(
       "g%",
@@ -1720,10 +1799,11 @@ class MatchitRubyTest : VimTestCase() {
 
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to if over inner loop`() {
     doTest(
       "g%",
@@ -1749,10 +1829,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to if ignoring malformed code`() {
     doTest(
       "g%",
@@ -1770,19 +1851,21 @@ class MatchitRubyTest : VimTestCase() {
           puts some_boolean
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from one line condition to if`() {
     doTest(
       "g%",
       """if tr${c}ue puts "true" end""",
       """${c}if true puts "true" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from do to end`() {
     doTest(
       "g%",
@@ -1804,10 +1887,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from module to end`() {
     doTest(
       "g%",
@@ -1825,10 +1909,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to module`() {
     doTest(
       "g%",
@@ -1846,10 +1931,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to ensure`() {
     doTest(
       "g%",
@@ -1875,10 +1961,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from ensure to rescue`() {
     doTest(
       "g%",
@@ -1904,10 +1991,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from rescue to begin`() {
     doTest(
       "g%",
@@ -1933,10 +2021,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from begin to end`() {
     doTest(
       "g%",
@@ -1962,10 +2051,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to retry`() {
     doTest(
       "g%",
@@ -1985,10 +2075,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}retry
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from retry to rescue`() {
     doTest(
       "g%",
@@ -2008,10 +2099,11 @@ class MatchitRubyTest : VimTestCase() {
           retry
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from while to end`() {
     doTest(
       "g%",
@@ -2031,10 +2123,11 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to while`() {
     doTest(
       "g%",
@@ -2054,10 +2147,11 @@ class MatchitRubyTest : VimTestCase() {
           end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from case to end`() {
     doTest(
       "g%",
@@ -2081,10 +2175,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to else in case block`() {
     doTest(
       "g%",
@@ -2108,10 +2203,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from else to when`() {
     doTest(
       "g%",
@@ -2135,10 +2231,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from when to when`() {
     doTest(
       "g%",
@@ -2162,10 +2259,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from when to case`() {
     doTest(
       "g%",
@@ -2189,10 +2287,11 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to until`() {
     doTest(
       "g%",
@@ -2206,10 +2305,11 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from until to end`() {
     doTest(
       "g%",
@@ -2223,10 +2323,11 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to next`() {
     doTest(
       "g%",
@@ -2250,10 +2351,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from next to elsif`() {
     doTest(
       "g%",
@@ -2277,10 +2379,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from elsif to redo`() {
     doTest(
       "g%",
@@ -2304,10 +2407,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from redo to if`() {
     doTest(
       "g%",
@@ -2331,10 +2435,11 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from =begin to =end`() {
     doTest(
       "g%",
@@ -2348,10 +2453,11 @@ class MatchitRubyTest : VimTestCase() {
           end comment
         =${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from =end to =begin`() {
     doTest(
       "g%",
@@ -2365,25 +2471,27 @@ class MatchitRubyTest : VimTestCase() {
           begin comment
         =end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from before if and semicolon to end`() {
     doTest(
       "g%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test reverse jump from whitespace before class to end`() {
     doTest(
       "g%",
       """ $c  class Foo end""",
       """   class Foo ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2391,6 +2499,7 @@ class MatchitRubyTest : VimTestCase() {
    * Tests for embedded Ruby
    */
 
+  @Test
   fun `test jump from opening to closing HTML tag`() {
     // This is just to test that HTML jumps are working in Ruby files.
     // MatchitHtmlTest is what tests the correctness of the HTML jumps.
@@ -2402,10 +2511,11 @@ class MatchitRubyTest : VimTestCase() {
       """
         <div><div>contents<$c/div></div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from opening to closing div while on class attribute`() {
     doTest(
       "%",
@@ -2427,10 +2537,11 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         <$c/div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from do to end in template block`() {
     doTest(
       "%",
@@ -2452,10 +2563,11 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from end to do in template block`() {
     doTest(
       "%",
@@ -2477,10 +2589,11 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from closing to opening div`() {
     doTest(
       "%",
@@ -2502,28 +2615,31 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from opening to closing angle bracket in template`() {
     doTest(
       "%",
       """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
       """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test reverse jump from opening to closing angle bracket in template`() {
     doTest(
       "g%",
       """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
       """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from do to end in table template`() {
     doTest(
       "%",
@@ -2557,10 +2673,11 @@ class MatchitRubyTest : VimTestCase() {
           <% ${c}end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from if to else in table template`() {
     doTest(
       "%",
@@ -2594,10 +2711,11 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test jump from else to end in table template`() {
     doTest(
       "%",
@@ -2631,10 +2749,11 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
+  @Test
   fun `test reverse jump from end to else in table template`() {
     doTest(
       "g%",
@@ -2668,7 +2787,7 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 }

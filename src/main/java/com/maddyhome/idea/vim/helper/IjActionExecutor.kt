@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,10 +14,13 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
+import com.intellij.openapi.actionSystem.DataContextWrapper
+import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.intellij.openapi.actionSystem.ex.ActionUtil
+import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.Service
@@ -31,16 +34,19 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.runFromVimKey
 import org.jetbrains.annotations.NonNls
+import java.awt.Component
+import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 @Service
-class IjActionExecutor : VimActionExecutor {
+internal class IjActionExecutor : VimActionExecutor {
   override val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
     get() = IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE
   override val ACTION_COLLAPSE_ALL_REGIONS: String
@@ -62,22 +68,35 @@ class IjActionExecutor : VimActionExecutor {
    * @param ijAction  The action to execute
    * @param context The context to run it in
    */
-  override fun executeAction(action: NativeAction, context: ExecutionContext): Boolean {
+  override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
     val ijAction = (action as IjNativeAction).action
+
+    /**
+     * Data context that defines that some action was started from IdeaVim.
+     * You can call use [runFromVimKey] key to define if intellij action was started from IdeaVim
+     */
+    val dataContext = DataContextWrapper(context.ij)
+    dataContext.putUserData(runFromVimKey, true)
+
     val event = AnActionEvent(
-      null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
-      ActionManager.getInstance(), 0
+      null,
+      dataContext,
+      ActionPlaces.KEYBOARD_SHORTCUT,
+      ijAction.templatePresentation.clone(),
+      ActionManager.getInstance(),
+      0,
     )
     // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
     //   because rider use async update method. See VIM-1819.
     // This method executes inside of lastUpdateAndCheckDumb
     // Another related issue: VIM-2604
-    if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
+    ijAction.beforeActionPerformedUpdate(event)
+    if (!event.presentation.isEnabled) return false
     if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
       // Some ActionGroups should not be performed, but shown as a popup
       val popup = JBPopupFactory.getInstance()
-        .createActionGroupPopup(event.presentation.text, ijAction, context.ij, false, null, -1)
-      val component = context.ij.getData(PlatformDataKeys.CONTEXT_COMPONENT)
+        .createActionGroupPopup(event.presentation.text, ijAction, dataContext, false, null, -1)
+      val component = dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT)
       if (component != null) {
         val window = SwingUtilities.getWindowAncestor(component)
         if (window != null) {
@@ -125,7 +144,7 @@ class IjActionExecutor : VimActionExecutor {
       manager.fireAfterActionPerformed(action, event, result!!)
     }
     if (indexError != null) {
-      ActionUtil.showDumbModeWarning(project, event)
+      ActionUtil.showDumbModeWarning(project, action, event)
     }
   }
 
@@ -136,9 +155,42 @@ class IjActionExecutor : VimActionExecutor {
    * @param context The context to run it in
    */
   override fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean {
-    val aMgr = ActionManager.getInstance()
-    val action = aMgr.getAction(name)
-    return action != null && executeAction(IjNativeAction(action), context)
+    val action = getAction(name, context)
+    return action != null && executeAction(null, IjNativeAction(action), context)
+  }
+  
+  private fun getAction(name: String, context: ExecutionContext): AnAction? {
+    val actionManager = ActionManager.getInstance()
+    val action = actionManager.getAction(name)
+    if (action !is EmptyAction) return action
+
+    // But if the action is an instance of EmptyAction, the fun begins
+    var component: Component? = context.ij.getData(PlatformDataKeys.CONTEXT_COMPONENT) ?: return null
+    while (component != null) {
+      if (component !is JComponent) {
+        component = component.parent
+        continue
+      }
+
+      val listOfActions = ActionUtil.getActions(component)
+      if (listOfActions.isEmpty()) {
+        component = component.getParent()
+        continue
+      }
+
+      fun AnAction.getId(): String? {
+        return actionManager.getId(this)
+          ?: (shortcutSet as? ProxyShortcutSet)?.actionId
+      }
+
+      for (action in listOfActions) {
+        if (action.getId() == name) {
+          return action
+        }
+      }
+      component = component.getParent()
+    }
+    return null
   }
 
   override fun executeCommand(
@@ -163,9 +215,11 @@ class IjActionExecutor : VimActionExecutor {
     CommandProcessor.getInstance()
       .executeCommand(
         editor.ij.project,
-        { cmd.execute(editor, EditorDataContext.init(editor.ij, context.ij).vim, operatorArguments) },
-        cmd.id, DocCommandGroupId.noneGroupId(editor.ij.document), UndoConfirmationPolicy.DEFAULT,
-        editor.ij.document
+        { cmd.execute(editor, injector.executionContextManager.onEditor(editor, context), operatorArguments) },
+        cmd.id,
+        DocCommandGroupId.noneGroupId(editor.ij.document),
+        UndoConfirmationPolicy.DEFAULT,
+        editor.ij.document,
       )
   }
 

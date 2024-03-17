@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,6 +14,9 @@ import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.LocalMarkStorage
+import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,7 +26,8 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.VisualChange
-import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
+import com.maddyhome.idea.vim.helper.lastSelectionInfo
+import com.maddyhome.idea.vim.helper.markStorage
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
@@ -33,16 +37,44 @@ import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartClear
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
-class IjVimCaret(val caret: Caret) : VimCaretBase() {
+internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
+
   override val registerStorage: CaretRegisterStorage
     get() {
       var storage = this.caret.registerStorage
       if (storage == null) {
-        storage = CaretRegisterStorageBase()
+        storage = CaretRegisterStorageBase(this)
         this.caret.registerStorage = storage
+      } else if (storage.caret != this) {
+        storage.caret = this
       }
       return storage
+    }
+  override val markStorage: LocalMarkStorage
+    get() {
+      var storage = this.caret.markStorage
+      if (storage == null) {
+        storage = LocalMarkStorage(this)
+        this.caret.markStorage = storage
+      } else if (storage.caret != this) {
+        storage.caret = this
+      }
+      return storage
+    }
+  override var lastSelectionInfo: SelectionInfo
+    get() {
+      val lastSelection = this.caret.lastSelectionInfo
+      if (lastSelection == null) {
+        val defaultValue = SelectionInfo(null, null, SelectionType.CHARACTER_WISE)
+        this.caret.lastSelectionInfo = defaultValue
+        return defaultValue
+      }
+      return lastSelection
+    }
+    set(value) {
+      this.caret.lastSelectionInfo = value
     }
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)
@@ -63,8 +95,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     set(value) {
       this.caret.vimSelectionStart = value
     }
-  override val vimLeadSelectionOffset: Int
-    get() = this.caret.vimLeadSelectionOffset
 
   override fun vimSelectionStartClear() {
     this.caret.vimSelectionStartClear()
@@ -129,6 +159,11 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.moveToVisualPosition(VisualPosition(position.line, position.column, position.leansRight))
   }
 
+  override fun setVimLastColumnAndGetCaret(col: Int): VimCaret {
+    caret.vimLastColumn = col
+    return this
+  }
+
   override fun setSelection(start: Offset, end: Offset) {
     caret.setSelection(start.point, end.point)
   }
@@ -142,8 +177,10 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override fun hashCode(): Int = this.caret.hashCode()
 }
 
-val VimCaret.ij: Caret
+public val VimCaret.ij: Caret
+  get() = (this as IjVimCaret).caret
+public val ImmutableVimCaret.ij: Caret
   get() = (this as IjVimCaret).caret
 
-val Caret.vim: VimCaret
+public val Caret.vim: VimCaret
   get() = IjVimCaret(this)

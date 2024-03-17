@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 
 // [WIP] https://youtrack.jetbrains.com/issue/VIM-2658/Troubleshooter
 @Service
-class Troubleshooter {
+internal class Troubleshooter {
   private val problems: MultiMap<String, Problem> = MultiMap()
 
   fun removeByType(type: String) {
@@ -31,7 +31,7 @@ class Troubleshooter {
 
   fun findIncorrectMappings(): List<Problem> {
     val problems = ArrayList<Problem>()
-    MappingMode.values().forEach { mode ->
+    MappingMode.entries.forEach { mode ->
       injector.keyGroup.getKeyMapping(mode).getByOwner(MappingOwner.IdeaVim.InitScript).forEach { (_, to) ->
         if (to is ToKeysMappingInfo) {
           if (":action" in to.toKeys.joinToString { it.keyChar.toString() }) {
@@ -48,4 +48,4 @@ class Troubleshooter {
   }
 }
 
-class Problem(description: String)
+internal class Problem(description: String)

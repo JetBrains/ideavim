@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.ex.evaluate
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ListTests {
@@ -34,10 +34,10 @@ class ListTests {
           VimFloat(4.6),
           VimString("bla bla"),
           VimList(mutableListOf(VimInt(5), VimInt(9))),
-          VimDictionary(linkedMapOf(VimString("key") to VimString("value")))
-        )
+          VimDictionary(linkedMapOf(VimString("key") to VimString("value"))),
+        ),
       ),
-      VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")!!.evaluate()
+      VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")!!.evaluate(),
     )
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,13 +9,15 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VisualBlockAppendActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test visual block append`() {
     val before = """
             ${c}int a;
@@ -32,6 +34,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test visual block append with dollar motion`() {
     val before = """
             ${c}int a;
@@ -47,6 +50,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test append in non block mode`() {
     doTest(
       "vwAHello<esc>",
@@ -66,9 +70,8 @@ class VisualBlockAppendActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 }

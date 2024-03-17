@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,7 +7,7 @@
  */
 package com.maddyhome.idea.vim.ex.ranges
 
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
@@ -18,10 +18,10 @@ import java.util.*
 /**
  * Base for all Ex command ranges
  */
-sealed class Range(
+public sealed class Range(
   // Line offset
   protected val offset: Int,
-  val isMove: Boolean,
+  public val isMove: Boolean,
 ) {
   /**
    * Gets the line number (0 based) specificied by this range. Includes the offset.
@@ -30,12 +30,12 @@ sealed class Range(
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if unable to get the line number
    */
-  fun getLine(editor: VimEditor, lastZero: Boolean): Int {
+  public fun getLine(editor: VimEditor, lastZero: Boolean): Int {
     val line = getRangeLine(editor, lastZero)
     return line + offset
   }
 
-  fun getLine(editor: VimEditor, caret: VimCaret, lastZero: Boolean): Int {
+  public fun getLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
     return if (offset == 0) getRangeLine(editor, lastZero) else getRangeLine(editor, caret, lastZero) + offset
   }
 
@@ -50,7 +50,7 @@ sealed class Range(
    */
   protected abstract fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int
 
-  protected abstract fun getRangeLine(editor: VimEditor, caret: VimCaret, lastZero: Boolean): Int
+  protected abstract fun getRangeLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -68,7 +68,7 @@ sealed class Range(
     return result
   }
 
-  companion object {
+  public companion object {
     /**
      * Factory method used to create an appropriate range based on the range text
      *
@@ -78,14 +78,14 @@ sealed class Range(
      * @return The ranges appropriate to the text
      */
     @JvmStatic
-    fun createRange(str: String, offset: Int, move: Boolean): Array<Range>? {
+    public fun createRange(str: String, offset: Int, move: Boolean): Array<Range>? {
       // Current line
       if (str.isEmpty() || str == ".") {
         return arrayOf(LineNumberRange(offset, move))
       } else if (str == "%") {
         return arrayOf(
           LineNumberRange(0, 0, move),
-          LineNumberRange(LineNumberRange.LAST_LINE, offset, move)
+          LineNumberRange(LineNumberRange.LAST_LINE, offset, move),
         )
       } else if (str == "$") {
         return arrayOf(LineNumberRange(LineNumberRange.LAST_LINE, offset, move))
@@ -111,14 +111,14 @@ sealed class Range(
 /**
  * Represents a specific line, the current line, or the last line of a file
  */
-class LineNumberRange : Range {
+public class LineNumberRange : Range {
   /**
    * Create a range for the current line
    *
    * @param offset The range offset
    * @param move   True if cursor should be moved
    */
-  constructor(offset: Int, move: Boolean) : super(offset, move) {
+  public constructor(offset: Int, move: Boolean) : super(offset, move) {
     line = CURRENT_LINE
   }
 
@@ -128,7 +128,7 @@ class LineNumberRange : Range {
    * @param offset The range offset
    * @param move   True if cursor should be moved
    */
-  constructor(line: Int, offset: Int, move: Boolean) : super(offset, move) {
+  public constructor(line: Int, offset: Int, move: Boolean) : super(offset, move) {
     this.line = line
   }
 
@@ -150,7 +150,7 @@ class LineNumberRange : Range {
 
   override fun getRangeLine(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     lastZero: Boolean,
   ): Int {
     line = if (line == LAST_LINE) editor.lineCount() - 1 else caret.getBufferPosition().line
@@ -178,16 +178,16 @@ class LineNumberRange : Range {
 
   private var line: Int
 
-  companion object {
-    const val CURRENT_LINE = -99999999
-    const val LAST_LINE = -99999998
+  public companion object {
+    public const val CURRENT_LINE: Int = -99999999
+    public const val LAST_LINE: Int = -99999998
   }
 }
 
 /**
  * Represents the line specified by a mark
  */
-class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offset, move) {
+public class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offset, move) {
   /**
    * Gets the line number specified by this range without regard to any offset.
    *
@@ -196,11 +196,11 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
    * @return The zero based line number, -1 if there is no such mark set in the file
    */
   override fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int {
-    val mark = injector.markGroup.getFileMark(editor, mark)
+    val mark = injector.markService.getMark(editor.currentCaret(), mark)
     return mark?.line ?: -1
   }
 
-  override fun getRangeLine(editor: VimEditor, caret: VimCaret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
+  override fun getRangeLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
 
   override fun toString(): String = "MarkRange[mark=$mark, ${super.toString()}]"
   override fun equals(other: Any?): Boolean {
@@ -226,7 +226,7 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
  * Represents a range given by a search pattern. The pattern can be '\\/', '\\?', '\\&amp;', /{pattern}/,
  * or ?{pattern}?.  The last two can be repeated 0 or more times after any of the others.
  */
-class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, move) {
+public class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, move) {
   /**
    * Parses the pattern into a list of subpatterns and flags
    *
@@ -285,7 +285,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
 
   override fun getRangeLine(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     lastZero: Boolean,
   ): Int {
     var line = caret.getBufferPosition().line
@@ -343,7 +343,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
   private val patterns: MutableList<String?> = mutableListOf()
   private val directions: MutableList<Direction> = mutableListOf()
 
-  companion object {
+  public companion object {
     private val logger = vimLogger<SearchRange>()
   }
 

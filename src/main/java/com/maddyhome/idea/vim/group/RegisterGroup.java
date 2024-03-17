@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,9 +14,9 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
+import com.maddyhome.idea.vim.state.mode.SelectionType;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +37,10 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 
+  public RegisterGroup() {
+    this.initClipboardOptionListener();
+  }
+
   public void saveData(final @NotNull Element element) {
     logger.debug("Save registers data");
     final Element registersElement = new Element("registers");
@@ -50,7 +54,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       }
       final Element registerElement = new Element("register");
       registerElement.setAttribute("name", String.valueOf(key));
-      registerElement.setAttribute("type", Integer.toString(register.getType().getValue()));
+      registerElement.setAttribute("type", register.getType().name());
       final String text = register.getText();
       if (text != null) {
         logger.trace("Save register as 'text'");
@@ -95,7 +99,25 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         final Register register;
         final Element textElement = registerElement.getChild("text");
         final String typeText = registerElement.getAttributeValue("type");
-        final SelectionType type = SelectionType.fromValue(Integer.parseInt(typeText));
+        SelectionType type;
+        try {
+          type = SelectionType.valueOf(typeText);
+        }
+        catch (IllegalArgumentException e) {
+          // This whole `if` keeps compatibility with the mode when SelectionType had numbers
+          if (Integer.toString(1 << 1).equals(typeText)) {
+            type = SelectionType.CHARACTER_WISE;
+          }
+          else if (Integer.toString(1 << 2).equals(typeText)) {
+            type = SelectionType.LINE_WISE;
+          }
+          else if (Integer.toString(1 << 3).equals(typeText)) {
+            type = SelectionType.BLOCK_WISE;
+          }
+          else {
+            type = SelectionType.CHARACTER_WISE;
+          }
+        }
         if (textElement != null) {
           logger.trace("Register has 'text' element");
           final String text = VimPlugin.getXML().getSafeXmlText(textElement);

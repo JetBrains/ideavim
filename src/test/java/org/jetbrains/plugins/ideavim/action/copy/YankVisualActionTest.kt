@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,15 +12,19 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
+import kotlin.test.assertNotNull
 
 class YankVisualActionTest : VimTestCase() {
+  @Test
   fun `test simple yank`() {
     doTest(
       injector.parser.parseKeys("viw" + "y"),
@@ -32,11 +36,13 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "found", SelectionType.CHARACTER_WISE
+      "found",
+      SelectionType.CHARACTER_WISE,
     )
   }
 
   @VimBehaviorDiffers("\n")
+  @Test
   fun `test yank empty line`() {
     doTest(
       injector.parser.parseKeys("v" + "y"),
@@ -48,11 +54,13 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "", SelectionType.CHARACTER_WISE
+      "",
+      SelectionType.CHARACTER_WISE,
     )
   }
 
   @VimBehaviorDiffers("land\n")
+  @Test
   fun `test yank to the end`() {
     doTest(
       injector.parser.parseKeys("viwl" + "y"),
@@ -64,10 +72,12 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "land", SelectionType.CHARACTER_WISE
+      "land",
+      SelectionType.CHARACTER_WISE,
     )
   }
 
+  @Test
   fun `test yank multicaret`() {
     val text = """
                             A Discovery
@@ -79,39 +89,42 @@ class YankVisualActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     typeText(injector.parser.parseKeys("viw" + "y"))
-    val editor = myFixture.editor.vim
+    val editor = fixture.editor.vim
     val lastRegister = injector.registerGroup.lastRegisterChar
-    val registers = editor.carets().map { it.registerStorage.getRegister(it, lastRegister)?.rawText }
-    assertEquals(listOf("found", "was"), registers)
+    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
+    kotlin.test.assertEquals(listOf("found", "was"), registers)
   }
 
   // todo multicaret
-//  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-//  fun testYankVisualRange() {
-//    val before = """
-//            q${c}werty
-//            asdf${c}gh
-//            ${c}zxcvbn
-//
-//    """.trimIndent()
-//    configureByText(before)
-//    typeText(injector.parser.parseKeys("vey"))
-//
-//    val lastRegister = VimPlugin.getRegister().lastRegister
-//    TestCase.assertNotNull(lastRegister)
-//    val text = lastRegister!!.text
-//    TestCase.assertNotNull(text)
-//
-//    typeText(injector.parser.parseKeys("G" + "$" + "p"))
-//    val after = """
-//      qwerty
-//      asdfgh
-//      zxcvbn
-//      wert${c}yg${c}hzxcvb${c}n
-//    """.trimIndent()
-//    assertState(after)
-//  }
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  @Disabled
+  fun testYankVisualRange() {
+    val before = """
+            q${c}werty
+            asdf${c}gh
+            ${c}zxcvbn
 
+    """.trimIndent()
+    configureByText(before)
+    typeText(injector.parser.parseKeys("vey"))
+
+    val lastRegister = VimPlugin.getRegister().lastRegister
+    assertNotNull<Any>(lastRegister)
+    val text = lastRegister.text
+    assertNotNull<Any>(text)
+
+    typeText(injector.parser.parseKeys("G" + "$" + "p"))
+    val after = """
+      qwerty
+      asdfgh
+      zxcvbn
+      wert${c}yg${c}hzxcvb${c}n
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @Test
   fun `test yank line`() {
     doTest(
       injector.parser.parseKeys("V" + "y"),
@@ -123,10 +136,12 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "I found it in a legendary land\n", SelectionType.LINE_WISE
+      "I found it in a legendary land\n",
+      SelectionType.LINE_WISE,
     )
   }
 
+  @Test
   fun `test yank last line`() {
     doTest(
       injector.parser.parseKeys("V" + "y"),
@@ -138,10 +153,12 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by ${c}the torrent of a mountain pass.
       """.trimIndent(),
-      "hard by the torrent of a mountain pass.\n", SelectionType.LINE_WISE
+      "hard by the torrent of a mountain pass.\n",
+      SelectionType.LINE_WISE,
     )
   }
 
+  @Test
   fun `test yank multicaret line`() {
     val text = """
                             A Discovery
@@ -153,16 +170,17 @@ class YankVisualActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     typeText(injector.parser.parseKeys("V" + "y"))
-    val editor = myFixture.editor.vim
+    val editor = fixture.editor.vim
     val lastRegister = injector.registerGroup.lastRegisterChar
-    val registers = editor.carets().map { it.registerStorage.getRegister(it, lastRegister)?.rawText }
-    assertEquals(
+    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
+    kotlin.test.assertEquals(
       listOf("all rocks and lavender and tufted grass,\n", "hard by the torrent of a mountain pass.\n"),
-      registers
+      registers,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testYankVisualLines() {
     val before = """
             q${c}we
@@ -192,6 +210,7 @@ class YankVisualActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test block yank`() {
     doTest(
       injector.parser.parseKeys("<C-V>lj" + "y"),
@@ -203,10 +222,12 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "fo\nl ", SelectionType.BLOCK_WISE
+      "fo\nl ",
+      SelectionType.BLOCK_WISE,
     )
   }
 
+  @Test
   fun `test block yank with dollar motion`() {
     doTest(
       injector.parser.parseKeys("<C-V>3j$" + "y"),
@@ -224,10 +245,11 @@ class YankVisualActionTest : VimTestCase() {
                     ere it was settled on some sodden sand
                     rd by the torrent of a mountain pass.
       """.trimIndent(),
-      SelectionType.BLOCK_WISE
+      SelectionType.BLOCK_WISE,
     )
   }
 
+  @Test
   fun `test block yank with dollar motion backward`() {
     doTest(
       injector.parser.parseKeys("<C-V>k$" + "y"),
@@ -243,10 +265,11 @@ class YankVisualActionTest : VimTestCase() {
                     found it in a legendary land
                     l rocks and lavender and tufted grass,[ additional symbols]
       """.trimIndent(),
-      SelectionType.BLOCK_WISE
+      SelectionType.BLOCK_WISE,
     )
   }
 
+  @Test
   fun `test yank to numbered register in visual`() {
     doTest(
       injector.parser.parseKeys("ve" + "\"2y"),
@@ -259,10 +282,11 @@ class YankVisualActionTest : VimTestCase() {
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
       "rocks",
-      SelectionType.CHARACTER_WISE
+      SelectionType.CHARACTER_WISE,
     )
   }
 
+  @Test
   fun `test yank to numbered register`() {
     doTest(
       injector.parser.parseKeys("\"2yy"),
@@ -275,7 +299,7 @@ class YankVisualActionTest : VimTestCase() {
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
       "all rocks and lavender and tufted grass,[ additional symbols]\n",
-      SelectionType.LINE_WISE
+      SelectionType.LINE_WISE,
     )
   }
 
@@ -286,7 +310,7 @@ class YankVisualActionTest : VimTestCase() {
     val lastRegister = VimPlugin.getRegister().lastRegister!!
     val text = lastRegister.text
     val type = lastRegister.type
-    assertEquals(expectedText, text)
-    assertEquals(expectedType, type)
+    kotlin.test.assertEquals(expectedText, text)
+    kotlin.test.assertEquals(expectedType, type)
   }
 }

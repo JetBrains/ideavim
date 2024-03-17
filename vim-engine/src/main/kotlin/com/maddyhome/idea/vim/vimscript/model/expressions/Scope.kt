@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions
 
-enum class Scope(val c: String) {
+public enum class Scope(public val c: String) {
 
   BUFFER_VARIABLE("b"),
   WINDOW_VARIABLE("w"),
@@ -17,11 +17,12 @@ enum class Scope(val c: String) {
   LOCAL_VARIABLE("l"),
   SCRIPT_VARIABLE("s"),
   FUNCTION_VARIABLE("a"),
-  VIM_VARIABLE("v");
+  VIM_VARIABLE("v"),
+  ;
 
-  companion object {
-    fun getByValue(s: String): Scope? {
-      return values().firstOrNull { it.c == s }
+  public companion object {
+    public fun getByValue(s: String): Scope? {
+      return entries.firstOrNull { it.c == s }
     }
   }
 

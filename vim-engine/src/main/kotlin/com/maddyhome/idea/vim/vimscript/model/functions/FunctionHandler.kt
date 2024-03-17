@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,17 +17,16 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
-abstract class FunctionHandler {
-
-  abstract val name: String
-  open val scope: Scope? = null
-  abstract val minimumNumberOfArguments: Int?
-  abstract val maximumNumberOfArguments: Int?
-  var ranges: Ranges? = null
+public abstract class FunctionHandler {
+  public lateinit var name: String
+  public open val scope: Scope? = null
+  public abstract val minimumNumberOfArguments: Int?
+  public abstract val maximumNumberOfArguments: Int?
+  public var ranges: Ranges? = null
 
   protected abstract fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
 
-  fun executeFunction(arguments: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  public fun executeFunction(arguments: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     checkFunctionCall(arguments)
     val result = doFunction(arguments, editor, context, vimContext)
     ranges = null

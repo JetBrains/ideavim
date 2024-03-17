@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,8 +12,8 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-object EngineStringHelper {
-  fun toPrintableCharacters(keys: List<KeyStroke>): String {
+public object EngineStringHelper {
+  public fun toPrintableCharacters(keys: List<KeyStroke>): String {
     if (keys.isEmpty()) {
       return ""
     }
@@ -34,7 +34,7 @@ object EngineStringHelper {
    * @return A printable String of the character represented by the KeyStroke
    */
   @JvmStatic
-  fun toPrintableCharacter(key: KeyStroke): String {
+  public fun toPrintableCharacter(key: KeyStroke): String {
     // TODO: Look at 'isprint', 'display' and 'encoding' settings
     var c = key.keyChar
     if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers == 0) {
@@ -63,6 +63,21 @@ object EngineStringHelper {
 }
 
 // https://stackoverflow.com/a/14652763/3124227
-fun String.removeAsciiColorCodes(): String {
+public fun String.removeAsciiColorCodes(): String {
   return this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
+}
+
+internal fun String.indexOfOrNull(char: Char, startIndex: Int = 0): Int? {
+  val index = this.indexOf(char, startIndex)
+  return if (index < 0) null else index
+}
+
+internal fun String.lastIndexOfOrNull(char: Char, startIndex: Int = 0, endIndex: Int = length): Int? {
+  if (startIndex < 0 || endIndex > this.length) return null
+  var i = endIndex - 1
+  while (i >= startIndex) {
+    if (this[i] == char) return i
+    --i
+  }
+  return null
 }

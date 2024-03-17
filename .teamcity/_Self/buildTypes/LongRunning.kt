@@ -1,13 +1,14 @@
 package _Self.buildTypes
 
 import _Self.Constants.LONG_RUNNING_TESTS
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object LongRunning : BuildType({
+object LongRunning : IdeaVimBuildType({
   name = "Long running tests"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
@@ -17,26 +18,29 @@ object LongRunning : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
 
   steps {
     gradle {
-      tasks = "clean testLongRunning"
+      tasks = "clean :tests:long-running-tests:testLongRunning"
       buildFile = ""
       enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
     }
   }
 
   triggers {
     vcs {
-      branchFilter = ""
+      enabled = false
+      branchFilter = "+:<default>"
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
+    schedule {
+      enabled = true
+      schedulingPolicy = daily {
+        hour = 5
+      }
+    }
   }
 })

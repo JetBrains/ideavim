@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -21,14 +21,14 @@ import com.maddyhome.idea.vim.command.OperatorArguments
  *   - [VimActionHandler.SingleExecution]
  *   - [VimActionHandler.ForEachCaret]
  */
-sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerBase(myRunForEachCaret) {
+public sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerBase(myRunForEachCaret) {
   /**
    * This handler executes an action for each caret. That means that if you have 5 carets,
    *   [execute] will be called 5 times.
    * @see [VimActionHandler.SingleExecution] for only one execution.
    */
-  abstract class ForEachCaret : VimActionHandler(true) {
-    abstract fun execute(
+  public abstract class ForEachCaret : VimActionHandler(true) {
+    public abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -42,8 +42,8 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
    *   [execute] will be called 1 time.
    * @see [VimActionHandler.ForEachCaret] for per-caret execution.
    */
-  abstract class SingleExecution : VimActionHandler(false) {
-    abstract fun execute(
+  public abstract class SingleExecution : VimActionHandler(false) {
+    public abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
@@ -51,15 +51,15 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
     ): Boolean
   }
 
-  abstract class ConditionalMulticaret : VimActionHandler(false) {
-    abstract fun runAsMulticaret(
+  public abstract class ConditionalMulticaret : VimActionHandler(false) {
+    public abstract fun runAsMulticaret(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    abstract fun execute(
+    public abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -67,7 +67,7 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    abstract fun execute(
+    public abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
@@ -80,7 +80,7 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     return when (this) {
       is ForEachCaret -> execute(editor, caret, context, cmd, operatorArguments)

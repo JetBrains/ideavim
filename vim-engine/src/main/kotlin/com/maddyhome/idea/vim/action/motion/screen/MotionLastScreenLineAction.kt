@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,8 +7,10 @@
  */
 package com.maddyhome.idea.vim.action.motion.screen
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -31,7 +33,7 @@ L                       To line [count] from bottom of window (default: Last
                         scroll.  E.g. "yL" yanks from the cursor to the last
                         visible line.
  */
-abstract class MotionLastScreenLineActionBase(private val operatorPending: Boolean) :
+public abstract class MotionLastScreenLineActionBase(private val operatorPending: Boolean) :
   MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
@@ -39,7 +41,7 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
 
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
@@ -49,5 +51,8 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
   }
 }
 
-class MotionLastScreenLineAction : MotionLastScreenLineActionBase(false)
-class MotionOpPendingLastScreenLineAction : MotionLastScreenLineActionBase(true)
+@CommandOrMotion(keys = ["L"], modes = [Mode.NORMAL, Mode.VISUAL])
+public class MotionLastScreenLineAction : MotionLastScreenLineActionBase(false)
+
+@CommandOrMotion(keys = ["L"], modes = [Mode.OP_PENDING])
+public class MotionOpPendingLastScreenLineAction : MotionLastScreenLineActionBase(true)

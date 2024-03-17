@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,17 +8,16 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
 // bounds are considered inside corresponding quotes
-fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
-  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACKWARDS)?.second ?: 0
+internal fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
+  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACKWARDS)?.second?.plus(1) ?: 0
   val changes = quoteChanges(chars, begin)
   // TODO: here we need to keep only the latest element in beforePos (if any) and
   //   don't need atAndAfterPos to be eagerly collected
@@ -168,10 +167,9 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
  * case insensitive search, so `\<Work\>` will match `Work` and `work`. But when choosing the same pattern from search
  * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
  */
-fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
-  val sc = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.smartcaseName) &&
-    !ignoreSmartCaseOption
-  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ignorecaseName) && !(sc && containsUpperCase(pattern))
+internal fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
+  val sc = injector.globalOptions().smartcase && !ignoreSmartCaseOption
+  return injector.globalOptions().ignorecase && !(sc && containsUpperCase(pattern))
 }
 
 private fun containsUpperCase(pattern: String): Boolean {

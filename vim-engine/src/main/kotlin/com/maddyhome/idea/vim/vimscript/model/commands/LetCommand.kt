@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,14 +8,16 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
@@ -41,7 +43,8 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 /**
  * see "h :let"
  */
-data class LetCommand(
+@ExCommand(command = "let")
+public data class LetCommand(
   val ranges: Ranges,
   val variable: Expression,
   val operator: AssignmentOperator,
@@ -49,10 +52,10 @@ data class LetCommand(
   val isSyntaxSupported: Boolean,
 ) : Command.SingleExecution(ranges) {
 
-  companion object {
+  private companion object {
     private val logger = vimLogger<LetCommand>()
   }
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -133,7 +136,7 @@ data class LetCommand(
             val from = Integer.parseInt(variable.from?.evaluate(editor, context, this)?.toString() ?: "0")
             val to = Integer.parseInt(
               variable.to?.evaluate(editor, context, this)?.toString()
-                ?: (variableValue.values.size - 1).toString()
+                ?: (variableValue.values.size - 1).toString(),
             )
 
             val expressionValue = expression.evaluate(editor, context, this)
@@ -176,10 +179,13 @@ data class LetCommand(
         if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
+          val option = injector.optionGroup.getOption(variable.optionName)
+            ?: throw exExceptionMessage("E518", variable.originalString)
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
-            Scope.GLOBAL_VARIABLE -> injector.optionService.setOptionValue(OptionScope.GLOBAL, variable.optionName, newValue, variable.originalString)
-            Scope.LOCAL_VARIABLE -> injector.optionService.setOptionValue(OptionScope.LOCAL(editor), variable.optionName, newValue, variable.originalString)
+            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(editor), newValue)
+            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(editor), newValue)
+            null -> injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(editor), newValue)
             else -> throw ExException("Invalid option scope")
           }
         } else {
@@ -197,7 +203,7 @@ data class LetCommand(
               """
               Error during `let ${variable.originalString} ${operator.value} ${expression.originalString}` command execution.
               Could not set register value
-              """.trimIndent()
+              """.trimIndent(),
             )
           }
         } else if (RegisterConstants.VALID_REGISTERS.contains(variable.char)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -26,22 +27,23 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 /**
  * see "h :call"
  */
-class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.SingleExecution(ranges) {
+@ExCommand(command = "cal[l]")
+public class CallCommand(public val ranges: Ranges, public val functionCall: Expression) : Command.SingleExecution(ranges) {
 
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (functionCall is FunctionCallExpression) {
       val function = injector.functionService.getFunctionHandlerOrNull(
         functionCall.scope,
         functionCall.functionName.evaluate(editor, context, vimContext).value,
-        vimContext
+        vimContext,
       )
       if (function != null) {
         if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
           throw ExException(
             "E725: Calling dict function without Dictionary: " +
-              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
+              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext),
           )
         }
         function.ranges = ranges

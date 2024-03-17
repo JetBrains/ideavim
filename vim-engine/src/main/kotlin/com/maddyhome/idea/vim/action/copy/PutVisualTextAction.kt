@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,31 +8,29 @@
 
 package com.maddyhome.idea.vim.action.copy
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.put.PutData
-import java.util.*
 
 /**
  * @author vlan
  */
-sealed class PutVisualTextBaseAction(
+public sealed class PutVisualTextBaseAction(
   private val insertTextBeforeCaret: Boolean,
   private val indent: Boolean,
   private val caretAfterInsertedText: Boolean,
+  private val modifyRegister: Boolean = true,
 ) : VisualOperatorActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeForAllCarets(
     editor: VimEditor,
@@ -48,7 +46,7 @@ sealed class PutVisualTextBaseAction(
     var result = true
     injector.application.runWriteAction {
       caretToPutData.forEach {
-        result = injector.put.putTextForCaret(editor, it.key, context, it.value, true) && result
+        result = injector.put.putTextForCaret(editor, it.key, context, it.value, true, modifyRegister) && result
       }
     }
     return result
@@ -56,12 +54,13 @@ sealed class PutVisualTextBaseAction(
 
   private fun getPutDataForCaret(caret: VimCaret, selection: VimSelection?, count: Int): PutData {
     val lastRegisterChar = injector.registerGroup.lastRegisterChar
-    val register = caret.registerStorage.getRegister(caret, lastRegisterChar)
+    val register = caret.registerStorage.getRegister(lastRegisterChar)
     val textData = register?.let {
       PutData.TextData(
         register.text ?: injector.parser.toPrintableString(register.keys),
         register.type,
-        register.transferableData
+        register.transferableData,
+        register.name,
       )
     }
     val visualSelection = selection?.let { PutData.VisualSelection(mapOf(caret to it), it.type) }
@@ -69,11 +68,20 @@ sealed class PutVisualTextBaseAction(
   }
 }
 
-class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false)
-class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
+@CommandOrMotion(keys = ["P"], modes = [Mode.VISUAL])
+public class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false, modifyRegister = false)
 
-class PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
-class PutVisualTextAfterCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
+@CommandOrMotion(keys = ["p"], modes = [Mode.VISUAL])
+public class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
 
-class PutVisualTextBeforeCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
-class PutVisualTextAfterCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)
+@CommandOrMotion(keys = ["]P", "[P"], modes = [Mode.VISUAL])
+public class PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
+
+@CommandOrMotion(keys = ["[p", "]p"], modes = [Mode.VISUAL])
+public class PutVisualTextAfterCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
+
+@CommandOrMotion(keys = ["gP"], modes = [Mode.VISUAL])
+public class PutVisualTextBeforeCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
+
+@CommandOrMotion(keys = ["gp"], modes = [Mode.VISUAL])
+public class PutVisualTextAfterCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)

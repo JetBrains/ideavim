@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,13 +8,13 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimExOutputPanelService {
-  fun getPanel(editor: VimEditor): VimExOutputPanel
+public interface VimExOutputPanelService {
+  public fun getPanel(editor: VimEditor): VimExOutputPanel
 }
 
-interface VimExOutputPanel {
-  val text: String?
+public interface VimExOutputPanel {
+  public val text: String?
 
-  fun output(text: String)
-  fun clear()
+  public fun output(text: String)
+  public fun clear()
 }

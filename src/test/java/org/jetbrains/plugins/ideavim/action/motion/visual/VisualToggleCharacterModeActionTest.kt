@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,18 +10,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Test
 
 class VisualToggleCharacterModeActionTest : VimTestCase() {
+  @Test
   fun `test vim start after enter visual`() {
     val before = """
             A Discovery
@@ -32,11 +30,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys("v"))
+    typeText("v")
     val startOffset = (before rangeOf "found").startOffset
-    assertEquals(startOffset, myFixture.editor.caretModel.primaryCaret.vimSelectionStart)
+    kotlin.test.assertEquals(startOffset, fixture.editor.caretModel.primaryCaret.vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual with motion`() {
     val before = """
             A Discovery
@@ -47,11 +46,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys("vl"))
+    typeText("vl")
     val startOffset = (before rangeOf "found").startOffset
-    assertEquals(startOffset, myFixture.editor.caretModel.primaryCaret.vimSelectionStart)
+    kotlin.test.assertEquals(startOffset, fixture.editor.caretModel.primaryCaret.vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual multicaret`() {
     val before = """
             A Discovery
@@ -62,13 +62,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys("vl"))
+    typeText("vl")
     val startOffset1 = (before rangeOf "found").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
-    assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
-    assertEquals(startOffset2, myFixture.editor.caretModel.allCarets[1].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset1, fixture.editor.caretModel.allCarets[0].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset2, fixture.editor.caretModel.allCarets[1].vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual multicaret with merge`() {
     val before = """
             A Discovery
@@ -79,13 +80,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys("v2e"))
+    typeText("v2e")
     val startOffset1 = (before rangeOf "legendary").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
-    assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
-    assertEquals(startOffset2, myFixture.editor.caretModel.allCarets[1].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset1, fixture.editor.caretModel.allCarets[0].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset2, fixture.editor.caretModel.allCarets[1].vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual multicaret with merge to left`() {
     val before = """
             A Discovery
@@ -96,13 +98,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys("v2b"))
+    typeText("v2b")
     val startOffset1 = (before rangeOf "legendary").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
-    assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
-    assertEquals(startOffset2, myFixture.editor.caretModel.allCarets[1].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset1, fixture.editor.caretModel.allCarets[0].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset2, fixture.editor.caretModel.allCarets[1].vimSelectionStart)
   }
 
+  @Test
   fun `test enter visual with count`() {
     doTest(
       "1v",
@@ -122,10 +125,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count multicaret`() {
     doTest(
       "1v",
@@ -145,10 +149,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with five count`() {
     doTest(
       "5v",
@@ -168,10 +173,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with 100 count`() {
     doTest(
       "100v",
@@ -191,10 +197,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after visual operation`() {
     doTest(
       listOf("vedx", "1v"),
@@ -214,10 +221,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after visual operation multicaret`() {
     doTest(
       listOf("vedx", "1v"),
@@ -237,10 +245,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after visual operation multiple time`() {
     doTest(
       listOf("vedx", "1v", "<ESC>bb", "1v"),
@@ -260,10 +269,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with double count after visual operation`() {
     doTest(
       listOf("vedx", "2v"),
@@ -283,10 +293,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with ten count after visual operation`() {
     doTest(
       listOf("vedx", "10v"),
@@ -306,10 +317,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with double count after visual operation multiline`() {
     doTest(
       listOf("vjld", "2v"),
@@ -328,10 +340,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     har${c}d${se} by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with ten count after visual operation multiline`() {
     doTest(
       listOf("vjld", "10v"),
@@ -350,10 +363,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     har${c}d${se} by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after multiline visual operation`() {
     doTest(
       listOf("vjld", "1v"),
@@ -372,11 +386,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     whe${c}r${se}e it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @VimBehaviorDiffers(description = "Different caret postion")
+  @Test
   fun `test enter visual with count with dollar motion`() {
     doTest(
       listOf("v\$dj", "1v"),
@@ -404,11 +419,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                   w${s}here it was settled on some sodden sand${c}${se}
                   hard by the torrent of a mountain pass.
               """.trimIndent(),*/
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test enter visual with count with dollar motion and down movement`() {
     // expect to see switches v, $, d, v.
     doTest(
@@ -438,10 +454,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                    w${s}here it was settled on some sodden sand[long line]
                    hard by the torrent of a mountain pass.${c}${se}
                """.trimIndent(),*/
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after line visual operation`() {
     doTest(
       listOf("Vd", "1v"),
@@ -460,10 +477,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${se}where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after line visual operation to line end`() {
     doTest(
       listOf("V3jd3k", "1v"),
@@ -489,11 +507,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
                     ${c}${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test enter visual with count after line visual operation multicaret`() {
     doTest(
       listOf("Vd", "1v"),
@@ -511,10 +530,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${s}${c}where it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with double count after line visual operation`() {
     doTest(
       listOf("Vd", "2v"),
@@ -533,10 +553,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${c}where it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with ten count after line visual operation`() {
     doTest(
       listOf("Vd", "10v"),
@@ -555,11 +576,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     ${c}hard by the torrent of a mountain pass.${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test enter visual with count after line visual operation with dollar motion`() {
     doTest(
       listOf("V\$d", "1v"),
@@ -578,10 +600,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${se}where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after block visual operation`() {
     doTest(
       listOf("<C-V>jld", "1v"),
@@ -601,10 +624,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with count after block visual operation multiple time`() {
     doTest(
       listOf("<C-V>jld", "1v", "<ESC>kh", "1v"),
@@ -624,10 +648,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with double count after block visual operation`() {
     doTest(
       listOf("<C-V>jld", "2v"),
@@ -647,10 +672,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     wh${s}ere${c} ${se}it was settled on some sodden sand
                     ha${s}rd ${c}b${se}y the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with ten count after block visual operation`() {
     doTest(
       listOf("<C-V>jld", "20v"),
@@ -670,10 +696,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     wh${s}ere it was settled on some sodden sa${c}n${se}d[long line]
                     ha${s}rd by the torrent of a mountain pass.${c}${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with dollar motion count after block visual operation`() {
     doTest(
       listOf("<C-V>j\$d2j", "1v"),
@@ -702,10 +729,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                   w${s}here it was settled on some sodden sand[long line${c}]${se}
                   h${s}ard by the torrent of a mountain pass.${c}${se}
               """.trimIndent(),*/
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test selectmode option`() {
     configureByText(
       """
@@ -715,10 +743,10 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
-    typeText(injector.parser.parseKeys("v"))
-    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    enterCommand("set selectmode=cmd")
+    typeText("v")
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.newapi.vim
 /**
  * A collection of hacks to improve the interaction with fancy AppCode templates
  */
-object AppCodeTemplates {
+internal object AppCodeTemplates {
   private val facedAppCodeTemplate = Key.create<IntRange>("FacedAppCodeTemplate")
 
   private const val TEMPLATE_START = "<#T##"
@@ -40,7 +40,7 @@ object AppCodeTemplates {
     private var editor: Editor? = null
 
     override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
 
       val hostEditor = event.dataContext.getData(CommonDataKeys.HOST_EDITOR)
       if (hostEditor != null) {
@@ -49,7 +49,7 @@ object AppCodeTemplates {
     }
 
     override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
-      if (!VimPlugin.isEnabled()) return
+      if (VimPlugin.isNotEnabled()) return
 
       if (ActionManager.getInstance().getId(action) == IdeActions.ACTION_CHOOSE_LOOKUP_ITEM) {
         val myEditor = editor

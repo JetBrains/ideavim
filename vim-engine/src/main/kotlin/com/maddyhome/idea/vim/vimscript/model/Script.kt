@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,11 +10,14 @@ package com.maddyhome.idea.vim.vimscript.model
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
-data class Script(val units: List<Executable> = ArrayList()) : Executable {
+public data class Script(val units: List<Executable> = ArrayList()) : Executable {
   override lateinit var vimContext: VimLContext
+  override lateinit var rangeInScript: TextRange
 
   /**
    * we store the "s:" scope variables and functions here
@@ -38,5 +41,10 @@ data class Script(val units: List<Executable> = ArrayList()) : Executable {
       }
     }
     return latestResult
+  }
+
+  override fun restoreOriginalRange(deletionInfo: DeletionInfo) {
+    super.restoreOriginalRange(deletionInfo)
+    units.forEach { it.restoreOriginalRange(deletionInfo) }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import java.util.*
 
-data class VimString(val value: String) : VimDataType() {
+public data class VimString(val value: String) : VimDataType() {
 
   // todo refactoring
   override fun asDouble(): Double {
@@ -82,5 +82,9 @@ data class VimString(val value: String) : VimDataType() {
 
   override fun unlockVar(depth: Int) {
     this.isLocked = false
+  }
+
+  public companion object {
+    public val EMPTY: VimString = VimString("")
   }
 }

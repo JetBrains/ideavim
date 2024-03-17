@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,12 +8,14 @@
 
 package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.experimentalApi
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import java.util.*
 
 /**
@@ -21,88 +23,95 @@ import java.util.*
  */
 @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 class VimTextObjEntireExtensionTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("textobj-entire")
   }
 
   // |gU| |ae|
+  @Test
   fun testUpperCaseEntireBuffer() {
     doTest("gUae", poem, "<caret>$poemUC")
   }
 
   // |gu| |ae|
+  @Test
   fun testLowerCaseEntireBuffer() {
     doTest("guae", poem, "<caret>$poemLC")
   }
 
   // |c| |ae|
+  @Test
   fun testChangeEntireBuffer() {
-    doTest("cae", poem, "<caret>", VimStateMachine.Mode.INSERT)
+    doTest("cae", poem, "<caret>", Mode.INSERT)
   }
 
   // |d| |ae|
+  @Test
   fun testDeleteEntireBuffer() {
     doTest("dae", poem, "<caret>")
   }
 
   // |y| |ae|
+  @Test
   fun testYankEntireBuffer() {
     doTest("yae", poem, "<caret>$poemNoCaret")
   }
 
   // |gU| |ie|
+  @Test
   fun testUpperCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "gUie",
       "\n  \n \n${poem}\n \n  \n",
-      "\n  \n \n<caret>${poemUC}\n \n  \n"
+      "\n  \n \n<caret>${poemUC}\n \n  \n",
     )
   }
 
   // |gu| |ae|
+  @Test
   fun testLowerCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "guie",
       "\n  \n \n${poem}\n \n  \n",
-      "\n  \n \n<caret>${poemLC}\n \n  \n"
+      "\n  \n \n<caret>${poemLC}\n \n  \n",
     )
   }
 
   // |c| |ae|
+  @Test
   fun testChangeEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "cie",
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>\n\n  \n \n",
-      VimStateMachine.Mode.INSERT
+      Mode.INSERT,
     ) // additional \n because poem ends with a \n
   }
 
+  // |d| |ae|
   @VimBehaviorDiffers(
     originalVimAfter =
     "\n  \n \n<caret>\n\n  \n \n",
-    description = "Our code changes the motion type to linewise, but it should not"
+    description = "Our code changes the motion type to linewise, but it should not",
   )
-  // |d| |ae|
+  @Test
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "die",
       "\n  \n \n${poem}\n  \n \n",
-      if (experimentalApi()) {
-        "\n  \n \n<caret>\n  \n \n"
-      } else {
-        "\n  \n \n<caret>\n\n  \n \n"
-      }
+      "\n  \n \n<caret>\n\n  \n \n",
     ) // additional \n because poem ends with a \n
   }
 
   // |y| |ae|
+  @Test
   fun testYankEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "yie",
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>${poemNoCaret}\n  \n \n"
+      "\n  \n \n<caret>${poemNoCaret}\n  \n \n",
     )
   }
 

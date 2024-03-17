@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -24,17 +24,16 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
-import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.action.change.LazyVimCommand;
+import com.maddyhome.idea.vim.api.NativeAction;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
+import com.maddyhome.idea.vim.api.VimKeyGroupBase;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.key.Node;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
-import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -49,6 +48,7 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -101,9 +101,9 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   @Override
   public void updateShortcutKeysRegistration() {
-    for (Editor editor : HelperKt.localEditors()) {
-      unregisterShortcutKeys(new IjVimEditor(editor));
-      registerRequiredShortcutKeys(new IjVimEditor(editor));
+    for (VimEditor editor : injector.getEditorGroup().getEditors()) {
+      unregisterShortcutKeys(editor);
+      registerRequiredShortcutKeys(editor);
     }
   }
 
@@ -209,46 +209,20 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
   }
 
-  public void registerCommandAction(@NotNull VimActionsInitiator actionHolder) {
-    IjVimActionsInitiator holder = (IjVimActionsInitiator)actionHolder;
-
-    if (!VimPlugin.getPluginId().equals(holder.getBean().getPluginDescriptor().getPluginId())) {
-      logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
-                   "Please create a plugin using `VimExtension`. " +
-                   "Plugin to blame: " +
-                   holder.getBean().getPluginDescriptor().getPluginId());
-      return;
-    }
-
-    Set<List<KeyStroke>> actionKeys = holder.getBean().getParsedKeys();
-    if (actionKeys == null) {
-      final EditorActionHandlerBase action = actionHolder.getInstance();
-      if (action instanceof ComplicatedKeysAction) {
-        actionKeys = ((ComplicatedKeysAction)action).getKeyStrokesSet();
-      }
-      else {
-        throw new RuntimeException("Cannot register action: " + action.getClass().getName());
-      }
-    }
-
-    Set<MappingMode> actionModes = holder.getBean().getParsedModes();
-    if (actionModes == null) {
-      throw new RuntimeException("Cannot register action: " + holder.getBean().getImplementation());
-    }
-
+  public void registerCommandAction(@NotNull LazyVimCommand command) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       initIdentityChecker();
-      for (List<KeyStroke> keys : actionKeys) {
-        checkCommand(actionModes, actionHolder.getInstance(), keys);
+      for (List<KeyStroke> keys : command.getKeys()) {
+        checkCommand(command.getModes(), command, keys);
       }
     }
 
-    for (List<KeyStroke> keyStrokes : actionKeys) {
+    for (List<KeyStroke> keyStrokes : command.getKeys()) {
       registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
 
-      for (MappingMode mappingMode : actionModes) {
-        Node<VimActionsInitiator> node = getKeyRoot(mappingMode);
-        NodesKt.addLeafs(node, keyStrokes, actionHolder);
+      for (MappingMode mappingMode : command.getModes()) {
+        Node<LazyVimCommand> node = getKeyRoot(mappingMode);
+        NodesKt.addLeafs(node, keyStrokes, command);
       }
     }
   }
@@ -256,7 +230,11 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
     for (KeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
+        if (!injector.getApplication().isOctopusEnabled() ||
+            !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
+            !(key.getKeyCode() == KeyEvent.VK_ENTER && key.getModifiers() == 0)) {
+          getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
+        }
       }
     }
   }

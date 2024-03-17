@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,20 +10,23 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 
-class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymodelName, OptionConstants.selectmodeName) {
+@TraceOptions(TestOptionConstants.keymodel, TestOptionConstants.selectmode)
+class MotionShiftDownActionHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test visual down`() {
     doTest(
@@ -44,14 +47,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test visual down twice`() {
     doTest(
@@ -72,14 +75,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 wh${c}e${se}re it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test save column`() {
     doTest(
@@ -100,14 +103,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.[additio${c}n${se}al chars]
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, OptionConstants.selectmode_key)
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
   fun `test select down`() {
     doTest(
@@ -128,14 +131,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, OptionConstants.selectmode_key)
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
   fun `test select down twice`() {
     doTest(
@@ -156,14 +159,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 wh${c}${se}ere it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test char select simple move`() {
     doTest(
@@ -184,15 +187,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test char select move to empty line`() {
     doTest(
@@ -213,15 +215,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test char select move from empty line`() {
     doTest(
@@ -242,15 +243,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test char select move to file end`() {
     doTest(
@@ -271,15 +271,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard ${s}b$c${se}y the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test char select move multicaret`() {
     doTest(
@@ -300,15 +299,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard ${s}b$c${se}y the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test line select simple move`() {
     doTest(
@@ -329,15 +327,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test line select to empty line`() {
     doTest(
@@ -358,15 +355,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test line select from empty line`() {
     doTest(
@@ -387,15 +383,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test line select to file end`() {
     doTest(
@@ -416,15 +411,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 ${s}hard by the ${c}torrent of a mountain pass.$se
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test line select multicaret`() {
     doTest(
@@ -445,15 +439,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 ${se}where it was settled on some sodden sand
                 ${s}hard by the ${c}torrent of a mountain pass.$se
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test block select simple move`() {
     doTest(
@@ -474,15 +467,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test block select to empty line`() {
     doTest(
@@ -503,15 +495,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test block select from empty line`() {
     doTest(
@@ -532,15 +523,14 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test block select to file end`() {
     doTest(
@@ -561,8 +551,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the ${s}t$c${se}orrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 }

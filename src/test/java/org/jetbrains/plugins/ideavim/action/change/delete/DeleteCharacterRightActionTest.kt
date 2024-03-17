@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,9 +10,11 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 // |x|
 class DeleteCharacterRightActionTest : VimTestCase() {
+  @Test
   fun `test delete single character`() {
     val keys = injector.parser.parseKeys("x")
     val before = "I ${c}found it in a legendary land"
@@ -22,6 +24,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test delete multiple characters`() {
     val keys = injector.parser.parseKeys("5x")
     val before = "I ${c}found it in a legendary land"
@@ -31,29 +34,31 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test deletes min of count and end of line`() {
     val keys = injector.parser.parseKeys("20x")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary l${c}and
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary ${c}l
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(before)
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test delete with inlay relating to preceding text`() {
     val keys = injector.parser.parseKeys("x")
     val before = "I f${c}ound it in a legendary land"
@@ -81,6 +86,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     assertVisualPosition(0, 4)
   }
 
+  @Test
   fun `test delete with inlay relating to following text`() {
     // This should have the same behaviour as related to preceding text
     val keys = injector.parser.parseKeys("x")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,32 +8,33 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
+  @Test
   fun `test insert multiple carets`() {
     doTest(
       "IHello<esc>",
       """
-                ${c}A Discovery
+                ${c}Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and ${c}lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consect${c}etur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                Hell${c}oA Discovery
+                Hell${c}oLorem Ipsum
 
-                Hell${c}oI found it in a legendary land
-                Hell${c}oall rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Hell${c}oLorem ipsum dolor sit amet,
+                Hell${c}oconsectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 }

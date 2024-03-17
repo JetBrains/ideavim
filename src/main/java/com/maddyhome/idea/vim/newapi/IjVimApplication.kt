@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -25,7 +25,7 @@ import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
 @Service
-class IjVimApplication : VimApplicationBase() {
+internal class IjVimApplication : VimApplicationBase() {
   override fun isMainThread(): Boolean {
     return ApplicationManager.getApplication().isDispatchThread
   }
@@ -43,6 +43,10 @@ class IjVimApplication : VimApplicationBase() {
     return ApplicationManager.getApplication().isUnitTestMode
   }
 
+  override fun isInternal(): Boolean {
+    return ApplicationManager.getApplication().isInternal
+  }
+
   override fun postKey(stroke: KeyStroke, editor: VimEditor) {
     val component: Component = SwingUtilities.getAncestorOfClass(Window::class.java, editor.ij.component)
     val event = createKeyEvent(stroke, component)
@@ -52,10 +56,6 @@ class IjVimApplication : VimApplicationBase() {
       }
       Toolkit.getDefaultToolkit().systemEventQueue.postEvent(event)
     }
-  }
-
-  override fun localEditors(): List<VimEditor> {
-    return com.maddyhome.idea.vim.helper.localEditors().map { IjVimEditor(it) }
   }
 
   override fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
@@ -82,11 +82,20 @@ class IjVimApplication : VimApplicationBase() {
     com.maddyhome.idea.vim.helper.runAfterGotFocus(runnable)
   }
 
+  override fun isOctopusEnabled(): Boolean {
+    val property = System.getProperty("octopus.handler") ?: "true"
+    if (property.isBlank()) return true
+    return property.toBoolean()
+  }
+
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {
     return KeyEvent(
       component,
       if (stroke.keyChar == KeyEvent.CHAR_UNDEFINED) KeyEvent.KEY_PRESSED else KeyEvent.KEY_TYPED,
-      System.currentTimeMillis(), stroke.modifiers, stroke.keyCode, stroke.keyChar
+      System.currentTimeMillis(),
+      stroke.modifiers,
+      stroke.keyCode,
+      stroke.keyChar,
     )
   }
 

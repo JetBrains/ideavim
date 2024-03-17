@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,10 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class DelfunctionCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test delete existing function`() {
     configureByText("\n")
     typeText(
@@ -23,8 +25,8 @@ class DelfunctionCommandTest : VimTestCase() {
           "function F1() |" +
             "  return 10 |" +
             "endfunction"
-          )
-      )
+          ),
+      ),
     )
     typeText(commandToKeys("delfunction F1"))
     assertPluginError(false)
@@ -34,6 +36,7 @@ class DelfunctionCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test delf`() {
     configureByText("\n")
     typeText(
@@ -42,8 +45,8 @@ class DelfunctionCommandTest : VimTestCase() {
           "function F1() |" +
             "  return 10 |" +
             "endfunction"
-          )
-      )
+          ),
+      ),
     )
     typeText(commandToKeys("delf F1"))
     assertPluginError(false)
@@ -53,6 +56,7 @@ class DelfunctionCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test delete nonexistent function`() {
     configureByText("\n")
     typeText(commandToKeys("delfunction F1"))
@@ -61,6 +65,7 @@ class DelfunctionCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test delete script function from command line context`() {
     configureByText("\n")
     typeText(commandToKeys("delfunction s:F1"))
@@ -69,6 +74,7 @@ class DelfunctionCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test delete nonexistent function with ignoreError flag`() {
     configureByText("\n")
     typeText(commandToKeys("delfunction! F1"))

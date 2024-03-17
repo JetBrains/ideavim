@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,7 +13,7 @@ import javax.swing.KeyStroke
 import javax.swing.text.DefaultEditorKit
 import javax.swing.text.JTextComponent.KeyBinding
 
-object ExKeyBindings {
+internal object ExKeyBindings {
 
   // TODO - add the following keys:
   // Ctrl-\ Ctrl-N - abort
@@ -77,7 +77,7 @@ object ExKeyBindings {
 
       // These appear to be non-Vim shortcuts
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.pasteAction)
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.pasteAction),
     )
   }
 }

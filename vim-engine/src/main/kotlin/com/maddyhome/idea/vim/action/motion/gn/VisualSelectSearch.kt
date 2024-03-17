@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.motion.gn
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -14,16 +16,17 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
 import kotlin.math.max
 
-class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["gn"], modes = [Mode.NORMAL, Mode.VISUAL])
+public class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   override fun getOffset(
@@ -38,7 +41,8 @@ class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-class VisualSelectPreviousSearch : MotionActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["gN"], modes = [Mode.NORMAL, Mode.VISUAL])
+public class VisualSelectPreviousSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   override fun getOffset(
@@ -60,7 +64,7 @@ private fun selectNextSearch(editor: VimEditor, count: Int, forwards: Boolean): 
   if (!editor.inVisualMode) {
     val startOffset = if (forwards) range.startOffset else max(range.endOffset - adj, 0)
     caret.moveToOffset(startOffset)
-    injector.visualMotionGroup.enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE)
   }
   return if (forwards) max(range.endOffset - adj, 0) else range.startOffset
 }

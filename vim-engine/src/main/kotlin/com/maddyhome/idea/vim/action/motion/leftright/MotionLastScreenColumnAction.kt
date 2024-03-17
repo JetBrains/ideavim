@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,43 +7,36 @@
  */
 package com.maddyhome.idea.vim.action.motion.leftright
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
-class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["g$", "g<End>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
-    if (editor.inInsertMode) {
+    if (editor.isInsertionAllowed) {
       allow = true
     } else if (editor.inVisualMode) {
-      val opt = (
-        injector.optionService.getOptionValue(
-          OptionScope.LOCAL(editor),
-          OptionConstants.selectionName
-        ) as VimString
-        ).value
-      if (opt != "old") {
-        allow = true
-      }
+      allow = injector.options(editor).selection != "old"
     }
     val motion = injector.motion.moveCaretToCurrentDisplayLineEnd(editor, caret, allow)
     return when (motion) {

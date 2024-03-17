@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,13 +12,17 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class MotionDownActionTest : VimTestCase() {
+  @Test
   fun `test motion down in visual block mode`() {
     val keys = "<C-V>2kjjj"
     val before = """
@@ -37,9 +41,10 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}e${se}re i|t was settled on some sodden sand
             ha|${s}r${se}d by| the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
   }
 
+  @Test
   fun `test motion down in visual block mode with dollar motion`() {
     val keys = "<C-V>\$jj"
     val before = """
@@ -58,9 +63,68 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
   }
 
+  @Test
+  @Disabled
+  fun `test motion down in visual block mode with dollar motion2`() {
+    val keys = "i<C-O>d<ESC>"
+    val before = """
+            A Discovery
+
+            I |${c}found it in a legendary land
+            al|l rocks and lavender and tufted grass,
+            wh|ere it was settled on some sodden sand[additional Chars]
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val after = """
+            A Discovery
+
+            I |${s}found it in a legendary lan${c}d${se}
+            al|${s}l rocks and lavender and tufted grass${c},${se}
+            wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByTextX("aa.txt", before)
+    typeText(keys)
+//    println("Mode: " + mode())
+//    doTest(keys, before, after, MyMode.VISUAL(SelectionType.BLOCK_WISE))
+  }
+
+  @Test
+  @Disabled
+  fun `test motion down in visual block mode with dollar motion3`() {
+    val keys = "v"
+    val before = """
+            A Discovery
+
+            I |${c}found it in a legendary land
+            al|l rocks and lavender and tufted grass,
+            wh|ere it was settled on some sodden sand[additional Chars]
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val after = """
+            A Discovery
+
+            I |${s}found it in a legendary lan${c}d${se}
+            al|${s}l rocks and lavender and tufted grass${c},${se}
+            wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByTextX("aa.txt", before)
+    typeText(keys)
+    println("register " + this.register("'<"))
+    println("Mode: " + mode())
+    typeText("h")
+    println("register " + this.register("'<"))
+    typeText(":")
+    println("register " + this.register("'<"))
+//    println("Mode: " + mode())
+//    doTest(keys, before, after, MyMode.VISUAL(SelectionType.BLOCK_WISE))
+  }
+
+  @Test
   fun `test last column after line deletion`() {
     val keys = listOf("Vd", "j")
     val before = """
@@ -72,9 +136,10 @@ class MotionDownActionTest : VimTestCase() {
             
             ${c}all rocks and lavender and tufted grass,
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
+  @Test
   fun `test with inlays - move down from line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -86,11 +151,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down to correct column on line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -102,11 +168,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down from line with preceding inlay to line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -118,12 +185,13 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down from long line with inlay to correct column`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -135,11 +203,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavende${c}r
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down from line with inlay and back to correct column`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
@@ -151,11 +220,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavender
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test motion up down without inlays`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
@@ -171,6 +241,7 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - long line moving onto shorter line with inlay before caret`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -182,11 +253,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavende${c}r
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - long line moving onto shorter line with trailing inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -200,12 +272,13 @@ class MotionDownActionTest : VimTestCase() {
             and tufted grass,
     """.trimIndent()
     configureByText(before)
-    val inlayOffset = myFixture.editor.document.getLineEndOffset(1)
-    myFixture.editor.inlayModel.addInlineElement(inlayOffset, HintRenderer("Hello"))
+    val inlayOffset = fixture.editor.document.getLineEndOffset(1)
+    fixture.editor.inlayModel.addInlineElement(inlayOffset, HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down onto line with inlay and back to correct column`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
@@ -217,11 +290,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavender
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test motion to the last empty line`() {
     doTest(
       "j",
@@ -233,7 +307,23 @@ class MotionDownActionTest : VimTestCase() {
             I found it in a legendary land
             ${c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test move on two empty strings`() {
+    doTest(
+      "\$j",
+      """
+            |${c}
+            |
+      """.trimMargin(),
+      """
+            |
+            |${c}
+      """.trimMargin(),
+      Mode.NORMAL(),
     )
   }
 }

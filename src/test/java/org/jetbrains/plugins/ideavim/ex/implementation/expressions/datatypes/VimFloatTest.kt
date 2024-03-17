@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class VimFloatTest {

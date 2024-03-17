@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.ExException
 
-data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
+public data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
 
   override fun asDouble(): Double {
     throw ExException("E728: Using a Dictionary as a Number")

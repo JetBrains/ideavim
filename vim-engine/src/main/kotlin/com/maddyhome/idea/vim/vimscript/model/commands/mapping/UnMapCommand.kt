@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -17,8 +18,9 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 
-data class UnMapCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+@ExCommand(command = "unm[ap],nun[map],vu[nmap],xu[nmap],sunm[ap],ou[nmap],unm[ap],iu[nmap],lu[nmap],cu[nmap]")
+public data class UnMapCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     return if (executeCommand()) ExecutionResult.Success else ExecutionResult.Error
@@ -36,7 +38,7 @@ data class UnMapCommand(val ranges: Ranges, val argument: String, val cmd: Strin
     return true
   }
 
-  companion object {
+  public companion object {
     private val COMMAND_INFOS = arrayOf(
       CommandInfo("unm", "ap", MappingMode.NVO, false),
       CommandInfo("nun", "map", MappingMode.N, false),
@@ -45,7 +47,7 @@ data class UnMapCommand(val ranges: Ranges, val argument: String, val cmd: Strin
       CommandInfo("sunm", "ap", MappingMode.S, false),
       CommandInfo("ou", "nmap", MappingMode.O, false),
       CommandInfo("iu", "nmap", MappingMode.I, false),
-      CommandInfo("cu", "nmap", MappingMode.C, false)
+      CommandInfo("cu", "nmap", MappingMode.C, false),
     )
   }
 }

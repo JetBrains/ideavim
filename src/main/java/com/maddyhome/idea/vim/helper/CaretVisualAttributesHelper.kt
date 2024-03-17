@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,18 +8,28 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.IsReplaceCharListener
+import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import org.jetbrains.annotations.TestOnly
 import java.awt.Color
 
@@ -29,11 +39,11 @@ import java.awt.Color
  * Avoid this if possible - we should be using caret shape based on mode. This is only used for IntelliJ specific
  * behaviour, e.g. handling selection updates during mouse drag.
  */
-fun Caret.forceBarCursor() {
+internal fun Caret.forceBarCursor() {
   editor.caretModel.primaryCaret.visualAttributes = BAR
 }
 
-fun Editor.updateCaretsVisualAttributes() {
+internal fun Editor.updateCaretsVisualAttributes() {
   // In notebooks command mode the caret is hidden
   // Without this if the caret appears inside a cell while it shouldn't
   if (!HandlerInjector.notebookCommandMode(this)) {
@@ -47,46 +57,23 @@ fun Editor.updateCaretsVisualAttributes() {
  *
  * Used when Vim emulation is disabled
  */
-fun Editor.removeCaretsVisualAttributes() {
+internal fun Editor.removeCaretsVisualAttributes() {
   caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
 }
 
-fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
+internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
   GuiCursorOptionHelper.getAttributes(guicursorMode()).type.let {
     it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
   }
 
-object GuicursorChangeListener : OptionChangeListener<VimDataType> {
-  override fun processGlobalValueChange(oldValue: VimDataType?) {
-    AttributesCache.clear()
-    GuiCursorOptionHelper.clearEffectiveValues()
-    localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
+internal object GuicursorChangeListener : EffectiveOptionValueChangeListener {
+  override fun onEffectiveValueChanged(editor: VimEditor) {
+    editor.ij.updatePrimaryCaretVisualAttributes()
   }
 }
 
 private fun Editor.guicursorMode(): GuiCursorMode {
-  if (this.vim.vimStateMachine.isReplaceCharacter) {
-    // Can be true for NORMAL and VISUAL
-    return GuiCursorMode.REPLACE
-  }
-
-  // Note that Vim does not change the caret for SELECT mode and continues to use VISUAL or VISUAL_EXCLUSIVE. IdeaVim
-  // makes much more use of SELECT than Vim does (e.g. it's the default for idearefactormode) so it makes sense for us
-  // to more visually distinguish VISUAL and SELECT. So we use INSERT; a selection and the insert caret is intuitively
-  // the same as SELECT
-  return when (editorMode) {
-    VimStateMachine.Mode.COMMAND -> GuiCursorMode.NORMAL
-    VimStateMachine.Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
-    VimStateMachine.Mode.SELECT -> GuiCursorMode.INSERT
-    VimStateMachine.Mode.INSERT -> GuiCursorMode.INSERT
-    VimStateMachine.Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
-    VimStateMachine.Mode.REPLACE -> GuiCursorMode.REPLACE
-    // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
-    VimStateMachine.Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
-    VimStateMachine.Mode.INSERT_NORMAL -> GuiCursorMode.NORMAL
-    VimStateMachine.Mode.INSERT_VISUAL -> GuiCursorMode.VISUAL
-    VimStateMachine.Mode.INSERT_SELECT -> GuiCursorMode.INSERT
-  }
+  return GuiCursorMode.fromMode(vim.mode, vim.vimStateMachine.isReplaceCharacter)
 }
 
 /**
@@ -98,15 +85,20 @@ private fun Editor.guicursorMode(): GuiCursorMode {
 private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance().isBlockCursor
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
+  if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
 
   // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
-  (this as? EditorEx)?.setCaretVisible(true)
+  // NOTE: At the moment, this causes project leak in tests
+  if (!ApplicationManager.getApplication().isUnitTestMode) {
+    (this as? EditorEx)?.setCaretVisible(true)
+  }
 }
 
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
+  if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
-  val attributes = if (inBlockSubMode) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
+  val attributes = if (this.vim.inBlockSelection) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
   this.caretModel.allCarets.forEach {
     if (it != this.caretModel.primaryCaret) {
       it.visualAttributes = attributes
@@ -119,11 +111,18 @@ private val BLOCK = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NOR
 private val BAR = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
 
 private object AttributesCache {
+  private var lastGuicursorValue = ""
   private val cache = mutableMapOf<GuiCursorMode, CaretVisualAttributes>()
 
   fun getCaretVisualAttributes(editor: Editor): CaretVisualAttributes {
     if (isBlockCursorOverride()) {
       return BLOCK
+    }
+
+    val guicursor = injector.globalOptions().guicursor.value
+    if (lastGuicursorValue != guicursor) {
+      cache.clear()
+      lastGuicursorValue = guicursor
     }
 
     val guicursorMode = editor.guicursorMode()
@@ -138,9 +137,35 @@ private object AttributesCache {
       CaretVisualAttributes(colour, CaretVisualAttributes.Weight.NORMAL, shape, attributes.thickness / 100F)
     }
   }
-
-  fun clear() = cache.clear()
 }
 
 @TestOnly
-fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
+internal fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
+
+public class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener {
+  override fun isReplaceCharChanged(editor: VimEditor) {
+    updateCaretsVisual(editor)
+  }
+
+  override fun modeChanged(editor: VimEditor, oldMode: Mode) {
+    updateCaretsVisual(editor)
+  }
+
+  private fun updateCaretsVisual(editor: VimEditor) {
+    if (injector.globalOptions().ideaglobalmode) {
+      updateAllEditorsCaretsVisual()
+    } else {
+      val ijEditor = (editor as IjVimEditor).editor
+      ijEditor.updateCaretsVisualAttributes()
+      ijEditor.updateCaretsVisualPosition()
+    }
+  }
+
+  public fun updateAllEditorsCaretsVisual() {
+    injector.editorGroup.getEditors().forEach { editor ->
+      val ijEditor = (editor as IjVimEditor).editor
+      ijEditor.updateCaretsVisualAttributes()
+      ijEditor.updateCaretsVisualPosition()
+    }
+  }
+}

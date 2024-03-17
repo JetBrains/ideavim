@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,11 +10,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Elliot Courant
  */
 class DelCmdCommandTest : VimTestCase() {
+  @Test
   fun `test remove alias`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -36,7 +38,7 @@ class DelCmdCommandTest : VimTestCase() {
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
 
     typeText(commandToKeys("command W"))
@@ -46,7 +48,7 @@ class DelCmdCommandTest : VimTestCase() {
       """Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
 
     // Delete one of the aliases and then list all aliases again.
@@ -58,10 +60,11 @@ class DelCmdCommandTest : VimTestCase() {
       """Name        Args       Definition
             |Vs          0          vs
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
   }
 
+  @Test
   fun `test remove non-existant alias`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")

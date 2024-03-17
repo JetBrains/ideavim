@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -94,8 +94,8 @@
  * |CTRL-E|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction}
  * |CTRL-F|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
  * |CTRL-G|               {@link com.maddyhome.idea.vim.action.file.FileGetFileInfoAction}
- * |<BS>|                 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction}
- * |CTRL-H|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction}
+ * |<BS>|                 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction}
+ * |CTRL-H|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction}
  * |<Tab>|                TO BE IMPLEMENTED
  * |CTRL-I|               {@link com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction}
  * |<NL>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction}
@@ -117,7 +117,7 @@
  * |CTRL-]|               {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
  * |CTRL-6|               {@link com.maddyhome.idea.vim.action.file.FilePreviousAction}
  * |CTRL-\CTRL-N|         {@link com.maddyhome.idea.vim.action.ResetModeAction}
- * |<Space>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction}
+ * |<Space>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceAction}
  * |!|                    {@link com.maddyhome.idea.vim.action.change.change.FilterMotionAction}
  * |!!|                   translated to !_
  * |quote|                handled by command key parser
@@ -333,7 +333,7 @@
  * |[m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction}
  * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
- * |[s|                   TO BE IMPLEMENTED
+ * |[s|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordPreviousAction}
  * |[z|                   TO BE IMPLEMENTED
  * |[{|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceOpenAction}
  * |]_CTRL-D|             TO BE IMPLEMENTED
@@ -358,7 +358,7 @@
  * |]m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction}
  * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
- * |]s|                   TO BE IMPLEMENTED
+ * |]s|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordNextAction}
  * |]z|                   TO BE IMPLEMENTED
  * |]}|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction}
  *

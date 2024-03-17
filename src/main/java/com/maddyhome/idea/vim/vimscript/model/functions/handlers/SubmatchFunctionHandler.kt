@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,8 +8,10 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -17,8 +19,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-object SubmatchFunctionHandler : FunctionHandler() {
-  override val name = "submatch"
+@VimscriptFunction(name = "submatch")
+internal class SubmatchFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2
 
@@ -35,5 +37,11 @@ object SubmatchFunctionHandler : FunctionHandler() {
       throw ExException("Sorry, only `submatch(0)` is supported :(")
     }
     return VimString(latestMatch)
+  }
+
+  companion object {
+    fun getInstance(): SubmatchFunctionHandler {
+      return injector.functionService.getBuiltInFunction("submatch") as SubmatchFunctionHandler
+    }
   }
 }

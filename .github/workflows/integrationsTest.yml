@@ -12,6 +12,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
 
     steps:
       - uses: actions/checkout@v2
@@ -29,3 +30,4 @@ jobs:
         run: ./gradlew integrationsTest
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}

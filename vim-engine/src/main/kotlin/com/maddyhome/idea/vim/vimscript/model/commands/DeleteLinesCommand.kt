@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,26 +8,28 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
  * see "h :delete"
  */
-data class DeleteLinesCommand(val ranges: Ranges, var argument: String) : Command.ForEachCaret(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+@ExCommand(command = "d[elete]")
+public data class DeleteLinesCommand(val ranges: Ranges, var argument: String) : Command.ForEachCaret(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun processCommand(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val argument = this.argument
     val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
@@ -41,8 +43,11 @@ data class DeleteLinesCommand(val ranges: Ranges, var argument: String) : Comman
 
     val textRange = getTextRange(editor, caret, true)
     return if (injector.changeGroup
-      .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false, operatorArguments)
-    ) ExecutionResult.Success
-    else ExecutionResult.Error
+        .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false, operatorArguments)
+    ) {
+      ExecutionResult.Success
+    } else {
+      ExecutionResult.Error
+    }
   }
 }

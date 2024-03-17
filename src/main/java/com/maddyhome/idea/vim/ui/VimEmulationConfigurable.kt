@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,15 +9,16 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionToolbarPosition
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.ComboBoxTableRenderer
 import com.intellij.openapi.ui.StripeTable
 import com.intellij.openapi.wm.IdeFocusManager
-import com.intellij.ui.DumbAwareActionButton
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.JBColor
@@ -50,7 +51,7 @@ import javax.swing.table.TableColumn
 /**
  * @author vlan
  */
-class VimEmulationConfigurable : Configurable {
+internal class VimEmulationConfigurable : Configurable {
   private val settingsPanel: VimSettingsPanel by lazy { VimSettingsPanel() }
 
   override fun getDisplayName(): String = message("configurable.name.vim.emulation")
@@ -116,7 +117,7 @@ class VimEmulationConfigurable : Configurable {
         helpLine.text = message(
           "configurable.noneditablehandler.helper.text.with.example",
           (firstPerMode.owner as PerMode).toNotation(),
-          KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null))
+          KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null)),
         )
         helpLine.foreground = UIUtil.getInactiveTextColor()
         add(helpLine, BorderLayout.SOUTH)
@@ -169,7 +170,7 @@ class VimEmulationConfigurable : Configurable {
       return getColumnModel().getColumn(column.index)
     }
 
-    private class ShortcutOwnerRenderer : ComboBoxTableRenderer<ShortcutOwner>(ShortcutOwner.values()) {
+    private class ShortcutOwnerRenderer : ComboBoxTableRenderer<ShortcutOwner>(ShortcutOwner.entries.toTypedArray()) {
       override fun customizeComponent(owner: ShortcutOwner, table: JTable, isSelected: Boolean) {
         super.customizeComponent(owner, table, isSelected)
         if (owner == ShortcutOwner.UNDEFINED) {
@@ -185,13 +186,14 @@ class VimEmulationConfigurable : Configurable {
     private enum class Column(val index: Int, val title: @Nls(capitalization = Nls.Capitalization.Title) String) {
       KEYSTROKE(0, "Shortcut"),
       IDE_ACTION(1, "IDE Action"),
-      OWNER(2, "Handler");
+      OWNER(2, "Handler"),
+      ;
 
       companion object {
         private val ourMembers: MutableMap<Int, Column> = HashMap()
 
         init {
-          for (column in values()) {
+          for (column in entries) {
             ourMembers[column.index] = column
           }
         }
@@ -223,7 +225,7 @@ class VimEmulationConfigurable : Configurable {
       }
 
       override fun getColumnCount(): Int {
-        return Column.values().size
+        return Column.entries.size
       }
 
       override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
@@ -293,18 +295,20 @@ class VimEmulationConfigurable : Configurable {
 
   private class CopyForRcAction(
     private val myModel: VimShortcutConflictsTable.Model,
-  ) : DumbAwareActionButton(
+  ) : DumbAwareAction(
     "Copy Config for .ideavimrc",
     "Copy config for .ideavimrc in sethandler format",
-    AllIcons.Actions.Copy
+    AllIcons.Actions.Copy,
   ) {
 
-    override fun updateButton(e: AnActionEvent) {
+    override fun update(e: AnActionEvent) {
       val enabled: Boolean = myModel.rows.stream().anyMatch {
         it.owner is AllModes && (it.owner as AllModes).owner != ShortcutOwner.UNDEFINED
       }
       e.presentation.isEnabled = enabled
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
     override fun actionPerformed(e: AnActionEvent) {
       val stringBuilder = StringBuilder()
@@ -327,13 +331,15 @@ class VimEmulationConfigurable : Configurable {
   class ResetHandlersAction(
     private val myModel: VimShortcutConflictsTable.Model,
     private val myTable: VimShortcutConflictsTable,
-  ) : DumbAwareActionButton("Reset Handlers", "Reset handlers", AllIcons.General.Reset) {
-    override fun updateButton(e: AnActionEvent) {
+  ) : DumbAwareAction("Reset Handlers", "Reset handlers", AllIcons.General.Reset) {
+    override fun update(e: AnActionEvent) {
       val enabled: Boolean = myModel.rows.stream().anyMatch {
         it.owner is AllModes && (it.owner as AllModes).owner != ShortcutOwner.UNDEFINED
       }
       e.presentation.isEnabled = enabled
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
     override fun actionPerformed(e: AnActionEvent) {
       TableUtil.stopEditing(myTable)

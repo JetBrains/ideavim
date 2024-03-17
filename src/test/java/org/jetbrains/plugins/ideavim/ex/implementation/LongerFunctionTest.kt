@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,7 +8,9 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation
 
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class LongerFunctionTest : VimTestCase() {
   val script = """
@@ -78,32 +80,102 @@ class LongerFunctionTest : VimTestCase() {
       vnoremap u :<C-u>call ToCamelCase()<CR>
       vnoremap U :<C-u>call ToSnakeCase()<CR>
   """.trimIndent()
+  val invert = """
+      " This function replaces the word under caret with it's antonym
+      " e.g. true -> false
+      " e.g. first -> last
+      function! Invert(calledFromVisual)
+        let antonyms = [
+                         \'true', 'false', 'after', 'before', 'start', 'end', 'left', 'right', 'first', 'last',
+                         \'up', 'down', 'min', 'max', 'minimum', 'maximum',
+                         \'True', 'False', 'After', 'Before', 'Start', 'End', 'Left', 'Right', 'First', 'Last',
+                         \'Up', 'Down', 'Min', 'Max', 'Minimum', 'Maximum',
+                       \]
 
-  // todo normal required
-//  fun `test 1`() {
-//    configureByText("""
-//      const val ${c}VERY_IMPORTANT_VALUE = 42
-//    """.trimIndent())
-//    injector.vimscriptExecutor.execute(script)
-//    typeText(injector.parser.parseKeys("veu"))
-//    assertState("""
-//      const val veryImportantValue${c} = 42
-//    """.trimIndent())
-//  }
+        if a:calledFromVisual
+          normal gv"wy
+        else
+          normal "wyiw
+        endif
+        let wordUnderCaret = @w
 
-  // todo normal required
-//  fun `test 2`() {
-//    configureByText("""
-//      val ${c}myCamelCaseValue = "Hi, I'm a simple value"
-//    """.trimIndent())
-//    injector.vimscriptExecutor.execute(script)
-//    typeText(injector.parser.parseKeys("veU"))
-//    assertState("""
-//      val MY_CAMEL_CASE_VALUE${c} = "Hi, I'm a simple value"
-//    """.trimIndent())
-//  }
+        let eraseWord = a:calledFromVisual ? 'gvc' : 'ciw'
+        let count = 0
+        while (count < len(antonyms))
+          if (antonyms[count] ==# wordUnderCaret)
+            let antonym = (count % 2 ==? 0) ? antonyms[count + 1] : antonyms[count - 1]
+            execute 'normal ' .. eraseWord .. antonym
+            break
+          endif
+          let count += 1
+        endwhile
+      endfunction
+      
+      nnoremap ! :call Invert(0)<CR>
+      vnoremap ! :<C-u>call Invert(1)<CR>
+  """.trimIndent()
 
-  // Remove this test when tests above will be uncommented
-  fun `test mock`() {
+  @Test
+  fun `test 1`() {
+    configureByText(
+      """
+      const val ${c}VERY_IMPORTANT_VALUE = 42
+      """.trimIndent(),
+    )
+    executeVimscript(script)
+    typeText(injector.parser.parseKeys("veu"))
+    assertState(
+      """
+      const val veryImportantValu${c}e = 42
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test 2`() {
+    configureByText(
+      """
+      val ${c}myCamelCaseValue = "Hi, I'm a simple value"
+      """.trimIndent(),
+    )
+    executeVimscript(script)
+    typeText(injector.parser.parseKeys("veU"))
+    assertState(
+      """
+      val MY_CAMEL_CASE_VALU${c}E = "Hi, I'm a simple value"
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test invert function in normal mode`() {
+    configureByText(
+      """
+      val myValue = t${c}rue
+      """,
+    )
+    executeVimscript(invert)
+    typeText("!")
+    assertState(
+      """
+      val myValue = fals${c}e
+      """,
+    )
+  }
+
+  @Test
+  fun `test invert function in visual mode`() {
+    configureByText(
+      """
+      val my${c}StartOffset = 10
+      """,
+    )
+    executeVimscript(invert)
+    typeText("vtO!")
+    assertState(
+      """
+      val myEndOffset = 10
+      """,
+    )
   }
 }

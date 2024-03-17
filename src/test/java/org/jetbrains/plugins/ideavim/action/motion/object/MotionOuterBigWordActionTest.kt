@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,13 +8,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionOuterBigWordActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, description = "Wrong caret position, but in real neovim works fine")
+  @Test
   fun `test on last dot`() {
     doTest(
       "<aW",
@@ -30,10 +33,11 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       where it was settled on some sodden sand
       ${c}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test past end in visual`() {
     doTest(
       "v\$aW",
@@ -45,7 +49,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       I found it in a ${s}legendary land
       $c}$se
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,16 +13,14 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * Base class for Vim commands handled by existing IDE actions.
  */
-abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
+internal abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     injector.actionExecutor.executeAction(actionName, context)
-    MotionGroup.scrollCaretIntoView(editor.ij)
+    injector.scroll.scrollCaretIntoView(editor)
     return true
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,148 +8,115 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class MotionPercentOrMatchActionTest : VimTestCase() {
+  @Test
   fun `test percent match simple`() {
     typeTextInFile(
-      injector.parser.parseKeys("%"),
-      "foo(b${c}ar)\n"
+      "%",
+      "foo(b${c}ar)\n",
     )
     assertOffset(3)
   }
 
+  @Test
   fun `test percent match multi line`() {
     typeTextInFile(
-      injector.parser.parseKeys("%"),
-      """foo(bar,
-                     |baz,
-                     |${c}quux)
-               """.trimMargin()
+      "%",
+      """
+        |foo(bar,
+        |baz,
+        |${c}quux)
+      """.trimMargin(),
     )
     assertOffset(3)
   }
 
+  @Test
   fun `test percent visual mode match multi line end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%"),
-      """${c}foo(
-                  |bar)""".trimMargin()
+      "v$%",
+      """
+        |${c}foo(
+        |bar)
+      """.trimMargin(),
     )
     assertOffset(8)
   }
 
+  @Test
   fun `test percent visual mode match from start multi line end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%"),
-      """$c(
-                  |bar)""".trimMargin()
+      "v$%",
+      """
+        |$c(
+        |bar)
+      """.trimMargin(),
     )
     assertOffset(5)
   }
 
+  @Test
   fun `test percent visual mode find brackets on the end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%"),
-      """foo(${c}bar)"""
+      "v$%",
+      """foo(${c}bar)""",
     )
     assertOffset(3)
   }
 
+  @Test
   fun `test percent twice visual mode find brackets on the end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%%"),
-      """foo(${c}bar)"""
+      "v$%%",
+      """foo(${c}bar)""",
     )
     assertOffset(7)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test percent match parens in string`() {
     typeTextInFile(
-      injector.parser.parseKeys("%"),
+      "%",
       """foo(bar, "foo(bar", ${c}baz)
-               """
+               """,
     )
     assertOffset(3)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test percent match xml comment start`() {
     configureByXmlText("$c<!-- foo -->")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("<!-- foo --$c>")
   }
 
+  @Test
   fun `test percent doesnt match partial xml comment`() {
     configureByXmlText("<!$c-- ")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("<!$c-- ")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test percent match xml comment end`() {
     configureByXmlText("<!-- foo --$c>")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("$c<!-- foo -->")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
-  fun `test percent match java comment start`() {
-    configureByJavaText("/$c* foo */")
-    typeText(injector.parser.parseKeys("%"))
-    assertState("/* foo *$c/")
-  }
-
-  fun `test percent doesnt match partial java comment`() {
-    configureByJavaText("$c/* ")
-    typeText(injector.parser.parseKeys("%"))
-    assertState("$c/* ")
-  }
-
-  fun `test percent match java comment end`() {
-    configureByJavaText("/* foo $c*/")
-    typeText(injector.parser.parseKeys("%"))
-    assertState("$c/* foo */")
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  fun `test percent match java doc comment start`() {
-    configureByJavaText("/*$c* foo */")
-    typeText(injector.parser.parseKeys("%"))
-    assertState("/** foo *$c/")
-  }
-
-  fun `test percent match java doc comment end`() {
-    configureByJavaText("/** foo *$c/")
-    typeText(injector.parser.parseKeys("%"))
-    assertState("$c/** foo */")
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
-  fun `test percent doesnt match after comment start`() {
-    configureByJavaText("/*$c foo */")
-    typeText(injector.parser.parseKeys("%"))
-    assertState("/*$c foo */")
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
-  fun `test percent doesnt match before comment end`() {
-    configureByJavaText("/* foo $c */")
-    typeText(injector.parser.parseKeys("%"))
-    assertState("/* foo $c */")
-  }
-
+  @Test
   fun `test motion with quote on the way`() {
     doTest(
       "%",
@@ -171,10 +138,11 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
              }
             $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test motion outside text`() {
     doTest(
       "%",
@@ -194,81 +162,174 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
             ""${'"'}
             )
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test motion in text`() {
     doTest(
-      "%", """ "I found ${c}it in a (legendary) land" """,
-      """ "I found it in a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ "I found ${c}it in a (legendary) land" """,
+      """ "I found it in a (legendary$c) land" """,
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test motion in text with quotes`() {
     doTest(
-      "%", """ "I found ${c}it in \"a (legendary) land" """,
-      """ "I found it in \"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ "I found ${c}it in \"a (legendary) land" """,
+      """ "I found it in \"a (legendary$c) land" """,
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test motion in text with quotes start before quote`() {
     doTest(
-      "%", """ $c "I found it in \"a (legendary) land" """,
-      """  "I found it in \"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ $c "I found it in \"a (legendary) land" """,
+      """  "I found it in \"a (legendary$c) land" """,
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test motion in text with quotes and double escape`() {
     doTest(
-      "%", """ "I found ${c}it in \\\"a (legendary) land" """,
-      """ "I found it in \\\"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ "I found ${c}it in \\\"a (legendary) land" """,
+      """ "I found it in \\\"a (legendary$c) land" """,
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test motion in text with escape (outer forward)`() {
+    doTest(
+      "%",
+      """ debugPrint$c(\(var)) """,
+      """ debugPrint(\(var)$c) """,
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test motion in text with escape (outer backward)`() {
+    doTest(
+      "%",
+      """ debugPrint(\(var)$c) """,
+      """ debugPrint$c(\(var)) """,
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test motion in text with escape (inner forward)`() {
+    doTest(
+      "%",
+      """ debugPrint(\$c(var)) """,
+      """ debugPrint(\(var$c)) """,
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test motion in text with escape (inner backward)`() {
+    doTest(
+      "%",
+      """ debugPrint(\$c(var)) """,
+      """ debugPrint(\(var$c)) """,
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test motion in text with quotes and double escape2`() {
+    doTest(
+      "%",
+      """ "I found ${c}it in a \(legendary\) land" """,
+      """ "I found it in a \(legendary\$c) land" """,
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test deleting with percent motion backward`() {
-    doTest("d%", "(foo bar$c)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("d%", "(foo bar$c)", c, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test deleting with percent motion`() {
-    doTest("d%", "$c(foo bar)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("d%", "$c(foo bar)", c, Mode.NORMAL())
   }
 
+  @Test
   fun `test count percent moves to line as percentage of file height`() {
     configureByLines(100, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(24, 4)
   }
 
+  @Test
   fun `test count percent moves to line as percentage of file height 2`() {
     configureByLines(50, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(12, 4)
   }
 
+  @Test
   fun `test count percent moves to line as percentage of file height 3`() {
     configureByLines(17, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(4, 4)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test count percent keeps same column with nostartline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set nostartofline")
     setPositionAndScroll(0, 0, 14)
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(24, 14)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test count percent handles shorter line with nostartline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("A" + " extra text" + "<Esc>"))
-    typeText(injector.parser.parseKeys("25%"))
+    enterCommand("set nostartofline")
+    typeText("A", " extra text", "<Esc>")
+    typeText("25%")
     assertPosition(24, 33)
+  }
+
+  @Test
+  fun `test percent match with false match in string`() {
+    typeTextInFile(
+      "%",
+      """
+        (a = ")")
+        ${c}(b = ")")
+      """.trimIndent()
+    )
+    assertOffset(18)
+  }
+
+  @Test
+  fun `test percent match with false match in string backwards`() {
+    typeTextInFile(
+      "%",
+      """
+        (a = ")")
+        (b = ")"${c})
+      """.trimIndent()
+    )
+    assertOffset(10)
   }
 }

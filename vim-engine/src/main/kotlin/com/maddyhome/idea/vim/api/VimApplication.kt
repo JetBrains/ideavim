@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,21 +10,21 @@ package com.maddyhome.idea.vim.api
 
 import javax.swing.KeyStroke
 
-interface VimApplication {
-  fun isMainThread(): Boolean
-  fun invokeLater(action: () -> Unit, editor: VimEditor)
-  fun invokeLater(action: () -> Unit)
-  fun isUnitTest(): Boolean
-  fun postKey(stroke: KeyStroke, editor: VimEditor)
+public interface VimApplication {
+  public fun isMainThread(): Boolean
+  public fun invokeLater(action: () -> Unit, editor: VimEditor)
+  public fun invokeLater(action: () -> Unit)
+  public fun isUnitTest(): Boolean
+  public fun isInternal(): Boolean
+  public fun postKey(stroke: KeyStroke, editor: VimEditor)
 
-  fun localEditors(): List<VimEditor>
+  public fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
+  public fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
 
-  fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
-  fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
+  public fun <T> runWriteAction(action: () -> T): T
+  public fun <T> runReadAction(action: () -> T): T
 
-  fun <T> runWriteAction(action: () -> T): T
-  fun <T> runReadAction(action: () -> T): T
-
-  fun currentStackTrace(): String
-  fun runAfterGotFocus(runnable: Runnable)
+  public fun currentStackTrace(): String
+  public fun runAfterGotFocus(runnable: Runnable)
+  public fun isOctopusEnabled(): Boolean
 }

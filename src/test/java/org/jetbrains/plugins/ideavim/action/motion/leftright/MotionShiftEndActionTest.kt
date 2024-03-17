@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,19 +11,24 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 
-class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName, OptionConstants.selectmodeName) {
+@TraceOptions(TestOptionConstants.keymodel, TestOptionConstants.selectmode)
+class MotionShiftEndActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, doesntAffectTest = true),
+    VimOption(TestOptionConstants.selectmode, doesntAffectTest = true),
+  )
   fun `test simple end`() {
     val keys = listOf("<S-End>")
     val before = """
@@ -42,13 +47,13 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test start visual`() {
     val keys = listOf("<S-End>")
@@ -68,13 +73,13 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, OptionConstants.selectmode_key)
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
   fun `test start select`() {
     val keys = listOf("<S-End>")
@@ -94,12 +99,12 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE))
   }
 
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue visual`() {
@@ -121,15 +126,15 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("<S-End>"))
-    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    assertState(Mode.NORMAL())
     typeText(injector.parser.parseKeys("0v" + "<S-End>"))
     assertState(after)
-    assertState(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertState(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue select`() {
@@ -151,9 +156,9 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("<S-End>"))
-    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    assertState(Mode.NORMAL())
     typeText(injector.parser.parseKeys("0gh" + "<S-End>"))
     assertState(after)
-    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
   }
 }

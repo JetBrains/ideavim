@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,12 +11,18 @@ package com.maddyhome.idea.vim.ui
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
+import com.intellij.ide.projectView.ProjectView
+import com.intellij.ide.scratch.ScratchRootType
+import com.intellij.ide.util.PsiNavigationSupport
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
+import com.intellij.openapi.application.impl.LaterInvocator
+import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -30,29 +36,30 @@ import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
+import com.intellij.psi.PsiManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.ui.LafIconLookup
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
 import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.SwingConstants
+import javax.swing.Timer
 
 @NonNls
-const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
-const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
+internal const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
+internal const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
 
-class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
+internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
 
   override fun getId(): String = STATUS_BAR_ICON_ID
 
@@ -63,19 +70,19 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   }
 
   override fun isAvailable(project: Project): Boolean {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusiconName) as VimString).value
-    return ideaStatusIconValue != IjVimOptionService.ideastatusicon_disabled
+    return injector.globalIjOptions().ideastatusicon != IjOptionConstants.ideastatusicon_disabled
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
-    VimPlugin.getOptionService().addListener(
-      IjVimOptionService.ideastatusiconName,
-      object : OptionChangeListener<VimDataType> {
-        override fun processGlobalValueChange(oldValue: VimDataType?) {
-          updateAll()
-        }
-      }
-    )
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(IjOptions.ideastatusicon) { updateAll() }
+
+    // Double update the status bar icon with 5-second delay
+    // There is an issue VIM-3084 that must probably caused by some race between status bar icon initialization
+    //   and .ideavimrc reading. I believe this is a simple fix for it.
+    val timer = Timer(5_000) { updateAll() }
+    timer.isRepeats = false
+    timer.start()
+
     return VimStatusBar()
   }
 
@@ -92,10 +99,10 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
       statusBarWidgetsManager.updateWidget(this)
     }
 
-    updateIcon()
+    Util.updateIcon()
   }
 
-  companion object {
+  object Util {
     fun updateIcon() {
       val projectManager = ProjectManager.getInstanceIfCreated() ?: return
       for (project in projectManager.openProjects) {
@@ -106,7 +113,7 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   }
 }
 
-class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
+internal class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
   override fun ID(): String = STATUS_BAR_ICON_ID
 
@@ -121,8 +128,9 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun getTooltipText() = STATUS_BAR_DISPLAY_NAME
 
   override fun getIcon(): Icon {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusiconName) as VimString).value
-    if (ideaStatusIconValue == IjVimOptionService.ideastatusicon_gray) return VimIcons.IDEAVIM_DISABLED
+    if (injector.globalIjOptions().ideastatusicon == IjOptionConstants.ideastatusicon_gray) {
+      return VimIcons.IDEAVIM_DISABLED
+    }
     return if (VimPlugin.isEnabled()) VimIcons.IDEAVIM else VimIcons.IDEAVIM_DISABLED
   }
 
@@ -138,7 +146,7 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
 }
 
-class VimActions : DumbAwareAction() {
+internal class VimActions : DumbAwareAction(), ActionRemoteBehaviorSpecification.Disabled {
 
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
@@ -158,9 +166,12 @@ private object VimActionsPopup {
     val actions = getActions()
     val popup = JBPopupFactory.getInstance()
       .createActionGroupPopup(
-        STATUS_BAR_DISPLAY_NAME, actions,
-        dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
-        ActionPlaces.POPUP
+        STATUS_BAR_DISPLAY_NAME,
+        actions,
+        dataContext,
+        JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+        false,
+        ActionPlaces.POPUP,
       )
     popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
@@ -175,6 +186,13 @@ private object VimActionsPopup {
     actionGroup.addSeparator()
     actionGroup.add(NotificationService.OpenIdeaVimRcAction(null))
     actionGroup.add(ShortcutConflictsSettings)
+    actionGroup.add(
+      HelpLink(
+        MessageHelper.message("action.plugins"),
+        "https://jb.gg/ideavim-plugins",
+        null,
+      ),
+    )
     actionGroup.addSeparator(MessageHelper.message("action.eap.choice.active.text"))
 
     actionGroup.add(JoinEap)
@@ -182,34 +200,54 @@ private object VimActionsPopup {
       HelpLink(
         MessageHelper.message("action.about.eap.text"),
         "https://github.com/JetBrains/ideavim#get-early-access",
-        null
-      )
+        null,
+      ),
     )
+
+    actionGroup.addSeparator("Learn")
+
+    actionGroup.add(TutorAction())
 
     actionGroup.addSeparator(MessageHelper.message("action.contacts.help.text"))
     actionGroup.add(
       HelpLink(
         MessageHelper.message("action.contact.on.twitter.text"),
         "https://twitter.com/ideavim",
-        VimIcons.TWITTER
-      )
+        VimIcons.TWITTER,
+      ),
     )
     actionGroup.add(
       HelpLink(
         MessageHelper.message("action.create.issue.text"),
-        "https://youtrack.jetbrains.com/issues/VIM",
-        VimIcons.YOUTRACK
-      )
+        "https://youtrack.jetbrains.com/newIssue?project=VIM&description=%0A%0A-----------%0AYou%20can%20improve%20the%20issue%20description%20by%20providing%3A%0A1)%20Your%20%60~%2F.ideavimrc%60%20configuration%20if%20you%20use%20it.%0A2)%20The%20%5Blog%5D(https%3A%2F%2Fintellij-support.jetbrains.com%2Fhc%2Fen-us%2Farticles%2F207241085-Locating-IDE-log-files)%20from%20your%20IDE.%0A%0AVersion:%20${VimPlugin.getVersion()}&c=Affected%20versions%20${VimPlugin.getVersion()}",
+        VimIcons.YOUTRACK,
+      ),
     )
     actionGroup.add(
       HelpLink(
         MessageHelper.message("action.contribute.on.github.text"),
         "https://github.com/JetBrains/ideavim",
-        AllIcons.Vcs.Vendors.Github
-      )
+        AllIcons.Vcs.Vendors.Github,
+      ),
     )
 
     return actionGroup
+  }
+}
+
+private class TutorAction : DumbAwareAction("Tutor") {
+  override fun actionPerformed(e: AnActionEvent) {
+    val project = e.project ?: return
+    val file = ScratchRootType.getInstance()
+      .createScratchFile(project, "Tutor.txt", PlainTextLanguage.INSTANCE, tutor) ?: return
+
+    PsiNavigationSupport.getInstance()
+      .createNavigatable(project, file, 0)
+      .navigate(!LaterInvocator.isInModalContextForProject(project))
+
+    PsiManager.getInstance(project).findFile(file)?.let {
+      ProjectView.getInstance(project).selectPsiElement(it, false)
+    }
   }
 }
 

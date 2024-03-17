@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,10 +14,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.elementType
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
@@ -52,7 +51,7 @@ import java.util.regex.Pattern
  * Port of matchit.vim (https://github.com/chrisbra/matchit)
  * @author Martin Yzeiri (@myzeiri)
  */
-class Matchit : VimExtension {
+internal class Matchit : VimExtension {
 
   override fun getName(): String = "matchit"
 
@@ -74,7 +73,7 @@ class Matchit : VimExtension {
 
     override fun getOffset(
       editor: VimEditor,
-      caret: VimCaret,
+      caret: ImmutableVimCaret,
       context: ExecutionContext,
       argument: Argument?,
       operatorArguments: OperatorArguments,
@@ -91,7 +90,7 @@ class Matchit : VimExtension {
 
   private class MatchitHandler(private val reverse: Boolean) : ExtensionHandler {
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val commandState = editor.vimStateMachine
       val count = commandState.commandBuilder.count
 
@@ -100,7 +99,7 @@ class Matchit : VimExtension {
 
       // Normally we want to jump to the start of the matching pair. But when moving forward in operator
       // pending mode, we want to include the entire match. isInOpPending makes that distinction.
-      val isInOpPending = commandState.isOperatorPending
+      val isInOpPending = commandState.isOperatorPending(editor.mode)
 
       if (isInOpPending) {
         val matchitAction = MatchitAction()
@@ -111,13 +110,15 @@ class Matchit : VimExtension {
           Argument(
             Command(
               count,
-              matchitAction, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java)
-            )
-          )
+              matchitAction,
+              Command.Type.MOTION,
+              EnumSet.noneOf(CommandFlags::class.java),
+            ),
+          ),
         )
       } else {
-        editor.forEachCaret { caret ->
-          VimPlugin.getMark().saveJumpLocation(editor)
+        editor.sortedCarets().forEach { caret ->
+          injector.jumpService.saveJumpLocation(editor)
           caret.moveToOffset(getMatchitOffset(editor.ij, caret.ij, count, isInOpPending, reverse))
         }
       }
@@ -154,7 +155,7 @@ private data class LanguagePatterns(
       this.openings + newLanguagePatterns.openings,
       this.closings + newLanguagePatterns.closings,
       this.reversedOpenings + newLanguagePatterns.reversedOpenings,
-      this.reversedClosings + newLanguagePatterns.reversedClosings
+      this.reversedClosings + newLanguagePatterns.reversedClosings,
     )
   }
 
@@ -162,8 +163,8 @@ private data class LanguagePatterns(
   // back references, should be built with the default constructor.
   companion object {
     operator fun invoke(openingPattern: String, closingPattern: String): LanguagePatterns {
-      val openingPatternsTable = mapOf(openingPattern to Pair(openingPattern, closingPattern))
-      val closingPatternsTable = mapOf(closingPattern to Pair(openingPattern, closingPattern))
+      val openingPatternsTable = linkedMapOf(openingPattern to Pair(openingPattern, closingPattern))
+      val closingPatternsTable = linkedMapOf(closingPattern to Pair(openingPattern, closingPattern))
       return LanguagePatterns(openingPatternsTable, closingPatternsTable)
     }
 
@@ -171,16 +172,16 @@ private data class LanguagePatterns(
       val openingAndMiddlePatterns = "(?:$openingPattern)|(?:$middlePattern)"
       val middleAndClosingPatterns = "(?:$middlePattern)|(?:$closingPattern)"
 
-      val openings = mapOf(openingAndMiddlePatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
-      val closings = mapOf(closingPattern to Pair(openingPattern, closingPattern))
+      val openings = linkedMapOf(openingAndMiddlePatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
+      val closings = linkedMapOf(closingPattern to Pair(openingPattern, closingPattern))
 
       // Supporting the g% motion is just a matter of rearranging the patterns table.
       // This particular arrangement relies on our checking if the cursor is on a closing pattern first.
-      val reversedOpenings = mapOf(
+      val reversedOpenings = linkedMapOf(
         openingPattern to Pair(openingPattern, closingPattern),
-        middlePattern to Pair(openingAndMiddlePatterns, middlePattern)
+        middlePattern to Pair(openingAndMiddlePatterns, middlePattern),
       )
-      val reversedClosings = mapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
+      val reversedClosings = linkedMapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
 
       return LanguagePatterns(openings, closings, reversedOpenings, reversedClosings)
     }
@@ -199,7 +200,7 @@ private data class MatchitSearchParams(
   // If the cursor is not in a comment, then we want to ignore any matches found in comments.
   // But if we are in comment, then we only want to match on things in comments. The same goes for quotes.
   val skipComments: Boolean,
-  val skipStrings: Boolean
+  val skipStrings: Boolean,
 )
 
 /**
@@ -216,10 +217,14 @@ private object FileTypePatterns {
 
     return if (fileTypeName in htmlLikeFileTypes) {
       this.htmlPatterns
+    } else if (fileTypeName == "JAVA" || fileExtension == "java") {
+      this.javaPatterns
     } else if (fileTypeName == "Ruby" || fileExtension == "rb") {
       this.rubyPatterns
     } else if (fileTypeName == "RHTML" || fileExtension == "erb") {
       this.rubyAndHtmlPatterns
+    } else if (fileTypeName == "PHP" || fileExtension == "php") {
+      this.phpPatterns
     } else if (fileTypeName == "C++" || fileTypeName == "C#" || fileTypeName == "ObjectiveC" || fileExtension == "c") {
       // "C++" also covers plain C.
       this.cPatterns
@@ -233,35 +238,47 @@ private object FileTypePatterns {
   }
 
   private val htmlLikeFileTypes = setOf(
-    "HTML", "XML", "XHTML", "JSP", "JavaScript", "JSX Harmony", "TypeScript", "TypeScript JSX", "Vue.js", "Handlebars/Mustache"
+    "HTML", "XML", "XHTML", "JSP", "JavaScript", "JSX Harmony",
+    "TypeScript", "TypeScript JSX", "Vue.js", "Handlebars/Mustache",
+    "Asp", "Razor", "UXML", "Xaml",
   )
 
   private val htmlPatterns = createHtmlPatterns()
+  private val javaPatterns = createJavaPatterns()
   private val rubyPatterns = createRubyPatterns()
   private val rubyAndHtmlPatterns = rubyPatterns + htmlPatterns
+  private val phpPatterns = createPhpPatterns()
   private val cPatterns = createCPatterns()
   private val gnuMakePatterns = createGnuMakePatterns()
   private val cMakePatterns = createCMakePatterns()
 
-  private fun createHtmlPatterns(): LanguagePatterns {
-    // A tag name may contain any characters except slashes, whitespace, and angle brackets.
-    // We surround the tag name in a capture group so that we can use it when searching for a match later.
-    val tagNamePattern = "([^/\\s><]+)"
+  private fun createHtmlPatterns(tagNamePattern: String = "[^/\\s><]+"): LanguagePatterns {
+    // By default, a tag name may contain any characters except slashes, whitespace, and angle brackets.
+    // A custom tagNamePattern can be provided if we need to interop with other languages.
 
     // An opening tag consists of "<" followed by a tag name and optionally some additional text after whitespace.
+    // We surround the tag name in a capture group so that we can use it when searching for a match later.
     // Note the assertion on "<" to not match on that character. If the cursor is on an angle bracket, then we want to
     // match angle brackets, not HTML tags.
-    val openingTagPattern = String.format("(?<=<)%s(?:\\s[^<>]*(\".*\")?)?", tagNamePattern)
+    val openingTagPattern = String.format("(?<=<)(%s)(?:\\s[^<>]*(\".*\")?)?", tagNamePattern)
 
     // A closing tag consists of a "<" followed by a slash, the tag name, and a ">".
-    val closingTagPattern = String.format("(?<=<)/%s(?=>)", tagNamePattern)
+    val closingTagPattern = String.format("(?<=<)/(%s)(?=>)", tagNamePattern)
 
     // The tag name is left as %s so we can substitute the back reference we captured.
-    val htmlSearchPair = Pair("(?<=<)%s(?:\\s[^<>]*(\".*\")?)?", "(?<=<)/%s>")
+    val htmlSearchPair = Pair("(?<=<)%s(?:\\s[^<>]*(\".*\")?)?(?=>)", "(?<=<)/%s>")
 
     return (
       LanguagePatterns("<", ">") +
-        LanguagePatterns(mapOf(openingTagPattern to htmlSearchPair), mapOf(closingTagPattern to htmlSearchPair))
+        LanguagePatterns(linkedMapOf(openingTagPattern to htmlSearchPair), linkedMapOf(closingTagPattern to htmlSearchPair))
+      )
+  }
+  
+  private fun createJavaPatterns(): LanguagePatterns {
+    return (
+        LanguagePatterns("\\b(?<!else\\s+)if\\b", "\\belse\\s+if\\b", "\\belse(?!\\s+if)\\b") +
+          LanguagePatterns("\\bdo\\b", "\\bwhile\\b") +
+          LanguagePatterns("\\btry\\b", "\\bcatch\\b", "\\bfinally\\b")
       )
   }
 
@@ -283,6 +300,26 @@ private object FileTypePatterns {
     return (
       LanguagePatterns(blockCommentStart, blockCommentEnd) +
         LanguagePatterns(openingKeywords, middleKeywords, endKeyword)
+      )
+  }
+
+  private fun createPhpPatterns(): LanguagePatterns {
+    // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/php.vim
+    val loopOpenings = "(?:\\b(?:for|do|foreach|switch)\\b)|(?:\\bwhile \\(.*?\\)\\s*:)"
+    val loopClosings = "(?:\\bend(?:for|foreach|while|switch)\\b)|(?:\\bwhile \\(.*\\)\\s*;)"
+
+    val openingDoc = "(?<=<<<)\\s*'?(\\w+)'?"
+    val closingDoc = "^\\s*(\\w+)\\s*[,;]"
+    val docSearchPair = Pair("(?<=<<<)\\s*'?%s'?", "%s") // %s for the captured doc string name.
+    val docPatterns = LanguagePatterns(linkedMapOf(openingDoc to docSearchPair), linkedMapOf(closingDoc to docSearchPair))
+
+    return (
+      LanguagePatterns("(?<=<)\\?(?:php|=)?", "\\?>") +
+        LanguagePatterns("<(?=\\?(?:php|=)?)", "\\?>") +
+        LanguagePatterns("\\bif\\b", "\\b(?:else|elseif)\\b", "\\bendif\\b") +
+        LanguagePatterns(loopOpenings, "\\b(?:case|break|continue)\\b", loopClosings) +
+        docPatterns +
+        createHtmlPatterns("[^/\\s><?]+") // Exclude question marks from tag names.
       )
   }
 
@@ -327,37 +364,45 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
   }
 
   val currentChar = editor.document.charsSequence[caretOffset]
-  var motion = -1
+  var motionOffset: Int? = null
 
   if (count > 0) {
     // Matchit doesn't affect the percent motion, so we fall back to the default behavior.
-    motion = VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count)
+    motionOffset = VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count)
   } else {
     // Check the simplest case first.
     if (DEFAULT_PAIRS.contains(currentChar)) {
-      motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim)
+      motionOffset = getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim))
     } else {
       val matchitPatterns = FileTypePatterns.getMatchitPatterns(virtualFile)
       if (matchitPatterns != null) {
-        motion = if (reverse) {
+        motionOffset = if (reverse) {
           findMatchingPair(editor, caretOffset, isInOpPending, matchitPatterns.reversedOpenings, matchitPatterns.reversedClosings)
         } else {
           findMatchingPair(editor, caretOffset, isInOpPending, matchitPatterns.openings, matchitPatterns.closings)
         }
       }
 
-      if (motion < 0) {
+      if (motionOffset == null || motionOffset < 0) {
         // Use default motion if the file type isn't supported or we didn't find any extended pairs.
-        motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim)
+        motionOffset = getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim))
       }
     }
   }
 
-  if (motion >= 0) {
-    motion = editor.vim.normalizeOffset(motion, false)
+  if (motionOffset != null && motionOffset >= 0) {
+    motionOffset = editor.vim.normalizeOffset(motionOffset, false)
   }
 
-  return motion
+  return motionOffset ?: -1
+}
+
+private fun getMotionOffset(motion: Motion): Int? {
+  return when (motion) {
+    is Motion.AbsoluteOffset -> motion.offset
+    is Motion.AdjustedOffset -> motion.offset
+    is Motion.Error, is Motion.NoMotion -> null
+  }
 }
 
 private fun findMatchingPair(
@@ -365,7 +410,7 @@ private fun findMatchingPair(
   caretOffset: Int,
   isInOpPending: Boolean,
   openings: PatternsTable,
-  closings: PatternsTable
+  closings: PatternsTable,
 ): Int {
   // For better performance, we limit our search to the current line. This way we don't have to scan the entire file
   // to determine if we're on a pattern or not. The original plugin behaves the same way.
@@ -419,6 +464,17 @@ private fun findMatchingPair(
   }
 
   if (closestSearchPair != null) {
+    val initialPatternStart = currentLineStart + closestMatchStart
+    val initialPatternEnd = currentLineStart + closestMatchEnd
+
+    val initialPsiElement = PsiHelper.getFile(editor)!!.findElementAt(initialPatternStart)
+    if (isGlobalSkippedElement(initialPsiElement)) {
+      // Check if the element is one to always ignore, regardless of the cursor position.
+      // In Ruby, however, we still want to jump if the cursor is on e.g. a "do" after an "if", but that "do" should be
+      // ignored when the cursor is on "if".
+      return -1
+    }
+
     val targetOpeningPattern: String
     val targetClosingPattern: String
 
@@ -431,14 +487,8 @@ private fun findMatchingPair(
       targetClosingPattern = closestSearchPair.second
     }
 
-    // HTML attributes are a special case where the cursor is inside of quotes, but we want to jump as if we were
-    // anywhere else inside the opening tag.
-    val currentPsiElement = PsiHelper.getFile(editor)!!.findElementAt(caretOffset)
-    val skipComments = !isComment(currentPsiElement)
-    val skipQuotes = !isQuoted(currentPsiElement) || isHtmlAttribute(currentPsiElement)
-
-    val initialPatternStart = currentLineStart + closestMatchStart
-    val initialPatternEnd = currentLineStart + closestMatchEnd
+    val skipComments = !isComment(initialPsiElement)
+    val skipQuotes = !isQuoted(initialPsiElement)
     val searchParams = MatchitSearchParams(initialPatternStart, initialPatternEnd, targetOpeningPattern, targetClosingPattern, skipComments, skipQuotes)
 
     val matchingPairOffset = if (direction == Direction.FORWARDS) {
@@ -557,13 +607,15 @@ private fun containsDefaultPairs(chars: CharSequence): Boolean {
   return false
 }
 
+private fun getElementType(psiElement: PsiElement?): String? {
+  return psiElement?.node?.elementType?.debugName
+}
+
 private fun matchShouldBeSkipped(editor: Editor, offset: Int, skipComments: Boolean, skipStrings: Boolean): Boolean {
   val psiFile = PsiHelper.getFile(editor)
   val psiElement = psiFile!!.findElementAt(offset)
 
-  // TODO: as we add support for more languages, we should store the ignored keywords for each language in its own
-  //  data structure. The original plugin stores that information in strings called match_skip.
-  if (isSkippedRubyKeyword(psiElement)) {
+  if (isSkippedRubyElement(psiElement) || isGlobalSkippedElement(psiElement)) {
     return true
   }
 
@@ -573,14 +625,22 @@ private fun matchShouldBeSkipped(editor: Editor, offset: Int, skipComments: Bool
     (skipStrings && insideQuotes) || (!skipStrings && !insideQuotes)
 }
 
-private fun isSkippedRubyKeyword(psiElement: PsiElement?): Boolean {
-  // In Ruby code, we want to ignore anything inside of a regular expression like "/ class /" and identifiers like
-  // "Foo.class". Matchit also ignores any "do" keywords that follow a loop or an if condition, as well as any inline
-  // "if" and "unless" expressions (a.k.a conditional modifiers).
-  val elementType = psiElement?.node?.elementType?.debugName
+private fun isSkippedRubyElement(psiElement: PsiElement?): Boolean {
+  // We want to ignore "do" keywords after conditions, any inline "if" or "unless" expressions, regex strings,
+  // and identifiers like "Foo.class",
+  val type = getElementType(psiElement)
+  return type == "do_cond" || type == "if modifier" || type == "unless modifier" ||
+    type == "regexp content" || type == "identifier"
+}
 
-  return elementType == "do_cond" || elementType == "if modifier" || elementType == "unless modifier" ||
-    elementType == "regexp content" || elementType == "identifier"
+private fun isGlobalSkippedElement(psiElement: PsiElement?): Boolean {
+  val type = getElementType(psiElement)
+  val parentType = getElementType(psiElement?.parent)
+
+  // JavaScript: Ignore regex strings, arrow functions, and angle brackets used for comparisons.
+  return type == "REGEXP_LITERAL" || type == "EQGT" || parentType == "BINARY_EXPRESSION" ||
+    // PHP: Ignore arrow functions and comparison brackets.
+    type == "arrow" || parentType == "Relational expression"
 }
 
 private fun isComment(psiElement: PsiElement?): Boolean {
@@ -588,12 +648,7 @@ private fun isComment(psiElement: PsiElement?): Boolean {
 }
 
 private fun isQuoted(psiElement: PsiElement?): Boolean {
-  val elementType = psiElement?.elementType?.debugName
-  return elementType == "STRING_LITERAL" || elementType == "XML_ATTRIBUTE_VALUE_TOKEN" ||
-    elementType == "string content" // Ruby specific.
-}
-
-private fun isHtmlAttribute(psiElement: PsiElement?): Boolean {
-  val elementType = psiElement?.elementType?.debugName
-  return elementType == "XML_ATTRIBUTE_VALUE_TOKEN"
+  val type = getElementType(psiElement)
+  return type == "STRING_LITERAL" || type == "XML_ATTRIBUTE_VALUE_TOKEN" ||
+    type == "string content" // Ruby specific.
 }

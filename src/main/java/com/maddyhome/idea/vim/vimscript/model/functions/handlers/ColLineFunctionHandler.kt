@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,30 +8,28 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 // TODO: 03.08.2021 Support second parameter
-object LineFunctionHandler : FunctionHandler() {
-
-  override val name = "line"
+@VimscriptFunction(name = "line")
+internal class LineFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2
 
@@ -46,9 +44,8 @@ object LineFunctionHandler : FunctionHandler() {
   }
 }
 
-object ColFunctionHandler : FunctionHandler() {
-
-  override val name = "col"
+@VimscriptFunction(name = "col")
+internal class ColFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 
@@ -69,7 +66,7 @@ private fun currentCol(editor: VimEditor): VimInt {
 
   // If virtualedit is set, the col is one more
   // XXX Should we also check the current mode?
-  if ((VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.virtualeditName) as VimString).value.isNotEmpty()) {
+  if (injector.options(editor).virtualedit.isNotEmpty()) {
     lineLength += 1
   }
 
@@ -122,7 +119,8 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
 
   // Mark
   if (name.length >= 2 && name[0] == '\'') {
-    val mark = VimPlugin.getMark().getMark(editor, name[1]) ?: return null
+    // todo make it multicaret
+    val mark = injector.markService.getMark(editor.primaryCaret(), name[1]) ?: return null
     val markLogicalLine = (mark.line + 1).asVimInt()
     val markLogicalCol = (mark.col + 1).asVimInt()
     return markLogicalLine to markLogicalCol

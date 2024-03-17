@@ -23,16 +23,212 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## End of changelog file maintenance
+
+Since version 2.9.0, the changelog can be found on YouTrack
+
+To Be Released: https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20
+Latest Fixes: https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20updated%20
+
+## 2.9.0, 2024-02-20
+
+### Fixes:
+* [VIM-3055](https://youtrack.jetbrains.com/issue/VIM-3055) Fix the issue with double deleting after dot
+
+### Merged PRs:
+* [805](https://github.com/JetBrains/ideavim/pull/805) by [chylex](https://github.com/chylex): VIM-3238 Fix recording a macro that replays another macro
+
+## 2.8.0, 2024-01-30
+
+### Fixes:
+* [VIM-3130](https://youtrack.jetbrains.com/issue/VIM-3130) Change the build version to 2023.1.2
+* [VIM-3168](https://youtrack.jetbrains.com/issue/VIM-3168) Do not switch to block caret after enter if the IdeaVim is disabled
+* [VIM-3165](https://youtrack.jetbrains.com/issue/VIM-3165) Do not process enter key as IdeaVim shortcut if it's not an actual keypress
+* [VIM-3159](https://youtrack.jetbrains.com/issue/VIM-3159) Shift-enter now works in normal mode again
+* [VIM-3157](https://youtrack.jetbrains.com/issue/VIM-3157) Do not invoke enter in invokeLater for python console
+* [VIM-3195](https://youtrack.jetbrains.com/issue/VIM-3195) Fix escape in injected editor
+* [VIM-3190](https://youtrack.jetbrains.com/issue/VIM-3190) Do not use octopus handler if the enter key is used with modifiers like shift or control
+* [VIM-3203](https://youtrack.jetbrains.com/issue/VIM-3203) Split action not works in normal mode
+* [VIM-3184](https://youtrack.jetbrains.com/issue/VIM-3184) Revert "VIM-3184: Temporally disable new handlers for the thin client"
+* [VIM-3186](https://youtrack.jetbrains.com/issue/VIM-3186) Do not multiply the enter action by the amount of carets
+* [VIM-3177](https://youtrack.jetbrains.com/issue/VIM-3177) Formatting of commit message works again
+* [VIM-1611](https://youtrack.jetbrains.com/issue/VIM-1611) actions related to resolving conflicts doesn't seem to work
+* [VIM-3204](https://youtrack.jetbrains.com/issue/VIM-3204) Add checker that verifies the configuratin of the keymap
+* [VIM-3084](https://youtrack.jetbrains.com/issue/VIM-3084) Double update for the status bar icon
+* [VIM-3176](https://youtrack.jetbrains.com/issue/VIM-3176) Reselecting visual selection after pasting above it select wrong lines
+* [VIM-3206](https://youtrack.jetbrains.com/issue/VIM-3206) Disable both copilot suggestion and insert mode on a single escape
+* [VIM-3090](https://youtrack.jetbrains.com/issue/VIM-3090) Cmd line mode saves the visual mode
+* [VIM-3085](https://youtrack.jetbrains.com/issue/VIM-3085) Open access to VimTypedActionHandler and VimShortcutKeyAction
+* [VIM-3260](https://youtrack.jetbrains.com/issue/VIM-3260) Processing the offsets at the file end
+* [VIM-3183](https://youtrack.jetbrains.com/issue/VIM-3183) Execute .ideavimrc on pooled thread
+
+### Merged PRs:
+* [763](https://github.com/JetBrains/ideavim/pull/763) by [Sam Ng](https://github.com/samabcde): Fix(VIM-3176) add test for restore selection after pasting in/below s…
+* [772](https://github.com/JetBrains/ideavim/pull/772) by [chylex](https://github.com/chylex): Prevent code completion popup from appearing after running a macro
+* [787](https://github.com/JetBrains/ideavim/pull/787) by [Leonid Danilov](https://github.com/Infonautica): Added "Which-Key" to Plugins
+* [778](https://github.com/JetBrains/ideavim/pull/778) by [lippfi](https://github.com/lippfi): Showmode
+* [788](https://github.com/JetBrains/ideavim/pull/788) by [Matt Ellis](https://github.com/citizenmatt): Refactor VimOptionGroupBase
+
+## 2.7.0, 2023-11-07
+
+### Fixes:
+* [VIM-2933](https://youtrack.jetbrains.com/issue/VIM-2933) Reloading/sourcing .ideavimrc does not initialize new plugins
+* [VIM-3138](https://youtrack.jetbrains.com/issue/VIM-3138) Do not try to register disposer if the caret is already disposed
+
+### Merged PRs:
+* [734](https://github.com/JetBrains/ideavim/pull/734) by [Matt Ellis](https://github.com/citizenmatt): Support `~/` on Windows
+* [736](https://github.com/JetBrains/ideavim/pull/736) by [chylex](https://github.com/chylex): Fix(VIM-2933): Reloading/sourcing .ideavimrc does not initialize new plugins
+
+## 2.6.3, 2023-10-30
+
+### Changes:
+- 2.6.0 and 2.6.1 releases are broken. Version 2.6.3 reverts IdeaVim plugin to the working state as for 2.5.1.
+
+## 2.6.0, 2023-10-27
+
+This version of IdeaVim contains a lot of issues. Version 2.6.3 reverts these changes.
+
+### Features:
+
+* `ShowHoverInfo` action can be used in mappings to open a tooltip that is shown by
+  mouse hovering | [VIM-2106](https://youtrack.jetbrains.com/issue/VIM-2106)
+* `has` Vim Script function supports the most common OS checks: win32, win64, linux, mac, macunix, osx, osxdarwin, bsd, sun, unix
+  * See https://github.com/JetBrains/ideavim#vim-script for details about Vim Script
+
+### Fixes:
+* [VIM-3060](https://youtrack.jetbrains.com/issue/VIM-3060) Clipboard interaction stopped working
+* [VIM-3095](https://youtrack.jetbrains.com/issue/VIM-3095) Fix missing ellipsis digraph
+* [VIM-2562](https://youtrack.jetbrains.com/issue/VIM-2562) Fix hang with multi-width chars in command line
+* [VIM-696](https://youtrack.jetbrains.com/issue/VIM-696) Vim selection issue after undo
+* [VIM-1639](https://youtrack.jetbrains.com/issue/VIM-1639) Ctrl-o and Ctrl-i jumping in files of different projects
+
+### Merged PRs:
+* [697](https://github.com/JetBrains/ideavim/pull/697) by [Matt Ellis](https://github.com/citizenmatt): Support per-window "global" values for local-to-window options
+* [717](https://github.com/JetBrains/ideavim/pull/717) by [Matt Ellis](https://github.com/citizenmatt): Fix(VIM-2562): Fix hang with multi-width chars in command line
+* [732](https://github.com/JetBrains/ideavim/pull/732) by [pWydmuch](https://github.com/pWydmuch): Fix md links in doc
+* [733](https://github.com/JetBrains/ideavim/pull/733) by [Matt Ellis](https://github.com/citizenmatt): Add support for ShowHoverInfo action to 2023.1 and 2023.2
+* [729](https://github.com/JetBrains/ideavim/pull/729) by [chylex](https://github.com/chylex): Add operating system type to `has()` function
+* [726](https://github.com/JetBrains/ideavim/pull/726) by [Matt Ellis](https://github.com/citizenmatt): Fix range for fall back comment mode
+
+## 2.5.0, 2023-09-01
+
+### Fixes:
+* [VIM-802](https://youtrack.jetbrains.com/issue/VIM-802) IdeaVim vs. Vim: discrepancies in using registers
+* [VIM-2246](https://youtrack.jetbrains.com/issue/VIM-2246) X11/Xorg Primary selection register "* not supported
+* [VIM-2313](https://youtrack.jetbrains.com/issue/VIM-2313)
+  [VIM-2318](https://youtrack.jetbrains.com/issue/VIM-2318)
+  [VIM-2666](https://youtrack.jetbrains.com/issue/VIM-2666)
+  [VIM-2951](https://youtrack.jetbrains.com/issue/VIM-2951)
+  IdeaVim works correctly in read-only editors like log or tests output.
+
+### Merged PRs:
+* [666](https://github.com/JetBrains/ideavim/pull/666) by [Matt Ellis](https://github.com/citizenmatt): Improve formatting of `:set` command output
+* [667](https://github.com/JetBrains/ideavim/pull/667) by [Matt Ellis](https://github.com/citizenmatt): Eagerly initialise local options and introduce option scope
+* [672](https://github.com/JetBrains/ideavim/pull/672) by [Matt Ellis](https://github.com/citizenmatt): Fix issue adding back hidden status bar widget
+* [668](https://github.com/JetBrains/ideavim/pull/668) by [ludwig-jb](https://github.com/ludwig-jb): Handle unicode grapheme clusters
+
+## 2.4.0, 2023-07-18
+
+### Fixes:
+* [VIM-2975](https://youtrack.jetbrains.com/issue/VIM-2975) Fix the offset after the rendered docs
+* [VIM-2685](https://youtrack.jetbrains.com/issue/VIM-2685) Register command outputs different values for same registers
+* [VIM-1294](https://youtrack.jetbrains.com/issue/VIM-1294) unvoluntary unfolding when using ideavim
+* [VIM-2818](https://youtrack.jetbrains.com/issue/VIM-2818) Wrong caret position after multicaret paste
+
+### Merged PRs:
+* [662](https://github.com/JetBrains/ideavim/pull/662) by [ludwig-jb](https://github.com/ludwig-jb): Update VimMessages#updateStatusBar to accept VimEditor
+* [659](https://github.com/JetBrains/ideavim/pull/659) by [Sam Ng](https://github.com/samabcde): VIM-2920 fix select block expansion when enclose boundary is line break
+
+## 2.3.0, 2023-06-14
+
+### Features:
+* Matchit now supports PHP files | [VIM-2678](https://youtrack.jetbrains.com/issue/VIM-2678)
+
+### Fixes:
+* [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
+* [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
+* [VIM-2930](https://youtrack.jetbrains.com/issue/VIM-2930) vim-multiple-cursors + ReplaceWithRegister issue
+* [VIM-2945](https://youtrack.jetbrains.com/issue/VIM-2945) %-movement mismatches braces
+* [VIM-2953](https://youtrack.jetbrains.com/issue/VIM-2953) The previous fix for :q command caused weird behavior of tab closing
+* [VIM-2964](https://youtrack.jetbrains.com/issue/VIM-2964) Fix an issue with leaking caret instance
+
+### Merged PRs:
+* [616](https://github.com/JetBrains/ideavim/pull/616) by [Matt Ellis](https://github.com/citizenmatt): Refactor/option delegated properties
+* [626](https://github.com/JetBrains/ideavim/pull/626) by [Martin Yzeiri](https://github.com/myzeiri): Matchit bug fixes
+* [619](https://github.com/JetBrains/ideavim/pull/619) by [Matt Ellis](https://github.com/citizenmatt): Fix some local options being used as global options
+* [638](https://github.com/JetBrains/ideavim/pull/638) by [Sam Ng](https://github.com/samabcde): VIM-2615 add support to sort u command
+* [646](https://github.com/JetBrains/ideavim/pull/646) by [Sam Ng](https://github.com/samabcde): VIM-1990 fix repeat delete find or till wrong MotionType
+* [649](https://github.com/JetBrains/ideavim/pull/649) by [Martin Yzeiri](https://github.com/myzeiri): Add Matchit support for PHP 
+
+## 2.2.0, 2023-04-20
+
+### Features:
+* Now every secondary caret has its own marks. You can use marks and `gv` in multiple-caret mode now.
+
+### Fixes:
+* [VIM-1829](https://youtrack.jetbrains.com/issue/VIM-1829/key-combinations-are-not-working-in-visual-mode-IdeaVim) Fix marks when moving lines up/down
+* [VIM-2130](https://youtrack.jetbrains.com/issue/VIM-2130/Vim-visual-mode-mapping-isnt-behaving-correctly-in-ideavim-it-leaves-visual-mode-after-its-executed) Fix marks when moving lines up/down
+* [VIM-2428](https://youtrack.jetbrains.com/issue/VIM-2428/The-gv-command-doesnt-work) Fix marks when moving lines up/down
+* [VIM-2686](https://youtrack.jetbrains.com/issue/VIM-2686/Multiple-caret-marks) Add individual mark storage for each secondary caret
+* [VIM-2840](https://youtrack.jetbrains.com/issue/VIM-2840) Replace with register does not work with count
+* [VIM-658](https://youtrack.jetbrains.com/issue/VIM-658) Stop macro on error
+* [VIM-2787](https://youtrack.jetbrains.com/issue/VIM-2787) Save ideavimrc loading
+* [VIM-2850](https://youtrack.jetbrains.com/issue/VIM-2850) Marks exception during IDE startup 
+* [VIM-2804](https://youtrack.jetbrains.com/issue/VIM-2804) IdeaVim multiple-cursors copy and paste issue when "set clipboard+=unnamed"
+* [VIM-1768](https://youtrack.jetbrains.com/issue/VIM-1768) Delete surrounding character while in multiple cursors mode
+* [VIM-282](https://youtrack.jetbrains.com/issue/VIM-282) Cursor line wrapping support (whichwrap)
+* [VIM-2315](https://youtrack.jetbrains.com/issue/VIM-2315) Fix overlapping mappings execution
+* [VIM-44](https://youtrack.jetbrains.com/issue/VIM-44) Unify navigation history between ideavim and idea
+* [VIM-1735](https://youtrack.jetbrains.com/issue/VIM-1735) Fix enabling mulple carets after line selection
+* [VIM-2881](https://youtrack.jetbrains.com/issue/VIM-2881) ReplaceRegister does no longer worker with MultiCursor
+* [VIM-2244](https://youtrack.jetbrains.com/issue/VIM-2244) nnoremap mapping doesn't work correctly
+* [VIM-2885](https://youtrack.jetbrains.com/issue/VIM-2885) "v:searchforward" does't work for IdeaVim
+* [VIM-2733](https://youtrack.jetbrains.com/issue/VIM-2733) vim-surround emulation interacts incorrectly with unmatched quotes on previous lines
+* [VIM-2884](https://youtrack.jetbrains.com/issue/VIM-2884) Moving multiple lines in visual mode is not working
+* [VIM-2868](https://youtrack.jetbrains.com/issue/VIM-2868) Pasting in visual mode with P should not replace yank register like when pasting with p
+* [VIM-2819](https://youtrack.jetbrains.com/issue/VIM-2819) Move command works incorrectly
+* [VIM-795](https://youtrack.jetbrains.com/issue/VIM-795) Ctrl-w + h doesn't alway work (window navigation to the left window)
+* [VIM-1551](https://youtrack.jetbrains.com/issue/VIM-1551) Surround: line surround not working
+* [VIM-1746](https://youtrack.jetbrains.com/issue/VIM-1746) IdeaVim Surround removes unwanted characters
+* [VIM-1750](https://youtrack.jetbrains.com/issue/VIM-1750) Surround with tag wrong position
+* [VIM-2286](https://youtrack.jetbrains.com/issue/VIM-2286) Set surround not working for me as expected
+* [VIM-2433](https://youtrack.jetbrains.com/issue/VIM-2433) Do not clear clipboard after inserting with ideaput
+* [VIM-2896](https://youtrack.jetbrains.com/issue/VIM-2896) Correct ordering of handlers
+* [VIM-2912](https://youtrack.jetbrains.com/issue/VIM-2912) Fix focus after :q
+* [VIM-2909](https://youtrack.jetbrains.com/issue/VIM-2909) Fix incorrect file detection while closing diff window
+
+### Merged PRs:
+* [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
+* [604](https://github.com/JetBrains/ideavim/pull/604) by [Dominic Palmer](https://github.com/dominicpalmer): VIM-2773: Include empty lines in the selection when dragging backwards from EOL
+* [603](https://github.com/JetBrains/ideavim/pull/603) by [Dominic Palmer](https://github.com/dominicpalmer): VIM-2773: Prevent viewport displacement on undo
+* [602](https://github.com/JetBrains/ideavim/pull/602) by [Matt Ellis](https://github.com/citizenmatt): Refactor options service
+* [612](https://github.com/JetBrains/ideavim/pull/612) by [Dani Sevastianov](https://github.com/danisevas): Fix quick-scope setup documentation
+* [617](https://github.com/JetBrains/ideavim/pull/617) by [Silence Tai](https://github.com/Stzx): Fix dispose operation
+
+## 2.1.0, 2023-01-10
+
+### Features:
+* Add IdeaVim tutor. You can access it via the status bar icon.
 
 ### Fixes:
 * [VIM-2797](https://youtrack.jetbrains.com/issue/VIM-2797) Introduce variable to mute default argtextobj mappings
 * [VIM-758](https://youtrack.jetbrains.com/issue/VIM-758) Support d mappings
+* [VIM-2577](https://youtrack.jetbrains.com/issue/VIM-2577) Fix paste at the end of notebook cell
+* [VIM-2813](https://youtrack.jetbrains.com/issue/VIM-2813) Migrate update checker to VimStandalonePluginUpdateChecker
+* [VIM-2833](https://youtrack.jetbrains.com/issue/VIM-2833) Fix rare deadlock during put in insert mode from clipboard
 
 ### Merged PRs:
 * [558](https://github.com/JetBrains/ideavim/pull/558) by [Matt Ellis](https://github.com/citizenmatt): Fix incorrect normalising for trailing inlay
 * [554](https://github.com/JetBrains/ideavim/pull/554) by [Matt Ellis](https://github.com/citizenmatt): Refactor "last column" calculations
 * [553](https://github.com/JetBrains/ideavim/pull/553) by [Matt Ellis](https://github.com/citizenmatt): Rearrange and rename some code in engine
+* [560](https://github.com/JetBrains/ideavim/pull/560) by [Runinho](https://github.com/Runinho): Fix(VIM-2577) paste not working at end of notebook cell
+* [571](https://github.com/JetBrains/ideavim/pull/571) by [Ada](https://github.com/adaext): Remove the redundant quotation mark at the end of "packadd matchit" command
+* [561](https://github.com/JetBrains/ideavim/pull/561) by [Matt Ellis](https://github.com/citizenmatt): Fix incremental search not scrolling to current match
+* [559](https://github.com/JetBrains/ideavim/pull/559) by [Runinho](https://github.com/Runinho): Fix(VIM-2760) notebookCommandMode detection
+* [579](https://github.com/JetBrains/ideavim/pull/579) by [Martin Yzeiri](https://github.com/myzeiri): VIM-2799: Add Matchit support for cshtml files
+* [580](https://github.com/JetBrains/ideavim/pull/580) by [Martin Yzeiri](https://github.com/myzeiri): Matchit: Add more Rider file types
+* [583](https://github.com/JetBrains/ideavim/pull/583) by [Matt Ellis](https://github.com/citizenmatt): Introduce ScrollGroup
+* [586](https://github.com/JetBrains/ideavim/pull/586) by [Patrick Elmquist](https://github.com/patrick-elmquist): Fixed number references in Tutor
 
 ## 2.0.0, 2022-11-01
 

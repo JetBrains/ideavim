@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.yank
 
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
@@ -17,18 +18,18 @@ import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
 
-open class YankGroupBase : VimYankGroup {
+public open class YankGroupBase : VimYankGroup {
   private val yankListeners: MutableList<VimYankListener> = ArrayList()
 
   private fun yankRange(
     editor: VimEditor,
-    caretToRange: Map<VimCaret, TextRange>,
+    caretToRange: Map<ImmutableVimCaret, TextRange>,
     range: TextRange,
     type: SelectionType,
     startOffsets: Map<VimCaret, Int>?,
@@ -41,7 +42,7 @@ open class YankGroupBase : VimYankGroup {
 
     var result = true
     for ((caret, myRange) in caretToRange) {
-      result = caret.registerStorage.storeText(caret, editor, myRange, type, false) && result
+      result = caret.registerStorage.storeText(editor, myRange, type, false) && result
     }
     return result
   }
@@ -80,7 +81,7 @@ open class YankGroupBase : VimYankGroup {
     editor: VimEditor,
     context: ExecutionContext,
     argument: Argument,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val motion = argument.motion
     val type = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
@@ -88,7 +89,7 @@ open class YankGroupBase : VimYankGroup {
     val nativeCaretCount = editor.nativeCarets().size
     if (nativeCaretCount <= 0) return false
 
-    val caretToRange = HashMap<VimCaret, TextRange>(nativeCaretCount)
+    val caretToRange = HashMap<ImmutableVimCaret, TextRange>(nativeCaretCount)
     val ranges = ArrayList<Pair<Int, Int>>(nativeCaretCount)
 
     // This logic is from original vim
@@ -113,7 +114,7 @@ open class YankGroupBase : VimYankGroup {
       caretToRange,
       range,
       type,
-      startOffsets
+      startOffsets,
     )
   }
 
@@ -127,7 +128,7 @@ open class YankGroupBase : VimYankGroup {
   override fun yankLine(editor: VimEditor, count: Int): Boolean {
     val caretCount = editor.nativeCarets().size
     val ranges = ArrayList<Pair<Int, Int>>(caretCount)
-    val caretToRange = HashMap<VimCaret, TextRange>(caretCount)
+    val caretToRange = HashMap<ImmutableVimCaret, TextRange>(caretCount)
     for (caret in editor.nativeCarets()) {
       val start = injector.motion.moveCaretToCurrentLineStart(editor, caret)
       val end = min(injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
@@ -152,9 +153,7 @@ open class YankGroupBase : VimYankGroup {
    */
   override fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
     range ?: return false
-
-    val caretToRange = HashMap<VimCaret, TextRange>()
-    val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
+    val caretToRange = HashMap<ImmutableVimCaret, TextRange>()
 
     if (type == SelectionType.LINE_WISE) {
       for (i in 0 until range.size()) {
@@ -184,15 +183,15 @@ open class YankGroupBase : VimYankGroup {
     }
 
     return if (moveCursor) {
-      yankRange(editor, caretToRange, range, selectionType, startOffsets)
+      yankRange(editor, caretToRange, range, type, startOffsets)
     } else {
-      yankRange(editor, caretToRange, range, selectionType, null)
+      yankRange(editor, caretToRange, range, type, null)
     }
   }
 
-  override fun addListener(listener: VimYankListener) = yankListeners.add(listener)
-  override fun removeListener(listener: VimYankListener) = yankListeners.remove(listener)
-  override fun notifyListeners(editor: VimEditor, textRange: TextRange) = yankListeners.forEach {
+  override fun addListener(listener: VimYankListener): Boolean = yankListeners.add(listener)
+  override fun removeListener(listener: VimYankListener): Boolean = yankListeners.remove(listener)
+  override fun notifyListeners(editor: VimEditor, textRange: TextRange): Unit = yankListeners.forEach {
     it.yankPerformed(editor, textRange)
   }
 }

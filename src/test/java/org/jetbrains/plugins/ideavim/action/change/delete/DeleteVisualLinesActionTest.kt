@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,127 +10,130 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class DeleteVisualLinesActionTest : VimTestCase() {
+  @Test
   fun `test remove line in char visual mode`() {
     doTest(
       "vlllX",
       """
                 I found ${c}it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                ${c}all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test remove line in char visual mode last line`() {
     doTest(
       "vlllX",
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 hard by ${c}the torrent of a mountain pass.
       """.trimIndent(),
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                ${c}Sed in orci mauris.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test remove line in line visual mode`() {
     doTest(
       "VX",
       """
                 I found ${c}it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                ${c}all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test remove line in line visual mode line end`() {
     doTest(
       "VX",
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 hard by ${c}the torrent of a mountain pass.
       """.trimIndent(),
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                ${c}Sed in orci mauris.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test multiple line delete till the end`() {
     val keys = "Vjd"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
+  @Test
   fun `test multiple line delete till the end with a new line`() {
     val keys = "Vjd"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
             
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 }

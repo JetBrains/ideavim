@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.ui
 
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.NlsSafe
@@ -18,27 +18,28 @@ import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
-import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import java.awt.event.MouseEvent
 
-object ShowCmd {
+internal object ShowCmd {
   // https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/vim.h#L1721
   private const val SHOWCMD_COLS = 10
 
   @NonNls
-  internal const val ID = "IdeaVim::ShowCmd"
+  internal const val ID = "IdeaVimShowCmd"
 
   @NlsSafe
   internal const val displayName = "IdeaVim showcmd"
@@ -58,27 +59,20 @@ object ShowCmd {
   }
 
   fun getFullText(editor: Editor?): String {
-    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmdName) || editor == null || editor.isDisposed) return ""
+    if (!injector.globalOptions().showcmd || editor == null || editor.isDisposed) return ""
 
     val editorState = editor.vim.vimStateMachine
     return EngineStringHelper.toPrintableCharacters(editorState.commandBuilder.keys + editorState.mappingState.keys)
   }
 }
 
-object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
-  override fun processGlobalValueChange(oldValue: VimDataType?) {
+internal object ShowCmdOptionChangeListener : GlobalOptionChangeListener {
+  override fun onGlobalOptionChanged() {
     ShowCmd.update()
-
-    val extension = StatusBarWidgetFactory.EP_NAME.findExtension(ShowCmdStatusBarWidgetFactory::class.java) ?: return
-    val projectManager = ProjectManager.getInstanceIfCreated() ?: return
-    for (project in projectManager.openProjects) {
-      val statusBarWidgetsManager = project.getService(StatusBarWidgetsManager::class.java) ?: continue
-      statusBarWidgetsManager.updateWidget(extension)
-    }
   }
 }
 
-class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
+internal class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   override fun getId() = ShowCmd.ID
 
   override fun getDisplayName(): String = ShowCmd.displayName
@@ -87,7 +81,10 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompati
     // Nothing
   }
 
-  override fun isAvailable(project: Project): Boolean = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmdName)
+  override fun isAvailable(project: Project): Boolean {
+    VimPlugin.getInstance()
+    return injector.globalOptions().showcmd
+  }
 
   override fun createWidget(project: Project): StatusBarWidget = Widget(project)
 
@@ -108,10 +105,11 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompati
 //
 // We only need to show partial commands, since the standard PositionPanel shows the other information already, with
 // the exception of "{lines}x{columns}" (it shows "x carets" instead)
-class Widget(project: Project) :
+internal class Widget(project: Project) :
   EditorBasedWidget(project),
   StatusBarWidget.Multiframe,
-  StatusBarWidget.TextPresentation {
+  StatusBarWidget.TextPresentation,
+  FileEditorManagerListener {
 
   override fun ID() = ShowCmd.ID
 
@@ -121,20 +119,31 @@ class Widget(project: Project) :
 
   @VimNlsSafe
   override fun getTooltipText(): String {
-    var count = ShowCmd.getFullText(this.editor)
+    var count = ShowCmd.getFullText(getEditor())
     if (count.isNotBlank()) count = ": $count"
     return "${ShowCmd.displayName}$count"
   }
 
-  override fun getText(): String = ShowCmd.getWidgetText(editor)
+  override fun getText(): String = ShowCmd.getWidgetText(getEditor())
 
   override fun getAlignment() = Component.CENTER_ALIGNMENT
 
   // Multiframe#copy to show the widget on popped out editors
-  override fun copy(): StatusBarWidget = Widget(myProject)
+  override fun copy(): StatusBarWidget = Widget(project)
+}
 
-  override fun selectionChanged(event: FileEditorManagerEvent) {
-    // Update when changing selected editor
-    myStatusBar?.updateWidget(ShowCmd.ID)
+internal class ShowCmdWidgetUpdater : EditorListener {
+  override fun focusGained(editor: VimEditor) {
+    editor.ij.project?.let { selectionChanged(it) }
+  }
+
+  override fun focusLost(editor: VimEditor) {
+    editor.ij.project?.let { selectionChanged(it) }
+  }
+
+  private fun selectionChanged(project: Project) {
+    val windowManager = WindowManager.getInstance()
+    val statusBar = windowManager.getStatusBar(project)
+    statusBar.updateWidget(ShowCmd.ID)
   }
 }

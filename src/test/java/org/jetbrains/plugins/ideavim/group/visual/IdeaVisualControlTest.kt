@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,346 +14,331 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.ConstantNode
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import kotlin.test.assertNull
 
-/**
- * @author Alex Plate
- */
-class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) {
-  @VimOptionDefaultAll
+@TraceOptions(TestOptionConstants.selectmode)
+class IdeaVisualControlTest : VimTestCase() {
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection no selection`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I $s$c${se}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSubMode(VimStateMachine.SubMode.NONE)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    assertMode(Mode.NORMAL())
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor in the middle`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found$c it$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}i${se}t in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
   @VimBehaviorDiffers(
     originalVimAfter = """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found i${c}t$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-    """
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """,
   )
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor on end`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found it$c$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found it ${c}i${se}n a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor on start`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I $s${c}found it$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I f${s}${c}ound it$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection lineend`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}it in a legendary land$se
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection next line`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}it in a legendary land
-            ${se}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            ${se}consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection start on line start`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             ${s}I found ${c}it ${se}in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             ${s}I found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection start on line end`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found ${c}it ${se}in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection multicaret`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found ${c}it ${se}in a legendary land
             all rocks $s$c${se}and lavender and tufted grass,
             where it was $s${c}settled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found i${c}t${se} in a legendary land
             all rocks ${s}a${c}n${se}d lavender and tufted grass,
             where it was s$s${c}ettled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection`() {
     configureByText(
@@ -364,13 +349,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -382,10 +366,9 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -397,14 +380,13 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks$c and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection next line`() {
     configureByText(
@@ -415,13 +397,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -433,14 +414,13 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rock${c}s and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection cursor on last line`() {
     configureByText(
@@ -451,13 +431,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and lavender and tufted grass,
             where it was settled ${c}on some sodden sand$se
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -469,14 +448,13 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent o${c}f a mountain pass.$se
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection cursor on first line`() {
     configureByText(
@@ -487,13 +465,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand$se
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -505,14 +482,13 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ${s}all rocks and la${c}vender and tufted grass,
             where it was settled on some sodden sand
             ${se}hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection multicaret`() {
     configureByText(
@@ -523,13 +499,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and lavender and tufted grass,
             ${s}where it was settled ${c}on some sodden sand
             hard by the torrent of a mountain pass.$se
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -541,14 +516,13 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and la${c}vender and tufted grass,
             ${se}where it was settled on some sodden sand
             ${s}hard by the torrent o${c}f a mountain pass.$se
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection motion up`() {
     configureByText(
@@ -559,13 +533,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ${s}all rocks and lavender ${c}and tufted grass,$se
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("k"))
@@ -577,71 +550,67 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection looks like block`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found$c$se it in a legendary land
             al${s}l roc$c${se}ks and lavender and tufted grass,
             wh${s}ere i$c${se}t was settled on some sodden sand
             ha${s}rd by $c${se}the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found$c$se it in a legendary land
             al${s}l roc$c${se}ks and lavender and tufted grass,
             wh${s}ere i$c${se}t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.BLOCK_WISE))
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}i${se}t in a legendary land
             al${s}l rock${c}s${se} and lavender and tufted grass,
             wh${s}ere it${c} ${se}was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-      """.trimIndent()
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection with longer line`() {
     configureByText(
@@ -652,13 +621,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             al${s}l rocks and lavender and tufted grass,$c$se
             wh${s}ere it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.BLOCK_WISE))
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -670,14 +638,13 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             al${s}l rocks and lavender and tufted gras${c}s${se},
             wh${s}ere it was settled on some sodden sa${c}n${se}d
             ha${s}rd by the torrent of a mountain pass.${c}$se
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection caret to the left`() {
     configureByText(
@@ -688,13 +655,12 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             al$s${c}l roc${se}ks and lavender and tufted grass,
             wh$s${c}ere i${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.NORMAL())
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.BLOCK_WISE))
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -706,91 +672,82 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all$s$c roc${se}ks and lavender and tufted grass,
             whe$s${c}re i${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
+    assertMode(Mode.VISUAL(SelectionType.BLOCK_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.selectmodeName,
-      OptionValueType.STRING,
-      OptionConstants.selectmode_ideaselection
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_ideaselection]))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-      """.trimIndent()
+            consectetur adipiscing elit
+      """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
 
-    myFixture.editor.selectionModel.setSelection(5, 10)
+    fixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
+  @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection to visual mode`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-      """.trimIndent()
+            consectetur adipiscing elit
+      """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
 
-    myFixture.editor.selectionModel.setSelection(5, 10)
+    fixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
+  @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-      """.trimIndent()
+            consectetur adipiscing elit
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("V"))
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
 
-    myFixture.editor.selectionModel.setSelection(2, 5)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    fixture.editor.selectionModel.setSelection(2, 5)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { myFixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
+  @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes in keep mode`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-      """.trimIndent()
+            consectetur adipiscing elit
+      """.trimIndent(),
     )
 
     startDummyTemplate()
@@ -798,23 +755,38 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     VimVisualTimer.doNow()
 
     typeText(injector.parser.parseKeys("<esc>V"))
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
 
-    myFixture.editor.selectionModel.setSelection(2, 5)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    fixture.editor.selectionModel.setSelection(2, 5)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { myFixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
-    assertMode(VimStateMachine.Mode.VISUAL)
-    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
+    waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertCaretsVisualAttributes()
   }
 
+  @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test control selection interruption`() {
+    configureByText(
+      """
+            Lorem Ipsum
+
+            I $s${c}found$se it in a legendary land
+            consectetur adipiscing elit
+      """.trimIndent(),
+    )
+
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    typeText(injector.parser.parseKeys("V"))
+    assertNull(VimVisualTimer.swingTimer)
+  }
+
   private fun startDummyTemplate() {
-    TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
-    val templateManager = TemplateManager.getInstance(myFixture.project)
+    TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
+    val templateManager = TemplateManager.getInstance(fixture.project)
     val createdTemplate = templateManager.createTemplate("", "")
     createdTemplate.addVariable(ConstantNode("1"), true)
-    templateManager.startTemplate(myFixture.editor, createdTemplate)
+    templateManager.startTemplate(fixture.editor, createdTemplate)
   }
 }

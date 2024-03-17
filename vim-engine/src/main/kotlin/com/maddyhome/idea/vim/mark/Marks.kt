@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,19 +12,16 @@ import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimEditor
 import org.jetbrains.annotations.NonNls
 
-interface Mark {
-  val key: Char
-  val line: Int
-  val col: Int
-  val filename: String
-  val protocol: String?
+public interface Mark {
+  public val key: Char
+  public val line: Int // 0-based
+  public val col: Int // 0-based
+  public val filepath: String
+  public val protocol: String?
 
-  fun isClear(): Boolean
-  fun clear()
+  public fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(line, col))
 
-  fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(line, col))
-
-  object KeySorter : Comparator<Mark> {
+  public object KeySorter : Comparator<Mark> {
     @NonNls
     private const val ORDER = "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"[]^.<>"
 
@@ -34,31 +31,22 @@ interface Mark {
   }
 }
 
-data class VimMark(
+public data class VimMark(
   override val key: Char,
   override var line: Int,
   override val col: Int,
-  override val filename: String,
+  override val filepath: String,
   override val protocol: String?,
 ) : Mark {
-
-  private var cleared = false
-
-  override fun isClear(): Boolean = cleared
-
-  override fun clear() {
-    cleared = true
-  }
-
-  companion object {
+  public companion object {
     @JvmStatic
-    fun create(key: Char?, line: Int?, col: Int?, filename: String?, protocol: String?): VimMark? {
+    public fun create(key: Char?, line: Int?, col: Int?, filename: String?, protocol: String?): VimMark? {
       return VimMark(
         key ?: return null,
         line ?: return null,
         col ?: 0,
         filename ?: return null,
-        protocol ?: ""
+        protocol ?: "",
       )
     }
   }

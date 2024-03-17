@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,18 +12,16 @@ import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.state.mode.Mode
 
-fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: VimStateMachine.Mode): Pair<Int, Int> {
+public fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineEnd = editor.getLineEndForOffset(nativeEnd)
   val adj =
-    if (isExclusiveSelection() || nativeEnd == lineEnd || mode == VimStateMachine.Mode.SELECT) 0 else 1
+    if (isExclusiveSelection() || nativeEnd == lineEnd || mode is Mode.SELECT) 0 else 1
   val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize().toInt())
   return nativeStart to adjEnd
 }
@@ -33,7 +31,7 @@ fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: VimStat
  *
  * Adds caret adjustment or extends to line start / end in case of linewise selection
  */
-fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, Int> {
+public fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineStart = editor.getLineStartForOffset(nativeStart)
   // Extend to \n char of line to fill full line with selection
@@ -41,26 +39,19 @@ fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, In
   return lineStart to lineEnd
 }
 
-fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
+public fun <T : Comparable<T>> sort(a: T, b: T): Pair<T, T> = if (a > b) b to a else a to b
 
-private fun isExclusiveSelection(): Boolean {
-  return (
-    injector.optionService.getOptionValue(
-      OptionScope.GLOBAL,
-      OptionConstants.selectionName
-    ) as VimString
-    ).value == "exclusive"
-}
+private fun isExclusiveSelection() = injector.globalOptions().selection.contains("exclusive")
 
-fun blockToNativeSelection(
+public fun blockToNativeSelection(
   editor: VimEditor,
   start: Int,
   end: Int,
-  mode: VimStateMachine.Mode,
+  mode: Mode,
 ): Pair<BufferPosition, BufferPosition> {
   var blockStart = editor.offsetToBufferPosition(start)
   var blockEnd = editor.offsetToBufferPosition(end)
-  if (!isExclusiveSelection() && mode != VimStateMachine.Mode.SELECT) {
+  if (!isExclusiveSelection() && mode !is Mode.SELECT) {
     if (blockStart.column > blockEnd.column) {
       if (blockStart.column < editor.lineLength(blockStart.line)) {
         blockStart = BufferPosition(blockStart.line, blockStart.column + 1)

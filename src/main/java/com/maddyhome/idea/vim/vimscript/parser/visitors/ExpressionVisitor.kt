@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -57,7 +57,7 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.Variabl
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.WrappedExpressionContext
 import org.antlr.v4.runtime.ParserRuleContext
 
-object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
+internal object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
   override fun visitDictionaryExpression(ctx: DictionaryExpressionContext): Expression {
     val dict: LinkedHashMap<Expression, Expression> = LinkedHashMap()
@@ -124,7 +124,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
       val index = SimpleExpression(ctx.expr(1).text)
       OneElementSublistExpression(index, left)
     } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
-        ctx.expr(1).text
+        ctx.expr(1).text,
       )
     ) {
       val postfix = "-" + ctx.expr(1).text
@@ -219,7 +219,14 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitOptionExpression(ctx: OptionExpressionContext): Expression {
-    val result = OptionExpression(Scope.getByValue(ctx.option()?.text ?: "") ?: Scope.GLOBAL_VARIABLE, ctx.option().optionName().text)
+    val scope = ctx.option().optionScope()?.anyScope()?.let {
+      when {
+        it.G_LOWERCASE() != null -> Scope.GLOBAL_VARIABLE
+        it.L_LOWERCASE() != null -> Scope.LOCAL_VARIABLE
+        else -> null
+      }
+    }
+    val result = OptionExpression(scope, ctx.option().optionName().text)
     result.originalString = ctx.text
     return result
   }

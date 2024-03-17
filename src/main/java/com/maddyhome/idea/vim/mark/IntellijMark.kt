@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,27 +15,26 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
 import java.lang.ref.WeakReference
 
-class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Project?) : Mark {
+internal class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Project?) : Mark {
 
   private val project: WeakReference<Project?> = WeakReference(project)
 
   override val key = BookmarksManager.getInstance(project)?.getType(bookmark)?.mnemonic!!
   override val line: Int
     get() = getMark()?.line ?: 0
-  override val filename: String
+  override val filepath: String
     get() = getMark()?.file?.path ?: ""
   override val protocol: String?
     get() = getMark()?.file?.let { VirtualFileManager.extractProtocol(it.url) } ?: ""
 
-  override fun isClear(): Boolean = getMark() == null
-  override fun clear() {
+  fun clear() {
     val mark = getMark() ?: return
     getProject()?.let { project -> BookmarksManager.getInstance(project)?.remove(mark) }
   }
 
   private fun getMark(): LineBookmark? =
     getProject()?.let {
-      project ->
+        project ->
       BookmarksManager.getInstance(project)?.getBookmark(BookmarkType.get(key)) as? LineBookmark
     }
 

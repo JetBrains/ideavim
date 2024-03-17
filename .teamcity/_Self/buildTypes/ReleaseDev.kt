@@ -1,22 +1,22 @@
 package _Self.buildTypes
 
 import _Self.Constants.DEV_CHANNEL
-import _Self.Constants.DEV_VERSION
 import _Self.Constants.RELEASE_DEV
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 
-object ReleaseDev : BuildType({
+object ReleaseDev : IdeaVimBuildType({
   name = "Publish Dev Build"
   description = "Build and publish Dev of IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "$DEV_VERSION-dev.%build.counter%"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", RELEASE_DEV)
@@ -25,23 +25,35 @@ object ReleaseDev : BuildType({
       "credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde",
       label = "Password"
     )
-    param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
-    param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_publishChannels", DEV_CHANNEL)
   }
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
 
   steps {
+    script {
+      name = "Pull git tags"
+      scriptContent = "git fetch --tags origin"
+    }
+    script {
+      name = "Pull git history"
+      scriptContent = "git fetch --unshallow"
+    }
     gradle {
-      tasks = "clean publishPlugin"
-      buildFile = ""
-      enableStacktrace = true
-      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+      name = "Calculate new dev version"
+      tasks = "scripts:calculateNewDevVersion"
+    }
+    gradle {
+      name = "Set TeamCity build number"
+      tasks = "scripts:setTeamCityBuildNumber"
+    }
+    gradle {
+      tasks = "publishPlugin"
     }
   }
 
@@ -52,6 +64,12 @@ object ReleaseDev : BuildType({
         hour = 2
       }
       branchFilter = ""
+    }
+  }
+
+  features {
+    sshAgent {
+      teamcitySshKey = "IdeaVim ssh keys"
     }
   }
 

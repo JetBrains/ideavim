@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,104 +10,108 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
+  @Test
   fun `test enter visual with count`() {
     doTest(
       "1<C-V>",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${s}${c}f${se}ound it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with five count`() {
     doTest(
       "5<C-V>",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${s}foun${c}d${se} it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test enter visual with 100 count`() {
     doTest(
       "100<C-V>",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${s}found it in a legendary land${c}${se}
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test on empty file`() {
     doTest(
-      "<C-V>", "", "",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      "<C-V>",
+      "",
+      "",
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
+  @Test
   fun `test selectmode option`() {
     configureByText(
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I${c} found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand[long line]
-                    hard by the torrent of a mountain pass.
-      """.trimIndent()
+                    consectetur adipiscing elit
+                    Sed in orci mauris.[long line]
+                    Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
     )
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
-    typeText(injector.parser.parseKeys("<C-V>"))
-    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_BLOCK)
+    enterCommand("set selectmode=cmd")
+    typeText("<C-V>")
+    assertState(Mode.SELECT(SelectionType.BLOCK_WISE))
   }
 }

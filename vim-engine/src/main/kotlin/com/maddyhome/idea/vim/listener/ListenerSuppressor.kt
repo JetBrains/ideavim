@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,8 +9,9 @@
 package com.maddyhome.idea.vim.listener
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.options.helpers.StrictMode
+import com.maddyhome.idea.vim.helper.StrictMode
 import java.io.Closeable
 
 /**
@@ -51,39 +52,39 @@ import java.io.Closeable
  * SelectionVimListenerSuppressor.lock().use { ... }
  * ```
  */
-sealed class VimListenerSuppressor {
+public sealed class VimListenerSuppressor {
   private var caretListenerSuppressor = 0
 
-  fun lock(): Locked {
+  public fun lock(): Locked {
     LOG.trace("Suppressor lock")
-    LOG.trace(injector.application.currentStackTrace())
+    LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor++
     return Locked()
   }
 
   // Please try not to use lock/unlock without scoping
   // Prefer try-with-resources
-  fun unlock() {
+  public fun unlock() {
     LOG.trace("Suppressor unlock")
-    LOG.trace(injector.application.currentStackTrace())
+    LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor--
   }
 
-  fun reset() {
+  public fun reset() {
     StrictMode.assert(caretListenerSuppressor == 0, "Listener is not zero")
     caretListenerSuppressor = 0
   }
 
-  val isNotLocked: Boolean
+  public val isNotLocked: Boolean
     get() = caretListenerSuppressor == 0
 
-  inner class Locked : Closeable {
-    override fun close() = unlock()
+  public inner class Locked : Closeable {
+    override fun close(): Unit = unlock()
   }
 
-  companion object {
+  public companion object {
     private val LOG = vimLogger<VimListenerSuppressor>()
   }
 }
 
-object SelectionVimListenerSuppressor : VimListenerSuppressor()
+public object SelectionVimListenerSuppressor : VimListenerSuppressor()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,19 +9,21 @@
 package com.maddyhome.idea.vim.handler
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 /**
  * @author Alex Plate
@@ -33,7 +35,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret() {
+public abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret() {
   final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     error("This method should not be executed")
   }
@@ -55,13 +57,13 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val startSel = OptionConstants.keymodel_startsel in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+    val startSel = injector.globalOptions().keymodel.contains(OptionConstants.keymodel_startsel)
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
-      if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
-        injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+      if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
+        injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
       } else {
         injector.visualMotionGroup
-          .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
+          .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
       }
     }
     return true
@@ -71,7 +73,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
    * This method is called when `keymodel` doesn't contain `startsel`,
    * or contains one of `continue*` values but in different mode.
    */
-  abstract fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret)
+  public abstract fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret)
 }
 
 /**
@@ -81,7 +83,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: Boolean) : VimActionHandler.ConditionalMulticaret() {
+public abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: Boolean) : VimActionHandler.ConditionalMulticaret() {
 
   override fun runAsMulticaret(
     editor: VimEditor,
@@ -92,11 +94,16 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
     val (inVisualMode, inSelectMode, withKey) = withKeyOrNot(editor)
     if (withKey) {
       if (!inVisualMode && !inSelectMode) {
-        if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
-          injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+        if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
+          injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
         } else {
-          injector.visualMotionGroup
-            .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
+          if (editor.isInsertionAllowed) {
+            injector.visualMotionGroup
+              .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE, ReturnTo.INSERT)
+          } else {
+            injector.visualMotionGroup
+              .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
+          }
         }
       }
       return true
@@ -106,8 +113,7 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
   }
 
   private fun withKeyOrNot(editor: VimEditor): Triple<Boolean, Boolean, Boolean> {
-    val keymodelOption =
-      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+    val keymodelOption = injector.globalOptions().keymodel
     val startSel = OptionConstants.keymodel_startsel in keymodelOption
     val inVisualMode = editor.inVisualMode
     val inSelectMode = editor.inSelectMode
@@ -146,13 +152,13 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
   /**
    * This method is called when `keymodel` contains `startsel`, or one of `continue*` values in corresponding mode
    */
-  abstract fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command)
+  public abstract fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command)
 
   /**
    * This method is called when `keymodel` doesn't contain `startsel`,
    * or contains one of `continue*` values but in different mode.
    */
-  abstract fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command)
+  public abstract fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command)
 }
 
 /**
@@ -163,20 +169,15 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
  *
  * Handler is called for each caret
  */
-abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
+public abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
   final override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val keymodel = (
-      injector.optionService.getOptionValue(
-        OptionScope.GLOBAL,
-        OptionConstants.keymodelName
-      ) as VimString
-      ).value.split(",")
+    val keymodel = injector.globalOptions().keymodel
     if (editor.inSelectMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel)) {
       editor.exitSelectModeNative(false)
     }
@@ -184,18 +185,17 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
       editor.exitVisualMode()
     }
 
-    return motion(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument)
+    return motion(editor, caret, context, argument, operatorArguments)
   }
 
   /**
    * Calculate new offset for current [caret]
    */
-  abstract fun motion(
+  public abstract fun motion(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,7 +13,6 @@ import com.intellij.codeInsight.editorActions.CopyPastePreProcessor
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.intellij.ide.CopyPasteManagerEx
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
@@ -22,29 +21,37 @@ import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.psi.PsiDocumentManager
-import com.maddyhome.idea.vim.VimPlugin
+import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.TestClipboardModel
-import com.maddyhome.idea.vim.helper.TestClipboardModel.contents
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.HeadlessException
+import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
 
 @Service
-class IjClipboardManager : VimClipboardManager {
+internal class IjClipboardManager : VimClipboardManager {
+  override fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>? {
+    val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return null
+    val contents = clipboard.getContents(null) ?: return null
+    return getTextAndTransferableData(contents)
+  }
+
   override fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>? {
+    val contents = getContents() ?: return null
+    return getTextAndTransferableData(contents)
+  }
+
+  private fun getTextAndTransferableData(trans: Transferable): Pair<String, List<Any>?>? {
     var res: String? = null
     var transferableData: List<TextBlockTransferableData> = ArrayList()
     try {
-      val trans = getContents() ?: return null
       val data = trans.getTransferData(DataFlavor.stringFlavor)
       res = data.toString()
       transferableData = collectTransferableData(trans)
@@ -53,22 +60,32 @@ class IjClipboardManager : VimClipboardManager {
     } catch (ignored: IOException) {
     }
     if (res == null) return null
-
     return Pair(res, transferableData)
   }
 
+  override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Transferable? {
+    return handleTextSetting(text, rawText, transferableData) { content -> setContents(content) }
+  }
+
+  override fun setPrimaryText(text: String, rawText: String, transferableData: List<Any>): Transferable? {
+    return handleTextSetting(text, rawText, transferableData) { content ->
+      val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return@handleTextSetting null
+      clipboard.setContents(content, EmptyClipboardOwner.INSTANCE)
+    }
+  }
+
   @Suppress("UNCHECKED_CAST")
-  override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Any? {
-    val transferableData1 = (transferableData as List<TextBlockTransferableData>).toMutableList()
+  private fun handleTextSetting(text: String, rawText: String, transferableData: List<Any>, setContent: (TextBlockTransferable) -> Unit?): Transferable? {
+    val mutableTransferableData = (transferableData as List<TextBlockTransferableData>).toMutableList()
     try {
-      val s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData1)
-      if (transferableData1.none { it is CaretStateTransferableData }) {
-        // Manually add CaretStateTransferableData to avoid adjustment of copied text to multicaret
-        transferableData1 += CaretStateTransferableData(intArrayOf(0), intArrayOf(s.length))
+      val s = TextBlockTransferable.convertLineSeparators(text, "\n", mutableTransferableData)
+      if (mutableTransferableData.none { it is CaretStateTransferableData }) {
+        // Manually add CaretStateTransferableData to avoid adjustment of a copied text to multicaret
+        mutableTransferableData += CaretStateTransferableData(intArrayOf(0), intArrayOf(s.length))
       }
-      logger.debug { "Paste text with transferable data: ${transferableData1.joinToString { it.javaClass.name }}" }
-      val content = TextBlockTransferable(s, transferableData1, RawText(rawText))
-      setContents(content)
+      logger.debug { "Paste text with transferable data: ${mutableTransferableData.joinToString { it.javaClass.name }}" }
+      val content = TextBlockTransferable(s, mutableTransferableData, RawText(rawText))
+      setContent(content)
       return content
     } catch (ignored: HeadlessException) {
     }
@@ -78,9 +95,12 @@ class IjClipboardManager : VimClipboardManager {
   override fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any> {
     val editor = (vimEditor as IjVimEditor).editor
     val transferableData: MutableList<TextBlockTransferableData> = ArrayList()
-    val project = editor.project ?: return ArrayList()
+    val project = editor.project ?: return emptyList()
 
-    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return ArrayList()
+    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return emptyList()
+
+    // This thing enables alternative context resolve for dumb mode.
+    // Please read docs for com.intellij.openapi.project.DumbService.isAlternativeResolveEnabled
     DumbService.getInstance(project).withAlternativeResolveEnabled {
       for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
         try {
@@ -90,8 +110,8 @@ class IjClipboardManager : VimClipboardManager {
               file,
               editor,
               textRange.startOffsets,
-              textRange.endOffsets
-            )
+              textRange.endOffsets,
+            ),
           )
         } catch (ignore: IndexNotReadyException) {
         }
@@ -119,12 +139,11 @@ class IjClipboardManager : VimClipboardManager {
     val project = editor.project ?: return text
     val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return text
     val rawText = TextBlockTransferable.convertLineSeparators(
-      text, "\n",
-      transferableData as Collection<TextBlockTransferableData?>
+      text,
+      "\n",
+      transferableData as Collection<TextBlockTransferableData?>,
     )
-    if (VimPlugin.getOptionService()
-      .isSet(OptionScope.GLOBAL, OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessName)
-    ) {
+    if (injector.ijOptions(vimEditor).ideacopypreprocess) {
       for (processor in CopyPastePreProcessor.EP_NAME.extensionList) {
         val escapedText = processor.preprocessOnCopy(file, textRange.startOffsets, textRange.endOffsets, rawText)
         if (escapedText != null) {
@@ -136,12 +155,7 @@ class IjClipboardManager : VimClipboardManager {
   }
 
   private fun setContents(contents: Transferable) {
-    if (ApplicationManager.getApplication().isUnitTestMode) {
-      TestClipboardModel.contents = contents
-      CopyPasteManagerEx.getInstanceEx().setContents(contents)
-    } else {
-      CopyPasteManagerEx.getInstanceEx().setContents(contents)
-    }
+    CopyPasteManagerEx.getInstanceEx().setContents(contents)
   }
 
   private fun collectTransferableData(transferable: Transferable): List<TextBlockTransferableData> {
@@ -155,13 +169,7 @@ class IjClipboardManager : VimClipboardManager {
     return allValues
   }
 
-  private fun getContents(): Transferable? {
-    if (ApplicationManager.getApplication().isUnitTestMode) {
-      return contents
-    }
-    val manager = CopyPasteManagerEx.getInstanceEx()
-    return manager.contents
-  }
+  private fun getContents(): Transferable? = CopyPasteManagerEx.getInstanceEx().contents
 
   companion object {
     val logger = vimLogger<IjClipboardManager>()

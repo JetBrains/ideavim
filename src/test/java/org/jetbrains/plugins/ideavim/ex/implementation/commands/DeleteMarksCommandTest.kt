@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,10 +9,11 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.editor.LogicalPosition
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -22,10 +23,10 @@ import kotlin.test.assertNull
 class DeleteMarksCommandTest : VimTestCase() {
   private fun setUpMarks(marks: String) {
     configureByText(
-      """I found it in a legendary land
-         all rocks and lavender and tufted grass,
-         where it was settled on some sodden sand
-         hard by the torrent of a mountain pass.
+      """Lorem ipsum dolor sit amet,
+         consectetur adipiscing elit
+         Sed in orci mauris.
+         Cras id tellus in ex imperdiet egestas.
 
          The features it combines mark it as new
          to science: shape and shade -- the special tinge,
@@ -36,19 +37,22 @@ class DeleteMarksCommandTest : VimTestCase() {
          corroded tissues could no longer hide
          that priceless mote now dimpling the convex
          and limpid teardrop on a lighted slide.
-         """.trimMargin()
+      """.trimMargin(),
     )
 
+    val vimEditor = fixture.editor.vim
     marks.forEachIndexed { index, c ->
-      VimPlugin.getMark()
-        .setMark(myFixture.editor.vim, c, myFixture.editor.logicalPositionToOffset(LogicalPosition(index, 0)))
+      injector.markService
+        .setMark(vimEditor.primaryCaret(), c, fixture.editor.logicalPositionToOffset(LogicalPosition(index, 0)))
     }
   }
 
   private fun getMark(ch: Char): Mark? {
-    return VimPlugin.getMark().getMark(myFixture.editor.vim, ch)
+    val vimEditor = fixture.editor.vim
+    return injector.markService.getMark(vimEditor.primaryCaret(), ch)
   }
 
+  @Test
   fun `test delete single mark`() {
     setUpMarks("a")
     typeText(commandToKeys("delmarks a"))
@@ -56,6 +60,7 @@ class DeleteMarksCommandTest : VimTestCase() {
     assertNull(getMark('a'), "Mark was not deleted")
   }
 
+  @Test
   fun `test delete multiple marks`() {
     setUpMarks("abAB")
     typeText(commandToKeys("delmarks Ab"))
@@ -67,6 +72,7 @@ class DeleteMarksCommandTest : VimTestCase() {
       .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was unexpectedly deleted") }
   }
 
+  @Test
   fun `test delete ranges (inclusive)`() {
     setUpMarks("abcde")
     typeText(commandToKeys("delmarks b-d"))
@@ -78,6 +84,7 @@ class DeleteMarksCommandTest : VimTestCase() {
       .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was unexpectedly deleted") }
   }
 
+  @Test
   fun `test delete multiple ranges and marks with whitespace`() {
     setUpMarks("abcdeABCDE")
     typeText(commandToKeys("delmarks b-dC-E a"))
@@ -89,6 +96,7 @@ class DeleteMarksCommandTest : VimTestCase() {
       .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was unexpectedly deleted") }
   }
 
+  @Test
   fun `test invalid range throws exception without deleting any marks`() {
     setUpMarks("a")
     typeText(commandToKeys("delmarks a-C"))
@@ -97,6 +105,7 @@ class DeleteMarksCommandTest : VimTestCase() {
     assertNotNull(getMark('a'), "Mark was deleted despite invalid command given")
   }
 
+  @Test
   fun `test invalid characters throws exception`() {
     setUpMarks("a")
     typeText(commandToKeys("delmarks bca# foo"))
@@ -105,6 +114,7 @@ class DeleteMarksCommandTest : VimTestCase() {
     assertNotNull(getMark('a'), "Mark was deleted despite invalid command given")
   }
 
+  @Test
   fun `test delmarks! with trailing spaces`() {
     setUpMarks("aBcAbC")
     typeText(commandToKeys("delmarks!"))
@@ -116,6 +126,7 @@ class DeleteMarksCommandTest : VimTestCase() {
       .forEach { ch -> assertNotNull(getMark(ch), "Global mark $ch was deleted by delmarks!") }
   }
 
+  @Test
   fun `test delmarks! with other arguments fails`() {
     setUpMarks("aBcAbC")
     typeText(commandToKeys("delmarks!a"))
@@ -125,6 +136,7 @@ class DeleteMarksCommandTest : VimTestCase() {
       .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was deleted despite invalid command given") }
   }
 
+  @Test
   fun `test trailing spaces ignored`() {
     setUpMarks("aBcAbC")
     typeText(commandToKeys("delmarks!   "))
@@ -136,6 +148,7 @@ class DeleteMarksCommandTest : VimTestCase() {
       .forEach { ch -> assertNotNull(getMark(ch), "Global mark $ch was deleted by delmarks!") }
   }
 
+  @Test
   fun `test alias (delm)`() {
     setUpMarks("a")
     typeText(commandToKeys("delm a"))

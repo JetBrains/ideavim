@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,34 +12,26 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
-@RunWith(Theories::class)
 class InsertCompletedLiteralActionTest : VimTestCase() {
 
   companion object {
     @JvmStatic
     val octalPrefix = listOf("o", "O")
-      @DataPoints("octalPrefix") get
 
     @JvmStatic
     val shortHexPrefix = listOf("x", "X")
-      @DataPoints("shortHexPrefix") get
 
     @JvmStatic
     val hexPrefix = listOf("u")
-      @DataPoints("hexPrefix") get
 
     @JvmStatic
     val longHexPrefix = listOf("U")
-      @DataPoints("longHexPrefix") get
 
     @JvmStatic
     val insertDigraph = listOf("<C-v>", "<C-q>")
-      @DataPoints("insertDigraph") get
   }
 
   private fun checkInsert(code: String, result: String) {
@@ -55,7 +47,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
   // fun `octal codes`(@FromDataPoints("octalPrefix") prefix: String) {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  @Theory
+  @Test
   fun `octal codes`() {
     for (prefix in octalPrefix) {
       checkInsert("$prefix ", " ")
@@ -67,7 +59,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
 
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  @Theory
+  @Test
   fun `decimal codes`() {
     checkInsert("1 ", "${1.toChar()}")
     checkInsert("01 ", "${1.toChar()}")
@@ -76,7 +68,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
 
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  @Theory
+  @Test
   fun `hex codes`() {
     for (prefix in shortHexPrefix) {
       checkInsert("$prefix ", " ")
@@ -105,7 +97,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
     }
   }
 
-  @Theory
+  @Test
   fun `unexpected prefix ending`() {
     checkInsert("o<C-a>", 1.toChar().toString())
     checkInsert("O<C-a>", 1.toChar().toString())
@@ -122,26 +114,26 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
     checkInsert("U<Esc>", 27.toChar().toString())
   }
 
-  @Theory
+  @Test
   fun `special keys`() {
     checkInsert("<Esc>", "${27.toChar()}")
 //     checkInsert("<CR>", "${13.toChar()}") exception is thrown because of the \r symbol
   }
 
-  // todo
-//  @Theory
-//  fun `keycode 10 is not 10 at all`() {
-//    checkInsert("010", 0.toChar().toString())
-//    checkInsert("o012", 0.toChar().toString())
-//    checkInsert("O012", 0.toChar().toString())
-//    checkInsert("010", 0.toChar().toString())
-//    checkInsert("x0A", 0.toChar().toString())
-//    checkInsert("X0A", 0.toChar().toString())
-//    checkInsert("u000A", 0.toChar().toString())
-//    checkInsert("U0000000A", 0.toChar().toString())
-//  }
+  @Test
+  @Disabled
+  fun `keycode 10 is not 10 at all`() {
+    checkInsert("010", 0.toChar().toString())
+    checkInsert("o012", 0.toChar().toString())
+    checkInsert("O012", 0.toChar().toString())
+    checkInsert("010", 0.toChar().toString())
+    checkInsert("x0A", 0.toChar().toString())
+    checkInsert("X0A", 0.toChar().toString())
+    checkInsert("u000A", 0.toChar().toString())
+    checkInsert("U0000000A", 0.toChar().toString())
+  }
 
-  @Theory
+  @Test
   fun `regular character`() {
     checkInsert("a", "a")
     checkInsert("A", "A")
@@ -192,7 +184,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  @Theory
+  @Test
   fun `control plus character`() {
     checkInsert("<C-a>", 1.toChar().toString())
     checkInsert("<C-b>", 2.toChar().toString())

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,16 +8,17 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import kotlin.system.measureTimeMillis
 
 // todo time limit
 class LongerScriptTest : VimTestCase() {
 
   // it's always broken somehow
+  @Test
   fun `test token helper function`() {
     configureByText("\n")
     val function = """
@@ -60,11 +61,12 @@ class LongerScriptTest : VimTestCase() {
     """.trimIndent()
     val parsingTime = measureTimeMillis { VimscriptParser.parse(function) }
     println(parsingTime)
-    injector.vimscriptExecutor.execute(function)
+    executeVimscript(function)
     typeText(commandToKeys("echo F('s[ubstitute]')"))
     assertExOutput("'s' | 'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';\n")
   }
 
+  @Test
   fun `test matchit vim parsing time`() {
     val script = """
       "  matchit.vim: (global plugin) Extended "%" matching
@@ -837,6 +839,7 @@ class LongerScriptTest : VimTestCase() {
     println(parsingTime)
   }
 
+  @Test
   fun `test abolish vim parsing time`() {
     val script = """
       " abolish.vim - Language friendly searches, substitutions, and abbreviations

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,13 +14,12 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.intellij.openapi.progress.ProcessCanceledException
-import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -29,10 +28,13 @@ import javax.swing.KeyStroke
  * Accepts all regular keystrokes and passes them on to the Vim key handler.
  *
  * IDE shortcut keys used by Vim commands are handled by [com.maddyhome.idea.vim.action.VimShortcutKeyAction].
+ *
+ * This class is used in Which-Key plugin, so don't make it internal. Generally, we should provide a proper
+ *   way to get ideavim keys for this plugin. See VIM-3085
  */
-class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
+public class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
-  private val traceTime = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideatracetimeName)
+  private val traceTime = injector.globalOptions().ideatracetime
 
   init {
     KeyHandlerKeeper.getInstance().originalHandler = origHandler
@@ -75,7 +77,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
       val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
       val startTime = if (traceTime) System.currentTimeMillis() else null
-      handler.handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, context).vim)
+      handler.handleKey(editor.vim, keyStroke, injector.executionContextManager.onEditor(editor.vim, context.vim), handler.keyHandlerState)
       if (startTime != null) {
         val duration = System.currentTimeMillis() - startTime
         LOG.info("VimTypedAction '$charTyped': $duration ms")
@@ -87,7 +89,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
     }
   }
 
-  companion object {
+  internal companion object {
     private val LOG = logger<VimTypedActionHandler>()
   }
 }
@@ -95,7 +97,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
 /**
  * A nasty workaround to handle `<S-Space>` events. Probably all the key events should go trough this listener.
  */
-object VimKeyListener : KeyAdapter() {
+internal object VimKeyListener : KeyAdapter() {
 
   var isSpaceShift = false
 

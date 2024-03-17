@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -24,8 +24,6 @@ import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
@@ -43,6 +41,9 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
@@ -293,7 +294,7 @@ public class ExEntryPanel extends JPanel {
         VimPlugin.getEditor().closeEditorSearchSession(editor);
         final int matchOffset = SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
         if (matchOffset != -1) {
-          editor.getCaretModel().getPrimaryCaret().moveToOffset(matchOffset);
+          new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
         }
         else {
           resetCaretOffset(editor);
@@ -421,7 +422,7 @@ public class ExEntryPanel extends JPanel {
   }
 
   private boolean isIncSearchEnabled() {
-    return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.incsearchName, OptionConstants.incsearchName);
+    return globalOptions(injector).getIncsearch();
   }
 
   private boolean active;
@@ -452,7 +453,7 @@ public class ExEntryPanel extends JPanel {
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
-      if (!VimPlugin.isEnabled()) return;
+      if (VimPlugin.isNotEnabled()) return;
       // Calls updateUI on this and child components
       if (ExEntryPanel.isInstanceWithShortcutsActive()) {
         IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstance());

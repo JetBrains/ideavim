@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,9 +9,11 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class IfStatementTest : VimTestCase() {
 
+  @Test
   fun `test simple if with true condition`() {
     configureByText("\n")
     typeText(
@@ -19,12 +21,13 @@ class IfStatementTest : VimTestCase() {
         "" +
           "if 1 |" +
           " echo 'success' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test simple if with false condition`() {
     configureByText("\n")
     typeText(
@@ -32,12 +35,13 @@ class IfStatementTest : VimTestCase() {
         "" +
           "if 0 |" +
           " echo 'success' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertNoExOutput()
   }
 
+  @Test
   fun `test unreachable else`() {
     configureByText("\n")
     typeText(
@@ -47,12 +51,13 @@ class IfStatementTest : VimTestCase() {
           " echo 'success' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test else`() {
     configureByText("\n")
     typeText(
@@ -62,12 +67,13 @@ class IfStatementTest : VimTestCase() {
           " echo 'failure' |" +
           "else |" +
           " echo 'success' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test unreachable elif`() {
     configureByText("\n")
     typeText(
@@ -79,12 +85,13 @@ class IfStatementTest : VimTestCase() {
           " echo 'failure' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test elif`() {
     configureByText("\n")
     typeText(
@@ -96,12 +103,13 @@ class IfStatementTest : VimTestCase() {
           " echo 'success' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test multiple elifs`() {
     configureByText("\n")
     typeText(
@@ -115,8 +123,8 @@ class IfStatementTest : VimTestCase() {
           " echo 'success' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }

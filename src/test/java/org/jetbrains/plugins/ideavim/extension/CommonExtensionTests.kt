@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,14 +9,17 @@
 package org.jetbrains.plugins.ideavim.extension
 
 import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.invokeLater
+import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.Alias
 import com.maddyhome.idea.vim.extension.ExtensionBeanClass
 import com.maddyhome.idea.vim.extension.ExtensionHandler
@@ -24,90 +27,94 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
-import junit.framework.TestCase
+import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class OpMappingTest : VimTestCase() {
-  private var initialized = false
-
   private lateinit var extension: ExtensionBeanClass
 
-  override fun setUp() {
-    super.setUp()
-    if (!initialized) {
-      initialized = true
+  private var disposable: Disposable = Disposer.newDisposable()
 
-      extension = TestExtension.createBean()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    extension = TestExtension.createBean()
 
-      VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
-      enableExtensions("TestExtension")
-    }
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
+    enableExtensions("TestExtension")
   }
 
-  override fun tearDown() {
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
-    super.tearDown()
+  @AfterEach
+  override fun tearDown(testInfo: TestInfo) {
+    Disposer.dispose(disposable)
+    super.tearDown(testInfo)
   }
 
+  @Test
   fun `test simple delete`() {
     doTest(
       "dI",
       "${c}I found it in a legendary land",
       "${c}nd it in a legendary land",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test simple delete backwards`() {
     doTest(
       "dP",
       "I found ${c}it in a legendary land",
       "I f${c}it in a legendary land",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test delete emulate inclusive`() {
     doTest(
       "dU",
       "${c}I found it in a legendary land",
       "${c}d it in a legendary land",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test linewise delete`() {
     doTest(
       "dO",
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test disable extension via set`() {
     configureByText("${c}I found it in a legendary land")
     typeText(injector.parser.parseKeys("Q"))
@@ -122,41 +129,44 @@ class OpMappingTest : VimTestCase() {
     assertState("I ${c}found it in a legendary land")
   }
 
+  @Test
   fun `test disable extension as extension point`() {
     configureByText("${c}I found it in a legendary land")
     typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    Disposer.dispose(disposable)
+    disposable = Disposer.newDisposable()
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     enableExtensions("TestExtension")
     typeText(injector.parser.parseKeys("Q"))
     assertState("I ${c}found it in a legendary land")
   }
 
+  @Test
   fun `test disable disposed extension`() {
     configureByText("${c}I found it in a legendary land")
     typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    Disposer.dispose(disposable)
+    disposable = Disposer.newDisposable()
     typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
     enableExtensions("TestExtension")
     typeText(injector.parser.parseKeys("Q"))
     assertState("I ${c}found it in a legendary land")
   }
 
+  @Test
   fun `test delayed action`() {
     configureByText("${c}I found it in a legendary land")
     typeText(injector.parser.parseKeys("R"))
@@ -171,6 +181,7 @@ class OpMappingTest : VimTestCase() {
   /**
    * This test tests an intentionally incorrectly implemented action
    */
+  @Test
   fun `test delayed incorrect action`() {
     configureByText("${c}I found it in a legendary land")
     typeText(injector.parser.parseKeys("E"))
@@ -187,34 +198,41 @@ class PlugExtensionsTest : VimTestCase() {
 
   private lateinit var extension: ExtensionBeanClass
 
-  override fun setUp() {
-    super.setUp()
+  private var disposable: Disposable = Disposer.newDisposable()
+
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    configureByText("\n")
 
     extension = TestExtension.createBean()
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
   }
 
-  override fun tearDown() {
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
-    super.tearDown()
+  @AfterEach
+  override fun tearDown(testInfo: TestInfo) {
+    Disposer.dispose(disposable)
+    super.tearDown(super.testInfo)
   }
 
+  @Test
   fun `test enable via plug`() {
-    injector.vimscriptExecutor.execute("Plug 'MyTest'", false)
+    executeVimscript("Plug 'MyTest'", false)
 
     assertTrue(extension.ext.initialized)
   }
 
+  @Test
   fun `test enable via plugin`() {
-    injector.vimscriptExecutor.execute("Plugin 'MyTest'", false)
+    executeVimscript("Plugin 'MyTest'", false)
 
     assertTrue(extension.ext.initialized)
   }
 
+  @Test
   fun `test enable via plug and disable via set`() {
-    injector.vimscriptExecutor.execute("Plug 'MyTest'")
-    injector.vimscriptExecutor.execute("set noTestExtension")
+    executeVimscript("Plug 'MyTest'")
+    executeVimscript("set noTestExtension")
     assertTrue(extension.ext.initialized)
     assertTrue(extension.ext.disposed)
   }
@@ -224,72 +242,87 @@ class PlugMissingKeysTest : VimTestCase() {
 
   private lateinit var extension: ExtensionBeanClass
 
-  override fun setUp() {
-    super.setUp()
+  private var disposable: Disposable = Disposer.newDisposable()
+
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    configureByText("\n")
 
     extension = TestExtension.createBean()
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    VimExtension.EP_NAME.point.registerExtension(extension, disposable)
   }
 
-  override fun tearDown() {
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
-    super.tearDown()
+  @AfterEach
+  override fun tearDown(testInfo: TestInfo) {
+    Disposer.dispose(disposable)
+    super.tearDown(super.testInfo)
   }
 
+  @Test
   fun `test missing keys`() {
     executeLikeVimrc(
       "map myKey <Plug>TestMissing",
-      "Plug 'MyTest'"
+      "Plug 'MyTest'",
     )
 
+    // Mapping to Z was override by the mapping to myKey
     val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
-    TestCase.assertEquals(1, keyMappings.size)
-    TestCase.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
+    kotlin.test.assertEquals(1, keyMappings.size)
+    kotlin.test.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
 
     val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, injector.parser.parseKeys("<Plug>TestMissing"))
-    TestCase.assertEquals(1, iKeyMappings.size)
-    TestCase.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
+    kotlin.test.assertEquals(1, iKeyMappings.size)
+    kotlin.test.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
   }
 
+  @Test
   fun `test missing keys enable plugin first`() {
     executeLikeVimrc(
       "Plug 'MyTest'",
-      "map myKey <Plug>TestMissing"
+      "map myKey <Plug>TestMissing",
     )
 
+    // Mapping to Z was override by the mapping to myKey
     val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
-    TestCase.assertEquals(1, keyMappings.size)
-    TestCase.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
+    kotlin.test.assertEquals(1, keyMappings.size)
+    kotlin.test.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
 
     val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, injector.parser.parseKeys("<Plug>TestMissing"))
-    TestCase.assertEquals(1, iKeyMappings.size)
-    TestCase.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
+    kotlin.test.assertEquals(1, iKeyMappings.size)
+    kotlin.test.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
   }
 
+  @Test
   fun `test packadd`() {
-    assertFalse(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
-    executeLikeVimrc(
-      "packadd matchit",
-    )
-
-    assertTrue(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
+    assertOptionUnset("matchit")
+    executeLikeVimrc("packadd matchit")
+    assertOptionSet("matchit")
   }
 
+  @Test
   fun `test packadd ex`() {
-    assertFalse(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
-    executeLikeVimrc(
-      "packadd! matchit",
-    )
+    assertOptionUnset("matchit")
+    executeLikeVimrc("packadd! matchit")
+    assertOptionSet("matchit")
+  }
 
-    assertTrue(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
+  private fun assertOptionSet(name: String) {
+    val option = injector.optionGroup.getOption(name)!!
+    assertTrue(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)).asBoolean())
+  }
+
+  private fun assertOptionUnset(name: String) {
+    val option = injector.optionGroup.getOption(name)!!
+    assertFalse(injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)).asBoolean())
   }
 
   private fun executeLikeVimrc(vararg text: String) {
     injector.vimscriptExecutor.executingVimscript = true
-    injector.vimscriptExecutor.execute(text.joinToString("\n"), false)
+    injector.vimscriptExecutor.executingIdeaVimRcConfiguration = true
+    executeVimscript(text.joinToString("\n"), false)
+    injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false
     injector.vimscriptExecutor.executingVimscript = false
-    VimExtensionRegistrar.enableDelayedExtensions()
   }
 }
 
@@ -310,14 +343,14 @@ private class TestExtension : VimExtension {
       injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"),
       owner,
       MoveEmulateInclusive(),
-      false
+      false,
     )
     putExtensionHandlerMapping(
       MappingMode.O,
       injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"),
       owner,
       MoveBackwards(),
-      false
+      false,
     )
     putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
     putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
@@ -344,29 +377,29 @@ private class TestExtension : VimExtension {
   }
 
   private class MoveEmulateInclusive : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
-      VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      VimPlugin.getVisualMotion().enterVisualMode(editor, SelectionType.CHARACTER_WISE)
       val caret = editor.ij.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
-      caret.vim.moveToOffset(newOffset)
+      val newOffset = VimPlugin.getMotion().getHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
+      caret.vim.moveToMotion(newOffset)
     }
   }
 
   private class MoveBackwards : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset - 5) }
     }
   }
 
   private class Move : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset + 5) }
     }
   }
 
   private class MoveLinewise : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
-      VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      VimPlugin.getVisualMotion().enterVisualMode(editor, SelectionType.LINE_WISE)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret.vim, 1)
       caret.vim.moveToOffset((newOffset as Motion.AbsoluteOffset).offset)
@@ -374,15 +407,15 @@ private class TestExtension : VimExtension {
   }
 
   private class MoveLinewiseInNormal : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val caret = editor.ij.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 1, true)
-      caret.vim.moveToOffset(newOffset)
+      val newOffset = VimPlugin.getMotion().getHorizontalMotion(editor, caret.vim, 1, true)
+      caret.vim.moveToMotion(newOffset)
     }
   }
 
   private class DelayedAction : ExtensionHandler.WithCallback() {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       invokeLater {
         invokeLater {
           editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset + 5) }
@@ -394,7 +427,7 @@ private class TestExtension : VimExtension {
 
   // This action should be registered with WithCallback, but we intentionally made it incorrectly for tests
   private class DelayedIncorrectAction : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       invokeLater {
         invokeLater {
           editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset + 5) }

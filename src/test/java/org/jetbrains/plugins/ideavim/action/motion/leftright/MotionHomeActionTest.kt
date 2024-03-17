@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,22 +10,22 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import org.jetbrains.plugins.ideavim.OptionValueType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import kotlin.test.assertTrue
 
-class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+@TraceOptions(TestOptionConstants.keymodel)
+class MotionHomeActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test motion home`() {
     val keys = "<Home>"
     val before = """
@@ -44,17 +44,17 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test default stop select`() {
-    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+    val keymodel = optionsNoEditor().keymodel
     assertTrue(OptionConstants.keymodel_stopselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
   fun `test continue visual`() {
     val keys = listOf("v", "<Home>")
     val before = """
@@ -73,11 +73,11 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
   fun `test continue select`() {
     val keys = listOf("gh", "<Home>")
     val before = """
@@ -96,17 +96,11 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test exit visual`() {
     val keys = listOf("v", "<Home>")
     val before = """
@@ -125,17 +119,11 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test exit select`() {
     val keys = listOf("gh", "<Home>")
     val before = """
@@ -154,6 +142,6 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 }

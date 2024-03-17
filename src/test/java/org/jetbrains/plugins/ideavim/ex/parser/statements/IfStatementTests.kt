@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,22 +10,26 @@ package org.jetbrains.plugins.ideavim.ex.parser.statements
 
 import com.maddyhome.idea.vim.vimscript.model.statements.IfStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.productForArguments
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@RunWith(Theories::class)
-class IfStatementTests {
+class IfStatementTests : VimTestCase() {
 
   companion object {
     @JvmStatic
-    val values = listOf("", " ") @DataPoints get
+    val values = listOf("", " ")
+
+    @JvmStatic
+    fun arg4(): List<Arguments> = productForArguments(values, values, values, values)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg4")
   fun ifTest(sp1: String, sp2: String, sp3: String, sp4: String) {
     val script = VimscriptParser.parse(
       """
@@ -39,7 +43,7 @@ class IfStatementTests {
           echo 1
           echo 1
         endif$sp4
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is IfStatement)

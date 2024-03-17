@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,9 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 class AnonymousFunctionTest : VimTestCase() {
 
+  @Test
   fun `test anonymous function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {}"))
@@ -23,30 +26,33 @@ class AnonymousFunctionTest : VimTestCase() {
            function dict.pi() |
              return 3.1415 |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo dict.pi()"))
     assertExOutput("3.1415\n")
   }
 
   // todo. `commandToKeys` is executed as if it would from the command line. so no script - no scope ¯\_(ツ)_/¯
-//  fun `test anonymous function with scope`() {
-//    configureByText("\n")d
-//    typeText(commandToKeys("let s:dict = {}"))
-//    typeText(
-//      commandToKeys(
-//        """
-//           function s:dict.pi() |
-//             return 3.1415 |
-//           endfunction
-//        """.trimIndent()
-//      )
-//    )
-//    typeText(commandToKeys("echo s:dict.pi()"))
-//    assertExOutput("3.1415\n")
-//  }
+  @Test
+  @Disabled
+  fun `test anonymous function with scope`() {
+    configureByText("\n")
+    typeText(commandToKeys("let s:dict = {}"))
+    typeText(
+      commandToKeys(
+        """
+           function s:dict.pi() |
+             return 3.1415 |
+           endfunction
+        """.trimIndent(),
+      ),
+    )
+    typeText(commandToKeys("echo s:dict.pi()"))
+    assertExOutput("3.1415\n")
+  }
 
+  @Test
   fun `test self in anonymous function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'name': 'dict'}"))
@@ -56,13 +62,14 @@ class AnonymousFunctionTest : VimTestCase() {
            function dict.getName() |
              return self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo dict.getName()"))
     assertExOutput("dict\n")
   }
 
+  @Test
   fun `test inner anonymous function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'dict2': {'dict3': {}}}"))
@@ -72,14 +79,15 @@ class AnonymousFunctionTest : VimTestCase() {
            function dict.dict2.dict3.sayHi() |
              echo 'hi' |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("call dict.dict2.dict3.sayHi()"))
     assertExOutput("hi\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test anonymous function for non-dict variable`() {
     configureByText("\n")
     typeText(commandToKeys("let list = []"))
@@ -89,14 +97,15 @@ class AnonymousFunctionTest : VimTestCase() {
            function list.sayHi() |
              echo 'hi' |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E1203: Dot can only be used on a dictionary")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test dictionary function already exists`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'abs' : function('abs')}"))
@@ -110,13 +119,14 @@ class AnonymousFunctionTest : VimTestCase() {
                return -a:number |
              endif |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E717: Dictionary entry already exists")
   }
 
+  @Test
   fun `test replace existing function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'abs' : function('abs')}"))
@@ -130,14 +140,15 @@ class AnonymousFunctionTest : VimTestCase() {
                return -a:number |
              endif |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo dict.abs(-10)"))
     assertExOutput("10\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
   fun `test funcref required`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'abs' : 'absolute'}"))
@@ -151,8 +162,8 @@ class AnonymousFunctionTest : VimTestCase() {
                return -a:number |
              endif |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E718: Funcref required")

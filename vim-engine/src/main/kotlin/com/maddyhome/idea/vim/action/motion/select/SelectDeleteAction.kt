@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -21,7 +23,8 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-class SelectDeleteAction : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["<BS>", "<DEL>"], modes = [Mode.SELECT])
+public class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT
 
@@ -34,7 +37,7 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
     val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action, context)) {
+      if (injector.actionExecutor.executeAction(editor, action, context)) {
         break
       }
     }

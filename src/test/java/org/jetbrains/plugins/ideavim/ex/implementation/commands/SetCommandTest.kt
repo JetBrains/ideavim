@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,134 +8,323 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
+@Suppress("SpellCheckingInspection")
+@TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class SetCommandTest : VimTestCase() {
 
-  fun `test unknown option`() {
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     configureByText("\n")
-    typeText(commandToKeys("set unknownOption"))
+  }
+
+  private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("set shell=/dummy/path/to/bash")
+    enterCommand("set shellcmdflag=-x")
+    enterCommand("set shellxescape=@")
+    enterCommand("set shellxquote={")
+  }
+
+  @Test
+  fun `test unknown option`() {
+    enterCommand("set unknownOption")
     assertPluginError(true)
     assertPluginErrorMessageContains("Unknown option: unknownOption")
   }
 
+  @Test
   fun `test toggle option`() {
-    configureByText("\n")
-    typeText(commandToKeys("set rnu"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumberName))
-    typeText(commandToKeys("set rnu!"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumberName))
+    enterCommand("set rnu")
+    assertTrue(options().relativenumber)
+    enterCommand("set nornu")
+    assertFalse(options().relativenumber)
+    enterCommand("set rnu!")
+    assertTrue(options().relativenumber)
+    enterCommand("set invrnu")
+    assertFalse(options().relativenumber)
   }
 
-  // todo we have spaces in assertExOutput because of pad(20) in the com.maddyhome.idea.vim.vimscript.model.commands.SetCommandKt#showOptions method
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test number option`() {
-    configureByText("\n")
-    typeText(commandToKeys("set scrolloff&"))
-    assertEquals(VimInt(0), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName))
-    typeText(commandToKeys("set scrolloff?"))
-    assertExOutput("scrolloff=0         \n")
-    typeText(commandToKeys("set scrolloff=5"))
-    assertEquals(VimInt(5), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName))
-    typeText(commandToKeys("set scrolloff?"))
-    assertExOutput("scrolloff=5         \n")
+    enterCommand("set scrolloff&")
+    assertEquals(0, options().scrolloff)
+    assertCommandOutput("set scrolloff?", "  scrolloff=0\n")
+    enterCommand("set scrolloff=5")
+    assertEquals(5, options().scrolloff)
+    assertCommandOutput("set scrolloff?", "  scrolloff=5\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test toggle option as a number`() {
-    configureByText("\n")
-    typeText(commandToKeys("set number&"))
-    assertEquals(VimInt(0), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.numberName))
-    typeText(commandToKeys("set number?"))
-    assertExOutput("nonumber            \n")
-    typeText(commandToKeys("let &nu=1000"))
-    assertEquals(VimInt(1000), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.numberName))
-    typeText(commandToKeys("set number?"))
-    assertExOutput("  number            \n")
+    enterCommand("set number&")   // Local to window. Reset local + per-window "global" value to default: nonu
+    assertEquals(0, injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertCommandOutput("set number?", "nonumber\n")
+
+    // Should have the same effect as `:set` (although `:set` doesn't allow assigning a number to a boolean)
+    // I.e. this sets the local value and the per-window "global" value
+    enterCommand("let &nu=1000")
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble().toInt())
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertCommandOutput("set number?", "  number\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test toggle option exceptions`() {
-    configureByText("\n")
-    typeText(commandToKeys("set number+=10"))
+    enterCommand("set number+=10")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: number+=10")
-    typeText(commandToKeys("set number+=test"))
+    enterCommand("set number+=test")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: number+=test")
 
-    typeText(commandToKeys("set number^=10"))
+    enterCommand("set number^=10")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: number^=10")
-    typeText(commandToKeys("set number^=test"))
+    enterCommand("set number^=test")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: number^=test")
 
-    typeText(commandToKeys("set number-=10"))
+    enterCommand("set number-=10")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: number-=10")
-    typeText(commandToKeys("set number-=test"))
+    enterCommand("set number-=test")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: number-=test")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test number option exceptions`() {
-    configureByText("\n")
-    typeText(commandToKeys("set scrolloff+=10"))
-    assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scrolloff+=10")
-    typeText(commandToKeys("set scrolloff+=test"))
+    enterCommand("set scrolloff+=10")
+    assertPluginError(false)
+    enterCommand("set scrolloff+=test")
     assertPluginError(true)
     assertPluginErrorMessageContains("E521: Number required after =: scrolloff+=test")
 
-    typeText(commandToKeys("set scrolloff^=10"))
-    assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scrolloff^=10")
-    typeText(commandToKeys("set scrolloff^=test"))
+    enterCommand("set scrolloff^=10")
+    assertPluginError(false)
+    enterCommand("set scrolloff^=test")
     assertPluginError(true)
     assertPluginErrorMessageContains("E521: Number required after =: scrolloff^=test")
 
-    typeText(commandToKeys("set scrolloff-=10"))
-    assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scrolloff-=10")
-    typeText(commandToKeys("set scrolloff-=test"))
+    enterCommand("set scrolloff-=10")
+    assertPluginError(false)
+    enterCommand("set scrolloff-=test")
     assertPluginError(true)
     assertPluginErrorMessageContains("E521: Number required after =: scrolloff-=test")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test string option`() {
-    configureByText("\n")
-    typeText(commandToKeys("set selection&"))
-    assertEquals(VimString("inclusive"), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectionName))
-    typeText(commandToKeys("set selection?"))
-    assertExOutput("selection=inclusive \n")
-    typeText(commandToKeys("set selection=exclusive"))
-    assertEquals(VimString("exclusive"), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectionName))
-    typeText(commandToKeys("set selection?"))
-    assertExOutput("selection=exclusive \n")
+    enterCommand("set selection&")
+    assertEquals("inclusive", options().selection)
+    assertCommandOutput("set selection?", "  selection=inclusive\n")
+    enterCommand("set selection=exclusive")
+    assertEquals("exclusive", options().selection)
+    assertCommandOutput("set selection?", "  selection=exclusive\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test show numbered value`() {
-    configureByText("\n")
-    typeText(commandToKeys("set so"))
-    assertExOutput("scrolloff=0         \n")
+    assertCommandOutput("set so", "  scrolloff=0\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  fun `test show numbered value with questionmark`() {
-    configureByText("\n")
-    typeText(commandToKeys("set so?"))
-    assertExOutput("scrolloff=0         \n")
+  @Test
+  fun `test show numbered value with question mark`() {
+    assertCommandOutput("set so?", "  scrolloff=0\n")
+  }
+
+  @Test
+  fun `test show all modified effective option values`() {
+    enterCommand("set number relativenumber scrolloff nrformats")
+    assertCommandOutput("set",
+      """
+        |--- Options ---
+        |  number              relativenumber
+        |
+      """.trimMargin())
+  }
+
+  @Test
+  fun `test show all effective option values`() {
+    setOsSpecificOptionsToSafeValues()
+    assertCommandOutput("set all",
+      """
+        |--- Options ---
+        |noargtextobj        noincsearch           selectmode=       notextobj-indent
+        |nocommentary        nomatchit             shellcmdflag=-x     timeout
+        |nodigraph             maxmapdepth=20      shellxescape=@      timeoutlen=1000
+        |noexchange            more                shellxquote={     notrackactionids
+        |nogdefault          nomultiple-cursors    showcmd             undolevels=1000
+        |nohighlightedyank   noNERDTree            showmode            virtualedit=
+        |  history=50          nrformats=hex       sidescroll=0      novisualbell
+        |nohlsearch          nonumber              sidescrolloff=0     visualdelay=100
+        |noideaglobalmode      operatorfunc=     nosmartcase           whichwrap=b,s
+        |noideajoin          norelativenumber    nosneak               wrapscan
+        |  ideamarks           scroll=0            startofline
+        |  ideawrite=all       scrolljump=1      nosurround
+        |noignorecase          scrolloff=0       notextobj-entire
+        |  clipboard=ideaput,autoselect,exclude:cons\|linux
+        |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+        |  ide=IntelliJ IDEA Community Edition
+        |noideacopypreprocess
+        |  idearefactormode=select
+        |  ideastatusicon=enabled
+        |  ideavimsupport=dialog
+        |  iskeyword=@,48-57,_
+        |  keymodel=continueselect,stopselect
+        |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+        |  matchpairs=(:),{:},[:]
+        |noReplaceWithRegister
+        |  selection=inclusive
+        |  shell=/dummy/path/to/bash
+        |novim-paragraph-motion
+        |  viminfo='100,<50,s10,h
+        |
+      """.trimMargin())
+  }
+
+  @Test
+  fun `test show named options`() {
+    assertCommandOutput("set number? relativenumber? scrolloff? nrformats?", """
+      |  nrformats=hex     nonumber            norelativenumber      scrolloff=0
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show all modified option values in single column`() {
+    enterCommand("set number relativenumber scrolloff nrformats")
+    assertCommandOutput("set!",
+      """
+      |--- Options ---
+      |  number
+      |  relativenumber
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show all option values in single column`() {
+    setOsSpecificOptionsToSafeValues()
+    assertCommandOutput("set! all", """
+      |--- Options ---
+      |noargtextobj
+      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |nocommentary
+      |nodigraph
+      |noexchange
+      |nogdefault
+      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+      |nohighlightedyank
+      |  history=50
+      |nohlsearch
+      |  ide=IntelliJ IDEA Community Edition
+      |noideacopypreprocess
+      |noideaglobalmode
+      |noideajoin
+      |  ideamarks
+      |  idearefactormode=select
+      |  ideastatusicon=enabled
+      |  ideavimsupport=dialog
+      |  ideawrite=all
+      |noignorecase
+      |noincsearch
+      |  iskeyword=@,48-57,_
+      |  keymodel=continueselect,stopselect
+      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+      |nomatchit
+      |  matchpairs=(:),{:},[:]
+      |  maxmapdepth=20
+      |  more
+      |nomultiple-cursors
+      |noNERDTree
+      |  nrformats=hex
+      |nonumber
+      |  operatorfunc=
+      |norelativenumber
+      |noReplaceWithRegister
+      |  scroll=0
+      |  scrolljump=1
+      |  scrolloff=0
+      |  selection=inclusive
+      |  selectmode=
+      |  shell=/dummy/path/to/bash
+      |  shellcmdflag=-x
+      |  shellxescape=@
+      |  shellxquote={
+      |  showcmd
+      |  showmode
+      |  sidescroll=0
+      |  sidescrolloff=0
+      |nosmartcase
+      |nosneak
+      |  startofline
+      |nosurround
+      |notextobj-entire
+      |notextobj-indent
+      |  timeout
+      |  timeoutlen=1000
+      |notrackactionids
+      |  undolevels=1000
+      |novim-paragraph-motion
+      |  viminfo='100,<50,s10,h
+      |  virtualedit=
+      |novisualbell
+      |  visualdelay=100
+      |  whichwrap=b,s
+      |  wrapscan
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test show named options in single column`() {
+    assertCommandOutput("set! number? relativenumber? scrolloff? nrformats?", """
+      |  nrformats=hex
+      |nonumber
+      |norelativenumber
+      |  scrolloff=0
+      |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `test reset local value for local-to-buffer option`() {
+    enterCommand("set nrformats=octal")
+
+    enterCommand("set nrformats&")
+
+    assertCommandOutput("set nrformats?", "  nrformats=hex\n")
+  }
+
+  @Test
+  fun `test reset local value for global-local option`() {
+    enterCommand("set virtualedit=block") // Sets the global + effective values. Local is unset
+    enterCommand("setlocal virtualedit=onemore")  // Sets the local + effective values
+    assertCommandOutput("set virtualedit?", "  virtualedit=onemore\n")
+    assertCommandOutput("setlocal virtualedit?", "  virtualedit=onemore\n")
+
+    // This is like setting the global-local value to its own global value. :set with a global-local option will set the
+    // global value and unset the local value
+    enterCommand("set virtualedit<")
+
+    assertCommandOutput("set virtualedit?", "  virtualedit=block\n")
+    assertCommandOutput("setlocal virtualedit?", "  virtualedit=\n")
+
+    // Note that :setlocal virtualedit< has different behaviour. See SetlocalCommandTest
   }
 }

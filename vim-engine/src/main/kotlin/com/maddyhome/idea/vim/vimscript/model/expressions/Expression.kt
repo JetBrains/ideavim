@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,8 +13,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-abstract class Expression {
+public abstract class Expression {
 
-  lateinit var originalString: String
-  abstract fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
+  public lateinit var originalString: String
+  public abstract fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
 }

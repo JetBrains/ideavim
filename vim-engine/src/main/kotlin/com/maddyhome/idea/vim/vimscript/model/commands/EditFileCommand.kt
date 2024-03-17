@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -18,25 +19,26 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :edit"
  */
-data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+@ExCommand(command = "e[dit],bro[wse]")
+public data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val arg = argument
     if (arg == "#") {
-      injector.markGroup.saveJumpLocation(editor)
+      injector.jumpService.saveJumpLocation(editor)
       injector.file.selectPreviousTab(context)
       return ExecutionResult.Success
     } else if (arg.isNotEmpty()) {
       val res = injector.file.openFile(arg, context)
       if (res) {
-        injector.markGroup.saveJumpLocation(editor)
+        injector.jumpService.saveJumpLocation(editor)
       }
       return if (res) ExecutionResult.Success else ExecutionResult.Error
     }
 
     // Don't open a choose file dialog under a write action
     injector.application.invokeLater {
-      injector.actionExecutor.executeAction("OpenFile", injector.executionContextManager.createEditorDataContext(editor, context))
+      injector.actionExecutor.executeAction("OpenFile", injector.executionContextManager.onEditor(editor, context))
     }
 
     return ExecutionResult.Success

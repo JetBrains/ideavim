@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,16 +15,16 @@ import com.maddyhome.idea.vim.VimPlugin
 // This variable describe migrators and detectors that would be injected during production run
 private val productionMigrationComponents = MigrationComponents(
   migrators = setOf(
-    `Version 6 to 7 config migration`
+    `Version 6 to 7 config migration`,
   ),
   versionDetectors = listOf(
-    `Detect versions 3, 4, 5, 6`
+    `Detect versions 3, 4, 5, 6`,
   ),
-  currentVersion = VimPlugin.STATE_VERSION
+  currentVersion = VimPlugin.STATE_VERSION,
 )
 
 // Just a collection of migrators and collectors
-class MigrationComponents(
+internal class MigrationComponents(
   val migrators: Set<ConfigMigrator>,
   val versionDetectors: List<VersionDetector>,
   val currentVersion: Int,
@@ -48,7 +48,7 @@ class MigrationComponents(
  *   we should silently skip it instead of failure.
  */
 @Service
-class ApplicationConfigurationMigrator(migrationComponents: MigrationComponents) {
+internal class ApplicationConfigurationMigrator(migrationComponents: MigrationComponents) {
 
   @Suppress("unused", "HardCodedStringLiteral")
   constructor() : this(productionMigrationComponents)
@@ -79,7 +79,9 @@ class ApplicationConfigurationMigrator(migrationComponents: MigrationComponents)
       version = if (configMigrator != null) {
         configMigrator.versionUp()
         configMigrator.toVersion
-      } else version + 1
+      } else {
+        version + 1
+      }
     }
   }
 

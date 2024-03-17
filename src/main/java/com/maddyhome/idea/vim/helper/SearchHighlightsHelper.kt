@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -21,19 +21,20 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.ColorUtil
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.annotations.Contract
 import java.awt.Color
 import java.awt.Font
 import java.util.*
 
-fun updateSearchHighlights(
+internal fun updateSearchHighlights(
   pattern: String?,
   shouldIgnoreSmartCase: Boolean,
   showHighlights: Boolean,
@@ -42,7 +43,7 @@ fun updateSearchHighlights(
   updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
 
-fun updateIncsearchHighlights(
+internal fun updateIncsearchHighlights(
   editor: Editor,
   pattern: String,
   forwards: Boolean,
@@ -51,20 +52,24 @@ fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset =
     if (searchRange != null) editor.vim.getLineStartOffset(searchRange.startLine) else caretOffset
-  val showHighlights = VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.hlsearchName)
+  val showHighlights = injector.options(editor.vim).hlsearch
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 
-fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): RangeHighlighter {
+internal fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): RangeHighlighter {
   val color = TextAttributes(
     editor.colorsScheme.getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
     editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
     editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
-    EffectType.ROUNDED_BOX, Font.PLAIN
+    EffectType.ROUNDED_BOX,
+    Font.PLAIN,
   )
   return editor.markupModel.addRangeHighlighter(
-    start, end, HighlighterLayer.SELECTION,
-    color, HighlighterTargetArea.EXACT_RANGE
+    start,
+    end,
+    HighlighterLayer.SELECTION,
+    color,
+    HighlighterTargetArea.EXACT_RANGE,
   )
 }
 
@@ -82,11 +87,24 @@ private fun updateSearchHighlights(
 ): Int {
   var currentMatchOffset = -1
   val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentMatchOffset
+
+  // TODO: This implementation needs rethinking
+  // It's a bit weird that we update search highlights across all open projects. It would make more sense to treat top
+  // level project frame windows as separate applications, but we can't do this because IdeaVim does not maintain state
+  // per-project.
+  // So, to be clear, this will loop over each project, and therefore, for each project top-level frame, will update
+  // search highlights in all editors for the document of the currently selected editor. It does not update highlights
+  // for editors for the document that are in other projects.
+
   for (project in projectManager.openProjects) {
     val current = FileEditorManager.getInstance(project).selectedTextEditor ?: continue
-    // [VERSION UPDATE] 202+ Use editors
-    val editors = localEditors(current.document, project)
-    for (editor in editors) {
+    val editors = injector.editorGroup.getEditors(IjVimDocument(current.document))
+    for (vimEditor in editors) {
+      val editor = (vimEditor as IjVimEditor).editor
+      if (editor.project != project) {
+        continue
+      }
+
       // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
       // Force update for the situations where the text is the same, but the ignore case values have changed.
       // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
@@ -102,7 +120,7 @@ private fun updateSearchHighlights(
         val startLine = searchRange?.startLine ?: 0
         val endLine = searchRange?.endLine ?: -1
         val results =
-          SearchHelper.findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
+          injector.searchHelper.findAll(IjVimEditor(editor), pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
         if (results.isNotEmpty()) {
           currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
           highlightSearchResults(editor, pattern, results, currentMatchOffset)
@@ -111,12 +129,12 @@ private fun updateSearchHighlights(
       } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
         // nohlsearch + incsearch
         val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscanName)) {
+        if (injector.globalOptions().wrapscan) {
           searchOptions.add(SearchOptions.WRAP)
         }
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
         if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
-        val result = SearchHelper.findPattern(editor, pattern, initialOffset, 1, searchOptions)
+        val result = injector.searchHelper.findPattern(IjVimEditor(editor), pattern, initialOffset, 1, searchOptions)
         if (result != null) {
           currentMatchOffset = result.startOffset
           val results = listOf(result)
@@ -173,7 +191,7 @@ private fun findClosestMatch(editor: Editor, results: List<TextRange>, initialOf
     }
     d2 - d1
   }
-  if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscanName)) {
+  if (!injector.globalOptions().wrapscan) {
     val start = max.startOffset
     if (forwards && start < initialOffset) {
       return -1
@@ -193,7 +211,7 @@ private fun distance(range: TextRange, pos: Int, forwards: Boolean, size: Int): 
   }
 }
 
-fun highlightSearchResults(editor: Editor, pattern: String, results: List<TextRange>, currentMatchOffset: Int) {
+internal fun highlightSearchResults(editor: Editor, pattern: String, results: List<TextRange>, currentMatchOffset: Int) {
   var highlighters = editor.vimLastHighlighters
   if (highlighters == null) {
     highlighters = mutableListOf()
@@ -219,8 +237,11 @@ private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolea
     attributes.errorStripeColor = getFallbackErrorStripeColor(attributes, editor.colorsScheme)
   }
   val highlighter = editor.markupModel.addRangeHighlighter(
-    start, end, HighlighterLayer.SELECTION - 1,
-    attributes, HighlighterTargetArea.EXACT_RANGE
+    start,
+    end,
+    HighlighterLayer.SELECTION - 1,
+    attributes,
+    HighlighterTargetArea.EXACT_RANGE,
   )
   highlighter.errorStripeTooltip = tooltip
   return highlighter

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,7 +16,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-abstract class VimStringParserBase : VimStringParser {
+public abstract class VimStringParserBase : VimStringParser {
   override val plugKeyStroke: KeyStroke
     get() = parseKeys("<Plug>")[0]
 
@@ -241,6 +241,21 @@ abstract class VimStringParserBase : VimStringParser {
       KeyEvent.VK_F12 -> "f12"
       VK_PLUG -> "plug"
       VK_ACTION -> "action"
+      KeyEvent.VK_NUMPAD0 -> "k0"
+      KeyEvent.VK_NUMPAD1 -> "k1"
+      KeyEvent.VK_NUMPAD2 -> "k2"
+      KeyEvent.VK_NUMPAD3 -> "k3"
+      KeyEvent.VK_NUMPAD4 -> "k4"
+      KeyEvent.VK_NUMPAD5 -> "k5"
+      KeyEvent.VK_NUMPAD6 -> "k6"
+      KeyEvent.VK_NUMPAD7 -> "k7"
+      KeyEvent.VK_NUMPAD8 -> "k8"
+      KeyEvent.VK_NUMPAD9 -> "k9"
+      KeyEvent.VK_KP_DOWN -> "kdown"
+      KeyEvent.VK_KP_UP -> "kup"
+      KeyEvent.VK_KP_LEFT -> "kleft"
+      KeyEvent.VK_KP_RIGHT -> "kright"
+      KeyEvent.VK_UNDO -> "undo"
       else -> null
     }
   }
@@ -442,7 +457,9 @@ abstract class VimStringParserBase : VimStringParser {
   private fun octalDigitToNumber(c: Char): Int? {
     return if (c in '0'..'7') {
       c.code - '0'.code
-    } else null
+    } else {
+      null
+    }
   }
 
   private fun hexDigitToNumber(c: Char): Int? {
@@ -511,6 +528,23 @@ abstract class VimStringParserBase : VimStringParser {
       "f12" -> KeyEvent.VK_F12
       "plug" -> VK_PLUG
       "action" -> VK_ACTION
+      "k0" -> KeyEvent.VK_NUMPAD0
+      "k1" -> KeyEvent.VK_NUMPAD1
+      "k2" -> KeyEvent.VK_NUMPAD2
+      "k3" -> KeyEvent.VK_NUMPAD3
+      "k4" -> KeyEvent.VK_NUMPAD4
+      "k5" -> KeyEvent.VK_NUMPAD5
+      "k6" -> KeyEvent.VK_NUMPAD6
+      "k7" -> KeyEvent.VK_NUMPAD7
+      "k8" -> KeyEvent.VK_NUMPAD8
+      "k9" -> KeyEvent.VK_NUMPAD9
+      "khome" -> KeyEvent.VK_HOME
+      "kend" -> KeyEvent.VK_END
+      "kdown" -> KeyEvent.VK_KP_DOWN
+      "kup" -> KeyEvent.VK_KP_UP
+      "kleft" -> KeyEvent.VK_KP_LEFT
+      "kright" -> KeyEvent.VK_KP_RIGHT
+      "undo" -> KeyEvent.VK_UNDO
       else -> null
     }
   }
@@ -539,7 +573,7 @@ abstract class VimStringParserBase : VimStringParser {
     INIT, ESCAPE, SPECIAL
   }
 
-  companion object {
+  private companion object {
     private const val CMD_PREFIX = "d-"
     private const val META_PREFIX = "m-"
     private const val ALT_PREFIX = "a-"

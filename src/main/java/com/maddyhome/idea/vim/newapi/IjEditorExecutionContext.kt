@@ -1,0 +1,39 @@
+/*
+ * Copyright 2003-2023 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
+package com.maddyhome.idea.vim.newapi
+
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.UserDataHolder
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+
+internal open class IjEditorExecutionContext(override val context: DataContext) : ExecutionContext.Editor {
+  override fun updateEditor(editor: VimEditor): ExecutionContext {
+    return IjEditorExecutionContext(injector.executionContextManager.onEditor(editor, context.vim).ij)
+  }
+}
+
+internal class IjCaretAndEditorExecutionContext(override val context: DataContext) : IjEditorExecutionContext(context), ExecutionContext.CaretAndEditor
+
+// This key is stored in data context when the action is started from vim
+internal val runFromVimKey = Key.create<Boolean>("RunFromVim")
+
+/**
+ * Check if the action with this data context was started from Vim
+ */
+internal val DataContext.actionStartedFromVim: Boolean
+  get() = (this as? UserDataHolder)?.getUserData(runFromVimKey) ?: false
+
+public val DataContext.vim: ExecutionContext
+  get() = IjEditorExecutionContext(this)
+
+public val ExecutionContext.ij: DataContext
+  get() = (this as IjEditorExecutionContext).context

@@ -1,6 +1,8 @@
 IdeaVim project is licensed under MIT license except the following parts of it:
 
-File [RegExp.kt](src/main/java/com/maddyhome/idea/vim/regexp/RegExp.kt) is licensed under Vim License.
+* File [RegExp.kt](src/main/java/com/maddyhome/idea/vim/regexp/RegExp.kt) is licensed under Vim License.  
+* File [ScrollViewHelper.kt](com/maddyhome/idea/vim/helper/ScrollViewHelper.kt) is licensed under Vim License.
+* File [Tutor.kt](src/main/java/com/maddyhome/idea/vim/ui/Tutor.kt) is licensed under Vim License.
 
 ```
 VIM LICENSE
@@ -26,8 +28,8 @@ II) It is allowed to distribute a modified (or extended) version of Vim,
           maintainer will do with your changes and under what license they
           will be distributed is negotiable.  If there has been no negotiation
           then this license, or a later version, also applies to your changes.
-          The current maintainer is Bram Moolenaar <Bram@vim.org>.  If this
-          changes it will be announced in appropriate places (most likely
+          The current maintainers are listed here: https://github.com/orgs/vim/people.
+          If this changes it will be announced in appropriate places (most likely
           vim.sf.net, www.vim.org and/or comp.editors). When it is completely
           impossible to contact the maintainer, the obligation to send him
           your changes ceases.  Once the maintainer has confirmed that he has
@@ -82,3 +84,8 @@ IV)  It is not allowed to remove this license from the distribution of the Vim
      license for previous Vim releases instead of the license that they came
      with, at your option.
 ```
+
+---
+
+File [sneakIcon.png](doc/images/sneakIcon.svg), which is originally an icon of the ideavim-sneak plugin,
+is merged icons of IdeaVim plugin and a random sneaker by FreePic from flaticon.com.

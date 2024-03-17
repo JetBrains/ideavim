@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,8 +7,10 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
@@ -22,14 +24,14 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
+public sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
@@ -39,12 +41,19 @@ sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionH
   }
 }
 
-class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
-class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
-class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
-class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
+@CommandOrMotion(keys = ["]}"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
 
-private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: VimCaret, count: Int, type: Char): Int {
+@CommandOrMotion(keys = ["[{"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
+
+@CommandOrMotion(keys = ["])"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
+
+@CommandOrMotion(keys = ["[("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
+
+private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int {
   return if (editor.currentCaret().offset.point == 0 && count < 0 || editor.currentCaret().offset.point >= editor.fileSize() - 1 && count > 0) {
     -1
   } else {

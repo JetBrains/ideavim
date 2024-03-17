@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.ui.ex;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -122,16 +121,11 @@ public class ExTextField extends JTextField {
   }
 
   void setType(@NotNull String type) {
-    String hkey = null;
-    switch (type.charAt(0)) {
-      case '/':
-      case '?':
-        hkey = HistoryConstants.SEARCH;
-        break;
-      case ':':
-        hkey = HistoryConstants.COMMAND;
-        break;
-    }
+    String hkey = switch (type.charAt(0)) {
+      case '/', '?' -> HistoryConstants.SEARCH;
+      case ':' -> HistoryConstants.COMMAND;
+      default -> null;
+    };
 
     if (hkey != null) {
       history = VimPlugin.getHistory().getEntries(hkey, 0, 0);
@@ -141,7 +135,7 @@ public class ExTextField extends JTextField {
 
   /**
    * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
-   *
+   * <p>
    * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
    */
   void saveLastEntry() {
@@ -221,7 +215,6 @@ public class ExTextField extends JTextField {
 
   void setEditor(@NotNull Editor editor, DataContext context) {
     this.context = context;
-    Project project = editor.getProject();
     EditorHolderService.getInstance().setEditor(editor);
   }
 
@@ -306,7 +299,10 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    VimPlugin.getProcess().cancelExEntry(new IjVimEditor(EditorHolderService.getInstance().getEditor()), true);
+    Editor editor = EditorHolderService.getInstance().getEditor();
+    if (editor != null) {
+      VimPlugin.getProcess().cancelExEntry(new IjVimEditor(editor), true);
+    }
   }
 
   public void setCurrentAction(@NotNull MultiStepAction action, char pendingIndicator) {
@@ -324,7 +320,7 @@ public class ExTextField extends JTextField {
 
   /**
    * Text to show while composing a digraph or inserting a literal or register
-   *
+   * <p>
    * The prompt character is inserted directly into the text of the text field, rather than drawn over the top of the
    * current character. When the action has been completed, the new character(s) are either inserted or overwritten,
    * depending on the insert/overwrite status of the text field. This mimics Vim's behaviour.
@@ -373,7 +369,11 @@ public class ExTextField extends JTextField {
   void toggleInsertReplace() {
     ExDocument doc = (ExDocument)getDocument();
     doc.toggleInsertReplace();
+
+    // Hide/show the caret so its new shape is immediately visible
+    caret.setVisible(false);
     resetCaret();
+    caret.setVisible(true);
   }
 
   private void resetCaret() {
@@ -416,20 +416,15 @@ public class ExTextField extends JTextField {
     private boolean hasFocus;
 
     public void setAttributes(GuiCursorAttributes attributes) {
-      final boolean active = isActive();
 
-      // Hide the currently visible caret
-      if (isVisible()) {
-        setVisible(false);
-      }
+      // Note: do not call anything that causes a layout in this method! E.g. setVisible. This method is used as a
+      // callback whenever the caret moves, and causing a layout at this point can cause issues such as an infinite
+      // loop in the layout algorithm with multi-width characters such as emoji or non-Latin characters (I don't know
+      // why the layout algorithm gets stuck, but we can easily avoid it)
+      // See VIM-2562
 
       mode = attributes.getType();
       thickness = mode == GuiCursorType.BLOCK ? 100 : attributes.getThickness();
-
-      // Make sure the caret is visible, but only if we're active, otherwise we'll kick off the flasher timer unnecessarily
-      if (active) {
-        setVisible(true);
-      }
     }
 
     @Override
@@ -494,7 +489,7 @@ public class ExTextField extends JTextField {
 
     /**
      * Updates the bounds of the caret and repaints those bounds.
-     *
+     * <p>
      * This method is not guaranteed to be called before paint(). The bounds are for use by repaint().
      *
      * @param r The current location of the caret, usually provided by MapToView. The x and y appear to be the upper

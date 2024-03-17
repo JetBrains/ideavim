@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,6 +13,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.lineLength
@@ -22,7 +23,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 import kotlin.math.max
 
-class AddInlineInlaysAction : AnAction() {
+internal class AddInlineInlaysAction : AnAction(), ActionRemoteBehaviorSpecification.Disabled {
   companion object {
     private val random = Random()
   }
@@ -46,7 +47,7 @@ class AddInlineInlaysAction : AnAction() {
       inlayModel.addInlineElement(
         offset,
         relatesToPrecedingText,
-        HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:")
+        HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"),
       )
       // Every 20 chars +/- 5 chars
       i += 20 + (random.nextInt(10) - 5)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -23,6 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SelectExtendVariousMotionsTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun `test with tabs`() {
     val code = """
         class Scratch {
@@ -55,7 +57,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}fu${c}${se}nc myFunc() {
         ${s}${c}${se}.return anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
 
     typeText(injector.parser.parseKeys("<S-UP>".repeat(7) + "<S-Right>".repeat(3)))
@@ -73,7 +75,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func m${c}${se}yFunc() {
         ${s}.re${c}${se}turn anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
 
     typeText(injector.parser.parseKeys("<S-Right>".repeat(2)))
@@ -91,7 +93,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func myF${c}${se}unc() {
         ${s}.retu${c}${se}rn anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
   }
 }

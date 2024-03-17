@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,51 +11,37 @@ package com.maddyhome.idea.vim.vimscript.services
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getOrPutBufferData
+import com.maddyhome.idea.vim.api.getOrPutTabData
+import com.maddyhome.idea.vim.api.getOrPutWindowData
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-abstract class VimVariableServiceBase : VariableService {
+public abstract class VimVariableServiceBase : VariableService {
   private var globalVariables: MutableMap<String, VimDataType> = mutableMapOf()
   private val windowVariablesKey = Key<MutableMap<String, VimDataType>>("TabVariables")
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
   private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
+  protected var vimVariables: MutableMap<String, VimDataType> = mutableMapOf()
 
-  private fun getWindowVariables(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storedVariableMap = injector.vimStorageService.getDataFromEditor(editor, windowVariablesKey)
-    if (storedVariableMap != null) {
-      return storedVariableMap
-    }
-    val windowVariables = mutableMapOf<String, VimDataType>()
-    injector.vimStorageService.putDataToEditor(editor, windowVariablesKey, windowVariables)
-    return windowVariables
-  }
+  private fun getWindowVariables(editor: VimEditor) =
+    injector.vimStorageService.getOrPutWindowData(editor, windowVariablesKey) { mutableMapOf() }
 
-  private fun getBufferVariables(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storedVariableMap = injector.vimStorageService.getDataFromBuffer(editor, bufferVariablesKey)
-    if (storedVariableMap != null) {
-      return storedVariableMap
-    }
-    val bufferVariables = mutableMapOf<String, VimDataType>()
-    injector.vimStorageService.putDataToBuffer(editor, bufferVariablesKey, bufferVariables)
-    return bufferVariables
-  }
+  private fun getBufferVariables(editor: VimEditor) =
+    injector.vimStorageService.getOrPutBufferData(editor, bufferVariablesKey) { mutableMapOf() }
 
-  private fun getTabVariables(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storedVariableMap = injector.vimStorageService.getDataFromTab(editor, tabVariablesKey)
-    if (storedVariableMap != null) {
-      return storedVariableMap
-    }
-    val tabVariables = mutableMapOf<String, VimDataType>()
-    injector.vimStorageService.putDataToTab(editor, tabVariablesKey, tabVariables)
-    return tabVariables
-  }
+  private fun getTabVariables(editor: VimEditor) =
+    injector.vimStorageService.getOrPutTabData(editor, tabVariablesKey) { mutableMapOf() }
 
   protected fun getDefaultVariableScope(executable: VimLContext): Scope {
     return when (executable.getExecutableContext(executable)) {
@@ -118,7 +104,7 @@ abstract class VimVariableServiceBase : VariableService {
       ?: throw ExException(
         "E121: Undefined variable: " +
           (if (variable.scope != null) variable.scope.c + ":" else "") +
-          variable.name.evaluate(editor, context, vimContext).value
+          variable.name.evaluate(editor, context, vimContext).value,
       )
   }
 
@@ -186,10 +172,24 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   protected open fun getVimVariable(name: String, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType? {
-    throw ExException("The 'v:' scope is not implemented yet :(")
+    return when (name) {
+      "count" -> {
+        val count = VimStateMachine.getInstance(editor).commandBuilder.count
+        VimInt(count)
+      }
+      "count1" -> {
+        val count1 = VimStateMachine.getInstance(editor).commandBuilder.count.coerceAtLeast(1)
+        VimInt(count1)
+      }
+      "searchforward" -> {
+        val searchForward = if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0
+        VimInt(searchForward)
+      }
+      else -> throw ExException("The 'v:' scope is not implemented yet :(")
+    }
   }
 
-  protected open fun storeGlobalVariable(name: String, value: VimDataType) {
+  public override fun storeGlobalVariable(name: String, value: VimDataType) {
     globalVariables[name] = value
   }
 
@@ -241,5 +241,13 @@ abstract class VimVariableServiceBase : VariableService {
 
   override fun clear() {
     globalVariables.clear()
+  }
+
+  override fun getVimVariable(name: String): VimDataType? {
+    return vimVariables[name]
+  }
+
+  override fun storeVimVariable(name: String, value: VimDataType) {
+    vimVariables[name] = value
   }
 }

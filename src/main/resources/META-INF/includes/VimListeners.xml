@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2003-2022 The IdeaVim authors
+  ~ Copyright 2003-2023 The IdeaVim authors
   ~
   ~ Use of this source code is governed by an MIT-style
   ~ license that can be found in the LICENSE.txt file or at
@@ -10,12 +10,16 @@
   <applicationListeners>
     <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
-              topic="com.intellij.ide.ui.LafManagerListener"/>
-  </applicationListeners>
-  <projectListeners>
     <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimCorrectorKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+  </applicationListeners>
+  <projectListeners>
 
     <listener class="com.maddyhome.idea.vim.listener.VimListenerManager$VimFileEditorManagerListener"
               topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
@@ -26,7 +30,7 @@
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimTemplateManagerListener"
               topic="com.intellij.codeInsight.template.TemplateManagerListener"/>
 
-    <listener class="com.maddyhome.idea.vim.group.MarkGroup$VimBookmarksListener"
+    <listener class="com.maddyhome.idea.vim.group.VimMarkServiceImpl$VimBookmarksListener"
               topic="com.intellij.ide.bookmark.BookmarksListener"/>
 
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimFindModelListener"

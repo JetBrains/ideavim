@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,24 +9,39 @@ package com.maddyhome.idea.vim.extension
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.Extension
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.CommandLineHelper
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ModalEntry
+import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.KeyStroke
 
 /**
@@ -36,10 +51,13 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
-object VimExtensionFacade {
+public object VimExtensionFacade {
+
+  private val LOG = logger<VimExtensionFacade>()
+
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
-  fun putExtensionHandlerMapping(
+  public fun putExtensionHandlerMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -49,13 +67,14 @@ object VimExtensionFacade {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
+
   /**
    * COMPATIBILITY-LAYER: Additional method
    * Please see: https://jb.gg/zo8n0r
    */
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
-  fun putExtensionHandlerMapping(
+  public fun putExtensionHandlerMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -67,7 +86,7 @@ object VimExtensionFacade {
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
-  fun putKeyMapping(
+  public fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -79,7 +98,7 @@ object VimExtensionFacade {
 
   /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
   @JvmStatic
-  fun putKeyMappingIfMissing(
+  public fun putKeyMappingIfMissing(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -93,7 +112,7 @@ object VimExtensionFacade {
   /**
    * Equivalent to calling 'command' to set up a user-defined command or alias
    */
-  fun addCommand(
+  public fun addCommand(
     name: String,
     handler: CommandAliasHandler,
   ) {
@@ -104,7 +123,7 @@ object VimExtensionFacade {
    * Equivalent to calling 'command' to set up a user-defined command or alias
    */
   @JvmStatic
-  fun addCommand(
+  public fun addCommand(
     name: String,
     minimumNumberOfArguments: Int,
     maximumNumberOfArguments: Int,
@@ -112,12 +131,6 @@ object VimExtensionFacade {
   ) {
     VimPlugin.getCommand()
       .setAlias(name, CommandAlias.Call(minimumNumberOfArguments, maximumNumberOfArguments, name, handler))
-  }
-
-  /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
-  @JvmStatic
-  fun setOperatorFunction(function: OperatorFunction) {
-    VimPlugin.getKey().operatorFunction = function
   }
 
   /**
@@ -128,32 +141,37 @@ object VimExtensionFacade {
    * leaves the editor in the insert mode if it's been activated.
    */
   @JvmStatic
-  fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
-    val context = EditorDataContext.init(editor)
-    keys.forEach { KeyHandler.getInstance().handleKey(editor.vim, it, context.vim, false, false) }
+  public fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
+    val context = injector.executionContextManager.onEditor(editor.vim)
+    val keyHandler = KeyHandler.getInstance()
+    keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, false, keyHandler.keyHandlerState) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
   @JvmStatic
-  fun inputKeyStroke(editor: Editor): KeyStroke {
+  public fun inputKeyStroke(editor: Editor): KeyStroke {
     if (editor.vim.vimStateMachine.isDotRepeatInProgress) {
       val input = Extension.consumeKeystroke()
+      LOG.trace("inputKeyStroke: dot repeat in progress. Input: $input")
       return input ?: error("Not enough keystrokes saved: ${Extension.lastExtensionHandler}")
     }
 
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
+      LOG.trace("Unit test mode is active")
       val mappingStack = KeyHandler.getInstance().keyStack
       mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
-        if (editor.vim.vimStateMachine.isRecording) {
+        if (injector.registerGroup.isRecording) {
           KeyHandler.getInstance().modalEntryKeys += it
         }
       }
     } else {
+      LOG.trace("Getting char from the modal entry...")
       var ref: KeyStroke? = null
       ModalEntry.activate(editor.vim) { stroke: KeyStroke? ->
         ref = stroke
         false
       }
+      LOG.trace("Got char $ref")
       ref
     }
     val result = key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())
@@ -163,38 +181,99 @@ object VimExtensionFacade {
 
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
-  fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
+  public fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
     return service<CommandLineHelper>().inputString(editor.vim, prompt, finishOn) ?: ""
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */
   @JvmStatic
-  fun getRegister(register: Char): List<KeyStroke>? {
+  public fun getRegister(register: Char): List<KeyStroke>? {
     val reg = VimPlugin.getRegister().getRegister(register) ?: return null
     return reg.keys
   }
 
   @JvmStatic
-  fun getRegisterForCaret(register: Char, caret: VimCaret): List<KeyStroke>? {
-    val reg = caret.registerStorage.getRegister(caret, register) ?: return null
+  public fun getRegisterForCaret(register: Char, caret: VimCaret): List<KeyStroke>? {
+    val reg = caret.registerStorage.getRegister(register) ?: return null
     return reg.keys
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
-  fun setRegister(register: Char, keys: List<KeyStroke?>?) {
+  public fun setRegister(register: Char, keys: List<KeyStroke?>?) {
     VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList())
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
-  fun setRegisterForCaret(register: Char, caret: VimCaret, keys: List<KeyStroke?>?) {
-    caret.registerStorage.setKeys(caret, register, keys?.filterNotNull() ?: emptyList())
+  public fun setRegisterForCaret(register: Char, caret: ImmutableVimCaret, keys: List<KeyStroke?>?) {
+    caret.registerStorage.setKeys(register, keys?.filterNotNull() ?: emptyList())
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
-  fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
+  public fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
     VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList(), type)
   }
+
+  @JvmStatic
+  public fun exportScriptFunction(
+    scope: Scope?,
+    name: String,
+    args: List<String>,
+    defaultArgs: List<Pair<String, Expression>>,
+    hasOptionalArguments: Boolean,
+    flags: EnumSet<FunctionFlag>,
+    function: ScriptFunction
+  ) {
+    var functionDeclaration: FunctionDeclaration? = null
+    val body = listOf(object : Executable {
+      // This context is set to the function declaration during initialisation and then set to the function execution
+      // context during execution
+      override lateinit var vimContext: VimLContext
+      override var rangeInScript: TextRange = TextRange(0, 0)
+
+      override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+        return function.execute(editor, context, functionDeclaration!!.functionVariables)
+      }
+    })
+    functionDeclaration = FunctionDeclaration(
+      scope,
+      name,
+      args,
+      defaultArgs,
+      body,
+      replaceExisting = true,
+      flags,
+      hasOptionalArguments
+    )
+    functionDeclaration.rangeInScript = TextRange(0, 0)
+    body.forEach { it.vimContext = functionDeclaration }
+    injector.functionService.storeFunction(functionDeclaration)
+  }
+}
+
+public fun VimExtensionFacade.exportOperatorFunction(name: String, function: OperatorFunction) {
+  exportScriptFunction(null, name, listOf("type"), emptyList(), false, noneOfEnum()) {
+    editor, context, args ->
+
+    val type = args["type"]?.asString()
+    val selectionType = when (type) {
+      "line" -> SelectionType.LINE_WISE
+      "block" -> SelectionType.BLOCK_WISE
+      "char" -> SelectionType.CHARACTER_WISE
+      else -> return@exportScriptFunction ExecutionResult.Error
+    }
+
+    if (function.apply(editor, context, selectionType)) {
+      ExecutionResult.Success
+    }
+    else {
+      ExecutionResult.Error
+    }
+  }
+}
+
+public fun interface ScriptFunction {
+  public fun execute(editor: VimEditor, context: ExecutionContext, args: Map<String, VimDataType>): ExecutionResult
 }

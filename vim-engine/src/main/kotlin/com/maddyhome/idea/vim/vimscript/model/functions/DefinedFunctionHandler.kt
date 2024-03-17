@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -28,13 +28,15 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionHandler() {
-
+public data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionHandler() {
   private val logger = vimLogger<DefinedFunctionHandler>()
-  override val name = function.name
-  override val scope = function.scope
-  override val minimumNumberOfArguments = function.args.size
-  override val maximumNumberOfArguments get() = if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
+  override val scope: Scope? = function.scope
+  override val minimumNumberOfArguments: Int = function.args.size
+  override val maximumNumberOfArguments: Int? get() = if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
+
+  init {
+    name = function.name
+  }
 
   override fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     var returnValue: VimDataType? = null
@@ -47,8 +49,8 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       ranges!!.addRange(
         arrayOf(
           LineNumberRange(currentLine, 0, false),
-          LineNumberRange(currentLine, 0, false)
-        )
+          LineNumberRange(currentLine, 0, false),
+        ),
       )
     }
     initializeFunctionVariables(argumentValues, editor, context, vimContext)
@@ -66,7 +68,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
 
     if (exceptionsCaught.isNotEmpty()) {
       injector.messages.indicateError()
-      injector.messages.showStatusBarMessage(exceptionsCaught.last().message)
+      injector.messages.showStatusBarMessage(editor, exceptionsCaught.last().message)
     }
     return returnValue ?: VimInt(0)
   }
@@ -129,7 +131,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         argumentValues[index].evaluate(editor, context, functionCallContext),
         editor,
         context,
-        function
+        function,
       )
     }
     // optional function arguments with default values
@@ -140,7 +142,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         expressionToStore.evaluate(editor, context, functionCallContext),
         editor,
         context,
-        function
+        function,
       )
     }
     // all the other optional arguments passed to function are stored in a:000 variable
@@ -148,7 +150,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val remainingArgs = if (function.args.size + function.defaultArgs.size < argumentValues.size) {
         VimList(
           argumentValues.subList(function.args.size + function.defaultArgs.size, argumentValues.size)
-            .map { it.evaluate(editor, context, functionCallContext) }.toMutableList()
+            .map { it.evaluate(editor, context, functionCallContext) }.toMutableList(),
         )
       } else {
         VimList(mutableListOf())
@@ -158,16 +160,22 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         remainingArgs,
         editor,
         context,
-        function
+        function,
       )
     }
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "firstline"),
-      VimInt(ranges!!.getFirstLine(editor, editor.currentCaret()) + 1), editor, context, function
+      VimInt(ranges!!.getFirstLine(editor, editor.currentCaret()) + 1),
+      editor,
+      context,
+      function,
     )
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "lastline"),
-      VimInt(ranges!!.getLine(editor, editor.currentCaret()) + 1), editor, context, function
+      VimInt(ranges!!.getLine(editor, editor.currentCaret()) + 1),
+      editor,
+      context,
+      function,
     )
   }
 }

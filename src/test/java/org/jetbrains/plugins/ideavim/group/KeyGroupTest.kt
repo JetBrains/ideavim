@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,11 +15,13 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class KeyGroupTest : VimTestCase() {
   private val owner = MappingOwner.Plugin.get("KeyGroupTest")
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  @Test
   fun `test remove key mapping`() {
     val keyGroup = VimPlugin.getKey()
     val keys = injector.parser.parseKeys("<C-S-B>")
@@ -38,6 +40,7 @@ class KeyGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  @Test
   fun `test remove and add key mapping`() {
     val keyGroup = VimPlugin.getKey()
     val keys = injector.parser.parseKeys("<C-S-B>")

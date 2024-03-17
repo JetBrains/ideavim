@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,10 +14,9 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.group.EditorHolderService
 
-@Service
-class VimProjectService(val project: Project) : Disposable {
+@Service(Service.Level.PROJECT)
+internal class VimProjectService(val project: Project) : Disposable {
   override fun dispose() {
-
     // Not sure if this is a best solution
     EditorHolderService.getInstance().editor = null
   }
@@ -29,5 +28,5 @@ class VimProjectService(val project: Project) : Disposable {
 }
 
 @Suppress("unused")
-val Project.vimDisposable
+internal val Project.vimDisposable
   get() = VimProjectService.getInstance(this)

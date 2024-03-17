@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,17 +8,13 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimMessages {
-  fun showStatusBarMessage(message: String?)
-  fun getStatusBarMessage(): String?
-  fun indicateError()
-  fun clearError()
-  fun isError(): Boolean
-  fun message(key: String, vararg params: Any): String
+public interface VimMessages {
+  public fun showStatusBarMessage(editor: VimEditor?, message: String?)
+  public fun getStatusBarMessage(): String?
+  public fun indicateError()
+  public fun clearError()
+  public fun isError(): Boolean
+  public fun message(key: String, vararg params: Any): String
 
-  fun updateStatusBar()
-
-  fun showMode(msg: String) {
-    showStatusBarMessage(msg)
-  }
+  public fun updateStatusBar(editor: VimEditor)
 }

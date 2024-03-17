@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
 /**
  * @author Alex Plate
  */
-class VimState {
+internal class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
 
@@ -40,7 +40,7 @@ class VimState {
   }
 }
 
-val map by lazy { mutableMapOf<String, Boolean>() }
+private val map by lazy { mutableMapOf<String, Boolean>() }
 
 private class StateProperty(val xmlName: String) : ReadWriteProperty<VimState, Boolean> {
 

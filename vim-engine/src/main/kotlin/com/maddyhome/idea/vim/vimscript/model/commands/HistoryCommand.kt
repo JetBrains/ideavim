@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -23,8 +24,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :history"
  */
-data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+@ExCommand(command = "his[tory]")
+public data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     logger.debug("execute")
 
@@ -81,13 +83,17 @@ data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.Si
         logger.debug("bad number")
         return ExecutionResult.Error
       }
-    } else 0
+    } else {
+      0
+    }
     val l = if (last.isNotEmpty()) {
       last.toIntOrNull() ?: run {
         logger.debug("bad number")
         return ExecutionResult.Error
       }
-    } else 0
+    } else {
+      0
+    }
 
     val p = processKey(f, l)
     val res = when (key[0]) {
@@ -113,7 +119,7 @@ data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.Si
     }
   }
 
-  companion object {
+  public companion object {
     private val logger = vimLogger<HistoryCommand>()
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,12 +9,14 @@
 package com.maddyhome.idea.vim.ui.ex
 
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.CollectionFactory
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.VimSearchHelperBase
+import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -27,39 +29,39 @@ import javax.swing.text.TextAction
 import kotlin.math.abs
 import kotlin.math.min
 
-interface MultiStepAction : Action {
+internal interface MultiStepAction : Action {
   fun reset()
 }
 
-class HistoryUpAction : TextAction(ExEditorKit.HistoryUp) {
+internal class HistoryUpAction : TextAction(ExEditorKit.HistoryUp) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(true, false)
   }
 }
 
-class HistoryDownAction : TextAction(ExEditorKit.HistoryDown) {
+internal class HistoryDownAction : TextAction(ExEditorKit.HistoryDown) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(false, false)
   }
 }
 
-class HistoryUpFilterAction : TextAction(ExEditorKit.HistoryUpFilter) {
+internal class HistoryUpFilterAction : TextAction(ExEditorKit.HistoryUpFilter) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(true, true)
   }
 }
 
-class HistoryDownFilterAction : TextAction(ExEditorKit.HistoryDownFilter) {
+internal class HistoryDownFilterAction : TextAction(ExEditorKit.HistoryDownFilter) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(false, true)
   }
 }
 
-class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAction {
+internal class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAction {
   private enum class State {
     SKIP_CTRL_R, WAIT_REGISTER
   }
@@ -104,7 +106,7 @@ class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAc
   }
 }
 
-class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
+internal class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     logger.debug("complete entry")
     val stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
@@ -115,7 +117,8 @@ class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
     //   write action
     // * The key handler routines get the chance to clean up and reset state
     val entry = ExEntryPanel.getInstance().entry
-    KeyHandler.getInstance().handleKey(entry.editor.vim, stroke, entry.context.vim)
+    val keyHandler = KeyHandler.getInstance()
+    keyHandler.handleKey(entry.editor.vim, stroke, entry.context.vim, keyHandler.keyHandlerState)
   }
 
   companion object {
@@ -123,21 +126,21 @@ class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
   }
 }
 
-class CancelEntryAction : TextAction(ExEditorKit.CancelEntry) {
+internal class CancelEntryAction : TextAction(ExEditorKit.CancelEntry) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.cancel()
   }
 }
 
-class EscapeCharAction : TextAction(ExEditorKit.EscapeChar) {
+internal class EscapeCharAction : TextAction(ExEditorKit.EscapeChar) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.escape()
   }
 }
 
-abstract class DeleteCharAction internal constructor(name: String?) : TextAction(name) {
+internal abstract class DeleteCharAction internal constructor(name: String?) : TextAction(name) {
   @kotlin.jvm.Throws(BadLocationException::class)
   fun deleteSelection(doc: Document, dot: Int, mark: Int): Boolean {
     if (dot != mark) {
@@ -184,7 +187,7 @@ abstract class DeleteCharAction internal constructor(name: String?) : TextAction
   }
 }
 
-class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNextCharAction) {
+internal class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNextCharAction) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.saveLastEntry()
@@ -202,7 +205,7 @@ class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNextCharAct
   }
 }
 
-class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.deletePrevCharAction) {
+internal class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.deletePrevCharAction) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.saveLastEntry()
@@ -222,7 +225,7 @@ class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.deletePrevCha
   }
 }
 
-class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordAction) {
+internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordAction) {
   /**
    * Invoked when an action occurs.
    */
@@ -231,14 +234,23 @@ class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordActio
     target.saveLastEntry()
     val doc = target.document
     val caret = target.caret
-    val offset = VimSearchHelperBase.Companion.findNextWord(
-      target.actualText, caret.dot.toLong(), target.actualText.length.toLong(),
-      -1, false, false
-    )
+    val project = target.editor.project
+
+    // Create a VimEditor instance on the Swing text field which we can pass to the search helpers. We need an editor
+    // rather than just working on a buffer because the search helpers need local options (specifically the local to
+    // buffer 'iskeyword'). We use the CMD_LINE scenario to initialise local options from the main editor. The options
+    // service will copy all local-to-buffer and local-to-window options, effectively cloning the options.
+    // TODO: Over time, we should migrate all ex actions to be based on VimEditor
+    // This will mean we always have an editor that has been initialised for options, etc. But also means that we can
+    // share the command line entry actions between IdeaVim implementations
+    val editor = TextComponentEditorImpl(project, target).vim
+    injector.optionGroup.initialiseLocalOptions(editor, target.editor.vim, LocalOptionInitialisationScenario.CMD_LINE)
+
+    val offset = injector.searchHelper.findNextWord(editor, caret.dot, -1, bigWord = false, spaceWords = false)
     if (logger.isDebugEnabled) logger.debug("offset=$offset")
     try {
       val pos = caret.dot
-      doc.remove(offset.toInt(), (pos - offset).toInt())
+      doc.remove(offset, pos - offset)
     } catch (ex: BadLocationException) {
       // ignore
     }
@@ -249,7 +261,7 @@ class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordActio
   }
 }
 
-class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
+internal class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
   /**
    * Invoked when an action occurs.
    */
@@ -266,7 +278,7 @@ class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
   }
 }
 
-class ToggleInsertReplaceAction : TextAction(ExEditorKit.ToggleInsertReplace) {
+internal class ToggleInsertReplaceAction : TextAction(ExEditorKit.ToggleInsertReplace) {
   /**
    * Invoked when an action occurs.
    */

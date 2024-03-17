@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,97 +11,105 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class DeleteMotionActionTest : VimTestCase() {
 
+  @Test
   fun `test delete last line`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def xxx():
           expression one
           expression${c} two
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
         def xxx():
           ${c}expression one
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun `test on line in middle`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def xxx():
           expression${c} one
           expression two
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
         def xxx():
           ${c}expression two
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun `test delete single line`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def x${c}xx():
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(c)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test delete last line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
-    typeTextInFile(
-      injector.parser.parseKeys("dd"),
+    configureByText(
       """
         |def xxx():
         |  expression one
         |  expression${c} two
-      """.trimMargin()
+      """.trimMargin(),
     )
+    enterCommand("set nostartofline")
+    typeText("dd")
     assertState(
       """
         |def xxx():
         |  expression${c} one
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
   @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
+  @Test
   fun `test delete last line stored with new line`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def xxx():
           expression one
           expression${c} two
-      """.trimIndent()
+      """.trimIndent(),
     )
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
-    assertEquals("  expression two\n", savedText)
+    kotlin.test.assertEquals("  expression two\n", savedText)
   }
 
+  @Test
   fun `test delete line action multicaret`() {
     typeTextInFile(
-      injector.parser.parseKeys("d3d"),
+      "d3d",
       """
         abc${c}de
         abcde
@@ -111,14 +119,38 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         abcde
         
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("${c}abcde\n${c}")
   }
 
+  companion object {
+    @JvmStatic
+    fun repeatFindAndTillTestCase(): Stream<Arguments> {
+      return Stream.of(
+        arguments("${c}111b222b333", "dtbd;", "${c}b333"),
+        arguments("111b2${c}22b333", "dtbd,", "111b${c}b333"),
+        arguments("111b222b33${c}3", "dTbd;", "111b${c}3"),
+        arguments("111b2${c}22b333", "dTbd,", "111b${c}b333"),
+        arguments("${c}111b222b333", "dfbd;", "${c}333"),
+        arguments("111b2${c}22b333", "dfbd,", "111${c}333"),
+        arguments("111b222b33${c}3", "dFbd;", "111${c}3"),
+        arguments("111b2${c}22b333", "dFbd,", "111${c}333"),
+      )
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("repeatFindAndTillTestCase")
+  fun `test delete repeat find and till motion`(content: String, keys: String, expected: String) {
+    typeTextInFile(keys, content)
+    assertState(expected)
+  }
+
+  @Test
   fun `test delete motion action multicaret`() {
     typeTextInFile(
-      injector.parser.parseKeys("dt)"),
+      "dt)",
       """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c} || b != 0);
@@ -130,7 +162,7 @@ class DeleteMotionActionTest : VimTestCase() {
          |    }
          |  }
          |}
-        """.trimMargin()
+      """.trimMargin(),
     )
     assertState(
       """|public class Foo {
@@ -144,71 +176,72 @@ class DeleteMotionActionTest : VimTestCase() {
          |    }
          |  }
          |}
-         """.trimMargin()
+      """.trimMargin(),
     )
   }
 
+  @Test
   fun `test delete empty line`() {
     val file = """
-            A Discovery
+            Lorem Ipsum
             ${c}
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val newFile = """
-            A Discovery
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem Ipsum
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    typeTextInFile(injector.parser.parseKeys("dd"), file)
+    typeTextInFile("dd", file)
     assertState(newFile)
   }
 
+  @Test
   fun `test delete on last line`() {
     doTest(
       "dd",
       """
-            A Discovery
+            Lorem Ipsum
             
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             ${c}
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
             
-            I found it in a legendary land
-            ${c}all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            ${c}consectetur adipiscing elit
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
+  @Test
   fun `test empty line`() {
     doTest(
       "dd",
       """
-            A Discovery
+            Lorem Ipsum
             
             ${c}
             
             
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
             
             ${c}
             
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

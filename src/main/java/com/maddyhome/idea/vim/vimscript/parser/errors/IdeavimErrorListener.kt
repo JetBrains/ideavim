@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,7 +15,7 @@ import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 
-class IdeavimErrorListener : BaseErrorListener() {
+internal class IdeavimErrorListener : BaseErrorListener() {
   private val logger = logger<IdeavimErrorListener>()
   companion object {
     val testLogger = mutableListOf<String>()
@@ -27,7 +27,7 @@ class IdeavimErrorListener : BaseErrorListener() {
     line: Int,
     charPositionInLine: Int,
     msg: String?,
-    e: RecognitionException?
+    e: RecognitionException?,
   ) {
     VimscriptParser.linesWithErrors.add(line)
     val message = "line $line:$charPositionInLine $msg"

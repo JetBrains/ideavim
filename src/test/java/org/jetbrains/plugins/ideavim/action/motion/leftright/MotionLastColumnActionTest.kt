@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,13 +10,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionLastColumnActionTest : VimTestCase() {
+  @Test
   fun `test dollar motion`() {
     val keys = "$"
     val before = """
@@ -35,9 +38,10 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
+  @Test
   fun `test dollar motion with motion to longer line`() {
     val keys = "\$j"
     val before = """
@@ -56,9 +60,10 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
+  @Test
   fun `test dollar motion in visual block mode`() {
     val keys = "<C-V>jj\$"
     val before = """
@@ -77,7 +82,30 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden sand${c}${se}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
+  }
+
+  @Test
+  fun `test dollar motion resets intended location after motion`() {
+    doTest(
+      "\$hlj",
+      """
+          A Discovery
+
+          I ${c}found it in a legendary land
+          all rocks and lavender and tufted grass,[ additional symbols]
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+          A Discovery
+
+          I found it in a legendary land
+          all rocks and lavender and tu${c}fted grass,[ additional symbols]
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass.
+      """.trimIndent(),
+    )
   }
 
   @VimBehaviorDiffers(
@@ -88,8 +116,9 @@ class MotionLastColumnActionTest : VimTestCase() {
             al${s}l rocks and lavender and tufted grass${c},${se}[ additional symbols]
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
-    """
+    """,
   )
+  @Test
   fun `test dollar motion in visual block mode with left motion`() {
     val keys = "<C-V>jj\$h"
     val before = """
@@ -108,9 +137,10 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.BLOCK_WISE))
   }
 
+  @Test
   fun `test dollar motion from insert mode`() {
     val keys = "i<C-O>$"
     val before = """
@@ -129,10 +159,11 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
+  @Test
   fun `test dollar motion from insert mode with deletion`() {
     val keys = "i<C-O>d$"
     val before = """
@@ -151,6 +182,6 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
+    doTest(keys, before, after, Mode.INSERT)
   }
 }

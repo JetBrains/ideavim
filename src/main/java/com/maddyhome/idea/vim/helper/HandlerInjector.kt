@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
@@ -19,7 +20,7 @@ import java.lang.reflect.Modifier
  * It's needed to wait till JupyterCommandModeTypingBlocker is going to be registered using an extension point
  * After that, we would be able to register our typingHandler before (or after) the one from jupyter.
  */
-class HandlerInjector {
+internal class HandlerInjector {
   companion object {
     @JvmStatic
     fun inject(): TypedActionHandler? {
@@ -49,7 +50,15 @@ class HandlerInjector {
     fun notebookCommandMode(editor: Editor?): Boolean {
       return if (editor != null) {
         val inEditor = EditorHelper.getVirtualFile(editor)?.extension == "ipynb"
-        TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker") && inEditor
+        return if (TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker")) {
+          inEditor
+        } else {
+          // only true in command mode.
+          // Set by `org.jetbrains.plugins.notebooks.ui.editor.actions.command.mode.NotebookEditorModeListenerAdapter`
+          // appears to be null in non Notebook editors
+          val allow_plain_letter_shortcuts = editor.contentComponent.getClientProperty(ActionUtil.ALLOW_PlAIN_LETTER_SHORTCUTS)
+          inEditor && (allow_plain_letter_shortcuts != null && allow_plain_letter_shortcuts as Boolean)
+        }
       } else {
         TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker")
       }

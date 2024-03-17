@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,12 +12,14 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -26,13 +28,15 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.troubleshooting.Troubleshooter
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import com.maddyhome.idea.vim.vimscript.services.VimRcService.VIMRC_FILE_NAME
 import com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc
 import org.jetbrains.annotations.TestOnly
+import java.nio.file.Path
+import kotlin.io.path.readText
 
 /**
  * This file contains a "reload ~/.ideavimrc file" action functionality.
@@ -44,7 +48,7 @@ import org.jetbrains.annotations.TestOnly
  * - Action / action group
  */
 
-object VimRcFileState : VimrcFileState {
+internal object VimRcFileState : VimrcFileState {
   // Hash of .ideavimrc parsed to Script class
   private var state: Int? = null
 
@@ -55,6 +59,8 @@ object VimRcFileState : VimrcFileState {
 
   private val saveStateListeners = ArrayList<() -> Unit>()
 
+  private val LOG = logger<VimRcFileState>()
+
   fun saveFileState(filePath: String, text: String) {
     this.filePath = FileUtil.toSystemDependentName(filePath)
     val script = VimscriptParser.parse(text)
@@ -63,8 +69,11 @@ object VimRcFileState : VimrcFileState {
   }
 
   override fun saveFileState(filePath: String) {
-    val vimRcFile = VimRcService.findIdeaVimRc()
-    val ideaVimRcText = vimRcFile?.readText() ?: ""
+    val ideaVimRcText = Path.of(filePath).let {
+      kotlin.runCatching { it.readText() }
+        .onFailure { LOG.error(it) }
+        .getOrNull()
+    } ?: ""
     saveFileState(filePath, ideaVimRcText)
   }
 
@@ -101,7 +110,7 @@ object VimRcFileState : VimrcFileState {
   }
 }
 
-class ReloadVimRc : DumbAwareAction() {
+internal class ReloadVimRc : DumbAwareAction(), ActionRemoteBehaviorSpecification.Disabled {
   override fun update(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: run {
       e.presentation.isEnabledAndVisible = false
@@ -128,8 +137,11 @@ class ReloadVimRc : DumbAwareAction() {
     // XXX: Actually, it worth to add e.presentation.description, but it doesn't work because of some reason
     val sameDoc = VimRcFileState.equalTo(editor.document)
     e.presentation.icon = if (sameDoc) VimIcons.IDEAVIM else AllIcons.Actions.BuildLoadChanges
-    e.presentation.text = if (sameDoc) MessageHelper.message("action.no.changes.text")
-    else MessageHelper.message("action.reload.text")
+    e.presentation.text = if (sameDoc) {
+      MessageHelper.message("action.no.changes.text")
+    } else {
+      MessageHelper.message("action.reload.text")
+    }
 
     e.presentation.isEnabledAndVisible = true
   }
@@ -138,18 +150,19 @@ class ReloadVimRc : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
-    FileDocumentManager.getInstance().saveDocumentAsIs(editor.document)
     injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
     Troubleshooter.instance.removeByType("old-action-notation-in-mappings")
-    executeIdeaVimRc()
+
+    // Reload the ideavimrc in the context of the current window, as though we had called `:source ~/.ideavimrc`
+    executeIdeaVimRc(editor.vim)
   }
 }
 
-class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
+internal class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   override val autoHideable: Boolean = false
 
-  override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
-    super.register(component, parentDisposable)
+  override fun register(dataContext: DataContext, component: FloatingToolbarComponent, parentDisposable: Disposable) {
+    super.register(dataContext, component, parentDisposable)
     val action = {
       component.scheduleShow()
     }
@@ -160,7 +173,7 @@ class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   }
 }
 
-class ReloadFloatingToolbarActionGroup : DefaultActionGroup() {
+internal class ReloadFloatingToolbarActionGroup : DefaultActionGroup(), ActionRemoteBehaviorSpecification.Disabled {
   companion object {
     const val ACTION_GROUP = "IdeaVim.ReloadVimRc.group"
   }

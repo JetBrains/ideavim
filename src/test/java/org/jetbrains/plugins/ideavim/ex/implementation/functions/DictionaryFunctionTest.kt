@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,9 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 class DictionaryFunctionTest : VimTestCase() {
 
+  @Test
   fun `test self in dictionary function with assignment via function function`() {
     configureByText("\n")
     typeText(
@@ -22,8 +25,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.data |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'data': [], 'print': function('Print')}"))
     typeText(commandToKeys("call dict.print()"))
@@ -32,6 +35,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("delfunction! Print"))
   }
 
+  @Test
   fun `test self in dictionary function with assignment via let command`() {
     configureByText("\n")
     typeText(
@@ -40,8 +44,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict_name'}"))
     typeText(commandToKeys("let PrintFr = function('Print')"))
@@ -53,6 +57,7 @@ class DictionaryFunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test dictionary function without dict`() {
     configureByText("\n")
     typeText(
@@ -61,8 +66,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("call Print()"))
     assertPluginError(true)
@@ -72,36 +77,39 @@ class DictionaryFunctionTest : VimTestCase() {
   }
 
   // todo big brain logic
-//  fun `test assigned dictionary function to another dictionary`() {
-//    configureByText("\n")
-//    typeText(
-//      commandToKeys(
-//        """
-//           function Print() dict |
-//             echo self.name |
-//           endfunction
-//        """.trimIndent()
-//      )
-//    )
-//    typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
-//    typeText(commandToKeys("echo dict.print"))
-//    assertExOutput("function('Print', {'name': 'dict', 'print': function('Print')}")
-//    typeText(commandToKeys("echo dict"))
-//    assertExOutput("{'name': 'dict', 'print': function('Print')}")
-//    typeText(commandToKeys("call dict.print()"))
-//    assertExOutput("dict\n")
-//
-//    typeText(commandToKeys("let dict2 = {'name': 'dict2', 'print': dict.print}"))
-//    typeText(commandToKeys("echo dict2.print"))
-//    assertExOutput("function('Print', {'name': 'dict2', 'print': function('Print', {name: 'dict', 'print': function('Print')})}")
-//    typeText(commandToKeys("echo dict2"))
-//    assertExOutput("{'name': 'dict2', 'print': function('Print', {name: 'dict', 'print': function('Print')})}")
-//    typeText(commandToKeys("call dict2.print()"))
-//    assertExOutput("dict2\n")
-//
-//    typeText(commandToKeys("delfunction! Print"))
-//  }
+  @Test
+  @Disabled
+  fun `test assigned dictionary function to another dictionary`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+           function Print() dict |
+             echo self.name |
+           endfunction
+        """.trimIndent(),
+      ),
+    )
+    typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
+    typeText(commandToKeys("echo dict.print"))
+    assertExOutput("function('Print', {'name': 'dict', 'print': function('Print')}")
+    typeText(commandToKeys("echo dict"))
+    assertExOutput("{'name': 'dict', 'print': function('Print')}")
+    typeText(commandToKeys("call dict.print()"))
+    assertExOutput("dict\n")
 
+    typeText(commandToKeys("let dict2 = {'name': 'dict2', 'print': dict.print}"))
+    typeText(commandToKeys("echo dict2.print"))
+    assertExOutput("function('Print', {'name': 'dict2', 'print': function('Print', {name: 'dict', 'print': function('Print')})}")
+    typeText(commandToKeys("echo dict2"))
+    assertExOutput("{'name': 'dict2', 'print': function('Print', {name: 'dict', 'print': function('Print')})}")
+    typeText(commandToKeys("call dict2.print()"))
+    assertExOutput("dict2\n")
+
+    typeText(commandToKeys("delfunction! Print"))
+  }
+
+  @Test
   fun `test self is not changed after let assignment`() {
     configureByText("\n")
     typeText(
@@ -110,8 +118,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("let dict2 = {'name': 'dict2'}"))
@@ -126,6 +134,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("delfunction! Print"))
   }
 
+  @Test
   fun `test self is not changed after in-dictionary assignment`() {
     configureByText("\n")
     typeText(
@@ -134,8 +143,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("let dict2 = {'name': 'dict2', 'print': dict.print}"))
@@ -149,6 +158,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("delfunction! Print"))
   }
 
+  @Test
   fun `test assigned partial to another dictionary`() {
     configureByText("\n")
     typeText(
@@ -157,8 +167,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict'}"))
     typeText(commandToKeys("let dict.print = function('Print', dict)"))
@@ -173,6 +183,7 @@ class DictionaryFunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test self is read-only`() {
     configureByText("\n")
     typeText(
@@ -181,8 +192,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              let self = [] |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("call dict.print()"))
@@ -192,6 +203,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("delfunction! Print"))
   }
 
+  @Test
   fun `test self in inner dictionary`() {
     configureByText("\n")
     typeText(
@@ -200,8 +212,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'innerDict': {'name': 'innerDict', 'print': function('Print')}}"))
     typeText(commandToKeys("call dict.innerDict.print()"))

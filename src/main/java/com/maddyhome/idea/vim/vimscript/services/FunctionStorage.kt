@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.vimscript.services
 
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.extensions.ExtensionPointName
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
@@ -17,25 +16,26 @@ import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
+import com.maddyhome.idea.vim.vimscript.model.functions.EngineFunctionProvider
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.IntellijFunctionProvider
+import com.maddyhome.idea.vim.vimscript.model.functions.LazyVimscriptFunction
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-object FunctionStorage : VimscriptFunctionService {
+internal class FunctionStorage : VimscriptFunctionService {
 
   private val logger = logger<FunctionStorage>()
 
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
 
-  private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
-  private val builtInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
+  private val builtInFunctions: MutableMap<String, LazyVimscriptFunction> = mutableMapOf()
 
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
       throw ExException("E128: Function name must start with a capital or \"s:\": $name")
     }
 
-    if (scope != null)
+    if (scope != null) {
       when (scope) {
         Scope.GLOBAL_VARIABLE -> {
           if (globalFunctions.containsKey(name)) {
@@ -60,6 +60,7 @@ object FunctionStorage : VimscriptFunctionService {
         }
         else -> throw ExException("E130: Unknown function: ${scope.c}:$name")
       }
+    }
 
     if (globalFunctions.containsKey(name)) {
       globalFunctions[name]!!.isDeleted = true
@@ -137,7 +138,7 @@ object FunctionStorage : VimscriptFunctionService {
   }
 
   override fun getBuiltInFunction(name: String): FunctionHandler? {
-    return builtInFunctions[name]
+    return builtInFunctions[name]?.instance
   }
 
   private fun storeScriptFunction(functionDeclaration: FunctionDeclaration) {
@@ -163,15 +164,14 @@ object FunctionStorage : VimscriptFunctionService {
   }
 
   override fun registerHandlers() {
-    extensionPoint.extensions().forEach(FunctionBeanClass::register)
+    val engineFunctions = EngineFunctionProvider.getFunctions()
+    engineFunctions.forEach { addHandler(it) }
+
+    val intellijFunctions = IntellijFunctionProvider.getFunctions()
+    intellijFunctions.forEach { addHandler(it) }
   }
 
-  override fun addHandler(handlerHolder: Any) {
-    handlerHolder as FunctionBeanClass
-    if (handlerHolder.name != null) {
-      builtInFunctions[handlerHolder.name!!] = handlerHolder.instance
-    } else {
-      logger.error("Received function handler with null name")
-    }
+  override fun addHandler(handler: LazyVimscriptFunction) {
+    builtInFunctions[handler.name] = handler
   }
 }

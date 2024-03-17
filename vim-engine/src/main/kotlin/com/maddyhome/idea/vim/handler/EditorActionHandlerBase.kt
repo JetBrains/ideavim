@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.state.VimStateMachine
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -40,12 +40,22 @@ import javax.swing.KeyStroke
  *  SpecialKeyHandlers are not presented here because these handlers are created to a limited set of commands and they
  *    are already implemented.
  */
-abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
-  val id: String = getActionId(this::class.java.name)
+public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
+  public val id: String = getActionId(this::class.java.name)
 
-  abstract val type: Command.Type
+  /**
+   * Note: I don't like this field because it controls RW lock. In case we process RW lock inside the command,
+   *   we change this type to OTHER_SELF_SYNCHRONIZED. This may cause problems because some logic may depend on,
+   *   let's say, INSERT type of the command.
+   * At the moment of this comment writing I discovered a deadlock inside the
+   *   [com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction] and I have to change this from INSERT to
+   *   OTHER_SELF_SYNCHRONIZED. This should cause no problems because I don't see any logic depending on INSERT,
+   *   but there is some logic depending on other command types and such change may cause bugs.
+   * It looks like it'll be needed to split command type and synchronization type.
+   */
+  public abstract val type: Command.Type
 
-  open val argumentType: Argument.Type? = null
+  public open val argumentType: Argument.Type? = null
 
   /**
    * Returns various binary flags for the command.
@@ -54,9 +64,9 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    *
    * @see com.maddyhome.idea.vim.command.Command
    */
-  open val flags: EnumSet<CommandFlags> = noneOfEnum()
+  public open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
-  abstract fun baseExecute(
+  public abstract fun baseExecute(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -64,16 +74,49 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+  /**
+   * Post execute is executed only one time after the main execute method
+   */
+  public open fun postExecute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ) {}
+
+  public fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
-    if (myRunForEachCaret) {
-      editor.forEachCaret(action)
+
+    // IJ platform has one issue - recursive `runForEachCaret` is not allowed. Strictly speaking, at this moment
+    //   we don't know if we run this action inside of this run or not.
+    val currentCaret = editor.currentCaret()
+    val primaryCaret = editor.primaryCaret()
+    if (editor.isInForEachCaretScope()) {
+      if (myRunForEachCaret) {
+        action(currentCaret)
+      } else {
+        if (currentCaret == primaryCaret) {
+          action(primaryCaret)
+        }
+      }
     } else {
-      action(editor.primaryCaret())
+      if (myRunForEachCaret) {
+        editor.forEachCaret(action)
+      } else {
+        action(primaryCaret)
+      }
+    }
+
+    if (currentCaret == primaryCaret) {
+      val cmd = VimStateMachine.getInstance(editor).executingCommand ?: run {
+        injector.messages.indicateError()
+        return
+      }
+      postExecute(editor, context, cmd, operatorArguments)
     }
   }
 
-  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
+  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     if (!injector.enabler.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
@@ -88,22 +131,24 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
         caret,
         injector.executionContextManager.onCaret(caret, context),
         cmd,
-        operatorArguments
+        operatorArguments,
       )
-    ) injector.messages.indicateError()
+    ) {
+      injector.messages.indicateError()
+    }
   }
 
-  open fun process(cmd: Command) {
+  public open fun process(cmd: Command) {
     // No-op
   }
 
-  companion object {
+  public companion object {
     private val logger = vimLogger<EditorActionHandlerBase>()
 
-    fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { injector.parser.parseKeys(it) }.toSet()
+    public fun parseKeysSet(keyStrings: List<String>): Set<List<KeyStroke>> = keyStrings.map { injector.parser.parseKeys(it) }.toSet()
 
     @JvmStatic
-    fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
+    public fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
       injector.parser.parseKeys(keyStrings[it])
     }.toSet()
 
@@ -111,7 +156,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     private const val VimActionPrefix = "Vim"
 
     @NonNls
-    fun getActionId(classFullName: String): String {
+    public fun getActionId(classFullName: String): String {
       return classFullName
         .takeLastWhile { it != '.' }
         .let { if (it.startsWith(VimActionPrefix, true)) it else "$VimActionPrefix$it" }

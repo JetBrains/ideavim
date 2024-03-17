@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,14 +9,13 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class GotoLineCommandTest : VimTestCase() {
+  @Test
   fun `test goto explicit line`() {
     val before = """
       A Discovery
@@ -39,6 +38,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto explicit line check history`() {
     val before = """
       A Discovery
@@ -65,6 +65,7 @@ class GotoLineCommandTest : VimTestCase() {
     kotlin.test.assertEquals("3", register.text)
   }
 
+  @Test
   fun `test goto positive relative line`() {
     val before = """
       A Discovery
@@ -87,6 +88,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto using forward search range`() {
     val before = """
       A Discovery
@@ -109,6 +111,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto using backward search range`() {
     val before = """
       A Discovery
@@ -131,6 +134,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto negative relative line`() {
     val before = """
       A Discovery
@@ -153,6 +157,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto line moves to first non-blank char`() {
     val before = """
       A Discovery
@@ -175,6 +180,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto zero relative line moves to first non-blank char on current line`() {
     val before = """
       A Discovery
@@ -198,8 +204,8 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test goto line moves to same column with nostartofline option`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     val before = """
       A Discovery
 
@@ -209,6 +215,7 @@ class GotoLineCommandTest : VimTestCase() {
       hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set nostartofline")
     enterCommand("3")
     val after = """
       A Discovery
@@ -222,8 +229,8 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test goto zero relative line with nostartofline option does not move caret`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     val before = """
       A Discovery
 
@@ -233,6 +240,7 @@ class GotoLineCommandTest : VimTestCase() {
       hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set nostartofline")
     enterCommand("+0")
     val after = """
       A Discovery
@@ -245,17 +253,19 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     enterCommand("30")
     assertPosition(29, 4)
     assertTopLogicalLine(5)
   }
 
+  @Test
   fun `test goto relative line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     enterCommand("+30")
     assertPosition(30, 4)
     assertTopLogicalLine(6)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,7 +23,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import org.jetbrains.annotations.NonNls
 
@@ -31,7 +31,8 @@ import org.jetbrains.annotations.NonNls
  *
  * @author John Weigel
  */
-data class BufferListCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+@ExCommand(command = "ls,files,buffers")
+internal data class BufferListCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   companion object {
@@ -66,17 +67,22 @@ data class BufferListCommand(val ranges: Ranges, val argument: String) : Command
     for ((file, displayFileName) in virtualFileDisplayMap) {
       val editor = EditorHelper.getEditor(file) ?: continue
 
-      val bufStatus = getBufferStatus(editor.vim, file, currentFile, previousFile)
+      val bufStatus = getBufferStatus(editor, file, currentFile, previousFile)
 
       if (bufStatusMatchesFilter(filter, bufStatus)) {
-        val lineNum = editor.vimLine
+        val lineNum = editor.ij.vimLine
         val lineNumPad =
           if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
 
         bufferList.add(
           String.format(
-            "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum
-          )
+            "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d",
+            index,
+            bufStatus,
+            displayFileName,
+            "",
+            lineNum,
+          ),
         )
       }
       index++

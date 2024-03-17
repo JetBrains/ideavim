@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,13 +9,14 @@ package com.maddyhome.idea.vim.extension
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.OperatorArguments
 
 /**
  * An action handler registered by its extension to be executed as a Vim command.
  *
  * @author vlan
  */
-interface ExtensionHandler {
+public interface ExtensionHandler {
   /**
    * Executes the action.
    *
@@ -26,13 +27,14 @@ interface ExtensionHandler {
    * for a write action, you'll have to apply it by yourself if you're modifying IntelliJ's data structures like
    * documents or virtual files.
    */
-  fun execute(editor: VimEditor, context: ExecutionContext)
-  val isRepeatable: Boolean
+  public fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {}
+
+  public val isRepeatable: Boolean
     get() = false
 
-  abstract class WithCallback : ExtensionHandler {
-    var _backingFunction: Runnable? = null
-    fun continueVimExecution() {
+  public abstract class WithCallback : ExtensionHandler {
+    public var _backingFunction: Runnable? = null
+    public fun continueVimExecution() {
       if (_backingFunction != null) {
         _backingFunction!!.run()
       }

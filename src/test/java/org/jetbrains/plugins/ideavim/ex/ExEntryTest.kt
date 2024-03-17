@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,67 +10,76 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class ExEntryTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     configureByText("\n")
   }
 
+  @Test
   fun `test cancel entry`() {
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<Esc>")
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-[>")
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-C>")
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     assertIsDeactivated()
   }
 
+  @Test
   fun `test complete entry`() {
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<Enter>")
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionService().resetAllOptions()
+    VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-J>")
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionService().resetAllOptions()
+    VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-M>")
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(options().incsearch)
     assertIsDeactivated()
   }
 
+  @Test
   fun `test caret shape`() {
     // Show block at end of input (normal)
     // Show vertical bar in insert mode
@@ -94,6 +103,7 @@ class ExEntryTest : VimTestCase() {
     assertEquals("VER 25", exEntryPanel.entry.caretShape)
   }
 
+  @Test
   fun `test caret shape comes from guicursor`() {
     enterCommand("set guicursor=c:ver50,ci:hor75,cr:block")
 
@@ -116,6 +126,7 @@ class ExEntryTest : VimTestCase() {
     assertEquals("HOR 75", exEntryPanel.entry.caretShape)
   }
 
+  @Test
   fun `test move caret to beginning of line`() {
     typeExInput(":set incsearch<C-B>")
     assertExOffset(0)
@@ -126,6 +137,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(0)
   }
 
+  @Test
   fun `test move caret to end of line`() {
     typeExInput(":set incsearch<C-B>")
     assertExOffset(0)
@@ -141,6 +153,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(13)
   }
 
+  @Test
   fun `test backspace deletes character in front of caret`() {
     typeExInput(":set incsearch<BS>")
     assertExText("set incsearc")
@@ -149,6 +162,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("set incsear")
   }
 
+  @Test
   fun `test backspace character in front of caret cancels entry`() {
     typeExInput(":<BS>")
     assertIsDeactivated()
@@ -172,24 +186,28 @@ class ExEntryTest : VimTestCase() {
     assertIsActive()
   }
 
+  @Test
   fun `test delete deletes character under caret`() {
     typeExInput(":set<Left>")
     typeText("<Del>")
     assertExText("se")
   }
 
+  @Test
   fun `test delete at end of string deletes character to left of caret`() {
     typeExInput(":set")
     typeText("<Del>")
     assertExText("se")
   }
 
+  @Test
   fun `test delete with no text cancels entry`() {
     typeExInput(":set")
     typeText("<Del><Del><Del><Del>")
     assertIsDeactivated()
   }
 
+  @Test
   fun `test delete word before caret`() {
     typeExInput(":set incsearch<C-W>")
     assertExText("set ")
@@ -201,6 +219,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("set rch")
   }
 
+  @Test
   fun `test delete to start of line`() {
     typeExInput(":set incsearch<C-U>")
     assertExText("")
@@ -212,6 +231,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Vim reorders history even when cancelling entry")
+  @Test
   fun `test command history`() {
     typeExInput(":set digraph<CR>")
     typeExInput(":digraph<CR>")
@@ -250,6 +270,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CMD)
+  @Test
   fun `test matching command history`() {
     typeExInput(":set digraph<CR>")
     typeExInput(":digraph<CR>")
@@ -279,6 +300,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("set digraph")
   }
 
+  @Test
   fun `test search history`() {
     typeExInput("/something cool<CR>")
     typeExInput("/not cool<CR>")
@@ -311,6 +333,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Vim reorders history even when cancelling entry")
+  @Test
   fun `test matching search history`() {
     typeExInput("/something cool<CR>")
     typeExInput("/not cool<CR>")
@@ -346,6 +369,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("something cool")
   }
 
+  @Test
   fun `test toggle insert replace`() {
     val exDocument = exEntryPanel.entry.document as ExDocument
     assertFalse(exDocument.isOverwrite)
@@ -363,6 +387,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("set digraph")
   }
 
+  @Test
   fun `test move caret one WORD left`() {
     typeExInput(":set incsearch<S-Left>")
     assertExOffset(4)
@@ -378,6 +403,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Moving one word right positions caret at end of previous word")
+  @Test
   fun `test move caret one WORD right`() {
     typeExInput(":set incsearch")
     caret.dot = 0
@@ -397,6 +423,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(13)
   }
 
+  @Test
   fun `test insert digraph`() {
     typeExInput(":<C-K>OK")
     assertExText("✓")
@@ -415,6 +442,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(1)
   }
 
+  @Test
   fun `test prompt while inserting digraph`() {
     typeExInput(":<C-K>")
     assertExText("?")
@@ -439,6 +467,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(0)
   }
 
+  @Test
   fun `test escape cancels digraph`() {
     typeExInput(":<C-K><Esc>OK")
     assertIsActive()
@@ -457,6 +486,7 @@ class ExEntryTest : VimTestCase() {
 
   // TODO: Test inserting control characters, if/when supported
 
+  @Test
   fun `test insert literal character`() {
     typeExInput(":<C-V>123<C-V>080")
     assertExText("{P")
@@ -494,6 +524,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test prompt while inserting literal character`() {
     typeExInput(":<C-V>")
     assertExText("^")
@@ -518,6 +549,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(1)
   }
 
+  @Test
   fun `test insert register`() {
     VimPlugin.getRegister().setKeys('c', injector.parser.parseKeys("hello world"))
     VimPlugin.getRegister().setKeys('5', injector.parser.parseKeys("greetings programs"))
@@ -540,6 +572,7 @@ class ExEntryTest : VimTestCase() {
     // Vim shows " after hitting <C-R>
   }
 
+  @Test
   fun `test insert multi-line register`() {
     // parseKeys parses <CR> in a way that Register#getText doesn't like
     val keys = mutableListOf<KeyStroke>()
@@ -555,18 +588,21 @@ class ExEntryTest : VimTestCase() {
   // TODO: Test other special registers, if/when supported
   // E.g. '.' '%' '#', etc.
 
+  @Test
   fun `test insert last command`() {
     typeExInput(":set incsearch<CR>")
     typeExInput(":<C-R>:")
     assertExText("set incsearch")
   }
 
+  @Test
   fun `test insert last search command`() {
     typeExInput("/hello<CR>")
     typeExInput(":<C-R>/")
     assertExText("hello")
   }
 
+  @Test
   fun `test cmap`() {
     typeExInput(":cmap x z<CR>")
     typeExInput(":cnoremap w z<CR>")
@@ -583,6 +619,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("z")
   }
 
+  @Test
   fun `test cmap Ctrl`() {
     typeText(injector.parser.stringToKeys(":cmap <C-B> b") + injector.parser.parseKeys("<CR>"))
     typeExInput(":<C-B>")
@@ -597,8 +634,8 @@ class ExEntryTest : VimTestCase() {
 
   private fun typeExInput(text: String) {
     assertTrue(
+      text.startsWith(":") || text.startsWith('/') || text.startsWith('?'),
       "Ex command must start with ':', '/' or '?'",
-      text.startsWith(":") || text.startsWith('/') || text.startsWith('?')
     )
 
     val keys = mutableListOf<KeyStroke>()
@@ -606,7 +643,7 @@ class ExEntryTest : VimTestCase() {
       // <Left> doesn't work correctly in tests. The DefaultEditorKit.NextVisualPositionAction action is correctly
       // called, but fails to move the caret correctly because the text component has never been painted
       if (it.keyCode == KeyEvent.VK_LEFT && it.modifiers == 0) {
-        if (keys.count() > 0) {
+        if (keys.isNotEmpty()) {
           typeText(keys)
           keys.clear()
         }
@@ -616,21 +653,18 @@ class ExEntryTest : VimTestCase() {
         keys.add(it)
       }
     }
-    if (keys.count() > 0)
+    if (keys.isNotEmpty()) {
       typeText(keys)
-  }
-
-  private fun typeText(text: String) {
-    typeText(injector.parser.parseKeys(text))
+    }
   }
 
   private fun deactivateExEntry() {
     // We don't need to reset text, that's handled by #active
-    if (exEntryPanel.isActive)
+    if (exEntryPanel.isActive) {
       typeText("<C-C>")
+    }
   }
 
-  @Suppress("DEPRECATION")
   private fun assertExText(expected: String) {
     // Get the text directly from the text field. This will include any "prompt" chars for e.g. digraphs
     assertEquals(expected, exEntryPanel.entry.text)

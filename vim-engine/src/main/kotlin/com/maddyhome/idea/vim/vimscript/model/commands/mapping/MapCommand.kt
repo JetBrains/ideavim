@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -30,8 +31,9 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+@ExCommand(command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],no[map],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]")
+public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -58,8 +60,11 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     }
 
     val mappingOwner =
-      if (injector.vimscriptExecutor.executingVimscript) MappingOwner.IdeaVim.InitScript
-      else MappingOwner.IdeaVim.Other
+      if (injector.vimscriptExecutor.executingIdeaVimRcConfiguration) {
+        MappingOwner.IdeaVim.InitScript
+      } else {
+        MappingOwner.IdeaVim.Other
+      }
     if (arguments.specialArguments.contains(EXPR)) {
       injector.statisticsService.setIfMapExprUsed(true)
       injector.keyGroup
@@ -100,7 +105,8 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     SPECIAL("<special>"),
     SCRIPT("<script>"),
     EXPR("<expr>"),
-    UNIQUE("<unique>");
+    UNIQUE("<unique>"),
+    ;
 
     override fun toString(): String {
       return this.myName
@@ -108,7 +114,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
 
     companion object {
       fun fromString(s: String): SpecialArgument? {
-        for (argument in values()) {
+        for (argument in entries) {
           if (s == argument.myName) {
             return argument
           }
@@ -125,7 +131,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     val secondArgument: String,
   )
 
-  companion object {
+  public companion object {
     private const val CTRL_V = '\u0016'
     private val COMMAND_INFOS = arrayOf(
       // TODO: Support smap, map!, lmap
@@ -144,7 +150,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       CommandInfo("xn", "oremap", MappingMode.X, false),
       CommandInfo("ono", "remap", MappingMode.O, false),
       CommandInfo("ino", "remap", MappingMode.I, false),
-      CommandInfo("cno", "remap", MappingMode.C, false)
+      CommandInfo("cno", "remap", MappingMode.C, false),
     )
     private val UNSUPPORTED_SPECIAL_ARGUMENTS = EnumSet.of(SCRIPT)
     private val logger = vimLogger<MapCommand>()

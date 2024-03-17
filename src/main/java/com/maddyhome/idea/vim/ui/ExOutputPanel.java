@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,11 +17,13 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.diagnostic.VimLogger;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +36,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 /**
  * This panel displays text in a <code>more</code> like window.
@@ -55,6 +60,8 @@ public class ExOutputPanel extends JPanel {
 
   private boolean myActive = false;
 
+  private static final VimLogger LOG = injector.getLogger(ExOutputPanel.class);
+
   private ExOutputPanel(@NotNull Editor editor) {
     myEditor = editor;
 
@@ -64,7 +71,9 @@ public class ExOutputPanel extends JPanel {
     add(myScrollPane, BorderLayout.CENTER);
     add(myLabel, BorderLayout.SOUTH);
 
+    // Set the text area read only, and support wrap
     myText.setEditable(false);
+    myText.setLineWrap(true);
 
     myAdapter = new ComponentAdapter() {
       @Override
@@ -95,7 +104,7 @@ public class ExOutputPanel extends JPanel {
   }
 
   private static int countLines(@NotNull String text) {
-    if (text.length() == 0) {
+    if (text.isEmpty()) {
       return 0;
     }
 
@@ -130,14 +139,14 @@ public class ExOutputPanel extends JPanel {
   }
 
   public void setText(@NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String data) {
-    if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
+    if (!data.isEmpty() && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
     }
 
     myText.setText(data);
     myText.setFont(UiHelper.selectFont(data));
     myText.setCaretPosition(0);
-    if (data.length() > 0) {
+    if (!data.isEmpty()) {
       activate();
     }
   }
@@ -270,7 +279,7 @@ public class ExOutputPanel extends JPanel {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.moreName, OptionConstants.moreName)) {
+    if (!globalOptions(injector).getMore()) {
       // FIX
       scrollOffset(100000);
     }
@@ -293,9 +302,13 @@ public class ExOutputPanel extends JPanel {
         final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
+        if (LOG.isTrace()) {
+          LOG.trace("Adding new keys to keyStack as part of playback. State before adding keys: " +
+                    KeyHandler.getInstance().getKeyStack().dump());
+        }
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
-        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), new IjExecutionContext(EditorDataContext.init(myEditor, null)),
-                                          0, 1);
+        ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(myEditor), null);
+        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
       }
     });
   }
@@ -352,9 +365,12 @@ public class ExOutputPanel extends JPanel {
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
-      if (!VimPlugin.isEnabled()) return;
-      // Calls updateUI on this and child components
-      for (Editor editor : HelperKt.localEditors()) {
+      if (VimPlugin.isNotEnabled()) return;
+
+      // This listener is only invoked for local scenarios, and we only need to update local editor UI. This will invoke
+      // updateUI on the output pane and it's child components
+      for (VimEditor vimEditor : injector.getEditorGroup().getEditors()) {
+        Editor editor = ((IjVimEditor)vimEditor).getEditor();
         if (!ExOutputPanel.isPanelActive(editor)) continue;
         IJSwingUtilities.updateComponentTreeUI(ExOutputPanel.getInstance(editor));
       }

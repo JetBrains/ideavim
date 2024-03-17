@@ -1,0 +1,45 @@
+# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
+
+# This workflow syncs changes from the docs folder of IdeaVim to the IdeaVim.wiki repository
+
+name: Sync docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    steps:
+      - name: Fetch origin repo
+        uses: actions/checkout@v3
+        with:
+          path: origin
+          # See end of file updateChangeslog.yml for explanation of this secret
+          ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
+
+      - name: Fetch docs repo
+        uses: actions/checkout@v3
+        with:
+          repository: JetBrains/ideavim.wiki
+          path: docs
+
+      - name: Sync docs
+        id: update_authors
+        run: cp -a origin/doc/. docs
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: master
+          repository: docs
+          commit_message: Update docs
+          commit_user_name: IdeaVim Bot
+          commit_user_email: maintainers@ideavim.dev
+          commit_author: IdeaVim Bot <maintainers@ideavim.dev>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,7 +13,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.project.DumbAwareAction
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -30,13 +30,19 @@ import javax.swing.KeyStroke
  * component has focus. It registers all shortcuts used by the Swing actions and forwards them directly to the key
  * handler.
  */
-class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAction() {
+internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val keyStroke = getKeyStroke(e)
     if (keyStroke != null) {
       val editor = exEntryPanel.entry.editor
-      KeyHandler.getInstance().handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, e.dataContext).vim)
+      val keyHandler = KeyHandler.getInstance()
+      keyHandler.handleKey(
+        editor.vim,
+        keyStroke,
+        injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim),
+        keyHandler.keyHandlerState
+      )
     }
   }
 
@@ -53,7 +59,6 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAct
   }
 
   fun registerCustomShortcutSet() {
-
     val shortcuts = ExKeyBindings.bindings.map {
       KeyboardShortcut(it.key, null)
     }.toTypedArray()

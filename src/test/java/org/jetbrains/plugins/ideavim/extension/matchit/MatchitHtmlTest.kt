@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,16 +9,21 @@
 package org.jetbrains.plugins.ideavim.extension.matchit
 
 import com.intellij.ide.highlighter.HtmlFileType
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class MatchitHtmlTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("matchit")
   }
 
+  @Test
   fun `test basic jump to closing tag`() {
     doTest(
       "%",
@@ -28,10 +33,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading<$c/h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test basic jump to opening tag`() {
     doTest(
       "%",
@@ -41,10 +48,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <${c}h1>Heading</h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test multiline jump to closing tag`() {
     doTest(
       "%",
@@ -58,10 +67,12 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph body</p>
         <$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test multiline jump to opening tag`() {
     doTest(
       "%",
@@ -75,10 +86,12 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph body</p>
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to closing tag while ignoring nested tags`() {
     doTest(
       "%",
@@ -96,10 +109,12 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         <$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to closing tag while ignoring outer tags`() {
     doTest(
       "%",
@@ -113,10 +128,12 @@ class MatchitHtmlTest : VimTestCase() {
           <div>contents<$c/div>
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to opening tag while ignoring nested tags`() {
     doTest(
       "%",
@@ -134,10 +151,12 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to opening tag while ignoring outer tags`() {
     doTest(
       "%",
@@ -151,10 +170,12 @@ class MatchitHtmlTest : VimTestCase() {
           <${c}div>contents</div>
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to closing tag while in tag attributes`() {
     doTest(
       "%",
@@ -164,10 +185,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine<$c/h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test don't jump on standalone tags`() {
     doTest(
       "%",
@@ -181,10 +204,12 @@ class MatchitHtmlTest : VimTestCase() {
           <img src=$c"my-image.png" alt="my-image">
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test don't jump on empty lines`() {
     doTest(
       "%",
@@ -198,10 +223,12 @@ class MatchitHtmlTest : VimTestCase() {
         $c 
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump forwards to matching angle bracket on opening tag`() {
     doTest(
       "%",
@@ -211,19 +238,23 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1$c>Heading</h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump forwards to matching angle bracket when on whitespace`() {
     doTest(
       "%",
       "$c    <h1>Heading</h1>",
       "    <h1$c>Heading</h1>",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to last angle bracket when in tag body`() {
     doTest(
       "%",
@@ -233,10 +264,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine</h1$c>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump forwards to matching angle bracket on closing tag`() {
     doTest(
       "%",
@@ -246,10 +279,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading</h1$c>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump backwards to matching angle bracket on opening tag`() {
     doTest(
       "%",
@@ -259,10 +294,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         $c<h1>Heading</h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump backwards to matching angle bracket on closing tag`() {
     doTest(
       "%",
@@ -272,10 +309,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading$c</h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to matching square bracket inside tag`() {
     doTest(
       "%",
@@ -285,10 +324,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf$c]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to matching parenthesis inside tag`() {
     doTest(
       "%",
@@ -298,10 +339,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition($c)">{{displayValue}}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to matching curly brace in tag body`() {
     doTest(
       "%",
@@ -311,10 +354,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}$c}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to closing tag when inside brackets in opening tag`() {
     doTest(
       "%",
@@ -324,10 +369,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump to opening curly brace when in tag body`() {
     doTest(
       "%",
@@ -337,10 +384,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{$c{displayValue}}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test don't jump on standalone tag with brackets on the same line`() {
     doTest(
       "%",
@@ -350,10 +399,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from opening to closing tag while ignoring comments`() {
     doTest(
       "%",
@@ -379,10 +430,12 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from closing to opening tag while ignoring comments`() {
     doTest(
       "%",
@@ -408,10 +461,12 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from opening to closing tag inside a comment block`() {
     doTest(
       "%",
@@ -425,10 +480,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- <$c/div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from closing to opening tag inside a comment block`() {
     doTest(
       "%",
@@ -442,10 +499,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from opening to closing angle bracket inside a comment block`() {
     doTest(
       "%",
@@ -459,10 +518,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from closing to opening angle bracket inside a comment block`() {
     doTest(
       "%",
@@ -476,10 +537,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from opening to closing angle bracket on a comment marker`() {
     doTest(
       "%",
@@ -493,10 +556,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from opening to closing angle bracket ignoring bracket in string`() {
     doTest(
       "%",
@@ -506,7 +571,78 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <p *ngIf="count > 0"$c>Count is greater than zero</p>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test jump from multiline opening tag to closing`() {
+    doTest(
+      "%",
+      """
+        <h1 ${c}id="title"
+           class="red right-aligned">
+           Header Content
+        </h1>
+      """.trimIndent(),
+      """
+        <h1 id="title"
+           class="red right-aligned">
+           Header Content
+        <$c/h1>
+      """.trimIndent(),
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
+    )
+  }
+  
+  @Test
+  fun `test jump from whitespace before comment angle bracket to closing bracket`() {
+    doTest(
+      "%",
+      "$c  <!-- A comment -->",
+      "  <!-- A comment --$c>",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test jump from opening tag to closing tag ignoring inner tag with similar name`() {
+    doTest(
+      "%",
+      """
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
+      """.trimIndent(),
+      """
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
+      """.trimIndent(),
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test jump from closing tag to opening tag ignoring inner tag with similar name`() {
+    doTest(
+      "%",
+      """
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
+      """.trimIndent(),
+      """
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
+      """.trimIndent(),
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
@@ -514,6 +650,7 @@ class MatchitHtmlTest : VimTestCase() {
    *  g% motion tests. For HTML, g% should behave the same as %.
    */
 
+  @Test
   fun `test reverse jump to closing tag`() {
     doTest(
       "g%",
@@ -523,10 +660,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading<$c/h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to opening tag`() {
     doTest(
       "g%",
@@ -536,10 +675,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <${c}h1>Heading</h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to closing tag while ignoring nested tags`() {
     doTest(
       "g%",
@@ -557,10 +698,12 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         <$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to closing tag while ignoring outer tags`() {
     doTest(
       "g%",
@@ -574,10 +717,12 @@ class MatchitHtmlTest : VimTestCase() {
           <div>contents<$c/div>
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to opening tag while ignoring nested tags`() {
     doTest(
       "g%",
@@ -595,10 +740,12 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to opening tag while ignoring outer tags`() {
     doTest(
       "g%",
@@ -612,10 +759,12 @@ class MatchitHtmlTest : VimTestCase() {
           <${c}div>contents</div>
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to closing tag while in tag attributes`() {
     doTest(
       "g%",
@@ -625,10 +774,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine<$c/h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test don't reverse jump on standalone tags`() {
     doTest(
       "g%",
@@ -642,10 +793,12 @@ class MatchitHtmlTest : VimTestCase() {
           <img src=$c"my-image.png" alt="my-image">
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test don't reverse jump on empty lines`() {
     doTest(
       "g%",
@@ -659,10 +812,12 @@ class MatchitHtmlTest : VimTestCase() {
         $c 
         </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to closing angle bracket`() {
     doTest(
       "g%",
@@ -672,19 +827,23 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1$c>Heading</h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to closing angle bracket when on whitespace`() {
     doTest(
       "g%",
       "$c    <h1>Heading</h1>",
       "    <h1$c>Heading</h1>",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to last angle bracket when in tag body`() {
     doTest(
       "g%",
@@ -694,10 +853,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine</h1$c>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to opening angle bracket`() {
     doTest(
       "g%",
@@ -707,10 +868,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         $c<h1>Heading</h1>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to matching square bracket inside tag`() {
     doTest(
       "g%",
@@ -720,10 +883,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf$c]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to matching parenthesis inside tag`() {
     doTest(
       "g%",
@@ -733,10 +898,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition($c)">{{displayValue}}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to matching curly brace in tag body`() {
     doTest(
       "g%",
@@ -746,10 +913,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}$c}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to closing tag when inside brackets in opening tag`() {
     doTest(
       "g%",
@@ -759,10 +928,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump to opening curly brace when in tag body`() {
     doTest(
       "g%",
@@ -772,10 +943,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{$c{displayValue}}</div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test don't reverse jump on standalone tag with brackets on the same line`() {
     doTest(
       "g%",
@@ -785,10 +958,12 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from opening to closing tag while ignoring comments`() {
     doTest(
       "g%",
@@ -814,10 +989,12 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from closing to opening tag while ignoring comments`() {
     doTest(
       "g%",
@@ -843,10 +1020,12 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from opening to closing tag inside a comment block`() {
     doTest(
       "g%",
@@ -860,10 +1039,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- <$c/div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from closing to opening tag inside a comment block`() {
     doTest(
       "g%",
@@ -877,10 +1058,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from opening to closing angle bracket inside a comment block`() {
     doTest(
       "g%",
@@ -894,10 +1077,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from closing to opening angle bracket inside a comment block`() {
     doTest(
       "g%",
@@ -911,10 +1096,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from opening to closing angle bracket on a comment marker`() {
     doTest(
       "g%",
@@ -928,10 +1115,12 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test reverse jump from opening to closing angle bracket ignoring bracket in string`() {
     doTest(
       "g%",
@@ -941,26 +1130,57 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <p *ngIf="count > 0"$c>Count is greater than zero</p>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
-  fun `test jump from multiline opening tag to closing`() {
+  @Test
+  fun `test reverse jump from whitespace before comment angle bracket to closing bracket`() {
     doTest(
-      "%",
+      "g%",
+      "$c  <!-- A comment -->",
+      "  <!-- A comment --$c>",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test reverse jump from opening tag to closing tag ignoring inner tag with similar name`() {
+    doTest(
+      "g%",
       """
-        <h1 ${c}id="title"
-           class="red right-aligned">
-           Header Content
-        </h1>
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
       """.trimIndent(),
       """
-        <h1 id="title"
-           class="red right-aligned">
-           Header Content
-        <$c/h1>
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test reverse jump from closing tag to opening tag ignoring inner tag with similar name`() {
+    doTest(
+      "g%",
+      """
+        <Box>
+          <BoxHeading></BoxHeading>
+        <${c}/Box>
+      """.trimIndent(),
+      """
+        <${c}Box>
+          <BoxHeading></BoxHeading>
+        </Box>
+      """.trimIndent(),
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 }

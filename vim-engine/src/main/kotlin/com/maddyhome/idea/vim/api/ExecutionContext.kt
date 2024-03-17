@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,16 +12,17 @@ package com.maddyhome.idea.vim.api
  * This would be ideal if we could provide a typed solution, but sofar this is just a holder
  */
 
-interface ExecutionContext {
-  val context: Any
+public sealed interface ExecutionContext {
+  public val context: Any
 
   // TODO: 10.02.2022 Not sure about this method
-  fun updateEditor(editor: VimEditor): ExecutionContext
+  public fun updateEditor(editor: VimEditor): ExecutionContext
+
+  public interface Editor : ExecutionContext
+  public interface CaretAndEditor : Editor
 }
 
-interface ExecutionContextManager {
-  fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext
-  fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext
-  fun createCaretSpecificDataContext(context: ExecutionContext, caret: VimCaret): ExecutionContext
-  fun createEditorDataContext(editor: VimEditor, context: ExecutionContext): ExecutionContext
+public interface ExecutionContextManager {
+  public fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext.Editor
+  public fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor
 }

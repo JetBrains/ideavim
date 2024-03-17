@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,27 +8,28 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class DeleteEndOfLineActionTest : VimTestCase() {
+  @Test
   fun `test delete on empty line`() {
     doTest(
       "D",
       """
-                A Discovery
+                Lorem Ipsum
                 $c
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
                 $c
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 }

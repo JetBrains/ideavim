@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-object GreaterIgnoreCaseHandler : BinaryOperatorHandler() {
+public object GreaterIgnoreCaseHandler : BinaryOperatorHandler() {
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     return if (left is VimString || right is VimString) {

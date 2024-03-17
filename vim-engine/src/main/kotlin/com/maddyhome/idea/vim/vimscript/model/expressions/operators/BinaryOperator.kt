@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -47,7 +47,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bin
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.UnequalsHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.UnequalsIgnoreCaseHandler
 
-enum class BinaryOperator(val value: String, val handler: BinaryOperatorHandler) {
+public enum class BinaryOperator(public val value: String, public val handler: BinaryOperatorHandler) {
   MULTIPLICATION("*", MultiplicationHandler),
   DIVISION("/", DivisionHandler),
   ADDITION("+", AdditionHandler),
@@ -86,11 +86,12 @@ enum class BinaryOperator(val value: String, val handler: BinaryOperatorHandler)
   MATCHES_CASE_SENSITIVE("=~#", MatchesCaseSensitiveHandler),
   DOESNT_MATCH("!~", DoesntMatchHandler),
   DOESNT_MATCH_IGNORE_CASE("!~?", DoesntMatchIgnoreCaseHandler),
-  DOESNT_MATCH_CASE_SENSITIVE("!~#", DoesntMatchIgnoreCaseHandler);
+  DOESNT_MATCH_CASE_SENSITIVE("!~#", DoesntMatchIgnoreCaseHandler),
+  ;
 
-  companion object {
-    fun getByValue(value: String): BinaryOperator? {
-      return values().firstOrNull { it.value == value }
+  public companion object {
+    public fun getByValue(value: String): BinaryOperator? {
+      return entries.firstOrNull { it.value == value }
     }
   }
 }

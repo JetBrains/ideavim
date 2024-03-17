@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -39,18 +39,29 @@ import javax.swing.KeyStroke
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
 @Suppress("GrazieInspection")
-interface Node<T>
+public interface Node<T>
 
 /** Represents a complete command */
-class CommandNode<T>(val actionHolder: T) : Node<T>
+public data class CommandNode<T>(public val actionHolder: T) : Node<T>
 
 /** Represents a part of the command */
-open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>()
+public open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    if (!super.equals(other)) return false
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return super.hashCode()
+  }
+}
 
 /** Represents a root node for the mode */
-class RootNode<T> : CommandPartNode<T>()
+public class RootNode<T> : CommandPartNode<T>()
 
-fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
+public fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
   var node: Node<T> = this
   val len = keyStrokes.size
   // Add a child for each keystroke in the shortcut for this action

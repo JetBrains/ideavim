@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -21,6 +21,6 @@ public final class VimIcons {
   public static final @NotNull Icon YOUTRACK = load("/icons/youtrack.svg");
 
   private static @NotNull Icon load(@NotNull @NonNls String path) {
-    return IconManager.getInstance().getIcon(path, VimIcons.class);
+    return IconManager.getInstance().getIcon(path, VimIcons.class.getClassLoader());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,20 +11,22 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 
-class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+@TraceOptions(TestOptionConstants.keymodel)
+class MotionArrowRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and block caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -48,7 +50,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and block caret 2`() {
     val before = "I fo${c}und it in a legendary land"
     val after = "I fou${c}nd it in a legendary land"
@@ -70,7 +72,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and bar caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -98,7 +100,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and bar caret 2`() {
     val before = "I fo${c}und it in a legendary land"
     val after = "I fou${c}nd it in a legendary land"
@@ -122,7 +124,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
     assertVisualPosition(0, 4)
 
     typeText(injector.parser.parseKeys("<Right>"))
-    myFixture.checkResult(after)
+    fixture.checkResult(after)
 
     assertOffset(5)
     assertVisualPosition(0, 6)
@@ -134,7 +136,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
 
   // Kotlin parameter hints are a good example of inlays related to following text
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to following text and block caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -157,7 +159,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to following text and bar caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -184,151 +186,199 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test visual default options`() {
     doTest(
       listOf("v", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${s}f${c}o${se}und it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopsel
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopsel]))
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I f${c}ound it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${s}f${c}o${se}und it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I f${c}ound it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodelName,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
-  )
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
                 all rocks and ${c}lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I f${c}ound it in a legendary land
                 all rocks and l${c}avender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  fun `test whichwrap in the same line`() {
+    doTest(
+      listOf("<Right>"),
+      """
+          Oh, hi M${c}ark
+      """.trimIndent(),
+      """
+          Oh, hi Ma${c}rk
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=>")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  fun `test whichwrap at file end`() {
+    doTest(
+      listOf("<Right>"),
+      """
+          Oh, hi Mar${c}k
+      """.trimIndent(),
+      """
+          Oh, hi Mar${c}k
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=>")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  fun `test whichwrap to next line`() {
+    doTest(
+      listOf("<Right>"),
+      """
+          Oh, hi Mar${c}k
+          You are my favourite customer
+      """.trimIndent(),
+      """
+          Oh, hi Mark
+          ${c}You are my favourite customer
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=>")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  fun `test from empty line to empty line`() {
+    doTest(
+      listOf("<Right>"),
+      """
+          Oh, hi Mark
+          ${c}
+          
+          You are my favourite customer
+      """.trimIndent(),
+      """
+          Oh, hi Mark
+          
+          ${c}
+          You are my favourite customer
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=>")
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,68 +10,19 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 
-/**
- * @author Alex Plate
- */
-
-/**
- * This works almost like [Caret.getLeadSelectionOffset], but vim-specific
- */
-val Caret.vimLeadSelectionOffset: Int
-  get() {
-    val caretOffset = offset
-    if (hasSelection()) {
-      val selectionAdj = VimPlugin.getVisualMotion().selectionAdj
-      if (caretOffset != selectionStart && caretOffset != selectionEnd) {
-        // Try to check if current selection is tweaked by fold region.
-        val foldingModel = editor.foldingModel
-        val foldRegion = foldingModel.getCollapsedRegionAtOffset(caretOffset)
-        if (foldRegion != null) {
-          if (foldRegion.startOffset == selectionStart) {
-            return (selectionEnd - selectionAdj).coerceAtLeast(0)
-          } else if (foldRegion.endOffset == selectionEnd) {
-            return selectionStart
-          }
-        }
-      }
-
-      return if (editor.subMode == VimStateMachine.SubMode.VISUAL_LINE) {
-        val selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line
-        val caretLine = editor.offsetToLogicalPosition(this.offset).line
-        if (caretLine == selectionStartLine) {
-          val column = editor.offsetToLogicalPosition(selectionEnd).column
-          if (column == 0) (selectionEnd - 1).coerceAtLeast(0) else selectionEnd
-        } else selectionStart
-      } else if (editor.inBlockSubMode) {
-        val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
-        val pCaret = editor.caretModel.primaryCaret
-        when (pCaret.offset) {
-          selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
-          selections.first().second -> selections.last().first
-          selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
-          selections.last().second -> selections.first().first
-          else -> selections.first().first
-        }
-      } else {
-        if (caretOffset == selectionStart) (selectionEnd - selectionAdj).coerceAtLeast(0) else selectionStart
-      }
-    }
-    return caretOffset
-  }
-
-fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimStateMachine.Mode) {
-  if (predictedMode != VimStateMachine.Mode.VISUAL) {
-    if (!predictedMode.isEndAllowed) {
+internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: Mode) {
+  if (predictedMode !is Mode.VISUAL) {
+    if (!editor.vim.isEndAllowed(predictedMode)) {
       editor.caretModel.allCarets.forEach { caret ->
         val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
         val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
@@ -92,4 +43,11 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimState
       }
     }
   }
+}
+
+@Deprecated("Use same method on VimCaret")
+internal fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
+  vimSelectionStart = start
+  setVisualSelection(start, end, this.vim)
+  if (moveCaretToSelectionEnd && !editor.vim.inBlockSelection) moveToInlayAwareOffset(end)
 }

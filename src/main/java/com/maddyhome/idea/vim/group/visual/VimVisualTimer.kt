@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,12 +8,11 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.ActionEvent
 import javax.swing.Timer
 
@@ -53,26 +52,25 @@ import javax.swing.Timer
  *   editorHasSelection is false. Insert mode ([mode]) has no selection and editor also has no selection, so
  *   no adjustment gets performed and IdeaVim stays in insert mode.
  */
-object VimVisualTimer {
+// Do not remove until it's used in EasyMotion plugin in tests
+public object VimVisualTimer {
 
-  var swingTimer: Timer? = null
-  var mode: VimStateMachine.Mode? = null
+  public var swingTimer: Timer? = null
+  public var mode: Mode? = null
 
-  inline fun singleTask(currentMode: VimStateMachine.Mode, crossinline task: (initialMode: VimStateMachine.Mode?) -> Unit) {
+  public inline fun singleTask(currentMode: Mode, crossinline task: (initialMode: Mode?) -> Unit) {
     swingTimer?.stop()
 
     if (mode == null) mode = currentMode
 
     // Default delay - 100 ms
-    val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, "visualdelay") as VimInt).value) {
-      timerAction(task)
-    }
+    val timer = Timer(injector.globalIjOptions().visualdelay) { timerAction(task) }
     timer.isRepeats = false
     timer.start()
     swingTimer = timer
   }
 
-  fun doNow() {
+  public fun doNow() {
     val swingTimer1 = swingTimer
     if (swingTimer1 != null) {
       swingTimer1.stop()
@@ -82,7 +80,12 @@ object VimVisualTimer {
     }
   }
 
-  inline fun timerAction(task: (initialMode: VimStateMachine.Mode?) -> Unit) {
+  public fun drop() {
+    swingTimer?.stop()
+    swingTimer = null
+  }
+
+  public inline fun timerAction(task: (initialMode: Mode?) -> Unit) {
     task(mode)
     swingTimer = null
     mode = null

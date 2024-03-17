@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,91 +10,93 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 
-class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName) {
-  @VimOptionDefaultAll
+@TraceOptions(TestOptionConstants.virtualedit)
+class MotionRightActionTest : VimTestCase() {
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion`() {
     doTest(
       "l",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found ${c}it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found i${c}t in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion with repeat`() {
     doTest(
       "3l",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found ${c}it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it ${c}in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion to the end`() {
     doTest(
       "3l",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary lan${c}d
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary lan${c}d
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
   fun `test virtual edit motion to the end`() {
     doTest(
       "3l",
@@ -108,12 +110,12 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
   fun `test virtual edit motion after dollar`() {
     doTest(
       "\$l",
@@ -127,154 +129,269 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion non-ascii`() {
     doTest(
       "l",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendar${c}𝛁 land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendar𝛁${c} land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion emoji`() {
     doTest(
       "l",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendar${c}🐔 land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendar🐔${c} land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  fun `test simple motion multiple code point grapheme cluster`() {
+    doTest(
+      "l",
+      """
+            Lorem Ipsum
+
+            I found it in a legendar${c}👩‍👩‍👧‍👧 land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+            Lorem Ipsum
+
+            I found it in a legendar👩‍👩‍👧‍👧${c} land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion czech`() {
     doTest(
       "l",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendar${c}ž land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendarž${c} land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion tab`() {
     doTest(
       "l",
       """
-        A Discovery
+        Lorem Ipsum
 
         I found it in a legendar${c}. land
-        all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
+        consectetur adipiscing elit
+        Sed in orci mauris.
         hard by the torrent of a mountain pass
       """.trimIndent().dotToTab(),
       """
-        A Discovery
+        Lorem Ipsum
 
         I found it in a legendar.${c} land
-        all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
+        consectetur adipiscing elit
+        Sed in orci mauris.
         hard by the torrent of a mountain pass
       """.trimIndent().dotToTab(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test char visual mode`() {
     doTest(
       listOf("v", "ll"),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary lan${c}d
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary lan${s}d${c}${se}
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test block visual mode`() {
     doTest(
       listOf("<C-V>", "ll"),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary lan${c}d
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary lan${s}d${c}${se}
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  fun `test whichwrap in the same line`() {
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi M${c}ark
+      """.trimIndent(),
+      """
+          Oh, hi Ma${c}rk
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=l")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  fun `test whichwrap at file end`() {
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi Mar${c}k
+      """.trimIndent(),
+      """
+          Oh, hi Mar${c}k
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=l")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  fun `test whichwrap to next line`() {
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi Mar${c}k
+          You are my favourite customer
+      """.trimIndent(),
+      """
+          Oh, hi Mark
+          ${c}You are my favourite customer
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=l")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  fun `test from empty line to empty line`() {
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi Mark
+          ${c}
+
+          You are my favourite customer
+      """.trimIndent(),
+      """
+          Oh, hi Mark
+
+          ${c}
+          You are my favourite customer
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=l")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  fun `test d command with whichwrap`() {
+    doTest(
+      listOf("dl"),
+      """
+          Oh, hi Mar${c}k
+          You are my favourite customer
+      """.trimIndent(),
+      """
+          Oh, hi Ma${c}r
+          You are my favourite customer
+      """.trimIndent(),
+    ) {
+      enterCommand("set whichwrap=l")
+    }
   }
 }

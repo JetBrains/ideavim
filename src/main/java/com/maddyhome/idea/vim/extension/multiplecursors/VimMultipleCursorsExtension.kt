@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -20,14 +20,14 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
@@ -41,9 +41,9 @@ import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import java.lang.Integer.min
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import kotlin.math.max
+import kotlin.math.min
 
 @NlsSafe
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
@@ -71,7 +71,7 @@ private var Editor.vimMultipleCursorsLastSelection: TextRange? by userData()
  *
  * See https://github.com/terryma/vim-multiple-cursors
  * */
-class VimMultipleCursorsExtension : VimExtension {
+internal class VimMultipleCursorsExtension : VimExtension {
 
   override fun getName() = "multiple-cursors"
 
@@ -82,7 +82,7 @@ class VimMultipleCursorsExtension : VimExtension {
       injector.parser.parseKeys(NEXT_OCCURRENCE),
       owner,
       NextOccurrenceHandler(whole = false),
-      false
+      false,
     )
     putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false)
     putExtensionHandlerMapping(
@@ -90,7 +90,7 @@ class VimMultipleCursorsExtension : VimExtension {
       injector.parser.parseKeys(ALL_OCCURRENCES),
       owner,
       AllOccurrencesHandler(whole = false),
-      false
+      false,
     )
     putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false)
     putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false)
@@ -102,7 +102,7 @@ class VimMultipleCursorsExtension : VimExtension {
   }
 
   abstract class WriteActionHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       ApplicationManager.getApplication().runWriteAction {
         executeInWriteAction(editor.ij, context.ij)
       }
@@ -150,7 +150,16 @@ class VimMultipleCursorsExtension : VimExtension {
           // Keep a track of the selected text, we'll check it later
           patterns.add(selectedText)
 
-          val lines = selectedText.count { it == '\n' }
+          val minOffset = min(caret.selectionEnd, caret.selectionStart)
+          var maxOffset = max(caret.selectionEnd, caret.selectionStart)
+
+          // As the last offset appears after the new line character, technically it's placed on the next line.
+          if (selectedText.lastOrNull() == '\n') {
+            maxOffset -= 1
+          }
+          val start = editor.document.getLineNumber(minOffset)
+          val end = editor.document.getLineNumber(maxOffset)
+          val lines = end - start
           if (lines > 0) {
             val selectionStart = min(caret.selectionStart, caret.selectionEnd)
             val startPosition = editor.offsetToVisualPosition(selectionStart)
@@ -163,7 +172,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
         if (newPositions.size > 0) {
           editor.vim.exitVisualMode()
-          newPositions.forEach { editor.caretModel.addCaret(it, true) ?: return }
+          newPositions.forEach { editor.caretModel.addCaret(it, true) ?: return@forEach }
           editor.updateCaretsVisualAttributes()
           return
         }
@@ -237,7 +246,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
       // Note that ignoreCase is not overridden by the `\C` in the pattern
       val pattern = makePattern(text, whole)
-      val matches = SearchHelper.findAll(editor, pattern, 0, -1, false)
+      val matches = injector.searchHelper.findAll(IjVimEditor(editor), pattern, 0, -1, false)
       for (match in matches) {
         if (match.contains(primaryCaret.offset)) {
           primaryCaret.vim.moveToOffset(match.startOffset)
@@ -279,14 +288,14 @@ class VimMultipleCursorsExtension : VimExtension {
       if (!editor.caretModel.removeCaret(caret)) {
         editor.vim.exitVisualMode()
       }
-      MotionGroup.scrollCaretIntoView(caret.editor)
+      injector.scroll.scrollCaretIntoView(editor.vim)
     }
   }
 
   private fun selectText(caret: Caret, text: String, offset: Int): TextRange? {
     if (text.isEmpty()) return null
     caret.vim.vimSetSelection(offset, offset + text.length - 1, true)
-    MotionGroup.scrollCaretIntoView(caret.editor)
+    injector.scroll.scrollCaretIntoView(caret.editor.vim)
     return TextRange(caret.selectionStart, caret.selectionEnd)
   }
 
@@ -303,17 +312,17 @@ class VimMultipleCursorsExtension : VimExtension {
 
   private fun enterVisualMode(editor: VimEditor) {
     // We need to reset the key handler to make sure we pick up the fact that we're in visual mode
-    VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
+    VimPlugin.getVisualMotion().enterVisualMode(editor, SelectionType.CHARACTER_WISE)
     KeyHandler.getInstance().reset(editor)
   }
 
   private fun findNextOccurrence(editor: Editor, startOffset: Int, text: String, whole: Boolean): Int {
     val searchOptions = enumSetOf(SearchOptions.WHOLE_FILE)
-    if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.wrapscanName)) {
+    if (injector.options(editor.vim).wrapscan) {
       searchOptions.add(SearchOptions.WRAP)
     }
 
-    return SearchHelper.findPattern(editor, makePattern(text, whole), startOffset, 1, searchOptions)?.startOffset ?: -1
+    return injector.searchHelper.findPattern(IjVimEditor(editor), makePattern(text, whole), startOffset, 1, searchOptions)?.startOffset ?: -1
   }
 
   private fun makePattern(text: String, whole: Boolean): String {

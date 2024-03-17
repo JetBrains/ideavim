@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,15 +13,14 @@ import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
-import com.maddyhome.idea.vim.option.ToggleOption
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.statistic.PluginState
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-object VimExtensionRegistrar : VimExtensionRegistrator {
+internal object VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
   internal val extensionAliases = HashMap<String, String>()
   private var extensionRegistered = false
@@ -46,31 +45,33 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
           unregisterExtension(extension)
         }
       },
-      false, VimPlugin.getInstance()
+      false,
+      VimPlugin.getInstance(),
     )
   }
 
   @Synchronized
   private fun registerExtension(extensionBean: ExtensionBeanClass) {
     val name = extensionBean.name ?: extensionBean.instance.name
+    if (name == "sneak" && extensionBean.name == null) {
+      // Filter out the old ideavim-sneak extension that used to be a separate plugin
+      // https://github.com/Mishkun/ideavim-sneak
+      return
+    }
     if (name in registeredExtensions) return
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    VimPlugin.getOptionServiceImpl().addOption(ToggleOption(name, getAbbrev(name), false))
-    VimPlugin.getOptionService().addListener(
-      name,
-      object : OptionChangeListener<VimDataType> {
-        override fun processGlobalValueChange(oldValue: VimDataType?) {
-          if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, name)) {
-            initExtension(extensionBean, name)
-            PluginState.enabledExtensions.add(name)
-          } else {
-            extensionBean.instance.dispose()
-          }
-        }
+    val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
+    VimPlugin.getOptionGroup().addOption(option)
+    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(option) {
+      if (injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).asBoolean()) {
+        initExtension(extensionBean, name)
+        PluginState.Util.enabledExtensions.add(name)
+      } else {
+        extensionBean.instance.dispose()
       }
-    )
+    }
   }
 
   private fun getAbbrev(name: String): String {
@@ -86,6 +87,31 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
     }
   }
 
+  /**
+   * During vim initialization process, it firstly loads the .vimrc file, then executes scripts from the plugins folder.
+   * This practically means that the .vimrc file is initialized first, then the plugins are loaded.
+   * See `:h initialization`
+   *
+   * In IdeaVim we don't have a separate plugins folder to load it after .ideavimrc load. However, we can collect
+   *   the list of plugins mentioned in the .ideavimrc and load them after .ideavimrc execution is finished.
+   *
+   * Why this matters? Because this affects the order of commands are executed. For example:
+   * ```
+   * plug 'tommcdo/vim-exchange'
+   * let g:exchange_no_mappings=1
+   * ```
+   * Here the user will expect that the exchange plugin won't have default mappings. However, if we load vim-exchange
+   *    immediately, this variable won't be initialized at the moment of plugin initialization.
+   *
+   * There is also a tricky case for mappings override:
+   * ```
+   * plug 'tommcdo/vim-exchange'
+   * map X <Plug>(ExchangeLine)
+   * ```
+   * For this case, a plugin with a good implementation detects that there is already a defined mapping for
+   *   `<Plug>(ExchangeLine)` and doesn't register the default cxx mapping. However, such detection requires the mapping
+   *   to be defined before the plugin initialization.
+   */
   @JvmStatic
   fun enableDelayedExtensions() {
     delayedExtensionEnabling.forEach {
@@ -102,18 +128,15 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.remove(name)
     removeAliases(extension)
     extension.instance.dispose()
-    VimPlugin.getOptionService().removeOption(name)
+    VimPlugin.getOptionGroup().removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }
 
   override fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
-    try {
-      VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, name)
-    } catch (e: ExException) {
-      return false
-    }
+    val option = injector.optionGroup.getOption(name) as? ToggleOption ?: return false
+    injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL(null))
     return true
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -29,8 +30,9 @@ private val ARGUMENT_DELETE_ALL_FILE_MARKS = Regex("^!$")
 private const val ESCAPED_QUOTE = "\\\""
 private const val UNESCAPED_QUOTE = "\""
 
-data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+@ExCommand(command = "delm[arks]")
+public data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val processedArg = argument
@@ -46,22 +48,14 @@ data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Comman
       if (index != -1) {
         val invalidIndex = if (processedArg[index] == '-') (index - 1).coerceAtLeast(0) else index
 
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E475, processedArg.substring(invalidIndex)))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E475, processedArg.substring(invalidIndex)))
         return ExecutionResult.Error
       }
     }
 
-    processedArg.forEach { character -> deleteMark(editor, character) }
+    processedArg.forEach { character -> injector.markService.removeMark(editor, character) }
 
     return ExecutionResult.Success
-  }
-}
-
-private fun deleteMark(editor: VimEditor, character: Char) {
-  if (character != ' ') {
-    val markGroup = injector.markGroup
-    val mark = markGroup.getMark(editor, character) ?: return
-    markGroup.removeMark(character, mark)
   }
 }
 

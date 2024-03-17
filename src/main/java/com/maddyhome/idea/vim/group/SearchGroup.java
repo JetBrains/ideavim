@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -21,8 +21,6 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
@@ -33,19 +31,14 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.history.HistoryConstants;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
-import com.maddyhome.idea.vim.newapi.IjVimCaret;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.newapi.*;
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.VimLContext;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression;
@@ -62,41 +55,48 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
 
-import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
 
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
-public class SearchGroup extends VimSearchGroupBase implements PersistentStateComponent<Element> {
+@Deprecated
+/**
+ * @deprecated Replace with IjVimSearchGroup
+ */
+public class SearchGroup extends IjVimSearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
-    VimPlugin.getOptionService().addListener(
-      OptionConstants.hlsearchName,
-      new OptionChangeListener<VimDataType>() {
-        @Override
-        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
-          resetShowSearchHighlight();
+    super();
+    if (!globalIjOptions(injector).getUseNewRegex()) {
+      // TODO: Investigate migrating these listeners to use the effective value change listener
+      // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
+      // the highlights in that project's current document's open editors (see VIM-2779).
+      // However, we probably only want to update the editors associated with the current document, so maybe the whole
+      // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
+      // changes in the search options.
+      VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch, () -> {
+        resetShowSearchHighlight();
+        forceUpdateSearchHighlights();
+      });
+
+      final GlobalOptionChangeListener updateHighlightsIfVisible = () -> {
+        if (showSearchHighlight) {
           forceUpdateSearchHighlights();
         }
-      },
-      false
-    );
-
-    final OptionChangeListener<VimDataType> updateHighlightsIfVisible =
-      new OptionChangeListener<VimDataType>() {
-        @Override
-        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
-            if (showSearchHighlight) {
-              forceUpdateSearchHighlights();
-            }
-        }
       };
-    VimPlugin.getOptionService().addListener(OptionConstants.ignorecaseName, updateHighlightsIfVisible, false);
-    VimPlugin.getOptionService().addListener(OptionConstants.smartcaseName, updateHighlightsIfVisible, false);
+      VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.ignorecase, updateHighlightsIfVisible);
+      VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.smartcase, updateHighlightsIfVisible);
+    }
   }
 
   public void turnOn() {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.updateSearchHighlights(false);
+      return;
+    }
     updateSearchHighlights();
   }
 
@@ -107,7 +107,12 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   }
 
   @TestOnly
+  @Override
   public void resetState() {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.resetState();
+      return;
+    }
     lastPatternIdx = RE_SEARCH;
     lastSearch = lastSubstitute = lastReplace = null;
     lastPatternOffset = "";
@@ -121,7 +126,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * @return The pattern used for last search. Can be null
    */
+  @Override
   public @Nullable String getLastSearchPattern() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSearchPattern();
     return lastSearch;
   }
 
@@ -129,7 +136,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * Get the last pattern used in substitution.
    * @return The pattern used for the last substitute command. Can be null
    */
+  @Override
   public @Nullable String getLastSubstitutePattern() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSubstitutePattern();
     return lastSubstitute;
   }
 
@@ -138,7 +147,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    *
    * @return The pattern last used for either searching or substitution. Can be null
    */
-  public @Nullable String getLastUsedPattern() {
+  @Override
+  protected @Nullable String getLastUsedPattern() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastUsedPattern();
     switch (lastPatternIdx) {
       case RE_SEARCH: return lastSearch;
       case RE_SUBST:  return lastSubstitute;
@@ -202,6 +213,10 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   @TestOnly
   public void setLastSearchState(@SuppressWarnings("unused") @NotNull Editor editor, @NotNull String pattern,
                                  @NotNull String patternOffset, Direction direction) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.setLastSearchState(pattern, patternOffset, direction);
+      return;
+    }
     setLastUsedPattern(pattern, RE_SEARCH, true);
     lastIgnoreSmartCase = false;
     lastPatternOffset = patternOffset;
@@ -233,7 +248,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
                                                  int startLine,
                                                  int endLine,
                                                  boolean ignoreCase) {
-    return SearchHelper.findAll(editor, pattern, startLine, endLine, ignoreCase);
+    return injector.getSearchHelper().findAll(new IjVimEditor(editor), pattern, startLine, endLine, ignoreCase);
   }
 
   /**
@@ -261,6 +276,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    */
   @Override
   public int processSearchCommand(@NotNull VimEditor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchCommand(editor, command, startOffset, dir);
+
     boolean isNewPattern = false;
     String pattern = null;
     String patternOffset = null;
@@ -420,7 +437,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return        The offset of the result or the start of the word under the caret if not found. Returns -1 on error
    */
   @Override
-  public int searchWord(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean whole, Direction dir) {
+  public int searchWord(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count, boolean whole, @NotNull Direction dir) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchWord(editor, caret, count, whole, dir);
     TextRange range = SearchHelper.findWordUnderCursor(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
     if (range == null) {
       logger.warn("No range was found");
@@ -461,7 +479,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return        The offset of the next match, or -1 if not found
    */
   @Override
-  public int searchNext(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
+  public int searchNext(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchNext(editor, caret, count);
     return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count, lastDir);
   }
 
@@ -477,7 +496,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return        The offset of the next match, or -1 if not found
    */
   @Override
-  public int searchPrevious(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
+  public int searchPrevious(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchPrevious(editor, caret, count);
     return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count,
                                    lastDir.reverse());
   }
@@ -531,6 +551,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
                                           @NotNull @NonNls String excmd,
                                           @NotNull @NonNls String exarg,
                                           @NotNull VimLContext parent) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.processSubstituteCommand(editor, caret, range, excmd, exarg, parent);
+
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     List<ExException> exceptions = new ArrayList<>();
     if (CommandStateHelper.inVisualMode(((IjVimEditor) editor).getEditor())) {
@@ -624,7 +646,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(editor), OptionConstants.gdefaultName, OptionConstants.gdefaultName);
+      do_all = options(injector, editor).getGdefault();
       do_ask = false;
       do_error = true;
       do_ic = 0;
@@ -694,8 +716,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       return false;
     }
 
-    Pair<Boolean, Triple<Object, String, Object>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
-                                                                                          RE_SUBST);
+    Pair<Boolean, Triple<Object, String, Object>> booleanregmmatch_tPair = search_regcomp(pat, which_pat, RE_SUBST);
     if (!booleanregmmatch_tPair.getFirst()) {
       if (do_error) {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
@@ -703,9 +724,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       }
       return false;
     }
-    RegExp.regmmatch_T regmatch = (RegExp.regmmatch_T) booleanregmmatch_tPair.getSecond().getFirst();
+    RegExp.regmmatch_T regmatch = (RegExp.regmmatch_T)booleanregmmatch_tPair.getSecond().getFirst();
     String pattern = booleanregmmatch_tPair.getSecond().getSecond();
-    RegExp sp = (RegExp) booleanregmmatch_tPair.getSecond().getThird();
+    RegExp sp = (RegExp)booleanregmmatch_tPair.getSecond().getThird();
 
     /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
     if (do_ic == 'i') {
@@ -738,8 +759,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    int start = ((IjVimEditor) editor).getEditor().getDocument().getLineStartOffset(line1);
-    int end = ((IjVimEditor) editor).getEditor().getDocument().getLineEndOffset(line2);
+    int start = ((IjVimEditor)editor).getEditor().getDocument().getLineStartOffset(line1);
+    int end = ((IjVimEditor)editor).getEditor().getDocument().getLineEndOffset(line2);
 
     if (logger.isDebugEnabled()) {
       logger.debug("search range=[" + start + "," + end + "]");
@@ -758,10 +779,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
       if (nmatch > 0) {
         if (firstMatch) {
-          VimPlugin.getMark().saveJumpLocation(editor);
+          VimInjectorKt.injector.getJumpService().saveJumpLocation(editor);
           firstMatch = false;
         }
-
 
         String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
         if (sub.charAt(0) == '\\' && sub.charAt(1) == '=') {
@@ -771,22 +791,25 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             exceptions.add(new ExException("E15: Invalid expression: " + exprString));
             expression = new SimpleExpression(new VimString(""));
           }
-        } else if (match == null) {
+        }
+        else if (match == null) {
           return false;
         }
 
         int line = lnum + regmatch.startpos[0].lnum;
         CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
         CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
-        int startoff = startpos.toOffset(((IjVimEditor) editor).getEditor());
-        int endoff = endpos.toOffset(((IjVimEditor) editor).getEditor());
+        int startoff = startpos.toOffset(((IjVimEditor)editor).getEditor());
+        int endoff = endpos.toOffset(((IjVimEditor)editor).getEditor());
 
         if (do_all || line != lastLine) {
           boolean doReplace = true;
           if (do_ask) {
-            RangeHighlighter hl = SearchHighlightsHelper.addSubstitutionConfirmationHighlight(((IjVimEditor) editor).getEditor(), startoff, endoff);
-            final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor) editor).getEditor(), match, ((IjVimCaret) caret).getCaret(), startoff);
-            ((IjVimEditor) editor).getEditor().getMarkupModel().removeHighlighter(hl);
+            RangeHighlighter hl =
+              SearchHighlightsHelper.addSubstitutionConfirmationHighlight(((IjVimEditor)editor).getEditor(), startoff,
+                                                                          endoff);
+            final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor)editor).getEditor(), match, ((IjVimCaret)caret).getCaret(), startoff);
+            ((IjVimEditor)editor).getEditor().getMarkupModel().removeHighlighter(hl);
             switch (choice) {
               case SUBSTITUTE_THIS:
                 doReplace = true;
@@ -809,25 +832,26 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             }
           }
           if (doReplace) {
-            SubmatchFunctionHandler.INSTANCE.setLatestMatch(((IjVimEditor) editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
+            SubmatchFunctionHandler.Companion.getInstance().setLatestMatch(
+              ((IjVimEditor)editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
             caret.moveToOffset(startoff);
             if (expression != null) {
               try {
-              match = expression
-                .evaluate(editor, new IjExecutionContext(EditorDataContext.init(((IjVimEditor) editor).getEditor(), null)), parent)
-                .toInsertableString();
-              } catch (Exception e) {
-                exceptions.add((ExException) e);
+                match =
+                  expression.evaluate(editor, injector.getExecutionContextManager().onEditor(editor, null), parent).toInsertableString();
+              }
+              catch (Exception e) {
+                exceptions.add((ExException)e);
                 match = "";
               }
             }
 
             String finalMatch = match;
-            ApplicationManager.getApplication().runWriteAction(() -> ((IjVimEditor) editor).getEditor().getDocument().replaceString(startoff, endoff,
-                                                                                                        finalMatch));
+            ApplicationManager.getApplication().runWriteAction(
+              () -> ((IjVimEditor)editor).getEditor().getDocument().replaceString(startoff, endoff, finalMatch));
             lastMatch = startoff;
             int newend = startoff + match.length();
-            newpos = CharacterPosition.Companion.fromOffset(((IjVimEditor) editor).getEditor(), newend);
+            newpos = CharacterPosition.Companion.fromOffset(((IjVimEditor)editor).getEditor(), newend);
 
             lnum += newpos.line - endpos.line;
             line2 += newpos.line - endpos.line;
@@ -867,7 +891,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       }
     }
 
-    SubmatchFunctionHandler.INSTANCE.setLatestMatch("");
+    SubmatchFunctionHandler.Companion.getInstance().setLatestMatch("");
 
     // todo throw multiple exceptions at once
     if (!exceptions.isEmpty()) {
@@ -882,6 +906,10 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
   @Override
   public void setLastSearchPattern(@Nullable String lastSearchPattern) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.setLastSearchPattern(lastSearchPattern);
+      return;
+    }
     this.lastSearch = lastSearchPattern;
     if (showSearchHighlight) {
       resetIncsearchHighlights();
@@ -891,6 +919,10 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
   @Override
   public void setLastSubstitutePattern(@Nullable String lastSubstitutePattern) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.setLastSubstitutePattern(lastSubstitutePattern);
+      return;
+    }
     this.lastSubstitute = lastSubstitutePattern;
   }
 
@@ -900,6 +932,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
                                 int patternOffset,
                                 int startOffset,
                                 @NotNull Direction direction) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchRange(editor, pattern, patternOffset, startOffset, direction);
     return processSearchRange(((IjVimEditor) editor).getEditor(), pattern, patternOffset, startOffset, direction);
   }
 
@@ -990,7 +1023,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     else {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-      exEntryPanel.activate(editor, EditorDataContext.init(editor, null), MessageHelper.message("replace.with.0", match), "", 1);
+      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
+      exEntryPanel.activate(editor, ((IjEditorExecutionContext)context).getContext(), MessageHelper.message("replace.with.0", match), "", 1);
       new IjVimCaret(caret).moveToOffset(startoff);
       ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);
@@ -1021,6 +1055,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    */
   @Override
   public @Nullable TextRange getNextSearchRange(@NotNull VimEditor editor, int count, boolean forwards) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getNextSearchRange(editor, count, forwards);
     editor.removeSecondaryCarets();
     TextRange current = findUnderCaret(editor);
 
@@ -1054,15 +1089,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
   @Override
   @Nullable
-  public TextRange findUnderCaret(@NotNull VimEditor editor) {
-    final TextRange backSearch = searchBackward(editor, editor.primaryCaret().getOffset().getPoint() + 1, 1);
-    if (backSearch == null) return null;
-    return backSearch.contains(editor.primaryCaret().getOffset().getPoint()) ? backSearch : null;
-  }
-
-  @Override
-  @Nullable
   public TextRange searchBackward(@NotNull VimEditor editor, int offset, int count) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.searchBackward(editor, offset, count);
     // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
     final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
     final TextRange foundBackward = VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), offset, count, searchOptions);
@@ -1080,7 +1108,12 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   //
   // *******************************************************************************************************************
   //region Search highlights
+  @Override
   public void clearSearchHighlight() {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.clearSearchHighlight();
+      return;
+    }
     showSearchHighlight = false;
     updateSearchHighlights();
   }
@@ -1100,18 +1133,27 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   /**
    * Reset the search highlights to the last used pattern after highlighting incsearch results.
    */
+  @Override
   public void resetIncsearchHighlights() {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.resetIncsearchHighlights();
+      return;
+    }
     SearchHighlightsHelper.updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, true);
   }
 
   private void resetShowSearchHighlight() {
-    showSearchHighlight = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.hlsearchName, OptionConstants.hlsearchName);
+    showSearchHighlight = globalOptions(injector).getHlsearch();
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.highlightSearchLines(new IjVimEditor(editor), startLine, endLine);
+      return;
+    }
     final String pattern = getLastUsedPattern();
     if (pattern != null) {
-      final List<TextRange> results = SearchHelper.findAll(editor, pattern, startLine, endLine,
+      final List<TextRange> results = injector.getSearchHelper().findAll(new IjVimEditor(editor), pattern, startLine, endLine,
         shouldIgnoreCase(pattern, lastIgnoreSmartCase));
       SearchHighlightsHelper.highlightSearchResults(editor, pattern, results, -1);
     }
@@ -1120,18 +1162,30 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   /**
    * Updates search highlights when the selected editor changes
    */
-  public static void fileEditorManagerSelectionChangedCallback(@SuppressWarnings("unused") @NotNull FileEditorManagerEvent event) {
+  public void fileEditorManagerSelectionChangedCallback(@SuppressWarnings("unused") @NotNull FileEditorManagerEvent event) {
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      super.updateSearchHighlights(false);
+      return;
+    }
     VimPlugin.getSearch().updateSearchHighlights();
   }
 
   @Override
   public Integer findDecimalNumber(@NotNull String line) {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.findDecimalNumber(line);
     Pair<TextRange, NumberType> searchResult = SearchHelper.findNumberInText(line, 0, false, false, false);
     if (searchResult != null) {
       TextRange range = searchResult.component1();
       return Integer.parseInt(line.substring(range.getStartOffset(), range.getEndOffset()));
     }
     return null;
+  }
+
+  @NotNull
+  @Override
+  public Direction getLastSearchDirection() {
+    if (globalIjOptions(injector).getUseNewRegex()) return super.getLastSearchDirection();
+    return lastDir;
   }
 
   /**
@@ -1142,47 +1196,50 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     public static DocumentSearchListener INSTANCE = new DocumentSearchListener();
 
     @Contract(pure = true)
-    private DocumentSearchListener () {
+    private DocumentSearchListener() {
     }
 
     @Override
     public void documentChanged(@NotNull DocumentEvent event) {
-      for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-        final Document document = event.getDocument();
+      // Loop over all local editors for the changed document, across all projects, and update search highlights.
+      // Note that the change may have come from a remote guest in Code With Me scenarios (in which case
+      // ClientId.current will be a guest ID), but we don't care - we still need to add/remove highlights for the
+      // changed text. Make sure we only update local editors, though.
+      final Document document = event.getDocument();
+      for (VimEditor vimEditor : injector.getEditorGroup().getEditors(new IjVimDocument(document))) {
+        final Editor editor = ((IjVimEditor)vimEditor).getEditor();
+        Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
+        if (hls == null) {
+          continue;
+        }
 
-        for (Editor editor : localEditors(document, project)) {
-          Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
-          if (hls == null) {
-            continue;
+        if (logger.isDebugEnabled()) {
+          logger.debug("hls=" + hls);
+          logger.debug("event=" + event);
+        }
+
+        // We can only re-highlight whole lines, so clear any highlights in the affected lines
+        final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
+        final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
+        final int startLineOffset = document.getLineStartOffset(startPosition.line);
+        final int endLineOffset = document.getLineEndOffset(endPosition.line);
+
+        final Iterator<RangeHighlighter> iter = hls.iterator();
+        while (iter.hasNext()) {
+          final RangeHighlighter highlighter = iter.next();
+          if (!highlighter.isValid() ||
+              (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
+            iter.remove();
+            editor.getMarkupModel().removeHighlighter(highlighter);
           }
+        }
 
-          if (logger.isDebugEnabled()) {
-            logger.debug("hls=" + hls);
-            logger.debug("event=" + event);
-          }
+        VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
 
-          // We can only re-highlight whole lines, so clear any highlights in the affected lines
-          final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
-          final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
-          final int startLineOffset = document.getLineStartOffset(startPosition.line);
-          final int endLineOffset = document.getLineEndOffset(endPosition.line);
-
-          final Iterator<RangeHighlighter> iter = hls.iterator();
-          while (iter.hasNext()) {
-            final RangeHighlighter highlighter = iter.next();
-            if (!highlighter.isValid() || (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
-              iter.remove();
-              editor.getMarkupModel().removeHighlighter(highlighter);
-            }
-          }
-
-          VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
-
-          if (logger.isDebugEnabled()) {
-            hls = UserDataManager.getVimLastHighlighters(editor);
-            logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
-            logger.debug("hls=" + hls);
-          }
+        if (logger.isDebugEnabled()) {
+          hls = UserDataManager.getVimLastHighlighters(editor);
+          logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
+          logger.debug("hls=" + hls);
         }
       }
     }
@@ -1211,7 +1268,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return              The offset to the occurrence or -1 if not found
    */
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
-    boolean wrap =  VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.wrapscanName, OptionConstants.wrapscanName);
+    boolean wrap = globalOptions(injector).getWrapscan();
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
     int offset = 0;
@@ -1274,7 +1331,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS);
 
     // Uses RE_LAST. We know this is always set before being called
-    TextRange range = SearchHelper.findPattern(editor, getLastUsedPattern(), startOffset, count, searchOptions);
+    TextRange range = injector.getSearchHelper().findPattern(new IjVimEditor(editor), getLastUsedPattern(), startOffset, count, searchOptions);
     if (range == null) {
       logger.warn("No range is found");
       return -1;
@@ -1373,8 +1430,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
 
     Element show = search.getChild("show-last");
-    final String vimInfo = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.viminfoName, OptionConstants.viminfoName)).getValue();
-    final boolean disableHighlight = Set.of(vimInfo.split(",")).contains("h");
+    final boolean disableHighlight = globalOptions(injector).getViminfo().contains("h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
@@ -1433,7 +1489,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   private @NotNull String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
   private boolean lastIgnoreSmartCase;
   private @NotNull Direction lastDir = Direction.FORWARDS;
-  private boolean showSearchHighlight = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.hlsearchName, OptionConstants.hlsearchName);
+  private boolean showSearchHighlight = globalOptions(injector).getHlsearch();
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,24 +14,16 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
-class ExecutionContextManagerStub : ExecutionContextManager {
+public class ExecutionContextManagerStub : ExecutionContextManager {
   init {
     vimLogger<ExecutionContextManagerStub>().warn("ExecutionContextManagerStub is used. Please replace it with your own implementation of ExecutionContextManager.")
   }
 
-  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext {
+  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
     TODO("Not yet implemented")
   }
 
-  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext {
-    TODO("Not yet implemented")
-  }
-
-  override fun createCaretSpecificDataContext(context: ExecutionContext, caret: VimCaret): ExecutionContext {
-    TODO("Not yet implemented")
-  }
-
-  override fun createEditorDataContext(editor: VimEditor, context: ExecutionContext): ExecutionContext {
+  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor {
     TODO("Not yet implemented")
   }
 }

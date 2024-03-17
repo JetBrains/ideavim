@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.helper.EngineStringHelper
 import java.util.*
 import javax.swing.KeyStroke
 
-abstract class VimDigraphGroupBase() : VimDigraphGroup {
+public abstract class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun getDigraph(ch1: Char, ch2: Char): Char {
     var key = String(charArrayOf(ch1, ch2))
@@ -35,25 +35,27 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
 
     if (ch.code < 0x100) {
       injector.messages.showStatusBarMessage(
+        editor,
         String.format(
           "<%s>  %d,  Hex %02x,  Oct %03o%s",
           EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),
           ch.code,
           ch.code,
           ch.code,
-          digraphText
-        )
+          digraphText,
+        ),
       )
     } else {
       injector.messages.showStatusBarMessage(
+        editor,
         String.format(
           "<%s> %d, Hex %04x, Oct %o%s",
           EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),
           ch.code,
           ch.code,
           ch.code,
-          digraphText
-        )
+          digraphText,
+        ),
       )
     }
   }
@@ -1083,6 +1085,7 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
     '/', '-', '\u2020', // DAGGER
     '/', '=', '\u2021', // DOUBLE DAGGER
     '.', '.', '\u2025', // TWO DOT LEADER
+    ',', '.', '\u2026', // ELLIPSIS
     '%', '0', '\u2030', // PER MILLE SIGN
     '1', '\'', '\u2032', // PRIME
     '2', '\'', '\u2033', // DOUBLE PRIME
@@ -1677,10 +1680,10 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
     'f', 'i', '\ufb01', // LATIN SMALL LIGATURE FI
     'f', 'l', '\ufb02', // LATIN SMALL LIGATURE FL
     'f', 't', '\ufb05', // LATIN SMALL LIGATURE FT
-    's', 't', '\ufb06'
+    's', 't', '\ufb06',
   )
   protected val digraphs: HashMap<String, Char> = HashMap<String, Char>(defaultDigraphs.size)
-  protected val keys = TreeMap<Char, String>()
+  protected val keys: TreeMap<Char, String> = TreeMap<Char, String>()
 
   init {
     loadDigraphs()

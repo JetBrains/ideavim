@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,32 +17,38 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-
-/**
- * Pop all modes, but leave editor state. E.g. editor selection is not removed.
- */
-fun Editor.popAllModes() {
-  val commandState = this.vim.vimStateMachine
-  while (commandState.mode != VimStateMachine.Mode.COMMAND) {
-    commandState.popModes()
-  }
-}
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.inSelectMode
+import com.maddyhome.idea.vim.state.mode.returnTo
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
-fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
-  if (!this.inSelectMode) return
+internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
+  if (!this.vim.inSelectMode) return
 
-  this.vim.vimStateMachine.popModes()
+  val returnTo = this.vim.vimStateMachine.mode.returnTo
+  when (returnTo) {
+    ReturnTo.INSERT -> {
+      this.vim.mode = Mode.INSERT
+    }
+
+    ReturnTo.REPLACE -> {
+      this.vim.mode = Mode.REPLACE
+    }
+
+    null -> {
+      this.vim.mode = Mode.NORMAL()
+    }
+  }
   SelectionVimListenerSuppressor.lock().use {
     this.caretModel.allCarets.forEach {
       it.removeSelection()
-      it.vimSelectionStartClear()
+      it.vim.vimSelectionStartClear()
       if (adjustCaretPosition) {
         val lineEnd = IjVimEditor(this).getLineEndForOffset(it.offset)
         val lineStart = IjVimEditor(this).getLineStartForOffset(it.offset)
@@ -55,15 +61,28 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
 }
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
-fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
+internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
-  this.vimStateMachine.popModes()
+  val returnTo = this.vimStateMachine.mode.returnTo
+  when (returnTo) {
+    ReturnTo.INSERT -> {
+      this.mode = Mode.INSERT
+    }
+
+    ReturnTo.REPLACE -> {
+      this.mode = Mode.REPLACE
+    }
+
+    null -> {
+      this.mode = Mode.NORMAL()
+    }
+  }
   SelectionVimListenerSuppressor.lock().use {
     this.carets().forEach { vimCaret ->
       val caret = (vimCaret as IjVimCaret).caret
       caret.removeSelection()
-      caret.vimSelectionStartClear()
+      caret.vim.vimSelectionStartClear()
       if (adjustCaretPosition) {
         val lineEnd = IjVimEditor((this as IjVimEditor).editor).getLineEndForOffset(caret.offset)
         val lineStart = IjVimEditor(this.editor).getLineStartForOffset(caret.offset)
@@ -75,6 +94,6 @@ fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   }
 }
 
-fun Editor.exitInsertMode(context: DataContext, operatorArguments: OperatorArguments) {
-  VimPlugin.getChange().processEscape(IjVimEditor(this), IjExecutionContext(context), operatorArguments)
+internal fun Editor.exitInsertMode(context: DataContext, operatorArguments: OperatorArguments) {
+  VimPlugin.getChange().processEscape(IjVimEditor(this), IjEditorExecutionContext(context), operatorArguments)
 }

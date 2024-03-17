@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.window
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -18,7 +20,8 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author Alex Plate
  */
-class LookupDownAction : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["<C-N>"], modes = [Mode.INSERT])
+public class LookupDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-N>")
 
@@ -37,7 +40,7 @@ class LookupDownAction : VimActionHandler.SingleExecution() {
       val keyStroke = keySet.first().first()
       val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
       for (action in actions) {
-        if (injector.actionExecutor.executeAction(action, context)) break
+        if (injector.actionExecutor.executeAction(editor, action, context)) break
       }
     }
     return true

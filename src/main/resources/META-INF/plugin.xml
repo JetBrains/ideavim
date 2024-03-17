@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2003-2022 The IdeaVim authors
+  ~ Copyright 2003-2023 The IdeaVim authors
   ~
   ~ Use of this source code is governed by an MIT-style
   ~ license that can be found in the LICENSE.txt file or at
@@ -9,35 +9,6 @@
 <idea-plugin url="https://plugins.jetbrains.com/plugin/164" xmlns:xi="http://www.w3.org/2001/XInclude">
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
-  <change-notes><![CDATA[
-    <h3>Changes:</h3>
-    <ul>
-      <li>IdeaVim changes license from GPL-2.0 or later to MIT. <a href="https://youtrack.jetbrains.com/issue/VIM-2782">VIM-2782</a>
-      </li>
-    </ul>
-    <h3>Fixes:</h3>
-    <ul>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1758">VIM-1758</a> Commentary plugin in rider</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1903">VIM-1903</a> Autoindent now works in rider</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2744">VIM-2744</a> Fix undo from ex line</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2749">VIM-2749</a> Fix :tabn and :tabN commands</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2718">VIM-2718</a> Fixed case where the primary caret was
-        changed
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2766">VIM-2766</a> Move NERDTree update to background thread
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2768">VIM-2768</a> Refactor listeners</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2776">VIM-2776</a> Use filename index for file search</li>
-    </ul>
-
-    <h3>Merged PRs:</h3>
-    <ul>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/550">550</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: Fix(VIM-2778) Remove override of editor scroll setting
-      </li>
-    </ul>
-    ]]>
-  </change-notes>
   <description><![CDATA[
       <p>Vim engine for JetBrains IDEs</p>
       <br/>
@@ -56,7 +27,7 @@
   <!-- Please search for "[VERSION UPDATE]" in project in case you update the since-build version -->
   <!-- Check for [Version Update] tag in YouTrack as well -->
   <!-- Also, please update the value in build.gradle.kts file-->
-  <idea-version since-build="223.7401.7"/>
+  <idea-version since-build="233.11799.67"/>
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform (including CWM) -->
   <depends>com.intellij.modules.platform</depends>
@@ -66,6 +37,8 @@
   <!--suppress PluginXmlValidity -->
   <depends optional="true" config-file="ides/ideavim-withRider.xml">com.intellij.modules.rider</depends>
   <!--suppress PluginXmlValidity -->
+  <depends optional="true" config-file="ides/ideavim-withClionNova.xml">org.jetbrains.plugins.clion.radler</depends>
+  <!--suppress PluginXmlValidity -->
   <depends optional="true" config-file="ides/ideavim-withAppCode.xml">com.intellij.modules.appcode</depends>
   <depends optional="true" config-file="ideavim-withAceJump.xml">AceJump</depends>
 
@@ -74,33 +47,26 @@
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
 
-  <application-components>
-    <component>
-      <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>
-    </component>
-  </application-components>
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.group.JumpsListener"
+              topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
+  </projectListeners>
 
   <extensionPoints>
     <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
 
     </extensionPoint>
-    <extensionPoint name="vimLibraryFunction"
-                    beanClass="com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass" dynamic="true">
-      <with attribute="implementation" implements="com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler"/>
-    </extensionPoint>
-    <!--    For internal use only -->
-    <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.handler.ActionBeanClass" dynamic="true">
-      <with attribute="implementation" implements="com.maddyhome.idea.vim.handler.EditorActionHandlerBase"/>
-    </extensionPoint>
+    <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
-    <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
-    <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory"/>
-    <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
+    <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory" order="last, before Memory"/>
+    <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory" order="last, before IdeaVimMode"/>
+    <statusBarWidgetFactory id="IdeaVimShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
+    <statusBarWidgetFactory id="IdeaVimMacro" implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory" order="first, after IdeaVimShowCmd"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
@@ -108,6 +74,9 @@
          which (at least for 2020.1) has some long running activities that block other startup extensions. None of the
          core platform activities have IDs, so we can't use "before ID". We have to use "first" -->
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.KeymapChecker"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.CopilotKeymapCorrector"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 
@@ -117,20 +86,65 @@
 
     <notificationGroup displayType="STICKY_BALLOON" id="ideavim-sticky"/>
 
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.PluginState"/>
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.OptionsState"/>
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.VimscriptState"/>
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.ShortcutConflictState"/>
+    <!--suppress PluginXmlValidity -->
+    <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.WidgetState"/>
 
     <statistics.counterUsagesCollector implementationClass="com.maddyhome.idea.vim.statistic.ActionTracker"/>
+
+
+<!--    <localInspection language="textmate" shortName="UsePlug" bundle="messages.IdeaVimBundle"-->
+<!--                     key="use.plug.inspection.display.name" groupKey="use.plug.inspection.group.display.name"-->
+<!--                     enabledByDefault="true" level="WARNING"-->
+<!--                     implementationClass="com.maddyhome.idea.vim.inspections.UsePlugSyntaxInspection"/>-->
+
+<!--    Do not care about red handlers in order. They are necessary for proper ordering, and they'll be resolved when needed -->
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
+                         id="ideavim-enter"
+                         order="before editorEnter, before rd.client.editor.enter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.CaretShapeEnterEditorHandler"
+                         id="ideavim-enter-shape"
+                         order="before jupyterCommandModeEnterKeyHandler"/>
+
+<!--    "first" is not defined for this handler as it leads to "unsatisfied ordering exception". Not sure exectly why, but it appears in tests-->
+    <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscHandler"
+                         id="ideavim-esc"
+                         order="after smart-step-into-escape, after AceHandlerEscape, before jupyterCommandModeEscKeyHandler, before templateEscape, before backend.escape"/>
+    <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscLoggerHandler"
+                         id="ideavim-esc-logger"
+                         order="first"/>
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterLoggerHandler"
+                         id="ideavim-enter-logger"
+                         order="first"/>
+    <editorActionHandler action="EditorStartNewLine"
+                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineDetector"
+                         id="ideavim-start-new-line-detector"
+                         order="first"/>
+    <editorActionHandler action="EditorStartNewLineBefore"
+                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineBeforeCurrentDetector"
+                         id="ideavim-start-new-line-before-current-detector"
+                         order="first"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/includes/VimActions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/includes/VimLibraryFunctions.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
+  <!--
+
+  IMPORTANT!
+
+  Please make sure that all actions added implement the ActionRemoteBehaviorSpecification.Disabled interface on your
+  action. This will prevent the action from flowing from a Code With Me host to the JetBrains Client
+
+  -->
   <actions resource-bundle="messages.IdeaVimBundle">
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
@@ -144,6 +158,7 @@
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
     <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>
+    <action id="CustomizeModeWidget" class="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetPopup"/>
 
     <group id="IdeaVim.ReloadVimRc.group" class="com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup">
       <action id="IdeaVim.ReloadVimRc.reload" class="com.maddyhome.idea.vim.ui.ReloadVimRc"

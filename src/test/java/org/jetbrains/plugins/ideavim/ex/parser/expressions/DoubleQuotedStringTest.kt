@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
 import com.maddyhome.idea.vim.api.injector
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
 import javax.swing.KeyStroke.getKeyStroke
 import kotlin.test.assertEquals

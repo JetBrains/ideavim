@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,15 +9,14 @@ package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class DigraphSequence {
+public class DigraphSequence: Cloneable {
   private var digraphState = DIG_STATE_PENDING
   private var digraphChar = 0.toChar()
   private lateinit var codeChars: CharArray
@@ -25,23 +24,23 @@ class DigraphSequence {
   private var codeType = 0
   private var codeMax = 0
 
-  fun isDigraphStart(key: KeyStroke): Boolean {
+  public fun isDigraphStart(key: KeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       key.keyCode == KeyEvent.VK_K && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  fun isLiteralStart(key: KeyStroke): Boolean {
+  public fun isLiteralStart(key: KeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  fun startDigraphSequence(): DigraphResult {
+  public fun startDigraphSequence(): DigraphResult {
     logger.debug("startDigraphSequence")
     digraphState = DIG_STATE_DIG_ONE
     return DigraphResult.HANDLED_DIGRAPH
   }
 
-  fun startLiteralSequence(): DigraphResult {
+  public fun startLiteralSequence(): DigraphResult {
     logger.debug("startLiteralSequence")
     digraphState = DIG_STATE_CODE_START
     codeChars = CharArray(8)
@@ -49,13 +48,11 @@ class DigraphSequence {
     return DigraphResult.HANDLED_LITERAL
   }
 
-  fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
+  public fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     return when (digraphState) {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
-        if (key.keyCode == KeyEvent.VK_BACK_SPACE &&
-          injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.digraphName)
-        ) {
+        if (key.keyCode == KeyEvent.VK_BACK_SPACE && injector.options(editor).digraph) {
           digraphState = DIG_STATE_BACK_SPACE
         } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
           digraphChar = key.keyChar
@@ -220,12 +217,52 @@ class DigraphSequence {
     return null
   }
 
-  fun reset() {
+  public fun reset() {
     digraphState = DIG_STATE_PENDING
     codeChars = CharArray(8)
   }
 
-  companion object {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as DigraphSequence
+
+    if (digraphState != other.digraphState) return false
+    if (digraphChar != other.digraphChar) return false
+    if (!codeChars.contentEquals(other.codeChars)) return false
+    if (codeCnt != other.codeCnt) return false
+    if (codeType != other.codeType) return false
+    if (codeMax != other.codeMax) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = digraphState
+    result = 31 * result + digraphChar.hashCode()
+    result = 31 * result + codeChars.contentHashCode()
+    result = 31 * result + codeCnt
+    result = 31 * result + codeType
+    result = 31 * result + codeMax
+    return result
+  }
+
+  public override fun clone(): DigraphSequence {
+    val result = DigraphSequence()
+    result.digraphState = digraphState
+    result.digraphChar = digraphChar
+    if (::codeChars.isInitialized) {
+      result.codeChars = codeChars.copyOf()
+    }
+    result.codeCnt = codeCnt
+    result.codeType = codeType
+    result.codeMax = codeMax
+
+    return result
+  }
+
+  public companion object {
     private const val DIG_STATE_PENDING = 1
     private const val DIG_STATE_DIG_ONE = 2
     private const val DIG_STATE_DIG_TWO = 3

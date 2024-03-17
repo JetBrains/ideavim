@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,45 +8,34 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
+import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import java.util.regex.Pattern
 
-object KeywordOptionHelper {
+public object KeywordOptionHelper {
 
   private const val allLettersRegex = "\\p{L}"
   private val validationPattern =
     Pattern.compile("(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$")
 
-  private lateinit var keywordSpecs: MutableList<KeywordSpec>
-
-  init {
-    updateSpecs()
-  }
-
-  fun updateSpecs() {
-    keywordSpecs = valuesToValidatedAndReversedSpecs(
-      parseValues(
-        (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.iskeywordName) as VimString).value
-      )
-    )!!.toMutableList()
-  }
-
-  fun isValueInvalid(value: String): Boolean {
+  public fun isValueInvalid(value: String): Boolean {
     val values = parseValues(value)
     val specs = valuesToValidatedAndReversedSpecs(values)
     return values == null || specs == null
   }
 
-  fun isKeyword(c: Char): Boolean {
+  public fun isKeyword(editor: VimEditor, c: Char): Boolean {
     if (c.code >= '\u0100'.code) {
       return true
     }
-    for (spec in keywordSpecs) {
+
+    val specs =
+      injector.optionGroup.getParsedEffectiveOptionValue(Options.iskeyword, editor) { optionValue ->
+        valuesToValidatedAndReversedSpecs(parseValues(optionValue.asString()))!!
+      }
+    for (spec in specs) {
       if (spec.contains(c.code)) {
         return !spec.negate()
       }
@@ -54,8 +43,16 @@ object KeywordOptionHelper {
     return false
   }
 
-  fun toRegex(): List<String> {
-    return keywordSpecs.map {
+  // TODO: Come up with a more friendly API for IdeaVim-EasyMotion
+  // Perhaps pass in VimEditor, or allow retrieving the list of KeywordSpec
+  @Deprecated("Only maintained for compatibility. Does not handle local-to-buffer iskeyword option")
+  public fun toRegex(): List<String> {
+    // 'iskeyword' is a local-to-buffer option, but we're not passed an editor. We have to use the global value. We also
+    // have to use the fallback window to avoid any asserts about accessing a non-global option as a global option.
+    // This is not ideal and should not be replicated in non-deprecated code
+    val isKeyword = injector.optionGroup.getOptionValue(Options.iskeyword, OptionAccessScope.GLOBAL(injector.fallbackWindow)).value
+    val specs = valuesToValidatedAndReversedSpecs(parseValues(isKeyword)) ?: emptyList()
+    return specs.map {
       it.initializeValues()
       if (it.isAllLetters) {
         allLettersRegex
@@ -67,7 +64,7 @@ object KeywordOptionHelper {
     }
   }
 
-  fun parseValues(content: String): List<String>? {
+  public fun parseValues(content: String): List<String>? {
     if (!validationPattern.matcher(content).matches()) {
       return null
     }
@@ -191,13 +188,9 @@ object KeywordOptionHelper {
       }
       return if (isRange) {
         code >= rangeLow!! && code <= rangeHigh!!
-      } else code == rangeLow
+      } else {
+        code == rangeLow
+      }
     }
-  }
-}
-
-object KeywordOptionChangeListener : OptionChangeListener<VimDataType> {
-  override fun processGlobalValueChange(oldValue: VimDataType?) {
-    KeywordOptionHelper.updateSpecs()
   }
 }

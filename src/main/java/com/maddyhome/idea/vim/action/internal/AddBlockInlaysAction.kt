@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,6 +13,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorCustomElementRenderer
 import com.intellij.openapi.editor.Inlay
@@ -32,7 +33,7 @@ import java.util.*
 import javax.swing.UIManager
 import kotlin.math.max
 
-class AddBlockInlaysAction : AnAction() {
+internal class AddBlockInlaysAction : AnAction(), ActionRemoteBehaviorSpecification.Disabled {
   override fun actionPerformed(e: AnActionEvent) {
     val dataContext = e.dataContext
     val editor = getEditor(dataContext) ?: return
@@ -114,8 +115,9 @@ class AddBlockInlaysAction : AnAction() {
       private fun getCurrentContext(editor: Editor): FontRenderContext {
         val editorContext = FontInfo.getFontRenderContext(editor.contentComponent)
         return FontRenderContext(
-          editorContext.transform, AntialiasingType.getKeyForCurrentScope(false),
-          if (editor is EditorImpl) UISettings.editorFractionalMetricsHint else RenderingHints.VALUE_FRACTIONALMETRICS_OFF
+          editorContext.transform,
+          AntialiasingType.getKeyForCurrentScope(false),
+          if (editor is EditorImpl) UISettings.editorFractionalMetricsHint else RenderingHints.VALUE_FRACTIONALMETRICS_OFF,
         )
       }
 

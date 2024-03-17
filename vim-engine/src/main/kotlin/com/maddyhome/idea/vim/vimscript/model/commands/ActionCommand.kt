@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimEditor
@@ -20,27 +21,28 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * @author smartbomb
  */
-data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+@ExCommand(command = "action")
+public data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
 
-  override val argFlags = flags(
+  override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
     Access.READ_ONLY,
-    Flag.SAVE_VISUAL
+    Flag.SAVE_VISUAL,
   )
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val actionName = argument.trim()
     val action = injector.actionExecutor.getAction(actionName) ?: throw ExException(injector.messages.message("action.not.found.0", actionName))
     if (injector.application.isUnitTest()) {
-      executeAction(action, context)
+      executeAction(editor, action, context)
     } else {
-      injector.application.runAfterGotFocus { executeAction(action, context) }
+      injector.application.runAfterGotFocus { executeAction(editor, action, context) }
     }
     return ExecutionResult.Success
   }
 
-  private fun executeAction(action: NativeAction, context: ExecutionContext) {
-    injector.actionExecutor.executeAction(action, context)
+  private fun executeAction(editor: VimEditor, action: NativeAction, context: ExecutionContext) {
+    injector.actionExecutor.executeAction(editor, action, context)
   }
 }

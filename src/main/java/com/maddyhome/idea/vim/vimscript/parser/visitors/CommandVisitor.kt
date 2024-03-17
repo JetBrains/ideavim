@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,10 +9,13 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
 import com.intellij.openapi.diagnostic.logger
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.vimscript.model.commands.ActionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ActionListCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.AsciiCommand
@@ -30,15 +33,12 @@ import com.maddyhome.idea.vim.vimscript.model.commands.DeleteLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DeleteMarksCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DelfunctionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DigraphCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.DumpLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EditFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ExecuteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.FileCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.FindClassCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.FindFileCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.FindSymbolCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GoToLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GotoCharacterCommand
@@ -61,8 +61,6 @@ import com.maddyhome.idea.vim.vimscript.model.commands.PlugCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PrintCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.PromptFindCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.PromptReplaceCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PutLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.QuitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.RedoCommand
@@ -73,7 +71,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SelectFirstFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SelectLastFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.SetLocalCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SetglobalCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SetlocalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShellCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShiftLeftCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShiftRightCommand
@@ -111,11 +110,13 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.ExprCon
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.OtherCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.RangeContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.RangeOffsetContext
+import org.antlr.v4.runtime.ParserRuleContext
 import java.util.stream.Collectors
 import kotlin.reflect.KClass
+import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
 
-object CommandVisitor : VimscriptBaseVisitor<Command>() {
+internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   private val logger = logger<CommandVisitor>()
   private val expressionVisitor: ExpressionVisitor = ExpressionVisitor
@@ -172,11 +173,15 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val variable: Expression = expressionVisitor.visit(ctx.expr(0))
     val operator = getByValue(ctx.assignmentOperator().text)
     val expression: Expression = expressionVisitor.visit(ctx.expr(1))
-    return LetCommand(ranges, variable, operator, expression, true)
+    val command = LetCommand(ranges, variable, operator, expression, true)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitLet2Command(ctx: VimscriptParser.Let2CommandContext): Command {
-    return LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitEchoCommand(ctx: EchoCommandContext): Command {
@@ -186,13 +191,17 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
         expressionVisitor.visit(tree)
       }
       .collect(Collectors.toList())
-    return EchoCommand(ranges, expressions)
+    val command = EchoCommand(ranges, expressions)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitCallCommand(ctx: CallCommandContext): Command {
     val ranges: Ranges = parseRanges(ctx.range())
     val functionCall = ExpressionVisitor.visit(ctx.expr())
-    return CallCommand(ranges, functionCall)
+    val command = CallCommand(ranges, functionCall)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitDelfunctionCommand(ctx: DelfunctionCommandContext): DelfunctionCommand {
@@ -201,7 +210,9 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
     val functionName = ctx.functionName().text
     val ignoreIfMissing = ctx.replace != null
-    return DelfunctionCommand(ranges, functionScope, functionName, ignoreIfMissing)
+    val command = DelfunctionCommand(ranges, functionScope, functionName, ignoreIfMissing)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitGoToLineCommand(ctx: VimscriptParser.GoToLineCommandContext): Command {
@@ -212,35 +223,37 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       ranges = Ranges()
       ranges.addRange(
         createRange(ctx.shortRange().text, 0, false)
-          ?: throw ExException("Could not create a range")
+          ?: throw ExException("Could not create a range"),
       )
     }
-    return GoToLineCommand(ranges)
+    val command = GoToLineCommand(ranges)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitCommandWithComment(ctx: VimscriptParser.CommandWithCommentContext): Command {
     val ranges = parseRanges(ctx.range())
     val commandName = ctx.name.text
     val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
-    return createCommandByCommandContext(ranges, argument, commandName)
+    return createCommandByCommandContext(ranges, argument, commandName, ctx)
   }
 
   override fun visitCommandWithoutComments(ctx: VimscriptParser.CommandWithoutCommentsContext): Command {
     val ranges = parseRanges(ctx.range())
     val commandName = ctx.name.text
     val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
-    return createCommandByCommandContext(ranges, argument, commandName)
+    return createCommandByCommandContext(ranges, argument, commandName, ctx)
   }
 
   override fun visitCommandWithBars(ctx: VimscriptParser.CommandWithBarsContext): Command {
     val ranges = parseRanges(ctx.range())
     val commandName = ctx.name.text
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
-    return createCommandByCommandContext(ranges, argument, commandName)
+    return createCommandByCommandContext(ranges, argument, commandName, ctx)
   }
 
-  private fun createCommandByCommandContext(ranges: Ranges, argument: String, commandName: String): Command {
-    return when (getCommandByName(commandName)) {
+  private fun createCommandByCommandContext(ranges: Ranges, argument: String, commandName: String, ctx: ParserRuleContext): Command {
+    val command = when (getCommandByName(commandName)) {
       MapCommand::class -> MapCommand(ranges, argument, commandName)
       MapClearCommand::class -> MapClearCommand(ranges, argument, commandName)
       UnMapCommand::class -> UnMapCommand(ranges, argument, commandName)
@@ -252,28 +265,35 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
         }
       }
       SplitCommand::class -> {
-        if (commandName.startsWith("v"))
+        if (commandName.startsWith("v")) {
           SplitCommand(ranges, argument, SplitType.VERTICAL)
-        else
+        } else {
           SplitCommand(ranges, argument, SplitType.HORIZONTAL)
+        }
       }
       SubstituteCommand::class -> SubstituteCommand(ranges, argument, commandName)
       else -> getCommandByName(commandName).primaryConstructor!!.call(ranges, argument)
     }
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitShiftLeftCommand(ctx: VimscriptParser.ShiftLeftCommandContext): ShiftLeftCommand {
     val ranges = parseRanges(ctx.range())
     val argument = (ctx.commandArgument?.text ?: "").trim()
     val length = ctx.lShift().text.length
-    return ShiftLeftCommand(ranges, argument, length)
+    val command = ShiftLeftCommand(ranges, argument, length)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitShiftRightCommand(ctx: VimscriptParser.ShiftRightCommandContext): ShiftRightCommand {
     val ranges = parseRanges(ctx.range())
     val argument = (ctx.commandArgument?.text ?: "").trim()
     val length = ctx.rShift().text.length
-    return ShiftRightCommand(ranges, argument, length)
+    val command = ShiftRightCommand(ranges, argument, length)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitExecuteCommand(ctx: VimscriptParser.ExecuteCommandContext): ExecuteCommand {
@@ -283,12 +303,15 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
         expressionVisitor.visit(tree)
       }
       .collect(Collectors.toList())
-    return ExecuteCommand(ranges, expressions)
+    val command = ExecuteCommand(ranges, expressions)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
-    return com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text)
-      ?: LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitOtherCommand(ctx: OtherCommandContext): Command {
@@ -298,13 +321,26 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
     val alphabeticPart = name.split(Regex("\\P{Alpha}"))[0]
     if (setOf("s", "su", "sub", "subs", "subst", "substi", "substit", "substitu", "substitut", "substitut", "substitute").contains(alphabeticPart)) {
-      return SubstituteCommand(ranges, name.replaceFirst(alphabeticPart, "") + argument, alphabeticPart)
+      val command = SubstituteCommand(ranges, name.replaceFirst(alphabeticPart, "") + argument, alphabeticPart)
+      command.rangeInScript = ctx.getTextRange()
+      return command
     }
+    val commandConstructor = getCommandByName(name).constructors
+      .filter { it.parameters.size == 2 }
+      .firstOrNull { it.parameters[0].type == Ranges::class.createType() && it.parameters[1].type == String::class.createType() }
+    val command = commandConstructor?.call(ranges, argument) ?: UnknownCommand(ranges, name, argument)
+    command.rangeInScript = ctx.getTextRange()
+    return command
+  }
 
-    return UnknownCommand(ranges, name, argument)
+  private fun getTextRange(ctx: ParserRuleContext): TextRange {
+    val startOffset = ctx.start.startIndex
+    val endOffset = ctx.stop.stopIndex + 1
+    return TextRange(startOffset, endOffset)
   }
 
   // todo I am ashamed of that
+  // todo 31.05.2023 I am still ashamed of that
   private val commands = mutableMapOf(
     "delf" to DelfunctionCommand::class,
     "delfu" to DelfunctionCommand::class,
@@ -337,9 +373,6 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "buffers" to BufferListCommand::class,
     "cal" to CallCommand::class,
     "call" to CallCommand::class,
-    "cla" to FindClassCommand::class,
-    "clas" to FindClassCommand::class,
-    "class" to FindClassCommand::class,
     "com" to CmdCommand::class,
     "comm" to CmdCommand::class,
     "comma" to CmdCommand::class,
@@ -379,11 +412,6 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "digrap" to DigraphCommand::class,
     "digraph" to DigraphCommand::class,
     "digraphs" to DigraphCommand::class,
-    "dump" to DumpLineCommand::class,
-    "dumpl" to DumpLineCommand::class,
-    "dumpli" to DumpLineCommand::class,
-    "dumplin" to DumpLineCommand::class,
-    "dumpline" to DumpLineCommand::class,
     "ec" to EchoCommand::class,
     "ech" to EchoCommand::class,
     "echo" to EchoCommand::class,
@@ -413,10 +441,6 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "file" to FileCommand::class,
     "fin" to FindFileCommand::class,
     "find" to FindFileCommand::class,
-    "sym" to FindSymbolCommand::class,
-    "symb" to FindSymbolCommand::class,
-    "symbo" to FindSymbolCommand::class,
-    "symbol" to FindSymbolCommand::class,
     "g" to GlobalCommand::class,
     "gl" to GlobalCommand::class,
     "glo" to GlobalCommand::class,
@@ -534,21 +558,6 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "Pri" to PrintCommand::class,
     "Prin" to PrintCommand::class,
     "Print" to PrintCommand::class,
-    "pro" to PromptFindCommand::class,
-    "prom" to PromptFindCommand::class,
-    "promp" to PromptFindCommand::class,
-    "prompt" to PromptFindCommand::class,
-    "promptf" to PromptFindCommand::class,
-    "promptfi" to PromptFindCommand::class,
-    "promptfin" to PromptFindCommand::class,
-    "promptfind" to PromptFindCommand::class,
-    "promptr" to PromptReplaceCommand::class,
-    "promptre" to PromptReplaceCommand::class,
-    "promptrep" to PromptReplaceCommand::class,
-    "promptrepl" to PromptReplaceCommand::class,
-    "promptrepla" to PromptReplaceCommand::class,
-    "promptreplac" to PromptReplaceCommand::class,
-    "promptreplace" to PromptReplaceCommand::class,
     "pu" to PutLinesCommand::class,
     "put" to PutLinesCommand::class,
     "q" to QuitCommand::class,
@@ -594,11 +603,17 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "last" to SelectLastFileCommand::class,
     "se" to SetCommand::class,
     "set" to SetCommand::class,
-    "setl" to SetLocalCommand::class,
-    "setlo" to SetLocalCommand::class,
-    "setloc" to SetLocalCommand::class,
-    "setloca" to SetLocalCommand::class,
-    "setlocal" to SetLocalCommand::class,
+    "setg" to SetglobalCommand::class,
+    "setgl" to SetglobalCommand::class,
+    "setglo" to SetglobalCommand::class,
+    "setglob" to SetglobalCommand::class,
+    "setgloba" to SetglobalCommand::class,
+    "setglobal" to SetglobalCommand::class,
+    "setl" to SetlocalCommand::class,
+    "setlo" to SetlocalCommand::class,
+    "setloc" to SetlocalCommand::class,
+    "setloca" to SetlocalCommand::class,
+    "setlocal" to SetlocalCommand::class,
     "sethandler" to SetHandlerCommand::class,
     "sh" to ShellCommand::class,
     "she" to ShellCommand::class,
@@ -834,6 +849,10 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   )
 
   private fun getCommandByName(commandName: String): KClass<out Command> {
-    return commands[commandName]!!
+    return if (injector.globalIjOptions().exCommandAnnotation) {
+      injector.vimscriptParser.exCommands.getCommand(commandName)?.getKClass() ?: UnknownCommand::class
+    } else {
+      commands[commandName]!!
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.extension.textobjindent;
 
 import com.intellij.openapi.editor.Caret;
 import com.maddyhome.idea.vim.api.ExecutionContext;
-import com.maddyhome.idea.vim.api.VimCaret;
+import com.maddyhome.idea.vim.api.ImmutableVimCaret;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.*;
@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.state.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,11 +100,10 @@ public class VimIndentObject implements VimExtension {
       @Nullable
       @Override
       public TextRange getRange(@NotNull VimEditor editor,
-                                @NotNull VimCaret caret,
+                                @NotNull ImmutableVimCaret caret,
                                 @NotNull ExecutionContext context,
                                 int count,
-                                int rawCount,
-                                @Nullable Argument argument) {
+                                int rawCount) {
         final CharSequence charSequence = ((IjVimEditor)editor).getEditor().getDocument().getCharsSequence();
         final int caretOffset = ((IjVimCaret)caret).getCaret().getOffset();
 
@@ -259,19 +260,19 @@ public class VimIndentObject implements VimExtension {
     }
 
     @Override
-    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
       IjVimEditor vimEditor = (IjVimEditor)editor;
-      @NotNull VimStateMachine vimStateMachine = VimStateMachine.getInstance(vimEditor);
+      @NotNull VimStateMachine vimStateMachine = VimStateMachine.Companion.getInstance(vimEditor);
       int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());
 
       final IndentObjectHandler textObjectHandler = new IndentObjectHandler(includeAbove, includeBelow);
 
-      if (!vimStateMachine.isOperatorPending()) {
+      if (!vimStateMachine.isOperatorPending(editor.getMode())) {
         ((IjVimEditor)editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0, null);
+          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {
+              if (vimStateMachine.getMode() instanceof Mode.VISUAL) {
                 EngineVisualGroupKt.vimSetSelection(new IjVimCaret(caret), range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
                 InlayHelperKt.moveToInlayAwareOffset(caret, range.getStartOffset());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -19,6 +19,6 @@ package com.maddyhome.idea.vim.command
  * If some command implements this interface, and the user enters motion operator that is the same as the command itself, the
  *   motion operator will be replaced with `_`.
  */
-interface DuplicableOperatorAction {
-  val duplicateWith: Char
+public interface DuplicableOperatorAction {
+  public val duplicateWith: Char
 }

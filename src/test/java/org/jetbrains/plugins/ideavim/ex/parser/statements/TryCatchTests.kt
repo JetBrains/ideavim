@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,52 +11,50 @@ package org.jetbrains.plugins.ideavim.ex.parser.statements
 import com.maddyhome.idea.vim.vimscript.model.statements.ThrowStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.TryStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.junit.Test
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.FromDataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.productForArguments
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@RunWith(Theories::class)
-class TryCatchTests {
+class TryCatchTests : VimTestCase() {
 
   companion object {
     @JvmStatic
     val spaces = listOf("", " ")
-      @DataPoints("spaces") get
 
     @JvmStatic
     val tryNames = listOf("try")
-      @DataPoints("try") get
 
     @JvmStatic
     val catchNames = listOf("cat", "catc", "catch")
-      @DataPoints("catch") get
 
     @JvmStatic
     val finallyNames = listOf("fina", "final", "finall", "finally")
-      @DataPoints("finally") get
 
     @JvmStatic
     val endtryNames = listOf("endt", "endtr", "endtry")
-      @DataPoints("endtry") get
+
+    @JvmStatic
+    fun combinations(): List<Arguments> = productForArguments(tryNames, catchNames, finallyNames, endtryNames, spaces, spaces, spaces, spaces)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("combinations")
   fun `try catch finally with different names`(
-    @FromDataPoints("try") tryAlias: String,
-    @FromDataPoints("catch") catchAlias: String,
-    @FromDataPoints("finally") finallyAlias: String,
-    @FromDataPoints("endtry") endtryAlias: String,
-    @FromDataPoints("spaces") sp1: String,
-    @FromDataPoints("spaces") sp2: String,
-    @FromDataPoints("spaces") sp3: String,
-    @FromDataPoints("spaces") sp4: String
+    tryAlias: String,
+    catchAlias: String,
+    finallyAlias: String,
+    endtryAlias: String,
+    sp1: String,
+    sp2: String,
+    sp3: String,
+    sp4: String,
   ) {
     val script = VimscriptParser.parse(
       """
@@ -67,7 +65,7 @@ class TryCatchTests {
         $finallyAlias$sp3
           echo 'finalizing'
         $endtryAlias$sp4
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -86,7 +84,7 @@ class TryCatchTests {
         try
           throw 'something'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -106,7 +104,7 @@ class TryCatchTests {
         catch /some/
           echo 'caught'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -128,7 +126,7 @@ class TryCatchTests {
         catch
           echo 'caught'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -150,7 +148,7 @@ class TryCatchTests {
         finally
           echo 'caught'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -178,7 +176,7 @@ class TryCatchTests {
           echo 'caught3'
           echo 'caught3'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -201,7 +199,7 @@ class TryCatchTests {
       """
         try
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -219,7 +217,7 @@ class TryCatchTests {
           throw 'something'
         catch
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -240,7 +238,7 @@ class TryCatchTests {
           throw 'something'
         finally
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)

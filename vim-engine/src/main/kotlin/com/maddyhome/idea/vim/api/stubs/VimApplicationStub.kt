@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
-class VimApplicationStub : VimApplicationBase() {
+public class VimApplicationStub : VimApplicationBase() {
   init {
     vimLogger<ExecutionContextManagerStub>().warn("VimApplicationStub is used. Please replace it with your own implementation of VimApplication.")
   }
@@ -34,11 +34,11 @@ class VimApplicationStub : VimApplicationBase() {
     TODO("Not yet implemented")
   }
 
-  override fun postKey(stroke: KeyStroke, editor: VimEditor) {
+  override fun isInternal(): Boolean {
     TODO("Not yet implemented")
   }
 
-  override fun localEditors(): List<VimEditor> {
+  override fun postKey(stroke: KeyStroke, editor: VimEditor) {
     TODO("Not yet implemented")
   }
 
@@ -63,6 +63,10 @@ class VimApplicationStub : VimApplicationBase() {
   }
 
   override fun runAfterGotFocus(runnable: Runnable) {
+    TODO("Not yet implemented")
+  }
+
+  override fun isOctopusEnabled(): Boolean {
     TODO("Not yet implemented")
   }
 }

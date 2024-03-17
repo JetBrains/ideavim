@@ -32,6 +32,10 @@ OK, ready to do some coding?
 Yoo hoo! You’re all set to begin contributing.
 We've prepared some useful configurations for you:
 
+- `Start IJ with IdeaVim`
+- `IdeaVim tests`
+- `IdeaVim full verification`
+
 ![Prepared configurations light](assets/contributing/configs-light.png#gh-light-mode-only)![Prepared configurations dark](assets/contributing/configs-dark.png#gh-dark-mode-only)
 
 And here are useful gradle commands:
@@ -87,9 +91,16 @@ Here are some guides for testing:
 
 1. Read the javadoc for the `@VimBehaviorDiffers` annotation in the source code.
 
-2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd", "123 123 123 123", etc. Try to choose an example
-text that is easy to read and understand what is wrong if the test fails. For example, take a few lines from your
-favorite poem, or use Vladimir Nabokov’s “A Discovery" if you don't have one.
+2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd", "123 123 123 123", etc. Use a few lines of code or
+the following template:
+```text
+Lorem Ipsum
+
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit
+Sed in orci mauris.
+Cras id tellus in ex imperdiet egestas.
+```
 
 3. Don't forget to test your functionality with line start, line end, file start, file end, empty line, multiple
 carets, dollar motion, etc.
@@ -149,7 +160,7 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 
 ### Resources:
 
-* [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
+* [Continuous integration builds](https://ideavim.teamcity.com/)
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
 * [Chat on gitter](https://gitter.im/JetBrains/ideavim)
 * [IdeaVim Channel](https://jb.gg/bi6zp7) on [JetBrains Server](https://discord.gg/jetbrains)
@@ -157,5 +168,5 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 * [Changelog](CHANGES.md)
 * [Contributors listing](AUTHORS.md)
 
-[teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJEAP&guest=1
-[teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJEAP)/statusIcon.svg?guest=1
+[teamcity-build-status]: https://ideavim.teamcity.com/viewType.html?buildTypeId=Ideavim_IdeaVimTests_Latest_EAP&guest=1
+[teamcity-build-status-svg]: https://ideavim.teamcity.com/app/rest/builds/buildType:(id:Ideavim_IdeaVimTests_Latest_EAP)/statusIcon.svg?guest=1

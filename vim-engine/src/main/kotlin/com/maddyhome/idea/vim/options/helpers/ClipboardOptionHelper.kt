@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,37 +8,27 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-object ClipboardOptionHelper {
-  var ideaputDisabled = false
+public object ClipboardOptionHelper {
+  public var ideaputDisabled: Boolean = false
     private set
 
-  class IdeaputDisabler : AutoCloseable {
-    private val containedBefore: Boolean
+  public class IdeaputDisabler : AutoCloseable {
+    private val containedBefore =
+      injector.globalOptions().clipboard.contains(OptionConstants.clipboard_ideaput)
 
     init {
-      val optionValue = (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString).value
-      containedBefore = optionValue.contains(OptionConstants.clipboard_ideaput)
-      injector.optionService.removeValue(
-        OptionScope.GLOBAL,
-        OptionConstants.clipboardName,
-        OptionConstants.clipboard_ideaput,
-        OptionConstants.clipboardName
-      )
+      injector.globalOptions().clipboard.removeValue(OptionConstants.clipboard_ideaput)
       ideaputDisabled = true
     }
 
     override fun close() {
-      if (containedBefore) injector.optionService.appendValue(
-        OptionScope.GLOBAL,
-        OptionConstants.clipboardName,
-        OptionConstants.clipboard_ideaput,
-        OptionConstants.clipboardName
-      )
+      if (containedBefore) {
+        injector.globalOptions().clipboard.prependValue(OptionConstants.clipboard_ideaput)
+      }
       ideaputDisabled = false
     }
   }

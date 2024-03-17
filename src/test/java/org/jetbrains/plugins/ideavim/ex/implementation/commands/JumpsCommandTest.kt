@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,14 +10,17 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class JumpsCommandTest : VimTestCase() {
+  @Test
   fun `test shows empty list`() {
     configureByText("")
     enterCommand("jumps")
     assertExOutput(" jump line  col file/text\n>\n")
   }
 
+  @Test
   fun `test show jump list`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -29,7 +32,7 @@ class JumpsCommandTest : VimTestCase() {
                       |to science: shape and shade -- the special tinge,
                       |akin to moonlight, tempering its blue,
                       |the dingy underside, the checquered fringe.
-                      """.trimMargin()
+      """.trimMargin(),
     )
 
     enterSearch("sodden")
@@ -45,10 +48,12 @@ class JumpsCommandTest : VimTestCase() {
                      |   2     7   12 to science: shape and shade -- the special tinge,
                      |   1     2    4 all rocks and lavender and tufted grass,
                      |>
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 
+  @Test
   fun `test highlights current jump spot`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -60,7 +65,7 @@ class JumpsCommandTest : VimTestCase() {
                       |to science: shape and shade -- the special tinge,
                       |akin to moonlight, tempering its blue,
                       |the dingy underside, the checquered fringe.
-                      """.trimMargin()
+      """.trimMargin(),
     )
 
     enterSearch("sodden")
@@ -78,10 +83,12 @@ class JumpsCommandTest : VimTestCase() {
                      |>  0     7   12 to science: shape and shade -- the special tinge,
                      |   1     2    4 all rocks and lavender and tufted grass,
                      |   2     9   10 the dingy underside, the checquered fringe.
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 
+  @Test
   fun `test list trims and truncates`() {
     val indent = " ".repeat(100)
     val text = "Really long line ".repeat(1000)
@@ -94,10 +101,12 @@ class JumpsCommandTest : VimTestCase() {
       """ jump line  col file/text
                      |   1     1    0 ${text.substring(0, 200)}
                      |>
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 
+  @Test
   fun `test correctly encodes non-printable characters`() {
     configureByText("\u0009Hello\u0006World\u007f")
 
@@ -108,7 +117,8 @@ class JumpsCommandTest : VimTestCase() {
       """ jump line  col file/text
                      |   1     1    0 Hello^FWorld^?
                      |>
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 }

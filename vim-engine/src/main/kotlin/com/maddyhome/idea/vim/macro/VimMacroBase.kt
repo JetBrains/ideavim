@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,11 +12,13 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
-abstract class VimMacroBase : VimMacro {
+public abstract class VimMacroBase : VimMacro {
   override var lastRegister: Char = 0.toChar()
   private var macroDepth = 0
 
@@ -43,8 +45,12 @@ abstract class VimMacroBase : VimMacro {
       } else {
         injector.parser.parseKeys(register.rawText)
       }
+
+      logger.trace {
+        "Adding new keys to keyStack as part of playback. State before adding keys: ${KeyHandler.getInstance().keyStack.dump()}"
+      }
       KeyHandler.getInstance().keyStack.addKeys(keys)
-      playbackKeys(editor, context, 0, count)
+      playbackKeys(editor, context, count)
     } finally {
       --macroDepth
     }
@@ -65,7 +71,7 @@ abstract class VimMacroBase : VimMacro {
     return lastRegister.code != 0 && playbackRegister(editor, context, lastRegister, count)
   }
 
-  companion object {
-    val logger = vimLogger<VimMacroBase>()
+  public companion object {
+    public val logger: VimLogger = vimLogger<VimMacroBase>()
   }
 }

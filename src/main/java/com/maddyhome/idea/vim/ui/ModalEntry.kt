@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,10 +8,13 @@
 
 package com.maddyhome.idea.vim.ui
 
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.Toolkit
@@ -21,15 +24,20 @@ import javax.swing.KeyStroke
 /**
  * @author dhleong
  */
-object ModalEntry {
-  inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
+public object ModalEntry {
 
+  public val LOG: Logger = logger<ModalEntry>()
+
+  public inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
     // Firstly we pull the unfinished keys of the current mapping
     val mappingStack = KeyHandler.getInstance().keyStack
+    LOG.trace("Dumping key stack:")
+    LOG.trace { mappingStack.dump() }
     var stroke = mappingStack.feedSomeStroke()
     while (stroke != null) {
       val result = processor(stroke)
       if (!result) {
+        LOG.trace("Got char from mapping stack")
         return
       }
       stroke = mappingStack.feedSomeStroke()
@@ -52,10 +60,11 @@ object ModalEntry {
         } else {
           return true
         }
-        if (editor.vimStateMachine.isRecording) {
+        if (injector.registerGroup.isRecording) {
           KeyHandler.getInstance().modalEntryKeys += stroke
         }
         if (!processor(stroke)) {
+          LOG.trace("Got char from keyboard input: $stroke. Event: $e")
           KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this)
           loop.exit()
         }

@@ -8,7 +8,8 @@ import com.maddyhome.idea.vim.helper.Msg
 import org.jetbrains.annotations.NonNls
 import java.util.*
 
-class RegExp {
+@Deprecated("Please use VimRegex class instead")
+internal class RegExp {
     /*
      * The first byte of the regexp internal "program" is actually this magic
      * number; the start node begins in the second byte.  It's used to catch the
@@ -84,12 +85,12 @@ class RegExp {
     */
   // EMSG_M_RET_null("E369: invalid item in %s%%[]", reg_magic == MAGIC_ALL)
   private fun EMSG_RET_null(key: String) {
-    injector.messages.showStatusBarMessage(injector.messages.message(key))
+    injector.messages.showStatusBarMessage(null, injector.messages.message(key))
   }
 
   private fun EMSG_M_RET_null(key: String, isMagic: Boolean) {
     val `val` = if (isMagic) "" else "\\"
-    injector.messages.showStatusBarMessage(injector.messages.message(key, `val`))
+    injector.messages.showStatusBarMessage(null, injector.messages.message(key, `val`))
   }
 
   private fun EMSG_ONE_RET_null() {
@@ -107,7 +108,9 @@ class RegExp {
     }
     return if (c == Magic.STAR || c == Magic.PLUS || c == Magic.LCURLY) {
       MULTI_MULT
-    } else NOT_MULTI
+    } else {
+      NOT_MULTI
+    }
   }
 
     /*
@@ -155,7 +158,7 @@ class RegExp {
     var len: Int
     val flags = Flags()
     if (expr == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return null
     }
     r = regprog_T()
@@ -274,7 +277,7 @@ class RegExp {
     if (paren == REG_ZPAREN) {
       /* Make a ZOPEN node. */
       if (regnzpar >= NSUBEXP) {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E50))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E50))
         return null
       }
       parno = regnzpar
@@ -336,7 +339,7 @@ class RegExp {
 
     /* Check for proper termination. */if (paren != REG_NOPAREN && getchr() != Magic.RPAREN) {
       return if (paren == REG_ZPAREN) {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E52))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E52))
         null
       } else if (paren == REG_NPAREN) {
         EMSG_M_RET_null(Msg.E53, reg_magic == MAGIC_ALL)
@@ -350,7 +353,7 @@ class RegExp {
         EMSG_M_RET_null(Msg.E55, reg_magic == MAGIC_ALL)
         null
       } else {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_trailing))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_trailing))
         null
       }
       /* NOTREACHED */
@@ -581,15 +584,16 @@ class RegExp {
       /* Can't have a multi follow a multi. */
       if (peekchr() == Magic.STAR) {
         val `val` = if (reg_magic >= MAGIC_ON) "" else "\\"
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E61, `val`))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E61, `val`))
       } else {
         val `val` = if (reg_magic >= MAGIC_ON) "" else "\\"
         injector.messages.showStatusBarMessage(
+          null,
           injector.messages.message(
             Msg.E62,
             `val`,
-            Character.toString(Magic.no_Magic(peekchr()).toChar())
-          )
+            Character.toString(Magic.no_Magic(peekchr()).toChar()),
+          ),
         )
       }
       return null
@@ -617,7 +621,7 @@ class RegExp {
       HEX, NHEX, OCTAL, NOCTAL,
       WORD, NWORD, HEAD, NHEAD,
       ALPHA, NALPHA, LOWER, NLOWER,
-      UPPER, NUPPER
+      UPPER, NUPPER,
     )
     val p: CharPointer
     var extra = 0
@@ -651,7 +655,7 @@ class RegExp {
         }
         val i = classchars.indexOf(Magic.no_Magic(c).toChar())
         if (i == -1) {
-          injector.messages.showStatusBarMessage(injector.messages.message(Msg.E63))
+          injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E63))
           return null
         }
         ret = regnode(classcodes[i] + extra)
@@ -660,7 +664,7 @@ class RegExp {
       Magic.DOT, Magic.i, Magic.I, Magic.k, Magic.K, Magic.f, Magic.F, Magic.p, Magic.P, Magic.s, Magic.S, Magic.d, Magic.D, Magic.x, Magic.X, Magic.o, Magic.O, Magic.w, Magic.W, Magic.h, Magic.H, Magic.a, Magic.A, Magic.l, Magic.L, Magic.u, Magic.U -> {
         val i = classchars.indexOf(Magic.no_Magic(c).toChar())
         if (i == -1) {
-          injector.messages.showStatusBarMessage(injector.messages.message(Msg.E63))
+          injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E63))
           return null
         }
         ret = regnode(classcodes[i] + extra)
@@ -689,11 +693,12 @@ class RegExp {
         c = Magic.no_Magic(c)
         val `val` = if (if (c == '*'.code) reg_magic >= MAGIC_ON else reg_magic == MAGIC_ALL) "" else "\\"
         injector.messages.showStatusBarMessage(
+          null,
           injector.messages.message(
             Msg.E64,
             `val`,
-            Character.toString(c.toChar())
-          )
+            Character.toString(c.toChar()),
+          ),
         )
         return null
       }
@@ -713,7 +718,7 @@ class RegExp {
           }
         }
       } else {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_nopresub))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_nopresub))
         return null
       }
       Magic.N1, Magic.N2, Magic.N3, Magic.N4, Magic.N5, Magic.N6, Magic.N7, Magic.N8, Magic.N9 -> {
@@ -747,7 +752,7 @@ class RegExp {
         when (c) {
           '('.code -> {
             if (reg_do_extmatch != REX_SET) {
-              injector.messages.showStatusBarMessage(injector.messages.message(Msg.E66))
+              injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E66))
               return null
             }
             if (one_exactly) {
@@ -763,7 +768,7 @@ class RegExp {
           }
           '1'.code, '2'.code, '3'.code, '4'.code, '5'.code, '6'.code, '7'.code, '8'.code, '9'.code -> {
             if (reg_do_extmatch != REX_USE) {
-              injector.messages.showStatusBarMessage(injector.messages.message(Msg.E67))
+              injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E67))
               return null
             }
             ret = regnode(ZREF + c - '0'.code)
@@ -772,7 +777,7 @@ class RegExp {
           's'.code -> ret = regnode(MOPEN)
           'e'.code -> ret = regnode(MCLOSE)
           else -> {
-            injector.messages.showStatusBarMessage(injector.messages.message(Msg.E68))
+            injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E68))
             return null
           }
         }
@@ -914,7 +919,7 @@ class RegExp {
               endc = regparse!!.charAt().code
               regparse!!.inc()
               if (startc > endc) {
-                injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_invrange))
+                injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_invrange))
                 return null
               }
               while (++startc <= endc) {
@@ -1071,7 +1076,7 @@ class RegExp {
         regc('\u0000'.code)
         prevchr_len = 1 /* last char was the ']' */
         if (regparse!!.charAt() != ']') {
-          injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_toomsbra))
+          injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_toomsbra))
           return null
         }
         skipchr() /* let's be friends with the lexer again */
@@ -1094,9 +1099,9 @@ class RegExp {
             * e.g., a "[" without matching "]".
             */len = 0
       while (c != '\u0000'.code && (
-        len == 0 || re_multi_type(peekchr()) == NOT_MULTI &&
-          !one_exactly && !Magic.is_Magic(c)
-        )
+          len == 0 || re_multi_type(peekchr()) == NOT_MULTI &&
+            !one_exactly && !Magic.is_Magic(c)
+          )
       ) {
         c = Magic.no_Magic(c)
         regc(c)
@@ -1252,8 +1257,8 @@ class RegExp {
                      * "\(", "\|", "\&' or "\n" */if (reg_magic >= MAGIC_OFF &&
           (
             at_start || reg_magic == MAGIC_ALL || prevchr == Magic.LPAREN || prevchr == Magic.PIPE || prevchr == Magic.AMP || prevchr == Magic.n || Magic.no_Magic(
-                prevchr
-              ) == '('.code &&
+              prevchr,
+            ) == '('.code &&
               prevprevchr == Magic.PERCENT
             )
         ) {
@@ -1266,10 +1271,10 @@ class RegExp {
           val p = regparse!!.ref(1)
 
           /* ignore \c \C \m and \M after '$' */while (p.charAt(0) == '\\' && (
-            p.charAt(1) == 'c' || p.charAt(
-                1
+              p.charAt(1) == 'c' || p.charAt(
+                1,
               ) == 'C' || p.charAt(1) == 'm' || p.charAt(1) == 'M'
-            )
+              )
           ) {
             p.inc(2)
           }
@@ -1408,7 +1413,7 @@ class RegExp {
     }
     if (regparse!!.charAt() != '}' || maxval == 0 && minval == 0) {
       val `val` = if (reg_magic == MAGIC_ALL) "" else "\\"
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.synerror, `val`))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.synerror, `val`))
       return null
     }
 
@@ -1455,9 +1460,11 @@ class RegExp {
          * can't go before line 1 */
     return if (reg_firstlnum + lnum < 0) {
       null
-    } else CharPointer(
-      reg_buf!!.getLineBuffer(reg_firstlnum + lnum)
-    )
+    } else {
+      CharPointer(
+        reg_buf!!.getLineBuffer(reg_firstlnum + lnum),
+      )
+    }
 
     // return ml_get_buf(reg_buf, reg_firstlnum + lnum, false);
   }
@@ -1491,7 +1498,7 @@ class RegExp {
     buf: VimEditor?,
     lcount: Int,
     lnum: Int,
-    col: Int
+    col: Int,
   ): Int /* window in which to search or null */ /* buffer in which to search */ /* nr of line to start looking for match */ /* column to start looking for match */ {
     val r: Int
     // VimEditor save_curbuf = curbuf;
@@ -1524,7 +1531,7 @@ class RegExp {
     reg_endpos = reg_mmatch!!.endpos
 
     /* Be paranoid... */if (prog == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return false
     }
 
@@ -1566,7 +1573,7 @@ class RegExp {
       retval = regtry(prog, col)
     }
     if (out_of_stack) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.E363))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E363))
     }
     return retval > 0
   }
@@ -1595,7 +1602,7 @@ class RegExp {
     }
 
     /* Be paranoid... */if (prog == null || line == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return retval
     }
 
@@ -1666,7 +1673,7 @@ class RegExp {
       }
     }
     if (out_of_stack) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.E363))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E363))
     }
 
     /* Didn't find a match. */
@@ -1745,9 +1752,9 @@ class RegExp {
             /* Only accept single line matches. */
             if (reg_startzpos[i]!!.lnum >= 0 && reg_endzpos[i]!!.lnum == reg_startzpos[i]!!.lnum) {
               re_extmatch_out!!.matches[i] = reg_getline(
-                reg_startzpos[i]!!.lnum
+                reg_startzpos[i]!!.lnum,
               )!!.ref(reg_startzpos[i]!!.col).substring(
-                reg_endzpos[i]!!.col - reg_startzpos[i]!!.col
+                reg_endzpos[i]!!.col - reg_startzpos[i]!!.col,
               )
             }
           } else {
@@ -1811,7 +1818,7 @@ class RegExp {
           RE_BOF -> /* Passing -1 to the getline() function provided for the search
                          * should always return null if the current line is the first
                          * line of the file. */if (reglnum != 0 || !reginput!!.equals(regline) || reg_match == null && reg_getline(
-              -1
+              -1,
             ) != null
           ) {
             return false
@@ -1830,7 +1837,8 @@ class RegExp {
             }
           }
           RE_LNUM -> if (reg_match != null || !re_num_cmp(
-              reglnum + reg_firstlnum, scan
+              reglnum + reg_firstlnum,
+              scan,
             )
           ) {
             return false
@@ -2026,9 +2034,9 @@ class RegExp {
             var opnd: CharPointer
             opnd = scan.OPERAND()
             /* Inline the first byte, for speed. */if (opnd.charAt() != reginput!!.charAt() && (
-              !ireg_ic ||
-                opnd.charAt().lowercaseChar() != reginput!!.charAt().lowercaseChar()
-              )
+                !ireg_ic ||
+                  opnd.charAt().lowercaseChar() != reginput!!.charAt().lowercaseChar()
+                )
             ) {
               return false
             }
@@ -2039,7 +2047,7 @@ class RegExp {
               /* Need to match first byte again for multi-byte. */if (cstrncmp(
                   opnd,
                   reginput!!,
-                  len
+                  len,
                 ) != 0
               ) {
                 return false
@@ -2146,7 +2154,6 @@ class RegExp {
                   ccol = reg_startpos[no]!!.col
                   clnum = reg_startpos[no]!!.lnum
                   while (true) {
-
                                         /* Since getting one line may invalidate
                                              * the other, need to make copy.  Slow! */if (!regline!!.equals(reg_tofree)) {
                       reg_tofree = regline!!.ref(0)
@@ -2232,7 +2239,7 @@ class RegExp {
               brace_max[no] = scan.OPERAND_MAX()
               brace_count[no] = 0
             } else {
-              injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_internal))
+              injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_internal))
               return false
             }
           }
@@ -2356,7 +2363,6 @@ class RegExp {
                 return false
               }
               while (true) {
-
                 /* If it could work, try it. */if (nextb == '\u0000' || reginput!!.charAt() == nextb || reginput!!.charAt() == nextb_ic) {
                   reg_save(save)
                   if (regmatch(next)) {
@@ -2366,7 +2372,7 @@ class RegExp {
                 }
                 /* Couldn't or didn't match: try advancing one char. */if (count == minval || regrepeat(
                     scan.OPERAND(),
-                    1
+                    1,
                   ) == 0
                 ) {
                   break
@@ -2423,9 +2429,13 @@ class RegExp {
                                  * result, hitting the start of the line or the previous
                                  * line (for multi-line matching).
                                  * Set behind_pos to where the match should end, BHPOS
-                                 * will match it. */save_behind_pos = if (behind_pos == null) null else regsave_T(
-                behind_pos!!
-              )
+                                 * will match it. */save_behind_pos = if (behind_pos == null) {
+                null
+              } else {
+                regsave_T(
+                  behind_pos!!,
+                )
+              }
               behind_pos = regsave_T(save_start)
               while (true) {
                 reg_restore(save_start)
@@ -2485,7 +2495,7 @@ class RegExp {
           }
           END -> return true /* Success! */
           else -> {
-            injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+            injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
             return false
           }
         }
@@ -2496,7 +2506,7 @@ class RegExp {
         /*
          * We get here only if there's trouble -- normally "case END" is the
          * terminating point.
-         */injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+         */injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
     return false
   }
 
@@ -2798,7 +2808,7 @@ class RegExp {
           break
         }
       }
-      else -> injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+      else -> injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
     }
     if (mask != 0) {
       while (count < maxcount) {
@@ -2845,7 +2855,7 @@ class RegExp {
      */
   private fun prog_magic_wrong(): Boolean {
     if ((if (reg_match == null) reg_mmatch!!.regprog!!.program else reg_match!!.regprog!!.program)[0].code != REGMAGIC) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
       return true
     }
     return false
@@ -2940,7 +2950,9 @@ class RegExp {
   private fun reg_save_equal(save: regsave_T): Boolean {
     return if (reg_match == null) {
       reglnum == save.pos.lnum && reginput!!.equals(regline!!.ref(save.pos.col))
-    } else reginput!!.equals(save.ptr)
+    } else {
+      reginput!!.equals(save.ptr)
+    }
   }
 
     /*
@@ -2968,7 +2980,9 @@ class RegExp {
     if (reg_match == null) {
       posp.col = savep.pos.col
       posp.lnum = savep.pos.lnum
-    } else pp?.assign(savep.ptr!!)
+    } else {
+      pp?.assign(savep.ptr!!)
+    }
   }
 
     /*
@@ -2981,7 +2995,9 @@ class RegExp {
     }
     return if (scan.OPERAND_CMP() == '<') {
       `val` < n
-    } else `val` == n
+    } else {
+      `val` == n
+    }
   }
 
     /*
@@ -3183,7 +3199,7 @@ class RegExp {
     var mode = 0
 
     /* Be paranoid... */if (source == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return null
     }
     if (prog_magic_wrong()) {
@@ -3302,7 +3318,7 @@ class RegExp {
                   break
                 }
               } else if (s!!.isNul) /* we hit '\u0000'. */ {
-                injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_damg))
+                injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_damg))
                 return dst.toString()
               } else {
                 if (backslash && (s.charAt() == '\r' || s.charAt() == '\\')) {
@@ -3662,6 +3678,7 @@ class RegExp {
 
     @JvmField
     var lnum = 0
+
     @JvmField
     var col = 0
     override fun toString(): String {
@@ -3700,10 +3717,13 @@ class RegExp {
   class regmmatch_T {
     @JvmField
     var regprog: regprog_T? = null
+
     @JvmField
     var startpos = arrayOfNulls<lpos_T>(NSUBEXP)
+
     @JvmField
     var endpos = arrayOfNulls<lpos_T>(NSUBEXP)
+
     @JvmField
     var rmm_ic = false
 
@@ -3963,7 +3983,7 @@ class RegExp {
       1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, /*  P        S     U  V  W  X        [           _ */
       1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, /*     a     c  d     f     h  i     k  l  m  n  o */
       0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, /*  p        s     u  v  w  x     z  {  |     ~    */
-      1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1
+      1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1,
     )
 
     /* arguments for reg() */
@@ -3986,7 +4006,7 @@ class RegExp {
         i = 0
         while (i < (CharacterClasses.CLASS_NAMES?.size ?: 0)) {
           if (pp.ref(2)
-            .strncmp(CharacterClasses.CLASS_NAMES!![i], CharacterClasses.CLASS_NAMES[i].length) == 0
+              .strncmp(CharacterClasses.CLASS_NAMES!![i], CharacterClasses.CLASS_NAMES[i].length) == 0
           ) {
             pp.inc(CharacterClasses.CLASS_NAMES[i].length + 2)
             return i

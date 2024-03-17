@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -25,15 +25,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
  *   - [ChangeEditorActionHandler.SingleExecution]
  *   - [ChangeEditorActionHandler.ForEachCaret]
  */
-sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
+public sealed class ChangeEditorActionHandler(runForEachCaret: Boolean) : EditorActionHandlerBase(runForEachCaret) {
 
   /**
    * This handler executes an action for each caret. That means that if you have 5 carets, [execute] will be
    *   called 5 times.
    * @see [ChangeEditorActionHandler.SingleExecution] for only one execution.
    */
-  abstract class ForEachCaret : ChangeEditorActionHandler() {
-    abstract fun execute(
+  public abstract class ForEachCaret : ChangeEditorActionHandler(true) {
+    public abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -47,8 +47,8 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
    *   [execute] will be called 1 time.
    * @see [ChangeEditorActionHandler.ForEachCaret] for per-caret execution
    */
-  abstract class SingleExecution : ChangeEditorActionHandler() {
-    abstract fun execute(
+  public abstract class SingleExecution : ChangeEditorActionHandler(false) {
+    public abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
@@ -56,15 +56,15 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     ): Boolean
   }
 
-  abstract class ConditionalSingleExecution : ChangeEditorActionHandler() {
-    abstract fun runAsMulticaret(
+  public abstract class ConditionalSingleExecution : ChangeEditorActionHandler(true) {
+    public abstract fun runAsMulticaret(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    abstract fun execute(
+    public abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -72,13 +72,15 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    abstract fun execute(
+    public abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
       operatorArguments: OperatorArguments,
     ): Boolean
   }
+
+  private val worked = arrayOf(true)
 
   final override fun baseExecute(
     editor: VimEditor,
@@ -96,38 +98,29 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     editor.vimChangeActionSwitchMode = null
 
     editor.startGuardedBlockChecking()
-
-    val worked = arrayOf(true)
+    worked[0] = true
     try {
       when (this) {
         is ForEachCaret -> {
-          editor.forEachNativeCaret(
-            { current ->
-              if (!current.isValid) return@forEachNativeCaret
-              if (!execute(editor, current, context, cmd.argument, operatorArguments)) {
-                worked[0] = false
-              }
-            },
-            true
-          )
+          if (!execute(editor, caret, context, cmd.argument, operatorArguments)) {
+            worked[0] = false
+          }
         }
         is SingleExecution -> {
           worked[0] = execute(editor, context, cmd.argument, operatorArguments)
         }
         is ConditionalSingleExecution -> {
+          // The handler is registered as multicaret run. So, if we want to execute the handler once, we call
+          //   it only on main caret iteration.
           val runAsMulticaret = this.runAsMulticaret(editor, context, cmd, operatorArguments)
           if (runAsMulticaret) {
-            editor.forEachNativeCaret(
-              { current ->
-                if (!current.isValid) return@forEachNativeCaret
-                if (!execute(editor, current, context, cmd.argument, operatorArguments)) {
-                  worked[0] = false
-                }
-              },
-              true
-            )
+            if (!execute(editor, caret, context, cmd.argument, operatorArguments)) {
+              worked[0] = false
+            }
           } else {
-            worked[0] = execute(editor, context, cmd.argument, operatorArguments)
+            if (caret == editor.currentCaret()) {
+              worked[0] = execute(editor, context, cmd.argument, operatorArguments)
+            }
           }
         }
       }
@@ -141,6 +134,15 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
       editor.stopGuardedBlockChecking()
     }
 
+    return worked[0]
+  }
+
+  final override fun postExecute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ) {
     if (worked[0]) {
       VimRepeater.saveLastChange(cmd)
       VimRepeater.repeatHandler = false
@@ -150,7 +152,5 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     if (toSwitch != null) {
       injector.changeGroup.processPostChangeModeSwitch(editor, context, toSwitch)
     }
-
-    return worked[0]
   }
 }

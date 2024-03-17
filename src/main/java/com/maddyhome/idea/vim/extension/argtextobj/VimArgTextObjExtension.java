@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,10 +10,7 @@ package com.maddyhome.idea.vim.extension.argtextobj;
 
 import com.intellij.openapi.editor.Document;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.ExecutionContext;
-import com.maddyhome.idea.vim.api.VimCaret;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
@@ -26,8 +23,9 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.state.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import kotlin.Unit;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -196,11 +194,10 @@ public class VimArgTextObjExtension implements VimExtension {
       @Nullable
       @Override
       public TextRange getRange(@NotNull VimEditor editor,
-                                @NotNull VimCaret caret,
+                                @NotNull ImmutableVimCaret caret,
                                 @NotNull ExecutionContext context,
                                 int count,
-                                int rawCount,
-                                @Nullable Argument argument) {
+                                int rawCount) {
         BracketPairs bracketPairs = DEFAULT_BRACKET_PAIRS;
         final String bracketPairsVar = bracketPairsVariable();
         if (bracketPairsVar != null) {
@@ -246,27 +243,26 @@ public class VimArgTextObjExtension implements VimExtension {
     }
 
     @Override
-    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
 
       IjVimEditor vimEditor = (IjVimEditor) editor;
-      @NotNull VimStateMachine vimStateMachine = VimStateMachine.getInstance(vimEditor);
+      @NotNull VimStateMachine vimStateMachine = VimStateMachine.Companion.getInstance(vimEditor);
       int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());
 
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
-      if (!vimStateMachine.isOperatorPending()) {
-        editor.forEachNativeCaret((VimCaret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
+      if (!vimStateMachine.isOperatorPending(editor.getMode())) {
+        editor.nativeCarets().forEach((VimCaret caret) -> {
+          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {
+              if (vimStateMachine.getMode() instanceof Mode.VISUAL) {
                 com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt.vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
                 InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret)caret).getCaret(), range.getStartOffset());
               }
             }
           }
-          return Unit.INSTANCE;
         });
       } else {
         vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,

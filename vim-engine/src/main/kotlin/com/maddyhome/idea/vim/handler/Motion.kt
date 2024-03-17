@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,10 +8,13 @@
 
 package com.maddyhome.idea.vim.handler
 
-sealed class Motion {
-  object Error : Motion()
-  object NoMotion : Motion()
-  open class AbsoluteOffset(val offset: Int) : Motion()
+/**
+ * [Error] and [NoMotion] both do not move the caret. However, in case of macros, [Error] stops the macro execution.
+ */
+public sealed class Motion {
+  public object Error : Motion()
+  public object NoMotion : Motion()
+  public open class AbsoluteOffset(public val offset: Int) : Motion()
 
   /**
    * Represents a motion to an absolute offset that has been horizontally adjusted to avoid virtual text.
@@ -25,15 +28,15 @@ sealed class Motion {
    * @param intendedColumn  The index of the intended location of the caret, as counted in columns from the start of the
    *                        buffer line, including the column width of all virtual text.
    */
-  class AdjustedOffset(offset: Int, val intendedColumn: Int) : AbsoluteOffset(offset)
+  public class AdjustedOffset(offset: Int, public val intendedColumn: Int) : AbsoluteOffset(offset)
 }
 
-fun Int.toMotion(): Motion.AbsoluteOffset {
+public fun Int.toMotion(): Motion.AbsoluteOffset {
   if (this < 0) error("Unexpected motion: $this")
   return Motion.AbsoluteOffset(this)
 }
 
-fun Int.toMotionOrError(): Motion = if (this < 0) Motion.Error else Motion.AbsoluteOffset(this)
-fun Long.toMotionOrError(): Motion = if (this < 0) Motion.Error else Motion.AbsoluteOffset(this.toInt())
-fun Int.toMotionOrNoMotion(): Motion = if (this < 0) Motion.NoMotion else Motion.AbsoluteOffset(this)
-fun Int.toAdjustedMotionOrError(intendedColumn: Int): Motion = if (this < 0) Motion.Error else Motion.AdjustedOffset(this, intendedColumn)
+public fun Int.toMotionOrError(): Motion = if (this < 0) Motion.Error else Motion.AbsoluteOffset(this)
+public fun Long.toMotionOrError(): Motion = if (this < 0) Motion.Error else Motion.AbsoluteOffset(this.toInt())
+public fun Int.toMotionOrNoMotion(): Motion = if (this < 0) Motion.NoMotion else Motion.AbsoluteOffset(this)
+public fun Int.toAdjustedMotionOrError(intendedColumn: Int): Motion = if (this < 0) Motion.Error else Motion.AdjustedOffset(this, intendedColumn)

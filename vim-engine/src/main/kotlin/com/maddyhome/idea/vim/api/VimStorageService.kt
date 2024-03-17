@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,27 +8,31 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimStorageService {
+public interface VimStorageService {
   /**
-   * Gets data from editor (in Vim it is called window).
-   * Vim stores there window scoped (`w:`) variables and local options.
+   * Gets keyed data from a Vim window
+   *
+   * IdeaVim's [VimEditor] is equivalent to Vim's window, which is an editor view on a buffer. Vim stores window scoped
+   * variables (`w:`) and local-to-window options per-window.
    *
    * NOTE: data should remain in window even if it is moved to another split
    * @param editor editor/window to get the value from
    * @param key key
    */
-  fun <T> getDataFromEditor(editor: VimEditor, key: Key<T>): T?
+  public fun <T> getDataFromWindow(editor: VimEditor, key: Key<T>): T?
 
   /**
-   * Puts data to editor (in Vim it is called window).
-   * Vim stores there window scoped (`w:`) variables and local options.
+   * Stores keyed user data in a Vim window
+   *
+   * IdeaVim's [VimEditor] is equivalent to Vim's window, which is an editor view on a buffer. Vim stores window scoped
+   * variables (`w:`) and local-to-window options per-window.
    *
    * NOTE: data should remain in window even if it is moved to another split
    * @param editor editor/window to store the value
    * @param key key
    * @param data data to store
    */
-  fun <T> putDataToEditor(editor: VimEditor, key: Key<T>, data: T)
+  public fun <T> putDataToWindow(editor: VimEditor, key: Key<T>, data: T)
 
   /**
    * Gets data from buffer
@@ -37,7 +41,7 @@ interface VimStorageService {
    * @param editor editor/window with the buffer opened
    * @param key key
    */
-  fun <T> getDataFromBuffer(editor: VimEditor, key: Key<T>): T?
+  public fun <T> getDataFromBuffer(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Puts data to buffer
@@ -47,7 +51,7 @@ interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  fun <T> putDataToBuffer(editor: VimEditor, key: Key<T>, data: T)
+  public fun <T> putDataToBuffer(editor: VimEditor, key: Key<T>, data: T)
 
   /**
    * Gets data from tab (group of windows)
@@ -56,7 +60,7 @@ interface VimStorageService {
    * @param editor editor/window in the tap page
    * @param key key
    */
-  fun <T> getDataFromTab(editor: VimEditor, key: Key<T>): T?
+  public fun <T> getDataFromTab(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Puts data to tab (group of windows)
@@ -66,7 +70,16 @@ interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  fun <T> putDataToTab(editor: VimEditor, key: Key<T>, data: T)
+  public fun <T> putDataToTab(editor: VimEditor, key: Key<T>, data: T)
 }
 
-data class Key<T>(val name: String)
+public data class Key<T>(val name: String)
+
+public fun <T> VimStorageService.getOrPutWindowData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+  getDataFromWindow(editor, key) ?: provider().also { putDataToWindow(editor, key, it) }
+
+public fun <T> VimStorageService.getOrPutBufferData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+  getDataFromBuffer(editor, key) ?: provider().also { putDataToBuffer(editor, key, it) }
+
+public fun <T> VimStorageService.getOrPutTabData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+  getDataFromTab(editor, key) ?: provider().also { putDataToTab(editor, key, it) }

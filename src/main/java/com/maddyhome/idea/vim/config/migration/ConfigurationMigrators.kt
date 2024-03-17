@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,17 +10,17 @@ package com.maddyhome.idea.vim.config.migration
 
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.util.JDOMUtil
-import com.intellij.util.io.exists
 import org.jdom.Element
+import kotlin.io.path.exists
 
-interface ConfigMigrator {
+internal interface ConfigMigrator {
   val fromVersion: Int
   val toVersion: Int
   fun versionUp()
 }
 
 @Suppress("ClassName")
-object `Version 6 to 7 config migration` : ConfigMigrator {
+internal object `Version 6 to 7 config migration` : ConfigMigrator {
   override val fromVersion: Int = 6
   override val toVersion: Int = 7
 
@@ -39,7 +39,6 @@ object `Version 6 to 7 config migration` : ConfigMigrator {
   }
 
   fun performMigration(configuration: Element): Pair<Element, Element> {
-
     val (local, shared) = configuration.getChildren("component").partition { it.getAttribute("name").value in local }
 
     val sharedElement = Element("application")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,20 +11,20 @@ package com.maddyhome.idea.vim
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.localEditors
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 
 /**
  * @author Alex Plate
  */
-class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
+internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
 
   private var firstInitializationOccurred = false
 
-  override fun runActivity(project: Project) {
+  override suspend fun execute(project: Project) {
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
 
@@ -34,11 +34,12 @@ class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
 }
 
 // This is a temporal workaround for VIM-2487
-class PyNotebooksCloseWorkaround : ProjectManagerListener {
+internal class PyNotebooksCloseWorkaround : ProjectManagerListener {
   override fun projectClosingBeforeSave(project: Project) {
-    val close = injector.optionService.getOptionValue(OptionScope.GLOBAL, "closenotebooks").asBoolean()
-    if (close) {
-      localEditors().forEach { editor ->
+    // TODO: Confirm context in CWM scenario
+    if (injector.globalIjOptions().closenotebooks) {
+      injector.editorGroup.getEditors().forEach { vimEditor ->
+        val editor = (vimEditor as IjVimEditor).editor
         val virtualFile = EditorHelper.getVirtualFile(editor)
         if (virtualFile?.extension == "ipynb") {
           val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)

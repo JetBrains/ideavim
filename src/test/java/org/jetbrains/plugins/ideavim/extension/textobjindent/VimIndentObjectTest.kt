@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,31 +8,37 @@
 
 package org.jetbrains.plugins.ideavim.extension.textobjindent
 
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 /**
  * @author Shrikant Sharat Kandula (@sharat87)
  */
 @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 class VimIndentObjectTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("textobj-indent")
   }
 
+  @Test
   fun testSingleLine() {
     doTest(
       "dii",
       """
         one
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
+  @Test
   fun testDeleteFlatIndent() {
     doTest(
       "dii",
@@ -42,10 +48,11 @@ class VimIndentObjectTest : VimTestCase() {
         three
         four
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
+  @Test
   fun testDeleteOuterFlatIndent() {
     doTest(
       "dai",
@@ -55,10 +62,11 @@ class VimIndentObjectTest : VimTestCase() {
         three
         four
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
+  @Test
   fun testDeleteInnerIndent() {
     doTest(
       "2Gdii",
@@ -71,10 +79,11 @@ class VimIndentObjectTest : VimTestCase() {
       """
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun testDeleteOuterIndent() {
     doTest(
       "2Gdai",
@@ -86,10 +95,11 @@ class VimIndentObjectTest : VimTestCase() {
       """.trimIndent(),
       """
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun testDeleteFarOuterIndent() {
     doTest(
       "2GdaI",
@@ -99,10 +109,11 @@ class VimIndentObjectTest : VimTestCase() {
           three
         four
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
+  @Test
   fun testDeleteInnerIndentWithLinesAbove() {
     doTest(
       "5Gdii",
@@ -121,10 +132,11 @@ class VimIndentObjectTest : VimTestCase() {
         go hear
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun testDeleteInnerIndentWithBlankLinesAbove() {
     doTest(
       "6Gdii",
@@ -145,10 +157,11 @@ class VimIndentObjectTest : VimTestCase() {
 
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun testNested1() {
     doTest(
       "2Gdii",
@@ -161,10 +174,11 @@ class VimIndentObjectTest : VimTestCase() {
       """
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun testNested1a() {
     doTest(
       "3Gdai",
@@ -177,10 +191,11 @@ class VimIndentObjectTest : VimTestCase() {
       """
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun testNested2() {
     doTest(
       "3Gdii",
@@ -194,10 +209,11 @@ class VimIndentObjectTest : VimTestCase() {
         one
           two
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun testNested3() {
     doTest(
       "3Gdii",
@@ -213,12 +229,13 @@ class VimIndentObjectTest : VimTestCase() {
           two
         four
         five
-      """.trimIndent()
+      """.trimIndent(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
     assertSelection(null)
   }
 
+  @Test
   fun testNested4() {
     doTest(
       "3Gdii",
@@ -234,7 +251,7 @@ class VimIndentObjectTest : VimTestCase() {
           two
         four
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

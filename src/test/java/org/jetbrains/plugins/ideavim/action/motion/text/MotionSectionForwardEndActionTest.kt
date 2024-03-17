@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,42 +8,46 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.state.mode.Mode
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionSectionForwardEndActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+  @Test
   fun `test remove full text`() {
     doTest(
       "d][",
       """
-          ${c}I found it in a legendary land
-          all rocks and lavender and tufted grass,
-          where it was settled on some sodden sand
-          hard by the torrent of a mountain pass.
+          ${c}Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit
+          Sed in orci mauris.
+          Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       "$c.",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+  @Test
   fun `test remove full text with new line at the end`() {
     doTest(
       "d][",
       """
-          ${c}I found it in a legendary land
-          all rocks and lavender and tufted grass,
-          where it was settled on some sodden sand
-          hard by the torrent of a mountain pass.
+          ${c}Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit
+          Sed in orci mauris.
+          Cras id tellus in ex imperdiet egestas.
           
       """.trimIndent(),
       "$c.\n",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test move forward`() {
     doTest(
       "][",
@@ -77,10 +81,11 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test move forward twice`() {
     doTest(
       "][][",
@@ -114,10 +119,11 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test move forward till the end`() {
     doTest(
       "][][][",
@@ -151,7 +157,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 }

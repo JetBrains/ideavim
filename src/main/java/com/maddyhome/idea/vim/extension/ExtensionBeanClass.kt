@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,7 +13,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
 
-class ExtensionBeanClass : BaseKeyedLazyInstance<VimExtension>() {
+internal class ExtensionBeanClass : BaseKeyedLazyInstance<VimExtension>() {
 
   @Attribute("implementation")
   var implementation: String? = null
@@ -34,7 +34,7 @@ class ExtensionBeanClass : BaseKeyedLazyInstance<VimExtension>() {
 }
 
 @Tag("alias")
-class Alias {
+internal class Alias {
   @Attribute("name")
   var name: String? = null
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.ui.ExOutputPanel
 /**
  * @author vlan
  */
-class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
+public class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
   override var text: String? = null
     private set
 
@@ -34,9 +34,9 @@ class ExOutputModel private constructor(private val myEditor: Editor) : VimExOut
     }
   }
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun getInstance(editor: Editor): ExOutputModel {
+    public fun getInstance(editor: Editor): ExOutputModel {
       var model = editor.vimExOutput
       if (model == null) {
         model = ExOutputModel(editor)

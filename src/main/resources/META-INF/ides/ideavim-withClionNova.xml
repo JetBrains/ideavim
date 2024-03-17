@@ -1,0 +1,19 @@
+<!--
+  ~ Copyright 2003-2024 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <editorActionHandler action="EditorEscape"
+                         implementationClass="com.maddyhome.idea.vim.handler.VimEscForRiderHandler"
+                         id="ideavim-clion-nova-esc"
+                         order="first, before idea.only.escape"/>
+  </extensions>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <clionNovaProvider implementation="com.maddyhome.idea.vim.ide.ClionNovaProviderImpl"/>
+  </extensions>
+</idea-plugin>

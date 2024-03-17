@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.delete
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -16,7 +18,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
@@ -26,10 +28,11 @@ import java.util.*
 /**
  * @author vlan
  */
-class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["X"], modes = [Mode.VISUAL])
+public class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 
   override fun executeAction(
     editor: VimEditor,
@@ -48,7 +51,7 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
         val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
         val lineRange = TextRange(
           editor.getLineStartForOffset(textRange.startOffset),
-          lineEndForOffset + endsWithNewLine
+          lineEndForOffset + endsWithNewLine,
         )
         Triple(caret, lineRange, SelectionType.LINE_WISE)
       }

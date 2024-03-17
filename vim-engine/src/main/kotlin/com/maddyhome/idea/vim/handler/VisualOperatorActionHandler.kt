@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,9 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimBlockSelection
@@ -26,10 +24,13 @@ import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inRepeatMode
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.selectionType
 
 /**
  * @author Alex Plate
@@ -40,14 +41,14 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
  *  - [VisualOperatorActionHandler.SingleExecution]
  *  - [VisualOperatorActionHandler.ForEachCaret]
  */
-sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
+public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   /**
    * Base class for visual operation handlers.
    * This handler executes an action for each caret. That means that if you have 5 carets,
    *   [executeAction] will be called 5 times.
    * @see [VisualOperatorActionHandler.SingleExecution] for only one execution.
    */
-  abstract class ForEachCaret : VisualOperatorActionHandler() {
+  public abstract class ForEachCaret : VisualOperatorActionHandler() {
 
     /**
      * Execute an action for current [caret].
@@ -57,7 +58,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
      * This method is executed once for each caret except case with block selection. If there is block selection,
      *   the method will be executed only once with [Caret#primaryCaret].
      */
-    abstract fun executeAction(
+    public abstract fun executeAction(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -71,18 +72,18 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
      * [caretsAndSelections] contains a map of all current carets and corresponding selections.
      *   If there is block selection, only one caret is in [caretsAndSelections].
      */
-    open fun beforeExecution(
+    public open fun beforeExecution(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
       caretsAndSelections: Map<VimCaret, VimSelection>,
-    ) = true
+    ): Boolean = true
 
     /**
      * This method executes after [executeAction] and only once for all carets.
      * [res] has true if ALL executions of [executeAction] returned true.
      */
-    open fun afterExecution(editor: VimEditor, context: ExecutionContext, cmd: Command, res: Boolean) {}
+    public open fun afterExecution(editor: VimEditor, context: ExecutionContext, cmd: Command, res: Boolean) {}
   }
 
   /**
@@ -91,7 +92,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
    *   [executeForAllCarets] will be called 1 time.
    * @see [VisualOperatorActionHandler.ForEachCaret] for per-caret execution
    */
-  abstract class SingleExecution : VisualOperatorActionHandler() {
+  public abstract class SingleExecution : VisualOperatorActionHandler() {
     /**
      * Execute an action
      * [caretsAndSelections] contains a map of all current carets and corresponding selections.
@@ -99,7 +100,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
      *
      * This method is executed once for all carets.
      */
-    abstract fun executeForAllCarets(
+    public abstract fun executeForAllCarets(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
@@ -113,7 +114,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     logger.info("Execute visual command $cmd")
 
@@ -123,7 +124,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     logger.debug { "Count of selection segments: ${selections.size}" }
     logger.debug { selections.values.joinToString("\n") { vimSelection -> "Caret: $vimSelection" } }
 
-    val commandWrapper = VisualStartFinishWrapper(editor, cmd, this)
+    val commandWrapper = VisualStartFinishWrapper(editor, cmd)
     commandWrapper.start()
 
     val res = arrayOf(true)
@@ -147,7 +148,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
               context,
               cmd,
               selections.values.first(),
-              operatorArguments
+              operatorArguments,
             )
           else -> editor.forEachNativeCaret(
             { currentCaret ->
@@ -155,7 +156,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
               val loopRes = executeAction(editor, currentCaret, context, cmd, range, operatorArguments)
               res[0] = loopRes and res[0]
             },
-            true
+            true,
           )
         }
 
@@ -184,8 +185,9 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             primaryCaret to VimBlockSelection(
               primaryCaret.offset.point,
               end,
-              this, range.columns >= VimMotionGroupBase.LAST_COLUMN
-            )
+              this,
+              range.columns >= VimMotionGroupBase.LAST_COLUMN,
+            ),
           )
         } else {
           val carets = mutableMapOf<VimCaret, VimSelection>()
@@ -197,25 +199,26 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           carets.toMap()
         }
       }
-      this.inBlockSubMode -> {
+      this.inBlockSelection -> {
         val primaryCaret = primaryCaret()
         mapOf(
           primaryCaret to VimBlockSelection(
             primaryCaret.vimSelectionStart,
             primaryCaret.offset.point,
-            this, primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN
-          )
+            this,
+            primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN,
+          ),
         )
       }
       else -> this.nativeCarets().associateWith { caret ->
-        val subMode = this.vimStateMachine.subMode
+        val mode = this.vimStateMachine.mode
         VimSimpleSelection.createWithNative(
           caret.vimSelectionStart,
           caret.offset.point,
           caret.selectionStart,
           caret.selectionEnd,
-          SelectionType.fromSubMode(subMode),
-          this
+          mode.selectionType ?: CHARACTER_WISE,
+          this,
         )
       }
     }
@@ -224,41 +227,35 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   private class VisualStartFinishWrapper(
     private val editor: VimEditor,
     private val cmd: Command,
-    private val visualOperatorActionHandler: VisualOperatorActionHandler
   ) {
     private val visualChanges = mutableMapOf<VimCaret, VisualChange?>()
 
     fun start() {
       logger.debug("Preparing visual command")
-      editor.vimKeepingVisualOperatorAction = CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags
 
       editor.forEachCaret {
         val change =
-          if (this@VisualStartFinishWrapper.editor.inVisualMode && !this@VisualStartFinishWrapper.editor.inRepeatMode) {
-            VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
-          } else null
-        this@VisualStartFinishWrapper.visualChanges[it] = change
+          if (editor.inVisualMode && !editor.inRepeatMode) {
+            VisualOperation.getRange(editor, it, cmd.flags)
+          } else {
+            null
+          }
+        visualChanges[it] = change
       }
       logger.debug { visualChanges.values.joinToString("\n") { "Caret: $visualChanges" } }
 
-      // If this is a mutli key change then exit visual now
-      if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
-        logger.debug("Exit visual before command executing")
-        editor.exitVisualMode()
-      }
+      logger.debug("Exit visual before command executing")
+      editor.exitVisualMode()
     }
 
     fun finish(res: Boolean) {
       logger.debug("Finish visual command. Result: $res")
 
-      if (visualOperatorActionHandler.id != "VimVisualOperatorAction" ||
-        injector.keyGroup.operatorFunction?.postProcessSelection() != false
-      ) {
-        if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
-          logger.debug("Not multikey undo - exit visual")
-          editor.exitVisualMode()
-        }
-      }
+      // Note that we don't exit visual mode here - we've already done it before executing the actual operator, and so
+      // it is up to the operator's implementation to ensure it is in the correct mode. This is important for operators
+      // that are async, such as Commentary when running on Rider (Commentary sets the selection, then invokes the
+      // block/line comment actions, which are implemented in an external process. By exiting visual mode again, we
+      // reset the selection before Rider's backend process has a chance to process the action and it fails).
 
       if (res) {
         VimRepeater.saveLastChange(cmd)
@@ -270,8 +267,6 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           }
         }
       }
-
-      editor.vimKeepingVisualOperatorAction = false
     }
   }
 

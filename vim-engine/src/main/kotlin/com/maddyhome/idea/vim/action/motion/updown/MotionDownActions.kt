@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,8 +8,10 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -19,12 +21,14 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-open class MotionDownAction : MotionActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["j"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
+  override val keepFold: Boolean = true
 
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
@@ -33,10 +37,11 @@ open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class MotionDownCtrlNAction : MotionDownAction() {
+@CommandOrMotion(keys = ["<C-N>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class MotionDownCtrlNAction : MotionDownAction() {
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
@@ -54,12 +59,13 @@ class MotionDownCtrlNAction : MotionDownAction() {
   }
 }
 
-class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["gj", "g<Down>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,

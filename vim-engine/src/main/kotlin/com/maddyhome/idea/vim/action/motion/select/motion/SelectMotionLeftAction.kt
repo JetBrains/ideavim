@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,9 +8,12 @@
 
 package com.maddyhome.idea.vim.action.motion.select.motion
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -18,28 +21,25 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * @author Alex Plate
  */
 
-class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["<Left>"], modes = [Mode.SELECT])
+public class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val keymodel =
-      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+    val keymodel = injector.globalOptions().keymodel
     if (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel) {
       logger.debug("Keymodel option has stopselect. Exiting select mode")
       val startSelection = caret.selectionStart
@@ -54,11 +54,10 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
       }
       // No return statement, perform motion to left
     }
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
-      .toMotionOrError()
+    return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, false)
   }
 
-  companion object {
+  private companion object {
     private val logger = injector.getLogger(SelectMotionLeftAction::class.java)
   }
 }

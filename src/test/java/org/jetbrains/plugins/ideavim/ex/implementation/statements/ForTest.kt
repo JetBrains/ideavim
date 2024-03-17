@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.statements
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ForTest : VimTestCase() {
 
+  @Test
   fun `test iterating over string`() {
     configureByText("\n")
     typeText(
@@ -25,12 +27,13 @@ class ForTest : VimTestCase() {
           let result .= i . i |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("aabbccddeeff\n")
   }
 
+  @Test
   fun `test iterating over list`() {
     configureByText("\n")
     typeText(
@@ -41,12 +44,13 @@ class ForTest : VimTestCase() {
           let result .= char |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("hello\n")
   }
 
+  @Test
   fun `test iterating over modifying list`() {
     configureByText("\n")
     typeText(
@@ -61,12 +65,13 @@ class ForTest : VimTestCase() {
           endif |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("hello!!\n")
   }
 
+  @Test
   fun `test continue`() {
     configureByText("\n")
     typeText(
@@ -80,12 +85,13 @@ class ForTest : VimTestCase() {
         let result .= char |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("123\n")
   }
 
+  @Test
   fun `test break`() {
     configureByText("\n")
     typeText(
@@ -101,12 +107,13 @@ class ForTest : VimTestCase() {
         let counter += 1 |
       endfor |
       echo firstDigitIndex
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("3\n")
   }
 
+  @Test
   fun `test for with list`() {
     configureByText("\n")
     typeText(
@@ -119,13 +126,14 @@ class ForTest : VimTestCase() {
             let secondElements .= s |
           endfor |
           echo firstElements .. ' ' .. secondElements
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("123 abc\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and non-list iterable`() {
     configureByText("\n")
     typeText(
@@ -137,14 +145,15 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E714: List required")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and non-list iterable item`() {
     configureByText("\n")
     typeText(
@@ -156,14 +165,15 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E714: List required")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and different length iterable item 1`() {
     configureByText("\n")
     typeText(
@@ -175,14 +185,15 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E688: More targets than List items")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and different length iterable item 2`() {
     configureByText("\n")
     typeText(
@@ -194,8 +205,8 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E684: Less targets than List items")

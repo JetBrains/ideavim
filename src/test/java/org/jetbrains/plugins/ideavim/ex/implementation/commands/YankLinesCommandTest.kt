@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,54 +10,57 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class YankLinesCommandTest : VimTestCase() {
+  @Test
   fun `test copy with range`() {
     configureByText(
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 h
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("3,4y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
-    assertEquals(
-      """|I found it in a legendary land
-         |all rocks and lavender and tufted grass,
+    kotlin.test.assertEquals(
+      """|Lorem ipsum dolor sit amet,
+         |consectetur adipiscing elit
          |
-         """.trimMargin(),
-      yanked
+      """.trimMargin(),
+      yanked,
     )
   }
 
+  @Test
   fun `test copy with one char on the last line`() {
     configureByText(
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 h
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("%y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
-    assertEquals(
+    kotlin.test.assertEquals(
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 h
                 
       """.trimIndent(),
-      yanked
+      yanked,
     )
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.action.motion.visual
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -15,12 +17,13 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
 
 /**
  * @author vlan
  */
-class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["o"], modes = [Mode.VISUAL])
+public class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -29,14 +32,15 @@ class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean = swapVisualEnds(caret)
 }
 
 /**
  * @author vlan
  */
-class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["O"], modes = [Mode.VISUAL])
+public class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -46,7 +50,7 @@ class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (editor.inBlockSubMode) {
+    if (editor.inBlockSelection) {
       return swapVisualEndsBigO(editor)
     }
 

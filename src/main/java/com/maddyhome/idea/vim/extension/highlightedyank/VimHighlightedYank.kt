@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -25,11 +25,11 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.options.helpers.StrictMode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.NonNls
 import java.awt.Color
@@ -37,7 +37,7 @@ import java.awt.Font
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
+internal const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 
 @NonNls
 private val HIGHLIGHT_DURATION_VARIABLE_NAME = "highlightedyank_highlight_duration"
@@ -52,7 +52,7 @@ private fun getDefaultHighlightTextColor(): Color {
       .also { defaultHighlightTextColor = it }
 }
 
-class HighlightColorResetter : LafManagerListener {
+internal class HighlightColorResetter : LafManagerListener {
   override fun lookAndFeelChanged(source: LafManager) {
     defaultHighlightTextColor = null
   }
@@ -76,7 +76,7 @@ class HighlightColorResetter : LafManagerListener {
  *
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
-class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
+internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
   private val highlightHandler = HighlightHandler()
 
   override fun getName() = "highlightedyank"
@@ -111,7 +111,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
       val project = editor.project
       if (project != null) {
         Disposer.register(
-          VimProjectService.getInstance(project)
+          VimProjectService.getInstance(project),
         ) {
           this.editor = null
           yankHighlighters.clear()
@@ -141,7 +141,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
         range.endInclusive,
         HighlighterLayer.SELECTION,
         getHighlightTextAttributes(),
-        HighlighterTargetArea.EXACT_RANGE
+        HighlighterTargetArea.EXACT_RANGE,
       )
 
       yankHighlighters.add(highlighter)
@@ -160,7 +160,8 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
               editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
             }
           },
-          timeout, TimeUnit.MILLISECONDS
+          timeout,
+          TimeUnit.MILLISECONDS,
         )
       }
     }
@@ -170,7 +171,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
       extractUsersHighlightColor(),
       editor?.colorsScheme?.getColor(EditorColors.CARET_COLOR),
       EffectType.SEARCH_MATCH,
-      Font.PLAIN
+      Font.PLAIN,
     )
 
     private fun extractUsersHighlightDuration(): Long {
@@ -201,7 +202,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
           @VimNlsSafe val message = MessageHelper.message(
             "highlightedyank.invalid.value.of.0.1",
             "g:$variable",
-            e.message ?: ""
+            e.message ?: "",
           )
           VimPlugin.showMessage(message)
 

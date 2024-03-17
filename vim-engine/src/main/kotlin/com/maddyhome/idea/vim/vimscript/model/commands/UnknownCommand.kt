@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -23,9 +23,9 @@ import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.
 /**
  * any command with no parser rule. we assume that it is an alias
  */
-data class UnknownCommand(val ranges: Ranges, val name: String, val argument: String) :
+public data class UnknownCommand(val ranges: Ranges, val name: String, val argument: String) :
   Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   private object Constants {
     const val MAX_RECURSION = 100
@@ -60,7 +60,7 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
           }
         }
       } else {
-        injector.messages.showStatusBarMessage(injector.messages.message("recursion.detected.maximum.alias.depth.reached"))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("recursion.detected.maximum.alias.depth.reached"))
         injector.messages.indicateError()
         return ExecutionResult.Error
       }

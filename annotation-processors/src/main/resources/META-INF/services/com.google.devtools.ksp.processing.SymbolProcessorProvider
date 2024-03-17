@@ -1,0 +1,3 @@
+com.intellij.vim.providers.CommandOrMotionProcessorProvider
+com.intellij.vim.providers.ExCommandProcessorProvider
+com.intellij.vim.providers.VimscriptFunctionProcessorProvider

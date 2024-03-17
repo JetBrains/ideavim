@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,15 +9,16 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Michal Placek
  */
 class BufferCloseCommandTest : VimTestCase() {
+  @Test
   fun `test close file by bd command`() {
-
-    val psiFile1 = myFixture.configureByText("A_Discovery1", "I found it in a legendary land")
-    val psiFile2 = myFixture.configureByText("A_Discovery2", "all rocks and lavender and tufted grass,")
+    val psiFile1 = fixture.configureByText("A_Discovery1", "Lorem ipsum dolor sit amet,")
+    val psiFile2 = fixture.configureByText("A_Discovery2", "consectetur adipiscing elit")
 
     fileManager.openFile(psiFile1.virtualFile, false)
     fileManager.openFile(psiFile2.virtualFile, true)

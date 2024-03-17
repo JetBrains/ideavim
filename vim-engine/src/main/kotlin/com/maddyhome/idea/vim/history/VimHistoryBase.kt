@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,11 +8,12 @@
 
 package com.maddyhome.idea.vim.history
 
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
-open class VimHistoryBase : VimHistory {
-  val histories: MutableMap<String, HistoryBlock> = HashMap()
+public open class VimHistoryBase : VimHistory {
+  public val histories: MutableMap<String, HistoryBlock> = HashMap()
 
   override fun addEntry(key: String, text: String) {
     logger.debug { "Add entry '$text' to $key" }
@@ -62,7 +63,7 @@ open class VimHistoryBase : VimHistory {
     return histories.getOrPut(key) { HistoryBlock() }
   }
 
-  companion object {
-    val logger = vimLogger<VimHistoryBase>()
+  public companion object {
+    public val logger: VimLogger = vimLogger<VimHistoryBase>()
   }
 }

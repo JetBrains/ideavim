@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -22,8 +23,9 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
+import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
-data class AnonymousFunctionDeclaration(
+public data class AnonymousFunctionDeclaration(
   val sublist: OneElementSublistExpression,
   val args: List<String>,
   val defaultArgs: List<Pair<String, Expression>>,
@@ -34,6 +36,7 @@ data class AnonymousFunctionDeclaration(
 ) : Executable {
 
   override lateinit var vimContext: VimLContext
+  override lateinit var rangeInScript: TextRange
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val container = sublist.expression.evaluate(editor, context, vimContext)
@@ -53,5 +56,10 @@ data class AnonymousFunctionDeclaration(
     container.dictionary[index] = VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
     container.dictionary[index]
     return ExecutionResult.Success
+  }
+
+  override fun restoreOriginalRange(deletionInfo: DeletionInfo) {
+    super.restoreOriginalRange(deletionInfo)
+    body.forEach { it.restoreOriginalRange(deletionInfo) }
   }
 }

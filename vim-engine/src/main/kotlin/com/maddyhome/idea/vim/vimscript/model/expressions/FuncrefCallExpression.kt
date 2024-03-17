@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 
-data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
+public data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
 
-  fun evaluateWithRange(ranges: Ranges?, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  public fun evaluateWithRange(ranges: Ranges?, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val value = expression.evaluate(editor, context, vimContext)
     if (value is VimFuncref) {
       value.handler.ranges = ranges

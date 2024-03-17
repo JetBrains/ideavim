@@ -22,9 +22,10 @@ IdeaVim is a Vim engine for JetBrains IDEs.
 
 ##### Resources:
 
-* [Plugin homepage](https://plugins.jetbrains.com/plugin/164-ideavim)
+* [Plugin homepage](https://lp.jetbrains.com/ideavim/)
+* [Plugin on Marketplace](https://plugins.jetbrains.com/plugin/164-ideavim)
 * [Changelog](CHANGES.md)
-* [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
+* [Continuous integration builds](https://ideavim.teamcity.com/)
 
 #### Compatibility
 
@@ -53,7 +54,7 @@ Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
 1. Click the  IdeaVim icon <img src="src/main/resources/META-INF/pluginIcon_noBorders.svg" width="16" height="16" alt="icon"/>
-in the status bar  | `Early Access Program` | `Subscibe to EAP`
+in the status bar  | `Early Access Program` | `Subscribe to EAP`
 
 
 Or subscribe to EAP updates manually:
@@ -89,7 +90,7 @@ Here are some examples of supported vim features and commands:
 * Vim web help
 * `~/.ideavimrc` configuration file
 
-[IdeaVim plugins](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins):
+[IdeaVim plugins](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins):
 
 * vim-easymotion
 * NERDTree
@@ -103,7 +104,8 @@ Here are some examples of supported vim features and commands:
 * vim-highlightedyank
 * vim-paragraph-motion
 * vim-indent-object
-* match.it
+* match.it  
+etc
 
 See also:
 
@@ -202,7 +204,7 @@ Put your settings to `$XDG_CONFIG_HOME/ideavim/ideavimrc` file.
 IdeaVim Plugins
 --------------------
 
-See [doc/emulated-plugins.md](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins)
+See [doc/IdeaVim Plugins.md](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins)
 
 Executing IDE Actions
 ---------------------
@@ -211,14 +213,14 @@ IdeaVim adds various commands for listing and executing arbitrary IDE actions as
 Ex commands or via `:map` command mappings:
 
 ### Executing actions:
-* `:action {action_id}`
-    * Execute an action by `{action_id}`. Works from Ex command line.
-    * Please don't use `:action` in mappings. Use `<Action>` instead.
 * `<Action>({action_id})`
     * For the mappings you can use a special `<Action>` keyword. Don't forget the parentheses.
     * E.g. `map gh <Action>(ShowErrorDescription)`  <- execute hover on `gh`.
     * :warning: Mappings to `<Action>` don't work with `noremap`. 
       If you know the case when it's needed, please [let us know](https://github.com/JetBrains/ideavim#contact-maintainers).
+* `:action {action_id}`
+    * Execute an action by `{action_id}`. Works from Ex command line.
+    * Please don't use `:action` in mappings. Use `<Action>` instead.
 
 ### Finding action ids:
 
@@ -253,8 +255,7 @@ Ex commands or via `:map` command mappings:
 ##### Some popular actions:
 
 ```
-QuickJavaDoc - Quick Documentation (not only for java, all languages)
-ShowErrorDescription - Show description of the error under the caret (cursor hovering)
+ShowHoverInfo - Quick Documentation and Error Description
 QuickImplementations - Quick Definition
 ```
 
@@ -323,7 +324,7 @@ IdeaVim tips and tricks
 - Use the power of IJ and Vim:
     - `set ideajoin` to enable join via the IDE. See the [examples](https://jb.gg/f9zji9).
     - Make sure `ideaput` is enabled for `clipboard` to enable native IJ insertion in Vim.
-    - Sync IJ bookmarks and Vim marks: `set ideamarks`
+    - Sync IJ bookmarks and IdeaVim global marks: `set ideamarks` (works for marks with capital letters only)
     - Check out more [ex commands](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 
 - Use your vim settings with IdeaVim. Put `source ~/.vimrc` in `~/.ideavimrc`.
@@ -351,9 +352,12 @@ is the source of this knowledge.
 [Here](https://github.com/vim/vim/blob/759d81549c1340185f0d92524c563bb37697ea88/src/normal.c#L5365)
 is the full list of synonyms.
 
+- You can read a [post](https://github.com/JetBrains/ideavim/wiki/how-many-modes-does-vim-have) about how modes work in Vim and IdeaVim.
+
 - Have you ever used `U` after `dd`? [Don't even try](https://github.com/vim/vim/blob/759d81549c1340185f0d92524c563bb37697ea88/src/ops.c#L874).
 
-- A lot of variables that refers to visual mode start with two uppercase letters, e.g. `VIsual_active`. [Some examples](https://github.com/vim/vim/blob/master/src/normal.c#L17).
+- A lot of variables that refer to visual mode start with two uppercase letters, e.g. `VIsual_active`. [Some examples](https://github.com/vim/vim/blob/master/src/normal.c#L17).
+  As mentioned [here](https://vi.stackexchange.com/a/42885/12441), this was done this way to avoid the clash with X11.
 
 - Other [strange things](https://github.com/vim/vim/blob/759d81549c1340185f0d92524c563bb37697ea88/src/ex_docmd.c#L1845) from vi:
     * ":3"       jumps to line 3
@@ -361,6 +365,9 @@ is the full list of synonyms.
     * ":|"       prints current line
 
 - Vim script doesn't skip white space before comma. `F(a ,b)` => E475.
+
+- Fancy constants for [undolevels](https://vimhelp.org/options.txt.html#%27undolevels%27):
+  > The local value is set to -123456 when the global value is to be used.
 
 License
 -------

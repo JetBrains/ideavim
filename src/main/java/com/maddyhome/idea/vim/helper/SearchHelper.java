@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.google.common.collect.Lists;
+import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx;
 import com.intellij.lang.CodeDocumentationAwareCommenter;
 import com.intellij.lang.Commenter;
 import com.intellij.lang.Language;
@@ -16,25 +17,28 @@ import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.spellchecker.SpellCheckerSeveritiesProvider;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
-import com.maddyhome.idea.vim.api.VimSearchHelperBase;
-import com.maddyhome.idea.vim.command.VimStateMachine;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.regexp.CharPointer;
-import com.maddyhome.idea.vim.regexp.RegExp;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.regexp.*;
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult;
+import com.maddyhome.idea.vim.state.VimStateMachine;
+import com.maddyhome.idea.vim.state.mode.Mode;
+import it.unimi.dsi.fastutil.ints.IntComparator;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -45,8 +49,10 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 
 /**
  * Helper methods for searching text
@@ -60,6 +66,8 @@ public class SearchHelper {
   /**
    * Find text matching the given pattern.
    *
+   * @deprecated Use IjVimSearchHelper.findPattern instead
+   *
    * <p>See search.c:searchit</p>
    *
    * @param editor          The editor to search in
@@ -70,12 +78,13 @@ public class SearchHelper {
    * @return                A TextRange representing the result, or null
    */
   @Nullable
+  @Deprecated
   public static TextRange findPattern(@NotNull Editor editor,
                                       @Nullable String pattern,
                                       int startOffset,
                                       int count,
                                       EnumSet<SearchOptions> searchOptions) {
-    if (pattern == null || pattern.length() == 0) {
+    if (pattern == null || pattern.isEmpty()) {
       logger.warn("Pattern is null or empty. Cannot perform search");
       return null;
     }
@@ -348,6 +357,8 @@ public class SearchHelper {
   /**
    * Find all occurrences of the pattern.
    *
+   * @deprecated Use IjVimSearchHelper.findall instead
+   *
    * @param editor      The editor to search in
    * @param pattern     The pattern to search for
    * @param startLine   The start line of the range to search for
@@ -355,12 +366,33 @@ public class SearchHelper {
    * @param ignoreCase  Case sensitive or insensitive searching
    * @return            A list of TextRange objects representing the results
    */
+  @Deprecated
   public static @NotNull List<TextRange> findAll(@NotNull Editor editor,
                                                  @NotNull String pattern,
                                                  int startLine,
                                                  int endLine,
                                                  boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
+
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      final List<VimRegexOptions> options = new ArrayList<>();
+      if (globalOptions(injector).getSmartcase()) options.add(VimRegexOptions.SMART_CASE);
+      if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
+      VimEditor vimEditor = new IjVimEditor(editor);
+      try {
+        // TODO: we shouldn't care about the ignoreCase argument, and instead just look into the editor options.
+        // It would require a refactor, so for now prepend \c or \C to "force" ignoreCase
+        String newPattern = (ignoreCase ? "\\c" : "\\C") + pattern;
+        VimRegex regex = new VimRegex(newPattern);
+        List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine), vimEditor.getLineEndOffset(endLine == -1 ? vimEditor.lineCount() - 1 : endLine) + 1, options);
+        for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
+        return results;
+      } catch (VimRegexException e) {
+        injector.getMessages().showStatusBarMessage(vimEditor, e.getMessage());
+        return results;
+      }
+    }
+
     final int lineCount = new IjVimEditor(editor).lineCount();
     final int actualEndLine = endLine == -1 ? lineCount - 1 : endLine;
 
@@ -403,6 +435,10 @@ public class SearchHelper {
     return results;
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findSection instead
+   */
+  @Deprecated
   public static int findSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int line = caret.getLogicalPosition().line + dir;
@@ -429,6 +465,10 @@ public class SearchHelper {
     return res;
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findUnmatchedBlock instead
+   */
+  @Deprecated
   public static int findUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, char type, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
@@ -445,6 +485,19 @@ public class SearchHelper {
     return findBlockLocation(chars, found, match, dir, pos, count, false);
   }
 
+  /**
+   * Find block enclosing the caret
+   *
+   * @deprecated Use IjVimSearchHelper.findBlockRange instead
+   *
+   * @param editor  The editor to search in
+   * @param caret   The caret currently at
+   * @param type    The type of block, e.g. (, [, {, <
+   * @param count   Find the nth next occurrence of the block
+   * @param isOuter Control whether the match includes block character
+   * @return When block is found, return text range matching where end offset is exclusive,
+   * otherwise return null
+   */
   public static @Nullable TextRange findBlockRange(@NotNull Editor editor,
                                                    @NotNull Caret caret,
                                                    char type,
@@ -457,6 +510,30 @@ public class SearchHelper {
 
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
+
+    // extend the range for blank line after type and before close, as they are excluded when inner match
+    if (!isOuter) {
+      if (start > 1 && chars.charAt(start - 2) == type && chars.charAt(start - 1) == '\n') {
+        start--;
+      }
+      if (end < chars.length() && chars.charAt(end) == '\n') {
+        boolean isSingleLineAllWhiteSpaceUntilClose = false;
+        int countWhiteSpaceCharacter = 1;
+        for (; end + countWhiteSpaceCharacter < chars.length(); countWhiteSpaceCharacter++) {
+          if (Character.isWhitespace(chars.charAt(end + countWhiteSpaceCharacter)) &&
+              chars.charAt(end + countWhiteSpaceCharacter) != '\n') {
+            continue;
+          }
+          if (chars.charAt(end + countWhiteSpaceCharacter) == close) {
+            isSingleLineAllWhiteSpaceUntilClose = true;
+          }
+          break;
+        }
+        if (isSingleLineAllWhiteSpaceUntilClose) {
+          end += countWhiteSpaceCharacter;
+        }
+      }
+    }
 
     boolean rangeSelection = end - start > 1;
     if (rangeSelection && start == 0) // early return not only for optimization
@@ -491,7 +568,8 @@ public class SearchHelper {
     boolean startPosInStringFound = false;
 
     if (initialPosIsInString) {
-      TextRange quoteRange = findBlockQuoteInLineRange(editor, caret, '"', false);
+      TextRange quoteRange = injector.getSearchHelper()
+        .findBlockQuoteInLineRange(new IjVimEditor(editor), new IjVimCaret(caret), '"', false);
       if (quoteRange != null) {
         int startOffset = quoteRange.getStartOffset();
         int endOffset = quoteRange.getEndOffset();
@@ -528,6 +606,7 @@ public class SearchHelper {
 
     if (!isOuter) {
       bstart++;
+      // exclude first line break after start for inner match
       if (chars.charAt(bstart) == '\n') {
         bstart++;
       }
@@ -583,8 +662,7 @@ public class SearchHelper {
       if (ret >= 0) {
         return ret;
       }
-      if (commenter instanceof CodeDocumentationAwareCommenter) {
-        final CodeDocumentationAwareCommenter docCommenter = (CodeDocumentationAwareCommenter)commenter;
+      if (commenter instanceof CodeDocumentationAwareCommenter docCommenter) {
         return findMatchingBlockCommentPair(comment, pos, docCommenter.getDocumentationCommentPrefix(),
                                             docCommenter.getDocumentationCommentSuffix());
       }
@@ -610,7 +688,8 @@ public class SearchHelper {
     }
 
     int line = caret.getLogicalPosition().line;
-    int end = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true);
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
+    int end = EngineEditorHelperKt.getLineEndOffset(vimEditor, line, true);
 
     // To handle the case where visual mode allows the user to go past the end of the line,
     // which will prevent loc from finding a pairable character below
@@ -618,11 +697,13 @@ public class SearchHelper {
       pos = end - 1;
     }
 
+    final String pairChars = parseMatchPairsOption(vimEditor);
+
     CharSequence chars = editor.getDocument().getCharsSequence();
     int loc = -1;
     // Search the remainder of the current line for one of the candidate characters
     while (pos < end) {
-      loc = getPairChars().indexOf(chars.charAt(pos));
+      loc = pairChars.indexOf(chars.charAt(pos));
       if (loc >= 0) {
         break;
       }
@@ -636,8 +717,8 @@ public class SearchHelper {
       // What direction should we go now (-1 is backward, 1 is forward)
       Direction dir = loc % 2 == 0 ? Direction.FORWARDS : Direction.BACKWARDS;
       // Which character did we find and which should we now search for
-      char found = getPairChars().charAt(loc);
-      char match = getPairChars().charAt(loc + dir.toInt());
+      char found = pairChars.charAt(loc);
+      char match = pairChars.charAt(loc + dir.toInt());
       res = findBlockLocation(chars, found, match, dir, pos, 1, true);
     }
 
@@ -667,16 +748,16 @@ public class SearchHelper {
                                        boolean allowInString) {
     int res = -1;
     int initialPos = pos;
+    boolean initialInString = checkInString(chars, pos, true);
     Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACKWARDS && x > 0 ? x - 1 : x + 1;
     final int inCheckPos = inCheckPosF.apply(pos);
     boolean inString = checkInString(chars, inCheckPos, true);
-    boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
     int stack = 0;
     // Search to start or end of file, as appropriate
     Set<Character> charsToSearch = new HashSet<>(Arrays.asList('\'', '"', '\n', match, found));
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
-      @Nullable Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch, false, dir);
+      @Nullable Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch, true, dir);
       if (ci == null) {
         return -1;
       }
@@ -731,34 +812,6 @@ public class SearchHelper {
     return backslashCounter % 2 == 0;
   }
 
-  private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.FORWARDS);
-  }
-
-  private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.BACKWARDS);
-  }
-
-  private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
-    final int start = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor), pos);
-    return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start, quote);
-  }
-
-  private static int findQuoteInLine(@NotNull CharSequence chars, int pos, char quote, @NotNull Direction direction) {
-    return findCharacterPosition(chars, pos, quote, true, false, direction);
-  }
-
-  private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c) {
-    int cnt = 0;
-    while (pos > 0 && (chars.charAt(pos + Direction.BACKWARDS.toInt()) != '\n')) {
-      pos = findCharacterPosition(chars, pos + Direction.BACKWARDS.toInt(), c, false, true, Direction.BACKWARDS);
-      if (pos != -1) {
-        cnt++;
-      }
-    }
-    return cnt;
-  }
-
   public static @Nullable Pair<Character, Integer> findPositionOfFirstCharacter(@NotNull CharSequence chars,
                                                                                 int pos,
                                                                                 final Set<Character> needles,
@@ -775,21 +828,6 @@ public class SearchHelper {
     return null;
   }
 
-  private static int findCharacterPosition(@NotNull CharSequence chars,
-                                           int pos,
-                                           final char c,
-                                           boolean currentLineOnly,
-                                           boolean searchEscaped,
-                                           @NotNull Direction direction) {
-    while (pos >= 0 && pos < chars.length() && (!currentLineOnly || chars.charAt(pos) != '\n')) {
-      if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
-        return pos;
-      }
-      pos += direction.toInt();
-    }
-    return -1;
-  }
-
   /**
    * returns new position which ignore whitespaces at beginning of the line
    */
@@ -803,6 +841,10 @@ public class SearchHelper {
   }
 
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findBlockTagRange instead
+   */
+  @Deprecated
   public static @Nullable TextRange findBlockTagRange(@NotNull Editor editor,
                                                       @NotNull Caret caret,
                                                       int count,
@@ -864,8 +906,8 @@ public class SearchHelper {
         selectionEndWithoutNewline++;
       }
 
-      final VimStateMachine.Mode mode = VimStateMachine.getInstance(new IjVimEditor(editor)).getMode();
-      if (mode == VimStateMachine.Mode.VISUAL) {
+      final Mode mode = VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode();
+      if (mode instanceof Mode.VISUAL) {
         if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline &&
           openingTag.getEndOffset() == selectionStart) {
           // Special case: if the inner tag is already selected we should like isOuter is active
@@ -1003,144 +1045,6 @@ public class SearchHelper {
     }
   }
 
-
-  public static @Nullable TextRange findBlockQuoteInLineRange(@NotNull Editor editor,
-                                                              @NotNull Caret caret,
-                                                              char quote,
-                                                              boolean isOuter) {
-    final CharSequence chars = editor.getDocument().getCharsSequence();
-    final int pos = caret.getOffset();
-    if (pos >= chars.length() || chars.charAt(pos) == '\n') {
-      return null;
-    }
-
-    int start = findPreviousQuoteInLine(chars, pos, quote);
-    if (start == -1) {
-      start = findFirstQuoteInLine(editor, pos, quote);
-      if (start == -1) {
-        return null;
-      }
-    }
-    final int current = Math.max(start, pos);
-    int end = current;
-
-    if (chars.charAt(pos) == quote && current == pos) {
-      final int quotes = countCharactersInLine(chars, pos, quote) + 1;
-
-      if (quotes % 2 == 0) {
-        start = findPreviousQuoteInLine(chars, current - 1, quote);
-      }
-      else {
-        end = findNextQuoteInLine(chars, current + 1, quote);
-      }
-    }
-    else {
-      end = findNextQuoteInLine(chars, current + 1, quote);
-    }
-
-    if (end == -1) {
-      return null;
-    }
-    if (!isOuter) {
-      start++;
-      end--;
-    }
-
-    // End offset exclusive
-    return new TextRange(start, end + 1);
-  }
-
-  public static int findNextCamelStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = caret.getOffset();
-    int size = EditorHelperRt.getFileSize(editor);
-
-    int found = 0;
-    int step = count >= 0 ? 1 : -1;
-    if (pos < 0 || pos >= size) {
-      return pos;
-    }
-
-    int res = pos;
-    pos += step;
-    while (pos >= 0 && pos < size && found < Math.abs(count)) {
-      if (Character.isUpperCase(chars.charAt(pos))) {
-        if ((pos == 0 || !Character.isUpperCase(chars.charAt(pos - 1))) ||
-            (pos == size - 1 || Character.isLowerCase(chars.charAt(pos + 1)))) {
-          res = pos;
-          found++;
-        }
-      }
-      else if (Character.isLowerCase(chars.charAt(pos))) {
-        if (pos == 0 || !Character.isLetter(chars.charAt(pos - 1))) {
-          res = pos;
-          found++;
-        }
-      }
-      else if (Character.isDigit(chars.charAt(pos))) {
-        if (pos == 0 || !Character.isDigit(chars.charAt(pos - 1))) {
-          res = pos;
-          found++;
-        }
-      }
-
-      pos += step;
-    }
-
-    if (found < Math.abs(count)) {
-      res = -1;
-    }
-
-    return res;
-  }
-
-  public static int findNextCamelEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = caret.getOffset();
-    int size = EditorHelperRt.getFileSize(editor);
-
-    int found = 0;
-    int step = count >= 0 ? 1 : -1;
-    if (pos < 0 || pos >= size) {
-      return pos;
-    }
-
-    int res = pos;
-    pos += step;
-    while (pos >= 0 && pos < size && found < Math.abs(count)) {
-      if (Character.isUpperCase(chars.charAt(pos))) {
-        if (pos == size - 1 ||
-            !Character.isLetter(chars.charAt(pos + 1)) ||
-            (Character.isUpperCase(chars.charAt(pos + 1)) &&
-             pos < size - 2 &&
-             Character.isLowerCase(chars.charAt(pos + 2)))) {
-          res = pos;
-          found++;
-        }
-      }
-      else if (Character.isLowerCase(chars.charAt(pos))) {
-        if (pos == size - 1 || !Character.isLowerCase(chars.charAt(pos + 1))) {
-          res = pos;
-          found++;
-        }
-      }
-      else if (Character.isDigit(chars.charAt(pos))) {
-        if (pos == size - 1 || !Character.isDigit(chars.charAt(pos + 1))) {
-          res = pos;
-          found++;
-        }
-      }
-
-      pos += step;
-    }
-
-    if (found < Math.abs(count)) {
-      res = -1;
-    }
-
-    return res;
-  }
-
   /**
    * This counts all the words in the file.
    */
@@ -1154,19 +1058,15 @@ public class SearchHelper {
    * This counts all the words in the file.
    */
   public static @NotNull CountPosition countWords(@NotNull Editor editor, int start, int end) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
     int offset = editor.getCaretModel().getOffset();
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
 
-    return countWords(chars, start, end, offset);
-  }
-
-  public static @NotNull CountPosition countWords(@NotNull CharSequence chars, int start, int end, int offset) {
     int count = 1;
     int position = 0;
     int last = -1;
     int res = start;
     while (true) {
-      res = (int)VimSearchHelperBase.Companion.findNextWordOne(chars, res, end, 1, true, false);
+      res = injector.getSearchHelper().findNextWord(vimEditor, res, 1, true, false);
       if (res == start || res == 0 || res > end || res == last) {
         break;
       }
@@ -1426,8 +1326,9 @@ public class SearchHelper {
    * @return The text range of the found word or null if there is no word under/after the cursor on the line
    */
   public static @Nullable TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret) {
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int stop = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), caret.getLogicalPosition().line, true);
+    int stop = EngineEditorHelperKt.getLineEndOffset(vimEditor, caret.getLogicalPosition().line, true);
 
     int pos = caret.getOffset();
     // Technically the first condition is covered by the second one, but let it be
@@ -1439,16 +1340,16 @@ public class SearchHelper {
       CharacterHelper.CharacterType.PUNCTUATION};
     for (int i = 0; i < 2; i++) {
       start = pos;
-      CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(start), false);
+      CharacterHelper.CharacterType type = CharacterHelper.charType(vimEditor, chars.charAt(start), false);
       if (type == types[i]) {
         // Search back for start of word
-        while (start > 0 && CharacterHelper.charType(chars.charAt(start - 1), false) == types[i]) {
+        while (start > 0 && CharacterHelper.charType(vimEditor, chars.charAt(start - 1), false) == types[i]) {
           start--;
         }
       }
       else {
         // Search forward for start of word
-        while (start < stop && CharacterHelper.charType(chars.charAt(start), false) != types[i]) {
+        while (start < stop && CharacterHelper.charType(vimEditor, chars.charAt(start), false) != types[i]) {
           start++;
         }
       }
@@ -1466,16 +1367,20 @@ public class SearchHelper {
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
     if (start < stop &&
         (start >= chars.length() - 1 ||
-         CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD)) {
+         CharacterHelper.charType(vimEditor, chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD)) {
       end = start + 1;
     }
     else {
-      end = VimSearchHelperBase.Companion.findNextWordEnd(chars, start, stop, 1, false, false) + 1;
+      end = injector.getSearchHelper().findNextWordEnd(vimEditor, start, 1, false, false) + 1;
     }
 
     return new TextRange(start, end);
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findWordUnderCursor instead
+   */
+  @Deprecated
   @Contract("_, _, _, _, _, _, _ -> new")
   public static @NotNull TextRange findWordUnderCursor(@NotNull Editor editor,
                                                        @NotNull Caret caret,
@@ -1507,11 +1412,12 @@ public class SearchHelper {
     int pos = caret.getOffset();
     if (chars.length() <= pos) return new TextRange(chars.length() - 1, chars.length() - 1);
 
-    boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
+    boolean startSpace = CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
-                          CharacterHelper.charType(chars.charAt(pos - 1), isBig) !=
-                          CharacterHelper.charType(chars.charAt(pos), isBig);
+                          CharacterHelper.charType(vimEditor, chars.charAt(pos - 1), isBig) !=
+                          CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
     int start = pos;
 
     if (logger.isDebugEnabled()) {
@@ -1521,35 +1427,32 @@ public class SearchHelper {
 
     if ((!onWordStart && !(startSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
       if (dir == 1) {
-        start = (int)VimSearchHelperBase.Companion.findNextWord(chars, pos, max, -1, isBig, !isOuter);
+        start = injector.getSearchHelper().findNextWord(vimEditor, pos, -1, isBig, !isOuter);
       }
       else {
-        start = (int)VimSearchHelperBase.Companion.findNextWord(chars, pos, max, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
+        start = injector.getSearchHelper().findNextWord(vimEditor, pos, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
       }
 
-      start = EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), start, false);
+      start = EngineEditorHelperKt.normalizeOffset(vimEditor, start, false);
     }
 
     if (logger.isDebugEnabled()) logger.debug("start=" + start);
 
     // Find word end
     boolean onWordEnd = pos >= max - 1 ||
-                        CharacterHelper.charType(chars.charAt(pos + 1), isBig) !=
-                        CharacterHelper.charType(chars.charAt(pos), isBig);
+                        CharacterHelper.charType(vimEditor, chars.charAt(pos + 1), isBig) !=
+                        CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
 
     if (logger.isDebugEnabled()) logger.debug("onWordEnd=" + onWordEnd);
 
     int end = pos;
     if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
       if (dir == 1) {
-        end = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, count -
-                                               (onWordEnd &&
-                                                !hasSelection &&
-                                                (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0), isBig,
-                              !isOuter);
+        int c = count - (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0);
+        end = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, c, isBig, !isOuter);
       }
       else {
-        end = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
+        end = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, !isOuter);
       }
     }
 
@@ -1559,17 +1462,17 @@ public class SearchHelper {
     if (dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
       }
     }
     if (dir == -1 && isOuter && startSpace) {
       if (pos > min) {
-        if (CharacterHelper.charType(chars.charAt(pos - 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(pos - 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
       }
@@ -1580,18 +1483,18 @@ public class SearchHelper {
     if (!goForward && dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goForward = true;
         }
       }
     }
     if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
       if (end < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(end + 1), !isBig) !=
-            CharacterHelper.charType(chars.charAt(end), !isBig)) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(end + 1), !isBig) !=
+            CharacterHelper.charType(vimEditor, chars.charAt(end), !isBig)) {
           goForward = true;
         }
       }
@@ -1603,17 +1506,17 @@ public class SearchHelper {
     }
 
     if (goForward) {
-      if (EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), end, 1)) {
+      if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, end, 1)) {
         while (end + 1 < max &&
-               CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+               CharacterHelper.charType(vimEditor, chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           end++;
         }
       }
     }
     if (goBack) {
-      if (EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), start, -1)) {
+      if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, start, -1)) {
         while (start > min &&
-               CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+               CharacterHelper.charType(vimEditor, chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           start--;
         }
       }
@@ -1663,743 +1566,66 @@ public class SearchHelper {
     }
   }
 
-  public static int findNextSentenceStart(@NotNull Editor editor,
-                                          @NotNull Caret caret,
-                                          int count,
-                                          boolean countCurrent,
-                                          boolean requireAll) {
-    int dir = count > 0 ? 1 : -1;
-    count = Math.abs(count);
-    int total = count;
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int start = caret.getOffset();
-    int max = EditorHelperRt.getFileSize(editor);
-
-    int res = start;
-    for (; count > 0 && res >= 0 && res <= max - 1; count--) {
-      res = findSentenceStart(editor, chars, res, max, dir, countCurrent, count > 1);
-      if (res == 0 || res == max - 1) {
-        count--;
-        break;
-      }
-    }
-
-    if (res < 0 && (!requireAll || total == 1)) {
-      res = dir > 0 ? max - 1 : 0;
-    }
-    else if (count > 0 && total > 1 && !requireAll) {
-      res = dir > 0 ? max - 1 : 0;
-    }
-    else if (count > 0 && total > 1 && requireAll) {
-      res = -count;
-    }
-
-    return res;
-  }
-
-  public static int findNextSentenceEnd(@NotNull Editor editor,
-                                        @NotNull Caret caret,
-                                        int count,
-                                        boolean countCurrent,
-                                        boolean requireAll) {
-    int dir = count > 0 ? 1 : -1;
-    count = Math.abs(count);
-    int total = count;
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int start = caret.getOffset();
-    int max = EditorHelperRt.getFileSize(editor);
-
-    int res = start;
-    for (; count > 0 && res >= 0 && res <= max - 1; count--) {
-      res = findSentenceEnd(editor, chars, res, max, dir, countCurrent && count == total, count > 1);
-      if (res == 0 || res == max - 1) {
-        count--;
-        break;
-      }
-    }
-
-    if (res < 0 && (!requireAll || total == 1)) {
-      res = dir > 0 ? max - 1 : 0;
-    }
-    else if (count > 0 && total > 1 && !requireAll) {
-      res = dir > 0 ? max - 1 : 0;
-    }
-    else if (count > 0 && total > 1 && requireAll) {
-      res = -count;
-    }
-
-    return res;
-  }
-
-  private static int findSentenceStart(@NotNull Editor editor,
-                                       @NotNull CharSequence chars,
-                                       int start,
-                                       int max,
-                                       int dir,
-                                       boolean countCurrent,
-                                       boolean multiple) {
-    // Save off the next paragraph since a paragraph is a valid sentence.
-    int lline = editor.offsetToLogicalPosition(start).line;
-    int np = findNextParagraph(editor, lline, dir, false, multiple);
-
-    int end;
-    // start < max was added to avoid exception and it may be incorrect
-    if (start < max && chars.charAt(start) == '\n' && !countCurrent) {
-      end = findSentenceEnd(editor, chars, start, max, -1, false, multiple);
-    }
-    else {
-      end = findSentenceEnd(editor, chars, start, max, -1, true, multiple);
-    }
-    if (end == start && countCurrent && chars.charAt(end) == '\n') {
-      return end;
-    }
-
-    int pos = end - 1;
-    if (end >= 0) {
-      int offset = end + 1;
-      while (offset < max) {
-        char ch = chars.charAt(offset);
-        if (!Character.isWhitespace(ch)) {
-          break;
-        }
-        offset++;
-      }
-
-      if (dir > 0) {
-        if (offset == start && countCurrent) {
-          return offset;
-        }
-        else if (offset > start) {
-          return offset;
-        }
-      }
-      else {
-        if (offset == start && countCurrent) {
-          return offset;
-        }
-        else if (offset < start) {
-          return offset;
-        }
-      }
-    }
-
-    if (dir > 0) {
-      end = findSentenceEnd(editor, chars, start, max, dir, true, multiple);
-    }
-    else {
-      end = findSentenceEnd(editor, chars, pos, max, dir, countCurrent, multiple);
-    }
-
-    int res = end + 1;
-    if (end != -1 && (chars.charAt(end) != '\n' || !countCurrent)) {
-      while (res < max) {
-        char ch = chars.charAt(res);
-        if (!Character.isWhitespace(ch)) {
-          break;
-        }
-        res++;
-      }
-    }
-
-    // Now let's see which to return, the sentence we found or the paragraph we found.
-    // This mess returns which ever is closer to our starting point (and in the right direction).
-    if (res >= 0 && np >= 0) {
-      if (dir > 0) {
-        if (np < res || res < start) {
-          res = np;
-        }
-      }
-      else {
-        if (np > res || (res >= start && !countCurrent)) {
-          res = np;
-        }
-      }
-    }
-    else if (res == -1 && np >= 0) {
-      res = np;
-    }
-    // else we found neither, res already -1
-
-    return res;
-  }
-
-  private static int findSentenceEnd(@NotNull Editor editor,
-                                     @NotNull CharSequence chars,
-                                     int start,
-                                     int max,
-                                     int dir,
-                                     boolean countCurrent,
-                                     boolean multiple) {
-    if (dir > 0 && start >= EditorHelperRt.getFileSize(editor) - 1) {
-      return -1;
-    }
-    else if (dir < 0 && start <= 0) {
-      return -1;
-    }
-
-    // Save off the next paragraph since a paragraph is a valid sentence.
-    int lline = editor.offsetToLogicalPosition(start).line;
-    int np = findNextParagraph(editor, lline, dir, false, multiple);
-
-    // Sections are also end-of-sentence markers. However, { and } in column 1 don't count.
-    // Since our section implementation only supports these and form-feed chars, we'll just
-    // check for form-feeds below.
-
-    int res = -1;
-
-    int offset = start;
-    boolean found = false;
-    // Search forward looking for a candidate end-of-sentence character (., !, or ?)
-    while (offset >= 0 && offset < max && !found) {
-      char ch = chars.charAt(offset);
-      if (".!?".indexOf(ch) >= 0) {
-        int end = offset; // Save where we found the punctuation.
-        offset++;
-        // This can be followed by any number of ), ], ", or ' characters.
-        while (offset < max) {
-          ch = chars.charAt(offset);
-          if (")]\"'".indexOf(ch) == -1) {
-            break;
-          }
-
-          offset++;
-        }
-
-        // The next character must be whitespace for this to be a valid end-of-sentence.
-        if (offset >= max || Character.isWhitespace(ch)) {
-          // So we have found the end of the next sentence. Now let's see if we ended
-          // where we started (or further) on a back search. This will happen if we happen
-          // to start this whole search already on a sentence end.
-          if (offset - 1 == start && !countCurrent) {
-            // Skip back to the sentence end so we can search backward from there
-            // for the real previous sentence.
-            offset = end;
-          }
-          else {
-            // Yeah - we found the real end-of-sentence. Save it off.
-            res = offset - 1;
-            found = true;
-          }
-        }
-        else {
-          // Turned out not to be an end-of-sentence so move back to where we were.
-          offset = end;
-        }
-      }
-      else if (ch == '\n') {
-        int end = offset; // Save where we found the newline.
-        if (dir > 0) {
-          offset++;
-          while (offset < max) {
-            ch = chars.charAt(offset);
-            if (ch != '\n') {
-              offset--;
-              break;
-            }
-            if (offset == np && (end - 1 != start || countCurrent)) {
-              break;
-            }
-            offset++;
-          }
-
-          if (offset == np && (end - 1 != start || countCurrent)) {
-            res = end - 1;
-            found = true;
-          }
-          else if (offset > end) {
-            res = offset;
-            np = res;
-            found = true;
-          }
-          else if (offset == end) {
-            if (offset > 0 && chars.charAt(offset - 1) == '\n' && countCurrent) {
-              res = end;
-              np = res;
-              found = true;
-            }
-          }
-        }
-        else {
-          if (offset > 0) {
-            offset--;
-            while (offset > 0) {
-              ch = chars.charAt(offset);
-              if (ch != '\n') {
-                offset++;
-                break;
-              }
-
-              offset--;
-            }
-          }
-
-          if (offset < end) {
-            if (end == start && countCurrent) {
-              res = end;
-            }
-            else {
-              res = offset - 1;
-            }
-
-            found = true;
-          }
-        }
-
-        offset = end;
-      }
-      // Form-feeds are also end-of-sentence markers.
-      else if (ch == '\u000C') {
-        res = offset;
-        found = true;
-      }
-
-      offset += dir;
-    }
-
-    // Now let's see which to return, the sentence we found or the paragraph we found.
-    // This mess returns which ever is closer to our starting point (and in the right direction).
-    if (res >= 0 && np >= 0) {
-      if (dir > 0) {
-        if (np < res || res < start) {
-          res = np;
-        }
-      }
-      else {
-        if (np > res || (res >= start && !countCurrent)) {
-          res = np;
-        }
-      }
-    }
-    /*
-    else if (res == -1 && np >= 0)
-    {
-        res = np;
-    }
-    */
-
-    return res;
-  }
-
-  private static int findSentenceRangeEnd(@NotNull Editor editor,
-                                          @NotNull CharSequence chars,
-                                          int start,
-                                          int max,
-                                          int count,
-                                          boolean isOuter,
-                                          boolean oneway) {
-    int dir = count > 0 ? 1 : -1;
-    count = Math.abs(count);
-    int total = count;
-
-    boolean toggle = !isOuter;
-    boolean findend = dir < 1;
-    // Even = start, odd = end
-    int which;
-    int eprev = findSentenceEnd(editor, chars, start, max, -1, true, false);
-    int enext = findSentenceEnd(editor, chars, start, max, 1, true, false);
-    int sprev = findSentenceStart(editor, chars, start, max, -1, true, false);
-    int snext = findSentenceStart(editor, chars, start, max, 1, true, false);
-    if (snext == eprev) // On blank line
-    {
-      if (dir < 0 && !oneway) {
-        return start;
-      }
-
-      which = 0;
-      if (oneway) {
-        findend = dir > 0;
-      }
-      else if (dir > 0 && start < max - 1 && !Character.isSpaceChar(chars.charAt(start + 1))) {
-        findend = true;
-      }
-    }
-    else if (start == snext) // On sentence start
-    {
-      if (dir < 0 && !oneway) {
-        return start;
-      }
-
-      which = dir > 0 ? 1 : 0;
-      if (dir < 0 && oneway) {
-        findend = false;
-      }
-    }
-    else if (start == enext) // On sentence end
-    {
-      if (dir > 0 && !oneway) {
-        return start;
-      }
-
-      which = 0;
-      if (dir > 0 && oneway) {
-        findend = true;
-      }
-    }
-    else if (start >= sprev && start <= enext && enext < snext) // Middle of sentence
-    {
-      which = dir > 0 ? 1 : 0;
-    }
-    else // Between sentences
-    {
-      which = dir > 0 ? 0 : 1;
-      if (dir > 0) {
-        if (oneway) {
-          if (start < snext - 1) {
-            findend = true;
-          }
-          else if (start == snext - 1) {
-            count++;
-          }
-        }
-        else {
-          findend = true;
-        }
-      }
-      else {
-        if (oneway) {
-          if (start > eprev + 1) {
-            findend = false;
-          }
-          else if (start == eprev + 1) {
-            count++;
-          }
-        }
-        else {
-          findend = true;
-        }
-      }
-    }
-
-    int res = start;
-    for (; count > 0 && res >= 0 && res <= max - 1; count--) {
-      if ((toggle && which % 2 == 1) || (isOuter && findend)) {
-        res = findSentenceEnd(editor, chars, res, max, dir, false, total > 1);
-      }
-      else {
-        res = findSentenceStart(editor, chars, res, max, dir, false, total > 1);
-      }
-      if (res == 0 || res == max - 1) {
-        count--;
-        break;
-      }
-      if (toggle) {
-        if (which % 2 == 1 && dir < 0) {
-          res++;
-        }
-        else if (which % 2 == 0 && dir > 0) {
-          res--;
-        }
-      }
-
-      which++;
-    }
-
-    if (res < 0 || count > 0) {
-      res = dir > 0 ? (max > 0 ? max - 1 : 0) : 0;
-    }
-    else if (isOuter && ((dir < 0 && findend) || (dir > 0 && !findend))) {
-      if (res != 0 && res != max - 1) {
-        res -= dir;
-      }
-    }
-
-    if (chars.charAt(res) == '\n' && res > 0 && chars.charAt(res - 1) != '\n') {
-      res--;
-    }
-
-    return res;
-  }
-
-  @Contract("_, _, _, _ -> new")
-  public static @NotNull TextRange findSentenceRange(@NotNull Editor editor,
-                                                     @NotNull Caret caret,
-                                                     int count,
-                                                     boolean isOuter) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    if (chars.length() == 0) return new TextRange(0, 0);
-    int max = EditorHelperRt.getFileSize(editor);
-    int offset = caret.getOffset();
-    int ssel = caret.getSelectionStart();
-    int esel = caret.getSelectionEnd();
-    if (Math.abs(esel - ssel) > 1) {
-      int start;
-      int end;
-      // Forward selection
-      if (offset == esel - 1) {
-        start = ssel;
-        end = findSentenceRangeEnd(editor, chars, offset, max, count, isOuter, true);
-
-        return new TextRange(start, end + 1);
-      }
-      // Backward selection
-      else {
-        end = esel - 1;
-        start = findSentenceRangeEnd(editor, chars, offset, max, -count, isOuter, true);
-
-        return new TextRange(end, start + 1);
-      }
-    }
-    else {
-      int end = findSentenceRangeEnd(editor, chars, offset, max, count, isOuter, false);
-
-      boolean space = isOuter;
-      if (Character.isSpaceChar(chars.charAt(end))) {
-        space = false;
-      }
-
-      int start = findSentenceRangeEnd(editor, chars, offset, max, -1, space, false);
-
-      return new TextRange(start, end + 1);
-    }
-  }
-
-  public static int findNextParagraph(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowBlanks) {
-    int line = findNextParagraphLine(editor, caret, count, allowBlanks);
-
-    int maxline = new IjVimEditor(editor).lineCount();
-    if (line >= 0 && line < maxline) {
-      return new IjVimEditor(editor).getLineStartOffset(line);
-    }
-    else if (line == maxline) {
-      return count > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
-    }
-    else {
-      return -1;
-    }
-  }
-
-  private static int findNextParagraph(@NotNull Editor editor,
-                                       int lline,
-                                       int dir,
-                                       boolean allowBlanks,
-                                       boolean skipLines) {
-    int line = findNextParagraphLine(editor, lline, dir, allowBlanks, skipLines);
-
-    if (line >= 0) {
-      return new IjVimEditor(editor).getLineStartOffset(line);
-    }
-    else {
-      return dir > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
-    }
-  }
-
-  private static int findNextParagraphLine(@NotNull Editor editor,
-                                           @NotNull Caret caret,
-                                           int count,
-                                           boolean allowBlanks) {
-    int line = caret.getLogicalPosition().line;
-
-    int maxline = new IjVimEditor(editor).lineCount();
-    int dir = count > 0 ? 1 : -1;
-    boolean skipLines = count > 1;
-    count = Math.abs(count);
-    int total = count;
-
-    for (; count > 0 && line >= 0; count--) {
-      line = findNextParagraphLine(editor, line, dir, allowBlanks, skipLines);
-    }
-
-    if (total == 1 && line < 0) {
-      line = dir > 0 ? maxline - 1 : 0;
-    }
-    else if (total > 1 && count == 0 && line < 0) {
-      line = dir > 0 ? maxline - 1 : 0;
-    }
-
-    return line;
-  }
-
-  private static int findNextParagraphLine(@NotNull Editor editor,
-                                           int line,
-                                           int dir,
-                                           boolean allowBlanks,
-                                           boolean skipLines) {
-    int maxline = new IjVimEditor(editor).lineCount();
-    int res = -1;
-
-    line = skipEmptyLines(editor, line, dir, allowBlanks);
-    while (line >= 0 && line < maxline && res == -1) {
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, allowBlanks)) {
-        res = line;
-        if (skipLines) {
-          line = skipEmptyLines(editor, line, dir, allowBlanks);
-        }
-      }
-
-      line += dir;
-    }
-
-    return res;
-  }
-
-  private static int skipEmptyLines(@NotNull Editor editor, int line, int dir, boolean allowBlanks) {
-    int maxline = new IjVimEditor(editor).lineCount();
-    while (line >= 0 && line < maxline) {
-      if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, allowBlanks)) {
-        return line;
-      }
-
-      line += dir;
-    }
-
-    return line;
-  }
-
-  public static @Nullable TextRange findParagraphRange(@NotNull Editor editor,
-                                                       @NotNull Caret caret,
-                                                       int count,
-                                                       boolean isOuter) {
-    int line = caret.getLogicalPosition().line;
-    int maxline = new IjVimEditor(editor).lineCount();
-    if (logger.isDebugEnabled()) logger.debug("starting on line " + line);
-    int sline;
-    int eline;
-    boolean fixstart = false;
-    boolean fixend = false;
-    if (isOuter) {
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, true)) {
-        sline = line;
-      }
-      else {
-        sline = findNextParagraphLine(editor, caret, -1, true);
-      }
-
-      eline = findNextParagraphLine(editor, caret, count, true);
-      if (eline < 0) {
-        return null;
-      }
-
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) &&
-          EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
-        if (sline == line) {
-          eline--;
-          fixstart = true;
-        }
-        else {
-          sline++;
-          fixend = true;
-        }
-      }
-      else if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true) &&
-               !EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) &&
-               sline > 0) {
-        sline--;
-        fixstart = true;
-      }
-      else {
-        if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
-          fixend = true;
-        }
-        else {
-          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-            fixstart = true;
-          }
-        }
-      }
-    }
-    else {
-      sline = line;
-      if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-        sline = findNextParagraphLine(editor, caret, -1, true);
-        if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-          sline++;
-        }
-        eline = line;
-      }
-      else {
-        eline = line - 1;
-      }
-
-      int which = EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) ? 0 : 1;
-      for (int i = 0; i < count; i++) {
-        if (which % 2 == 1) {
-          eline = findNextParagraphLine(editor, eline, 1, true, false) - 1;
-          if (eline < 0) {
-            if (i == count - 1) {
-              eline = maxline - 1;
-            }
-            else {
-              return null;
-            }
-          }
-        }
-        else {
-          eline++;
-        }
-        which++;
-      }
-      fixstart = true;
-      fixend = true;
-    }
-
-    if (fixstart) {
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
-        while (sline > 0) {
-          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline - 1, true)) {
-            sline--;
-          }
-          else {
-            break;
-          }
-        }
-      }
-    }
-
-    if (fixend) {
-      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
-        while (eline < maxline - 1) {
-          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline + 1, true)) {
-            eline++;
-          }
-          else {
-            break;
-          }
-        }
-      }
-    }
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("final sline=" + sline);
-      logger.debug("final eline=" + eline);
-    }
-    int start = new IjVimEditor(editor).getLineStartOffset(sline);
-    int end = new IjVimEditor(editor).getLineStartOffset(eline);
-
-    return new TextRange(start, end + 1);
-  }
-
+  /**
+   * @deprecated Use IjVimSearchHelper.findMethodStart instead
+   */
   public static int findMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return PsiHelper.findMethodStart(editor, caret.getOffset(), count);
   }
 
+  /**
+   * @deprecated Use IjVimSearchHelper.findMethodEnd instead
+   */
   public static int findMethodEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return PsiHelper.findMethodEnd(editor, caret.getOffset(), count);
   }
 
-  private static @NotNull String getPairChars() {
-    if (pairsChars == null) {
-      VimPlugin.getOptionService().addListener(
-        OptionConstants.matchpairsName,
-        new OptionChangeListener<VimDataType>() {
-          @Override
-          public void processGlobalValueChange(@Nullable VimDataType oldValue) {
-            pairsChars = parseMatchPairsOption();
-          }
-        },
-        true
-      );
+  public static int findMisspelledWords(@NotNull Editor editor,
+                                       int startOffset,
+                                       int endOffset,
+                                       int skipCount,
+                                       IntComparator offsetOrdering) {
+    Project project = editor.getProject();
+    if (project == null) {
+      return -1;
     }
 
-    return pairsChars;
+    IntSortedSet offsets = new IntRBTreeSet(offsetOrdering);
+    DaemonCodeAnalyzerEx.processHighlights(editor.getDocument(), project, SpellCheckerSeveritiesProvider.TYPO,
+                                           startOffset, endOffset, highlight -> {
+        if (highlight.getSeverity() == SpellCheckerSeveritiesProvider.TYPO) {
+          int offset = highlight.getStartOffset();
+          if (offset >= startOffset && offset <= endOffset) {
+            offsets.add(offset);
+          }
+        }
+        return true;
+      });
+
+    if (offsets.isEmpty()) {
+      return -1;
+    }
+
+    if (skipCount >= offsets.size()) {
+      return offsets.lastInt();
+    }
+    else {
+      IntIterator offsetIterator = offsets.iterator();
+      skip(offsetIterator, skipCount);
+      return offsetIterator.nextInt();
+    }
   }
 
-  private static @NotNull String parseMatchPairsOption() {
-    String[] vals = ((VimString) VimPlugin.getOptionService()
-      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.matchpairsName, OptionConstants.matchpairsName))
-      .getValue()
-      .split(",");
+  private static void skip(IntIterator iterator, final int n) {
+    if (n < 0) throw new IllegalArgumentException("Argument must be nonnegative: " + n);
+    int i = n;
+    while (i-- != 0 && iterator.hasNext()) iterator.nextInt();
+  }
+
+  private static @NotNull String parseMatchPairsOption(final VimEditor vimEditor) {
+    List<String> pairs = options(injector, vimEditor).getMatchpairs();
     StringBuilder res = new StringBuilder();
-    for (String s : vals) {
+    for (String s : pairs) {
       if (s.length() == 3) {
         res.append(s.charAt(0)).append(s.charAt(2));
       }
@@ -2426,7 +1652,6 @@ public class SearchHelper {
     private final int position;
   }
 
-  private static @Nullable String pairsChars = null;
   private static final @NotNull String blockChars = "{}()[]<>";
 
   private static final Logger logger = Logger.getInstance(SearchHelper.class.getName());

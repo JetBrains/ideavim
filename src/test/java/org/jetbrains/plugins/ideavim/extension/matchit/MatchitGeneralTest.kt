@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,16 +9,19 @@
 package org.jetbrains.plugins.ideavim.extension.matchit
 
 import com.intellij.ide.highlighter.HtmlFileType
-import com.intellij.ide.highlighter.JavaFileType
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.experimentalApi
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class MatchitGeneralTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("matchit")
   }
 
@@ -26,40 +29,7 @@ class MatchitGeneralTest : VimTestCase() {
    * Tests to make sure we didn't break the default % motion
    */
 
-  fun `test jump from Java comment start to end`() {
-    doTest(
-      "%",
-      """
-        /$c**
-         *
-         */
-      """.trimIndent(),
-      """
-        /**
-         *
-         *$c/
-      """.trimIndent(),
-      fileType = JavaFileType.INSTANCE
-    )
-  }
-
-  fun `test jump from Java comment end to start`() {
-    doTest(
-      "%",
-      """
-        /**
-         *
-         *$c/
-      """.trimIndent(),
-      """
-        $c/**
-         *
-         */
-      """.trimIndent(),
-      fileType = JavaFileType.INSTANCE
-    )
-  }
-
+  @Test
   fun `test 25 percent jump`() {
     doTest(
       "25%",
@@ -75,82 +45,112 @@ class MatchitGeneralTest : VimTestCase() {
         int c;
         int d;
       """.trimIndent(),
-      fileType = HtmlFileType.INSTANCE
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from visual end of line to opening parenthesis`() {
     doTest(
       "v$%",
       """foo(${c}bar)""",
       """foo${s}$c(b${se}ar)""",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from visual end of line to opening parenthesis then back to closing`() {
     doTest(
       "v$%%",
       """foo(${c}bar)""",
       """foo(${s}bar$c)$se""",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete everything from opening parenthesis to closing parenthesis`() {
     doTest(
       "d%",
-      "$c(x == 123)", "", fileType = HtmlFileType.INSTANCE
+      "$c(x == 123)",
+      "",
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete everything from closing parenthesis to opening parenthesis`() {
     doTest(
       "d%",
-      "(x == 123$c)", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "(x == 123$c)",
+      "",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete everything from opening curly brace to closing curly brace`() {
     doTest(
       "d%",
-      "$c{ foo: 123 }", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c{ foo: 123 }",
+      "",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete everything from closing curly brace to opening curly brace`() {
     doTest(
       "d%",
-      "{ foo: 123 $c}", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "{ foo: 123 $c}",
+      "",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete everything from opening square bracket to closing square bracket`() {
     doTest(
       "d%",
-      "$c[1, 2, 3]", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c[1, 2, 3]",
+      "",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete everything from closing square bracket to opening square bracket`() {
     doTest(
       "d%",
-      "[1, 2, 3$c]", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "[1, 2, 3$c]",
+      "",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 
   /*
    * Tests for visual mode and deleting on the new Matchit patterns.
    */
+  @Test
   fun `test jump from visual end of line to opening angle bracket`() {
     doTest(
       "v$%",
       """</h${c}tml>""",
       """${s}$c</ht${se}ml>""",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+      HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test jump from visual end of line to start of for loop`() {
     doTest(
       "v$%",
@@ -164,7 +164,8 @@ class MatchitGeneralTest : VimTestCase() {
           puts n
         en${se}d
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, fileName = "ruby.rb"
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+      fileName = "ruby.rb",
     )
   }
 
@@ -176,8 +177,9 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
   """,
-    description = "Our code changes the motion type to linewise, but it should not"
+    description = "Our code changes the motion type to linewise, but it should not",
   )
+  @Test
   fun `test delete from elseif to else`() {
     doTest(
       "d%",
@@ -190,26 +192,18 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      if (experimentalApi()) {
-        """
-        if x == 0
-          puts "Zero"
-          puts "Positive"
-        end
-        """.trimIndent()
-      } else {
-        """
+      """
               if x == 0
                 puts "Zero"
               $c
                 puts "Positive"
               end
-        """.trimIndent()
-      },
-      fileName = "ruby.rb"
+      """.trimIndent(),
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test delete from elseif to else 2`() {
     doTest(
       "d%",
@@ -229,10 +223,11 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test delete from else to elsif with reverse motion`() {
     doTest(
       "dg%",
@@ -252,10 +247,11 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test delete from opening to closing div`() {
     doTest(
       "d%",
@@ -265,10 +261,11 @@ class MatchitGeneralTest : VimTestCase() {
         </div>
       """.trimIndent(),
       "$c<",
-      fileType = HtmlFileType.INSTANCE
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete from opening angle bracket to closing angle bracket`() {
     doTest(
       "d%",
@@ -276,10 +273,11 @@ class MatchitGeneralTest : VimTestCase() {
         $c<div></div>
       """.trimIndent(),
       "$c</div>",
-      fileType = HtmlFileType.INSTANCE
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
+  @Test
   fun `test delete whole function from def`() {
     doTest(
       "d%",
@@ -289,10 +287,11 @@ class MatchitGeneralTest : VimTestCase() {
         end
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test delete whole function from def with reverse motion`() {
     doTest(
       "dg%",
@@ -302,10 +301,11 @@ class MatchitGeneralTest : VimTestCase() {
         end
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test delete whole function from end`() {
     doTest(
       "d%",
@@ -315,10 +315,11 @@ class MatchitGeneralTest : VimTestCase() {
         en${c}d
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
+  @Test
   fun `test delete whole function from end with reverse motion`() {
     doTest(
       "dg%",
@@ -328,7 +329,7 @@ class MatchitGeneralTest : VimTestCase() {
         en${c}d
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 }

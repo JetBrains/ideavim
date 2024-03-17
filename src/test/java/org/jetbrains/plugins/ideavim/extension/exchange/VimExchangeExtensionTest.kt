@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,100 +10,104 @@ package org.jetbrains.plugins.ideavim.extension.exchange
 
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.state.mode.Mode
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class VimExchangeExtensionTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("exchange")
   }
 
   // |cx|
+  @Test
   fun `test exchange words left to right`() {
     doTest(
       listOf("cxe", "w", "cxe"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   // |cx|
+  @Test
   fun `test exchange words dot repeat`() {
     doTest(
       listOf("cxiw", "w", "."),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   // |cx|
+  @Test
   fun `test exchange words right to left`() {
     doTest(
       listOf("cxe", "b", "cxe"),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   // |cx|
+  @Test
   fun `test exchange words right to left with dot`() {
     doTest(
       listOf("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   // |X|
+  @Test
   fun `test visual exchange words left to right`() {
     doTest(
       listOf("veX", "w", "veX"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   // |X|
   @VimBehaviorDiffers(
     originalVimAfter = "The ${c}brown catch over the lazy dog",
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
+  @Test
   fun `test visual exchange words from inside`() {
     doTest(
       listOf("veX", "b", "v3e", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
   // |X|
   @VimBehaviorDiffers(
     originalVimAfter = "The brown ${c}catch over the lazy dog",
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
+  @Test
   fun `test visual exchange words from outside`() {
     doTest(
       listOf("v3e", "X", "w", "veX"),
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
@@ -115,8 +119,9 @@ class VimExchangeExtensionTest : VimTestCase() {
        ${c}brown fox
        the lazy dog
        """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
+  @Test
   fun `test exchange lines top down`() {
     doTest(
       listOf("cxx", "j", "cxx"),
@@ -130,8 +135,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          the lazy dog
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
@@ -143,8 +147,9 @@ class VimExchangeExtensionTest : VimTestCase() {
        ${c}brown fox
        the lazy dog
        """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
+  @Test
   fun `test exchange lines top down with dot`() {
     doTest(
       listOf("cxx", "j", "."),
@@ -158,8 +163,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          the lazy dog
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
@@ -169,8 +173,9 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown thecatch over
          fox
           lazy dog
-    """
+    """,
   )
+  @Test
   fun `test exchange to the line end`() {
     doTest(
       listOf("v$", "X", "jj^ve", "X"),
@@ -184,8 +189,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          catch over
          fox lazy dog
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
@@ -197,8 +201,9 @@ class VimExchangeExtensionTest : VimTestCase() {
          ${c}The quick
          brown fox
       """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
+  @Test
   fun `test exchange visual lines`() {
     doTest(
       listOf("Vj", "X", "jj", "Vj", "X"),
@@ -215,11 +220,11 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -236,6 +241,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -246,12 +252,13 @@ class VimExchangeExtensionTest : VimTestCase() {
     configureByText(before)
     typeText(injector.parser.parseKeys("Vj" + "X"))
 
-    assertHighlighter(4, 15, HighlighterTargetArea.LINES_IN_RANGE)
+    assertHighlighter(0, 19, HighlighterTargetArea.LINES_IN_RANGE)
 
     // Exit vim-exchange
     exitExchange()
   }
 
+  @Test
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
@@ -266,6 +273,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -280,6 +288,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -294,6 +303,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test to file end highlighter`() {
     val before = """
          The quick
@@ -305,8 +315,8 @@ class VimExchangeExtensionTest : VimTestCase() {
         buildString {
           append("v\$")
           append("X")
-        }
-      )
+        },
+      ),
     )
 
     assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
@@ -315,6 +325,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick
@@ -327,8 +338,8 @@ class VimExchangeExtensionTest : VimTestCase() {
         buildString {
           append("v\$")
           append("X")
-        }
-      )
+        },
+      ),
     )
 
     assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)
@@ -337,6 +348,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test back selection`() {
     val before = """
          The quick
@@ -352,36 +364,37 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test back selection exchange 1`() {
     doTest(
       listOf("vb", "X", "bevb", "X"),
       "The quick brow${c}n fox catch over the lazy dog",
       "The ${c}brown quick fox catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test back selection exchange 2`() {
     doTest(
       listOf("vb", "X", "wve", "X"),
       "The quick brow${c}n fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test back selection exchange 3`() {
     doTest(
       listOf("ve", "X", "wevb", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
   }
 
+  @Test
   fun `test change with down motion`() {
     val before = """
          The ${c}quick
@@ -401,6 +414,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @Test
   fun `test cxx`() {
     val before = """
          The ${c}quick
@@ -424,10 +438,10 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   private fun assertHighlighter(start: Int, end: Int, area: HighlighterTargetArea) {
-    val currentExchange = myFixture.editor.getUserData(VimExchangeExtension.EXCHANGE_KEY)!!
+    val currentExchange = fixture.editor.getUserData(VimExchangeExtension.Util.EXCHANGE_KEY)!!
     val highlighter = currentExchange.getHighlighter()!!
-    assertEquals(start, highlighter.startOffset)
-    assertEquals(end, highlighter.endOffset)
-    assertEquals(area, highlighter.targetArea)
+    kotlin.test.assertEquals(start, highlighter.startOffset)
+    kotlin.test.assertEquals(end, highlighter.endOffset)
+    kotlin.test.assertEquals(area, highlighter.targetArea)
   }
 }

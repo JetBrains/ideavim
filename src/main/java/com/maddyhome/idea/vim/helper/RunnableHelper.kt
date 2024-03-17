@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,7 +16,7 @@ import com.intellij.openapi.project.Project
 /**
  * This provides some helper methods to run code as a command and an application write action
  */
-object RunnableHelper {
+internal object RunnableHelper {
   private val logger = logger<RunnableHelper>()
 
   @JvmStatic

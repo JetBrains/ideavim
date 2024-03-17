@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,10 +9,12 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertAfterLineEndActionTest : VimTestCase() {
+  @Test
   fun `test insert after line end action`() {
     typeTextInFile(
       injector.parser.parseKeys("A" + " four" + "<ESC>"),
@@ -20,39 +22,39 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                     one two ${c}three
                     sev${c}en si${c}x five
 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     one two three fou${c}r
     seven six five fou${c}r
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
+  @Test
   fun `test multiple carets`() {
     doTest(
       "AHello<esc>",
       """
-                ${c}A Discovery
+                ${c}Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and ${c}lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectet${c}ur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A DiscoveryHell${c}o
+                Lorem IpsumHell${c}o
 
-                I found it in a legendary landHell${c}o
-                all rocks and lavender and tufted grass,Hell${c}o
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,Hell${c}o
+                consectetur adipiscing elitHell${c}o
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Mode.NORMAL(),
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
+    assertMode(Mode.NORMAL())
   }
 }

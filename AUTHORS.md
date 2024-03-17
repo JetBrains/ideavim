@@ -447,6 +447,62 @@ Contributors:
   [![icon][github]](https://github.com/lippfi)
   &nbsp;
   lippfi
+* [![icon][mail]](mailto:3237686+Runinho@users.noreply.github.com)
+  [![icon][github]](https://github.com/Runinho)
+  &nbsp;
+  Runinho
+* [![icon][mail]](mailto:me@yuhaowen.com)
+  [![icon][github]](https://github.com/adaext)
+  &nbsp;
+  Ada
+* [![icon][mail]](mailto:dominic.palmer@outlook.com)
+  [![icon][github]](https://github.com/dominicpalmer)
+  &nbsp;
+  Dominic Palmer
+* [![icon][mail]](mailto:kawagh.dev@gmail.com)
+  [![icon][github]](https://github.com/kawagh)
+  &nbsp;
+  kawagh
+* [![icon][mail]](mailto:78074243+danisevas@users.noreply.github.com)
+  [![icon][github]](https://github.com/danisevas)
+  &nbsp;
+  Dani Sevastianov
+* [![icon][mail]](mailto:oskar.persson@polken.se)
+  [![icon][github]](https://github.com/oskarpersson/)
+  &nbsp;
+  Oskar Persson 
+* [![icon][mail]](mailto:silence.m@hotmail.com)
+  [![icon][github]](https://github.com/Stzx)
+  &nbsp;
+  Silence Tai
+* [![icon][mail]](mailto:tszsumng90@gmail.com)
+  [![icon][github]](https://github.com/samabcde)
+  &nbsp;
+  Sam Ng
+* [![icon][mail]](mailto:ludwig.valda.vasquez@jetbrains.com)
+  [![icon][github]](https://github.com/ludwig-jb)
+  &nbsp;
+  ludwig-jb
+* [![icon][mail]](mailto:pvydmuch@gmail.com)
+  [![icon][github]](https://github.com/pWydmuch)
+  &nbsp;
+  pWydmuch
+* [![icon][mail]](mailto:leonid989@gmail.com)
+  [![icon][github]](https://github.com/Infonautica)
+  &nbsp;
+  Leonid Danilov
+* [![icon][mail]](mailto:emanuel-367@hotmail.com)
+  [![icon][github]](https://github.com/emanuelgestosa)
+  &nbsp;
+  Emanuel Gestosa
+* [![icon][mail]](mailto:81118900+lippfi@users.noreply.github.com)
+  [![icon][github]](https://github.com/lippfi)
+  &nbsp;
+  lippfi, 
+* [![icon][mail]](mailto:fillipser143@gmail.com)
+  [![icon][github]](https://github.com/Parker7123)
+  &nbsp;
+  FilipParker
 
 Previous contributors:
 

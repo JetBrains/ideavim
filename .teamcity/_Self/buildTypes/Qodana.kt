@@ -1,18 +1,18 @@
 package _Self.buildTypes
 
 import _Self.Constants.QODANA_TESTS
-import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
-import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object Qodana : BuildType({
+object Qodana : IdeaVimBuildType({
   name = "Qodana checks"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
@@ -22,48 +22,47 @@ object Qodana : BuildType({
 
   vcs {
     root(DslContext.settingsRoot)
+    branchFilter = "+:<default>"
 
     checkoutMode = CheckoutMode.AUTO
   }
 
   steps {
+    gradle {
+      name = "Generate grammar"
+      tasks = "generateGrammarSource"
+    }
     qodana {
       name = "Qodana"
-/*
-      reportAsTestsEnable = ""
-      failBuildOnErrors = ""
-      codeInspectionXmlConfig = "Custom"
-      codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
-      reportAsTestsEnable = "true"
-*/
-      clearConditions()
-      param("licenseaudit-enable", "true")
-      param("clonefinder-languages", "Java")
-      param("clonefinder-mode", "")
-      param("report-version", "")
-      param("clonefinder-languages-container", "Java Kotlin")
-      param("namesAndTagsCustom", "repo.labs.intellij.net/static-analyser/qodana")
-      param("clonefinder-queried-project", "src")
-      param("clonefinder-enable", "true")
-      param("clonefinder-reference-projects", "src")
-      param("yaml-configuration", "")
+      param("clonefinder-languages", "")
+      param("collect-anonymous-statistics", "")
+      param("licenseaudit-enable", "")
+      param("clonefinder-languages-container", "")
+      param("linterVersion", "")
+      param("clonefinder-queried-project", "")
+      param("clonefinder-enable", "")
+      param("clonefinder-reference-projects", "")
       linter = jvm {
         version = Qodana.JVMVersion.LATEST
       }
+      reportAsTests = true
+      additionalQodanaArguments = "--baseline qodana.sarif.json"
+      cloudToken = "credentialsJSON:6b79412e-9198-4862-9223-c5019488f903"
     }
   }
 
   triggers {
     vcs {
-      enabled = true
-      branchFilter = ""
+      enabled = false
+      branchFilter = "+:<default>"
     }
     schedule {
-      schedulingPolicy = weekly {
-        dayOfWeek = ScheduleTrigger.DAY.Tuesday
+      schedulingPolicy = daily {
+        hour = 12
+        minute = 0
+        timezone = "SERVER"
       }
-      branchFilter = ""
-      triggerBuild = always()
+      param("dayOfWeek", "Sunday")
     }
   }
 
@@ -74,11 +73,8 @@ object Qodana : BuildType({
       comparison = BuildFailureOnMetric.MetricComparison.MORE
       compareTo = value()
       metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
-      param("metricKey", "QodanaProblemsTotal")
+      param("metricKey", "QodanaProblemsNew")
+      enabled = false
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 })

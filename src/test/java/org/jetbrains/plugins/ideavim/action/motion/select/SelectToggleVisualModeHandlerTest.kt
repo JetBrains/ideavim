@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,14 +10,17 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SelectToggleVisualModeHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode characterwise`() {
     doTest(
       listOf("ve", "<C-G>"),
@@ -37,12 +40,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode characterwise left motion`() {
     doTest(
       listOf("vb", "<C-G>"),
@@ -62,12 +65,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode characterwise empty line`() {
     doTest(
       listOf("v", "<C-G>"),
@@ -87,12 +90,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode characterwise to line end`() {
     doTest(
       listOf("vel", "<C-G>"),
@@ -112,12 +115,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode characterwise one letter`() {
     doTest(
       listOf("v", "<C-G>"),
@@ -137,12 +140,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode characterwise multicaret`() {
     doTest(
       listOf("ve", "<C-G>"),
@@ -162,12 +165,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was ${s}settled$c$se on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.SELECT(SelectionType.CHARACTER_WISE)
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise`() {
     doTest(
       listOf("gh", "<S-Right>".repeat(4), "<C-G>"),
@@ -187,12 +190,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise left motion`() {
     doTest(
       listOf("gh", "<S-Left>".repeat(5), "<C-G>"),
@@ -212,12 +215,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise empty line`() {
     doTest(
       listOf("gh", "<C-G>"),
@@ -237,12 +240,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise line end`() {
     doTest(
       listOf("gh", "<S-Right>".repeat(5), "<C-G>"),
@@ -262,12 +265,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise one letter`() {
     doTest(
       listOf("gh", "<C-G>"),
@@ -287,8 +290,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -300,9 +302,10 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise line start`() {
     doTest(
       listOf("gh", "<S-Left>", "<C-G>"),
@@ -322,8 +325,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
@@ -335,9 +337,10 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${c}a${se}ll rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise end on line start`() {
     doTest(
       listOf("gh", "<S-Left>", "<S-Down>", "<C-G>"),
@@ -357,12 +360,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode characterwise multicaret`() {
     doTest(
       listOf("gh", "<S-Right>".repeat(4), "<C-G>"),
@@ -382,12 +385,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was ${s}sett${c}l${se}ed on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode linewise`() {
     doTest(
       listOf("Ve", "<C-G>"),
@@ -407,12 +410,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode linewise up motion`() {
     doTest(
       listOf("V", "k", "<C-G>"),
@@ -432,12 +435,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode linewise empty line`() {
     doTest(
       listOf("V", "<C-G>"),
@@ -457,12 +460,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode linewise multicaret`() {
     doTest(
       listOf("Ve", "<C-G>"),
@@ -482,12 +485,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}where it was settle${c}d on some sodden sand
                 ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.SELECT(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode linewise`() {
     doTest(
       listOf("gH", "<C-G>"),
@@ -507,12 +510,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode linewise empty line`() {
     doTest(
       listOf("gH", "<C-G>"),
@@ -532,12 +535,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode linewise multicaret`() {
     doTest(
       listOf("gH", "<C-G>"),
@@ -557,12 +560,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}where it was ${c}settled on some sodden sand$se
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE
+      Mode.VISUAL(SelectionType.LINE_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode blockwise`() {
     doTest(
       listOf("<C-V>ejj", "<C-G>"),
@@ -582,12 +585,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 wh${s}ere i$c${se}t was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to select mode blockwise left motion`() {
     doTest(
       listOf("<C-V>bjj", "<C-G>"),
@@ -607,12 +610,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 wh${s}${c}ere it${se} was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.SELECT(SelectionType.BLOCK_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode blockwise`() {
     doTest(
       listOf("g<C-H>", "<S-Right>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
@@ -632,12 +635,12 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 wh${s}ere ${c}i${se}t was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test switch to visual mode blockwise to left`() {
     doTest(
       listOf("g<C-H>", "<S-Left>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
@@ -657,8 +660,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where$s${c} it${se} was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 }

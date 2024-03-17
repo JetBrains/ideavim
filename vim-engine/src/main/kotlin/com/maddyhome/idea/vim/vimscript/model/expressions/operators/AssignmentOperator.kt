@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,22 +17,23 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bin
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.MultiplicationHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.SubtractionHandler
 
-enum class AssignmentOperator(val value: String) {
+public enum class AssignmentOperator(public val value: String) {
   ASSIGNMENT("="),
   ADDITION("+="),
   SUBTRACTION("-="),
   MULTIPLICATION("*="),
   DIVISION("/="),
   MODULUS("%="),
-  CONCATENATION(".=");
+  CONCATENATION(".="),
+  ;
 
-  companion object {
-    fun getByValue(value: String): AssignmentOperator {
-      return values().first { it.value == value }
+  public companion object {
+    public fun getByValue(value: String): AssignmentOperator {
+      return entries.first { it.value == value }
     }
   }
 
-  fun getNewValue(left: VimDataType?, right: VimDataType): VimDataType {
+  public fun getNewValue(left: VimDataType?, right: VimDataType): VimDataType {
     return when (this) {
       ASSIGNMENT -> right
       ADDITION -> {

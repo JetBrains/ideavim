@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,8 @@
 package com.maddyhome.idea.vim.action.change
 
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -18,7 +20,8 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 
-class RepeatChangeAction : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["."], modes = [Mode.NORMAL])
+internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
@@ -45,38 +48,35 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
 
     injector.registerGroup.selectRegister(VimRepeater.lastChangeRegister)
 
-    try {
-      if (repeatHandler && lastHandler != null) {
-        val processor = CommandProcessor.getInstance()
-        processor.executeCommand(
-          editor.ij.project,
-          { lastHandler.execute(editor, context) },
-          "Vim " + lastHandler.javaClass.simpleName,
-          null
-        )
-      } else if (!repeatHandler && lastCommand != null) {
-        if (cmd.rawCount > 0) {
-          lastCommand.count = cmd.count
-          val arg = lastCommand.argument
-          if (arg != null) {
-            val mot = arg.motion
-            mot.count = 0
-          }
+    if (repeatHandler && lastHandler != null) {
+      val processor = CommandProcessor.getInstance()
+      processor.executeCommand(
+        editor.ij.project,
+        { lastHandler.execute(editor, context, operatorArguments) },
+        "Vim " + lastHandler.javaClass.simpleName,
+        null,
+      )
+    } else if (!repeatHandler && lastCommand != null) {
+      if (cmd.rawCount > 0) {
+        lastCommand.count = cmd.count
+        val arg = lastCommand.argument
+        if (arg != null) {
+          val mot = arg.motion
+          mot.count = 0
         }
-        state.setExecutingCommand(lastCommand)
-
-        val arguments = operatorArguments.copy(count0 = lastCommand.rawCount)
-        injector.actionExecutor.executeVimAction(editor, lastCommand.action, context, arguments)
-
-        VimRepeater.saveLastChange(lastCommand)
       }
-    } catch (ignored: Exception) {
+      state.executingCommand = lastCommand
+
+      val arguments = operatorArguments.copy(count0 = lastCommand.rawCount)
+      injector.actionExecutor.executeVimAction(editor, lastCommand.action, context, arguments)
+
+      VimRepeater.saveLastChange(lastCommand)
     }
 
     state.isDotRepeatInProgress = false
 
     // Restore state
-    if (save != null) state.setExecutingCommand(save)
+    if (save != null) state.executingCommand = save
     VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar)
     if (lastHandler != null) Extension.lastExtensionHandler = lastHandler
     VimRepeater.repeatHandler = repeatHandler

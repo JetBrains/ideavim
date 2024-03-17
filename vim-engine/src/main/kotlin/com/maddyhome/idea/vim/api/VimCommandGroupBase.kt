@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,9 +12,9 @@ import com.maddyhome.idea.vim.api.VimCommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.GoalCommand
 
-abstract class VimCommandGroupBase : VimCommandGroup {
-  companion object {
-    private val overridePrefix = "!"
+public abstract class VimCommandGroupBase : VimCommandGroup {
+  public companion object {
+    private const val overridePrefix = "!"
   }
   private var aliases = HashMap<String, CommandAlias>()
 

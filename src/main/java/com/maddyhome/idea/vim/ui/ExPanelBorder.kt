@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,7 +14,7 @@ import com.intellij.util.ui.JBInsets
 import java.awt.Component
 import java.awt.Insets
 
-class ExPanelBorder internal constructor() : SideBorder(JBColor.border(), TOP) {
+internal class ExPanelBorder internal constructor() : SideBorder(JBColor.border(), TOP) {
 
   override fun getBorderInsets(component: Component?): Insets {
     return JBInsets(getThickness() + 2, 0, 2, 2)

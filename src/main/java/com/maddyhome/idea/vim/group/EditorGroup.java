@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,31 +8,30 @@
 
 package com.maddyhome.idea.vim.group;
 
+import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.find.EditorSearchSession;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.client.ClientAppSession;
+import com.intellij.openapi.client.ClientKind;
+import com.intellij.openapi.client.ClientSessionsManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorGutter;
-import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.LineNumberConverter;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimEditorGroup;
-import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.UserDataManager;
+import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
+import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -41,8 +40,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretsVisualAttributes;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
 
 /**
  * @author vlan
@@ -57,7 +59,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(e.getEditor())), OptionConstants.relativenumberName, OptionConstants.relativenumberName)) {
+      if (requiresRepaint && options(injector, new IjVimEditor(e.getEditor())).getRelativenumber()) {
         repaintRelativeLineNumbers(e.getEditor());
       }
     }
@@ -105,8 +107,9 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
-    final boolean relativeNumber = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.relativenumberName, OptionConstants.relativenumberName);
-    final boolean number = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.numberName, OptionConstants.numberName);
+    final EffectiveOptions options = options(injector, new IjVimEditor(editor));
+    final boolean relativeNumber = options.getRelativenumber();
+    final boolean number = options.getNumber();
 
     final boolean showBuiltinEditorLineNumbers = shouldShowBuiltinLineNumbers(editor, number, relativeNumber);
 
@@ -207,36 +210,66 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   public void editorCreated(@NotNull Editor editor) {
-    DocumentManager.INSTANCE.addListeners(editor.getDocument());
+    UserDataManager.setVimInitialised(editor, true);
+
     VimPlugin.getKey().registerRequiredShortcutKeys(new IjVimEditor(editor));
 
     initLineNumbers(editor);
-    // Turn on insert mode if editor doesn't have any file
-    if (!EditorHelper.isFileEditor(editor) &&
+
+    // We add Vim bindings to all opened editors, even read-only editors. We also add bindings to editors that are used
+    // elsewhere in the IDE, rather than just for editing project files. This includes editors used as part of the UI,
+    // such as the VCS commit message, or used as read-only viewers for text output, such as log files in run
+    // configurations or the Git Console tab. And editors are used for interactive stdin/stdout for console-based run
+    // configurations.
+    // We want to provide an intuitive experience for working with these additional editors, so we automatically switch
+    // to INSERT mode for interactive editors. Recognising these can be a bit tricky.
+    // These additional interactive editors are not file-based, but must have a writable document. However, log output
+    // documents are also writable (the IDE is writing new content as it becomes available) just not user-editable. So
+    // we must also check that the editor is not in read-only "viewer" mode (this includes "rendered" mode, which is
+    // read-only and also hides the caret).
+    // Furthermore, the interactive stdin/stdout console output is hosted in a read-only editor, but it can still be
+    // edited. The `ConsoleViewImpl` class installs a typing handler that ignores the editor's `isViewer` property and
+    // allows typing if the associated process (if any) is still running. We can get the editor's console view and check
+    // this ourselves, but we have to wait until the editor has finished initialising before it's available in user
+    // data.
+    // Note that we need a similar check in `VimEditor.isWritable` to allow Escape to work to exit insert mode. We need
+    // to know that a read-only editor that is hosting a console view with a running process can be treated as writable.
+    Runnable switchToInsertMode = () -> {
+      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
+      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), context);
+      KeyHandler.getInstance().reset(new IjVimEditor(editor));
+    };
+    if (!editor.isViewer() &&
+        !EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), new IjExecutionContext(EditorDataContext.init(editor, null)));
-      KeyHandler.getInstance().reset(new IjVimEditor(editor));
+      switchToInsertMode.run();
     }
-    updateCaretsVisualAttributes(editor);
+    ApplicationManager.getApplication().invokeLater(
+      () -> {
+        if (editor.isDisposed()) return;
+        ConsoleViewImpl consoleView = editor.getUserData(ConsoleViewImpl.CONSOLE_VIEW_IN_EDITOR_VIEW);
+        if (consoleView != null && consoleView.isRunning() && !CommandStateHelper.inInsertMode(editor)) {
+          switchToInsertMode.run();
+        }
+      });
+    updateCaretsVisualAttributes(new IjVimEditor(editor));
   }
 
   public void editorDeinit(@NotNull Editor editor, boolean isReleased) {
     deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(new IjVimEditor(editor));
-    DocumentManager.INSTANCE.removeListeners(editor.getDocument());
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
   }
 
-  public void notifyIdeaJoin(@Nullable Project project) {
-    if (VimPlugin.getVimState().isIdeaJoinNotified()
-        || VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideajoinName, IjVimOptionService.ideajoinName)) {
+  public void notifyIdeaJoin(@Nullable Project project, @NotNull VimEditor editor) {
+    if (VimPlugin.getVimState().isIdeaJoinNotified() || ijOptions(injector, editor).getIdeajoin()) {
       return;
     }
 
     VimPlugin.getVimState().setIdeaJoinNotified(true);
-    VimPlugin.getNotifications(project).notifyAboutIdeaJoin();
+    VimPlugin.getNotifications(project).notifyAboutIdeaJoin(editor);
   }
 
   @Nullable
@@ -254,10 +287,22 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   @Override
   public void notifyIdeaJoin(@NotNull VimEditor editor) {
-    notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject());
+    notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject(), editor);
   }
 
-  public static class NumberChangeListener implements LocalOptionChangeListener<VimDataType> {
+  @Override
+  public void updateCaretsVisualAttributes(@NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor) editor).getEditor();
+    CaretVisualAttributesHelperKt.updateCaretsVisualAttributes(ijEditor);
+  }
+
+  @Override
+  public void updateCaretsVisualPosition(@NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor) editor).getEditor();
+    CaretVisualAttributesHelperKt.updateCaretsVisualAttributes(ijEditor);
+  }
+
+  public static class NumberChangeListener implements EffectiveOptionValueChangeListener {
     public static NumberChangeListener INSTANCE = new NumberChangeListener();
 
     @Contract(pure = true)
@@ -265,16 +310,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
 
     @Override
-    public void processGlobalValueChange(@Nullable VimDataType oldValue) {
-      for (Editor editor : HelperKt.localEditors()) {
-        if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
-          updateLineNumbers(editor);
-        }
-      }
-    }
-
-    @Override
-    public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull VimEditor editor) {
+    public void onEffectiveValueChanged(@NotNull VimEditor editor) {
       Editor ijEditor = ((IjVimEditor)editor).getEditor();
 
       if (UserDataManager.getVimEditorGroup(ijEditor) && supportsVimLineNumbers(ijEditor)) {
@@ -286,7 +322,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.numberName, OptionConstants.numberName);
+      final boolean number = options(injector, new IjVimEditor(editor)).getNumber();
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based
@@ -306,11 +342,45 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
   }
 
-  @NotNull
   @Override
-  public Collection<VimEditor> localEditors() {
-    return HelperKt.localEditors().stream()
+  public @NotNull Collection<VimEditor> getEditorsRaw() {
+    return getLocalEditors()
       .map(IjVimEditor::new)
       .collect(Collectors.toList());
+  }
+
+  @NotNull
+  @Override
+  public Collection<VimEditor> getEditors() {
+    return getLocalEditors()
+      .filter(UserDataManager::getVimInitialised)
+      .map(IjVimEditor::new)
+      .collect(Collectors.toList());
+  }
+
+  @NotNull
+  @Override
+  public Collection<VimEditor> getEditors(@NotNull VimDocument buffer) {
+    final Document document = ((IjVimDocument)buffer).getDocument();
+    return getLocalEditors()
+      .filter(editor -> UserDataManager.getVimInitialised(editor) && editor.getDocument().equals(document))
+      .map(IjVimEditor::new)
+      .collect(Collectors.toList());
+  }
+
+  private Stream<Editor> getLocalEditors() {
+    // Always fetch local editors. If we're hosting a Code With Me session, any connected guests will create hidden
+    // editors to handle syntax highlighting, completion requests, etc. We need to make sure that IdeaVim only makes
+    // changes (e.g. adding search highlights) to local editors, so things don't incorrectly flow through to any Clients.
+    // In non-CWM scenarios, or if IdeaVim is installed on the Client, there are only ever local editors, so this will
+    // also work there. In Gateway remote development scenarios, IdeaVim should not be installed on the host, only the
+    // Client, so all should work there too.
+    // Note that most IdeaVim operations are in response to interactive keystrokes, which would mean that
+    // ClientEditorManager.getCurrentInstance would return local editors. However, some operations are in response to
+    // events such as document change (to update search highlights) and these can come from CWM guests, and we'd get the
+    // remote editors.
+    // This invocation will always get local editors, regardless of current context.
+    final ClientAppSession localSession = ClientSessionsManager.getAppSessions(ClientKind.LOCAL).get(0);
+    return localSession.getService(ClientEditorManager.class).editors();
   }
 }

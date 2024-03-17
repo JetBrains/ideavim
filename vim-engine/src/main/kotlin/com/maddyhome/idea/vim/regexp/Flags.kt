@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,40 +7,41 @@
  */
 package com.maddyhome.idea.vim.regexp
 
-class Flags {
+@Deprecated("Remove once old regex engine is removed")
+public class Flags {
   private var flags: Int
 
-  constructor() {
+  public constructor() {
     flags = 0
   }
 
-  constructor(flags: Int) {
+  public constructor(flags: Int) {
     this.flags = flags
   }
 
-  fun get(): Int {
+  public fun get(): Int {
     return flags
   }
 
-  fun isSet(flag: Int): Boolean {
+  public fun isSet(flag: Int): Boolean {
     return flags and flag != 0
   }
 
-  fun allSet(flags: Int): Boolean {
+  public fun allSet(flags: Int): Boolean {
     return this.flags and flags == flags
   }
 
-  fun init(flags: Int): Int {
+  public fun init(flags: Int): Int {
     this.flags = flags
     return this.flags
   }
 
-  fun set(flags: Int): Int {
+  public fun set(flags: Int): Int {
     this.flags = this.flags or flags
     return this.flags
   }
 
-  fun unset(flags: Int): Int {
+  public fun unset(flags: Int): Int {
     this.flags = this.flags and flags.inv()
     return this.flags
   }

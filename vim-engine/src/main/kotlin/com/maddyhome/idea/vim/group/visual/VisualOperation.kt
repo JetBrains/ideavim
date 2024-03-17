@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,28 +9,30 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.BufferPosition
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.selectionType
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.mode
 import java.util.*
 import kotlin.math.min
 
-object VisualOperation {
+public object VisualOperation {
   /**
    * Get [VisualChange] of current visual operation
    */
-  fun getRange(editor: VimEditor, caret: VimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
+  public fun getRange(editor: VimEditor, caret: ImmutableVimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
     var (start, end) = caret.run {
-      if (editor.inBlockSubMode) sort(vimSelectionStart, offset.point) else sort(selectionStart, selectionEnd)
+      if (editor.inBlockSelection) sort(vimSelectionStart, offset.point) else sort(selectionStart, selectionEnd)
     }
-    val type = SelectionType.fromSubMode(editor.subMode)
+    val type = editor.mode.selectionType ?: CHARACTER_WISE
 
     start = editor.normalizeOffset(start, false)
     end = editor.normalizeOffset(end, false)
@@ -43,10 +45,12 @@ object VisualOperation {
 
     val chars = if (editor.primaryCaret().vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
       VimMotionGroupBase.LAST_COLUMN
-    } else when (type) {
-      SelectionType.LINE_WISE -> ep.column
-      SelectionType.CHARACTER_WISE -> if (lines > 1) ep.column - injector.visualMotionGroup.selectionAdj else ep.column - sp.column
-      SelectionType.BLOCK_WISE -> ep.column - sp.column + 1
+    } else {
+      when (type) {
+        SelectionType.LINE_WISE -> ep.column
+        SelectionType.CHARACTER_WISE -> if (lines > 1) ep.column - injector.visualMotionGroup.selectionAdj else ep.column - sp.column
+        SelectionType.BLOCK_WISE -> ep.column - sp.column + 1
+      }
     }
 
     return VisualChange(lines, chars, type)
@@ -55,7 +59,7 @@ object VisualOperation {
   /**
    * Calculate end offset of [VisualChange]
    */
-  fun calculateRange(editor: VimEditor, range: VisualChange, count: Int, caret: VimCaret): Int {
+  public fun calculateRange(editor: VimEditor, range: VisualChange, count: Int, caret: ImmutableVimCaret): Int {
     var (lines, chars, type) = range
     if (type == SelectionType.LINE_WISE || type == SelectionType.BLOCK_WISE || lines > 1) {
       lines *= count

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,6 +7,8 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
+import com.intellij.vim.annotations.CommandOrMotion
+import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
@@ -14,13 +16,15 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["<C-Y>"], modes = [Mode.INSERT])
+public class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
@@ -32,11 +36,14 @@ class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret(
   ): Boolean {
     return if (editor.isOneLineMode()) {
       false
-    } else insertCharacterAroundCursor(editor, caret, -1)
+    } else {
+      insertCharacterAroundCursor(editor, caret, -1)
+    }
   }
 }
 
-class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["<C-E>"], modes = [Mode.INSERT])
+public class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
@@ -48,7 +55,9 @@ class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret(
   ): Boolean {
     return if (editor.isOneLineMode()) {
       false
-    } else insertCharacterAroundCursor(editor, caret, 1)
+    } else {
+      insertCharacterAroundCursor(editor, caret, 1)
+    }
   }
 }
 
@@ -71,7 +80,7 @@ private fun insertCharacterAroundCursor(editor: VimEditor, caret: VimCaret, dir:
     if (offset < charsSequence.length) {
       val ch = charsSequence[offset]
       (editor as MutableVimEditor).insertText(caret.offset, ch.toString())
-      caret.moveToOffset(injector.motion.getOffsetOfHorizontalMotion(editor, caret, 1, true))
+      caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
       res = true
     }
   }

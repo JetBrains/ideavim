@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 
-class IjVimLogger(private val logger: Logger) : VimLogger {
+internal class IjVimLogger(private val logger: Logger) : VimLogger {
   override fun isTrace(): Boolean = logger.isTraceEnabled
 
   override fun trace(data: String) {
@@ -30,6 +30,10 @@ class IjVimLogger(private val logger: Logger) : VimLogger {
 
   override fun error(message: String) {
     logger.error(message)
+  }
+
+  override fun error(message: String, e: Throwable) {
+    logger.error(message, e)
   }
 
   override fun info(message: String) {

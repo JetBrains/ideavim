@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -19,9 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author Rieon Ke
  * see "h :tabclose"
  */
-data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+@ExCommand(command = "tabc[lose]")
+public data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
 
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val current = injector.tabService.getCurrentTabIndex(context)
@@ -34,7 +36,7 @@ data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.S
       val select = if (index == current) index + 1 else current
       injector.tabService.removeTabAt(index, select, context)
     } else {
-      injector.messages.showStatusBarMessage(injector.messages.message("error.invalid.command.argument"))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("error.invalid.command.argument"))
     }
 
     return ExecutionResult.Success
@@ -53,7 +55,6 @@ data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.S
    * @return tab index to close
    */
   private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int? {
-
     if (arg.isEmpty()) return current
     if (last < 0) return null
 

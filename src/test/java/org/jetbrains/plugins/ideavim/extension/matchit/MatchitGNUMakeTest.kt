@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,14 +9,19 @@
 package org.jetbrains.plugins.ideavim.extension.matchit
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class MatchitGNUMakeTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("matchit")
   }
 
+  @Test
   fun `test jump from define to endef`() {
     doTest(
       "%",
@@ -32,10 +37,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         ${c}endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from endef to define`() {
     doTest(
       "%",
@@ -51,10 +57,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifdef to endif`() {
     doTest(
       "%",
@@ -68,10 +75,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from endif to ifdef`() {
     doTest(
       "%",
@@ -85,10 +93,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifndef to endif`() {
     doTest(
       "%",
@@ -102,10 +111,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from endif to ifndef`() {
     doTest(
       "%",
@@ -119,10 +129,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifeq to endif`() {
     doTest(
       "%",
@@ -136,10 +147,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from endif to ifeq`() {
     doTest(
       "%",
@@ -153,10 +165,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifneq to endif`() {
     doTest(
       "%",
@@ -170,10 +183,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from endif to ifneq`() {
     doTest(
       "%",
@@ -187,10 +201,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifneq to else`() {
     doTest(
       "%",
@@ -204,10 +219,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifeq to else in ifeq-else block`() {
     doTest(
       "%",
@@ -229,10 +245,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from else ifeq to else`() {
     doTest(
       "%",
@@ -254,10 +271,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifeq in else block to else`() {
     doTest(
       "%",
@@ -279,10 +297,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from else to endif in ifeq-else block`() {
     doTest(
       "%",
@@ -304,10 +323,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from endif to ifeq in ifeq-else block`() {
     doTest(
       "%",
@@ -329,10 +349,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifneq to else in ifneq-else block`() {
     doTest(
       "%",
@@ -354,10 +375,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from else ifneq to else`() {
     doTest(
       "%",
@@ -379,10 +401,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from ifneq in else block to else`() {
     doTest(
       "%",
@@ -404,10 +427,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from else to endif in ifneq-else block`() {
     doTest(
       "%",
@@ -429,10 +453,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test jump from endif to ifneq in ifneq-else block`() {
     doTest(
       "%",
@@ -454,12 +479,13 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
   // Reverse tests
 
+  @Test
   fun `test reverse jump from define to endef`() {
     doTest(
       "g%",
@@ -475,10 +501,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         ${c}endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from endef to define`() {
     doTest(
       "g%",
@@ -494,10 +521,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifdef to endif`() {
     doTest(
       "g%",
@@ -511,10 +539,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from endif to ifdef`() {
     doTest(
       "g%",
@@ -528,10 +557,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifndef to endif`() {
     doTest(
       "g%",
@@ -545,10 +575,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from endif to ifndef`() {
     doTest(
       "g%",
@@ -562,10 +593,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifeq to endif`() {
     doTest(
       "g%",
@@ -579,10 +611,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from endif to ifeq`() {
     doTest(
       "g%",
@@ -596,10 +629,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifneq to endif`() {
     doTest(
       "g%",
@@ -613,10 +647,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from endif to ifneq`() {
     doTest(
       "g%",
@@ -630,10 +665,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifneq to else`() {
     doTest(
       "g%",
@@ -647,10 +683,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         else
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifeq to endif in ifeq-else block`() {
     doTest(
       "g%",
@@ -672,10 +709,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from else ifeq to ifeq`() {
     doTest(
       "g%",
@@ -697,10 +735,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifeq in else block to ifeq`() {
     doTest(
       "g%",
@@ -722,10 +761,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from else to else in ifeq-else block`() {
     doTest(
       "g%",
@@ -747,10 +787,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from endif to else in ifeq-else block`() {
     doTest(
       "g%",
@@ -772,10 +813,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifneq to endif in ifneq-else block`() {
     doTest(
       "g%",
@@ -797,10 +839,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from else ifneq to ifneq`() {
     doTest(
       "g%",
@@ -822,10 +865,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from ifneq in else block to ifneq`() {
     doTest(
       "g%",
@@ -847,10 +891,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from else to else in ifneq-else block`() {
     doTest(
       "g%",
@@ -872,10 +917,11 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
+  @Test
   fun `test reverse jump from endif to else in ifneq-else block`() {
     doTest(
       "g%",
@@ -897,7 +943,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 }

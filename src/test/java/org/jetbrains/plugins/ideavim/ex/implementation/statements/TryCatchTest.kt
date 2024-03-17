@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.statements
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class TryCatchTest : VimTestCase() {
 
+  @Test
   fun `test successful catch of a throw statement`() {
     configureByText("\n")
     typeText(
@@ -23,14 +25,15 @@ class TryCatchTest : VimTestCase() {
           "  throw 'my exception' |" +
           "catch /my exception/ |" +
           "  echo 'caught' |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
     assertExOutput("caught\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test unsuccessful catch of a throw statement`() {
     configureByText("\n")
     typeText(
@@ -39,13 +42,14 @@ class TryCatchTest : VimTestCase() {
           "try |" +
           " throw 'my exception' |" +
           "catch /E117:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("my exception")
   }
 
+  @Test
   fun `test vim statement successful catch`() {
     configureByText("\n")
     typeText(
@@ -54,13 +58,14 @@ class TryCatchTest : VimTestCase() {
           "try |" +
           " echo undefinedVariable |" +
           "catch /E121: Undefined variable:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test vim statement unsuccessful catch`() {
     configureByText("\n")
     typeText(
@@ -69,13 +74,14 @@ class TryCatchTest : VimTestCase() {
           "try |" +
           " echo undefinedVariable |" +
           "catch /E117:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: undefinedVariable")
   }
 
+  @Test
   fun `test multiple catches`() {
     configureByText("\n")
     typeText(
@@ -86,14 +92,15 @@ class TryCatchTest : VimTestCase() {
           "catch /E117:/ |" +
           "  echo 'failure' |" +
           "catch /my exception/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
     assertNoExOutput()
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test no matching catch among multiple`() {
     configureByText("\n")
     typeText(
@@ -103,13 +110,14 @@ class TryCatchTest : VimTestCase() {
           "  throw 'my exception' |" +
           "catch /E117:/ |" +
           "catch /E118:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("my exception")
   }
 
+  @Test
   fun `test finally after catch`() {
     configureByText("\n")
     typeText(
@@ -122,14 +130,15 @@ class TryCatchTest : VimTestCase() {
           "catch /my exception/ |" +
           "finally |" +
           "  echo 'finally block' |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
     assertExOutput("finally block\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test finally after unsuccessful catch`() {
     configureByText("\n")
     typeText(
@@ -141,14 +150,15 @@ class TryCatchTest : VimTestCase() {
           "catch /E118:/ |" +
           "finally |" +
           "  echo 'finally block' |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("my exception")
     assertExOutput("finally block\n")
   }
 
+  @Test
   fun `test finish in try catch`() {
     configureByText("\n")
     typeText(
@@ -162,8 +172,8 @@ class TryCatchTest : VimTestCase() {
         finally |
           let y = 1 |
         endtry |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo x .. ' ' .. y"))
     assertExOutput("0 1\n")
