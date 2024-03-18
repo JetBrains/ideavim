@@ -178,12 +178,66 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(4)
   }
 
+  @Test
+  fun `test search motion for text at caret moves to next occurrence`() {
+    doTest(
+      searchCommand("/one"),
+      "${c}one one one",
+      "one ${c}one one"
+    )
+  }
+
+  @Test
+  fun `test search for last pattern`() {
+    doTest(
+      listOf(searchCommand("/one"), searchCommand("//")),
+      "${c}one one one",
+      "one one ${c}one"
+    )
+  }
+
   // |/pattern/e|
   @Test
   fun `test search e motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/e")
     assertOffset(6)
+  }
+
+  @Test
+  fun `test search e motion offset for text at caret`() {
+    doTest(
+      searchCommand("/one/e"),
+      "${c}one one one",
+      "on${c}e one one"
+    ) {
+      // TODO: Fix regression in new regex: VIM-3344
+      enterCommand("set nousenewregex")
+    }
+  }
+
+  @Test
+  fun `test search for last pattern with e motion offset`() {
+    doTest(
+      listOf(searchCommand("/one"), searchCommand("//e")),
+      "${c}one one one",
+      "one on${c}e one"
+    ) {
+      // TODO: Fix regression in new regex: VIM-3344
+      enterCommand("set nousenewregex")
+    }
+  }
+
+  @Test
+  fun `test search for last pattern with e motion offset 2`() {
+    doTest(
+      listOf(searchCommand("/one/e"), searchCommand("//e")),
+      "${c}one one one",
+      "one on${c}e one"
+    ) {
+      // TODO: Fix regression in new regex: VIM-3344
+      enterCommand("set nousenewregex")
+    }
   }
 
   @Test

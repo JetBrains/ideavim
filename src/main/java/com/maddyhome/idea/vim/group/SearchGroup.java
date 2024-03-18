@@ -341,7 +341,6 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     if (pattern == null || pattern.isEmpty()) {
       pattern = getLastSearchPattern();
-      patternOffset = lastPatternOffset;
       if (pattern == null || pattern.isEmpty()) {
         isNewPattern = true;
         pattern = getLastSubstitutePattern();
@@ -349,6 +348,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
           VimPlugin.showMessage(MessageHelper.message("e_noprevre"));
           return null;
         }
+      }
+      if (patternOffset == null || patternOffset.isEmpty()) {
+        patternOffset = lastPatternOffset;
       }
     }
 
@@ -1364,8 +1366,6 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     if (offsetIsLineOffset) {
       int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
       int newLine = EngineEditorHelperKt.normalizeLine(new IjVimEditor(editor), line + offset);
-
-      // TODO: Don't move the caret!
       res = VimPlugin.getMotion().moveCaretToLineStart(new IjVimEditor(editor), newLine);
     }
     else if (hasEndOffset || offset != 0) {
