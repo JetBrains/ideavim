@@ -39,7 +39,7 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
     // We use the global option listener instead of the effective listener that gets called for each affected editor
     // because we handle updating the affected editors ourselves (e.g., we can filter for visible windows).
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch) {
-      resetSearchHighlight()
+      setShouldShowSearchHighlights()
       updateSearchHighlights(true)
     }
 
@@ -169,7 +169,7 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
     showSearchHighlight = injector.globalOptions().hlsearch
   }
 
-  override fun resetSearchHighlight() {
+  override fun setShouldShowSearchHighlights() {
     showSearchHighlight = injector.globalOptions().hlsearch
   }
 

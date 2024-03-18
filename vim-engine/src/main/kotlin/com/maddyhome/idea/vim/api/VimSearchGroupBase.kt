@@ -165,7 +165,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   /**
    * Resets the variable that determines whether search highlights should be shown.
    */
-  protected abstract fun resetSearchHighlight()
+  protected abstract fun setShouldShowSearchHighlights()
 
   abstract override fun clearSearchHighlight()
 
@@ -269,7 +269,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
 
     lastDirection = direction
 
-    resetSearchHighlight()
+    setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
     val result = findItOffset(editor, startOffset, 1, lastDirection)
@@ -316,7 +316,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
 
     if (pattern.isNullOrEmpty()) {
       pattern = lastSearchPattern
-      patternOffset = lastPatternTrailing
       if (pattern.isNullOrEmpty()) {
         isNewPattern = true
         pattern = lastSubstitutePattern
@@ -324,6 +323,9 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
           injector.messages.showStatusBarMessage(null, "E35: No previous regular expression")
           return null
         }
+      }
+      if (patternOffset.isNullOrEmpty()) {
+        patternOffset = lastPatternTrailing
       }
     }
 
@@ -335,7 +337,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
 
     lastDirection = dir
 
-    resetSearchHighlight()
+    setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
     return findItOffset(editor, startOffset, 1, lastDirection)
@@ -363,7 +365,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     lastPatternTrailing = ""
     lastDirection = dir
 
-    resetSearchHighlight()
+    setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
     val offset = findItOffset(editor, range.startOffset, count, lastDirection)?.first ?: -1
@@ -409,7 +411,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     count: Int,
     dir: Direction,
   ): Int {
-    resetSearchHighlight()
+    setShouldShowSearchHighlights()
     updateSearchHighlights(false)
 
     val startOffset: Int = caret.offset
@@ -581,7 +583,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val oldLastSubstituteString: String = lastSubstituteString ?: ""
     lastSubstituteString = substituteString + ""
 
-    resetSearchHighlight()
+    setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
     var lastMatchStartOffset = -1
@@ -1019,6 +1021,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val searchOptions = EnumSet.of(SearchOptions.SHOW_MESSAGES, SearchOptions.WHOLE_FILE)
     if (dir === Direction.BACKWARDS) searchOptions.add(SearchOptions.BACKWARDS)
     if (lastIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
+    if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
     if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS)
 
     // Uses last pattern. We know this is always set before being called
