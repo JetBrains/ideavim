@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.ui.widgets.mode
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -45,7 +44,7 @@ import javax.swing.JPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-public class ModeWidgetPopup : AnAction(), ActionRemoteBehaviorSpecification.Disabled {
+public class ModeWidgetPopup : AnAction() {
   public override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
     val popup = createPopup() ?: return
