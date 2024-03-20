@@ -15,7 +15,6 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
@@ -59,7 +58,7 @@ import javax.swing.KeyStroke
  * This class is used in Which-Key plugin, so don't make it internal. Generally, we should provide a proper
  *   way to get ideavim keys for this plugin. See VIM-3085
  */
-public class VimShortcutKeyAction : AnAction(), DumbAware, ActionRemoteBehaviorSpecification.Disabled/*, LightEditCompatible*/ {
+public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   private val traceTime: Boolean
     get() {
       // Make sure the injector is initialized

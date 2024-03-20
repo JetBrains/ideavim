@@ -15,7 +15,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.actionSystem.remoting.ActionRemoteBehaviorSpecification
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider
@@ -110,7 +109,7 @@ internal object VimRcFileState : VimrcFileState {
   }
 }
 
-internal class ReloadVimRc : DumbAwareAction(), ActionRemoteBehaviorSpecification.Disabled {
+internal class ReloadVimRc : DumbAwareAction() {
   override fun update(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: run {
       e.presentation.isEnabledAndVisible = false
@@ -173,7 +172,7 @@ internal class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GR
   }
 }
 
-internal class ReloadFloatingToolbarActionGroup : DefaultActionGroup(), ActionRemoteBehaviorSpecification.Disabled {
+internal class ReloadFloatingToolbarActionGroup : DefaultActionGroup() {
   companion object {
     const val ACTION_GROUP = "IdeaVim.ReloadVimRc.group"
   }
