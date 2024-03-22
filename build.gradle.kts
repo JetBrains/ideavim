@@ -264,9 +264,6 @@ tasks {
   runPluginVerifier {
     downloadDir.set("${project.buildDir}/pluginVerifier/ides")
     teamCityOutputFormat.set(true)
-
-    // The latest version of the plugin verifier is broken, so temporally use the stable version
-    verifierVersion = "1.307"
   }
 
   generateGrammarSource {
