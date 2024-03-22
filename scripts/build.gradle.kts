@@ -58,13 +58,6 @@ tasks.register("checkNewPluginDependencies", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
 }
 
-tasks.register("updateAffectedRates", JavaExec::class) {
-  group = "verification"
-  description = "This job updates Affected Rate field on YouTrack"
-  mainClass.set("scripts.YouTrackUsersAffectedKt")
-  classpath = sourceSets["main"].runtimeClasspath
-}
-
 tasks.register("calculateNewVersion", JavaExec::class) {
   group = "release"
   mainClass.set("scripts.release.CalculateNewVersionKt")
