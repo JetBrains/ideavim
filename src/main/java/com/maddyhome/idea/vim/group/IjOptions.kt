@@ -10,9 +10,14 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
+import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_BUFFER
+import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -33,6 +38,56 @@ public object IjOptions {
     Options.overrideDefaultValue(Options.clipboard, VimString("ideaput,autoselect,exclude:cons\\|linux"))
   }
 
+  // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
+  public val breakindent: ToggleOption = addOption(ToggleOption("breakindent", LOCAL_TO_WINDOW, "bri", false))
+  public val colorcolumn: StringListOption = addOption(object : StringListOption("colorcolumn", LOCAL_TO_WINDOW, "cc", "") {
+    override fun checkIfValueValid(value: VimDataType, token: String) {
+      super.checkIfValueValid(value, token)
+      if (value != VimString.EMPTY) {
+        // Each element in the comma-separated string list needs to be a number. No spaces. Vim supports numbers
+        // beginning "+" or "-" to draw a highlight column relative to the 'textwidth' value. We don't fully support
+        // that, but we do automatically add "+0" because IntelliJ always displays the right margin
+        split((value as VimString).asString()).forEach {
+          if (!it.matches(Regex("[+-]?[0-9]+"))) {
+            throw exExceptionMessage("E474", token)
+          }
+        }
+      }
+    }
+  })
+  public val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
+  public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
+  public val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
+  public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
+  public val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))
+  public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
+
+  // These options are not explicitly listed as local-noglobal in Vim's help, but are set when a new buffer is edited,
+  // based on the value of 'fileformats' or 'fileencodings'. To prevent unexpected file cnversion, we treat them as
+  // local-noglobal. See `:help local-noglobal`, `:help 'fileformats'` and `:help 'fileencodings'`
+  public val bomb: ToggleOption =
+    addOption(ToggleOption("bomb", LOCAL_TO_BUFFER, "bomb", false, isLocalNoGlobal = true))
+  public val fileencoding: StringOption = addOption(
+    StringOption(
+      "fileencoding",
+      LOCAL_TO_BUFFER,
+      "fenc",
+      VimString.EMPTY,
+      isLocalNoGlobal = true
+    )
+  )
+  public val fileformat: StringOption = addOption(
+    StringOption(
+      "fileformat",
+      LOCAL_TO_BUFFER,
+      "ff",
+      if (injector.systemInfoService.isWindows) "dos" else "unix",
+      boundedValues = setOf("dos", "unix", "mac"),
+      isLocalNoGlobal = true
+    )
+  )
+
+  // IntelliJ specific functionality - custom options
   public val ide: StringOption = addOption(
     StringOption("ide", GLOBAL, "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
   )

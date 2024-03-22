@@ -22,7 +22,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@Suppress("SpellCheckingInspection")
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class SetCommandTest : VimTestCase() {
 
@@ -33,6 +32,7 @@ class SetCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("set fileformat=unix")
     enterCommand("set shell=/dummy/path/to/bash")
     enterCommand("set shellcmdflag=-x")
     enterCommand("set shellxescape=@")
@@ -49,13 +49,13 @@ class SetCommandTest : VimTestCase() {
   @Test
   fun `test toggle option`() {
     enterCommand("set rnu")
-    assertTrue(options().relativenumber)
+    assertTrue(optionsIj().relativenumber)
     enterCommand("set nornu")
-    assertFalse(options().relativenumber)
+    assertFalse(optionsIj().relativenumber)
     enterCommand("set rnu!")
-    assertTrue(options().relativenumber)
+    assertTrue(optionsIj().relativenumber)
     enterCommand("set invrnu")
-    assertFalse(options().relativenumber)
+    assertFalse(optionsIj().relativenumber)
   }
 
   @Test
@@ -70,16 +70,16 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test toggle option as a number`() {
-    enterCommand("set number&")   // Local to window. Reset local + per-window "global" value to default: nonu
-    assertEquals(0, injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
-    assertCommandOutput("set number?", "nonumber\n")
+    enterCommand("set digraph&")   // Local to window. Reset local + per-window "global" value to default: nodigraph
+    assertEquals(0, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertCommandOutput("set digraph?", "nodigraph\n")
 
     // Should have the same effect as `:set` (although `:set` doesn't allow assigning a number to a boolean)
     // I.e. this sets the local value and the per-window "global" value
-    enterCommand("let &nu=1000")
-    assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble().toInt())
-    assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
-    assertCommandOutput("set number?", "  number\n")
+    enterCommand("let &dg=1000")
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble().toInt())
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertCommandOutput("set digraph?", "  digraph\n")
   }
 
   @Test
@@ -149,35 +149,41 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified effective option values`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
     assertCommandOutput("set",
       """
         |--- Options ---
         |  number              relativenumber
+        |  fileencoding=utf-8
         |
       """.trimMargin())
   }
 
   @Test
   fun `test show all effective option values`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("set all",
       """
         |--- Options ---
-        |noargtextobj        noincsearch           selectmode=       notextobj-indent
-        |nocommentary        nomatchit             shellcmdflag=-x     timeout
-        |nodigraph             maxmapdepth=20      shellxescape=@      timeoutlen=1000
-        |noexchange            more                shellxquote={     notrackactionids
-        |nogdefault          nomultiple-cursors    showcmd             undolevels=1000
-        |nohighlightedyank   noNERDTree            showmode            virtualedit=
-        |  history=50          nrformats=hex       sidescroll=0      novisualbell
-        |nohlsearch          nonumber              sidescrolloff=0     visualdelay=100
-        |noideaglobalmode      operatorfunc=     nosmartcase           whichwrap=b,s
-        |noideajoin          norelativenumber    nosneak               wrapscan
-        |  ideamarks           scroll=0            startofline
-        |  ideawrite=all       scrolljump=1      nosurround
-        |noignorecase          scrolloff=0       notextobj-entire
+        |noargtextobj          ideamarks           scrolljump=1      notextobj-indent
+        |nobomb                ideawrite=all       scrolloff=0         textwidth=0
+        |nobreakindent       noignorecase          selectmode=         timeout
+        |  colorcolumn=      noincsearch           shellcmdflag=-x     timeoutlen=1000
+        |nocommentary        nolist                shellxescape=@    notrackactionids
+        |nocursorline        nomatchit             shellxquote={       undolevels=1000
+        |nodigraph             maxmapdepth=20      showcmd             virtualedit=
+        |noexchange            more                showmode          novisualbell
+        |  fileformat=unix   nomultiple-cursors    sidescroll=0        visualdelay=100
+        |nogdefault          noNERDTree            sidescrolloff=0     whichwrap=b,s
+        |nohighlightedyank     nrformats=hex     nosmartcase           wrap
+        |  history=50        nonumber            nosneak               wrapscan
+        |nohlsearch            operatorfunc=       startofline
+        |noideaglobalmode    norelativenumber    nosurround
+        |noideajoin            scroll=0          notextobj-entire
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
+        |  fileencoding=utf-8
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
         |  ide=IntelliJ IDEA Community Edition
         |noideacopypreprocess
@@ -207,10 +213,12 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified option values in single column`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
     assertCommandOutput("set!",
       """
       |--- Options ---
+      |  fileencoding=utf-8
       |  number
       |  relativenumber
       |""".trimMargin()
@@ -219,14 +227,21 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all option values in single column`() {
+    // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
     assertCommandOutput("set! all", """
       |--- Options ---
       |noargtextobj
+      |nobomb
+      |nobreakindent
       |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  colorcolumn=
       |nocommentary
+      |nocursorline
       |nodigraph
       |noexchange
+      |  fileencoding=utf-8
+      |  fileformat=unix
       |nogdefault
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |nohighlightedyank
@@ -245,6 +260,7 @@ class SetCommandTest : VimTestCase() {
       |noincsearch
       |  iskeyword=@,48-57,_
       |  keymodel=continueselect,stopselect
+      |nolist
       |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
       |nomatchit
       |  matchpairs=(:),{:},[:]
@@ -276,6 +292,7 @@ class SetCommandTest : VimTestCase() {
       |nosurround
       |notextobj-entire
       |notextobj-indent
+      |  textwidth=0
       |  timeout
       |  timeoutlen=1000
       |notrackactionids
@@ -286,6 +303,7 @@ class SetCommandTest : VimTestCase() {
       |novisualbell
       |  visualdelay=100
       |  whichwrap=b,s
+      |  wrap
       |  wrapscan
       |""".trimMargin()
     )
@@ -324,7 +342,5 @@ class SetCommandTest : VimTestCase() {
 
     assertCommandOutput("set virtualedit?", "  virtualedit=block\n")
     assertCommandOutput("setlocal virtualedit?", "  virtualedit=\n")
-
-    // Note that :setlocal virtualedit< has different behaviour. See SetlocalCommandTest
   }
 }

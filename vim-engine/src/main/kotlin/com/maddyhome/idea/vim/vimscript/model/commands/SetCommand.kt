@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.invertToggleOption
 import com.maddyhome.idea.vim.api.isDefaultValue
-import com.maddyhome.idea.vim.api.resetDefaultValue
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.unsetToggleOption
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -25,7 +24,6 @@ import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -146,21 +144,10 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessS
       when {
         token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
         token.startsWith("no") -> optionGroup.unsetToggleOption(getValidToggleOption(token.substring(2), token), scope)
-        token.startsWith("inv") -> optionGroup.invertToggleOption(
-          getValidToggleOption(token.substring(3), token),
-          scope
-        )
-
+        token.startsWith("inv") -> optionGroup.invertToggleOption(getValidToggleOption(token.substring(3), token), scope)
         token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
-        token.endsWith("&") -> optionGroup.resetDefaultValue(getValidOption(token.dropLast(1), token), scope)
-        token.endsWith("<") -> {
-          // Copy the global value to the target scope. If the target scope is global, this is a no-op. When copying a
-          // string global-local option to effective scope, Vim's behaviour matches setting that option at effective
-          // scope. That is, it sets the global value (a no-op) and resets the local value.
-          val option = getValidOption(token.dropLast(1), token)
-          val globalValue = optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(editor))
-          optionGroup.setOptionValue(option, scope, globalValue)
-        }
+        token.endsWith("&") -> optionGroup.resetToDefaultValue(getValidOption(token.dropLast(1), token), scope)
+        token.endsWith("<") -> optionGroup.resetToGlobalValue(getValidOption(token.dropLast(1), token), scope, editor)
         else -> {
           // `getOption` returns `Option<VimDataType>?`, but we need to treat it as `Option<out VimDataType>?` because
           // `ToggleOption` derives from `Option<out VimDataType>`, and the compiler will complain if the types are
@@ -300,9 +287,7 @@ private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: Optio
   if (option is ToggleOption) {
 
     // Unset global-local toggle option
-    if ((option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
-        || option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
-      && scope is OptionAccessScope.LOCAL && value == VimInt.MINUS_ONE) {
+    if (option.declaredScope.isGlobalLocal() && scope is OptionAccessScope.LOCAL && value == VimInt.MINUS_ONE) {
       return "--${option.name}"
     }
 

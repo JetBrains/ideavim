@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.helper.ScrollViewHelper
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
-import com.maddyhome.idea.vim.helper.vimEditorGroup
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
@@ -258,11 +257,7 @@ internal class ScrollGroup : VimScrollGroup {
 
   object ScrollOptionsChangeListener : EffectiveOptionValueChangeListener {
     override fun onEffectiveValueChanged(editor: VimEditor) {
-      editor.ij.apply {
-        if (vimEditorGroup) {
-          ScrollViewHelper.scrollCaretIntoView(this)
-        }
-      }
+      editor.ij.apply { ScrollViewHelper.scrollCaretIntoView(this) }
     }
   }
 

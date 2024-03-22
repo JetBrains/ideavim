@@ -129,8 +129,6 @@ public object Options {
   public val nrformats: StringListOption = addOption(
     StringListOption("nrformats", LOCAL_TO_BUFFER, "nf", "hex", setOf("octal", "hex", "alpha"))
   )
-  public val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
-  public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
   public val scroll: NumberOption = addOption(NumberOption("scroll", LOCAL_TO_WINDOW, "scr", 0))
   public val scrolloff: NumberOption = addOption(NumberOption("scrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "so", 0))
   public val selection: StringOption = addOption(
@@ -171,7 +169,7 @@ public object Options {
   )
   public val showcmd: ToggleOption = addOption(ToggleOption("showcmd", GLOBAL, "sc", true))
   public val showmode: ToggleOption = addOption(ToggleOption("showmode", GLOBAL, "smd", true))
-  public val sidescroll: NumberOption = addOption(NumberOption("sidescroll", GLOBAL, "ss", 0))
+  public val sidescroll: NumberOption = addOption(UnsignedNumberOption("sidescroll", GLOBAL, "ss", 0))
   public val sidescrolloff: NumberOption = addOption(
     NumberOption("sidescrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "siso", 0)
   )

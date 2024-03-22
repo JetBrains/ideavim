@@ -7,10 +7,12 @@
  */
 package org.jetbrains.plugins.ideavim
 
+import com.intellij.application.options.CodeStyle
 import com.intellij.ide.ClipboardSynchronizer
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.json.JsonFileType
+import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -25,10 +27,12 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.project.Project
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings
 import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.PlatformTestUtil
@@ -42,6 +46,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.GlobalOptions
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -53,6 +58,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -119,7 +125,7 @@ abstract class VimTestCase {
       KeyHandler.getInstance().fullReset(editor.vim)
     }
     KeyHandler.getInstance().keyHandlerState.reset(Mode.NORMAL())
-    VimPlugin.getOptionGroup().resetAllOptionsForTesting()
+    resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
@@ -135,6 +141,40 @@ abstract class VimTestCase {
     VimPlugin.clearError()
 
     this.testInfo = testInfo
+  }
+
+  private fun resetAllOptions() {
+    VimPlugin.getOptionGroup().resetAllOptionsForTesting()
+
+    // Some options are mapped to IntelliJ settings. Make sure the IntelliJ settings match the Vim defaults
+    EditorSettingsExternalizable.getInstance().apply {
+      isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.asBoolean()
+      isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
+      isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
+      isLineNumbersShown = IjOptions.number.defaultValue.asBoolean()
+      softWrapFileMasks = "*"
+      isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
+
+      verticalScrollJump = Options.scrolljump.defaultValue.value
+      verticalScrollOffset = Options.scrolloff.defaultValue.value
+      horizontalScrollJump = Options.sidescroll.defaultValue.value
+      horizontalScrollOffset = Options.sidescrolloff.defaultValue.value
+    }
+
+    CodeStyle.getDefaultSettings().getCommonSettings(null as Language?).apply {
+      RIGHT_MARGIN = IjOptions.textwidth.defaultValue.value
+      WRAP_ON_TYPING = if (IjOptions.textwidth.defaultValue > 0) {
+        CommonCodeStyleSettings.WrapOnTyping.WRAP.intValue
+      }
+      else {
+        CommonCodeStyleSettings.WrapOnTyping.NO_WRAP.intValue
+      }
+    }
+  }
+
+  private fun setDefaultIntelliJSettings(editor: Editor) {
+    // These settings don't have a global setting...
+    editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.asBoolean()
   }
 
   protected open fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
@@ -256,6 +296,7 @@ abstract class VimTestCase {
 
   protected fun configureByText(fileType: FileType, content: String): Editor {
     fixture.configureByText(fileType, content)
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
@@ -263,6 +304,7 @@ abstract class VimTestCase {
 
   private fun configureByText(fileName: String, content: String): Editor {
     fixture.configureByText(fileName, content)
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
@@ -270,6 +312,7 @@ abstract class VimTestCase {
 
   public fun configureByTextX(fileName: String, content: String): Editor {
     fixture.configureByText(fileName, content)
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
@@ -277,6 +320,7 @@ abstract class VimTestCase {
 
   protected fun configureByFileName(fileName: String): Editor {
     fixture.configureByText(fileName, "\n")
+    setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
     return fixture.editor
@@ -300,13 +344,18 @@ abstract class VimTestCase {
     configureByText(stringBuilder.toString())
   }
 
-  protected fun configureByColumns(columnCount: Int) {
+  protected fun configureByColumns(columnCount: Int, disableWrap: Boolean = true) {
     val content = buildString {
       repeat(columnCount) {
         append('0' + (it % 10))
       }
     }
     configureByText(content)
+
+    // `'wrap'` is set by default. But if we're configuring long columns, we usually don't want soft wraps enabled
+    if (disableWrap) {
+      enterCommand("set nowrap")
+    }
   }
 
   @JvmOverloads
@@ -341,7 +390,10 @@ abstract class VimTestCase {
   protected fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
-    val editor = fixture.editor
+    return typeText(fixture.editor, keys)
+  }
+
+  protected fun typeText(editor: Editor, keys: List<KeyStroke?>): Editor {
     NeovimTesting.typeCommand(
       keys.filterNotNull().joinToString(separator = "") { injector.parser.toKeyNotation(it) },
       testInfo,
@@ -451,7 +503,7 @@ abstract class VimTestCase {
     val actual = injector.registerGroup.getRegister(char)?.keys?.let(injector.parser::toKeyNotation)
     assertEquals(expected, actual, "Wrong register contents")
   }
-  
+
   protected fun assertState(modeAfter: Mode) {
     assertMode(modeAfter)
     assertCaretsVisualAttributes()

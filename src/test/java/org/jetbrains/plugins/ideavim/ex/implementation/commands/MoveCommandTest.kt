@@ -120,6 +120,7 @@ class MoveCommandTest : VimTestCase() {
       
       """.trimIndent(),
     )
+    enterCommand("set nowrap")
 
     typeText("Vj:m-2<CR>")
     assertState(
@@ -164,6 +165,7 @@ class MoveCommandTest : VimTestCase() {
       See, nothing.
       """.trimIndent(),
     )
+    enterCommand("set nowrap")
     typeText("Vj:m-3<CR>")
     assertState(
       """

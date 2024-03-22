@@ -69,6 +69,31 @@ public interface VimOptionGroup {
   public fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionAccessScope, value: T)
 
   /**
+   * Resets the option's target scope's value back to its default value
+   *
+   * This is the equivalent of `:set {option}&`, `:setglobal {option}&` and `:setlocal {option}&`.
+   *
+   * When called at global scope, it will reset the global value to the option's default value. Similarly for local
+   * scope. When called at effective scope for local options, it will reset both the local and global values. For
+   * global-local options, the local value is reset to the default value, rather than unset. This matches Vim behaviour.
+   */
+  public fun <T : VimDataType> resetToDefaultValue(option: Option<T>, scope: OptionAccessScope)
+
+  /**
+   * Resets the option's target scope's value back to its global value
+   *
+   * This is the equivalent of `:set {option}<`, `:setglobal {option}<` and `:setlocal {option}<`.
+   *
+   * For local options, this will copy the global value to the local value. For global options, or called at global
+   * scope (`:setglobal {option}<`), this is a no-op, as copying the global value to the global value obviously does
+   * nothing. For global-local options called at effective scope, this will also copy the current global value to the
+   * local value, but when called at local scope (`:setlocal {option}<`) then number-based options are unset,
+   * effectively resetting the local value to the global value. This is the only way to unset global-local toggle
+   * options.
+   */
+  public fun <T : VimDataType> resetToGlobalValue(option: Option<T>, scope: OptionAccessScope, editor: VimEditor)
+
+  /**
    * Get or create cached, parsed data for the option value effective for the editor
    *
    * The parsed data is created by the given [provider], based on the effective value of the option in the given
@@ -207,22 +232,8 @@ public interface VimOptionGroup {
 public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionAccessScope): Boolean =
   getOptionValue(option, scope) == option.defaultValue
 
-/**
- * Resets the option back to its default value
- *
- * Resetting a global-local value at local scope will set it to the default value, rather than set it to its unset
- * value. This matches Vim behaviour.
- */
-public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionAccessScope) {
-  setOptionValue(option, scope, option.defaultValue)
-}
-
-/**
- *
- */
 public fun <T: VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
-  check(option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
-    || option.declaredScope == OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW)
+  check(option.declaredScope.isGlobalLocal())
   return getOptionValue(option, OptionAccessScope.LOCAL(editor)) == option.unsetValue
 }
 

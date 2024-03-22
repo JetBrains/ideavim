@@ -42,8 +42,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.intellij.openapi.editor.EditorSettings.*;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
 
 /**
@@ -55,12 +55,31 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   private Boolean isKeyRepeat = null;
 
+  // TODO: Get rid of this custom line converter once we support soft wraps properly
+  // The builtin relative line converter looks like it's using Vim's logical lines for counting, where a Vim logical
+  // line is a buffer line, or a single line representing a fold of several buffer lines. This converter is counting
+  // screen lines (but badly - if you're on the second line of a wrapped line, it still counts like you're on the first.
+  // We really want to use Vim logical lines, but we don't currently support them for movement - we move by screen line.
+
   private final CaretListener myLineNumbersCaretListener = new CaretListener() {
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
-      final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && options(injector, new IjVimEditor(e.getEditor())).getRelativenumber()) {
-        repaintRelativeLineNumbers(e.getEditor());
+      // We don't get notified when the IDE's settings change, so make sure we're up-to-date when the caret moves
+      final Editor editor = e.getEditor();
+      boolean relativenumber = ijOptions(injector, new IjVimEditor(editor)).getRelativenumber();
+      if (relativenumber) {
+        if (!hasRelativeLineNumbersInstalled(editor)) {
+          installRelativeLineNumbers(editor);
+        }
+        else {
+          // We must repaint on each caret move, so we update when caret's visual line doesn't match logical line
+          repaintRelativeLineNumbers(editor);
+        }
+      }
+      else {
+        if (hasRelativeLineNumbersInstalled(editor)) {
+          removeRelativeLineNumbers(editor);
+        }
       }
     }
   };
@@ -73,11 +92,10 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     editor.getCaretModel().addCaretListener(myLineNumbersCaretListener);
     UserDataManager.setVimEditorGroup(editor, true);
 
-    UserDataManager.setVimLineNumbersInitialState(editor, editor.getSettings().isLineNumbersShown());
     updateLineNumbers(editor);
   }
 
-  private void deinitLineNumbers(@NotNull Editor editor, boolean isReleasing) {
+  private void deinitLineNumbers(@NotNull Editor editor) {
     if (isProjectDisposed(editor) || !supportsVimLineNumbers(editor) || !UserDataManager.getVimEditorGroup(editor)) {
       return;
     }
@@ -86,14 +104,6 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     UserDataManager.setVimEditorGroup(editor, false);
 
     removeRelativeLineNumbers(editor);
-
-    // Don't reset the built in line numbers if we're releasing the editor. If we do, EditorSettings.setLineNumbersShown
-    // can cause the editor to refresh settings and can call into FileManagerImpl.getCachedPsiFile AFTER FileManagerImpl
-    // has been disposed (Closing the project with a Find Usages result showing a preview panel is a good repro case).
-    // See IDEA-184351 and VIM-1671
-    if (!isReleasing) {
-      setBuiltinLineNumbers(editor, UserDataManager.getVimLineNumbersInitialState(editor));
-    }
   }
 
   private static boolean supportsVimLineNumbers(final @NotNull Editor editor) {
@@ -107,39 +117,20 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
-    final EffectiveOptions options = options(injector, new IjVimEditor(editor));
-    final boolean relativeNumber = options.getRelativenumber();
-    final boolean number = options.getNumber();
-
-    final boolean showBuiltinEditorLineNumbers = shouldShowBuiltinLineNumbers(editor, number, relativeNumber);
-
-    final EditorSettings settings = editor.getSettings();
-    if (settings.isLineNumbersShown() ^ showBuiltinEditorLineNumbers) {
-      // Update line numbers later since it may be called from a caret listener
-      // on the caret move and it may move the caret internally
-      ApplicationManager.getApplication().invokeLater(() -> {
-        if (editor.isDisposed()) return;
-        setBuiltinLineNumbers(editor, showBuiltinEditorLineNumbers);
-      });
+    final boolean isLineNumbersShown = editor.getSettings().isLineNumbersShown();
+    if (!isLineNumbersShown) {
+      return;
     }
 
-    if (relativeNumber) {
+    final LineNumerationType lineNumerationType = editor.getSettings().getLineNumerationType();
+    if (lineNumerationType == LineNumerationType.RELATIVE || lineNumerationType == LineNumerationType.HYBRID) {
       if (!hasRelativeLineNumbersInstalled(editor)) {
         installRelativeLineNumbers(editor);
       }
     }
-    else if (hasRelativeLineNumbersInstalled(editor)) {
+    else {
       removeRelativeLineNumbers(editor);
     }
-  }
-
-  private static boolean shouldShowBuiltinLineNumbers(final @NotNull Editor editor, boolean number, boolean relativeNumber) {
-    final boolean initialState = UserDataManager.getVimLineNumbersInitialState(editor);
-    return initialState || number || relativeNumber;
-  }
-
-  private static void setBuiltinLineNumbers(final @NotNull Editor editor, boolean show) {
-    editor.getSettings().setLineNumbersShown(show);
   }
 
   private static boolean hasRelativeLineNumbersInstalled(final @NotNull Editor editor) {
@@ -256,8 +247,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     updateCaretsVisualAttributes(new IjVimEditor(editor));
   }
 
-  public void editorDeinit(@NotNull Editor editor, boolean isReleased) {
-    deinitLineNumbers(editor, isReleased);
+  public void editorDeinit(@NotNull Editor editor) {
+    deinitLineNumbers(editor);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(new IjVimEditor(editor));
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
@@ -322,17 +313,18 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = options(injector, new IjVimEditor(editor)).getNumber();
+      final IjVimEditor ijVimEditor = new IjVimEditor(editor);
+      final boolean number = ijOptions(injector, ijVimEditor).getNumber();
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based
-      if (number && (lineNumber - 1) == caretLine) {
-        return lineNumber;
+      if ((lineNumber - 1) == caretLine) {
+        return number ? lineNumber : 0;
       }
       else {
-        final int visualLine = new IjVimEditor(editor).bufferLineToVisualLine(lineNumber - 1);
-        final int currentVisualLine = new IjVimEditor(editor).bufferLineToVisualLine(caretLine);
-        return Math.abs(currentVisualLine - visualLine);
+        final int visualLine = ijVimEditor.bufferLineToVisualLine(lineNumber - 1);
+        final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
+        return Math.abs(caretVisualLine - visualLine);
       }
     }
 
