@@ -27,6 +27,8 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
   public var count: Int = 0
     private set
   public val keys: Iterable<KeyStroke> get() = keyList
+  public val register: Char?
+    get() = commandParts.lastOrNull()?.register
 
   // The argument type for the current command part's action. Kept separate to handle digraphs and characters. We first
   // try to accept a digraph. If we get it, set expected argument type to character and handle the converted key. If we

@@ -203,6 +203,36 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
+  @Test
+  fun `with specific register`() {
+    val text = "one ${c}two three four"
+
+    configureByText(text)
+    VimPlugin.getRegister().setKeys('k', injector.parser.parseKeys("one"))
+    typeText(injector.parser.parseKeys("\"kgriw"))
+    assertState("one on${c}e three four")
+  }
+
+  @Test
+  fun `with specific register in visual mode`() {
+    val text = "one ${c}two three four"
+
+    configureByText(text)
+    VimPlugin.getRegister().setKeys('k', injector.parser.parseKeys("one"))
+    typeText(injector.parser.parseKeys("ve\"kgr"))
+    assertState("one on${c}e three four")
+  }
+
+  @Test
+  fun `with specific register in line mode`() {
+    val text = "one ${c}two three four"
+
+    configureByText(text)
+    VimPlugin.getRegister().setKeys('k', injector.parser.parseKeys("one"))
+    typeText(injector.parser.parseKeys("\"kgrr"))
+    assertState("${c}one\n")
+  }
+
   // --------------------------------------- grr --------------------------
 
   @Test

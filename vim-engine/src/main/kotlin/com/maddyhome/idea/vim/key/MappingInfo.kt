@@ -186,6 +186,10 @@ public class ToHandlerMappingInfo(
     }
 
     val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending(editor.mode), keyState.commandBuilder.count, vimStateMachine.mode)
+    val register = keyState.commandBuilder.register
+    if (register != null) {
+      injector.registerGroup.selectRegister(register)
+    }
     injector.actionExecutor.executeCommand(
       editor,
       { extensionHandler.execute(editor, context, operatorArguments) },
