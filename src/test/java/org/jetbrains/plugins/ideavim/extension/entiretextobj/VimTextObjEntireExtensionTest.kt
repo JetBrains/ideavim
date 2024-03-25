@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -57,6 +58,14 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
   @Test
   fun testYankEntireBuffer() {
     doTest("yae", poem, "<caret>$poemNoCaret")
+    assertRegisterString(injector.registerGroup.defaultRegister, poemNoCaret)
+  }
+
+  // |y| |ae|
+  @Test
+  fun testYankEntireBufferWithCustomRegister() {
+    doTest("\"kyae", poem, "<caret>$poemNoCaret")
+    assertRegisterString('k', poemNoCaret)
   }
 
   // |gU| |ie|

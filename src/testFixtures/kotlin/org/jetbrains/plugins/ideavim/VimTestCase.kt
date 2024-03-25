@@ -451,7 +451,12 @@ abstract class VimTestCase {
     val actual = injector.registerGroup.getRegister(char)?.keys?.let(injector.parser::toKeyNotation)
     assertEquals(expected, actual, "Wrong register contents")
   }
-  
+
+  protected fun assertRegisterString(char: Char, expected: String?) {
+    val actual = injector.registerGroup.getRegister(char)?.keys?.let(injector.parser::toPrintableString)
+    assertEquals(expected, actual, "Wrong register contents")
+  }
+
   protected fun assertState(modeAfter: Mode) {
     assertMode(modeAfter)
     assertCaretsVisualAttributes()
