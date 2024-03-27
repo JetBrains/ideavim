@@ -120,14 +120,14 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
     public fun createRangeAddresses(str: String, offset: Int, move: Boolean): Array<Address>? {
       // Current line
       if (str.isEmpty() || str == ".") {
-        return arrayOf(LineAddress(offset, move))
+        return arrayOf(CurrentLineAddress(offset, move))
       } else if (str == "%") {
         return arrayOf(
           LineAddress(0, 0, move),
-          LineAddress(LineAddress.LAST_LINE, offset, move),
+          LastLineAddress(offset, move)
         )
       } else if (str == "$") {
-        return arrayOf(LineAddress(LineAddress.LAST_LINE, offset, move))
+        return arrayOf(LastLineAddress(offset, move))
       } else if (str.startsWith("'") && str.length == 2) {
         return arrayOf(MarkAddress(str[1], offset, move))
       } else if (str.startsWith("/") || str.startsWith("\\/") || str.startsWith("\\&")) {
@@ -148,65 +148,58 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
 }
 
 /**
- * Represents a specific line, the current line, or the last line of a file
+ * Represents a specific line in the buffer
+ *
+ * @param line    The zero-based line of the address
+ * @param offset  The offset added or removed to the line that the address evaluates to, e.g. `:1,'a+3`
+ * @param move    True if the address should move the caret to the line that the address evaluates to
  */
-@TestOnly // Should be private. Constructor is public for test purposes only
-public class LineAddress : Address {
-  /**
-   * Create a range for the current line
-   *
-   * @param offset The range offset
-   * @param move   True if the cursor should be moved
-   */
-  public constructor(offset: Int, move: Boolean) : super(offset, move) {
-    line = CURRENT_LINE
-  }
+@TestOnly
+public class LineAddress(private val line: Int, offset: Int, move: Boolean) : Address(offset, move) {
 
-  /**
-   * Create a range for the given line
-   *
-   * @param offset The range offset
-   * @param move   True if the cursor should be moved
-   */
-  public constructor(line: Int, offset: Int, move: Boolean) : super(offset, move) {
-    this.line = line
-  }
-
-  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
-    if (line == CURRENT_LINE) {
-      line = editor.currentCaret().getBufferPosition().line
-    } else if (line == LAST_LINE) {
-      line = editor.lineCount() - 1
-    }
-    return line
-  }
-
-  override fun calculateLine(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    lastZero: Boolean,
-  ): Int {
-    // TODO: This doesn't match the behaviour in the other overload
-    line = if (line == LAST_LINE) editor.lineCount() - 1 else caret.getBufferPosition().line
-    return line
-  }
-
-  override fun toString(): String = "LineAddress[line=$line, ${super.toString()}]"
+  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int = line
+  override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int = line
 
   override fun equals(other: Any?): Boolean {
     return super.equals(other) && (other as? LineAddress)?.line == this.line
   }
 
-  override fun hashCode(): Int {
-    return super.hashCode() + 31 * line
+  override fun hashCode(): Int = super.hashCode() + 31 * line
+  override fun toString(): String = "LineAddress[line=$line, ${super.toString()}]"
+}
+
+/**
+ * Represents the current line for the given caret
+ *
+ * Entered as `.` in the command line.
+ */
+private class CurrentLineAddress(offset: Int, move: Boolean) : Address(offset, move) {
+  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
+    return calculateLine(editor, editor.primaryCaret(), lastZero)
   }
 
-  private var line: Int
-
-  public companion object {
-    public const val CURRENT_LINE: Int = -99999999
-    public const val LAST_LINE: Int = -99999998
+  override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
+    return caret.getBufferPosition().line
   }
+
+  override fun toString(): String = "CurrentLineAddress[${super.toString()}]"
+}
+
+/**
+ * Represents the last line in the buffer
+ *
+ * Entered as `$` in the command line.
+ */
+private class LastLineAddress(offset: Int, move: Boolean) : Address(offset, move) {
+  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
+    return calculateLine(editor, editor.primaryCaret(), lastZero)
+  }
+
+  override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
+    return editor.lineCount() - 1
+  }
+
+  override fun toString(): String = "LastLineAddress[${super.toString()}]"
 }
 
 /**
@@ -223,15 +216,12 @@ public class MarkAddress(private val mark: Char, offset: Int, move: Boolean) : A
     return calculateLine(editor, lastZero)
   }
 
-  override fun toString(): String = "MarkAddress[mark=$mark, ${super.toString()}]"
-
   override fun equals(other: Any?): Boolean {
     return super.equals(other) && (other as? MarkAddress)?.mark == this.mark
   }
 
-  override fun hashCode(): Int {
-    return super.hashCode() + 31 * mark.hashCode()
-  }
+  override fun hashCode(): Int = super.hashCode() + 31 * mark.hashCode()
+  override fun toString(): String = "MarkAddress[mark=$mark, ${super.toString()}]"
 }
 
 /**
@@ -336,13 +326,10 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
     }
   }
 
-  override fun toString(): String = "SearchAddress[patterns=$patterns, ${super.toString()}]"
-
   override fun equals(other: Any?): Boolean {
     return super.equals(other) && (other as? SearchAddress)?.patterns == this.patterns
   }
 
-  override fun hashCode(): Int {
-    return super.hashCode() + 31 * patterns.hashCode()
-  }
+  override fun hashCode(): Int = super.hashCode() + 31 * patterns.hashCode()
+  override fun toString(): String = "SearchAddress[patterns=$patterns, ${super.toString()}]"
 }
