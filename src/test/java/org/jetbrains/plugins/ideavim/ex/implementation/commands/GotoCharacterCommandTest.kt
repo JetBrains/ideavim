@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class GoToCommandTest : VimTestCase() {
+class GotoCharacterCommandTest : VimTestCase() {
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("goto 10")
