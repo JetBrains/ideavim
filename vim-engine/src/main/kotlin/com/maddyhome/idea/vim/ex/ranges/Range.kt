@@ -51,8 +51,7 @@ public class Range {
    * @return The line number represented by the range
    */
   public fun getLine(editor: VimEditor): Int {
-    processRange(editor)
-    return endLine
+    return processRange(editor).endLine
   }
 
   /**
@@ -63,16 +62,14 @@ public class Range {
    * @return The line number represented by the range
    */
   public fun getLine(editor: VimEditor, caret: VimCaret): Int {
-    processRange(editor, caret)
-    return endLine
+    return processRange(editor, caret).endLine
   }
 
   // TODO: Consider removing this
   // Most commands use either a range or a line which is the last line in a range. There should be no need to get the
   // first line separate from a range
   public fun getFirstLine(editor: VimEditor, caret: VimCaret): Int {
-    processRange(editor, caret)
-    return startLine
+    return processRange(editor, caret).startLine
   }
 
   /**
@@ -113,22 +110,17 @@ public class Range {
    * @return The line range
    */
   public fun getLineRange(editor: VimEditor, count: Int): LineRange {
-    processRange(editor)
-    val end: Int
-    val start: Int
-    if (count == -1) {
-      end = endLine
-      start = startLine
+    val lineRange = processRange(editor)
+    return if (count == -1) {
+      lineRange
     } else {
-      start = endLine
-      end = start + count - 1
+      LineRange(lineRange.endLine, lineRange.endLine + count - 1)
     }
-    return LineRange(start, end)
   }
 
   public fun getLineRange(editor: VimEditor, caret: VimCaret, count: Int): LineRange {
-    processRange(editor, caret)
-    return if (count == -1) LineRange(startLine, endLine) else LineRange(endLine, endLine + count - 1)
+    val lineRange = processRange(editor, caret)
+    return if (count == -1) lineRange else LineRange(lineRange.endLine, lineRange.endLine + count - 1)
   }
 
   /**
@@ -158,55 +150,23 @@ public class Range {
     return TextRange(start, min(end, editor.fileSize().toInt()))
   }
 
-  /**
-   * Processes the list of ranges and calculates the start and end lines of the range
-   *
-   * @param editor  The editor to get the lines for
-   */
-  private fun processRange(editor: VimEditor) {
-    // Already done
-    if (done) return
-
-    // Start with the range being the current line
-    startLine = if (defaultLine == -1) editor.currentCaret().getBufferPosition().line else defaultLine
-    endLine = startLine
-    var lastZero = false
-
-    // Now process each address in the range, moving the cursor if appropriate
-    for (address in addresses) {
-      startLine = endLine
-      endLine = address.getLine(editor, lastZero)
-      if (address.isMove) {
-        editor.primaryCaret().moveToOffset(
-          injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret()),
-        )
-      }
-
-      // TODO: Reconsider lastZero. I don't think it helps, and might actually cause problems
-      // Did that last address represent the start of the file?
-      lastZero = endLine < 0
-      count++
-    }
-
-    // If only one address is given, make the start and end the same
-    if (count == 1) {
-      startLine = endLine
-    }
-    done = true
+  private fun processRange(editor: VimEditor): LineRange {
+    return processRange(editor, editor.primaryCaret())
   }
 
-  private fun processRange(editor: VimEditor, caret: VimCaret) {
+  private fun processRange(editor: VimEditor, caret: VimCaret): LineRange {
     // Start with the range being the current line
-    startLine = if (defaultLine == -1) caret.getBufferPosition().line else defaultLine
-    endLine = startLine
+    var startLine = if (defaultLine == -1) caret.getBufferPosition().line else defaultLine
+    var endLine = startLine
 
-    // Now process each address in the range, moving the cursor if appropriate
+    // Now process each range component, moving the cursor if appropriate
+    var count = 0
     var lastZero = false
     for (address in addresses) {
       startLine = endLine
       endLine = address.getLine(editor, caret, lastZero)
       if (address.isMove) {
-        caret.moveToOffset(injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret()))
+        caret.moveToOffset(injector.motion.moveCaretToLineWithSameColumn(editor, endLine, caret))
       }
 
       // TODO: Reconsider lastZero. I don't think it helps, and might actually cause problems
@@ -217,7 +177,8 @@ public class Range {
 
     // If only one address is given, make the start and end the same
     if (count == 1) startLine = endLine
-    count = 0
+
+    return LineRange(startLine, endLine)
   }
 
   @NonNls
@@ -226,28 +187,16 @@ public class Range {
     if (this === other) return true
     if (other !is Range) return false
 
-    if (startLine != other.startLine) return false
-    if (endLine != other.endLine) return false
-    if (count != other.count) return false
     if (defaultLine != other.defaultLine) return false
-    if (done != other.done) return false
     if (addresses != other.addresses) return false
 
     return true
   }
 
   override fun hashCode(): Int {
-    var result = startLine
-    result = 31 * result + endLine
-    result = 31 * result + count
+    var result = defaultLine
     result = 31 * result + defaultLine
-    result = 31 * result + done.hashCode()
     result = 31 * result + addresses.hashCode()
     return result
   }
-
-  private var startLine = 0
-  private var endLine = 0
-  private var count = 0
-  private var done = false
 }
