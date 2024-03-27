@@ -9,12 +9,9 @@ package com.maddyhome.idea.vim.ex.ranges
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.TextRange
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.TestOnly
-import kotlin.math.min
 
 /**
  * Handles the set of range values entered as part of an Ex command.
@@ -88,24 +85,6 @@ public class Range {
   public fun getLineRange(editor: VimEditor, caret: VimCaret, count: Int): LineRange {
     val lineRange = processRange(editor, caret)
     return if (count == -1) lineRange else LineRange(lineRange.endLine, lineRange.endLine + count - 1)
-  }
-
-  /**
-   * Gets the text range represented by this range. If a count is given, the range is the range end line through
-   * count-1 lines. If no count is given (-1), the range is the range given by the user. The text range is based
-   * on the line range but this is character based from the start of the first line to the end of the last line.
-   *
-   * @param editor  The editor to get the range for
-   * @param count   The count given at the end of the command or -1 if no such count
-   * @return The text range
-   */
-  // TODO: Consider removing this
-  // TextRange isn't a Vim range, but offsets, so isn't related to Ranges. Consider an extension function on LineRange
-  public fun getTextRange(editor: VimEditor, caret: VimCaret, count: Int): TextRange {
-    val lineRange = getLineRange(editor, caret, count)
-    val start = editor.getLineStartOffset(lineRange.startLine)
-    val end = editor.getLineEndOffset(lineRange.endLine, true) + 1
-    return TextRange(start, min(end, editor.fileSize().toInt()))
   }
 
   private fun processRange(editor: VimEditor, caret: VimCaret): LineRange {

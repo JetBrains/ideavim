@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
@@ -252,7 +253,7 @@ internal class CommentaryExtension : VimExtension {
       Util.doCommentary(
         editor,
         context,
-        range.getTextRange(editor, editor.primaryCaret(), -1),
+        range.getLineRange(editor, editor.primaryCaret(), -1).toTextRange(editor),
         SelectionType.LINE_WISE,
         false
       )
