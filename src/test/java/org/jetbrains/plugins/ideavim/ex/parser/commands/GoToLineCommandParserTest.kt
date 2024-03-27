@@ -10,10 +10,11 @@ package org.jetbrains.plugins.ideavim.ex.parser.commands
 
 import com.maddyhome.idea.vim.vimscript.model.commands.GoToLineCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
-class GoToLineCommandTest {
+class GoToLineCommandParserTest : VimTestCase() {
 
   @Test
   fun `digit as go to line command`() {
