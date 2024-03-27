@@ -48,16 +48,6 @@ public class Range {
    * If a command expects a line, Vim uses the last line of any range passed to the command
    *
    * @param editor  The editor to get the line for
-   * @return The line number represented by the range
-   */
-  public fun getLine(editor: VimEditor): Int {
-    return processRange(editor).endLine
-  }
-
-  /**
-   * If a command expects a line, Vim uses the last line of any range passed to the command
-   *
-   * @param editor  The editor to get the line for
    * @param caret   The caret to use for current line, initial search line, etc. if required
    * @return The line number represented by the range
    */
@@ -70,20 +60,6 @@ public class Range {
   // first line separate from a range
   public fun getFirstLine(editor: VimEditor, caret: VimCaret): Int {
     return processRange(editor, caret).startLine
-  }
-
-  /**
-   * If a command expects a count, Vim uses the last line of the range passed to the command
-   *
-   * Note that the command may also have a count passed as an argument, which takes precedence over any range. This
-   * function only returns the count from the range. It is up to the caller to decide which count to use.
-   *
-   * @param editor  The editor to get the count for
-   * @param count   The count given at the end of the command or -1 if not provided
-   * @return count if count != -1, else return end line of range
-   */
-  public fun getCount(editor: VimEditor, count: Int): Int {
-    return if (count == -1) getLine(editor) else count
   }
 
   /**
@@ -109,15 +85,6 @@ public class Range {
    * @param count   The count given at the end of the command or -1 if not provided
    * @return The line range
    */
-  public fun getLineRange(editor: VimEditor, count: Int): LineRange {
-    val lineRange = processRange(editor)
-    return if (count == -1) {
-      lineRange
-    } else {
-      LineRange(lineRange.endLine, lineRange.endLine + count - 1)
-    }
-  }
-
   public fun getLineRange(editor: VimEditor, caret: VimCaret, count: Int): LineRange {
     val lineRange = processRange(editor, caret)
     return if (count == -1) lineRange else LineRange(lineRange.endLine, lineRange.endLine + count - 1)
@@ -134,24 +101,11 @@ public class Range {
    */
   // TODO: Consider removing this
   // TextRange isn't a Vim range, but offsets, so isn't related to Ranges. Consider an extension function on LineRange
-  public fun getTextRange(editor: VimEditor, count: Int): TextRange {
-    val lr = getLineRange(editor, count)
-    val start = editor.getLineStartOffset(lr.startLine)
-    val end = editor.getLineEndOffset(lr.endLine, true) + 1
-    return TextRange(start, min(end, editor.fileSize().toInt()))
-  }
-
-  // TODO: Consider removing this
-  // TextRange isn't a Vim range, but offsets, so isn't related to Ranges. Consider an extension function on LineRange
   public fun getTextRange(editor: VimEditor, caret: VimCaret, count: Int): TextRange {
     val lineRange = getLineRange(editor, caret, count)
     val start = editor.getLineStartOffset(lineRange.startLine)
     val end = editor.getLineEndOffset(lineRange.endLine, true) + 1
     return TextRange(start, min(end, editor.fileSize().toInt()))
-  }
-
-  private fun processRange(editor: VimEditor): LineRange {
-    return processRange(editor, editor.primaryCaret())
   }
 
   private fun processRange(editor: VimEditor, caret: VimCaret): LineRange {
@@ -183,6 +137,7 @@ public class Range {
 
   @NonNls
   override fun toString(): String = "Ranges[addresses=$addresses]"
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is Range) return false

@@ -249,7 +249,13 @@ internal class CommentaryExtension : VimExtension {
    */
   private class CommentaryCommandAliasHandler : CommandAliasHandler {
     override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
-      Util.doCommentary(editor, context, range.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
+      Util.doCommentary(
+        editor,
+        context,
+        range.getTextRange(editor, editor.primaryCaret(), -1),
+        SelectionType.LINE_WISE,
+        false
+      )
     }
   }
 }
