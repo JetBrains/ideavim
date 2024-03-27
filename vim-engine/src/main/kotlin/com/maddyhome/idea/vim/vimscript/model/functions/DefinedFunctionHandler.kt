@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
-import com.maddyhome.idea.vim.ex.ranges.LineNumberRange
+import com.maddyhome.idea.vim.ex.ranges.LineAddress
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -46,10 +46,10 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
     if (!isRangeGiven) {
       val currentLine = editor.currentCaret().getBufferPosition().line
       ranges = Ranges()
-      ranges!!.addRange(
+      ranges!!.addAddresses(
         arrayOf(
-          LineNumberRange(currentLine, 0, false),
-          LineNumberRange(currentLine, 0, false),
+          LineAddress(currentLine, 0, false),
+          LineAddress(currentLine, 0, false),
         ),
       )
     }

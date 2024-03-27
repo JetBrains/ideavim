@@ -13,50 +13,90 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import org.jetbrains.annotations.TestOnly
 import java.util.*
 
 /**
- * Base for all Ex command ranges
+ * Base for all Ex command addresses
+ *
+ * An address is a way of specifying a line number, either explicitly by number, or with a symbol to represent current
+ * line, last line, etc. An address can also have an offset, to allow for relative counting. A range is a collection of
+ * addresses. Each address is separated either with a comma, or a semicolon. If separated by a semicolon, the caret is
+ * moved after evaluating the line number.
+ *
+ * A range matching the whole file is represented by `%`, which is evaluated as two addresses, for the first and last
+ * lines in the file.
+ *
+ * See `:help range` and `:help {address}`.
+ *
+ * @param offset  The relative offset added or subtracted from the evaluated line number
+ * @param isMove  True if the caret should be moved after evaluating this address. In the text representation, a
+ *                semicolon follows this address.
  */
-public sealed class Range(
-  // Line offset
-  protected val offset: Int,
-  public val isMove: Boolean,
-) {
+public sealed class Address(public val offset: Int, public val isMove: Boolean) {
   /**
-   * Gets the line number (0 based) specificied by this range. Includes the offset.
+   * Gets the zero-based line number specified by this address.
+   *
+   * If the range included an offset (`+1`, `-1`), this is applied to the returned line number.
+   *
+   * Note that the user will have used one-based line numbers, but internally, we use zero-based. This conversion is
+   * automatically handled.
    *
    * @param editor   The editor to get the line for
-   * @param lastZero True if last line was set to start of file
-   * @return The zero based line number, -1 if unable to get the line number
+   * @param lastZero True if the last line was set to start of file
+   * @return The zero-based line number or -1 if unable to get the line number
    */
   public fun getLine(editor: VimEditor, lastZero: Boolean): Int {
-    val line = getRangeLine(editor, lastZero)
+    // TODO: Only apply offset if calculateLine returns a valid line number
+    val line = calculateLine(editor, lastZero)
     return line + offset
   }
 
+  /**
+   * Gets the zero-based line number specified by this address.
+   *
+   * If the range included an offset (`+1`, `-1`), this is applied to the returned line number.
+   *
+   * Note that the user will have used one-based line numbers, but internally, we use zero-based. This conversion is
+   * automatically handled.
+   *
+   * @param editor   The editor to get the line for
+   * @param caret    The caret to use for the current line or initial search line, if required
+   * @param lastZero True if the last line was set to start of file
+   * @return The zero-based line number or -1 if unable to get the line number
+   */
   public fun getLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
-    return if (offset == 0) getRangeLine(editor, lastZero) else getRangeLine(editor, caret, lastZero) + offset
+    // TODO: Why does this not pass through caret?
+    // TODO: Only apply offset if calculateLine returns a valid line number
+    return if (offset == 0) calculateLine(editor, lastZero) else calculateLine(editor, caret, lastZero) + offset
   }
 
   override fun toString(): String = "Range{offset=$offset, move=$isMove}"
 
   /**
-   * Gets the line number specified by this range without regard to any offset.
+   * Calculate the line number specified by this address. Does not apply offset
    *
    * @param editor   The editor to get the line for
-   * @param lastZero True if last line was set to start of file
-   * @return The zero based line number, -1 if inable to get the line number
+   * @param lastZero True if the last line was set to start of file
+   * @return The zero-based line number, -1 if unable to get the line number
    */
-  protected abstract fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int
+  protected abstract fun calculateLine(editor: VimEditor, lastZero: Boolean): Int
 
-  protected abstract fun getRangeLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int
+  /**
+   * Calculate the line number specified by this address. Does not apply offset
+   *
+   * @param editor   The editor to get the line for
+   * @param caret    The caret to use for initial search offset, or to get the current line, etc.
+   * @param lastZero True if the last line was set to start of file
+   * @return The zero-based line number, -1 if unable to get the line number
+   */
+  protected abstract fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other !is Range) return false
+    if (other !is Address) return false
 
-    if (offset != other) return false
+    if (offset != other.offset) return false
     if (isMove != other.isMove) return false
 
     return true
@@ -74,31 +114,30 @@ public sealed class Range(
      *
      * @param str    The range text
      * @param offset Any offset specified after the range
-     * @param move   True if cursor should be moved to range line
+     * @param move   True if the cursor should be moved to the line that the address evaluates to
      * @return The ranges appropriate to the text
      */
-    @JvmStatic
-    public fun createRange(str: String, offset: Int, move: Boolean): Array<Range>? {
+    public fun createRangeAddresses(str: String, offset: Int, move: Boolean): Array<Address>? {
       // Current line
       if (str.isEmpty() || str == ".") {
-        return arrayOf(LineNumberRange(offset, move))
+        return arrayOf(LineAddress(offset, move))
       } else if (str == "%") {
         return arrayOf(
-          LineNumberRange(0, 0, move),
-          LineNumberRange(LineNumberRange.LAST_LINE, offset, move),
+          LineAddress(0, 0, move),
+          LineAddress(LineAddress.LAST_LINE, offset, move),
         )
       } else if (str == "$") {
-        return arrayOf(LineNumberRange(LineNumberRange.LAST_LINE, offset, move))
+        return arrayOf(LineAddress(LineAddress.LAST_LINE, offset, move))
       } else if (str.startsWith("'") && str.length == 2) {
-        return arrayOf(MarkRange(str[1], offset, move))
+        return arrayOf(MarkAddress(str[1], offset, move))
       } else if (str.startsWith("/") || str.startsWith("\\/") || str.startsWith("\\&")) {
-        return arrayOf(SearchRange(str, offset, move))
+        return arrayOf(SearchAddress(str, offset, move))
       } else if (str.startsWith("?") || str.startsWith("\\?")) {
-        return arrayOf(SearchRange(str, offset, move))
+        return arrayOf(SearchAddress(str, offset, move))
       } else {
         try {
-          val line = str.toInt() - 1
-          return arrayOf(LineNumberRange(line, offset, move))
+          val line = str.toInt() - 1  // Convert to 0-based line
+          return arrayOf(LineAddress(line, offset, move))
         } catch (e: NumberFormatException) { // Ignore - we'll send back bad range later.
         }
       }
@@ -111,12 +150,13 @@ public sealed class Range(
 /**
  * Represents a specific line, the current line, or the last line of a file
  */
-public class LineNumberRange : Range {
+@TestOnly // Should be private. Constructor is public for test purposes only
+public class LineAddress : Address {
   /**
    * Create a range for the current line
    *
    * @param offset The range offset
-   * @param move   True if cursor should be moved
+   * @param move   True if the cursor should be moved
    */
   public constructor(offset: Int, move: Boolean) : super(offset, move) {
     line = CURRENT_LINE
@@ -126,20 +166,13 @@ public class LineNumberRange : Range {
    * Create a range for the given line
    *
    * @param offset The range offset
-   * @param move   True if cursor should be moved
+   * @param move   True if the cursor should be moved
    */
   public constructor(line: Int, offset: Int, move: Boolean) : super(offset, move) {
     this.line = line
   }
 
-  /**
-   * Gets the line number specified by this range without regard to any offset.
-   *
-   * @param editor   The editor to get the line for
-   * @param lastZero True if last line was set to start of file
-   * @return The zero based line number, -1 for start of file
-   */
-  override fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int {
+  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
     if (line == CURRENT_LINE) {
       line = editor.currentCaret().getBufferPosition().line
     } else if (line == LAST_LINE) {
@@ -148,32 +181,24 @@ public class LineNumberRange : Range {
     return line
   }
 
-  override fun getRangeLine(
+  override fun calculateLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     lastZero: Boolean,
   ): Int {
+    // TODO: This doesn't match the behaviour in the other overload
     line = if (line == LAST_LINE) editor.lineCount() - 1 else caret.getBufferPosition().line
     return line
   }
 
-  override fun toString(): String = "LineNumberRange[line=$line, ${super.toString()}]"
+  override fun toString(): String = "LineAddress[line=$line, ${super.toString()}]"
+
   override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as LineNumberRange
-
-    if (line != other.line) return false
-    if (offset != other.offset) return false
-    if (isMove != other.isMove) return false
-
-    return true
+    return super.equals(other) && (other as? LineAddress)?.line == this.line
   }
 
   override fun hashCode(): Int {
-    val prime = 31
-    return isMove.hashCode() + prime * offset.hashCode() + prime * prime * line.hashCode()
+    return super.hashCode() + 31 * line
   }
 
   private var line: Int
@@ -187,52 +212,41 @@ public class LineNumberRange : Range {
 /**
  * Represents the line specified by a mark
  */
-public class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offset, move) {
-  /**
-   * Gets the line number specified by this range without regard to any offset.
-   *
-   * @param editor   The editor to get the line for
-   * @param lastZero True if last line was set to start of file
-   * @return The zero based line number, -1 if there is no such mark set in the file
-   */
-  override fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int {
-    val mark = injector.markService.getMark(editor.currentCaret(), mark)
-    return mark?.line ?: -1
+@TestOnly // Should be private. Constructor is visible for test purposes only
+public class MarkAddress(private val mark: Char, offset: Int, move: Boolean) : Address(offset, move) {
+  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
+    return injector.markService.getMark(editor.currentCaret(), this.mark)?.line ?: -1
   }
 
-  override fun getRangeLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
+  override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
+    // TODO: Why is this not passing through the caret?
+    return calculateLine(editor, lastZero)
+  }
 
-  override fun toString(): String = "MarkRange[mark=$mark, ${super.toString()}]"
+  override fun toString(): String = "MarkAddress[mark=$mark, ${super.toString()}]"
+
   override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as MarkRange
-
-    if (mark != other.mark) return false
-    if (offset != other.offset) return false
-    if (isMove != other.isMove) return false
-
-    return true
+    return super.equals(other) && (other as? MarkAddress)?.mark == this.mark
   }
 
   override fun hashCode(): Int {
-    val prime = 31
-    return prime * prime * mark.hashCode() + prime * offset.hashCode() + isMove.hashCode()
+    return super.hashCode() + 31 * mark.hashCode()
   }
 }
 
 /**
  * Represents a range given by a search pattern. The pattern can be '\\/', '\\?', '\\&amp;', /{pattern}/,
- * or ?{pattern}?.  The last two can be repeated 0 or more times after any of the others.
+ * or ?{pattern}?.  The last two can be repeated zero or more times after any of the others.
  */
-public class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, move) {
-  /**
-   * Parses the pattern into a list of subpatterns and flags
-   *
-   * @param pattern The full search pattern
-   */
-  private fun setPattern(pattern: String) {
+private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Address(offset, move) {
+  private companion object {
+    private val logger = vimLogger<SearchAddress>()
+  }
+
+  private val patterns: MutableList<String?> = mutableListOf()
+  private val directions: MutableList<Direction> = mutableListOf()
+
+  init {
     logger.debug { "pattern=$pattern" }
     // Search range patterns such as `/one//two/` will be separated by a NULL character, rather than handled as separate
     // ranges. A range with an offset, such as `/one/+3/two/` will be treated as two ranges.
@@ -269,21 +283,15 @@ public class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(of
     }
   }
 
-  /**
-   * Gets the line number specified by this range without regard to any offset.
-   *
-   * @param editor   The editor to get the line for
-   * @param lastZero True if last line was set to start of file
-   * @return The zero based line number, -1 if the text was not found
-   */
-  override fun getRangeLine(
+  override fun calculateLine(
     editor: VimEditor,
     lastZero: Boolean,
-  ): Int { // Each subsequent pattern is searched for starting in the line after the previous search match
-    return getRangeLine(editor, editor.currentCaret(), lastZero)
+  ): Int {
+    // Each subsequent pattern is searched for starting in the line after the previous search match
+    return calculateLine(editor, editor.currentCaret(), lastZero)
   }
 
-  override fun getRangeLine(
+  override fun calculateLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     lastZero: Boolean,
@@ -300,8 +308,11 @@ public class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(of
       // lastPatternOffset is updated for future searches
       val patternOffset = if (i == patterns.size - 1) offset else 0
 
+      // Note that wrapscan, ignorecase, etc. all come from current option values, as expected
       searchOffset = getSearchOffset(editor, line, direction, lastZero)
       searchOffset = injector.searchGroup.processSearchRange(editor, pattern!!, patternOffset, searchOffset, direction)
+      // TODO: Vim throws E385 if it can't find a result and wrapscan isn't set
+      // TODO: Vim throws E486 if it can't find a result with wrapscan set - IdeaVim does the same
       if (searchOffset == -1) break
       line = editor.offsetToBufferPosition(searchOffset).line
     }
@@ -309,6 +320,15 @@ public class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(of
   }
 
   private fun getSearchOffset(editor: VimEditor, line: Int, direction: Direction, lastZero: Boolean): Int {
+    // TODO: I'm not sure this is correct
+    // lastZero is true if we have an address that evaluates to less than 0. I'm not sure of the circumstances when this
+    // is expected to be true. It can be true if there are no matches to search, or for something like `1-20` (first
+    // line, with an offset of minus 20). This would mean that the next search starts at the beginning of the "current"
+    // line, rather than the following line.
+    // This leads to behaviour such as `/foo/-20/foo/d` to delete the first line (assuming 'foo' is in the first line),
+    // which doesn't work in Vim.
+    // Firstly, we should only return a negative value for an error, which would mean that lastZero is only set when the
+    // last address cannot be resolved (cannot find search or no defined mark)
     return if (direction == Direction.FORWARDS && !lastZero) {
       injector.motion.moveCaretToLineEnd(editor, line, true)
     } else {
@@ -316,38 +336,13 @@ public class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(of
     }
   }
 
-  override fun toString(): String = "SearchRange[patterns=$patterns, ${super.toString()}]"
+  override fun toString(): String = "SearchAddress[patterns=$patterns, ${super.toString()}]"
 
   override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as SearchRange
-
-    if (patterns != other.patterns) return false
-    if (directions != other.directions) return false
-    if (offset != other.offset) return false
-    if (isMove != other.isMove) return false
-
-    return true
+    return super.equals(other) && (other as? SearchAddress)?.patterns == this.patterns
   }
 
   override fun hashCode(): Int {
-    var result = patterns.hashCode()
-    result = 31 * result + directions.hashCode()
-    result = 31 * result + offset.hashCode()
-    result = 31 * result + isMove.hashCode()
-    return result
-  }
-
-  private val patterns: MutableList<String?> = mutableListOf()
-  private val directions: MutableList<Direction> = mutableListOf()
-
-  public companion object {
-    private val logger = vimLogger<SearchRange>()
-  }
-
-  init {
-    setPattern(pattern)
+    return super.hashCode() + 31 * patterns.hashCode()
   }
 }

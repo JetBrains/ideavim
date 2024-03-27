@@ -12,7 +12,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
-class RangeTest : VimTestCase() {
+class AddressTest : VimTestCase() {
   @Test
   fun testNoRange() {
     configureByText("1\n2\n<caret>3\n4\n5\n")

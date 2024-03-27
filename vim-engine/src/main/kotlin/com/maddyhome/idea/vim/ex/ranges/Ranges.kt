@@ -13,19 +13,26 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
 import kotlin.math.min
 
 /**
  * Handles the set of range values entered as part of an Ex command.
  */
 public class Ranges {
+  // This property should be private, but is used in tests
+  @TestOnly
+  public val addresses: MutableList<Address> = mutableListOf()
+
+  private var defaultLine = -1
+
   /** Adds a range to the list */
-  public fun addRange(range: Array<Range>) {
-    ranges.addAll(range)
+  public fun addAddresses(range: Array<Address>) {
+    addresses.addAll(range)
   }
 
   /** Gets the number of ranges in the list */
-  public fun size(): Int = ranges.size
+  public fun size(): Int = addresses.size
 
   /**
    * Sets the default line to be used by this range if no range was actually given by the user. -1 is used to
@@ -38,7 +45,7 @@ public class Ranges {
   }
 
   /**
-   * Gets the line of the last range specified in the range list
+   * If a command expects a line, Vim uses the last line of any range passed to the command
    *
    * @param editor  The editor to get the line for
    * @return The line number represented by the range
@@ -48,36 +55,61 @@ public class Ranges {
     return endLine
   }
 
+  /**
+   * If a command expects a line, Vim uses the last line of any range passed to the command
+   *
+   * @param editor  The editor to get the line for
+   * @param caret   The caret to use for current line, initial search line, etc. if required
+   * @return The line number represented by the range
+   */
   public fun getLine(editor: VimEditor, caret: VimCaret): Int {
     processRange(editor, caret)
     return endLine
   }
 
+  // TODO: Consider removing this
+  // Most commands use either a range or a line which is the last line in a range. There should be no need to get the
+  // first line separate from a range
   public fun getFirstLine(editor: VimEditor, caret: VimCaret): Int {
     processRange(editor, caret)
     return startLine
   }
 
   /**
-   * Gets the count for an Ex command. This is either an explicit count enter at the end of the command or the
-   * end of the specified range.
+   * If a command expects a count, Vim uses the last line of the range passed to the command
+   *
+   * Note that the command may also have a count passed as an argument, which takes precedence over any range. This
+   * function only returns the count from the range. It is up to the caller to decide which count to use.
    *
    * @param editor  The editor to get the count for
-   * @param count   The count given at the end of the command or -1 if no such count (use end line)
+   * @param count   The count given at the end of the command or -1 if not provided
    * @return count if count != -1, else return end line of range
    */
-  public fun getCount(editor: VimEditor, count: Int): Int = if (count == -1) getLine(editor) else count
+  public fun getCount(editor: VimEditor, count: Int): Int {
+    return if (count == -1) getLine(editor) else count
+  }
 
+  /**
+   * If a command expects a count, Vim uses the last line of the range passed to the command
+   *
+   * Note that the command may also have a count passed as an argument, which takes precedence over any range. This
+   * function only returns the count from the range. It is up to the caller to decide which count to use.
+   *
+   * @param editor  The editor to get the count for
+   * @param caret   The caret to use for current line, initial search line, etc. if required
+   * @param count   The count given at the end of the command or -1 if not provided
+   * @return count if count != -1, else return end line of range
+   */
   public fun getCount(editor: VimEditor, caret: VimCaret, count: Int): Int {
     return if (count == -1) getLine(editor, caret) else count
   }
 
   /**
-   * Gets the line range represented by this range. If a count is given, the range is the range end line through
+   * Gets the line range represented by this Ex range. If a count is given, the range is the range end line through
    * count-1 lines. If no count is given (-1), the range is the range given by the user.
    *
    * @param editor  The editor to get the range for
-   * @param count   The count given at the end of the command or -1 if no such count
+   * @param count   The count given at the end of the command or -1 if not provided
    * @return The line range
    */
   public fun getLineRange(editor: VimEditor, count: Int): LineRange {
@@ -108,6 +140,8 @@ public class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The text range
    */
+  // TODO: Consider removing this
+  // TextRange isn't a Vim range, but offsets, so isn't related to Ranges. Consider an extension function on LineRange
   public fun getTextRange(editor: VimEditor, count: Int): TextRange {
     val lr = getLineRange(editor, count)
     val start = editor.getLineStartOffset(lr.startLine)
@@ -115,6 +149,8 @@ public class Ranges {
     return TextRange(start, min(end, editor.fileSize().toInt()))
   }
 
+  // TODO: Consider removing this
+  // TextRange isn't a Vim range, but offsets, so isn't related to Ranges. Consider an extension function on LineRange
   public fun getTextRange(editor: VimEditor, caret: VimCaret, count: Int): TextRange {
     val lineRange = getLineRange(editor, caret, count)
     val start = editor.getLineStartOffset(lineRange.startLine)
@@ -130,24 +166,29 @@ public class Ranges {
   private fun processRange(editor: VimEditor) {
     // Already done
     if (done) return
+
     // Start with the range being the current line
     startLine = if (defaultLine == -1) editor.currentCaret().getBufferPosition().line else defaultLine
     endLine = startLine
     var lastZero = false
-    // Now process each range, moving the cursor if appropriate
-    for (range in ranges) {
+
+    // Now process each address in the range, moving the cursor if appropriate
+    for (address in addresses) {
       startLine = endLine
-      endLine = range.getLine(editor, lastZero)
-      if (range.isMove) {
+      endLine = address.getLine(editor, lastZero)
+      if (address.isMove) {
         editor.primaryCaret().moveToOffset(
           injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret()),
         )
       }
-      // Did that last range represent the start of the file?
+
+      // TODO: Reconsider lastZero. I don't think it helps, and might actually cause problems
+      // Did that last address represent the start of the file?
       lastZero = endLine < 0
       count++
     }
-    // If only one range given, make the start and end the same
+
+    // If only one address is given, make the start and end the same
     if (count == 1) {
       startLine = endLine
     }
@@ -155,26 +196,32 @@ public class Ranges {
   }
 
   private fun processRange(editor: VimEditor, caret: VimCaret) {
+    // Start with the range being the current line
     startLine = if (defaultLine == -1) caret.getBufferPosition().line else defaultLine
     endLine = startLine
+
+    // Now process each address in the range, moving the cursor if appropriate
     var lastZero = false
-    for (range in ranges) {
+    for (address in addresses) {
       startLine = endLine
-      endLine = range.getLine(editor, caret, lastZero)
-      if (range.isMove) {
-        caret.moveToOffset(
-          injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret()),
-        )
+      endLine = address.getLine(editor, caret, lastZero)
+      if (address.isMove) {
+        caret.moveToOffset(injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret()))
       }
+
+      // TODO: Reconsider lastZero. I don't think it helps, and might actually cause problems
+      // Did that last address represent the start of the file?
       lastZero = endLine < 0
       ++count
     }
+
+    // If only one address is given, make the start and end the same
     if (count == 1) startLine = endLine
     count = 0
   }
 
   @NonNls
-  override fun toString(): String = "Ranges[ranges=$ranges]"
+  override fun toString(): String = "Ranges[addresses=$addresses]"
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is Ranges) return false
@@ -184,7 +231,7 @@ public class Ranges {
     if (count != other.count) return false
     if (defaultLine != other.defaultLine) return false
     if (done != other.done) return false
-    if (ranges != other.ranges) return false
+    if (addresses != other.addresses) return false
 
     return true
   }
@@ -195,14 +242,12 @@ public class Ranges {
     result = 31 * result + count
     result = 31 * result + defaultLine
     result = 31 * result + done.hashCode()
-    result = 31 * result + ranges.hashCode()
+    result = 31 * result + addresses.hashCode()
     return result
   }
 
   private var startLine = 0
   private var endLine = 0
   private var count = 0
-  private var defaultLine = -1
   private var done = false
-  public var ranges: MutableList<Range> = mutableListOf()
 }
