@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
-import com.maddyhome.idea.vim.ex.ranges.LineAddress
+import com.maddyhome.idea.vim.ex.ranges.Address
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -44,14 +44,9 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
     val isRangeGiven = (range?.size() ?: 0) > 0
 
     if (!isRangeGiven) {
-      val currentLine = editor.currentCaret().getBufferPosition().line
-      range = Range()
-      range!!.addAddresses(
-        arrayOf(
-          LineAddress(currentLine, 0, false),
-          LineAddress(currentLine, 0, false),
-        ),
-      )
+      range = Range().apply {
+        addAddresses(Address.createRangeAddresses(".", 0, false)!!)
+      }
     }
     initializeFunctionVariables(argumentValues, editor, context, vimContext)
 
@@ -163,16 +158,17 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
         function,
       )
     }
+    val lineRange = range!!.getLineRange(editor, editor.currentCaret(), -1)
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "firstline"),
-      VimInt(range!!.getFirstLine(editor, editor.currentCaret()) + 1),
+      VimInt(lineRange.startLine + 1),
       editor,
       context,
       function,
     )
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "lastline"),
-      VimInt(range!!.getLine(editor, editor.currentCaret()) + 1),
+      VimInt(lineRange.endLine + 1),
       editor,
       context,
       function,

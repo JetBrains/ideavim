@@ -52,13 +52,6 @@ public class Range {
     return processRange(editor, caret).endLine
   }
 
-  // TODO: Consider removing this
-  // Most commands use either a range or a line which is the last line in a range. There should be no need to get the
-  // first line separate from a range
-  public fun getFirstLine(editor: VimEditor, caret: VimCaret): Int {
-    return processRange(editor, caret).startLine
-  }
-
   /**
    * If a command expects a count, Vim uses the last line of the range passed to the command
    *

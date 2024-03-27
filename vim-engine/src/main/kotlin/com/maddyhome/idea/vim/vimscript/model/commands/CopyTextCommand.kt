@@ -34,7 +34,7 @@ public data class CopyTextCommand(val range: Range, val argument: String) : Comm
       val text = editor.getText(range)
 
       val goToLineCommand = injector.vimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
-      val line = goToLineCommand.commandRange.getFirstLine(editor, caret)
+      val line = goToLineCommand.commandRange.getLineRange(editor, caret, -1).startLine
 
       val transferableData = injector.clipboardManager.getTransferableData(editor, range, text)
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData, null)
