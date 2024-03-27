@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.ex.NoArgumentAllowedException
 import com.maddyhome.idea.vim.ex.NoRangeAllowedException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -230,7 +231,7 @@ public sealed class Command(public var commandRange: Range, public val commandAr
     getTextRange(editor, editor.currentCaret(), checkCount)
 
   public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): TextRange {
-    return commandRange.getTextRange(editor, caret, if (checkCount) countArgument else -1)
+    return commandRange.getLineRange(editor, caret, if (checkCount) countArgument else -1).toTextRange(editor)
   }
 
   private val countArgument: Int

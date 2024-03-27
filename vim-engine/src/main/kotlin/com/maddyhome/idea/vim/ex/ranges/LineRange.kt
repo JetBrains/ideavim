@@ -7,6 +7,11 @@
  */
 package com.maddyhome.idea.vim.ex.ranges
 
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.common.TextRange
+import kotlin.math.min
+
 public class LineRange(startLine: Int, endLine: Int) {
 
   @JvmField
@@ -24,4 +29,10 @@ public class LineRange(startLine: Int, endLine: Int) {
       this.endLine = startLine
     }
   }
+}
+
+public fun LineRange.toTextRange(editor: VimEditor): TextRange {
+  val start = editor.getLineStartOffset(startLine)
+  val end = editor.getLineEndOffset(endLine, true) + 1
+  return TextRange(start, min(end, editor.fileSize().toInt()))
 }
