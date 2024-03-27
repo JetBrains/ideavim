@@ -12,8 +12,8 @@ import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
+import com.maddyhome.idea.vim.ex.ranges.Address
+import com.maddyhome.idea.vim.ex.ranges.Address.Companion.createRangeAddresses
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.vimscript.model.commands.ActionCommand
@@ -147,22 +147,22 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
     }
   }
 
-  private fun parseRangesUnit(ctx: VimscriptParser.RangeUnitContext): Array<Range> {
+  private fun parseRangesUnit(ctx: VimscriptParser.RangeUnitContext): Array<Address> {
     val valueAndOffset = parseRangeExpression(ctx.rangeExpression())
     val move = ctx.rangeSeparator()?.text == ";"
-    val ranges = createRange(valueAndOffset.first, valueAndOffset.second, move)
-    if (ranges == null) {
-      logger.warn("Could not create a range for node ${ctx.text}")
-      throw ExException("Could not create a range ${ctx.text}")
+    val addresses = createRangeAddresses(valueAndOffset.first, valueAndOffset.second, move)
+    if (addresses == null) {
+      logger.warn("Could not create an address for node ${ctx.text}")
+      throw ExException("Could not create an address ${ctx.text}")
     }
-    return ranges
+    return addresses
   }
 
   private fun parseRanges(ctx: RangeContext?): Ranges {
     val ranges = Ranges()
     if (ctx?.rangeUnit() != null) {
       for (unit in ctx.rangeUnit()) {
-        ranges.addRange(parseRangesUnit(unit))
+        ranges.addAddresses(parseRangesUnit(unit))
       }
     }
     return ranges
@@ -221,8 +221,8 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
       ranges = parseRanges(ctx.range())
     } else {
       ranges = Ranges()
-      ranges.addRange(
-        createRange(ctx.shortRange().text, 0, false)
+      ranges.addAddresses(
+        createRangeAddresses(ctx.shortRange().text, 0, false)
           ?: throw ExException("Could not create a range"),
       )
     }
