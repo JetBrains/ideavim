@@ -34,23 +34,6 @@ import java.util.*
  *                semicolon follows this address.
  */
 public sealed class Address(public val offset: Int, public val isMove: Boolean) {
-  /**
-   * Gets the zero-based line number specified by this address.
-   *
-   * If the range included an offset (`+1`, `-1`), this is applied to the returned line number.
-   *
-   * Note that the user will have used one-based line numbers, but internally, we use zero-based. This conversion is
-   * automatically handled.
-   *
-   * @param editor   The editor to get the line for
-   * @param lastZero True if the last line was set to start of file
-   * @return The zero-based line number or -1 if unable to get the line number
-   */
-  public fun getLine(editor: VimEditor, lastZero: Boolean): Int {
-    // TODO: Only apply offset if calculateLine returns a valid line number
-    val line = calculateLine(editor, lastZero)
-    return line + offset
-  }
 
   /**
    * Gets the zero-based line number specified by this address.
@@ -66,21 +49,9 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
    * @return The zero-based line number or -1 if unable to get the line number
    */
   public fun getLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
-    // TODO: Why does this not pass through caret?
     // TODO: Only apply offset if calculateLine returns a valid line number
-    return if (offset == 0) calculateLine(editor, lastZero) else calculateLine(editor, caret, lastZero) + offset
+    return calculateLine(editor, caret, lastZero) + offset
   }
-
-  override fun toString(): String = "Range{offset=$offset, move=$isMove}"
-
-  /**
-   * Calculate the line number specified by this address. Does not apply offset
-   *
-   * @param editor   The editor to get the line for
-   * @param lastZero True if the last line was set to start of file
-   * @return The zero-based line number, -1 if unable to get the line number
-   */
-  protected abstract fun calculateLine(editor: VimEditor, lastZero: Boolean): Int
 
   /**
    * Calculate the line number specified by this address. Does not apply offset
@@ -91,6 +62,8 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
    * @return The zero-based line number, -1 if unable to get the line number
    */
   protected abstract fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int
+
+  override fun toString(): String = "Range{offset=$offset, move=$isMove}"
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -157,7 +130,6 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
 @TestOnly
 public class LineAddress(private val line: Int, offset: Int, move: Boolean) : Address(offset, move) {
 
-  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int = line
   override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int = line
 
   override fun equals(other: Any?): Boolean {
@@ -174,10 +146,6 @@ public class LineAddress(private val line: Int, offset: Int, move: Boolean) : Ad
  * Entered as `.` in the command line.
  */
 private class CurrentLineAddress(offset: Int, move: Boolean) : Address(offset, move) {
-  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
-    return calculateLine(editor, editor.primaryCaret(), lastZero)
-  }
-
   override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
     return caret.getBufferPosition().line
   }
@@ -191,10 +159,6 @@ private class CurrentLineAddress(offset: Int, move: Boolean) : Address(offset, m
  * Entered as `$` in the command line.
  */
 private class LastLineAddress(offset: Int, move: Boolean) : Address(offset, move) {
-  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
-    return calculateLine(editor, editor.primaryCaret(), lastZero)
-  }
-
   override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
     return editor.lineCount() - 1
   }
@@ -207,13 +171,9 @@ private class LastLineAddress(offset: Int, move: Boolean) : Address(offset, move
  */
 @TestOnly // Should be private. Constructor is visible for test purposes only
 public class MarkAddress(private val mark: Char, offset: Int, move: Boolean) : Address(offset, move) {
-  override fun calculateLine(editor: VimEditor, lastZero: Boolean): Int {
-    return injector.markService.getMark(editor.currentCaret(), this.mark)?.line ?: -1
-  }
 
   override fun calculateLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
-    // TODO: Why is this not passing through the caret?
-    return calculateLine(editor, lastZero)
+    return injector.markService.getMark(caret, this.mark)?.line ?: -1
   }
 
   override fun equals(other: Any?): Boolean {
@@ -271,14 +231,6 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
         }
       }
     }
-  }
-
-  override fun calculateLine(
-    editor: VimEditor,
-    lastZero: Boolean,
-  ): Int {
-    // Each subsequent pattern is searched for starting in the line after the previous search match
-    return calculateLine(editor, editor.currentCaret(), lastZero)
   }
 
   override fun calculateLine(
