@@ -12,17 +12,39 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+public abstract class BaseMotionTextObjectActionHandler : TextObjectActionHandler() {
+
+  override fun preExecute(editor: VimEditor) {
+    if (injector.globalOptions().fixdeadkeys) {
+      val mutableEditor = editor as? MutableVimEditor
+      if (mutableEditor != null) {
+        val lastCharData = LastCaretPositionData ?: return
+        injector.application.runWriteAction {
+          mutableEditor.insertText(
+            lastCharData.startOffset.offset,
+            lastCharData.selected
+          )
+        }
+      }
+    }
+  }
+}
+
+
 @CommandOrMotion(keys = ["i`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
+public class MotionInnerBlockBackQuoteAction : BaseMotionTextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -40,7 +62,7 @@ public class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["i\""], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
+public class MotionInnerBlockDoubleQuoteAction : BaseMotionTextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -55,10 +77,11 @@ public class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '"', false)
   }
+
 }
 
 @CommandOrMotion(keys = ["i'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
+public class MotionInnerBlockSingleQuoteAction : BaseMotionTextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -76,7 +99,7 @@ public class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
+public class MotionOuterBlockBackQuoteAction : BaseMotionTextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -94,7 +117,7 @@ public class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a\""], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
+public class MotionOuterBlockDoubleQuoteAction : BaseMotionTextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -112,7 +135,7 @@ public class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
+public class MotionOuterBlockSingleQuoteAction : BaseMotionTextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.handler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -84,9 +85,20 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     operatorArguments: OperatorArguments,
   ) {}
 
+  public open fun preExecute(editor: VimEditor) {
+    val caret = editor.currentCaret()
+    val start = caret.selectionStart
+    val end = caret.selectionEnd + 1
+    LastCaretPositionData = LastCaretPositionData(
+      editor.getText(start, end),
+      start
+    )
+  }
+
   public fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
 
+    preExecute(editor)
     // IJ platform has one issue - recursive `runForEachCaret` is not allowed. Strictly speaking, at this moment
     //   we don't know if we run this action inside of this run or not.
     val currentCaret = editor.currentCaret()
@@ -155,6 +167,8 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     @NonNls
     private const val VimActionPrefix = "Vim"
 
+    public var LastCaretPositionData: LastCaretPositionData? = null
+
     @NonNls
     public fun getActionId(classFullName: String): String {
       return classFullName
@@ -163,3 +177,5 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     }
   }
 }
+
+public data class LastCaretPositionData(val selected: String, val startOffset: Int)
