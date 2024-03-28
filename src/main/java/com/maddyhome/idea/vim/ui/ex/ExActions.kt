@@ -10,6 +10,9 @@ package com.maddyhome.idea.vim.ui.ex
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.containers.CollectionFactory
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
@@ -291,5 +294,67 @@ internal class ToggleInsertReplaceAction : TextAction(ExEditorKit.ToggleInsertRe
 
   companion object {
     private val logger = logger<ToggleInsertReplaceAction>()
+  }
+}
+
+internal class AutocompleteAction: TextAction(ExEditorKit.Autocomplete){
+  override fun actionPerformed(e: ActionEvent) {
+    val currentEditor = ExEntryPanel.getInstance().entry.editor
+    val target = getTextComponent(e) as ExTextField
+    val text = target.actualText
+    // autocomplete for edit
+    if(text.startsWith("e ") || text.startsWith("edit ")){
+      // split after first space to get filename to autocomplete
+      val fileStart = text.substring(text.indexOf(' ', 0) + 1)
+      // find potential files
+      val project = currentEditor!!.project!!
+
+      // find all files in the folders that are open
+      val editors = FileEditorManager.getInstance(project).getAllEditors()
+      val names = CollectionFactory.createSmallMemoryFootprintSet<String>()
+      val parents = CollectionFactory.createSmallMemoryFootprintSet<VirtualFile>()
+      for(editor in editors){
+        val parent = editor.file.parent
+        // we need to check a parent file only one time
+        if(parent in parents){
+          continue
+        }
+        parents.add(parent)
+        val childrens = parent.children
+        if (childrens != null){
+          for(child in childrens){
+            if(!child.isDirectory()) {
+              val name = child.name
+              if (name.startsWith(fileStart)) {
+                names.add(name)
+              }
+            }
+          }
+        }
+      }
+
+      // have we found a match?
+      if(names.size > 0){
+        val first = names.first()
+        // find the common starting string
+        var common = ""
+        for((i,c) in first.withIndex()){
+          var allSame = true
+          for(name in names){
+            if(name[i] != c) {
+              allSame = false
+              break
+            }
+          }
+          if(allSame){
+            common += c
+          } else {
+            break
+          }
+        }
+        // append common starting string
+        target.text += common.substring(fileStart.length)
+      }
+    }
   }
 }
