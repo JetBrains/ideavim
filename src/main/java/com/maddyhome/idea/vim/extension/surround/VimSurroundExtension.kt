@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
+import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -220,10 +221,10 @@ internal class VimSurroundExtension : VimExtension {
         val searchHelper = injector.searchHelper
         return when (char) {
           't' -> searchHelper.findBlockTagRange(editor, caret, 1, true)
-          '(', ')', 'b' -> searchHelper.findBlockRange(editor, caret, '(', 1, true)
-          '[', ']' -> searchHelper.findBlockRange(editor, caret, '[', 1, true)
-          '{', '}', 'B' -> searchHelper.findBlockRange(editor, caret, '{', 1, true)
-          '<', '>' -> searchHelper.findBlockRange(editor, caret, '<', 1, true)
+          '(', ')', 'b' -> findBlockRange(editor, caret, '(', 1, true)
+          '[', ']' -> findBlockRange(editor, caret, '[', 1, true)
+          '{', '}', 'B' -> findBlockRange(editor, caret, '{', 1, true)
+          '<', '>' -> findBlockRange(editor, caret, '<', 1, true)
           '`', '\'', '"' -> {
             val caretOffset = caret.offset.point
             val text = editor.text()

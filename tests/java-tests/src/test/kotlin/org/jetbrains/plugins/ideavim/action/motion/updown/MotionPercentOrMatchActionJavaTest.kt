@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.intellij.idea.TestFor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
@@ -65,5 +66,99 @@ class MotionPercentOrMatchActionJavaTest : VimJavaTestCase() {
     configureByJavaText("/* foo $c */")
     typeText("%")
     assertState("/* foo $c */")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-1399"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test percent ignores brace inside comment`() {
+    configureByJavaText("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      TokenStream result = new EmptyTokenFilter(in); /* $c{
+              * some text
+              */
+      result = new LowerCaseFilter(result);
+      return result;
+    }
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      TokenStream result = new EmptyTokenFilter(in); /* $c{
+              * some text
+              */
+      result = new LowerCaseFilter(result);
+      return result;
+    }
+    """.trimIndent())
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-1399"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test percent doesnt match brace inside comment`() {
+    configureByJavaText("""
+      protected TokenStream normalize(String fieldName, TokenStream in) $c{
+      TokenStream result = new EmptyTokenFilter(in); /* {
+              * some text
+              */
+      result = new LowerCaseFilter(result);
+      return result;
+    }
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      TokenStream result = new EmptyTokenFilter(in); /* {
+              * some text
+              */
+      result = new LowerCaseFilter(result);
+      return result;
+    $c}
+    """.trimIndent())
+  }
+
+  @Test
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test matching works with a sequence of single-line comments`() {
+    configureByJavaText("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // $c{
+      // result = new LowerCaseFilter(result);
+      // }
+      return result;
+    }
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // {
+      // result = new LowerCaseFilter(result);
+      // $c}
+      return result;
+    }
+    """.trimIndent())
+  }
+
+  @Test
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test matching doesn't work if a sequence of single-line comments is broken`() {
+    configureByJavaText("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // $c{
+        result = new LowerCaseFilter(result);
+      // }
+      return result;
+    }
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+      protected TokenStream normalize(String fieldName, TokenStream in) {
+      // $c{
+        result = new LowerCaseFilter(result);
+      // }
+      return result;
+    }
+    """.trimIndent())
   }
 }

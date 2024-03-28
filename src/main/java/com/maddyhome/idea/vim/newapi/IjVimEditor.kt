@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
@@ -358,7 +359,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return EditorHelper.getVirtualFile(editor)?.getUrl()?.let { VirtualFileManager.extractProtocol(it) }
   }
 
-  override val projectId = editor.project?.basePath ?: DEFAULT_PROJECT_ID
+  override val projectId = editor.project?.let { injector.file.getProjectId(it) } ?: DEFAULT_PROJECT_ID
 
   override fun visualPositionToOffset(position: VimVisualPosition): Offset {
     return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight)).offset
@@ -500,3 +501,6 @@ public val Editor.vim: VimEditor
   get() = IjVimEditor(this)
 public val VimEditor.ij: Editor
   get() = (this as IjVimEditor).editor
+
+public val com.intellij.openapi.util.TextRange.vim: TextRange
+  get() = TextRange(this.startOffset, this.endOffset)

@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
+import com.maddyhome.idea.vim.api.VimPsiService
 import com.maddyhome.idea.vim.api.VimRegexpService
 import com.maddyhome.idea.vim.api.VimScrollGroup
 import com.maddyhome.idea.vim.api.VimSearchGroup
@@ -65,6 +66,7 @@ import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.IjVimOptionGroup
+import com.maddyhome.idea.vim.group.IjVimPsiService
 import com.maddyhome.idea.vim.group.MacroGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
@@ -147,6 +149,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<MacroGroup>()
   override val undo: VimUndoRedo
     get() = service<UndoRedoHelper>()
+  override val psiService: VimPsiService
+    get() = service<IjVimPsiService>()
   override val commandLineHelper: VimCommandLineHelper
     get() = service<CommandLineHelper>()
   override val nativeActionManager: NativeActionManager

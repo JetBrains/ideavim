@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -381,10 +382,14 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-1287 |d| |v_i{|
   @Test
+  @VimBehaviorDiffers(
+    originalVimAfter = "{\"{foo, ${c}bar\", baz}}",
+    description = "We have PSI and can resolve this case correctly. I'm not sure if it should be fixed"
+  )
   fun testBadlyNestedBlockInsideString() {
     val before = "{\"{foo, ${c}bar\", baz}}"
     val keys = listOf("di{")
-    val after = "{\"{foo, ${c}bar\", baz}}"
+    val after = "{}}"
     doTest(keys, before, after, Mode.NORMAL())
   }
 
@@ -404,6 +409,14 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("ci{")
     val after = "\"{$c}\""
     doTest(keys, before, after, Mode.INSERT)
+  }
+
+  @Test
+  fun testDeletingInnerBlockWhenItIsPresentInString() {
+    val before = "let variable = ('abc' .. \"br${c}aces ( with content )\")"
+    val keys = listOf("di(")
+    val after = "let variable = ()"
+    doTest(keys, before, after, Mode.NORMAL())
   }
 
   // VIM-1008 |c| |v_i{|

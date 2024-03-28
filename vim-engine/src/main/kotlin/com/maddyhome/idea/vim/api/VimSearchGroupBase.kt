@@ -125,16 +125,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   ): ReplaceConfirmationChoice
 
   /**
-   * Parses a string representing a Vimscript expression.
-   *
-   * @param expressionString A string representing a VimScript expression.
-   * @return An internal representation of a VimScript expression.
-   */
-  protected abstract fun parseVimScriptExpression(
-    expressionString: String,
-  ): Expression?
-
-  /**
    * Highlights the string that would be replaced (pending user confimation) in
    * a substitute command.
    *
@@ -608,7 +598,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       var expression: Expression? = null
       if (hasExpression) {
         val exprString = substituteString.substring(2)
-        expression = parseVimScriptExpression(exprString)
+        expression = injector.vimscriptParser.parseExpression(exprString)
         if (expression == null) {
           exceptions.add(ExException("E15: Invalid expression: $exprString"))
           expression = SimpleExpression(VimString(""))

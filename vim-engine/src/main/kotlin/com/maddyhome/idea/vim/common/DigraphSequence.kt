@@ -230,10 +230,15 @@ public class DigraphSequence: Cloneable {
 
     if (digraphState != other.digraphState) return false
     if (digraphChar != other.digraphChar) return false
-    if (!codeChars.contentEquals(other.codeChars)) return false
     if (codeCnt != other.codeCnt) return false
     if (codeType != other.codeType) return false
     if (codeMax != other.codeMax) return false
+
+    if(::codeChars.isInitialized && other::codeChars.isInitialized) {
+      if (!codeChars.contentEquals(other.codeChars)) return false
+    } else if (::codeChars.isInitialized != other::codeChars.isInitialized) {
+      return false
+    }
 
     return true
   }
@@ -241,7 +246,7 @@ public class DigraphSequence: Cloneable {
   override fun hashCode(): Int {
     var result = digraphState
     result = 31 * result + digraphChar.hashCode()
-    result = 31 * result + codeChars.contentHashCode()
+    result = 31 * result + if (::codeChars.isInitialized) codeChars.contentHashCode() else 0
     result = 31 * result + codeCnt
     result = 31 * result + codeType
     result = 31 * result + codeMax

@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.state.mode.isChar
 import com.maddyhome.idea.vim.state.mode.isLine
-import com.maddyhome.idea.vim.state.mode.mode
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
@@ -99,6 +98,21 @@ public abstract class VimPutBase : VimPut {
     val rangeForMarks = TextRange(leftIndex, rightIndex)
 
     injector.markService.setVisualSelectionMarks(caret, rangeForMarks)
+  }
+
+  @RWLockLabel.SelfSynchronized
+  private fun deleteSelectedText(editor: VimEditor, caret: VimCaret, data: PutData, operatorArguments: OperatorArguments, saveToRegister: Boolean): VimCaret? {
+    if (data.visualSelection == null) return null
+    if (!caret.isValid) return null
+
+    // TODO [vakhitov] what if it is ImmutableCaret and it was changed from the one added to [caretsAndSelections]? We should introduce caret ids that won't change
+    val selectionForCaret = data.visualSelection.caretsAndSelections[caret] ?: return null
+
+    val range = selectionForCaret.toVimTextRange(false).normalize()
+    injector.application.runWriteAction {
+      injector.changeGroup.deleteRange(editor, caret, range, selectionForCaret.type, false, operatorArguments, saveToRegister)
+    }
+    return caret.moveToInlayAwareOffset(range.startOffset)
   }
 
   @RWLockLabel.SelfSynchronized
@@ -509,18 +523,20 @@ public abstract class VimPutBase : VimPut {
   @RWLockLabel.SelfSynchronized
   override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean, modifyRegister: Boolean): Boolean {
     val additionalData = collectPreModificationData(editor, data)
+    var currentCaret = caret
     data.visualSelection?.let {
-      deleteSelectedText(
+      currentCaret = deleteSelectedText(
         editor,
+        caret,
         data,
         OperatorArguments(false, 0, editor.mode),
         modifyRegister,
-      )
+      ) ?: return false
     }
-    val processedText = processText(caret, data) ?: return false
-    val updatedCaret = putForCaret(editor, caret, data, additionalData, context, processedText)
+    val processedText = processText(currentCaret, data) ?: return false
+    currentCaret = putForCaret(editor, currentCaret, data, additionalData, context, processedText)
     if (updateVisualMarks) {
-      wrapInsertedTextWithVisualMarks(updatedCaret, data, processedText)
+      wrapInsertedTextWithVisualMarks(currentCaret, data, processedText)
     }
     return true
   }

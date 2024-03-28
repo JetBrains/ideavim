@@ -9,6 +9,7 @@ package org.jetbrains.plugins.ideavim.helper
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.helper.checkInString
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -246,8 +247,7 @@ class SearchHelperTest : VimTestCase() {
   fun findBlockRange(testCase: FindBlockRangeTestCase) {
     val (_, text, type, count, isOuter, expected) = (testCase)
     configureByText(text)
-    val actual =
-      injector.searchHelper.findBlockRange(fixture.editor.vim, fixture.editor.vim.currentCaret(), type, count, isOuter)
+    val actual = findBlockRange(fixture.editor.vim, fixture.editor.vim.currentCaret(), type, count, isOuter)
     kotlin.test.assertEquals(expected, actual)
   }
 
@@ -294,8 +294,8 @@ class SearchHelperTest : VimTestCase() {
         FindBlockRangeTestCase("outer match exclude start paren in string when caret at start of quote", "(${c}\"(aa\")", '(', 1, isOuter = true, expected = TextRange(0, 7)),
         FindBlockRangeTestCase("inner match exclude start paren in string when caret at end of quote", "(\"(aa${c}\")", '(', 1, isOuter = false, expected = TextRange(1, 6)),
         FindBlockRangeTestCase("outer match exclude start paren in string when caret at end of quote", "(\"(aa${c}\")", '(', 1, isOuter = true, expected = TextRange(0, 7)),
-        FindBlockRangeTestCase("inner match not exclude start paren in string when caret in between quote", "(\"(a${c}a\")", '(', 1, isOuter = false, expected = null),
-        FindBlockRangeTestCase("outer match not exclude start paren in string when caret in between quote", "(\"(a${c}a\")", '(', 1, isOuter = true, expected = null),
+        FindBlockRangeTestCase("inner match not exclude start paren in string when caret in between quote", "(\"(a${c}a\")", '(', 1, isOuter = false, expected = TextRange(1, 6)), // Vim behavior differs, but we have some PSI magic and can resolve such cases
+        FindBlockRangeTestCase("outer match not exclude start paren in string when caret in between quote", "(\"(a${c}a\")", '(', 1, isOuter = true, expected = TextRange(0, 7)), // Vim behavior differs, but we have some PSI magic and can resolve such cases
         FindBlockRangeTestCase("inner match exclude end paren in string when caret at start of quote", "(${c}\"aa)\")", '(', 1, isOuter = false, expected = TextRange(1, 6)),
         FindBlockRangeTestCase("outer match exclude end paren in string when caret at start of quote", "(${c}\"aa)\")", '(', 1, isOuter = true, expected = TextRange(0, 7)),
         FindBlockRangeTestCase("inner match exclude end paren in string when caret at end of quote", "(\"aa)${c}\")", '(', 1, isOuter = false, expected = TextRange(1, 6)),

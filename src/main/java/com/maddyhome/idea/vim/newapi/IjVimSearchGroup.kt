@@ -26,9 +26,7 @@ import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.ui.ModalEntry
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler
-import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseExpression
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
@@ -134,10 +132,6 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
       exEntryPanel.deactivate(true, false)
     }
     return result.get()
-  }
-
-  override fun parseVimScriptExpression(expressionString: String): Expression? {
-    return parseExpression(expressionString)
   }
 
   override fun addSubstitutionConfirmationHighlight(editor: VimEditor, startOffset: Int, endOffset: Int) {

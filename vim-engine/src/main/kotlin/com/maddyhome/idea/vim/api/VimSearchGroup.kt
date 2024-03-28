@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
 public interface VimSearchGroup {

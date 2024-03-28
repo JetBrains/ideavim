@@ -13,10 +13,10 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -35,7 +35,7 @@ public class MotionInnerBlockAngleAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '<', count, false)
+    return findBlockRange(editor, caret, '<', count, false)
   }
 }
 
@@ -53,7 +53,7 @@ public class MotionInnerBlockBraceAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '{', count, false)
+    return findBlockRange(editor, caret, '{', count, false)
   }
 }
 
@@ -71,7 +71,7 @@ public class MotionInnerBlockBracketAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '[', count, false)
+    return findBlockRange(editor, caret, '[', count, false)
   }
 }
 
@@ -89,7 +89,7 @@ public class MotionInnerBlockParenAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '(', count, false)
+    return findBlockRange(editor, caret, '(', count, false)
   }
 }
 
@@ -107,7 +107,7 @@ public class MotionOuterBlockAngleAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '<', count, true)
+    return findBlockRange(editor, caret, '<', count, true)
   }
 }
 
@@ -125,7 +125,7 @@ public class MotionOuterBlockBraceAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '{', count, true)
+    return findBlockRange(editor, caret, '{', count, true)
   }
 }
 
@@ -143,7 +143,7 @@ public class MotionOuterBlockBracketAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '[', count, true)
+    return findBlockRange(editor, caret, '[', count, true)
   }
 }
 
@@ -161,6 +161,6 @@ public class MotionOuterBlockParenAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockRange(editor, caret, '(', count, true)
+    return findBlockRange(editor, caret, '(', count, true)
   }
 }

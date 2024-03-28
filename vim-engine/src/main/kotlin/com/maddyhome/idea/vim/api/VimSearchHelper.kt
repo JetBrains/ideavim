@@ -97,13 +97,6 @@ public interface VimSearchHelper {
     count: Int,
   ): Int
 
-  public fun findUnmatchedBlock(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    type: Char,
-    count: Int,
-  ): Int
-
   /**
    * Find the next word in the editor's document, from the given starting point
    *
@@ -218,25 +211,6 @@ public interface VimSearchHelper {
     editor: VimEditor,
     caret: ImmutableVimCaret,
     quote: Char,
-    isOuter: Boolean,
-  ): TextRange?
-
-  /**
-   * Find block enclosing the caret
-   *
-   * @param editor  The editor to search in
-   * @param caret   The caret currently at
-   * @param type    The type of block, e.g. (, [, {, <
-   * @param count   Find the nth next occurrence of the block
-   * @param isOuter Control whether the match includes block character
-   * @return When block is found, return text range matching where end offset is exclusive,
-   * otherwise return null
-   */
-  public fun findBlockRange(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    type: Char,
-    count: Int,
     isOuter: Boolean,
   ): TextRange?
 

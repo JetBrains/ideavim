@@ -20,4 +20,11 @@ public interface VimFile {
   public fun selectFile(count: Int, context: ExecutionContext): Boolean
   public fun selectNextFile(count: Int, context: ExecutionContext)
   public fun openFile(filename: String, context: ExecutionContext): Boolean
+
+  public fun getProjectId(project: Any): String
+
+  /**
+   * Focuses or opens a new VimEditor by [documentPath]
+   */
+  public fun selectEditor(projectId: String, documentPath: String, protocol: String?): VimEditor?
 }

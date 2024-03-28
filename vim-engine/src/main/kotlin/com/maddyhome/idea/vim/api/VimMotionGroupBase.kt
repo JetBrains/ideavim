@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.findMatchingPairOnCurrentLine
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
@@ -22,7 +23,7 @@ import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
-import com.maddyhome.idea.vim.state.mode.mode
+import org.jetbrains.annotations.Range
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -259,6 +260,64 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
     return moveCaretToLineStartSkipLeading(editor, line)
   }
 
+  override fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Motion {
+    val markService = injector.markService
+    val mark = markService.getMark(caret, ch) ?: return Motion.Error
+
+    val editor = caret.editor
+
+    val line = mark.line
+
+    if (editor.getPath() == mark.filepath) {
+      val offset = if (toLineStart) {
+        moveCaretToLineStartSkipLeading(editor, line)
+      } else {
+        editor.bufferPositionToOffset(BufferPosition(line, mark.col, false))
+      }
+      return offset.toMotionOrError()
+    }
+
+    // TODO [vakhitov] It is super super super wrong.
+    // TODO [vakhitov] We should remove all of the secondary carets and return an offset of the primary one
+    val markEditor = injector.file.selectEditor(editor.projectId, mark.filepath, mark.protocol) ?: return Motion.Error
+    // todo should we move all the carets or only one?
+    for (carett in markEditor.carets()) {
+      val offset = if (toLineStart) {
+        moveCaretToLineStartSkipLeading(markEditor, line)
+      } else {
+        // todo should it be the same as getting offset above?
+        markEditor.bufferPositionToOffset(BufferPosition(line, mark.col))
+      }
+      carett.moveToOffset(offset)
+    }
+    // TODO remove secondary carets and return result for primary caret
+    return Motion.Error
+  }
+
+  override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+    val jumpService = injector.jumpService
+    val spot = jumpService.getJumpSpot(editor)
+    val (line, col, fileName) = jumpService.getJump(editor, count) ?: return Motion.Error
+    val lp = BufferPosition(line, col, false)
+    return if (editor.getPath() != fileName) {
+      // TODO [vakhitov] come up with a more gentle way to handle protocol
+      injector.file.selectEditor(editor.projectId, fileName, "file")?.let { newEditor ->
+        if (spot == -1) {
+          jumpService.addJump(editor, false)
+        }
+        newEditor.let {
+          it.currentCaret().moveToOffset(it.normalizeOffset(newEditor.bufferPositionToOffset(lp), false))
+        }
+      }
+      Motion.Error
+    } else {
+      if (spot == -1) {
+        jumpService.addJump(editor, false)
+      }
+      editor.bufferPositionToOffset(lp).toMotionOrError()
+    }
+  }
+
   override fun getMotionRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -344,6 +403,63 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
       }
     }
     return TextRange(start, end)
+  }
+
+  override fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion {
+    val line = caret.getLine().line
+    val column = editor.normalizeColumn(line, count, allowEnd)
+    val offset = editor.bufferPositionToOffset(BufferPosition(line, column, false))
+    return if (column != count) {
+      Motion.AdjustedOffset(offset, count)
+    } else {
+      AbsoluteOffset(offset)
+    }
+  }
+
+  override fun moveCaretToLineWithSameColumn(
+    editor: VimEditor,
+    line: Int,
+    caret: ImmutableVimCaret,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+    var c = caret.vimLastColumn
+    var l = line
+    if (l < 0) {
+      l = 0
+      c = 0
+    } else if (l >= editor.lineCount()) {
+      l = editor.normalizeLine(editor.lineCount() - 1)
+      c = editor.lineLength(l)
+    }
+    val newPos = BufferPosition(l, editor.normalizeColumn(l, c, false))
+    return editor.bufferPositionToOffset(newPos)
+  }
+
+  override fun moveCaretToLinePercent(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+    return moveCaretToLineWithStartOfLineOption(
+      editor,
+      editor.normalizeLine((editor.lineCount() * count.coerceIn(0, 100) + 99) / 100 - 1), // TODO why do we have this 99? (It is there since 2003)
+      caret,
+    )
+  }
+
+  override fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Motion {
+    return findMatchingPairOnCurrentLine(editor, caret)?.toMotionOrError() ?: Motion.Error
+  }
+
+  override fun moveCaretToLineWithStartOfLineOption(
+    editor: VimEditor,
+    line: Int,
+    caret: ImmutableVimCaret,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+    return if (injector.options(editor).startofline) {
+      moveCaretToLineStartSkipLeading(editor, line)
+    } else {
+      moveCaretToLineWithSameColumn(editor, line, caret)
+    }
   }
 
   override fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: ImmutableVimCaret): Int {

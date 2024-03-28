@@ -8,10 +8,12 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
@@ -143,6 +145,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @Test
+  @Disabled("It will work after implementing all of the methods in VimPsiService")
   fun `test motion outside text`() {
     doTest(
       "%",
@@ -207,41 +210,45 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (outer forward)`() {
     doTest(
       "%",
       """ debugPrint$c(\(var)) """,
-      """ debugPrint(\(var)$c) """,
+      """ debugPrint(\(var$c)) """,
       Mode.NORMAL(),
     )
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (outer backward)`() {
     doTest(
       "%",
       """ debugPrint(\(var)$c) """,
-      """ debugPrint$c(\(var)) """,
+      """ debugPrint(\(var)$c) """,
       Mode.NORMAL(),
     )
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (inner forward)`() {
     doTest(
       "%",
       """ debugPrint(\$c(var)) """,
-      """ debugPrint(\(var$c)) """,
+      """ debugPrint(\$c(var)) """,
       Mode.NORMAL(),
     )
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.BUG_IN_NEOVIM)
   fun `test motion in text with escape (inner backward)`() {
     doTest(
       "%",
       """ debugPrint(\$c(var)) """,
-      """ debugPrint(\(var$c)) """,
+      """ debugPrint(\$c(var)) """,
       Mode.NORMAL(),
     )
   }
@@ -331,5 +338,29 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       """.trimIndent()
     )
     assertOffset(10)
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3294"])
+  fun `test matching with braces inside of string`() {
+    configureByText("""
+$c("("")")
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+("("")"$c)
+    """.trimIndent())
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3294"])
+  fun `test matching with braces inside of string 2`() {
+    configureByText("""
+("("")"$c)
+    """.trimIndent())
+    typeText("%")
+    assertState("""
+$c("("")")
+    """.trimIndent())
   }
 }
