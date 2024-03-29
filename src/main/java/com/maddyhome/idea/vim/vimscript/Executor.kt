@@ -74,8 +74,7 @@ internal class Executor : VimScriptExecutorBase() {
             VimPlugin.indicateError()
           }
         } catch (e: Exception) {
-          logger.warn("Caught: ${e.message}")
-          logger.warn(e.stackTrace.toString())
+          logger.warn(e)
           if (injector.application.isUnitTest()) {
             throw e
           }
