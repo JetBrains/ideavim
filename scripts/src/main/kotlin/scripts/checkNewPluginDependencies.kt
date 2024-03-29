@@ -49,17 +49,13 @@ suspend fun main() {
   }
   val output = response.body<List<String>>().toSet()
   println(output)
-  if (knownPlugins != output) {
-    val newPlugins = (output - knownPlugins).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
-    val removedPlugins = (knownPlugins - output.toSet()).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
+  val newPlugins = (output - knownPlugins).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
+  if (newPlugins.isNotEmpty()) {
+//    val removedPlugins = (knownPlugins - output.toSet()).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
     error(
       """
-        
       Unregistered plugins:
-      ${if (newPlugins.isNotEmpty()) newPlugins.joinToString(separator = "\n") { it.first + "(" + it.second + ")" } else "No unregistered plugins"}
-      
-      Removed plugins:
-      ${if (removedPlugins.isNotEmpty()) removedPlugins.joinToString(separator = "\n") { it.first + "(" + it.second + ")" } else "No removed plugins"}
+      ${newPlugins.joinToString(separator = "\n") { it.first + "(" + it.second + ")" }}
     """.trimIndent()
     )
   }
