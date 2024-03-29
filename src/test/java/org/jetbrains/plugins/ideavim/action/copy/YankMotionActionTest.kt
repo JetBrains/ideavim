@@ -42,10 +42,10 @@ class YankMotionActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(file)
 
-    val initialOffset = fixture.editor.caretModel.offset
+    val initialOffset = fixture.editor.caretModel
     typeText("yy")
 
-    kotlin.test.assertEquals(initialOffset, fixture.editor.caretModel.offset)
+    kotlin.test.assertEquals(initialOffset, fixture.editor.caretModel)
   }
 
   @Suppress("DANGEROUS_CHARACTERS")

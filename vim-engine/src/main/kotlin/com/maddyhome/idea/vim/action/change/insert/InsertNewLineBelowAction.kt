@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.state.mode.Mode
 
@@ -79,11 +78,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
   // Check if the "last character on previous line" has a guard
   // This is actively used in pycharm notebooks https://youtrack.jetbrains.com/issue/VIM-2495
   val hasGuards = moves.stream().anyMatch { (_, second): Pair<VimCaret?, Int?> ->
-    editor.document.getOffsetGuard(
-      Offset(
-        second!!,
-      ),
-    ) != null
+    editor.document.getOffsetGuard(second!!) != null
   }
   if (!hasGuards) {
     for ((first, second) in moves) {

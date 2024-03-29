@@ -28,7 +28,7 @@ public class MotionBigWordRightAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.findOffsetOfNextWord(editor, caret.offset.point, operatorArguments.count1, true)
+    return injector.motion.findOffsetOfNextWord(editor, caret.offset, operatorArguments.count1, true)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

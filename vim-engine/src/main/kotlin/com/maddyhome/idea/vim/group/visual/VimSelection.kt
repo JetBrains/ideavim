@@ -11,13 +11,12 @@ package com.maddyhome.idea.vim.group.visual
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.SelectionType.BLOCK_WISE
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.SelectionType.LINE_WISE
-import com.maddyhome.idea.vim.common.Pointer
-import com.maddyhome.idea.vim.common.TextRange
 import org.jetbrains.annotations.NonNls
 import kotlin.math.max
 import kotlin.math.min
@@ -140,7 +139,7 @@ public class VimLineSelection(
   override val type: SelectionType = LINE_WISE
 
   override fun toVimTextRange(skipNewLineForLineMode: Boolean): TextRange =
-    if (skipNewLineForLineMode && editor.fileSize() >= normNativeEnd && normNativeEnd > 0 && editor.charAt(Pointer(normNativeEnd - 1)) == '\n') {
+    if (skipNewLineForLineMode && editor.fileSize() >= normNativeEnd && normNativeEnd > 0 && editor.charAt(normNativeEnd - 1) == '\n') {
       TextRange(normNativeStart, (normNativeEnd - 1).coerceAtLeast(0))
     } else {
       TextRange(normNativeStart, normNativeEnd)

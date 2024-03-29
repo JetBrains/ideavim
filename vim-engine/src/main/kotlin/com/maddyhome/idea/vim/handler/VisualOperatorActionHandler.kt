@@ -183,7 +183,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
           val end = VisualOperation.calculateRange(this, range, 1, primaryCaret)
           mapOf(
             primaryCaret to VimBlockSelection(
-              primaryCaret.offset.point,
+              primaryCaret.offset,
               end,
               this,
               range.columns >= VimMotionGroupBase.LAST_COLUMN,
@@ -194,7 +194,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
           this.nativeCarets().forEach { caret ->
             val range = caret.vimLastVisualOperatorRange ?: return@forEach
             val end = VisualOperation.calculateRange(this, range, 1, caret)
-            carets += caret to VimSelection.create(caret.offset.point, end, range.type, this)
+            carets += caret to VimSelection.create(caret.offset, end, range.type, this)
           }
           carets.toMap()
         }
@@ -204,7 +204,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
         mapOf(
           primaryCaret to VimBlockSelection(
             primaryCaret.vimSelectionStart,
-            primaryCaret.offset.point,
+            primaryCaret.offset,
             this,
             primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN,
           ),
@@ -214,7 +214,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
         val mode = this.vimStateMachine.mode
         VimSimpleSelection.createWithNative(
           caret.vimSelectionStart,
-          caret.offset.point,
+          caret.offset,
           caret.selectionStart,
           caret.selectionEnd,
           mode.selectionType ?: CHARACTER_WISE,

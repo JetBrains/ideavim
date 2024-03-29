@@ -34,7 +34,7 @@ public class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecu
     }
     injector.editorGroup.notifyIdeaJoin(editor)
     var res = true
-    editor.nativeCarets().sortedByDescending { it.offset.point }.forEach { caret ->
+    editor.nativeCarets().sortedByDescending { it.offset }.forEach { caret ->
       if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true, operatorArguments)) {
         res = false
       }

@@ -60,7 +60,7 @@ public sealed class MotionSectionAction(private val charType: Char, public val d
 }
 
 private fun getCaretToSectionMotion(editor: VimEditor, caret: ImmutableVimCaret, type: Char, dir: Int, count: Int): Int {
-  return if (caret.offset.point == 0 && count < 0 || caret.offset.point >= editor.fileSize() - 1 && count > 0) {
+  return if (caret.offset == 0 && count < 0 || caret.offset >= editor.fileSize() - 1 && count > 0) {
     -1
   } else {
     var res = injector.searchHelper.findSection(editor, caret, type, dir, count)

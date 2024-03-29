@@ -48,8 +48,8 @@ public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
         editor.setSelectMode(myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {
           editor.nativeCarets().forEach {
-            if (it.offset.point + injector.visualMotionGroup.selectionAdj == it.selectionEnd) {
-              it.moveToInlayAwareOffset(it.offset.point + injector.visualMotionGroup.selectionAdj)
+            if (it.offset + injector.visualMotionGroup.selectionAdj == it.selectionEnd) {
+              it.moveToInlayAwareOffset(it.offset + injector.visualMotionGroup.selectionAdj)
             }
           }
         }
@@ -57,8 +57,8 @@ public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
         editor.pushVisualMode(myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {
           editor.nativeCarets().forEach {
-            if (it.offset.point == it.selectionEnd && it.visualLineStart <= it.offset.point - injector.visualMotionGroup.selectionAdj) {
-              it.moveToInlayAwareOffset(it.offset.point - injector.visualMotionGroup.selectionAdj)
+            if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - injector.visualMotionGroup.selectionAdj) {
+              it.moveToInlayAwareOffset(it.offset - injector.visualMotionGroup.selectionAdj)
             }
           }
         }

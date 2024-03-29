@@ -21,10 +21,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
-import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
-import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.helper.lastSelectionInfo
 import com.maddyhome.idea.vim.helper.markStorage
@@ -78,8 +75,8 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     }
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)
-  override val offset: Offset
-    get() = caret.offset.offset
+  override val offset: Int
+    get() = caret.offset
   override var vimLastColumn: Int
     get() = caret.vimLastColumn
     set(value) {
@@ -118,8 +115,8 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     this.caret.moveToLogicalPosition(LogicalPosition(position.line, position.column, position.leansForward))
   }
 
-  override fun getLine(): EditorLine.Pointer {
-    return EditorLine.Pointer.init(caret.logicalPosition.line, editor)
+  override fun getLine(): Int {
+    return caret.logicalPosition.line
   }
 
   override fun hasSelection(): Boolean {
@@ -164,8 +161,8 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     return this
   }
 
-  override fun setSelection(start: Offset, end: Offset) {
-    caret.setSelection(start.point, end.point)
+  override fun setSelection(start: Int, end: Int) {
+    caret.setSelection(start, end)
   }
 
   override fun removeSelection() {

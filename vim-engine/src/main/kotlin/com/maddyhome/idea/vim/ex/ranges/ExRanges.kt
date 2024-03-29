@@ -56,7 +56,7 @@ public sealed class Range(
     if (this === other) return true
     if (other !is Range) return false
 
-    if (offset != other.offset) return false
+    if (offset != other) return false
     if (isMove != other.isMove) return false
 
     return true

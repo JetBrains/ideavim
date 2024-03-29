@@ -531,15 +531,15 @@ internal object VimListenerManager {
           // When starting on an empty line and dragging vertically upwards onto
           // another line, the selection should include the entirety of the empty line
           caret.setSelection(
-            ijVimEditor.coerceOffset(endOffset + 1).point,
-            ijVimEditor.coerceOffset(startOffset).point,
+            ijVimEditor.coerceOffset(endOffset + 1),
+            ijVimEditor.coerceOffset(startOffset),
           )
         } else if (lineEnd == startOffset + 1 && startOffset == endOffset) {
           // When dragging left from EOL on a non-empty line, the selection
           // should include the last character on the line
           caret.setSelection(
-            ijVimEditor.coerceOffset(lineEnd).point,
-            ijVimEditor.coerceOffset(lineEnd - 1).point,
+            ijVimEditor.coerceOffset(lineEnd),
+            ijVimEditor.coerceOffset(lineEnd - 1),
           )
         }
       }

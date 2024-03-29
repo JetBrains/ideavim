@@ -24,9 +24,9 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.helper.isEndAllowed
 
 /**
  * @author Alex Plate
@@ -222,7 +222,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     val foldRegion = editor.getFoldRegionAtOffset(resultOffset)
     if (foldRegion != null && !foldRegion.isExpanded) {
       if (keepFold) {
-        resultOffset = foldRegion.startOffset.point
+        resultOffset = foldRegion.startOffset
       } else {
         foldRegion.isExpanded = true
       }

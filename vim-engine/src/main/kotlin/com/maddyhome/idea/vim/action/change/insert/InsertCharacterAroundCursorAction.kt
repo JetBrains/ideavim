@@ -75,7 +75,7 @@ private fun insertCharacterAroundCursor(editor: VimEditor, caret: VimCaret, dir:
   vp = VimVisualPosition(vp.line + dir, vp.column, false)
   val len = editor.lineLength(editor.visualLineToBufferLine(vp.line))
   if (vp.column < len) {
-    val offset = editor.visualPositionToOffset(VimVisualPosition(vp.line, vp.column, false)).point
+    val offset = editor.visualPositionToOffset(VimVisualPosition(vp.line, vp.column, false))
     val charsSequence = editor.text()
     if (offset < charsSequence.length) {
       val ch = charsSequence[offset]

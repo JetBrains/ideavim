@@ -52,7 +52,7 @@ public class MotionUpCtrlPAction : MotionUpAction() {
       if (caret == primaryCaret) {
         activeLookup.up(caret, context)
       }
-      caret.offset.point.toMotion()
+      caret.offset.toMotion()
     } else {
       super.getOffset(editor, caret, context, argument, operatorArguments)
     }

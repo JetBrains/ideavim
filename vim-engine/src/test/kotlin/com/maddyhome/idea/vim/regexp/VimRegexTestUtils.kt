@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.mark.VimMark
 import org.mockito.ArgumentMatchers.anyInt
@@ -107,7 +106,7 @@ internal object VimRegexTestUtils {
 
   fun mockCaret(caretOffset: Int, visualOffset: Pair<Int, Int> = Pair(-1, -1), marks: Map<Char, BufferPosition> = emptyMap()): VimCaret {
     val caretMock = Mockito.mock<VimCaret>()
-    whenever(caretMock.offset).thenReturn(Offset(caretOffset))
+    whenever(caretMock.offset).thenReturn(caretOffset)
     whenever(caretMock.selectionStart).thenReturn(visualOffset.first)
     whenever(caretMock.selectionEnd).thenReturn(visualOffset.second)
     val markStorage = mockMarkStorage(marks)

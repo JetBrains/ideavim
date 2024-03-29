@@ -74,7 +74,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     val chars: CharSequence = editor.text()
     var found = 0
     val step = if (count >= 0) 1 else -1
-    var pos: Int = caret.offset.point + step
+    var pos: Int = caret.offset + step
     while (pos in start until end && pos < chars.length) {
       if (chars[pos] == ch) {
         found++
@@ -455,7 +455,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     var leftQuote: Int
     var rightQuote: Int
 
-    val caretOffset = caret.offset.point
+    val caretOffset = caret.offset
     val quoteAfterCaret: Int = editor.text().indexOfNext(quote, caretOffset, true) ?: return null
     val quoteBeforeCaret: Int? = editor.text().indexOfPrevious(quote, caretOffset, true)
     val quotesBeforeCaret: Int = editor.text().occurrencesBeforeOffset(quote, caretOffset, true)
@@ -560,7 +560,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     count = Math.abs(count)
     val total = count
     val chars: CharSequence = editor.text()
-    val start: Int = caret.offset.point
+    val start: Int = caret.offset
     val max: Int = editor.fileSize().toInt()
     var res: Int? = start
     while (count > 0 && res != null && res >= 0 && res <= max - 1) {
@@ -594,7 +594,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     count = Math.abs(count)
     val total = count
     val chars: CharSequence = editor.text()
-    val start: Int = caret.offset.point
+    val start: Int = caret.offset
     val max: Int = editor.fileSize().toInt()
     var res: Int? = start
     while (count > 0 && res != null && res >= 0 && res <= max - 1) {
@@ -949,7 +949,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     val chars: CharSequence = editor.text()
     if (chars.length == 0) return TextRange(0, 0)
     val max: Int = editor.fileSize().toInt()
-    val offset: Int = caret.offset.point
+    val offset: Int = caret.offset
     val ssel: Int = caret.selectionStart
     val esel: Int = caret.selectionEnd
     return if (Math.abs(esel - ssel) > 1) {
@@ -1211,7 +1211,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     logger.debug("min=$min")
     logger.debug("max=$max")
 
-    val pos: Int = caret.offset.point
+    val pos: Int = caret.offset
     if (chars.length <= pos) return TextRange(chars.length - 1, chars.length - 1)
 
     val startSpace = charType(editor, chars[pos], isBig) === CharacterHelper.CharacterType.WHITESPACE
@@ -1336,7 +1336,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
   override fun findBlockTagRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
     var counter = count
     var isOuterVariable = isOuter
-    val position: Int = caret.offset.point
+    val position: Int = caret.offset
     val sequence: CharSequence = editor.text()
 
     val selectionStart: Int = caret.selectionStart

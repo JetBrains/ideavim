@@ -68,12 +68,12 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
 
     if (count < 0) {
       startOffset = 0
-      endOffset = caret.offset.point - 1
+      endOffset = caret.offset - 1
       skipCount = -count - 1
       offsetOrdering = IntComparators.OPPOSITE_COMPARATOR
     }
     else {
-      startOffset = caret.offset.point + 1
+      startOffset = caret.offset + 1
       endOffset = editor.ij.document.textLength
       skipCount = count - 1
       offsetOrdering = IntComparators.NATURAL_COMPARATOR

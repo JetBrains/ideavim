@@ -21,7 +21,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.state.mode.selectionType
 
@@ -67,7 +66,7 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
           }
           // Set the intended column before moving the caret, then reset because we've moved the caret
           it.vimLastColumn = intendedColumn
-          it.vimSetSelection(it.offset.point, end, true)
+          it.vimSetSelection(it.offset, end, true)
           it.vimLastColumn = intendedColumn
         }
       } else {
@@ -75,7 +74,7 @@ public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
           selectionType,
           returnTo ?: editor.vimStateMachine.mode.returnTo
         )
-        editor.forEachCaret { it.vimSetSelection(it.offset.point) }
+        editor.forEachCaret { it.vimSetSelection(it.offset) }
       }
       return true
     }

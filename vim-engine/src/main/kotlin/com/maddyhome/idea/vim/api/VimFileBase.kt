@@ -12,7 +12,7 @@ import java.lang.Long.toHexString
 
 public abstract class VimFileBase : VimFile {
   override fun displayHexInfo(editor: VimEditor) {
-    val offset = editor.currentCaret().offset.point
+    val offset = editor.currentCaret().offset
     val ch = editor.text()[offset]
 
     injector.messages.showStatusBarMessage(editor, toHexString(ch.code.toLong()))

@@ -18,9 +18,8 @@ import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 import java.util.*
 import kotlin.math.min
 
@@ -30,7 +29,7 @@ public object VisualOperation {
    */
   public fun getRange(editor: VimEditor, caret: ImmutableVimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
     var (start, end) = caret.run {
-      if (editor.inBlockSelection) sort(vimSelectionStart, offset.point) else sort(selectionStart, selectionEnd)
+      if (editor.inBlockSelection) sort(vimSelectionStart, offset) else sort(selectionStart, selectionEnd)
     }
     val type = editor.mode.selectionType ?: CHARACTER_WISE
 
@@ -75,7 +74,7 @@ public object VisualOperation {
       SelectionType.LINE_WISE -> injector.motion.moveCaretToLineWithSameColumn(editor, endLine, caret)
       SelectionType.CHARACTER_WISE -> when {
         lines > 1 -> injector.motion.moveCaretToLineStart(editor, endLine) + min(editor.lineLength(endLine), chars)
-        else -> editor.normalizeOffset(sp.line, caret.offset.point + chars - 1, true)
+        else -> editor.normalizeOffset(sp.line, caret.offset + chars - 1, true)
       }
       SelectionType.BLOCK_WISE -> {
         val endColumn = min(editor.lineLength(endLine), sp.column + chars - 1)

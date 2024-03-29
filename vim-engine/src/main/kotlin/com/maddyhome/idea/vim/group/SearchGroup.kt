@@ -110,7 +110,7 @@ public fun getCommentsOppositeBoundary(editor: VimEditor, pos: Int): Int? {
  */
 //  TODO [vakhitov] it would be better to make this search PSI-aware and skip chars in strings and comments
 public fun findMatchingPairOnCurrentLine(editor: VimEditor, caret: ImmutableVimCaret): Int? {
-  var pos = caret.offset.point
+  var pos = caret.offset
 
   val commentPos = getCommentsOppositeBoundary(editor, pos)
   if (commentPos != null) {
@@ -315,7 +315,7 @@ public fun findBlockRange(
   isOuter: Boolean,
 ): TextRange? {
   val chars: CharSequence = editor.text()
-  var pos: Int = caret.offset.point
+  var pos: Int = caret.offset
   var start: Int = caret.selectionStart
   var end: Int = caret.selectionEnd
 

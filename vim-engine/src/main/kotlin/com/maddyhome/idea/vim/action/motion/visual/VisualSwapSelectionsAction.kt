@@ -51,7 +51,7 @@ private fun swapVisualSelections(editor: VimEditor): Boolean {
   val vimSelectionStart = primaryCaret.vimSelectionStart
 
   editor.vimLastSelectionType = mode.selectionType
-  injector.markService.setVisualSelectionMarks(primaryCaret, TextRange(vimSelectionStart, primaryCaret.offset.point))
+  injector.markService.setVisualSelectionMarks(primaryCaret, TextRange(vimSelectionStart, primaryCaret.offset))
 
   editor.mode = mode.copy(selectionType = lastSelectionType)
   primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)

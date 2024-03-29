@@ -24,19 +24,16 @@ import com.maddyhome.idea.vim.api.VimMarkService.Companion.SENTENCE_END_MARK
 import com.maddyhome.idea.vim.api.VimMarkService.Companion.SENTENCE_START_MARK
 import com.maddyhome.idea.vim.api.VimMarkService.Companion.UPPERCASE_MARKS
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.util.*
@@ -161,11 +158,11 @@ public abstract class VimMarkServiceBase : VimMarkService {
 
     return when {
       markChar.isGlobalMark() -> {
-        setGlobalMark(editor, markChar, editor.primaryCaret().offset.point)
+        setGlobalMark(editor, markChar, editor.primaryCaret().offset)
       }
 
       markChar.isLocalMark() -> {
-        editor.carets().forEach { setMark(it, markChar, it.offset.point) }
+        editor.carets().forEach { setMark(it, markChar, it.offset) }
         true
       }
 
@@ -397,7 +394,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun editorReleased(editor: VimEditor) {
-    setMark(editor.primaryCaret(), LAST_BUFFER_POSITION, editor.primaryCaret().offset.point)
+    setMark(editor.primaryCaret(), LAST_BUFFER_POSITION, editor.primaryCaret().offset)
   }
 
   override fun resetAllMarksForCaret(caret: ImmutableVimCaret) {

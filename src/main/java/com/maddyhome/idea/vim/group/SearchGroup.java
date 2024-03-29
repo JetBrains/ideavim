@@ -1081,9 +1081,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
   private @Nullable TextRange findNextSearchForGn(@NotNull VimEditor editor, int count, boolean forwards) {
     if (forwards) {
       final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
-      return VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), editor.primaryCaret().getOffset().getPoint(), count, searchOptions);
+      return VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), editor.primaryCaret().getOffset(), count, searchOptions);
     } else {
-      return searchBackward(editor, editor.primaryCaret().getOffset().getPoint(), count);
+      return searchBackward(editor, editor.primaryCaret().getOffset(), count);
     }
   }
 

@@ -14,7 +14,6 @@ import com.intellij.openapi.editor.event.DocumentListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
 
 internal class IjVimDocument(val document: Document) : VimDocument {
 
@@ -41,7 +40,7 @@ internal class IjVimDocument(val document: Document) : VimDocument {
     document.removeDocumentListener(nativeListener)
   }
 
-  override fun getOffsetGuard(offset: Offset): LiveRange? {
-    return document.getOffsetGuard(offset.point)?.vim
+  override fun getOffsetGuard(offset: Int): LiveRange? {
+    return document.getOffsetGuard(offset)?.vim
   }
 }

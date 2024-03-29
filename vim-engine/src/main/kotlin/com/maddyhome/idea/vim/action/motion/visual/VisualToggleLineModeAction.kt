@@ -47,7 +47,7 @@ public class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    caret.vimSetSelection(caret.offset.point)
+    caret.vimSetSelection(caret.offset)
     return true
   }
 

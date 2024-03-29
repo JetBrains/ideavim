@@ -52,7 +52,7 @@ public class MotionDownCtrlNAction : MotionDownAction() {
       if (caret == primaryCaret) {
         activeLookup.down(primaryCaret, context)
       }
-      caret.offset.point.toMotion()
+      caret.offset.toMotion()
     } else {
       super.getOffset(editor, caret, context, argument, operatorArguments)
     }

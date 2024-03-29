@@ -34,7 +34,7 @@ public class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.findOffsetOfNextWord(editor, caret.offset.point, operatorArguments.count1, false)
+    return injector.motion.findOffsetOfNextWord(editor, caret.offset, operatorArguments.count1, false)
   }
 }
 
@@ -50,6 +50,6 @@ public class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.findOffsetOfNextWord(editor, caret.offset.point, operatorArguments.count1, false)
+    return injector.motion.findOffsetOfNextWord(editor, caret.offset, operatorArguments.count1, false)
   }
 }

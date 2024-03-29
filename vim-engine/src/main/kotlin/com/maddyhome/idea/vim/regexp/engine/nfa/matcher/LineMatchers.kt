@@ -70,8 +70,8 @@ internal class AtLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset.point).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset.point).line }
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset).line }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset).line }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
@@ -92,8 +92,8 @@ internal class BeforeLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset.point).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset.point).line }
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset).line }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset).line }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
@@ -114,8 +114,8 @@ internal class AfterLineCursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset.point).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset.point).line }
+    return if (possibleCursors.any { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset).line }) {
+      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset).line }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)

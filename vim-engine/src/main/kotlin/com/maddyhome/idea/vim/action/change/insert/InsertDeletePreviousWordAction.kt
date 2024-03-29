@@ -17,11 +17,11 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-W>"], modes = [Mode.INSERT])
@@ -52,9 +52,9 @@ public class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachC
  */
 private fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
   val deleteTo: Int = if (caret.getBufferPosition().column == 0) {
-    caret.offset.point - 1
+    caret.offset - 1
   } else {
-    var pointer = caret.offset.point - 1
+    var pointer = caret.offset - 1
     val chars = editor.text()
     while (pointer >= 0 && chars[pointer] == ' ' && chars[pointer] != '\n') {
       pointer--
@@ -73,7 +73,7 @@ private fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret, operato
   if (deleteTo < 0) {
     return false
   }
-  val range = TextRange(deleteTo, caret.offset.point)
+  val range = TextRange(deleteTo, caret.offset)
   injector.changeGroup.deleteRange(editor, caret, range, SelectionType.CHARACTER_WISE, true, operatorArguments)
   return true
 }

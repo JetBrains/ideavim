@@ -10,10 +10,9 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
 
 public interface VimDocument {
   public fun addChangeListener(listener: ChangesListener)
   public fun removeChangeListener(listener: ChangesListener)
-  public fun getOffsetGuard(offset: Offset): LiveRange?
+  public fun getOffsetGuard(offset: Int): LiveRange?
 }

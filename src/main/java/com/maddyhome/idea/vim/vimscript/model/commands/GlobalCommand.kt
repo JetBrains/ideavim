@@ -113,9 +113,9 @@ internal data class GlobalCommand(val ranges: Ranges, val argument: String, val 
       }
 
       if (globalBusy) {
-        val match = regex.findInLine(editor, editor.currentCaret().getLine().line)
+        val match = regex.findInLine(editor, editor.currentCaret().getLine())
         if (match is VimMatchResult.Success == !invert) {
-          globalExecuteOne(editor, context, editor.getLineStartOffset(editor.currentCaret().getLine().line), cmd.toString())
+          globalExecuteOne(editor, context, editor.getLineStartOffset(editor.currentCaret().getLine()), cmd.toString())
         }
       } else {
         val line1 = range.startLine
@@ -164,8 +164,8 @@ internal data class GlobalCommand(val ranges: Ranges, val argument: String, val 
       val searchcol = 0
       if (globalBusy) {
         val offset = editor.currentCaret().offset
-        val lineStartOffset = editor.getLineStartForOffset(offset.point)
-        match = sp.vim_regexec_multi(regmatch, editor, lcount, editor.currentCaret().getLine().line, searchcol)
+        val lineStartOffset = editor.getLineStartForOffset(offset)
+        match = sp.vim_regexec_multi(regmatch, editor, lcount, editor.currentCaret().getLine(), searchcol)
         if ((!invert && match > 0) || (invert && match <= 0)) {
           globalExecuteOne(editor, context, lineStartOffset, cmd.toString())
         }

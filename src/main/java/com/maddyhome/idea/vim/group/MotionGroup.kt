@@ -104,7 +104,7 @@ internal class MotionGroup : VimMotionGroupBase() {
     caret: ImmutableVimCaret,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, caret.getVisualPosition().line)
-    val bufferLine = caret.getLine().line
+    val bufferLine = caret.getLine()
     return editor.getLeadingCharacterOffset(bufferLine, col)
   }
 
@@ -134,18 +134,18 @@ internal class MotionGroup : VimMotionGroupBase() {
   }
 
   override fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int {
-    val project = editor.ij.project ?: return editor.currentCaret().offset.point
+    val project = editor.ij.project ?: return editor.currentCaret().offset
     val currentWindow = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow
     switchEditorTab(currentWindow, if (rawCount >= 1) -rawCount else -1, false)
-    return editor.currentCaret().offset.point
+    return editor.currentCaret().offset
   }
 
   override fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int {
     val absolute = rawCount >= 1
-    val project = editor.ij.project ?: return editor.currentCaret().offset.point
+    val project = editor.ij.project ?: return editor.currentCaret().offset
     val currentWindow = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow
     switchEditorTab(currentWindow, if (absolute) rawCount - 1 else 1, absolute)
-    return editor.currentCaret().offset.point
+    return editor.currentCaret().offset
   }
 
   private enum class ScreenLocation {

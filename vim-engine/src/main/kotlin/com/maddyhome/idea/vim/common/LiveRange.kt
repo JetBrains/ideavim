@@ -9,5 +9,5 @@
 package com.maddyhome.idea.vim.common
 
 public interface LiveRange {
-  public val startOffset: Offset
+  public val startOffset: Int
 }

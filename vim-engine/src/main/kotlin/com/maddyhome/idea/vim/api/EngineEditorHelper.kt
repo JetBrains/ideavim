@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.Graphemes
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import java.nio.CharBuffer
 
@@ -295,8 +294,8 @@ public fun VimEditor.isLineEmpty(line: Int, allowBlanks: Boolean): Boolean {
   return false
 }
 
-public fun VimEditor.coerceOffset(offset: Int): Offset {
-  if (offset < 0) return Offset(0)
-  if (offset > this.fileSize()) return Offset(this.fileSize().toInt())
-  return Offset(offset)
+public fun VimEditor.coerceOffset(offset: Int): Int {
+  if (offset < 0) return 0
+  if (offset > this.fileSize()) return this.fileSize().toInt()
+  return offset
 }

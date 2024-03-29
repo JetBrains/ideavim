@@ -118,7 +118,7 @@ internal class IdeaVimSneakExtension : VimExtension {
     var lastSymbols: String = ""
     fun jumpTo(editor: VimEditor, charone: Char, chartwo: Char, sneakDirection: Direction): TextRange? {
       val caret = editor.primaryCaret()
-      val position = caret.offset.point
+      val position = caret.offset
       val chars = editor.text()
       val foundPosition = sneakDirection.findBiChar(editor, chars, position, charone, chartwo)
       if (foundPosition != null) {

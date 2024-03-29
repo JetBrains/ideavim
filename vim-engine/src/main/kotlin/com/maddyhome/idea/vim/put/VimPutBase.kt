@@ -25,9 +25,7 @@ import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.api.setVisualSelectionMarks
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.RWLockLabel
@@ -135,7 +133,7 @@ public abstract class VimPutBase : VimPut {
     var text = data.textData?.rawText ?: run {
       if (caret == null) return null
       if (data.visualSelection != null) {
-        val offset = caret.offset.point
+        val offset = caret.offset
         injector.markService.setMark(caret, MARK_CHANGE_POS, offset)
         injector.markService.setChangeMarks(caret, TextRange(offset, offset + 1))
       }
@@ -248,7 +246,7 @@ public abstract class VimPutBase : VimPut {
   ): Pair<Int, VimCaret> {
     val overlappedCarets = ArrayList<VimCaret>(editor.carets().size)
     for (possiblyOverlappedCaret in editor.carets()) {
-      if (possiblyOverlappedCaret.offset.point != startOffset || possiblyOverlappedCaret == caret) continue
+      if (possiblyOverlappedCaret.offset != startOffset || possiblyOverlappedCaret == caret) continue
 
       val updated = possiblyOverlappedCaret.moveToMotion(
         injector.motion.getHorizontalMotion(editor, possiblyOverlappedCaret, 1, true),
@@ -405,7 +403,7 @@ public abstract class VimPutBase : VimPut {
       return when {
         visualSelection.typeInEditor.isChar && typeInRegister.isLine -> {
           application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret.offset, "\n") }
-          listOf(vimCaret.offset.point + 1)
+          listOf(vimCaret.offset + 1)
         }
         visualSelection.typeInEditor.isBlock -> {
           val firstSelectedLine = additionalData["firstSelectedLine"] as Int
@@ -418,7 +416,7 @@ public abstract class VimPutBase : VimPut {
               data.insertTextBeforeCaret -> listOf(vimEditor.getLineStartOffset(line))
               else -> {
                 val pos = vimEditor.getLineEndOffset(line, true)
-                application.runWriteAction { (vimEditor as MutableVimEditor).insertText(pos.offset, "\n") }
+                application.runWriteAction { (vimEditor as MutableVimEditor).insertText(pos, "\n") }
                 listOf(pos + 1)
               }
             }
@@ -440,20 +438,20 @@ public abstract class VimPutBase : VimPut {
           } else {
             null
           }
-          if (vimCaret.offset.point == vimEditor.fileSize().toInt() && vimEditor.fileSize().toInt() != 0 && lastChar != '\n') {
+          if (vimCaret.offset == vimEditor.fileSize().toInt() && vimEditor.fileSize().toInt() != 0 && lastChar != '\n') {
             application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret.offset, "\n") }
-            listOf(vimCaret.offset.point + 1)
+            listOf(vimCaret.offset + 1)
           } else {
-            listOf(vimCaret.offset.point)
+            listOf(vimCaret.offset)
           }
         }
-        else -> listOf(vimCaret.offset.point)
+        else -> listOf(vimCaret.offset)
       }
     } else {
       if (data.insertTextBeforeCaret) {
         return when (typeInRegister) {
           SelectionType.LINE_WISE -> listOf(injector.motion.moveCaretToCurrentLineStart(vimEditor, vimCaret))
-          else -> listOf(vimCaret.offset.point)
+          else -> listOf(vimCaret.offset)
         }
       }
 
@@ -465,16 +463,16 @@ public abstract class VimPutBase : VimPut {
             min(vimEditor.text().length, injector.motion.moveCaretToLineEnd(vimEditor, line, true) + 1)
           // At the end of a notebook cell the next symbol is a guard,
           // so we add a newline to be able to paste. Fixes VIM-2577
-          if (startOffset > 0 && vimEditor.document.getOffsetGuard(Offset(startOffset)) != null) {
-            application.runWriteAction { (vimEditor as MutableVimEditor).insertText((startOffset - 1).offset, "\n") }
+          if (startOffset > 0 && vimEditor.document.getOffsetGuard(startOffset) != null) {
+            application.runWriteAction { (vimEditor as MutableVimEditor).insertText((startOffset - 1), "\n") }
           }
           if (startOffset > 0 && startOffset == vimEditor.text().length && vimEditor.text()[startOffset - 1] != '\n') {
-            application.runWriteAction { (vimEditor as MutableVimEditor).insertText(startOffset.offset, "\n") }
+            application.runWriteAction { (vimEditor as MutableVimEditor).insertText(startOffset, "\n") }
             startOffset++
           }
         }
         else -> {
-          startOffset = vimCaret.offset.point
+          startOffset = vimCaret.offset
           if (!vimEditor.isLineEmpty(line, false)) {
             startOffset++
           }

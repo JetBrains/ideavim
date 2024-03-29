@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * @author Alex Plate
@@ -35,11 +35,11 @@ public class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution(
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    editor.nativeCarets().sortedByDescending { it.offset.point }.forEach { caret ->
-      val lineEnd = editor.getLineEndForOffset(caret.offset.point)
+    editor.nativeCarets().sortedByDescending { it.offset }.forEach { caret ->
+      val lineEnd = editor.getLineEndForOffset(caret.offset)
       caret.run {
-        vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
-        moveToInlayAwareOffset((offset.point + 1).coerceAtMost(lineEnd))
+        vimSetSystemSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
+        moveToInlayAwareOffset((offset + 1).coerceAtMost(lineEnd))
       }
     }
     return injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)

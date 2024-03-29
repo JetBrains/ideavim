@@ -53,10 +53,10 @@ public class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
 public class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
 private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int? {
-  return if (editor.currentCaret().offset.point == 0 && count < 0 || editor.currentCaret().offset.point >= editor.fileSize() - 1 && count > 0) {
+  return if (editor.currentCaret().offset == 0 && count < 0 || editor.currentCaret().offset >= editor.fileSize() - 1 && count > 0) {
     null
   } else {
-    val res = findUnmatchedBlock(editor, caret.offset.point, type, count) ?: return null
+    val res = findUnmatchedBlock(editor, caret.offset, type, count) ?: return null
     return editor.normalizeOffset(res, false)
   }
 }

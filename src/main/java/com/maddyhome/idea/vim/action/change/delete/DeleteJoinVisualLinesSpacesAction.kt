@@ -39,7 +39,7 @@ public class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.Sin
       return true
     }
     var res = true
-    editor.carets().sortedByDescending { it.offset.point }.forEach { caret ->
+    editor.carets().sortedByDescending { it.offset }.forEach { caret ->
       if (!caret.isValid) return@forEach
       val range = caretsAndSelections[caret] ?: return@forEach
       if (!injector.changeGroup.deleteJoinRange(

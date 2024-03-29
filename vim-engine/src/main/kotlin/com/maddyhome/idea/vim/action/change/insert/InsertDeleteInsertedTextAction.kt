@@ -17,11 +17,10 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-U>"], modes = [Mode.INSERT])
@@ -57,13 +56,13 @@ private fun insertDeleteInsertedText(
   var deleteTo = caret.vimInsertStart.startOffset
   val offset = caret.offset
   if (offset == deleteTo) {
-    deleteTo = Offset(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
+    deleteTo = injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret)
   }
-  if (deleteTo.point != -1) {
+  if (deleteTo != -1) {
     injector.changeGroup.deleteRange(
       editor,
       caret,
-      TextRange(deleteTo.point, offset.point),
+      TextRange(deleteTo, offset),
       SelectionType.CHARACTER_WISE,
       false,
       operatorArguments,

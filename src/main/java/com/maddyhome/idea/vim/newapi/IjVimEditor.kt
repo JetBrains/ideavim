@@ -37,12 +37,9 @@ import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StrictMode
@@ -91,18 +88,18 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.document.lineCount
   }
 
-  override fun deleteRange(leftOffset: Offset, rightOffset: Offset) {
-    editor.document.deleteString(leftOffset.point, rightOffset.point)
+  override fun deleteRange(leftOffset: Int, rightOffset: Int) {
+    editor.document.deleteString(leftOffset, rightOffset)
   }
 
-  override fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer {
-    val offset: Int = if (atPosition.line < lineCount()) {
+  override fun addLine(atPosition: Int): Int {
+    val offset: Int = if (atPosition < lineCount()) {
       // The new line character is inserted before the new line char of the previous line. So it works line an enter
       //   on a line end. I believe that the correct implementation would be to insert the new line char after the
       //   \n of the previous line, however at the moment this won't update the mark on this line.
       //   https://youtrack.jetbrains.com/issue/IDEA-286587
 
-      val lineStart = (editor.document.getLineStartOffset(atPosition.line) - 1).coerceAtLeast(0)
+      val lineStart = (editor.document.getLineStartOffset(atPosition) - 1).coerceAtLeast(0)
       val guard = editor.document.getOffsetGuard(lineStart)
       if (guard != null && guard.endOffset == lineStart + 1) {
         // Dancing around guarded blocks. It may happen that this concrete position is locked, but the next
@@ -117,11 +114,11 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       fileSize().toInt()
     }
     editor.document.insertString(offset, "\n")
-    return EditorLine.Pointer.init(atPosition.line, this)
+    return atPosition
   }
 
-  override fun insertText(atPosition: Offset, text: CharSequence) {
-    editor.document.insertString(atPosition.point, text)
+  override fun insertText(atPosition: Int, text: CharSequence) {
+    editor.document.insertString(atPosition, text)
   }
 
   override fun replaceString(start: Int, end: Int, newString: String) {
@@ -129,13 +126,13 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 
   // TODO: 30.12.2021 Is end offset inclusive?
-  override fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset> {
+  override fun getLineRange(line: Int): Pair<Int, Int> {
     // TODO: 30.12.2021 getLineEndOffset returns the same value for "xyz" and "xyz\n"
-    return editor.document.getLineStartOffset(line.line).offset to editor.document.getLineEndOffset(line.line).offset
+    return editor.document.getLineStartOffset(line) to editor.document.getLineEndOffset(line)
   }
 
-  override fun getLine(offset: Offset): EditorLine.Pointer {
-    return EditorLine.Pointer.init(editor.offsetToLogicalPosition(offset.point).line, this)
+  override fun getLine(offset: Int): Int {
+    return editor.offsetToLogicalPosition(offset).line
   }
 
   override fun carets(): List<VimCaret> {
@@ -204,15 +201,15 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.isOneLineMode
   }
 
-  override fun getText(left: Offset, right: Offset): CharSequence {
-    return editor.document.charsSequence.subSequence(left.point, right.point)
+  override fun getText(left: Int, right: Int): CharSequence {
+    return editor.document.charsSequence.subSequence(left, right)
   }
 
   override fun search(
-    pair: Pair<Offset, Offset>,
+    pair: Pair<Int, Int>,
     editor: VimEditor,
     shiftType: LineDeleteShift,
-  ): Pair<Pair<Offset, Offset>, LineDeleteShift>? {
+  ): Pair<Pair<Int, Int>, LineDeleteShift>? {
     val ijEditor = (editor as IjVimEditor).editor
     return when (shiftType) {
       LineDeleteShift.NO_NL -> if (pair.noGuard(ijEditor)) return pair to shiftType else null
@@ -361,8 +358,8 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override val projectId = editor.project?.let { injector.file.getProjectId(it) } ?: DEFAULT_PROJECT_ID
 
-  override fun visualPositionToOffset(position: VimVisualPosition): Offset {
-    return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight)).offset
+  override fun visualPositionToOffset(position: VimVisualPosition): Int {
+    return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight))
   }
 
   override fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments) {
@@ -418,8 +415,8 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return visualPosition.run { VimVisualPosition(line, column, leansRight) }
   }
 
-  override fun createLiveMarker(start: Offset, end: Offset): LiveRange {
-    return editor.document.createRangeMarker(start.point, end.point).vim
+  override fun createLiveMarker(start: Int, end: Int): LiveRange {
+    return editor.document.createRangeMarker(start, end).vim
   }
 
   /**
@@ -457,10 +454,10 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
             ijFoldRegion.isExpanded = value
           }
         }
-      override val startOffset: Offset
-        get() = Offset(ijFoldRegion.startOffset)
-      override val endOffset: Offset
-        get() = Offset(ijFoldRegion.endOffset)
+      override val startOffset: Int
+        get() = ijFoldRegion.startOffset
+      override val endOffset: Int
+        get() = ijFoldRegion.endOffset
 
     }
   }
@@ -469,17 +466,17 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return caret
   }
 
-  private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
-    return editor.document.getRangeGuard(this.first.point, this.second.point) == null
+  private fun Pair<Int, Int>.noGuard(editor: Editor): Boolean {
+    return editor.document.getRangeGuard(this.first, this.second) == null
   }
 
-  private inline fun Pair<Offset, Offset>.shift(
+  private inline fun Pair<Int, Int>.shift(
     shiftStart: Int = 0,
     shiftEnd: Int = 0,
-    action: Pair<Offset, Offset>.() -> Unit,
+    action: Pair<Int, Int>.() -> Unit,
   ) {
     val data =
-      (this.first.point + shiftStart).coerceAtLeast(0).offset to (this.second.point + shiftEnd).coerceAtLeast(0).offset
+      (this.first + shiftStart).coerceAtLeast(0) to (this.second + shiftEnd).coerceAtLeast(0)
     data.action()
   }
 

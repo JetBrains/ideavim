@@ -31,7 +31,7 @@ public class MotionCamelEndLeftAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.searchHelper.findPreviousCamelEnd(editor.text(), caret.offset.point, operatorArguments.count1)
+    return injector.searchHelper.findPreviousCamelEnd(editor.text(), caret.offset, operatorArguments.count1)
       ?.toMotionOrError() ?: Motion.Error
   }
 }
@@ -47,7 +47,7 @@ public class MotionCamelEndRightAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.searchHelper.findNextCamelEnd(editor.text(), caret.offset.point + 1, operatorArguments.count1)
+    return injector.searchHelper.findNextCamelEnd(editor.text(), caret.offset + 1, operatorArguments.count1)
       ?.toMotionOrError() ?: Motion.Error
   }
 }

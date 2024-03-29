@@ -212,8 +212,8 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   protected fun findUnderCaret(
     editor: VimEditor,
   ): TextRange? {
-    val backSearch = searchBackward(editor, editor.primaryCaret().offset.point + 1, 1) ?: return null
-    return if (backSearch.contains(editor.primaryCaret().offset.point)) backSearch else null
+    val backSearch = searchBackward(editor, editor.primaryCaret().offset + 1, 1) ?: return null
+    return if (backSearch.contains(editor.primaryCaret().offset)) backSearch else null
   }
 
   override fun searchBackward(
@@ -378,12 +378,12 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       injector.searchHelper.findPattern(
         editor,
         getLastUsedPattern(),
-        editor.primaryCaret().offset.point,
+        editor.primaryCaret().offset,
         count,
         searchOptions
       )
     } else {
-      searchBackward(editor, editor.primaryCaret().offset.point, count)
+      searchBackward(editor, editor.primaryCaret().offset, count)
     }
   }
 
@@ -393,7 +393,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     editor: VimEditor,
     forwards: Boolean,
   ): Boolean {
-    val currentPosition: Int = editor.currentCaret().offset.point
+    val currentPosition: Int = editor.currentCaret().offset
     return if (forwards) {
       nextRange.endOffset - injector.visualMotionGroup.selectionAdj == currentPosition
     } else {
@@ -410,7 +410,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     resetSearchHighlight()
     updateSearchHighlights(false)
 
-    val startOffset: Int = caret.offset.point
+    val startOffset: Int = caret.offset
     var offset = findItOffset(editor, startOffset, count, dir)
     if (offset == startOffset) {
       /* Avoid getting stuck on the current cursor position, which can
@@ -496,7 +496,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   ): TextRange? {
 
     val stop: Int = editor.getLineEndOffset(caret.getBufferPosition().line, true)
-    val pos: Int = caret.offset.point
+    val pos: Int = caret.offset
 
     // Technically the first condition is covered by the second one, but let it be
     if (editor.text().isEmpty() || editor.text().length <= pos) return null

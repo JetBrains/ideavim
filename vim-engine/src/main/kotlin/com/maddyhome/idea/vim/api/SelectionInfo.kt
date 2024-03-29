@@ -77,7 +77,7 @@ public data class SelectionInfo(public var start: BufferPosition?, public var en
 
       if (mode !is Mode.VISUAL) return null
       val start = editor.offsetToBufferPosition(caret.vimSelectionStart)
-      val end = editor.offsetToBufferPosition(caret.offset.point)
+      val end = editor.offsetToBufferPosition(caret.offset)
       return SelectionInfo(start, end, mode.selectionType)
     }
   }

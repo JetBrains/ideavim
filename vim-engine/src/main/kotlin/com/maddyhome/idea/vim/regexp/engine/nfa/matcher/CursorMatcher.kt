@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 /**
@@ -25,9 +24,9 @@ internal class CursorMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    return if (possibleCursors.map { it.offset.point }.contains(index)) {
+    return if (possibleCursors.map { it.offset }.contains(index)) {
       // now the only cursors possible are the ones at this index
-      val newPossibleCursors = possibleCursors.filter { it.offset.point == index }
+      val newPossibleCursors = possibleCursors.filter { it.offset == index }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)

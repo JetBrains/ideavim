@@ -25,7 +25,7 @@ public abstract class VimDigraphGroupBase() : VimDigraphGroup {
   }
 
   override fun displayAsciiInfo(editor: VimEditor) {
-    val offset = editor.currentCaret().offset.point
+    val offset = editor.currentCaret().offset
     val charsSequence = editor.text()
     if (charsSequence.isEmpty() || offset >= charsSequence.length) return
     val ch = charsSequence[offset]

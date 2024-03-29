@@ -10,12 +10,10 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.editor.RangeMarker
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
-import com.maddyhome.idea.vim.common.offset
 
 internal class IjLiveRange(val marker: RangeMarker) : LiveRange {
-  override val startOffset: Offset
-    get() = marker.startOffset.offset
+  override val startOffset: Int
+    get() = marker.startOffset
 }
 
 public val RangeMarker.vim: LiveRange

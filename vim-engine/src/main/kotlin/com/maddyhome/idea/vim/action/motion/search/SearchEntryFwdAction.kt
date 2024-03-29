@@ -39,7 +39,7 @@ public class SearchEntryFwdAction : MotionActionHandler.ForEachCaret() {
   ): Motion {
     if (argument == null) return Motion.Error
     return injector.searchGroup
-      .processSearchCommand(editor, argument.string, caret.offset.point, Direction.FORWARDS).toMotionOrError()
+      .processSearchCommand(editor, argument.string, caret.offset, Direction.FORWARDS).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

@@ -79,7 +79,7 @@ class VimRegexEngineTest : VimTestCase() {
     configureByText("Lor${c}em ${c}Ipsum")
     val editor = fixture.editor.vim
     val mark = VimMark.create('m', 0, 0, editor.getPath(), editor.extractProtocol())!!
-    val secondCaret = editor.carets().maxByOrNull { it.offset.point }!!
+    val secondCaret = editor.carets().maxByOrNull { it.offset }!!
     secondCaret.markStorage.setMark(mark)
 
     val result = findAll("\\%>'m\\%#.")

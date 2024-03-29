@@ -48,11 +48,11 @@ public class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
       if (editor.isTemplateActive()) {
         logger.debug("Template is active. Activate insert mode")
         injector.changeGroup.insertBeforeCursor(editor, context)
-        if (caret.offset.point in startSelection..endSelection) {
+        if (caret.offset in startSelection..endSelection) {
           return endSelection.toMotion()
         }
       }
-      return caret.offset.point.toMotion()
+      return caret.offset.toMotion()
     }
     return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, false)
   }

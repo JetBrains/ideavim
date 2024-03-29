@@ -64,7 +64,7 @@ public class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
 private fun swapVisualEnds(caret: VimCaret): Boolean {
   val vimSelectionStart = caret.vimSelectionStart
-  caret.vimSelectionStart = caret.offset.point
+  caret.vimSelectionStart = caret.offset
 
   caret.moveToOffset(vimSelectionStart)
 
@@ -77,7 +77,7 @@ private fun swapVisualEndsBigO(editor: VimEditor): Boolean {
 
   val adj = injector.visualMotionGroup.selectionAdj
 
-  if (caret.offset.point == caret.selectionStart) {
+  if (caret.offset == caret.selectionStart) {
     caret.vimSelectionStart = anotherSideCaret.selectionStart
     caret.moveToOffset(caret.selectionEnd - adj)
   } else {

@@ -15,10 +15,8 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.ChangesListener
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimSelection
@@ -102,12 +100,12 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     if (endOffset is AbsoluteOffset) {
       val res = deleteText(
         editor,
-        TextRange(caret.offset.point, endOffset.offset),
+        TextRange(caret.offset, endOffset.offset),
         SelectionType.CHARACTER_WISE,
         caret,
         operatorArguments,
       )
-      val pos = caret.offset.point
+      val pos = caret.offset
       val norm = editor.normalizeOffset(caret.getBufferPosition().line, pos, isChange)
       if (norm != pos ||
         editor.offsetToVisualPosition(norm) !==
@@ -120,7 +118,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       // will make sure it's in the right place, and visible
       val offset = editor.normalizeOffset(
         caret.getBufferPosition().line,
-        caret.offset.point,
+        caret.offset,
         isChange,
       )
       caret.moveToOffset(offset)
@@ -180,11 +178,11 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       val endOffsets = updatedRange.endOffsets
       for (i in updatedRange.size() - 1 downTo 0) {
         val (newRange, _) = editor.search(
-          startOffsets[i].offset to endOffsets[i].offset,
+          startOffsets[i] to endOffsets[i],
           editor,
           LineDeleteShift.NL_ON_END
         ) ?: continue
-        editor.deleteString(TextRange(newRange.first.point, newRange.second.point))
+        editor.deleteString(TextRange(newRange.first, newRange.second))
       }
       if (type != null) {
         val start = updatedRange.startOffset
@@ -204,7 +202,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param str    The text to insert
    */
   override fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret {
-    (editor as MutableVimEditor).insertText(Offset(offset), str)
+    (editor as MutableVimEditor).insertText(offset, str)
     val newCaret = caret.moveToInlayAwareOffset(offset + str.length)
 
     injector.markService.setMark(newCaret, MARK_CHANGE_POS, offset)
@@ -212,7 +210,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   override fun insertText(editor: VimEditor, caret: VimCaret, str: String): VimCaret {
-    return insertText(editor, caret, caret.offset.point, str)
+    return insertText(editor, caret, caret.offset, str)
   }
 
   public open fun insertText(editor: VimEditor, caret: VimCaret, start: BufferPosition, str: String) {
@@ -435,7 +433,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     val state = getInstance(editor)
     for (caret in editor.nativeCarets()) {
       caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
-      injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset.point)
+      injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
     }
     val cmd = state.executingCommand
     if (cmd != null && state.isDotRepeatInProgress) {
@@ -478,7 +476,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       val myChangeListener = VimChangesListener()
       vimDocumentListener = myChangeListener
       vimDocument!!.addChangeListener(myChangeListener)
-      oldOffset = editor.currentCaret().offset.point
+      oldOffset = editor.currentCaret().offset
       editor.insertMode = mode == Mode.INSERT
       editor.mode = mode
     }
@@ -657,14 +655,14 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     count: Int,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val initialOffset = caret.offset.point
+    val initialOffset = caret.offset
     val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true)
     val lineStart = injector.motion.moveCaretToCurrentLineStart(editor, caret)
     var startOffset = initialOffset
     if (offset == initialOffset && offset != lineStart) startOffset-- // handle delete from virtual space
     if (offset != -1) {
       val rangeToDelete = TextRange(startOffset, offset)
-      editor.nativeCarets().filter { it != caret && rangeToDelete.contains(it.offset.point) }
+      editor.nativeCarets().filter { it != caret && rangeToDelete.contains(it.offset) }
         .forEach { editor.removeCaret(it) }
       val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret, operatorArguments)
       if (editor.usesVirtualSpace) {
@@ -774,7 +772,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     }
     if (offset != -1) {
       val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret, operatorArguments)
-      if (res && caret.offset.point >= editor.fileSize() && caret.offset.point != 0) {
+      if (res && caret.offset >= editor.fileSize() && caret.offset != 0) {
         caret.moveToOffset(
           injector.motion.moveCaretToRelativeLineStartSkipLeading(
             editor,
@@ -838,8 +836,8 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       if (!caret.isValid) return@forEach
       val (first, second) = range.getNativeStartAndEnd()
       caret.setSelection(
-        first.offset,
-        second.offset,
+        first,
+        second,
       )
     }
     val joinLinesAction = injector.nativeActionManager.joinLines
@@ -1045,7 +1043,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       } else {
         injector.motion.moveCaretToLineStart(editor, caret.getBufferPosition().line + 1)
       }
-      deleteText(editor, TextRange(caret.offset.point, offset), null, caret, operatorArguments)
+      deleteText(editor, TextRange(caret.offset, offset), null, caret, operatorArguments)
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ")
         caret.moveToMotion(
@@ -1139,7 +1137,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     var kludge = false
     val bigWord = id == VIM_MOTION_BIG_WORD_RIGHT
     val chars = editor.text()
-    val offset = caret.offset.point
+    val offset = caret.offset
     val fileSize = editor.fileSize().toInt()
     if (fileSize > 0 && offset < fileSize) {
       val charType = charType(editor, chars[offset], bigWord)

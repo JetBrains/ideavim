@@ -226,7 +226,7 @@ internal class VimSurroundExtension : VimExtension {
           '{', '}', 'B' -> findBlockRange(editor, caret, '{', 1, true)
           '<', '>' -> findBlockRange(editor, caret, '<', 1, true)
           '`', '\'', '"' -> {
-            val caretOffset = caret.offset.point
+            val caretOffset = caret.offset
             val text = editor.text()
             if (text.getOrNull(caretOffset - 1) == char && text.getOrNull(caretOffset) == char) {
               TextRange(caretOffset - 1, caretOffset + 1)

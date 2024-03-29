@@ -17,9 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.argumentCaptured
-import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.extension.ExtensionHandler
@@ -159,7 +157,7 @@ public class ToHandlerMappingInfo(
     // TODO: Is this legal? Should we assert in this case?
     val shouldCalculateOffsets: Boolean = vimStateMachine.isOperatorPending(editor.mode)
 
-    val startOffsets: Map<ImmutableVimCaret, Offset> = editor.carets().associateWith { it.offset }
+    val startOffsets: Map<ImmutableVimCaret, Int> = editor.carets().associateWith { it.offset }
 
     if (extensionHandler.isRepeatable) {
       clean()
@@ -214,7 +212,7 @@ public class ToHandlerMappingInfo(
     private fun myFun(
       shouldCalculateOffsets: Boolean,
       editor: VimEditor,
-      startOffsets: Map<ImmutableVimCaret, Offset>,
+      startOffsets: Map<ImmutableVimCaret, Int>,
       keyState: KeyHandlerState,
     ) {
       if (shouldCalculateOffsets && !keyState.commandBuilder.hasCurrentCommandPartArgument()) {
@@ -223,23 +221,23 @@ public class ToHandlerMappingInfo(
           var startOffset = startOffsets[caret]
           if (caret.hasSelection()) {
             val vimSelection =
-              create(caret.vimSelectionStart, caret.offset.point, editor.mode.selectionType ?: CHARACTER_WISE, editor)
+              create(caret.vimSelectionStart, caret.offset, editor.mode.selectionType ?: CHARACTER_WISE, editor)
             offsets[caret] = vimSelection
             editor.mode = Mode.NORMAL()
-          } else if (startOffset != null && startOffset.point != caret.offset.point) {
+          } else if (startOffset != null && startOffset != caret.offset) {
             // Command line motions are always characterwise exclusive
             var endOffset = caret.offset
-            if (startOffset.point < endOffset.point) {
-              endOffset = (endOffset.point - 1).offset
+            if (startOffset < endOffset) {
+              endOffset = (endOffset - 1)
             } else {
-              startOffset = (startOffset.point - 1).offset
+              startOffset = (startOffset - 1)
             }
-            val vimSelection = create(startOffset.point, endOffset.point, CHARACTER_WISE, editor)
+            val vimSelection = create(startOffset, endOffset, CHARACTER_WISE, editor)
             offsets[caret] = vimSelection
             // FIXME: what is the comment below about?...
             // Move caret to the initial offset for better undo action
             //  This is not a necessary thing, but without it undo action look less convenient
-            editor.currentCaret().moveToOffset(startOffset.point)
+            editor.currentCaret().moveToOffset(startOffset)
           }
         }
         if (offsets.isNotEmpty()) {

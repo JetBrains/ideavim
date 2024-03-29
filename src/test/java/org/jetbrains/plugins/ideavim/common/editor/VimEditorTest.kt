@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.common.editor
 
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.WriteCommandAction
-import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -25,7 +24,7 @@ class VimEditorTest : VimTestCase() {
     val vimEditor = IjVimEditor(fixture.editor)
     WriteCommandAction.runWriteCommandAction(fixture.project) {
       runWriteAction {
-        vimEditor.deleteRange(0.offset, 5.offset)
+        vimEditor.deleteRange(0, 5)
       }
     }
     assertState("567890")

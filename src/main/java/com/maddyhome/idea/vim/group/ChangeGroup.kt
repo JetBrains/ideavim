@@ -198,7 +198,7 @@ public class ChangeGroup : VimChangeGroupBase() {
     val allowWrap = injector.options(editor).whichwrap.contains("~")
     var motion = injector.motion.getHorizontalMotion(editor, caret, count, true, allowWrap)
     if (motion is Motion.Error) return false
-    changeCase(editor, caret, caret.offset.point, (motion as AbsoluteOffset).offset, CharacterHelper.CASE_TOGGLE)
+    changeCase(editor, caret, caret.offset, (motion as AbsoluteOffset).offset, CharacterHelper.CASE_TOGGLE)
     motion = injector.motion.getHorizontalMotion(
       editor,
       caret,
@@ -455,7 +455,7 @@ public class ChangeGroup : VimChangeGroupBase() {
     dir: Int,
     operatorArguments: OperatorArguments,
   ) {
-    val start = caret.offset.point
+    val start = caret.offset
     val end = injector.motion.moveCaretToRelativeLineEnd(editor, caret, lines - 1, true)
     indentRange(editor, caret, context, TextRange(start, end), 1, dir, operatorArguments)
   }

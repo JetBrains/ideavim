@@ -9,10 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
-import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
@@ -178,14 +175,14 @@ public interface VimEditor {
 
   public fun nativeLineCount(): Int
 
-  public fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
+  public fun getLineRange(line: Int): Pair<Int, Int>
   public fun carets(): List<VimCaret>
   public fun sortedCarets(): List<VimCaret> = carets().sortedByOffset()
   public fun nativeCarets(): List<VimCaret>
   public fun sortedNativeCarets(): List<VimCaret> = nativeCarets().sortedByOffset()
 
   private fun List<VimCaret>.sortedByOffset(): List<VimCaret> {
-    return this.sortedWith(compareBy { it.offset.point }).reversed()
+    return this.sortedWith(compareBy { it.offset }).reversed()
   }
 
   /**
@@ -214,17 +211,17 @@ public interface VimEditor {
    * public function for refactoring, get rid of it
    */
   public fun search(
-    pair: Pair<Offset, Offset>,
+    pair: Pair<Int, Int>,
     editor: VimEditor,
     shiftType: LineDeleteShift,
-  ): Pair<Pair<Offset, Offset>, LineDeleteShift>?
+  ): Pair<Pair<Int, Int>, LineDeleteShift>?
 
   public fun offsetToBufferPosition(offset: Int): BufferPosition
   public fun bufferPositionToOffset(position: BufferPosition): Int
 
   // TODO: [visual] Try to remove these. Visual position is an IntelliJ concept and doesn't have a Vim equivalent
   public fun offsetToVisualPosition(offset: Int): VimVisualPosition
-  public fun visualPositionToOffset(position: VimVisualPosition): Offset
+  public fun visualPositionToOffset(position: VimVisualPosition): Int
 
   public fun visualPositionToBufferPosition(position: VimVisualPosition): BufferPosition
   public fun bufferPositionToVisualPosition(position: BufferPosition): VimVisualPosition
@@ -279,13 +276,13 @@ public interface VimEditor {
 
   public fun getLastVisualLineColumnNumber(line: Int): Int
 
-  public fun createLiveMarker(start: Offset, end: Offset): LiveRange
+  public fun createLiveMarker(start: Int, end: Int): LiveRange
   public var insertMode: Boolean
 
   public val document: VimDocument
 
-  public fun charAt(offset: Pointer): Char {
-    return text()[offset.point]
+  public fun charAt(offset: Int): Char {
+    return text()[offset]
   }
 
   public fun createIndentBySize(size: Int): String
@@ -322,18 +319,18 @@ public interface VimEditor {
 }
 
 public interface MutableVimEditor : VimEditor {
-  public fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer?
-  public fun insertText(atPosition: Offset, text: CharSequence)
+  public fun addLine(atPosition: Int): Int?
+  public fun insertText(atPosition: Int, text: CharSequence)
   public fun replaceString(start: Int, end: Int, newString: String)
 }
 
 public abstract class LinearEditor : VimEditor {
-  public abstract fun getLine(offset: Offset): EditorLine.Pointer
-  public abstract fun getText(left: Offset, right: Offset): CharSequence
+  public abstract fun getLine(offset: Int): Int
+  public abstract fun getText(left: Int, right: Int): CharSequence
 }
 
 public abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
-  public abstract fun deleteRange(leftOffset: Offset, rightOffset: Offset)
+  public abstract fun deleteRange(leftOffset: Int, rightOffset: Int)
 }
 
 public enum class LineDeleteShift {
@@ -363,6 +360,6 @@ public data class VimVisualPosition(val line: Int, public val column: Int, publi
 
 public interface VimFoldRegion {
   public var isExpanded: Boolean
-  public val startOffset: Offset
-  public val endOffset: Offset
+  public val startOffset: Int
+  public val endOffset: Int
 }

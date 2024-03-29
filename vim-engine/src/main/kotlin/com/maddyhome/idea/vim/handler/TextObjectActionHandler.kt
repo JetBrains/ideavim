@@ -16,14 +16,13 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
+import com.maddyhome.idea.vim.state.mode.selectionType
 
 /**
  * @author Alex Plate
@@ -69,10 +68,10 @@ public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
     val range = getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0) ?: return false
 
     val block = CommandFlags.FLAG_TEXT_BLOCK in cmd.flags
-    val newstart = if (block || caret.offset.point >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
-    val newend = if (block || caret.offset.point >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
+    val newstart = if (block || caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
+    val newend = if (block || caret.offset >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
 
-    if (caret.vimSelectionStart == caret.offset.point || block) {
+    if (caret.vimSelectionStart == caret.offset || block) {
       caret.vimSetSelection(newstart, newstart, false)
     }
 

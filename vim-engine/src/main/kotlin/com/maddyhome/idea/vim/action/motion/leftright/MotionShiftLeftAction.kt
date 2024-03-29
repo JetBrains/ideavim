@@ -34,7 +34,7 @@ public class MotionShiftLeftAction : ShiftedArrowKeyHandler(true) {
 
   override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
     val caret = editor.currentCaret()
-    val newOffset = injector.motion.findOffsetOfNextWord(editor, caret.offset.point, -cmd.count, false)
+    val newOffset = injector.motion.findOffsetOfNextWord(editor, caret.offset, -cmd.count, false)
     caret.moveToMotion(newOffset)
   }
 }

@@ -59,7 +59,7 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
   val col = caret.getBufferPosition().column
   // TODO: Is this correct? Should we really use only current caret? We have a caret as an argument
   val len = editor.lineLength(editor.currentCaret().getBufferPosition().line)
-  val offset = caret.offset.point
+  val offset = caret.offset
   if (len - col < count) {
     return false
   }

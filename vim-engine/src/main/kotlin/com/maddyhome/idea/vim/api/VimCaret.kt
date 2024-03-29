@@ -8,10 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimMoveBlockSelectionToOffset
@@ -19,10 +16,11 @@ import com.maddyhome.idea.vim.group.visual.vimMoveSelectionToCaret
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.register.Register
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.register.Register
 import javax.swing.KeyStroke
 
 /**
@@ -37,7 +35,7 @@ import javax.swing.KeyStroke
  */
 public interface ImmutableVimCaret {
   public val editor: VimEditor
-  public val offset: Offset
+  public val offset: Int
   public val isValid: Boolean
   public val isPrimary: Boolean
 
@@ -52,7 +50,7 @@ public interface ImmutableVimCaret {
   // TODO: [visual] Try to remove this. Visual position is an IntelliJ concept and Vim doesn't have a direct equivalent
   public fun getVisualPosition(): VimVisualPosition
 
-  public fun getLine(): EditorLine.Pointer
+  public fun getLine(): Int
 
   /**
    * Return the buffer line of the caret as a 1-based public value, as used by VimScript
@@ -78,7 +76,7 @@ per-caret marks.
 
   public fun vimSelectionStartClear()
 
-  public fun setSelection(start: Offset, end: Offset)
+  public fun setSelection(start: Int, end: Int)
   public fun removeSelection()
 
   public fun moveToOffset(offset: Int): VimCaret {
@@ -94,7 +92,7 @@ per-caret marks.
 
     // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
     // changes in surrounding text, especially with inline inlays.
-    val oldOffset = this.offset.point
+    val oldOffset = this.offset
     var caretAfterMove = moveToInlayAwareOffset(offset)
 
     // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
