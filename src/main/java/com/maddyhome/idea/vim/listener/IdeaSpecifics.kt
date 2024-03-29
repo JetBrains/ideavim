@@ -19,6 +19,7 @@ import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.find.FindModelListener
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
@@ -213,5 +214,7 @@ internal class FindActionIdAction : DumbAwareToggleAction() {
   override fun setSelected(e: AnActionEvent, state: Boolean) {
     injector.globalIjOptions().trackactionids = !injector.globalIjOptions().trackactionids
   }
+
+  override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 }
 //endregion
