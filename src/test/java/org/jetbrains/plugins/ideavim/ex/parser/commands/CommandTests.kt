@@ -100,8 +100,8 @@ class CommandTests : VimTestCase() {
     val command = VimscriptParser.parseCommand("10$sp1,${sp2}20${sp3}d")
     assertTrue(command is DeleteLinesCommand)
     assertEquals(2, command.range.size())
-    assertEquals(LineAddress(9, 0, false), command.range.addresses[0])
-    assertEquals(LineAddress(19, 0, false), command.range.addresses[1])
+    assertEquals(LineAddress(10, 0, false), command.range.addresses[0])
+    assertEquals(LineAddress(20, 0, false), command.range.addresses[1])
   }
 
   // VIM-2450

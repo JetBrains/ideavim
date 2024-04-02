@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Suppress("SpellCheckingInspection")
 class GotoCharacterCommandTest : VimTestCase() {
   @Test
   fun `command parsing`() {
@@ -22,7 +23,26 @@ class GotoCharacterCommandTest : VimTestCase() {
     assertTrue(command is GotoCharacterCommand)
     assertEquals("10", command.argument)
   }
-  
+
+  @Test
+  fun `go to offset 1 with no count or range`() {
+    doTest(
+      exCommand("goto"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
+        |Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
+        |Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
+        |accumsan vitae, facilisis ac nulla.
+      """.trimMargin(),
+      """
+        |${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
+        |Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
+        |Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
+        |accumsan vitae, facilisis ac nulla.
+      """.trimMargin()
+    )
+  }
+
   @Test
   fun `go to 10th character`() {
     configureByText("""
@@ -38,5 +58,24 @@ class GotoCharacterCommandTest : VimTestCase() {
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
     """.trimIndent())
+  }
+
+  @Test
+  fun `go to 10th character via range`() {
+    doTest(
+      exCommand("10goto"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
+        |Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
+        |Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
+        |accumsan vitae, facilisis ac nulla.
+      """.trimMargin(),
+      """
+        |Lorem ips${c}um dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
+        |Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
+        |Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
+        |accumsan vitae, facilisis ac nulla.
+      """.trimMargin()
+    )
   }
 }
