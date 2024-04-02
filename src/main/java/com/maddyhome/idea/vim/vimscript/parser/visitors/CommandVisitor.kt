@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Address
 import com.maddyhome.idea.vim.ex.ranges.Address.Companion.createRangeAddresses
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.vimscript.model.commands.ActionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ActionListCommand
@@ -147,7 +147,7 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
     }
   }
 
-  private fun parseRangesUnit(ctx: VimscriptParser.RangeUnitContext): Array<Address> {
+  private fun parseRangeUnit(ctx: VimscriptParser.RangeUnitContext): Array<Address> {
     val valueAndOffset = parseRangeExpression(ctx.rangeExpression())
     val move = ctx.rangeSeparator()?.text == ";"
     val addresses = createRangeAddresses(valueAndOffset.first, valueAndOffset.second, move)
@@ -158,128 +158,128 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return addresses
   }
 
-  private fun parseRanges(ctx: RangeContext?): Ranges {
-    val ranges = Ranges()
+  private fun parseRange(ctx: RangeContext?): Range {
+    val range = Range()
     if (ctx?.rangeUnit() != null) {
       for (unit in ctx.rangeUnit()) {
-        ranges.addAddresses(parseRangesUnit(unit))
+        range.addAddresses(parseRangeUnit(unit))
       }
     }
-    return ranges
+    return range
   }
 
   override fun visitLet1Command(ctx: VimscriptParser.Let1CommandContext): Command {
-    val ranges: Ranges = parseRanges(ctx.range())
+    val range: Range = parseRange(ctx.range())
     val variable: Expression = expressionVisitor.visit(ctx.expr(0))
     val operator = getByValue(ctx.assignmentOperator().text)
     val expression: Expression = expressionVisitor.visit(ctx.expr(1))
-    val command = LetCommand(ranges, variable, operator, expression, true)
+    val command = LetCommand(range, variable, operator, expression, true)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitLet2Command(ctx: VimscriptParser.Let2CommandContext): Command {
-    val command = LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = LetCommand(Range(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitEchoCommand(ctx: EchoCommandContext): Command {
-    val ranges: Ranges = parseRanges(ctx.range())
+    val range: Range = parseRange(ctx.range())
     val expressions = ctx.expr().stream()
       .map { tree: ExprContext ->
         expressionVisitor.visit(tree)
       }
       .collect(Collectors.toList())
-    val command = EchoCommand(ranges, expressions)
+    val command = EchoCommand(range, expressions)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitCallCommand(ctx: CallCommandContext): Command {
-    val ranges: Ranges = parseRanges(ctx.range())
+    val range: Range = parseRange(ctx.range())
     val functionCall = ExpressionVisitor.visit(ctx.expr())
-    val command = CallCommand(ranges, functionCall)
+    val command = CallCommand(range, functionCall)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitDelfunctionCommand(ctx: DelfunctionCommandContext): DelfunctionCommand {
-    val ranges: Ranges = parseRanges(ctx.range())
+    val range: Range = parseRange(ctx.range())
     val functionScope =
       if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
     val functionName = ctx.functionName().text
     val ignoreIfMissing = ctx.replace != null
-    val command = DelfunctionCommand(ranges, functionScope, functionName, ignoreIfMissing)
+    val command = DelfunctionCommand(range, functionScope, functionName, ignoreIfMissing)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitGoToLineCommand(ctx: VimscriptParser.GoToLineCommandContext): Command {
-    val ranges: Ranges
+    val range: Range
     if (ctx.range() != null) {
-      ranges = parseRanges(ctx.range())
+      range = parseRange(ctx.range())
     } else {
-      ranges = Ranges()
-      ranges.addAddresses(
+      range = Range()
+      range.addAddresses(
         createRangeAddresses(ctx.shortRange().text, 0, false)
           ?: throw ExException("Could not create a range"),
       )
     }
-    val command = GoToLineCommand(ranges)
+    val command = GoToLineCommand(range)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitCommandWithComment(ctx: VimscriptParser.CommandWithCommentContext): Command {
-    val ranges = parseRanges(ctx.range())
+    val ranges = parseRange(ctx.range())
     val commandName = ctx.name.text
     val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
     return createCommandByCommandContext(ranges, argument, commandName, ctx)
   }
 
   override fun visitCommandWithoutComments(ctx: VimscriptParser.CommandWithoutCommentsContext): Command {
-    val ranges = parseRanges(ctx.range())
+    val ranges = parseRange(ctx.range())
     val commandName = ctx.name.text
     val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
     return createCommandByCommandContext(ranges, argument, commandName, ctx)
   }
 
   override fun visitCommandWithBars(ctx: VimscriptParser.CommandWithBarsContext): Command {
-    val ranges = parseRanges(ctx.range())
+    val ranges = parseRange(ctx.range())
     val commandName = ctx.name.text
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
     return createCommandByCommandContext(ranges, argument, commandName, ctx)
   }
 
-  private fun createCommandByCommandContext(ranges: Ranges, argument: String, commandName: String, ctx: ParserRuleContext): Command {
+  private fun createCommandByCommandContext(range: Range, argument: String, commandName: String, ctx: ParserRuleContext): Command {
     val command = when (getCommandByName(commandName)) {
-      MapCommand::class -> MapCommand(ranges, argument, commandName)
-      MapClearCommand::class -> MapClearCommand(ranges, argument, commandName)
-      UnMapCommand::class -> UnMapCommand(ranges, argument, commandName)
+      MapCommand::class -> MapCommand(range, argument, commandName)
+      MapClearCommand::class -> MapClearCommand(range, argument, commandName)
+      UnMapCommand::class -> UnMapCommand(range, argument, commandName)
       GlobalCommand::class -> {
         if (commandName.startsWith("v")) {
-          GlobalCommand(ranges, argument, true)
+          GlobalCommand(range, argument, true)
         } else {
-          if (argument.startsWith("!")) GlobalCommand(ranges, argument.substring(1), true) else GlobalCommand(ranges, argument, false)
+          if (argument.startsWith("!")) GlobalCommand(range, argument.substring(1), true) else GlobalCommand(range, argument, false)
         }
       }
       SplitCommand::class -> {
         if (commandName.startsWith("v")) {
-          SplitCommand(ranges, argument, SplitType.VERTICAL)
+          SplitCommand(range, argument, SplitType.VERTICAL)
         } else {
-          SplitCommand(ranges, argument, SplitType.HORIZONTAL)
+          SplitCommand(range, argument, SplitType.HORIZONTAL)
         }
       }
-      SubstituteCommand::class -> SubstituteCommand(ranges, argument, commandName)
-      else -> getCommandByName(commandName).primaryConstructor!!.call(ranges, argument)
+      SubstituteCommand::class -> SubstituteCommand(range, argument, commandName)
+      else -> getCommandByName(commandName).primaryConstructor!!.call(range, argument)
     }
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitShiftLeftCommand(ctx: VimscriptParser.ShiftLeftCommandContext): ShiftLeftCommand {
-    val ranges = parseRanges(ctx.range())
+    val ranges = parseRange(ctx.range())
     val argument = (ctx.commandArgument?.text ?: "").trim()
     val length = ctx.lShift().text.length
     val command = ShiftLeftCommand(ranges, argument, length)
@@ -288,7 +288,7 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitShiftRightCommand(ctx: VimscriptParser.ShiftRightCommandContext): ShiftRightCommand {
-    val ranges = parseRanges(ctx.range())
+    val ranges = parseRange(ctx.range())
     val argument = (ctx.commandArgument?.text ?: "").trim()
     val length = ctx.rShift().text.length
     val command = ShiftRightCommand(ranges, argument, length)
@@ -297,7 +297,7 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitExecuteCommand(ctx: VimscriptParser.ExecuteCommandContext): ExecuteCommand {
-    val ranges = parseRanges(ctx.range())
+    val ranges = parseRange(ctx.range())
     val expressions = ctx.expr().stream()
       .map { tree: ExprContext ->
         expressionVisitor.visit(tree)
@@ -309,26 +309,26 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
-    val command = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(Range(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitOtherCommand(ctx: OtherCommandContext): Command {
-    val ranges: Ranges = parseRanges(ctx.range())
+    val range: Range = parseRange(ctx.range())
     val name = ctx.commandName().text
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
 
     val alphabeticPart = name.split(Regex("\\P{Alpha}"))[0]
     if (setOf("s", "su", "sub", "subs", "subst", "substi", "substit", "substitu", "substitut", "substitut", "substitute").contains(alphabeticPart)) {
-      val command = SubstituteCommand(ranges, name.replaceFirst(alphabeticPart, "") + argument, alphabeticPart)
+      val command = SubstituteCommand(range, name.replaceFirst(alphabeticPart, "") + argument, alphabeticPart)
       command.rangeInScript = ctx.getTextRange()
       return command
     }
     val commandConstructor = getCommandByName(name).constructors
       .filter { it.parameters.size == 2 }
-      .firstOrNull { it.parameters[0].type == Ranges::class.createType() && it.parameters[1].type == String::class.createType() }
-    val command = commandConstructor?.call(ranges, argument) ?: UnknownCommand(ranges, name, argument)
+      .firstOrNull { it.parameters[0].type == Range::class.createType() && it.parameters[1].type == String::class.createType() }
+    val command = commandConstructor?.call(range, argument) ?: UnknownCommand(range, name, argument)
     command.rangeInScript = ctx.getTextRange()
     return command
   }

@@ -504,7 +504,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
 
   private fun visitCollection(collectionElements: List<RegexParser.Collection_elemContext>, isNegated: Boolean, includesEOL: Boolean) : NFA {
     val individualChars: HashSet<Char> = HashSet()
-    val ranges: ArrayList<CollectionRange> = ArrayList()
+    val range: ArrayList<CollectionRange> = ArrayList()
     val charClasses: ArrayList<(Char) -> Boolean> = ArrayList()
     val collectionElementVisitor = CollectionElementVisitor()
     var containsEOL = false
@@ -518,7 +518,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
           hasUpperCase = hasUpperCase || element.char.isUpperCase()
           individualChars.add(element.char)
         }
-        is CollectionElement.CharacterRange -> ranges.add(CollectionRange(element.start, element.end))
+        is CollectionElement.CharacterRange -> range.add(CollectionRange(element.start, element.end))
         is CollectionElement.CharacterClassExpression -> charClasses.add(element.predicate)
       }
     }
@@ -526,7 +526,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     /**
      * If the collection is empty, match literally with '[]', or '[^]' if negated
      */
-    if (individualChars.isEmpty() && ranges.isEmpty() && charClasses.isEmpty())
+    if (individualChars.isEmpty() && range.isEmpty() && charClasses.isEmpty())
       return if (isNegated) NFA.fromMatcher(CharacterMatcher('['))
         .concatenate(NFA.fromMatcher(CharacterMatcher('^')))
         .concatenate(NFA.fromMatcher(CharacterMatcher(']')))
@@ -536,7 +536,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
     return NFA.fromMatcher(
       CollectionMatcher(
         individualChars,
-        ranges,
+        range,
         charClasses,
         isNegated,
         includesEOL || containsEOL

@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
@@ -27,7 +27,7 @@ import java.util.*
  */
 // todo make it multicaret
 @ExCommand(command = "sor[t]")
-public data class SortCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+public data class SortCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   @Throws(ExException::class)

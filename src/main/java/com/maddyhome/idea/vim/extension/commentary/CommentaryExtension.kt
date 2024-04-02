@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
@@ -248,8 +248,8 @@ internal class CommentaryExtension : VimExtension {
    * Used like `:1,3Commentary` or `g/fun/Commentary`
    */
   private class CommentaryCommandAliasHandler : CommandAliasHandler {
-    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
-      Util.doCommentary(editor, context, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
+    override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
+      Util.doCommentary(editor, context, range.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
     }
   }
 }

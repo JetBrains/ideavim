@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.ex.ranges.LineAddress
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -41,12 +41,12 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
   override fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     var returnValue: VimDataType? = null
     val exceptionsCaught = mutableListOf<ExException>()
-    val isRangeGiven = (ranges?.size() ?: 0) > 0
+    val isRangeGiven = (range?.size() ?: 0) > 0
 
     if (!isRangeGiven) {
       val currentLine = editor.currentCaret().getBufferPosition().line
-      ranges = Ranges()
-      ranges!!.addAddresses(
+      range = Range()
+      range!!.addAddresses(
         arrayOf(
           LineAddress(currentLine, 0, false),
           LineAddress(currentLine, 0, false),
@@ -165,14 +165,14 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
     }
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "firstline"),
-      VimInt(ranges!!.getFirstLine(editor, editor.currentCaret()) + 1),
+      VimInt(range!!.getFirstLine(editor, editor.currentCaret()) + 1),
       editor,
       context,
       function,
     )
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "lastline"),
-      VimInt(ranges!!.getLine(editor, editor.currentCaret()) + 1),
+      VimInt(range!!.getLine(editor, editor.currentCaret()) + 1),
       editor,
       context,
       function,

@@ -19,7 +19,7 @@ import kotlin.math.min
 /**
  * Handles the set of range values entered as part of an Ex command.
  */
-public class Ranges {
+public class Range {
   // This property should be private, but is used in tests
   @TestOnly
   public val addresses: MutableList<Address> = mutableListOf()
@@ -224,7 +224,7 @@ public class Ranges {
   override fun toString(): String = "Ranges[addresses=$addresses]"
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other !is Ranges) return false
+    if (other !is Range) return false
 
     if (startLine != other.startLine) return false
     if (endLine != other.endLine) return false

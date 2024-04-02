@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 @ExCommand(command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],no[map],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]")
-public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
+public data class MapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)

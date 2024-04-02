@@ -13,15 +13,15 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.lang.Integer.min
 
 /**
  * see "h :[range]"
  */
-public data class GoToLineCommand(val ranges: Ranges) :
-  Command.ForEachCaret(ranges) {
+public data class GoToLineCommand(val range: Range) :
+  Command.ForEachCaret(range) {
 
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 

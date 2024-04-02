@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :put"
  */
 @ExCommand(command = "pu[t]")
-public data class PutLinesCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+public data class PutLinesCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -38,7 +38,7 @@ public data class PutLinesCommand(val ranges: Ranges, val argument: String) : Co
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
 
-    val line = if (ranges.size() == 0) -1 else getLine(editor)
+    val line = if (range.size() == 0) -1 else getLine(editor)
     val textData = registerGroup.lastRegister?.let {
       PutData.TextData(
         it.text ?: injector.parser.toKeyNotation(it.keys),

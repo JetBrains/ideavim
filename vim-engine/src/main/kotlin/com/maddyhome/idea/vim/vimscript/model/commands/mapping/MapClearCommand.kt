@@ -14,12 +14,12 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 
 @ExCommand(command = "mapc[lear],nmapc[lear],vmapc[lear],xmapc[lear],smapc[lear],omapc[lear],mapc[lear],imapc[lear],lmapc[lear],cmapc[lear]")
-public data class MapClearCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
+public data class MapClearCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

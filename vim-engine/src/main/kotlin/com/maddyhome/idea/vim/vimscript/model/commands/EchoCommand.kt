@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
  * see "h :echo"
  */
 @ExCommand(command = "ec[ho]")
-public data class EchoCommand(val ranges: Ranges, val args: List<Expression>) : Command.SingleExecution(ranges) {
+public data class EchoCommand(val range: Range, val args: List<Expression>) : Command.SingleExecution(range) {
 
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 

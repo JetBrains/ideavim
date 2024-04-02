@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
  * see :h lockvar
  */
 @ExCommand(command = "lockv[ar]")
-public class LockVarCommand(public val ranges: Ranges, public val argument: String) : Command.SingleExecution(ranges, argument) {
+public class LockVarCommand(public val range: Range, public val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments
@@ -38,7 +38,7 @@ public class LockVarCommand(public val ranges: Ranges, public val argument: Stri
  * see :h unlockvar
  */
 @ExCommand(command = "unlo[ckvar]")
-public class UnlockVarCommand(public val ranges: Ranges, public val argument: String) : Command.SingleExecution(ranges, argument) {
+public class UnlockVarCommand(public val range: Range, public val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments

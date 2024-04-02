@@ -17,15 +17,14 @@ import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // todo make it for each caret
 @ExCommand(command = "norm[al]")
-public data class NormalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+public data class NormalCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
@@ -42,7 +41,7 @@ public data class NormalCommand(val ranges: Ranges, val argument: String) : Comm
     }
 
     val commandState = editor.vimStateMachine
-    val rangeUsed = ranges.size() != 0
+    val rangeUsed = range.size() != 0
     when (editor.mode) {
       is Mode.VISUAL -> {
         editor.exitVisualMode()

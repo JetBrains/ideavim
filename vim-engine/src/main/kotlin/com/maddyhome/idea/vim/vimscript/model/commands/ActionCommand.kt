@@ -15,14 +15,14 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
  * @author smartbomb
  */
 @ExCommand(command = "action")
-public data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+public data class ActionCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
 
   override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,

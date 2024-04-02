@@ -15,14 +15,14 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
  * see "h :>"
  */
 @ExCommand(">")
-public data class ShiftRightCommand(val ranges: Ranges, val argument: String, val length: Int) : Command.ForEachCaret(ranges, argument) {
+public data class ShiftRightCommand(val range: Range, val argument: String, val length: Int) : Command.ForEachCaret(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun processCommand(
