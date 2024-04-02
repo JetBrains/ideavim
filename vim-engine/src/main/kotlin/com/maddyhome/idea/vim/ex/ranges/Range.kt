@@ -21,6 +21,8 @@ public class Range {
   @TestOnly
   public val addresses: MutableList<Address> = mutableListOf()
 
+  // TODO: This isn't a default line. It's used to set a default value for count, if RANGE_IS_COUNT is set
+  // The only value used is 1, so maybe we don't need it, or RANGE_IS_COUNT?
   private var defaultLine = -1
 
   /** Adds a range to the list */
@@ -49,7 +51,7 @@ public class Range {
    * @return The line number represented by the range
    */
   public fun getLine(editor: VimEditor, caret: VimCaret): Int {
-    return processRange(editor, caret).endLine
+    return getLineRange(editor, caret, -1).endLine
   }
 
   /**
@@ -64,7 +66,7 @@ public class Range {
    * @return count if count != -1, else return end line of range
    */
   public fun getCount(editor: VimEditor, caret: VimCaret, count: Int): Int {
-    return if (count == -1) getLine(editor, caret) else count
+    return if (count == -1) processRange(editor, caret).endLine1 else count
   }
 
   /**
@@ -82,29 +84,29 @@ public class Range {
 
   private fun processRange(editor: VimEditor, caret: VimCaret): LineRange {
     // Start with the range being the current line
-    var startLine = if (defaultLine == -1) caret.getBufferPosition().line else defaultLine
-    var endLine = startLine
+    var startLine1 = if (defaultLine == -1) caret.getBufferPosition().line + 1 else defaultLine
+    var endLine1 = startLine1
 
     // Now process each range component, moving the cursor if appropriate
     var count = 0
     var lastZero = false
     for (address in addresses) {
-      startLine = endLine
-      endLine = address.getLine(editor, caret, lastZero)
+      startLine1 = endLine1
+      endLine1 = address.getLine1(editor, caret, lastZero)
       if (address.isMove) {
-        caret.moveToOffset(injector.motion.moveCaretToLineWithSameColumn(editor, endLine, caret))
+        caret.moveToOffset(injector.motion.moveCaretToLineWithSameColumn(editor, endLine1 - 1, caret))
       }
 
       // TODO: Reconsider lastZero. I don't think it helps, and might actually cause problems
       // Did that last address represent the start of the file?
-      lastZero = endLine < 0
+      lastZero = endLine1 <= 0
       ++count
     }
 
     // If only one address is given, make the start and end the same
-    if (count == 1) startLine = endLine
+    if (count == 1) startLine1 = endLine1
 
-    return LineRange(startLine, endLine)
+    return LineRange(startLine1 - 1, endLine1 - 1)
   }
 
   @NonNls

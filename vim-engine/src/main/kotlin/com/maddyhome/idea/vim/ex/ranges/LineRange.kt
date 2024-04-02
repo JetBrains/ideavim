@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import kotlin.math.min
 
 public class LineRange(startLine: Int, endLine: Int) {
-
   @JvmField
   public val startLine: Int
 
@@ -29,6 +28,9 @@ public class LineRange(startLine: Int, endLine: Int) {
       this.endLine = startLine
     }
   }
+
+  public val startLine1: Int = startLine + 1
+  public val endLine1: Int = endLine + 1
 }
 
 public fun LineRange.toTextRange(editor: VimEditor): TextRange {
