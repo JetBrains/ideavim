@@ -78,6 +78,7 @@ internal class IjActionExecutor : VimActionExecutor {
     val dataContext = DataContextWrapper(context.ij)
     dataContext.putUserData(runFromVimKey, true)
 
+    val actionId = ActionManager.getInstance().getId(ijAction)
     val event = AnActionEvent(
       null,
       dataContext,
@@ -90,8 +91,15 @@ internal class IjActionExecutor : VimActionExecutor {
     //   because rider use async update method. See VIM-1819.
     // This method executes inside of lastUpdateAndCheckDumb
     // Another related issue: VIM-2604
-    ijAction.beforeActionPerformedUpdate(event)
-    if (!event.presentation.isEnabled) return false
+
+    // This is a hack to fix the tests and fix VIM-3332
+    // We should get rid of it in VIM-3376
+    if (actionId == "RunClass" || actionId == IdeActions.ACTION_COMMENT_LINE || actionId == IdeActions.ACTION_COMMENT_BLOCK) {
+      ijAction.beforeActionPerformedUpdate(event)
+      if (!event.presentation.isEnabled) return false
+    } else {
+      if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
+    }
     if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
       // Some ActionGroups should not be performed, but shown as a popup
       val popup = JBPopupFactory.getInstance()
