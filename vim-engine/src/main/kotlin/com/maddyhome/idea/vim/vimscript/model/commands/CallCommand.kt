@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
  * see "h :call"
  */
 @ExCommand(command = "cal[l]")
-public class CallCommand(public val ranges: Ranges, public val functionCall: Expression) : Command.SingleExecution(ranges) {
+public class CallCommand(public val range: Range, public val functionCall: Expression) : Command.SingleExecution(range) {
 
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
@@ -46,7 +46,7 @@ public class CallCommand(public val ranges: Ranges, public val functionCall: Exp
               (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext),
           )
         }
-        function.ranges = ranges
+        function.range = range
         function.executeFunction(functionCall.arguments, editor, context, this)
         return ExecutionResult.Success
       }
@@ -54,14 +54,14 @@ public class CallCommand(public val ranges: Ranges, public val functionCall: Exp
       val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
       val funcref = injector.variableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, vimContext)
       if (funcref is VimFuncref) {
-        funcref.handler.ranges = ranges
+        funcref.handler.range = range
         funcref.execute(name, functionCall.arguments, editor, context, vimContext)
         return ExecutionResult.Success
       }
 
       throw ExException("E117: Unknown function: $name")
     } else if (functionCall is FuncrefCallExpression) {
-      functionCall.evaluateWithRange(ranges, editor, context, vimContext)
+      functionCall.evaluateWithRange(range, editor, context, vimContext)
       return ExecutionResult.Success
     } else {
       // todo add more exceptions

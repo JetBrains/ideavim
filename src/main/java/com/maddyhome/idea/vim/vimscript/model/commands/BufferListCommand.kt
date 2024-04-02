@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.newapi.ij
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NonNls
  * @author John Weigel
  */
 @ExCommand(command = "ls,files,buffers")
-internal data class BufferListCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+internal data class BufferListCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   companion object {

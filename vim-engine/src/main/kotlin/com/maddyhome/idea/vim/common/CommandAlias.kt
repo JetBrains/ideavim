@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.common
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -115,5 +115,5 @@ public sealed class GoalCommand {
 }
 
 public interface CommandAliasHandler {
-  public fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext)
+  public fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext)
 }

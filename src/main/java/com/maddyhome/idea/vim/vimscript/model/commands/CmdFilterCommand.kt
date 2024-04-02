@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.newapi.ij
@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :!"
  */
 @ExCommand(command = "!")
-internal data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+internal data class CmdFilterCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -70,7 +70,7 @@ internal data class CmdFilterCommand(val ranges: Ranges, val argument: String) :
 
     val workingDirectory = editor.ij.project?.basePath
     return try {
-      if (ranges.size() == 0) {
+      if (range.size() == 0) {
         // Show command output in a window
         VimPlugin.getProcess().executeCommand(editor, command, null, workingDirectory)?.let {
           ExOutputModel.getInstance(editor.ij).output(it)

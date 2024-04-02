@@ -13,7 +13,7 @@ import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import org.jetbrains.annotations.NonNls
 import java.io.UnsupportedEncodingException
@@ -24,7 +24,7 @@ import java.net.URLEncoder
  * see "h :help"
  */
 @ExCommand(command = "h[elp]")
-internal data class HelpCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+internal data class HelpCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     BrowserUtil.browse(helpTopicUrl(argument))

@@ -11,17 +11,17 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 
 public data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
 
-  public fun evaluateWithRange(ranges: Ranges?, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  public fun evaluateWithRange(range: Range?, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val value = expression.evaluate(editor, context, vimContext)
     if (value is VimFuncref) {
-      value.handler.ranges = ranges
+      value.handler.range = range
       return value.execute(value.handler.name, args, editor, context, vimContext)
     } else {
       // todo more exceptions

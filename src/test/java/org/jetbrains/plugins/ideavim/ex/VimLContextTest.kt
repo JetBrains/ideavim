@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
@@ -22,7 +22,7 @@ class VimLContextTest {
 
   @Test
   fun `get first context test`() {
-    val echoCommand = EchoCommand(Ranges(), listOf(SimpleExpression("oh, hi Mark")))
+    val echoCommand = EchoCommand(Range(), listOf(SimpleExpression("oh, hi Mark")))
     val ifStatement1 = IfStatement(listOf(Pair(SimpleExpression(1), listOf(echoCommand))))
     val ifStatement2 = IfStatement(listOf(Pair(SimpleExpression(1), listOf(ifStatement1))))
     val script = Script(listOf(ifStatement2))

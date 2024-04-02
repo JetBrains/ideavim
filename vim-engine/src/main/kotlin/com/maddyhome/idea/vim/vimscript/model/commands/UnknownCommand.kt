@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.GoalCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidCommandException
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.MAX_RECURSION
@@ -23,8 +23,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.
 /**
  * any command with no parser rule. we assume that it is an alias
  */
-public data class UnknownCommand(val ranges: Ranges, val name: String, val argument: String) :
-  Command.SingleExecution(ranges, argument) {
+public data class UnknownCommand(val range: Range, val name: String, val argument: String) :
+  Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   private object Constants {
@@ -55,7 +55,7 @@ public data class UnknownCommand(val ranges: Ranges, val name: String, val argum
             }
           }
           is GoalCommand.Call -> {
-            commandAlias.handler.execute(name, ranges, editor, context)
+            commandAlias.handler.execute(name, range, editor, context)
             return ExecutionResult.Success
           }
         }

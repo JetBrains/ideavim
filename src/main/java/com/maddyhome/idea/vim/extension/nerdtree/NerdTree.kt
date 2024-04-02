@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -137,13 +137,13 @@ internal class NerdTree : VimExtension {
   }
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
-    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
+    override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
       Util.callAction(editor, actionId, context)
     }
   }
 
   class ToggleHandler : CommandAliasHandler {
-    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
+    override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
       val project = editor.ij.project ?: return
       val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
       if (toolWindow.isVisible) {
@@ -155,7 +155,7 @@ internal class NerdTree : VimExtension {
   }
 
   class CloseHandler : CommandAliasHandler {
-    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
+    override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
       val project = editor.ij.project ?: return
       val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
       if (toolWindow.isVisible) {

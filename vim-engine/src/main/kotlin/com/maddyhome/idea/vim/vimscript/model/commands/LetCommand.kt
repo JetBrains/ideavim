@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -45,12 +45,12 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
  */
 @ExCommand(command = "let")
 public data class LetCommand(
-  val ranges: Ranges,
+  val range: Range,
   val variable: Expression,
   val operator: AssignmentOperator,
   val expression: Expression,
   val isSyntaxSupported: Boolean,
-) : Command.SingleExecution(ranges) {
+) : Command.SingleExecution(range) {
 
   private companion object {
     private val logger = vimLogger<LetCommand>()

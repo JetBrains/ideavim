@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.SearchGroup.RE_BOTH
 import com.maddyhome.idea.vim.group.SearchGroup.RE_LAST
@@ -38,7 +38,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :global" / "h :vglobal"
  */
 @ExCommand(command = "g[lobal],v[global]")
-internal data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: Boolean) : Command.SingleExecution(ranges, argument) {
+internal data class GlobalCommand(val range: Range, val argument: String, val invert: Boolean) : Command.SingleExecution(range, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -47,7 +47,7 @@ internal data class GlobalCommand(val ranges: Ranges, val argument: String, val 
     val caret = editor.currentCaret()
 
     // For :g command the default range is %
-    val lineRange: LineRange = if (ranges.size() == 0) {
+    val lineRange: LineRange = if (range.size() == 0) {
       LineRange(0, editor.lineCount() - 1)
     } else {
       getLineRange(editor, caret)

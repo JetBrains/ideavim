@@ -14,18 +14,18 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /*
  * see "h :tabmove"
  */
 @ExCommand(command = "tabm[ove]")
-public data class TabMoveCommand(val ranges: Ranges, var argument: String) : Command.SingleExecution(ranges, argument) {
+public data class TabMoveCommand(val range: Range, var argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    if (ranges.size() != 0) {
+    if (range.size() != 0) {
       throw ExException("Range form of tabmove command is not supported. Please use the argument form")
     }
 

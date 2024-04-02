@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidRangeException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
@@ -36,7 +36,7 @@ import kotlin.math.min
  * see "h :move"
  */
 @ExCommand(command = "m[ove]")
-public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+public data class MoveTextCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
   @Throws(ExException::class)
@@ -154,7 +154,7 @@ public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Co
     command: Command,
     lineRange: LineRange,
   ): Int {
-    var line = command.commandRanges.getFirstLine(editor, caret)
+    var line = command.commandRange.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1
     if (line >= lineRange.endLine) {
       line -= adj

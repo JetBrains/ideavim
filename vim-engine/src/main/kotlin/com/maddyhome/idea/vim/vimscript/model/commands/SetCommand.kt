@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.api.unsetToggleOption
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
@@ -38,21 +38,21 @@ import kotlin.math.ceil
  * see "h :set"
  */
 @ExCommand(command = "se[t]")
-public data class SetCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
+public data class SetCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.EFFECTIVE(editor)
 }
 
 @ExCommand(command = "setg[lobal]")
-public data class SetglobalCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
+public data class SetglobalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.GLOBAL(editor)
 }
 
 @ExCommand(command = "setl[ocal]")
-public data class SetlocalCommand(val ranges: Ranges, val argument: String) : SetCommandBase(ranges, argument) {
+public data class SetlocalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.LOCAL(editor)
 }
 
-public abstract class SetCommandBase(ranges: Ranges, argument: String) : Command.SingleExecution(ranges, argument) {
+public abstract class SetCommandBase(range: Range, argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
