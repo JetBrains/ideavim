@@ -10,7 +10,9 @@ package ui
 
 import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
+import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
+import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
@@ -120,6 +122,7 @@ class UiTests {
       Thread.sleep(5000)
       wrapWithIf(javaEditor)
       testTrackActionId(javaEditor)
+      testActionGenerate(javaEditor)
     }
   }
 
@@ -236,6 +239,26 @@ class UiTests {
     waitFor { !hasText("Copy Action Id") }
 
     vimExit()
+  }
+
+  private fun IdeaFrame.testActionGenerate(editor: Editor) {
+    val label = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
+    assertTrue(label.isEmpty())
+
+    keyboard {
+      enterText(":action Generate")
+      enter()
+    }
+
+    waitFor {
+      val generateDialog = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
+      if (generateDialog.size == 1) {
+        return@waitFor generateDialog.single().hasText("Generate")
+      }
+      return@waitFor false
+    }
+
+    keyboard { escape() }
   }
 
   private fun IdeaFrame.createFile(fileName: String, remoteRobot: RemoteRobot) {
