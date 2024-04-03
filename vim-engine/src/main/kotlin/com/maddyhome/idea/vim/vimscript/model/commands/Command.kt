@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import java.util.*
 
-public sealed class Command(public var commandRange: Range, public val commandArgument: String) : Executable {
+public sealed class Command(private var commandRange: Range, public val commandArgument: String) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
@@ -214,8 +214,11 @@ public sealed class Command(public var commandRange: Range, public val commandAr
     getCount(editor, editor.currentCaret(), defaultCount, checkCount)
 
   public fun getCount(editor: VimEditor, caret: VimCaret, defaultCount: Int, checkCount: Boolean): Int {
-    val count = commandRange.getCount(editor, caret, if (checkCount) countArgument else -1)
-    return if (count == -1) defaultCount else count
+    // TODO: Range.getCount does not return -1
+    val count = if (checkCount) countArgument else null
+    return count
+      ?: commandRange.getCount(editor, caret).takeUnless { it == -1 }
+      ?: defaultCount
   }
 
   @JvmOverloads
@@ -224,16 +227,23 @@ public sealed class Command(public var commandRange: Range, public val commandAr
 
   @JvmOverloads
   public fun getLineRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean = false): LineRange {
-    return commandRange.getLineRange(editor, caret, if (checkCount) countArgument else -1)
+    val lineRange = commandRange.getLineRange(editor, caret)
+    val count = if (checkCount) countArgument else null
+    return if (checkCount && count != null) {
+      // If the argument has a count, the returned range is count lines from the end of the command's range
+      LineRange(lineRange.endLine, lineRange.endLine + count - 1)
+    } else {
+      lineRange
+    }
   }
 
   public fun getTextRange(editor: VimEditor, checkCount: Boolean): TextRange =
     getTextRange(editor, editor.currentCaret(), checkCount)
 
   public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): TextRange {
-    return commandRange.getLineRange(editor, caret, if (checkCount) countArgument else -1).toTextRange(editor)
+    return getLineRange(editor, caret, checkCount).toTextRange(editor)
   }
 
-  private val countArgument: Int
-    get() = commandArgument.toIntOrNull() ?: -1
+  private val countArgument: Int?
+    get() = commandArgument.toIntOrNull()
 }

@@ -253,7 +253,7 @@ internal class CommentaryExtension : VimExtension {
       Util.doCommentary(
         editor,
         context,
-        range.getLineRange(editor, editor.primaryCaret(), -1).toTextRange(editor),
+        range.getLineRange(editor, editor.primaryCaret()).toTextRange(editor),
         SelectionType.LINE_WISE,
         false
       )

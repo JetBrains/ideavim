@@ -51,7 +51,7 @@ public class Range {
    * @return The line number represented by the range
    */
   public fun getLine(editor: VimEditor, caret: VimCaret): Int {
-    return getLineRange(editor, caret, -1).endLine
+    return getLineRange(editor, caret).endLine
   }
 
   /**
@@ -62,24 +62,21 @@ public class Range {
    *
    * @param editor  The editor to get the count for
    * @param caret   The caret to use for current line, initial search line, etc. if required
-   * @param count   The count given at the end of the command or -1 if not provided
-   * @return count if count != -1, else return end line of range
+   * @return The last line specified in the range, to be treated as a count (one-based)
    */
-  public fun getCount(editor: VimEditor, caret: VimCaret, count: Int): Int {
-    return if (count == -1) processRange(editor, caret).endLine1 else count
+  public fun getCount(editor: VimEditor, caret: VimCaret): Int {
+    return processRange(editor, caret).endLine1
   }
 
   /**
-   * Gets the line range represented by this Ex range. If a count is given, the range is the range end line through
-   * count-1 lines. If no count is given (-1), the range is the range given by the user.
+   * Gets the line range represented by this Ex range
    *
    * @param editor  The editor to get the range for
-   * @param count   The count given at the end of the command or -1 if not provided
-   * @return The line range
+   * @param caret   The caret to use for current line, initial search line, etc. if required
+   * @return The line range (zero-based)
    */
-  public fun getLineRange(editor: VimEditor, caret: VimCaret, count: Int): LineRange {
-    val lineRange = processRange(editor, caret)
-    return if (count == -1) lineRange else LineRange(lineRange.endLine, lineRange.endLine + count - 1)
+  public fun getLineRange(editor: VimEditor, caret: VimCaret): LineRange {
+    return processRange(editor, caret)
   }
 
   private fun processRange(editor: VimEditor, caret: VimCaret): LineRange {
