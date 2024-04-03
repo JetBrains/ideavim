@@ -59,11 +59,8 @@ public data class SortCommand(val range: Range, val argument: String) : Command.
   private fun getSortLineRange(editor: VimEditor, caret: VimCaret): LineRange {
     val range = getLineRange(editor, caret)
 
-    // Something like "30,20sort" gets converted to "20,30sort"
-    val normalizedRange = if (range.endLine < range.startLine) LineRange(range.endLine, range.startLine) else range
-
     // If we don't have a range, we either have "sort", a selection, or a block
-    if (normalizedRange.endLine - normalizedRange.startLine == 0) {
+    if (range.size == 1) {
       // If we have a selection.
       val selectionModel = editor.getSelectionModel()
       return if (selectionModel.hasSelection()) {
@@ -79,7 +76,7 @@ public data class SortCommand(val range: Range, val argument: String) : Command.
       } // If we have a generic selection, i.e. "sort" entire document
     }
 
-    return normalizedRange
+    return range
   }
 
   private fun parseSortOption(arg: String): SortOption {
