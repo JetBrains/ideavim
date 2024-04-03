@@ -14,17 +14,7 @@ import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection")
 class CopyCommandTest : VimTestCase() {
-  // TODO: This has the correct caret location for the default 'startofline'. Add another test for 'nostartofline'
   @Test
-  @VimBehaviorDiffers(
-    """
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
-      Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
-      Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
-      Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
-      accumsan vitae, facilisis ac nulla.
-    """,
-    "caret position differs")
   fun `test duplicate line below`() {
     configureByText("""
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
@@ -41,4 +31,6 @@ class CopyCommandTest : VimTestCase() {
       accumsan vitae, facilisis ac nulla.
     """.trimIndent())
   }
+
+  // TODO: Add another test with 'nostartofline'. This should maintain the cursor column
 }
