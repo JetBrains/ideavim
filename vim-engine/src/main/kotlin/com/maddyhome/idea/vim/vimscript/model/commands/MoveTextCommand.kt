@@ -154,7 +154,7 @@ public data class MoveTextCommand(val range: Range, val argument: String) : Comm
     command: Command,
     lineRange: LineRange,
   ): Int {
-    var line = command.commandRange.getLineRange(editor, caret, -1).startLine
+    var line = command.getLineRange(editor, caret).startLine
     val adj = lineRange.endLine - lineRange.startLine + 1
     if (line >= lineRange.endLine) {
       line -= adj

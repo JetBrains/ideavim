@@ -158,7 +158,7 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
         function,
       )
     }
-    val lineRange = range!!.getLineRange(editor, editor.currentCaret(), -1)
+    val lineRange = range!!.getLineRange(editor, editor.currentCaret())
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "firstline"),
       VimInt(lineRange.startLine + 1),
