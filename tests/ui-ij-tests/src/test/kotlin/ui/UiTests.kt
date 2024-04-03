@@ -123,6 +123,8 @@ class UiTests {
       wrapWithIf(javaEditor)
       testTrackActionId(javaEditor)
       testActionGenerate(javaEditor)
+      testActionNewElementSamePlace(javaEditor)
+      testActionCopy(javaEditor)
     }
   }
 
@@ -254,6 +256,46 @@ class UiTests {
       val generateDialog = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
       if (generateDialog.size == 1) {
         return@waitFor generateDialog.single().hasText("Generate")
+      }
+      return@waitFor false
+    }
+
+    keyboard { escape() }
+  }
+
+  private fun IdeaFrame.testActionNewElementSamePlace(editor: Editor) {
+    val label = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
+    assertTrue(label.isEmpty())
+
+    keyboard {
+      enterText(":action NewElementSamePlace")
+      enter()
+    }
+
+    waitFor {
+      val generateDialog = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
+      if (generateDialog.size == 1) {
+        return@waitFor generateDialog.single().hasText("New in This Directory")
+      }
+      return@waitFor false
+    }
+
+    keyboard { escape() }
+  }
+
+  private fun IdeaFrame.testActionCopy(editor: Editor) {
+    val label = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
+    assertTrue(label.isEmpty())
+
+    keyboard {
+      enterText(":action CopyReferencePopupGroup")
+      enter()
+    }
+
+    waitFor {
+      val generateDialog = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
+      if (generateDialog.size == 1) {
+        return@waitFor generateDialog.single().hasText("Copy")
       }
       return@waitFor false
     }
