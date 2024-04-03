@@ -571,7 +571,7 @@ public class ChangeGroup : VimChangeGroupBase() {
   ): Boolean {
     val startLine = range.startLine
     val endLine = range.endLine
-    val count = endLine - startLine + 1
+    val count = range.size
     if (count < 2) {
       return false
     }

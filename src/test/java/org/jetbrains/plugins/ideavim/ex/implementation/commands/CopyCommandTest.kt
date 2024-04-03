@@ -12,7 +12,9 @@ import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
+@Suppress("SpellCheckingInspection")
 class CopyCommandTest : VimTestCase() {
+  // TODO: This has the correct caret location for the default 'startofline'. Add another test for 'nostartofline'
   @Test
   @VimBehaviorDiffers(
     """

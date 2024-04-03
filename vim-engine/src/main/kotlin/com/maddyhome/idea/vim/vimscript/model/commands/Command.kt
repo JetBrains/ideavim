@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.ex.MissingArgumentException
 import com.maddyhome.idea.vim.ex.MissingRangeException
 import com.maddyhome.idea.vim.ex.NoArgumentAllowedException
 import com.maddyhome.idea.vim.ex.NoRangeAllowedException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.toTextRange
@@ -235,6 +236,22 @@ public sealed class Command(private var commandRange: Range, public val commandA
     } else {
       lineRange
     }
+  }
+
+  /**
+   * Return the first address, as a one-based line number, from the argument. Throws E16 for invalid range
+   *
+   * Given a command in the format `:[range]command {address}`, this function will return the line number for the
+   * `{address}`. If no address is specified, or is invalid, it will throw "E16: Invalid range".
+   *
+   * Note that address can be `0`, which can mean the line _before_ the first line. This is useful for `:[range]move 0`,
+   * to move a range to the very top of the file.
+   */
+  protected fun getAddressFromArgument(editor: VimEditor): Int {
+    // The simplest way to parse a range is to parse it as a command (it will default to GoToLineCommand) and ask for
+    // its line range. We should perhaps improve this in the future
+    return injector.vimscriptParser.parseCommand(commandArgument)?.getLineRange(editor)?.startLine1
+      ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
   }
 
   public fun getTextRange(editor: VimEditor, checkCount: Boolean): TextRange =
