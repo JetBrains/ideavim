@@ -22,8 +22,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidRangeException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
@@ -48,23 +50,25 @@ public data class MoveTextCommand(val range: Range, val argument: String) : Comm
     val caret = editor.primaryCaret()
     val caretPosition = caret.getBufferPosition()
 
-    val goToLineCommand = injector.vimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
-
-    val range = getTextRange(editor, caret, false)
-
-    /*
-    FIXME: see VIM-2884. It's absolutely not the best way to resolve this bug
-     */
-    caret.moveToOffset(range.startOffset)
-
+    // Move is defined as:
+    // :[range]m[ove] {address}
+    // Move the given [range] to below the line given by {address}. Address can be a range, but only the first address
+    // is used. The rest is ignored with no errors. Note that address is one-based, and 0 means move the text to below
+    // the line _before_ the first line (i.e., move to above the first line).
     val lineRange = getLineRange(editor, caret)
-    val line = min(editor.fileSize().toInt(), normalizeLine(editor, caret, goToLineCommand, lineRange))
-    val linesMoved = lineRange.endLine - lineRange.startLine + 1
+    val range = lineRange.toTextRange(editor)
+    // FIXME: see VIM-2884. It's absolutely not the best way to resolve this bug
+    caret.moveToOffset(range.startOffset)
+    val address1 = getAddressFromArgument(editor)
+
+    // Convert target one-based line to zero-based line. This means our special case of 0 will be represented by -1
+    val line = min(editor.fileSize().toInt(), normalizeAddress(address1 - 1, lineRange))
+    val linesMoved = lineRange.size
     if (line < -1 || line + linesMoved >= editor.lineCount()) {
-      caret.moveToBufferPosition(caretPosition)
-      throw ExException("E16: Invalid range")
+      throw exExceptionMessage(Msg.e_invrange)  // E16: Invalid range
     }
-    val shift = line + 1 - editor.offsetToBufferPosition(range.startOffset).line
+
+    val shift = line - editor.offsetToBufferPosition(range.startOffset).line + 1
 
     val localMarks = injector.markService.getAllLocalMarks(caret)
       .filter { range.contains(it.offset(editor)) }
@@ -86,6 +90,7 @@ public data class MoveTextCommand(val range: Range, val argument: String) : Comm
 
     editor.deleteString(range)
     val putData = if (line == -1) {
+      // Special case. Move text to below the line before the first line
       caret.moveToOffset(0)
       PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
     } else {
@@ -148,18 +153,13 @@ public data class MoveTextCommand(val range: Range, val argument: String) : Comm
   }
 
   @Throws
-  private fun normalizeLine(
-    editor: VimEditor,
-    caret: VimCaret,
-    command: Command,
-    lineRange: LineRange,
-  ): Int {
-    var line = command.getLineRange(editor, caret).startLine
-    val adj = lineRange.endLine - lineRange.startLine + 1
-    if (line >= lineRange.endLine) {
-      line -= adj
-    } else if (line >= lineRange.startLine) throw InvalidRangeException(injector.messages.message(Msg.e_backrange))
+  private fun normalizeAddress(address0: Int, lineRange: LineRange): Int {
+    if (address0 >= lineRange.endLine) {
+      return address0 - lineRange.size
+    } else if (address0 >= lineRange.startLine) {
+      throw InvalidRangeException(injector.messages.message(Msg.e_backrange)) // Backwards range given
+    }
 
-    return line
+    return address0
   }
 }

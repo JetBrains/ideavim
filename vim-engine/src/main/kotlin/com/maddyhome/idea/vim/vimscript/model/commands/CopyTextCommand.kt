@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -33,8 +32,12 @@ public data class CopyTextCommand(val range: Range, val argument: String) : Comm
       val range = getTextRange(editor, caret, false)
       val text = editor.getText(range)
 
-      val goToLineCommand = injector.vimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
-      val line = goToLineCommand.getLineRange(editor, caret).startLine
+      // Copy is defined as:
+      // :[range]co[py] {address}
+      // Copy the given [range] to below the line given by {address}. Address can be a range, but only the first address
+      // is used. The rest is ignored with no errors. Note that address is one-based, and 0 means copy the text to below
+      // the line _before_ the first line (i.e., copy to above the first line).
+      val address1 = getAddressFromArgument(editor)
 
       val transferableData = injector.clipboardManager.getTransferableData(editor, range, text)
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData, null)
@@ -45,7 +48,7 @@ public data class CopyTextCommand(val range: Range, val argument: String) : Comm
         insertTextBeforeCaret = false,
         rawIndent = true,
         caretAfterInsertedText = false,
-        putToLine = line,
+        putToLine = address1 - 1,
       )
       injector.put.putTextForCaret(editor, caret, context, putData)
     }
