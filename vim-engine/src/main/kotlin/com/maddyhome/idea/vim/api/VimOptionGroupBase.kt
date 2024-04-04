@@ -747,6 +747,10 @@ public sealed class OptionValue<T : VimDataType>(public open val value: T) {
    * current corresponding IDE setting no longer has the same value. This means that the user has explicitly set the
    * option via Vim, but changed it in the IDE. If this value is used to initialise an option in a new window, it is
    * treated as though the user explicitly set the option using Vim's `:set` commands.
+   *
+   * Note that the typical behaviour for externally mapped options is to modify the IDE setting's local value. In this
+   * case, only the local value of the IDE setting is considered. Changes to the IDE setting's global value do not
+   * override the local value, unless some other mechanism resets the IDE setting's local value.
    */
   public class External<T : VimDataType>(override val value: T): OptionValue<T>(value)
 

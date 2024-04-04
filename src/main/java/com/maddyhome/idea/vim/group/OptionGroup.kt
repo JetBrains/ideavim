@@ -141,23 +141,33 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  * not allow us to "unset" the local value. However, we don't actually care about this - it makes no difference to the
  * implementation.
  *
+ * IdeaVim will never set the global, persistent IntelliJ setting. `:set {option}` in Vim is not persistent, and does
+ * not affect all windows, so `:set {option}` in IdeaVim should also not be persistent, and should not affect all
+ * windows. IdeaVim will update the local value of the IntelliJ setting. For local-to-window options, only that window's
+ * IntelliJ value is updated. For local-to-buffer options, all open windows for the current document are modified. The
+ * drawback of this approach is that changing the global IntelliJ value in the Settings dialog will not update current
+ * windows. However, modifying the local value through the IDE will, and the global value can be reset with
+ * `:set {option}&`.
+ *
  * IdeaVim will still keep track of what it thinks the global and local values of these options are, but the
- * local/effective value is mapped to the IntelliJ setting. The current local value of the Vim option is always reported
- * as the current local/effective value of the IntelliJ setting, so it never gets out of sync. When setting the Vim
- * option, IdeaVim will only update the IntelliJ setting if the user explicitly sets it with `:set` or `:setlocal`. It
- * does not update the IntelliJ setting when setting the Vim defaults. This means that unless the user explicitly opts
- * in to the Vim option, the current IntelliJ setting is used. Changing the IntelliJ setting through the IDE is always
- * reflected.
+ * local/effective value is mapped to the local/effective IntelliJ setting. The current local value of the Vim option is
+ * always reported as the current local/effective value of the IntelliJ setting, so it never gets out of sync. When
+ * setting the Vim option, IdeaVim will only update the local IntelliJ setting if the user explicitly sets it with
+ * `:set` or `:setlocal`. It does not update the IntelliJ setting when setting the Vim defaults. This means that unless
+ * the user explicitly opts in to the Vim option, the current IntelliJ setting value is used. Changing the local
+ * IntelliJ setting through the IDE is always reflected. Changing the global IntelliJ value is only reflected if the Vim
+ * option is the default value.
  *
  * Normally, Vim updates both local and global values when changing the effective value of an option, and this is still
- * true for mapped options, although the global value is not mapped to anything. Instead, it is used to provide the
- * value when initialising a new window. If the user does not explicitly set the Vim option, the global value is still
- * a default value, and setting the new window's local value to default does not update the IntelliJ setting. But if the
+ * true for mapped options, although the global value is not mapped to anything. This value is used to provide the value
+ * when initialising a new window. If the user does not explicitly set the Vim option, the global value is still a
+ * default value, and setting the new window's local value to default does not update the IntelliJ setting. But if the
  * user does explicitly set the Vim option, the global value is used to initialise the new window, and is used to update
  * the IntelliJ setting. This gives us expected Vim-like behaviour when creating new windows.
  *
- * Changing the IntelliJ setting through the IDE is treated like `:setlocal` - it updates the local value, but does not
- * change the global value, so it does not affect new window initialisation.
+ * Changing the IntelliJ setting's local value through the IDE is treated like `:setlocal` - it updates the local Vim
+ * value, but does not change the global Vim value, so it does not affect new window initialisation. Changing the
+ * IntelliJ setting's global value through the IDE also behaves the same way when the Vim option is set to default.
  *
  * Typically, options that are implemented in IdeaVim should be registered in vim-engine, even if they are mapped to
  * IntelliJ settings. Options that do not have an IdeaVim implementation should be registered in the host-specific
