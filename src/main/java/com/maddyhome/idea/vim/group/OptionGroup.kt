@@ -223,6 +223,9 @@ private class BombOptionMapper : LocalOptionValueOverride<VimInt> {
 private class BreakIndentOptionMapper(breakIndentOption: ToggleOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(breakIndentOption) {
 
+  // The IntelliJ setting is in practice global, from the user's perspective
+  override val canUserModifyExternalLocalValue: Boolean = false
+
   override fun getGlobalExternalValue(editor: VimEditor) =
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent.asVimInt()
 
@@ -240,6 +243,9 @@ private class BreakIndentOptionMapper(breakIndentOption: ToggleOption)
  */
 private class ColorColumnOptionValueProvider(private val colorColumnOption: StringListOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimString>(colorColumnOption) {
+
+  // The IntelliJ setting is in practice global, from the user's perspective
+  override val canUserModifyExternalLocalValue: Boolean = false
 
   override fun getGlobalExternalValue(editor: VimEditor): VimString {
     if (!EditorSettingsExternalizable.getInstance().isRightMarginShown) {
@@ -332,8 +338,13 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
 private class CursorLineOptionMapper(cursorLineOption: ToggleOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(cursorLineOption) {
 
-  override fun getGlobalExternalValue(editor: VimEditor) =
-    EditorSettingsExternalizable.getInstance().isCaretRowShown.asVimInt()
+  // The IntelliJ setting is in practice global, from the user's perspective
+  override val canUserModifyExternalLocalValue: Boolean = false
+
+  override fun getGlobalExternalValue(editor: VimEditor): VimInt {
+    // Note that this is hardcoded to `true`
+    return EditorSettingsExternalizable.getInstance().isCaretRowShown.asVimInt()
+  }
 
   override fun getEffectiveExternalValue(editor: VimEditor) =
     editor.ij.settings.isCaretRowShown.asVimInt()
@@ -531,6 +542,9 @@ private class FileFormatOptionMapper : LocalOptionValueOverride<VimString> {
 private class ListOptionMapper(listOption: ToggleOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(listOption) {
 
+  // This is a global-local setting, and can be modified by the user via _View | Active Editor | Show Whitespaces_
+  override val canUserModifyExternalLocalValue: Boolean = true
+
   override fun getGlobalExternalValue(editor: VimEditor) =
     EditorSettingsExternalizable.getInstance().isWhitespacesShown.asVimInt()
 
@@ -550,6 +564,9 @@ private class ListOptionMapper(listOption: ToggleOption)
  */
 private class NumberOptionMapper(numberOption: ToggleOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(numberOption) {
+
+  // This is a global-local setting, and can be modified by the user via _View | Active Editor | Show Line Numbers_
+  override val canUserModifyExternalLocalValue: Boolean = true
 
   override fun getGlobalExternalValue(editor: VimEditor): VimInt {
     return (EditorSettingsExternalizable.getInstance().isLineNumbersShown
@@ -593,6 +610,9 @@ private class NumberOptionMapper(numberOption: ToggleOption)
  */
 private class RelativeNumberOptionMapper(relativeNumberOption: ToggleOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(relativeNumberOption) {
+
+  // The lineNumerationType IntelliJ setting is in practice global, from the user's perspective.
+  override val canUserModifyExternalLocalValue: Boolean = false
 
   override fun getGlobalExternalValue(editor: VimEditor): VimInt {
     return (EditorSettingsExternalizable.getInstance().isLineNumbersShown
@@ -654,6 +674,10 @@ private fun isShowingRelativeLineNumbers(lineNumerationType: LineNumerationType)
  * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
  */
 private class ScrollJumpOptionMapper : GlobalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+
+  // The IntelliJ setting is in practice global, from the user's perspective
+  override val canUserModifyExternalLocalValue: Boolean = false
+
   override fun getGlobalExternalValue() = EditorSettingsExternalizable.getInstance().verticalScrollJump.asVimInt()
   override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.verticalScrollJump.asVimInt()
 
@@ -680,6 +704,10 @@ private class ScrollJumpOptionMapper : GlobalOptionToGlobalLocalExternalSettingM
  * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
  */
 private class SideScrollOptionMapper : GlobalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+
+  // The IntelliJ setting is in practice global, from the user's perspective
+  override val canUserModifyExternalLocalValue: Boolean = false
+
   override fun getGlobalExternalValue() = EditorSettingsExternalizable.getInstance().horizontalScrollJump.asVimInt()
   override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.horizontalScrollJump.asVimInt()
 
@@ -703,6 +731,9 @@ private class SideScrollOptionMapper : GlobalOptionToGlobalLocalExternalSettingM
  */
 private class ScrollOffOptionMapper(option: NumberOption)
   : GlobalLocalOptionToGlobalLocalExternalSettingMapper<VimInt>(option) {
+
+  // The IntelliJ setting is in practice global. The base implementation relies on this fact
+  override val canUserModifyExternalLocalValue: Boolean = false
 
   override fun getGlobalExternalValue() = EditorSettingsExternalizable.getInstance().verticalScrollOffset.asVimInt()
   override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.verticalScrollOffset.asVimInt()
@@ -809,6 +840,9 @@ private class SideScrollOffOptionMapper(private val sideScrollOffOption: NumberO
 private class TextWidthOptionMapper(textWidthOption: NumberOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(textWidthOption) {
 
+  // The IntelliJ setting is in practice global, from the user's perspective
+  override val canUserModifyExternalLocalValue: Boolean = false
+
   override fun getGlobalExternalValue(editor: VimEditor): VimInt {
     // Get the default value for the current language. This requires a valid project attached to the editor, which we
     // won't have for the fallback window (it's really a TextComponentEditor). In this case, use a null language and
@@ -880,6 +914,9 @@ private class TextWidthOptionMapper(textWidthOption: NumberOption)
  */
 private class WrapOptionMapper(wrapOption: ToggleOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(wrapOption) {
+
+  // This is a global-local setting, and can be modified by the user via _View | Active Editor | Soft-Wrap_
+  override val canUserModifyExternalLocalValue: Boolean = true
 
   override fun getGlobalExternalValue(editor: VimEditor) = getGlobalIsUseSoftWraps(editor).asVimInt()
   override fun getEffectiveExternalValue(editor: VimEditor) = getEffectiveIsUseSoftWraps(editor).asVimInt()

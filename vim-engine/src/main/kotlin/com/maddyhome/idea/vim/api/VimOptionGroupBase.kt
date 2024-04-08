@@ -351,6 +351,21 @@ public interface LocalOptionValueOverride<T : VimDataType> : OptionValueOverride
 public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(private val option: Option<T>)
   : LocalOptionValueOverride<T> {
 
+  /**
+   * True if the user can modify the local value of the external global-local setting.
+   *
+   * If this value is false, there is no user facing UI to set the local value of the external global-local setting.
+   * In this case, the setting is in practice global, from the user's perspective. If the user changes the global value
+   * of the external setting, it would be reasonable to override the IdeaVim value. Conversely, it would be confusing if
+   * the global external value is changed and the editor doesn't update, like it would with IdeaVim disabled (even
+   * though it's also not possible to have different values in different editors without IdeaVim)
+   *
+   * For example, in IntelliJ, `'breakindent'` would return `false`, as there is no way to modify the local value of
+   * `EditorSettings.isUseCustomSoftWrapIndent`. However, `'list'` would return `true`, because it's possible to show or
+   * hide whitespace locally with _View | Active Editor | Show Whitespaces_.
+   */
+  protected abstract val canUserModifyExternalLocalValue: Boolean
+
   override fun getLocalValue(storedValue: OptionValue<T>?, editor: VimEditor): OptionValue<T> {
     // Always return the current effective IntelliJ editor setting, regardless of the current IdeaVim value - the user
     // might have changed the value through the IDE. This means `:setlocal wrap?` will show the current value
@@ -503,6 +518,19 @@ public abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataT
 public abstract class GlobalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>
   : GlobalOptionValueOverride<T> {
 
+  /**
+   * True if the user can modify the local value of the external global-local setting.
+   *
+   * If this value is false, there is no user facing UI to set the local value of the external global-local setting.
+   * In this case, the setting is in practice global, from the user's perspective. If the user changes the global value
+   * of the external setting, it would be reasonable to override the IdeaVim value. Conversely, it would be confusing if
+   * the global external value is changed and the editor doesn't update, like it would with IdeaVim disabled (even
+   * though it's also not possible to have different values in different editors without IdeaVim)
+   *
+   * This flag is mostly redundant for global Vim options. Both Vim option and external setting are treated as global.
+   */
+  protected abstract val canUserModifyExternalLocalValue: Boolean
+
   final override fun getGlobalValue(storedValue: OptionValue<T>, editor: VimEditor?): OptionValue<T> {
     return if (storedValue is OptionValue.Default) {
       // If we have an editor, return the local value. Since the IDE setting is global-local, this local value will
@@ -571,7 +599,24 @@ public abstract class GlobalLocalOptionToGlobalLocalExternalSettingMapper<T : Vi
 
   private var storedGlobalValue: OptionValue<T>? = null
 
+  /**
+   * True if the user can modify the local value of the external global-local setting.
+   *
+   * If this value is false, there is no user facing UI to set the local value of the external global-local setting.
+   * In this case, the setting is in practice global, from the user's perspective. If the user changes the global value
+   * of the external setting, it would be reasonable to override the IdeaVim value. Conversely, it would be confusing if
+   * the global external value is changed and the editor doesn't update, like it would with IdeaVim disabled (even
+   * though it's also not possible to have different values in different editors without IdeaVim)
+   *
+   * This flag is mostly redundant for global Vim options. Both Vim option and external setting are treated as global.
+   */
+  protected abstract val canUserModifyExternalLocalValue: Boolean
+
   override fun getGlobalValue(storedValue: OptionValue<T>, editor: VimEditor?): OptionValue<T> {
+    // If we assume that the user cannot change the local value, it makes it a lot easier to know if the current
+    // effective value is global or global-local (set by IdeaVim)
+    assert(!canUserModifyExternalLocalValue)
+
     if (editor != null && storedValue is OptionValue.Default) {
       // IdeaVim thinks the global value is default, so return the global external value
       return OptionValue.Default(getGlobalExternalValue())
@@ -611,6 +656,10 @@ public abstract class GlobalLocalOptionToGlobalLocalExternalSettingMapper<T : Vi
   }
 
   override fun getLocalValue(storedValue: OptionValue<T>?, editor: VimEditor): OptionValue<T> {
+    // If we assume that the user cannot change the local value, it makes it a lot easier to know if the current
+    // effective value is global or global-local (set by IdeaVim)
+    assert(!canUserModifyExternalLocalValue)
+
     if (storedValue == null) {
       // The local IdeaVim value hasn't been initialised yet. All we can do is use the local/effective external value
       return OptionValue.External(getEffectiveExternalValue(editor))
