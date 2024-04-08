@@ -454,8 +454,7 @@ private class FileEncodingOptionMapper : LocalOptionValueOverride<VimString> {
     val failReason = LoadTextUtil.getCharsetAutoDetectionReason(virtualFile)
     if (failReason != null && StandardCharsets.UTF_8 == virtualFile.charset && StandardCharsets.UTF_8 != charset) return Magic8.NO_WAY
 
-    var bytesToSave: ByteArray?
-    bytesToSave = try {
+    var bytesToSave = try {
       StringUtil.convertLineSeparators(loaded, separator).toByteArray(charset)
     }
     catch (e: UnsupportedOperationException) {
