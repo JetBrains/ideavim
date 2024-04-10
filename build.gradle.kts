@@ -141,7 +141,7 @@ dependencies {
   testFixturesImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 
   // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
-  testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
