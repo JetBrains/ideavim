@@ -49,6 +49,23 @@ public interface VimOptionGroup {
   public fun initialiseLocalOptions(editor: VimEditor, sourceEditor: VimEditor?, scenario: LocalOptionInitialisationScenario)
 
   /**
+   * Start tracking when the `~/.ideavimrc` file is being evaluated as part of IdeaVim startup.
+   *
+   * This is used to track when options are explicitly set as part of IdeaVim initialisation. These options will be used
+   * to initialise all subsequently opened windows, so can kind of be considered as "global" (but not in the same way as
+   * [OptionDeclaredScope.GLOBAL]). This is useful for externally mapped options. Typically, the external value is local
+   * to the editor, and setting the external global value doesn't update the local value. By tracking when the option is
+   * initialised during startup, we can reset these external local values when the external global value changes. Any
+   * option that is explicitly set by the user is not reset.
+   */
+  public fun startInitVimRc()
+
+  /**
+   * Stop tracking when the `~/.ideavimrc` file is being evaluated as part of IdeaVim startup.
+   */
+  public fun endInitVimRc()
+
+  /**
    * Get the [Option] by its name or abbreviation
    */
   public fun getOption(key: String): Option<VimDataType>?

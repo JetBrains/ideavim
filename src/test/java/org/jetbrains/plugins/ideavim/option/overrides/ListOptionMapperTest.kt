@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.option.overrides
 
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -73,6 +74,7 @@ class ListOptionMapperTest : VimTestCase() {
     fixture.editor.settings.isWhitespacesShown = true
     assertCommandOutput("set list?", "  list\n")
 
+    // View | Active Editor | Show Whitespaces
     fixture.editor.settings.isWhitespacesShown = false
     assertCommandOutput("set list?", "nolist\n")
   }
@@ -82,6 +84,7 @@ class ListOptionMapperTest : VimTestCase() {
     fixture.editor.settings.isWhitespacesShown = true
     assertCommandOutput("setlocal list?", "  list\n")
 
+    // View | Active Editor | Show Whitespaces
     fixture.editor.settings.isWhitespacesShown = false
     assertCommandOutput("setlocal list?", "nolist\n")
   }
@@ -136,9 +139,47 @@ class ListOptionMapperTest : VimTestCase() {
   fun `test set IDE setting is treated like setlocal`() {
     // If we use `:set`, it updates the local and per-window global values. If we set the value from the IDE, it only
     // affects the local value
+    // View | Active Editor | Show Whitespaces
     fixture.editor.settings.isWhitespacesShown = true
     assertCommandOutput("setlocal list?", "  list\n")
     assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("setglobal list?", "nolist\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will not update explicitly set value`() {
+    enterCommand("set list")
+
+    EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
+    assertCommandOutput("setlocal list?", "  list\n")
+    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("setglobal list?", "  list\n")
+
+    enterCommand("set nolist")
+
+    EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
+    assertCommandOutput("setlocal list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("setglobal list?", "nolist\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will update effective Vim value set during plugin startup`() {
+    // Default value is false. Update the global value to something different, but make sure the Vim options are default
+    EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
+    injector.optionGroup.resetAllOptionsForTesting()
+
+    try {
+      injector.optionGroup.startInitVimRc()
+      enterCommand("set list")
+    }
+    finally {
+      injector.optionGroup.endInitVimRc()
+    }
+
+    EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
+    assertCommandOutput("setlocal list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist\n")
     assertCommandOutput("setglobal list?", "nolist\n")
   }
 
@@ -241,6 +282,29 @@ class ListOptionMapperTest : VimTestCase() {
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
+    assertCommandOutput("set list?", "nolist\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will update effective Vim value in new window initialised from value set during startup`() {
+    // Default value is false. Update the global value to something different, but make sure the Vim options are default
+    EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
+    injector.optionGroup.resetAllOptionsForTesting()
+
+    try {
+      injector.optionGroup.startInitVimRc()
+      enterCommand("set list")
+    }
+    finally {
+      injector.optionGroup.endInitVimRc()
+    }
+
+    switchToNewFile("bbb.txt", "lorem ipsum")
+
+    assertCommandOutput("set list?", "  list\n")
+
+    // Changing the global setting should update the editor, because it was initially set during plugin startup
+    EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
     assertCommandOutput("set list?", "nolist\n")
   }
 }

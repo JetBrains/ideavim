@@ -24,6 +24,7 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorSettings
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
@@ -146,14 +147,17 @@ abstract class VimTestCase {
   }
 
   private fun resetAllOptions() {
-    VimPlugin.getOptionGroup().resetAllOptionsForTesting()
-
     // Some options are mapped to IntelliJ settings. Make sure the IntelliJ settings match the Vim defaults
     EditorSettingsExternalizable.getInstance().apply {
       isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.asBoolean()
       isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
       isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
       isLineNumbersShown = IjOptions.number.defaultValue.asBoolean()
+      lineNumeration = if (IjOptions.relativenumber.defaultValue.asBoolean()) {
+        if (isLineNumbersShown) EditorSettings.LineNumerationType.HYBRID else EditorSettings.LineNumerationType.RELATIVE
+      } else {
+        EditorSettings.LineNumerationType.ABSOLUTE
+      }
       softWrapFileMasks = "*"
       isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
 
@@ -172,6 +176,10 @@ abstract class VimTestCase {
         CommonCodeStyleSettings.WrapOnTyping.NO_WRAP.intValue
       }
     }
+
+    // Reset the Vim options. Important to do this after changing the IntelliJ settings, so that IdeaVim will treat
+    // these values as defaults.
+    VimPlugin.getOptionGroup().resetAllOptionsForTesting()
   }
 
   private fun setDefaultIntelliJSettings(editor: Editor) {

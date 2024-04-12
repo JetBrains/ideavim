@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.application.options.CodeStyle
 import com.intellij.codeStyle.AbstractConvertLineSeparatorsAction
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ScrollPositionCalculator
@@ -50,9 +51,11 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.NumberOption
+import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.ToggleOption
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
@@ -73,24 +76,58 @@ internal interface IjVimOptionGroup: VimOptionGroup {
   fun getEffectiveIjOptions(editor: VimEditor): EffectiveIjOptions
 }
 
-internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
+private interface InternalOptionValueAccessor {
+  fun <T : VimDataType> getOptionValueInternal(option: Option<T>, scope: OptionAccessScope): OptionValue<T>
+  fun <T : VimDataType> setOptionValueInternal(option: Option<T>, scope: OptionAccessScope, value: OptionValue<T>)
+}
+
+internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOptionValueAccessor, Disposable.Default {
+  private val namedOverrides = mutableMapOf<String, IdeaBackedOptionValueOverride>()
+  private val simpleOverrides = mutableSetOf<IdeaBackedOptionValueOverride>()
+
   init {
     addOptionValueOverride(IjOptions.bomb, BombOptionMapper())
-    addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper(IjOptions.breakindent))
+    addOptionValueOverride(IjOptions.breakindent, BreakIndentOptionMapper(IjOptions.breakindent, this))
     addOptionValueOverride(IjOptions.colorcolumn, ColorColumnOptionValueProvider(IjOptions.colorcolumn))
     addOptionValueOverride(IjOptions.cursorline, CursorLineOptionMapper(IjOptions.cursorline))
     addOptionValueOverride(IjOptions.fileencoding, FileEncodingOptionMapper())
     addOptionValueOverride(IjOptions.fileformat, FileFormatOptionMapper())
-    addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list))
-    addOptionValueOverride(IjOptions.number, NumberOptionMapper(IjOptions.number))
-    addOptionValueOverride(IjOptions.relativenumber, RelativeNumberOptionMapper(IjOptions.number))
+    addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list, this))
+    addOptionValueOverride(IjOptions.number, NumberOptionMapper(IjOptions.number, this))
+    addOptionValueOverride(IjOptions.relativenumber, RelativeNumberOptionMapper(IjOptions.relativenumber, this))
     addOptionValueOverride(IjOptions.textwidth, TextWidthOptionMapper(IjOptions.textwidth))
-    addOptionValueOverride(IjOptions.wrap, WrapOptionMapper(IjOptions.wrap))
+    addOptionValueOverride(IjOptions.wrap, WrapOptionMapper(IjOptions.wrap, this))
 
-    addOptionValueOverride(Options.scrolljump, ScrollJumpOptionMapper())
-    addOptionValueOverride(Options.sidescroll, SideScrollOptionMapper())
-    addOptionValueOverride(Options.scrolloff, ScrollOffOptionMapper(Options.scrolloff))
-    addOptionValueOverride(Options.sidescrolloff, SideScrollOffOptionMapper(Options.sidescrolloff))
+    // These options are defined and implemented in vim-engine, but IntelliJ has similar features with settings we can map
+    addOptionValueOverride(Options.scrolljump, ScrollJumpOptionMapper(Options.scrolljump, this))
+    addOptionValueOverride(Options.sidescroll, SideScrollOptionMapper(Options.sidescroll, this))
+    addOptionValueOverride(Options.scrolloff, ScrollOffOptionMapper(Options.scrolloff, this))
+    addOptionValueOverride(Options.sidescrolloff, SideScrollOffOptionMapper(Options.sidescrolloff, this))
+
+    // When a global editor setting changes, try to update the equivalent Vim option. We don't always update the Vim
+    // option when the IDE setting changes. Typically, if the user has explicitly set the Vim option, we don't reset it.
+    // The exception is if the option was set in ~/.ideavimrc. This is kind of like setting a global value, so it's
+    // reasonable to update the value when the IDE's global value changes. Vim's global options are always updated, too.
+    // Note that this callback runs even when Vim is disabled. This is because Vim options can set the local value of an
+    // IDE setting, and this callback can be the only way to reset them.
+    // There isn't a similar notification for code style changes, so we can't handle colorcolumn or textwidth
+    EditorSettingsExternalizable.getInstance().addPropertyChangeListener({ event ->
+      namedOverrides[event.propertyName]?.onGlobalIdeaValueChanged(event.propertyName)
+      simpleOverrides.forEach { override ->
+        override.onGlobalIdeaValueChanged(event.propertyName)
+      }
+    }, this)
+  }
+
+  override fun <T : VimDataType> addOptionValueOverride(option: Option<T>, override: OptionValueOverride<T>) {
+    if (override is IdeaBackedOptionValueOverride) {
+      override.ideaPropertyName?.let { namedOverrides[it] = override }
+      if (override.ideaPropertyName == null) {
+        simpleOverrides.add(override)
+      }
+    }
+
+    super.addOptionValueOverride(option, override)
   }
 
   override fun initialiseOptions() {
@@ -101,6 +138,21 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
 
   override fun getGlobalIjOptions() = GlobalIjOptions(OptionAccessScope.GLOBAL(null))
   override fun getEffectiveIjOptions(editor: VimEditor) = EffectiveIjOptions(OptionAccessScope.EFFECTIVE(editor))
+
+  // Not redundant, it changes visibility for the InternalOptionValueAccessor interface
+  @Suppress("RedundantOverride")
+  override fun <T : VimDataType> getOptionValueInternal(option: Option<T>, scope: OptionAccessScope): OptionValue<T> {
+    return super.getOptionValueInternal(option, scope)
+  }
+
+  @Suppress("RedundantOverride")
+  override fun <T : VimDataType> setOptionValueInternal(
+    option: Option<T>,
+    scope: OptionAccessScope,
+    value: OptionValue<T>
+  ) {
+    super.setOptionValueInternal(option, scope, value)
+  }
 
   companion object {
     fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
@@ -175,6 +227,169 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup {
  */
 
 
+
+private interface IdeaBackedOptionValueOverride {
+  val ideaPropertyName: String?
+  fun onGlobalIdeaValueChanged(propertyName: String)
+}
+
+/**
+ * Base class to map a local Vim option to a global-local IntelliJ setting, handling changes to the global value of the
+ * IDE setting.
+ */
+private abstract class LocalOptionToGlobalLocalIdeaSettingMapper<T : VimDataType>(
+  option: Option<T>,
+  private val internalOptionValueAccessor: InternalOptionValueAccessor,
+) : LocalOptionToGlobalLocalExternalSettingMapper<T>(option), IdeaBackedOptionValueOverride {
+
+  override val ideaPropertyName: String? = null
+
+  override fun onGlobalIdeaValueChanged(propertyName: String) {
+    if (propertyName == ideaPropertyName) {
+      doOnGlobalIdeaValueChanged()
+    }
+  }
+
+  protected fun doOnGlobalIdeaValueChanged() {
+    // This is a local Vim option, and its global value is only used for initialising new windows. Vim does not have a
+    // way to change the effective value across all windows.
+    // It is mapped to a global-local IntelliJ setting that might, in practice, be global, with no way for the user to
+    // set the local value.
+    // If the Vim option is "default", then the local part of the global-local IntelliJ setting is unset, and any
+    // changes to the global IntelliJ value are reflected in the IdeaVim value. So setting the global IntelliJ value can
+    // affect Vim options, unless they've been explicitly set by the user.
+    // This can be confusing to the user, as sometimes the local editor will update, and sometimes it won't, especially
+    // if the Vim option was set during plugin startup.
+    // We reset the local IntelliJ setting if Vim thinks the option is "default" (i.e., explicitly set, then reset with
+    // `:set {option}&`, which only copies the current global value), or if it was set during plugin startup. If the
+    // user explicitly set the Vim option with `:set {option}` or changed the local IntelliJ setting, we do not reset
+    // local editors.
+    // TODO: If the IntelliJ setting is in practice global, should we reset local Vim values?
+    // If the IntelliJ setting is truly global-local (e.g. show whitespaces), then we shouldn't reset, to match existing
+    // IntelliJ behaviour. But if a local Vim option is mapped to a global IntelliJ setting, is it more intuitive to
+    // reset the Vim option when the IntelliJ global value changes? This would be closer to existing IntelliJ behaviour
+    injector.editorGroup.getEditors().forEach { editor ->
+      val scope = OptionAccessScope.EFFECTIVE(editor)
+      val globalValue = getGlobalExternalValue(editor)
+      if (getEffectiveExternalValue(editor) != globalValue) {
+
+        val storedValue = internalOptionValueAccessor.getOptionValueInternal(option, scope)
+        val newValue = when (storedValue) {
+          is OptionValue.Default -> OptionValue.Default(globalValue)
+          is OptionValue.InitVimRc -> OptionValue.InitVimRc(globalValue)
+          is OptionValue.External -> null
+          is OptionValue.User -> null
+        }
+        if (newValue != null) {
+          resetLocalExternalValueToGlobal(editor)
+          internalOptionValueAccessor.setOptionValueInternal(
+            option,
+            scope,
+            newValue
+          )
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Base class to map a global Vim option to a global-local IntelliJ setting, handling changes to the global value of the
+ * IDE setting.
+ *
+ * This class assumes that the global-local IntelliJ is effectively global, with no UI to modify the local value. This
+ * simplifies the implementation, and is true for all current derived instances.
+ */
+private abstract class GlobalOptionToGlobalLocalIdeaSettingMapper<T : VimDataType>(
+  private val option: Option<T>,
+  private val internalOptionValueAccessor: InternalOptionValueAccessor,
+) : GlobalOptionToGlobalLocalExternalSettingMapper<T>(), IdeaBackedOptionValueOverride {
+
+  override val ideaPropertyName: String? = null
+
+  override fun onGlobalIdeaValueChanged(propertyName: String) {
+    if (propertyName == ideaPropertyName) {
+      doOnGlobalIdeaValueChanged()
+    }
+  }
+
+  protected fun doOnGlobalIdeaValueChanged() {
+    // All derived options currently return false for this, and the assumption simplifies implementation.
+    // We assume that the IntelliJ setting is, in practice, global. The local value of the IntelliJ setting is only set
+    // by IdeaVim to avoid modifying the persistent global value. If both Vim option and IntelliJ setting are global, we
+    // can update all editors whenever either one changes.
+    assert(!canUserModifyExternalLocalValue)
+
+    val globalIdeaValue = getGlobalExternalValue()
+    injector.editorGroup.getEditors().forEach { editor ->
+      val storedValue = internalOptionValueAccessor.getOptionValueInternal(option, OptionAccessScope.EFFECTIVE(editor))
+      if (storedValue.value != globalIdeaValue) {
+        resetLocalExternalValue(editor, globalIdeaValue)
+        if (storedValue !is OptionValue.Default) {
+          internalOptionValueAccessor.setOptionValueInternal(
+            option,
+            OptionAccessScope.EFFECTIVE(editor),
+            OptionValue.External(globalIdeaValue)
+          )
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Base class to map a global-local Vim option to a global-local IntelliJ setting, handling changes to the global value
+ * of the IDE setting.
+ *
+ * This class assumes that the global-local IntelliJ is effectively global, with no UI to modify the local value. This
+ * simplifies the implementation, and is true for all current derived instances.
+ */
+private abstract class GlobalLocalOptionToGlobalLocalIdeaSettingMapper<T : VimDataType>(
+  option: Option<T>,
+  private val internalOptionValueAccessor: InternalOptionValueAccessor,
+) : GlobalLocalOptionToGlobalLocalExternalSettingMapper<T>(option), IdeaBackedOptionValueOverride {
+
+  override val ideaPropertyName: String? = null
+
+  override fun onGlobalIdeaValueChanged(propertyName: String) {
+    if (propertyName == ideaPropertyName) {
+      doOnGlobalIdeaValueChanged()
+    }
+  }
+
+  protected fun doOnGlobalIdeaValueChanged() {
+    // All derived options currently return false for this, and the assumption simplifies implementation.
+    // We assume that the IntelliJ setting is, in practice, global. The local value of the IntelliJ setting is only set
+    // by IdeaVim to avoid modifying the persistent global value. When the IntelliJ global value is changed, we can
+    // reset all editors that IdeaVim thinks are set globally (including default).
+    assert(!canUserModifyExternalLocalValue)
+
+    // This is a global-local Vim option and a global (in practice) IntelliJ setting. Changing the IntelliJ global value
+    // should update the global value of the Vim option, but leave locally set Vim values unchanged.
+    // E.g. the user does `:set scrolloff=10` either in `~/.ideavimrc` or at the command line. This sets the global
+    // value of the Vim option, but leaves the local value unset. It also updates the local setting in applicable open
+    // editors. The user then changes "Vertical Scroll Offset" in the settings dialog. This should update the global
+    // value of the Vim option, leaving any local values unchanged.
+    val globalValue = getGlobalExternalValue()
+    injector.editorGroup.getEditors().forEach { editor ->
+      val localVimValue = internalOptionValueAccessor.getOptionValueInternal(option, OptionAccessScope.LOCAL(editor))
+      if (getEffectiveExternalValue(editor) != globalValue && localVimValue.value == option.unsetValue) {
+        setLocalExternalValue(editor, globalValue)
+      }
+
+      val globalScope = OptionAccessScope.GLOBAL(editor)
+      val storedValue = internalOptionValueAccessor.getOptionValueInternal(option, globalScope)
+      if (storedValue !is OptionValue.Default) {
+        internalOptionValueAccessor.setOptionValueInternal(option, globalScope, OptionValue.External(globalValue))
+        // Tell the base class that we've changed the global value, so it can update state
+        setGlobalValue(storedValue, OptionValue.External(globalValue), editor)
+      }
+    }
+  }
+}
+
+
+
 /**
  * Maps the `'bomb'` local-to-buffer Vim option to the file's current byte order mark
  *
@@ -220,11 +435,14 @@ private class BombOptionMapper : LocalOptionValueOverride<VimInt> {
  * Maps the `'breakindent'` local-to-window Vim option to the IntelliJ custom soft wrap indent global-local setting
  */
 // TODO: We could also implement 'breakindentopt', but only the shift:{n} component would be supportable
-private class BreakIndentOptionMapper(breakIndentOption: ToggleOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(breakIndentOption) {
+private class BreakIndentOptionMapper(
+  breakIndentOption: ToggleOption,
+  internalOptionValueAccessor: InternalOptionValueAccessor,
+) : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(breakIndentOption, internalOptionValueAccessor) {
 
   // The IntelliJ setting is in practice global, from the user's perspective
   override val canUserModifyExternalLocalValue: Boolean = false
+  override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_USE_CUSTOM_SOFT_WRAP_INDENT
 
   override fun getGlobalExternalValue(editor: VimEditor) =
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent.asVimInt()
@@ -240,6 +458,8 @@ private class BreakIndentOptionMapper(breakIndentOption: ToggleOption)
 
 /**
  * Maps the `'colorcolumn'` local-to-window Vim option to the IntelliJ global-local soft margin settings
+ *
+ * TODO: This is a code style setting - how can we react to changes?
  */
 private class ColorColumnOptionValueProvider(private val colorColumnOption: StringListOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimString>(colorColumnOption) {
@@ -334,6 +554,8 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
 
 /**
  * Maps the `'cursorline'` local-to-window Vim option to the IntelliJ global-local caret row setting
+ *
+ * Note that there isn't a global IntelliJ setting for this option.
  */
 private class CursorLineOptionMapper(cursorLineOption: ToggleOption)
   : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(cursorLineOption) {
@@ -538,8 +760,10 @@ private class FileFormatOptionMapper : LocalOptionValueOverride<VimString> {
 /**
  * Maps the `'list'` local-to-window Vim option to the IntelliJ global-local whitespace setting
  */
-private class ListOptionMapper(listOption: ToggleOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(listOption) {
+private class ListOptionMapper(listOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor)
+  : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(listOption, internalOptionValueAccessor) {
+
+  override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_IS_WHITESPACES_SHOWN
 
   // This is a global-local setting, and can be modified by the user via _View | Active Editor | Show Whitespaces_
   override val canUserModifyExternalLocalValue: Boolean = true
@@ -561,8 +785,8 @@ private class ListOptionMapper(listOption: ToggleOption)
  *
  * Note that this must work with `'relativenumber'` to correctly handle the hybrid modes.
  */
-private class NumberOptionMapper(numberOption: ToggleOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(numberOption) {
+private class NumberOptionMapper(numberOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor)
+  : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(numberOption, internalOptionValueAccessor) {
 
   // This is a global-local setting, and can be modified by the user via _View | Active Editor | Show Line Numbers_
   override val canUserModifyExternalLocalValue: Boolean = true
@@ -599,6 +823,13 @@ private class NumberOptionMapper(numberOption: ToggleOption)
       }
     }
   }
+
+  override fun onGlobalIdeaValueChanged(propertyName: String) {
+    if (propertyName == EditorSettingsExternalizable.PropNames.PROP_ARE_LINE_NUMBERS_SHOWN
+      || propertyName == EditorSettingsExternalizable.PropNames.PROP_LINE_NUMERATION) {
+      doOnGlobalIdeaValueChanged()
+    }
+  }
 }
 
 
@@ -607,8 +838,10 @@ private class NumberOptionMapper(numberOption: ToggleOption)
  *
  * Note that this must work with `'number'` to correctly handle the hybrid modes.
  */
-private class RelativeNumberOptionMapper(relativeNumberOption: ToggleOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(relativeNumberOption) {
+private class RelativeNumberOptionMapper(
+  relativeNumberOption: ToggleOption,
+  internalOptionValueAccessor: InternalOptionValueAccessor,
+) : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(relativeNumberOption, internalOptionValueAccessor) {
 
   // The lineNumerationType IntelliJ setting is in practice global, from the user's perspective.
   override val canUserModifyExternalLocalValue: Boolean = false
@@ -645,6 +878,13 @@ private class RelativeNumberOptionMapper(relativeNumberOption: ToggleOption)
       }
     }
   }
+
+  override fun onGlobalIdeaValueChanged(propertyName: String) {
+    if (propertyName == EditorSettingsExternalizable.PropNames.PROP_ARE_LINE_NUMBERS_SHOWN
+      || propertyName == EditorSettingsExternalizable.PropNames.PROP_LINE_NUMERATION) {
+      doOnGlobalIdeaValueChanged()
+    }
+  }
 }
 
 private fun isShowingAbsoluteLineNumbers(lineNumerationType: LineNumerationType) = when (lineNumerationType) {
@@ -672,7 +912,10 @@ private fun isShowingRelativeLineNumbers(lineNumerationType: LineNumerationType)
  * We can also clear the overridden IDE setting value by setting it to `-1`. So when the user resets the Vim option to
  * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
  */
-private class ScrollJumpOptionMapper : GlobalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+private class ScrollJumpOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor)
+  : GlobalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
+
+  override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_VERTICAL_SCROLL_JUMP
 
   // The IntelliJ setting is in practice global, from the user's perspective
   override val canUserModifyExternalLocalValue: Boolean = false
@@ -702,7 +945,10 @@ private class ScrollJumpOptionMapper : GlobalOptionToGlobalLocalExternalSettingM
  * We can also clear the overridden IDE setting value by setting it to `-1`. So when the user resets the Vim option to
  * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
  */
-private class SideScrollOptionMapper : GlobalOptionToGlobalLocalExternalSettingMapper<VimInt>() {
+private class SideScrollOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor)
+  : GlobalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
+
+  override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_HORIZONTAL_SCROLL_JUMP
 
   // The IntelliJ setting is in practice global, from the user's perspective
   override val canUserModifyExternalLocalValue: Boolean = false
@@ -728,8 +974,10 @@ private class SideScrollOptionMapper : GlobalOptionToGlobalLocalExternalSettingM
  * takes precedence over the global, persistent setting until the option is reset with either `:set scrolloff&` or
  * `:setlocal scrolloff<`.
  */
-private class ScrollOffOptionMapper(option: NumberOption)
-  : GlobalLocalOptionToGlobalLocalExternalSettingMapper<VimInt>(option) {
+private class ScrollOffOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor)
+  : GlobalLocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
+
+  override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_VERTICAL_SCROLL_OFFSET
 
   // The IntelliJ setting is in practice global. The base implementation relies on this fact
   override val canUserModifyExternalLocalValue: Boolean = false
@@ -777,8 +1025,12 @@ private class ScrollOffOptionMapper(option: NumberOption)
  * scrolling from IntelliJ. This would be a non-trivial change, and it might be better to move the scrolling to
  * vim-engine so it can also work in Fleet.
  */
-private class SideScrollOffOptionMapper(private val sideScrollOffOption: NumberOption)
-  : GlobalOptionValueOverride<VimInt>, LocalOptionValueOverride<VimInt> {
+private class SideScrollOffOptionMapper(
+  private val sideScrollOffOption: NumberOption,
+  private val internalOptionValueAccessor: InternalOptionValueAccessor,
+) : GlobalOptionValueOverride<VimInt>, LocalOptionValueOverride<VimInt>, IdeaBackedOptionValueOverride {
+
+  override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_HORIZONTAL_SCROLL_OFFSET
 
   override fun getGlobalValue(storedValue: OptionValue<VimInt>, editor: VimEditor?): OptionValue<VimInt> {
     if (storedValue is OptionValue.Default) {
@@ -794,7 +1046,8 @@ private class SideScrollOffOptionMapper(private val sideScrollOffOption: NumberO
     newValue: OptionValue<VimInt>,
     editor: VimEditor?,
   ): Boolean {
-    editor?.let { it.ij.settings.horizontalScrollOffset = 0 }
+    // The user has typed `:setlocal`. Just make sure that the IntelliJ value doesn't interfere with the Vim value
+    injector.editorGroup.getEditors().forEach { it.ij.settings.horizontalScrollOffset = 0 }
     return storedValue.value != newValue.value
   }
 
@@ -825,6 +1078,25 @@ private class SideScrollOffOptionMapper(private val sideScrollOffOption: NumberO
     // scrolling doesn't affect our scrolling
     editor.ij.settings.horizontalScrollOffset = 0
     return storedValue?.value != newValue.value
+  }
+
+  override fun onGlobalIdeaValueChanged(propertyName: String) {
+    if (propertyName == ideaPropertyName) {
+      // Again, just make sure the IntelliJ local value is 0
+      injector.editorGroup.getEditors().forEach { it.ij.settings.horizontalScrollOffset = 0 }
+
+      // Update the stored Vim global value. This will not override any existing local values
+      val globalScope = OptionAccessScope.GLOBAL(null)
+      val storedValue = internalOptionValueAccessor.getOptionValueInternal(sideScrollOffOption, globalScope)
+      if (storedValue !is OptionValue.Default) {
+        val externalGlobalValue = EditorSettingsExternalizable.getInstance().horizontalScrollOffset
+        internalOptionValueAccessor.setOptionValueInternal(
+          sideScrollOffOption,
+          globalScope,
+          OptionValue.External(VimInt(externalGlobalValue))
+        )
+      }
+    }
   }
 }
 
@@ -911,8 +1183,8 @@ private class TextWidthOptionMapper(textWidthOption: NumberOption)
 /**
  * Maps the `'wrap'` Vim option to the IntelliJ soft wrap settings
  */
-private class WrapOptionMapper(wrapOption: ToggleOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(wrapOption) {
+private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor)
+  : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(wrapOption, internalOptionValueAccessor) {
 
   // This is a global-local setting, and can be modified by the user via _View | Active Editor | Soft-Wrap_
   override val canUserModifyExternalLocalValue: Boolean = true
@@ -955,6 +1227,13 @@ private class WrapOptionMapper(wrapOption: ToggleOption)
     // because tests run headless then the UI is updated less, or differently, at least.
     if (ApplicationManager.getApplication().isUnitTestMode) {
       (editor.ij as? EditorEx)?.scrollPane?.viewport?.doLayout()
+    }
+  }
+
+  override fun onGlobalIdeaValueChanged(propertyName: String) {
+    if (propertyName == EditorSettingsExternalizable.PropNames.PROP_USE_SOFT_WRAPS
+      || propertyName == EditorSettingsExternalizable.PropNames.PROP_SOFT_WRAP_FILE_MASKS) {
+      doOnGlobalIdeaValueChanged()
     }
   }
 }
