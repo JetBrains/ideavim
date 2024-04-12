@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.NumberOption
@@ -264,6 +265,7 @@ private abstract class LocalOptionToGlobalLocalIdeaSettingMapper<T : VimDataType
     // `:set {option}&`, which only copies the current global value), or if it was set during plugin startup. If the
     // user explicitly set the Vim option with `:set {option}` or changed the local IntelliJ setting, we do not reset
     // local editors.
+    // Always update if Vim is disabled. This ensures that we update the local value of the IDE's global-local settings.
     // TODO: If the IntelliJ setting is in practice global, should we reset local Vim values?
     // If the IntelliJ setting is truly global-local (e.g. show whitespaces), then we shouldn't reset, to match existing
     // IntelliJ behaviour. But if a local Vim option is mapped to a global IntelliJ setting, is it more intuitive to
@@ -279,7 +281,7 @@ private abstract class LocalOptionToGlobalLocalIdeaSettingMapper<T : VimDataType
           is OptionValue.InitVimRc -> OptionValue.InitVimRc(globalValue)
           is OptionValue.External -> null
           is OptionValue.User -> null
-        }
+        } ?: if (vimDisabled(null)) OptionValue.Default(globalValue) else null
         if (newValue != null) {
           resetLocalExternalValueToGlobal(editor)
           internalOptionValueAccessor.setOptionValueInternal(
