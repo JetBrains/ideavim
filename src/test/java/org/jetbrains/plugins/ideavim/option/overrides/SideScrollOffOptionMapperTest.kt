@@ -139,6 +139,26 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
   }
 
   @Test
+  fun `test setting global IDE value will update IdeaVim value`() {
+    enterCommand("set sidescrolloff=10")
+
+    EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will not update locally set IdeaVim value`() {
+    enterCommand("setlocal sidescrolloff=10")
+
+    EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
+  }
+
+  @Test
   fun `test open new window without setting the option uses current intellij value as default value`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
 
@@ -160,15 +180,15 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
 
-    // Changing the global setting should NOT update the new editor
+    // Changing the global IntelliJ setting syncs with the global Vim value
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
 
     // We don't support externally changing the local editor setting
     enterCommand("setlocal sidescrolloff=30")
     assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30\n")
     assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
     assertEquals(10, EditorSettingsExternalizable.getInstance().horizontalScrollOffset)
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
@@ -437,7 +457,7 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     // Changing the intellij default value is reflected in IdeaVim
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 30
     assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30\n")
     assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30\n")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }

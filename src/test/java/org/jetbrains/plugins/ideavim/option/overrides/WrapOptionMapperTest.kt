@@ -15,6 +15,7 @@ import com.intellij.platform.util.coroutines.childScope
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -129,7 +130,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test global 'wrap' option affects IdeaVim value only`() {
+  fun `test setglobal 'wrap' option affects IdeaVim global value only`() {
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
     assertCommandOutput("setglobal wrap?", "  wrap\n")  // Default for IdeaVim option is true
 
@@ -140,19 +141,52 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test setglobal reports state from last call to set`() {
+  fun `test set updates IdeaVim global value as well as local`() {
     // `:set` will update both the local value, and the IdeaVim-only global value
     enterCommand("set nowrap")
     assertCommandOutput("setglobal wrap?", "nowrap\n")
   }
 
   @Test
-  fun `test setting IDE value is treated like setlocal`() {
+  fun `test setting local IDE value is treated like setlocal`() {
     // If we use `:set`, it updates the local and per-window global values. If we set the value from the IDE, it only
     // affects the local value
     fixture.editor.settings.isUseSoftWraps = false
     assertCommandOutput("setlocal wrap?", "nowrap\n")
     assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("setglobal wrap?", "  wrap\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will not update explicitly set value`() {
+    enterCommand("set nowrap")
+
+    EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
+    assertCommandOutput("setlocal wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("setglobal wrap?", "nowrap\n")
+
+    EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
+    assertCommandOutput("setlocal wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("setglobal wrap?", "nowrap\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will update effective Vim value set during plugin startup`() {
+    try {
+      injector.optionGroup.startInitVimRc()
+      enterCommand("set nowrap")
+    }
+    finally {
+      injector.optionGroup.endInitVimRc()
+    }
+
+    // Default is true, so reset it to false, then set back to true
+    EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
+    EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
+    assertCommandOutput("setlocal wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap\n")
     assertCommandOutput("setglobal wrap?", "  wrap\n")
   }
 
@@ -253,6 +287,26 @@ class WrapOptionMapperTest : VimTestCase() {
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
+    assertCommandOutput("set wrap?", "  wrap\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will update effective Vim value in new window initialised from value set during startup`() {
+    try {
+      injector.optionGroup.startInitVimRc()
+      enterCommand("set nowrap")
+    }
+    finally {
+      injector.optionGroup.endInitVimRc()
+    }
+
+    switchToNewFile("bbb.txt", "lorem ipsum")
+    assertCommandOutput("set wrap?", "nowrap\n")
+
+    // Changing the global setting should update the editor, because it was initially set during plugin startup
+    // Default is true, so reset before changing again
+    EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
+    EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
     assertCommandOutput("set wrap?", "  wrap\n")
   }
 }

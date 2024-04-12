@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.option.overrides
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -80,6 +81,7 @@ class BreakIndentOptionMapperTest : VimTestCase() {
     fixture.editor.settings.isUseCustomSoftWrapIndent = false
     assertCommandOutput("set breakindent?", "nobreakindent\n")
 
+    // Note that there is no actual UI in the IDE to set this
     fixture.editor.settings.isUseCustomSoftWrapIndent = true
     assertCommandOutput("set breakindent?", "  breakindent\n")
   }
@@ -89,6 +91,7 @@ class BreakIndentOptionMapperTest : VimTestCase() {
     fixture.editor.settings.isUseCustomSoftWrapIndent = false
     assertCommandOutput("setlocal breakindent?", "nobreakindent\n")
 
+    // Note that there is no actual UI in the IDE to set this
     fixture.editor.settings.isUseCustomSoftWrapIndent = true
     assertCommandOutput("setlocal breakindent?", "  breakindent\n")
   }
@@ -138,12 +141,52 @@ class BreakIndentOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  fun `test setting IDE value is treated like setlocal`() {
+  fun `test setting local IDE value is treated like setlocal`() {
     // If we use `:set`, it updates the local and per-window global values. If we set the value from the IDE, it only
     // affects the local value
+    // Note that there is no actual UI in the IDE to set this
     fixture.editor.settings.isUseCustomSoftWrapIndent = true
     assertCommandOutput("setlocal breakindent?", "  breakindent\n")
     assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will not update explicitly set value`() {
+    enterCommand("set breakindent")
+
+    EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
+    assertCommandOutput("setlocal breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("setglobal breakindent?", "  breakindent\n")
+
+    enterCommand("set nobreakindent")
+
+    EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
+    assertCommandOutput("setlocal breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will update effective Vim value set during plugin startup`() {
+    // Default value is false. Update the global value to something different, but make sure the Vim options are default
+    EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
+    injector.optionGroup.resetAllOptionsForTesting()
+
+    try {
+      injector.optionGroup.startInitVimRc()
+
+      // This is the same value as the global IDE setting. That's ok. We just want to explicitly set the Vim option
+      enterCommand("set breakindent")
+    }
+    finally {
+      injector.optionGroup.endInitVimRc()
+    }
+
+    EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
+    assertCommandOutput("setlocal breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent\n")
     assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
   }
 
@@ -242,9 +285,33 @@ class BreakIndentOptionMapperTest : VimTestCase() {
     switchToNewFile("bbb.txt", "lorem ipsum")
 
     assertCommandOutput("set breakindent?", "nobreakindent\n")
-
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
+    assertCommandOutput("set breakindent?", "nobreakindent\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will update effective Vim value in new window initialised from value set during startup`() {
+    // Default value is false. Update the global value to something different, but make sure the Vim options are default
+    EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
+    injector.optionGroup.resetAllOptionsForTesting()
+
+    try {
+      injector.optionGroup.startInitVimRc()
+
+      // This is the same value as the global IDE setting. That's ok. We just want to explicitly set the Vim option
+      enterCommand("set breakindent")
+    }
+    finally {
+      injector.optionGroup.endInitVimRc()
+    }
+
+    switchToNewFile("bbb.txt", "lorem ipsum")
+
+    assertCommandOutput("set breakindent?", "  breakindent\n")
+
+    // Changing the global setting should update the editor, because it was initially set during plugin startup
+    EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
     assertCommandOutput("set breakindent?", "nobreakindent\n")
   }
 }

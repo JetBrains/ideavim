@@ -146,6 +146,26 @@ class ScrollOffOptionMapperTest : VimTestCase() {
   }
 
   @Test
+  fun `test setting global IDE value will update IdeaVim value`() {
+    enterCommand("set scrolloff=10")
+
+    EditorSettingsExternalizable.getInstance().verticalScrollOffset = 20
+    assertCommandOutput("set scrolloff?", "  scrolloff=20\n")
+    assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1\n")
+    assertCommandOutput("setglobal scrolloff?", "  scrolloff=20\n")
+  }
+
+  @Test
+  fun `test setting global IDE value will not update locally set IdeaVim value`() {
+    enterCommand("setlocal scrolloff=10")
+
+    EditorSettingsExternalizable.getInstance().verticalScrollOffset = 20
+    assertCommandOutput("set scrolloff?", "  scrolloff=10\n")
+    assertCommandOutput("setlocal scrolloff?", "  scrolloff=10\n")
+    assertCommandOutput("setglobal scrolloff?", "  scrolloff=20\n")
+  }
+
+  @Test
   fun `test open new window without setting the option uses current intellij value as default value`() {
     EditorSettingsExternalizable.getInstance().verticalScrollOffset = 20
 
@@ -167,15 +187,15 @@ class ScrollOffOptionMapperTest : VimTestCase() {
 
     assertCommandOutput("set scrolloff?", "  scrolloff=20\n")
 
-    // Changing the global setting should NOT update the new editor
+    // Changing the global IntelliJ setting syncs with the global Vim value
     EditorSettingsExternalizable.getInstance().verticalScrollOffset = 10
-    assertCommandOutput("set scrolloff?", "  scrolloff=20\n")
+    assertCommandOutput("set scrolloff?", "  scrolloff=10\n")
 
     // We don't support externally changing the local editor setting
     enterCommand("setlocal scrolloff=30")
     assertCommandOutput("set scrolloff?", "  scrolloff=30\n")
     assertCommandOutput("setlocal scrolloff?", "  scrolloff=30\n")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=20\n")
+    assertCommandOutput("setglobal scrolloff?", "  scrolloff=10\n")
     assertEquals(10, EditorSettingsExternalizable.getInstance().verticalScrollOffset)
     assertEquals(30, fixture.editor.settings.verticalScrollOffset)
   }
@@ -417,7 +437,7 @@ class ScrollOffOptionMapperTest : VimTestCase() {
     // Changing the intellij default value is reflected in IdeaVim
     EditorSettingsExternalizable.getInstance().verticalScrollOffset = 30
     assertCommandOutput("set scrolloff?", "  scrolloff=30\n")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=10\n")
+    assertCommandOutput("setglobal scrolloff?", "  scrolloff=30\n")
     assertCommandOutput("setlocal scrolloff?", "  scrolloff=30\n")
   }
 

@@ -282,7 +282,13 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      executeIdeaVimRc(editor);
+      try {
+        VimInjectorKt.injector.getOptionGroup().startInitVimRc();
+        executeIdeaVimRc(editor);
+      }
+      finally {
+        VimInjectorKt.injector.getOptionGroup().endInitVimRc();
+      }
     }
   }
 

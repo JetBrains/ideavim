@@ -95,6 +95,15 @@ class ScrollJumpOptionMapperTest : VimTestCase() {
   }
 
   @Test
+  fun `test setting global IDE value will update IdeaVim value`() {
+    enterCommand("set scrolljump=7")
+    EditorSettingsExternalizable.getInstance().verticalScrollJump = 3
+    assertCommandOutput("setlocal scrolljump?", "  scrolljump=3\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=3\n")
+    assertCommandOutput("setglobal scrolljump?", "  scrolljump=3\n")
+  }
+
+  @Test
   fun `test reset 'scrolljump' to default resets to global intellij setting`() {
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 20
     fixture.editor.settings.verticalScrollJump = 10

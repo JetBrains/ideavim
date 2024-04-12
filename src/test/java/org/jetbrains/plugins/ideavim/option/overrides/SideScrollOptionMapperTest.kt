@@ -95,6 +95,15 @@ class SideScrollOptionMapperTest : VimTestCase() {
   }
 
   @Test
+  fun `test setting global IDE value will update IdeaVim value`() {
+    enterCommand("set sidescroll=7")
+    EditorSettingsExternalizable.getInstance().horizontalScrollJump = 3
+    assertCommandOutput("setlocal sidescroll?", "  sidescroll=3\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=3\n")
+    assertCommandOutput("setglobal sidescroll?", "  sidescroll=3\n")
+  }
+
+  @Test
   fun `test reset 'sidescroll' to default resets to global intellij setting`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 20
     fixture.editor.settings.horizontalScrollJump = 10

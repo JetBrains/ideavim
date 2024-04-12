@@ -310,7 +310,7 @@ tasks {
 
   patchPluginXml {
     // Don't forget to update plugin.xml
-    sinceBuild.set("233.11799.67")
+    sinceBuild.set("233.11799.241")
 
     changeNotes.set(
       """<a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>"""
