@@ -78,7 +78,7 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
         ExecutionResult.Success
       } else {
         // Filter
-        val range = getTextRange(editor, false)
+        val range = getTextRange(editor)
         val input = editor.ij.document.charsSequence.subSequence(range.startOffset, range.endOffset)
         VimPlugin.getProcess().executeCommand(editor, command, input, workingDirectory)?.let {
           ApplicationManager.getApplication().runWriteAction {
