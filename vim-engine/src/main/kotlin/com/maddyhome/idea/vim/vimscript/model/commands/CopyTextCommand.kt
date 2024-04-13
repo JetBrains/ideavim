@@ -14,9 +14,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.put.PutData
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -41,16 +41,31 @@ public data class CopyTextCommand(val range: Range, val argument: String) : Comm
 
       val transferableData = injector.clipboardManager.getTransferableData(editor, range, text)
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData, null)
-      val putData = PutData(
-        textData,
-        null,
-        1,
-        insertTextBeforeCaret = false,
-        rawIndent = true,
-        caretAfterInsertedText = false,
-        putToLine = address1 - 1,
-      )
-      injector.put.putTextForCaret(editor, caret, context, putData)
+      var mutableCaret = caret
+      val putData = if (address1 == 0) {
+        // TODO: This should maintain current column location
+        mutableCaret = mutableCaret.moveToOffset(0)
+        PutData(
+          textData,
+          null,
+          1,
+          insertTextBeforeCaret = true,
+          rawIndent = true,
+          caretAfterInsertedText = false,
+        )
+      }
+      else {
+        PutData(
+          textData,
+          null,
+          1,
+          insertTextBeforeCaret = false,
+          rawIndent = true,
+          caretAfterInsertedText = false,
+          putToLine = address1 - 1
+        )
+      }
+      injector.put.putTextForCaret(editor, mutableCaret, context, putData)
     }
     return ExecutionResult.Success
   }
