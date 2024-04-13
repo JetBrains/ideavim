@@ -29,7 +29,7 @@ public data class CopyTextCommand(val range: Range, val argument: String) : Comm
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val carets = editor.sortedCarets()
     for (caret in carets) {
-      val range = getTextRange(editor, caret, false)
+      val range = getTextRange(editor, caret)
       val text = editor.getText(range)
 
       // Copy is defined as:

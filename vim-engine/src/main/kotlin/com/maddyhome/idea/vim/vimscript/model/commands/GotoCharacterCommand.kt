@@ -31,7 +31,7 @@ public data class GotoCharacterCommand(val range: Range, val argument: String) :
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val count = getCount(editor, caret, 1, true)
+    val count = getCountFromArgument() ?: getCountFromRange(editor, caret)
     if (count <= 0) return ExecutionResult.Error
 
     val offset = max(0, min(count - 1, editor.fileSize().toInt() - 1))

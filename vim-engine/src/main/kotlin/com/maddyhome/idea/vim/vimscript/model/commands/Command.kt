@@ -211,6 +211,9 @@ public sealed class Command(private var commandRange: Range, public val commandA
   public fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
   public fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRange.getLine(editor, caret)
 
+  // TODO: Refactor getCount functions. It's confusing to pass a "check count" flag to "get count"
+  // Also, default count isn't used
+  // Migrate to getCountFromRange and getCountFromArgument, and possibly refactor/combine once semantics are understood
   public fun getCount(editor: VimEditor, defaultCount: Int, checkCount: Boolean): Int =
     getCount(editor, editor.currentCaret(), defaultCount, checkCount)
 
@@ -222,10 +225,23 @@ public sealed class Command(private var commandRange: Range, public val commandA
       ?: defaultCount
   }
 
-  @JvmOverloads
-  public fun getLineRange(editor: VimEditor, checkCount: Boolean = false): LineRange =
-    getLineRange(editor, editor.currentCaret(), checkCount)
+  protected fun getCountFromRange(editor: VimEditor, caret: VimCaret): Int {
+    return commandRange.getCount(editor, caret)
+  }
 
+  protected fun getCountFromArgument(): Int? {
+    return Regex("""(?<count>\d+)\s*(?<trailing>.*)?(".*)?""").matchEntire(commandArgument)?.let { match ->
+      match.groups["trailing"]?.let { trailing ->
+        if (trailing.value.isNotEmpty()) throw exExceptionMessage("E488", trailing.value)
+      }
+      match.groups["count"]?.value?.toInt()
+    }
+  }
+
+  public fun getLineRange(editor: VimEditor): LineRange =
+    getLineRange(editor, editor.currentCaret())
+
+  // TODO: Get rid of checkCount here. Used by getTextRange
   @JvmOverloads
   public fun getLineRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean = false): LineRange {
     val lineRange = commandRange.getLineRange(editor, caret)
@@ -254,10 +270,10 @@ public sealed class Command(private var commandRange: Range, public val commandA
       ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
   }
 
-  public fun getTextRange(editor: VimEditor, checkCount: Boolean): TextRange =
-    getTextRange(editor, editor.currentCaret(), checkCount)
+  public fun getTextRange(editor: VimEditor): TextRange =
+    getTextRange(editor, editor.currentCaret())
 
-  public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): TextRange {
+  public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean = false): TextRange {
     return getLineRange(editor, caret, checkCount).toTextRange(editor)
   }
 
