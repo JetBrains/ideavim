@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.ex.ranges
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.helper.Msg
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.TestOnly
 
@@ -86,18 +88,19 @@ public class Range {
 
     // Now process each range component, moving the cursor if appropriate
     var count = 0
-    var lastZero = false
     for (address in addresses) {
       startLine1 = endLine1
-      endLine1 = address.getLine1(editor, caret, lastZero)
+      endLine1 = address.getLine1(editor, caret)
       if (address.isMove) {
         caret.moveToOffset(injector.motion.moveCaretToLineWithSameColumn(editor, endLine1 - 1, caret))
       }
 
-      // TODO: Reconsider lastZero. I don't think it helps, and might actually cause problems
-      // Did that last address represent the start of the file?
-      lastZero = endLine1 <= 0
       ++count
+    }
+
+    // We can get a negative end line with a simple `:-10` go to line command. Vim treats this as an error
+    if (endLine1 < 0) {
+      throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
     }
 
     // If only one address is given, make the start and end the same
