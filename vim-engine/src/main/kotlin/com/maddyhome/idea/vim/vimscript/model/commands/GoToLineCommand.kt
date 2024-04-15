@@ -31,10 +31,10 @@ public data class GoToLineCommand(val range: Range) :
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val line = min(this.getLine(editor, caret), editor.lineCount() - 1)
-
-    if (line >= 0) {
-      val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, line, caret)
+    // The command's range is one-based, but zero is a valid address
+    val line1 = min(getLineRange(editor, caret).endLine1, editor.lineCount())
+    if (line1 >= 0) {
+      val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, (line1 - 1).coerceAtLeast(0), caret)
       caret.moveToOffset(offset)
       return ExecutionResult.Success
     }

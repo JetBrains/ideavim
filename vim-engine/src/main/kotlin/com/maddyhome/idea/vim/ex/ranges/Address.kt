@@ -10,9 +10,11 @@ package com.maddyhome.idea.vim.ex.ranges
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import org.jetbrains.annotations.TestOnly
 import java.util.*
 
@@ -49,12 +51,18 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
    *
    * @param editor   The editor to get the line for
    * @param caret    The caret to use for the current line or initial search line, if required
-   * @param lastZero True if the last line was set to start of file
    * @return The one-based line number or -1 if unable to get the line number
    */
-  public fun getLine1(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
-    // TODO: Only apply offset if calculateLine returns a valid line number
-    return calculateLine1(editor, caret, lastZero) + offset
+  public fun getLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
+    val line = calculateLine1(editor, caret)
+    return applyOffset(line)
+  }
+
+  protected open fun applyOffset(line: Int): Int {
+    return when {
+      line != -1 -> line + offset
+      else -> line
+    }
   }
 
   /**
@@ -62,10 +70,9 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
    *
    * @param editor   The editor to get the line for
    * @param caret    The caret to use for initial search offset, or to get the current line, etc.
-   * @param lastZero True if the last line was set to start of file
    * @return The one-based line number, -1 if unable to get the line number
    */
-  protected abstract fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int
+  protected abstract fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int
 
   override fun toString(): String = "Range{offset=$offset, move=$isMove}"
 
@@ -133,8 +140,7 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
  */
 @TestOnly
 public class LineAddress(private val line1: Int, offset: Int, move: Boolean) : Address(offset, move) {
-
-  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int = line1
+  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int = line1
 
   override fun equals(other: Any?): Boolean {
     return super.equals(other) && (other as? LineAddress)?.line1 == this.line1
@@ -150,7 +156,7 @@ public class LineAddress(private val line1: Int, offset: Int, move: Boolean) : A
  * Entered as `.` in the command line.
  */
 private class CurrentLineAddress(offset: Int, move: Boolean) : Address(offset, move) {
-  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
+  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
     return caret.getBufferPosition().line + 1 // Convert zero-based line to one-based
   }
 
@@ -163,7 +169,7 @@ private class CurrentLineAddress(offset: Int, move: Boolean) : Address(offset, m
  * Entered as `$` in the command line.
  */
 private class LastLineAddress(offset: Int, move: Boolean) : Address(offset, move) {
-  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
+  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
     return editor.lineCount()
   }
 
@@ -175,9 +181,10 @@ private class LastLineAddress(offset: Int, move: Boolean) : Address(offset, move
  */
 @TestOnly // Should be private. Constructor is visible for test purposes only
 public class MarkAddress(private val mark: Char, offset: Int, move: Boolean) : Address(offset, move) {
-
-  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
-    return injector.markService.getMark(caret, this.mark)?.line?.let { it + 1 } ?: -1
+  override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
+    val mark = injector.markService.getMark(caret, mark)
+      ?: throw exExceptionMessage("E20") // E20: Mark not set
+    return mark.line + 1
   }
 
   override fun equals(other: Any?): Boolean {
@@ -240,10 +247,9 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
   override fun calculateLine1(
     editor: VimEditor,
     caret: ImmutableVimCaret,
-    lastZero: Boolean,
   ): Int {
     var line0 = caret.getBufferPosition().line
-    var searchOffset = -1
+    var searchOffset: Int
     for (i in patterns.indices) {
       val pattern = patterns[i]
       val direction = directions[i]
@@ -252,33 +258,42 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
       // We pass it in, but don't apply it to the search result. It should only be applied to the last pattern, and so
       // is applied by the base class in getLine. But we need to pass it into processSearchRange so that
       // lastPatternOffset is updated for future searches
+      // Perhaps we should handle offset as part of the search, so we don't have to coerce to avoid the E16 validation?
       val patternOffset = if (i == patterns.size - 1) offset else 0
 
       // Note that wrapscan, ignorecase, etc. all come from current option values, as expected
-      searchOffset = getSearchOffset(editor, line0, direction, lastZero)
+      searchOffset = getSearchOffset(editor, line0, direction)
       searchOffset = injector.searchGroup.processSearchRange(editor, pattern!!, patternOffset, searchOffset, direction)
-      // TODO: Vim throws E385 if it can't find a result and wrapscan isn't set
-      // TODO: Vim throws E486 if it can't find a result with wrapscan set - IdeaVim does the same
-      if (searchOffset == -1) break
+
+      if (searchOffset == -1) {
+        if (injector.options(editor).wrapscan) {
+          throw exExceptionMessage("E486", pattern) // E486: Pattern not found: $pattern
+        }
+        else {
+          throw exExceptionMessage("E385", pattern) // E385: Search hit BOTTOM without match for: $pattern
+        }
+      }
       line0 = editor.offsetToBufferPosition(searchOffset).line
     }
-    return if (searchOffset != -1) (line0 + 1) else -1
+    return line0 + 1
   }
 
-  private fun getSearchOffset(editor: VimEditor, line: Int, direction: Direction, lastZero: Boolean): Int {
-    // TODO: I'm not sure this is correct
-    // lastZero is true if we have an address that evaluates to less than 0. I'm not sure of the circumstances when this
-    // is expected to be true. It can be true if there are no matches to search, or for something like `1-20` (first
-    // line, with an offset of minus 20). This would mean that the next search starts at the beginning of the "current"
-    // line, rather than the following line.
-    // This leads to behaviour such as `/foo/-20/foo/d` to delete the first line (assuming 'foo' is in the first line),
-    // which doesn't work in Vim.
-    // Firstly, we should only return a negative value for an error, which would mean that lastZero is only set when the
-    // last address cannot be resolved (cannot find search or no defined mark)
-    return if (direction == Direction.FORWARDS && !lastZero) {
+  private fun getSearchOffset(editor: VimEditor, line: Int, direction: Direction): Int {
+    return if (direction == Direction.FORWARDS) {
       injector.motion.moveCaretToLineEnd(editor, line, true)
     } else {
       injector.motion.moveCaretToLineStart(editor, line)
+    }
+  }
+
+  // Search ranges do not report "E16: Invalid range" with a too large negative offset, but the other ranges do.
+  // It's like the other ranges do validation - they know what the range's line is without any work, so validation is
+  // quick. Search has to do some work, so it's not validated, and silently coerced. Messy, but it's Vim compatibility.
+  // Alternatively, offset could be applied and coerced as part of the search, so it's valid when it comes out
+  override fun applyOffset(line: Int): Int {
+    return when {
+      line != -1 -> (line + offset).coerceAtLeast(0)
+      else -> line
     }
   }
 

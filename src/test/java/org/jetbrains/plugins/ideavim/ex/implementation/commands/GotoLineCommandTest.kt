@@ -13,7 +13,10 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
+@Suppress("SpellCheckingInspection")
 class GotoLineCommandTest : VimTestCase() {
   @Test
   fun `test goto explicit line`() {
@@ -39,6 +42,54 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test goto first non-whitespace character of line`() {
+    doTest(
+      exCommand("3"),
+      """
+        |    Lorem ipsum dolor ${c}sit amet, consectetur adipiscing elit.
+        |    Morbi nec luctus tortor, id venenatis lacus.
+        |    Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |    Ut id dapibus augue.
+        |    Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |    Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |    Morbi nec luctus tortor, id venenatis lacus.
+        |    ${c}Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |    Ut id dapibus augue.
+        |    Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |    Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto line maintains column with nostartofline`() {
+    doTest(
+      exCommand("3"),
+      """
+        |    Lorem ipsum dolor ${c}sit amet, consectetur adipiscing elit.
+        |    Morbi nec luctus tortor, id venenatis lacus.
+        |    Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |    Ut id dapibus augue.
+        |    Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |    Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |    Morbi nec luctus tortor, id venenatis lacus.
+        |    Nunc sit amet tell${c}us vel purus cursus posuere et at purus.
+        |    Ut id dapibus augue.
+        |    Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |    Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    ) {
+      enterCommand("set nostartofline")
+    }
+  }
+
+  @Test
   fun `test goto explicit line check history`() {
     val before = """
       A Discovery
@@ -61,8 +112,80 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
 
     val register = VimPlugin.getRegister().getRegister(':')
-    kotlin.test.assertNotNull(register)
-    kotlin.test.assertEquals("3", register.text)
+    assertNotNull(register)
+    assertEquals("3", register.text)
+  }
+
+  @Test
+  fun `test goto explicit line beyond end of file without errors`() {
+    doTest(
+      exCommand("100"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test goto last line`() {
+    doTest(
+      exCommand("$"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test goto line 0 moves to start of file without errors`() {
+    doTest(
+      exCommand("0"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(false)
   }
 
   @Test
@@ -89,6 +212,77 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test goto positive relative line stops at end of file without error`() {
+    doTest(
+      exCommand("+100"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test goto explicit line with postitive offset`() {
+    doTest(
+      exCommand("2+3"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto explicit line with too large postitive offset moves to end of file without errors`() {
+    doTest(
+      exCommand("2+300"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(false)
+  }
+
+  @Test
   fun `test goto using forward search range`() {
     val before = """
       A Discovery
@@ -112,6 +306,179 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test goto using forward search with too large negative offset moves to top of file without errors`() {
+    doTest(
+      exCommand("/ipsum/-100"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      """.trimMargin(),
+      """
+        |${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      """.trimMargin(),
+    )
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test goto using complex forward search moving back to start of file`() {
+    doTest(
+      exCommand("/ipsum/-100,/ipsum/"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+        |${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto using forward search range without results`() {
+    doTest(
+      exCommand("/banana"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+  }
+
+  @Test
+  fun `test goto using forward search range without wrapscan`() {
+    doTest(
+      exCommand("/ipsum"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    ) {
+      enterCommand("set nowrapscan")
+    }
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: ipsum")
+  }
+
+  @Test
+  fun `test goto next line with last used search pattern`() {
+    doTest(
+      listOf(searchCommand("/natoque"), "1G", exCommand("\\/")),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto previous line with last used search pattern`() {
+    doTest(
+      listOf(searchCommand("/sit"), "2G", exCommand("\\?")),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto next line with last used substitution pattern`() {
+    doTest(
+      // This tries to subsititute on the current line and will fail, but it will remember the pattern
+      listOf(exCommand("s/natoque/banana/g"), "1G", exCommand("\\&")),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
   fun `test goto using backward search range`() {
     val before = """
       A Discovery
@@ -122,7 +489,7 @@ class GotoLineCommandTest : VimTestCase() {
       hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    enterCommand("/lavender")
+    enterCommand("?lavender")
     val after = """
       A Discovery
 
@@ -155,6 +522,150 @@ class GotoLineCommandTest : VimTestCase() {
       hard by the torrent of a mountain pass.
     """.trimIndent()
     assertState(after)
+  }
+
+  @Test
+  fun `test goto negative relative line returns invalid range if beyond top of file`() {
+    doTest(
+      exCommand("-10"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E16: Invalid range")
+  }
+
+  @Test
+  fun `test goto explicit line with negative offset`() {
+    doTest(
+      exCommand("5-3"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto explicit line with too large negative offset is invalid range`() {
+    doTest(
+      exCommand("4-10"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E16: Invalid range")
+  }
+
+  @Test
+  fun `test goto last line of complex range`() {
+    doTest(
+      exCommand("2,3,-2,5"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto mark`() {
+    doTest(
+      listOf("ma", "3j", exCommand("'a")),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto unset mark reports errors`() {
+    doTest(
+      exCommand("'a"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E20: Mark not set")
   }
 
   @Test
