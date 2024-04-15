@@ -137,9 +137,8 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
   }
 
-  override fun isRegisterWritable(): Boolean {
-    return READONLY_REGISTERS.indexOf(lastRegisterChar) < 0
-  }
+  override fun isRegisterWritable(): Boolean = isRegisterWritable(lastRegisterChar)
+  override fun isRegisterWritable(reg: Char): Boolean = READONLY_REGISTERS.indexOf(reg) < 0
 
   override fun resetRegisters() {
     isRegisterSpecifiedExplicitly = false

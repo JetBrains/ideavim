@@ -37,8 +37,9 @@ public sealed class Command(private var commandRange: Range, public val commandA
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
-  public abstract val argFlags: CommandHandlerFlags
+  protected abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
+  private var nextArgumentTokenOffset = 0
   private val logger = vimLogger<Command>()
 
   public abstract class ForEachCaret(range: Range, argument: String = "") : Command(range, argument) {
@@ -85,7 +86,11 @@ public sealed class Command(private var commandRange: Range, public val commandA
     }
   }
 
-  private fun runCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  private fun runCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     when (this) {
       is ForEachCaret -> {
@@ -205,8 +210,18 @@ public sealed class Command(private var commandRange: Range, public val commandA
     val flags: Set<Flag>,
   )
 
-  public fun flags(rangeFlag: RangeFlag, argumentFlag: ArgumentFlag, access: Access, vararg flags: Flag): CommandHandlerFlags =
-    CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
+  protected fun flags(
+    rangeFlag: RangeFlag,
+    argumentFlag: ArgumentFlag,
+    access: Access,
+    vararg flags: Flag,
+  ): CommandHandlerFlags = CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
+
+  protected fun setNextArgumentTokenOffset(nextArgumentTokenOffset: Int) {
+    this.nextArgumentTokenOffset = nextArgumentTokenOffset
+  }
+
+  private fun getNextArgumentToken() = commandArgument.substring(nextArgumentTokenOffset).trimStart()
 
   public fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
   public fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRange.getLine(editor, caret)
@@ -230,7 +245,7 @@ public sealed class Command(private var commandRange: Range, public val commandA
   }
 
   protected fun getCountFromArgument(): Int? {
-    return Regex("""(?<count>\d+)\s*(?<trailing>.*)?(".*)?""").matchEntire(commandArgument)?.let { match ->
+    return Regex("""(?<count>\d+)\s*(?<trailing>.*)?(".*)?""").matchEntire(getNextArgumentToken())?.let { match ->
       match.groups["trailing"]?.let { trailing ->
         if (trailing.value.isNotEmpty()) throw exExceptionMessage("E488", trailing.value)
       }
@@ -255,6 +270,22 @@ public sealed class Command(private var commandRange: Range, public val commandA
   }
 
   /**
+   * Get the line range using the optional count argument
+   *
+   * The command is in the format `:[range]command {count}`. If `{count}` is not specified, the range is returned as-is.
+   * If `{count}` is specified, then the returned range is `count` lines from the last line of the range.
+   *
+   * The `{count}` argument must be a simple integer, with no trailing characters. This function will fail with "E488:
+   * Trailing characters" otherwise.
+   */
+  public fun getLineRangeWithCount(editor: VimEditor, caret: VimCaret): LineRange {
+    val lineRange = commandRange.getLineRange(editor, caret)
+    return getCountFromArgument()?.let { count ->
+      LineRange(lineRange.endLine, lineRange.endLine + count - 1)
+    } ?: lineRange
+  }
+
+  /**
    * Return the first address, as a one-based line number, from the argument. Throws E16 for invalid range
    *
    * Given a command in the format `:[range]command {address}`, this function will return the line number for the
@@ -266,7 +297,7 @@ public sealed class Command(private var commandRange: Range, public val commandA
   protected fun getAddressFromArgument(editor: VimEditor): Int {
     // The simplest way to parse a range is to parse it as a command (it will default to GoToLineCommand) and ask for
     // its line range. We should perhaps improve this in the future
-    return injector.vimscriptParser.parseCommand(commandArgument)?.getLineRange(editor)?.startLine1
+    return injector.vimscriptParser.parseCommand(getNextArgumentToken())?.getLineRange(editor)?.startLine1
       ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
   }
 
@@ -278,5 +309,5 @@ public sealed class Command(private var commandRange: Range, public val commandA
   }
 
   private val countArgument: Int?
-    get() = commandArgument.toIntOrNull()
+    get() = getNextArgumentToken().toIntOrNull()
 }

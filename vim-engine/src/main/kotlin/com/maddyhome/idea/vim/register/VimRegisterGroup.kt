@@ -43,6 +43,7 @@ public interface VimRegisterGroup {
   public fun resetRegisters()
   public fun recordKeyStroke(key: KeyStroke)
   public fun isRegisterWritable(): Boolean
+  public fun isRegisterWritable(reg: Char): Boolean
 
   /** Store text into the last register. */
   public fun storeText(
