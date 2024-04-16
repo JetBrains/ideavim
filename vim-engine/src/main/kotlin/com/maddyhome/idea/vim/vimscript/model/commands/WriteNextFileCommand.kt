@@ -22,8 +22,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 @ExCommand(command = "wn[ext]")
 public data class WriteNextFileCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val count = getCount(editor, 1, true)
+    // Note that `:[count]wn[ext] [++opt] {file}` does not get count from argument. Vim would parse a count argument to
+    // be the file name
+    val count = getCountFromRange(editor, editor.currentCaret())
 
     injector.file.saveFile(context)
     injector.jumpService.saveJumpLocation(editor)

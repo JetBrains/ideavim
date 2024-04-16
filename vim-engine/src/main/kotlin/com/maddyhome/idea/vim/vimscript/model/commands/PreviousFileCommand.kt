@@ -22,8 +22,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 @ExCommand(command = "prev[ious],bp[revious],N[ext]")
 public data class PreviousFileCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val count = getCount(editor, 1, true)
+    val count = getCountFromArgument() ?: getCountFromRange(editor, editor.currentCaret())
 
     injector.jumpService.saveJumpLocation(editor)
     injector.file.selectNextFile(-count, context)

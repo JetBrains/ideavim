@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -24,8 +25,14 @@ public data class FileCommand(val range: Range, val argument: String) : Command.
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val count = getCount(editor, 0, false)
-    injector.file.displayFileInfo(editor, count > 0)
+    // TODO: Support the `:file {name}` argument to set the name of the current file
+    // Note that `:file` doesn't really support a range or count. But `:0file` is support to remove the current file
+    // name. We don't support either of these features, but by accepting a range/count, we can report the right error
+    if (commandRange.size() != 0) {
+      throw ExException("E474: Invalid argument")
+    }
+
+    injector.file.displayFileInfo(editor, true)
     return ExecutionResult.Success
   }
 }

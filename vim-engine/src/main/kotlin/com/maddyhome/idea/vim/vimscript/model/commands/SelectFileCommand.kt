@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -24,17 +25,17 @@ public data class SelectFileCommand(val range: Range, val argument: String) : Co
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val count = getCount(editor, 0, true)
-
-    if (count > 0) {
-      val res = injector.file.selectFile(count - 1, context)
-      if (res) {
-        injector.jumpService.saveJumpLocation(editor)
-      }
-
-      return if (res) ExecutionResult.Success else ExecutionResult.Error
+    val count = getCountFromArgument() ?: getCountFromRange(editor, editor.currentCaret())
+    if (count <= 0) {
+      // Should never get this. The default address for RANGE_IS_COUNT is 1. But it ensures (count - 1) below is safe
+      throw exExceptionMessage("E939")  // E939: Positive count required
     }
 
-    return ExecutionResult.Success
+    val res = injector.file.selectFile(count - 1, context)
+    if (res) {
+      injector.jumpService.saveJumpLocation(editor)
+    }
+
+    return if (res) ExecutionResult.Success else ExecutionResult.Error
   }
 }
