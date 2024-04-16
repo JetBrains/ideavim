@@ -17,8 +17,19 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class GlobalCommandTest : VimTestCase() {
+  companion object {
+    private val initialText = """
+                A Discovery
+    
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass. 
+    """.trimIndent()
+  }
+
   @Test
-  fun `test default range`() {
+  fun `test delete search term in default range of whole file`() {
     doTest(
       "g/found/d",
       initialText,
@@ -33,7 +44,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test default range first line`() {
+  fun `test delete first line in default range`() {
     doTest(
       "g/Discovery/d",
       initialText,
@@ -48,7 +59,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test default range last line`() {
+  fun `test delete last line in default range`() {
     doTest(
       "g/torrent/d",
       initialText,
@@ -63,7 +74,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test two lines`() {
+  fun `test delete multiple matching lines`() {
     doTest(
       "g/it/d",
       initialText,
@@ -77,7 +88,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test two lines force`() {
+  fun `test delete multiple non-matching lines with global-bang`() {
     doTest(
       "g!/it/d",
       initialText,
@@ -89,7 +100,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test vglobal`() {
+  fun `test delete multiple non-matching lines with vglobal`() {
     doTest(
       "v/it/d",
       initialText,
@@ -101,7 +112,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test current line`() {
+  fun `test delete nothing if not found in current line`() {
     doTest(
       ".g/found/d",
       initialText,
@@ -110,7 +121,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test current line right place`() {
+  fun `test delete current line if matching`() {
     doTest(
       ".g/found/d",
       """
@@ -237,7 +248,7 @@ class GlobalCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
-  fun `test g with one separator and pattern`() {
+  fun `test print matching line if no command`() {
     doTest(
       "g/found",
       initialText,
@@ -248,7 +259,21 @@ class GlobalCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
-  fun `test g with one separator and pattern and separator`() {
+  fun `test print multiple matching line if no command`() {
+    doTest(
+      "g/it",
+      initialText,
+      initialText,
+    )
+    assertExOutput("""
+      |I found it in a legendary land
+      |where it was settled on some sodden sand
+      |""".trimMargin())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test print matching lines if no command and no trailing separator`() {
     doTest(
       "g/found/",
       initialText,
@@ -280,16 +305,5 @@ class GlobalCommandTest : VimTestCase() {
 
   private fun doTest(command: String, before: String, after: String) {
     doTest(listOf(exCommand(command)), before, after, Mode.NORMAL())
-  }
-
-  companion object {
-    private val initialText = """
-                A Discovery
-    
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass. 
-    """.trimIndent()
   }
 }

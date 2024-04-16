@@ -13,24 +13,46 @@ import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 
-/**
- * @author vlan
- */
+// TODO: We need a nicer way to handle output, especially wrt testing, appending + clearing
 public class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
+  private var isActiveInTestMode = false
+
+  override val isActive: Boolean
+    get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
+      ExOutputPanel.isPanelActive(myEditor)
+    } else {
+      isActiveInTestMode
+    }
+
   override var text: String? = null
-    private set
+    get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
+      ExOutputPanel.getInstance(myEditor).text
+    } else {
+      field
+    }
+    set(value) {
+      if (!ApplicationManager.getApplication().isUnitTestMode) {
+        ExOutputPanel.getInstance(myEditor).setText(value ?: "")
+      } else {
+        field = value
+        isActiveInTestMode = !value.isNullOrEmpty()
+      }
+    }
 
   override fun output(text: String) {
     this.text = text
-    if (!ApplicationManager.getApplication().isUnitTestMode) {
-      ExOutputPanel.getInstance(myEditor).setText(text)
-    }
   }
 
   override fun clear() {
     text = null
+  }
+
+  override fun close() {
     if (!ApplicationManager.getApplication().isUnitTestMode) {
-      ExOutputPanel.getInstance(myEditor).deactivate(false)
+      ExOutputPanel.getInstance(myEditor).close()
+    }
+    else {
+      isActiveInTestMode = false
     }
   }
 

@@ -13,8 +13,11 @@ public interface VimExOutputPanelService {
 }
 
 public interface VimExOutputPanel {
+  public val isActive: Boolean
+
   public val text: String?
 
   public fun output(text: String)
   public fun clear()
+  public fun close()
 }
