@@ -280,7 +280,7 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   override fun visitShiftLeftCommand(ctx: VimscriptParser.ShiftLeftCommandContext): ShiftLeftCommand {
     val ranges = parseRange(ctx.range())
-    val argument = (ctx.commandArgument?.text ?: "").trim()
+    val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
     val length = ctx.lShift().text.length
     val command = ShiftLeftCommand(ranges, argument, length)
     command.rangeInScript = ctx.getTextRange()
@@ -289,7 +289,7 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   override fun visitShiftRightCommand(ctx: VimscriptParser.ShiftRightCommandContext): ShiftRightCommand {
     val ranges = parseRange(ctx.range())
-    val argument = (ctx.commandArgument?.text ?: "").trim()
+    val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
     val length = ctx.rShift().text.length
     val command = ShiftRightCommand(ranges, argument, length)
     command.rangeInScript = ctx.getTextRange()
