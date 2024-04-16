@@ -13,13 +13,9 @@ public class InvalidCommandException(message: String, cmd: String?) : ExExceptio
 
 public class InvalidRangeException(s: String) : ExException(s)
 
-public class MissingArgumentException : ExException()
-
 public class MissingRangeException : ExException()
 
 public class NoArgumentAllowedException : ExException()
-
-public class NoRangeAllowedException : ExException()
 
 public class FinishException : ExException()
 

@@ -17,10 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.MissingArgumentException
 import com.maddyhome.idea.vim.ex.MissingRangeException
-import com.maddyhome.idea.vim.ex.NoArgumentAllowedException
-import com.maddyhome.idea.vim.ex.NoRangeAllowedException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
@@ -33,7 +30,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import java.util.*
 
-public sealed class Command(private var commandRange: Range, public val commandArgument: String) : Executable {
+public sealed class Command(protected var commandRange: Range, public val commandArgument: String) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
@@ -62,7 +59,7 @@ public sealed class Command(private var commandRange: Range, public val commandA
   @Throws(ExException::class)
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     checkRanges(editor)
-    checkArgument(editor)
+    checkArgument()
     if (editor.nativeCarets().any { it.hasSelection() } && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.removeSelection()
       editor.removeSecondaryCarets()
@@ -110,11 +107,12 @@ public sealed class Command(private var commandRange: Range, public val commandA
 
   private fun checkRanges(editor: VimEditor) {
     if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && commandRange.size() != 0) {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_norange))
-      throw NoRangeAllowedException()
+      // Some commands (e.g. `:file`) throw "E474: Invalid argument" instead, while e.g. `:3ascii` throws E481
+      throw exExceptionMessage("E481")  // E481: No range allowed
     }
 
     if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && commandRange.size() == 0) {
+      // This will never be hit. The flag is used by `:[range]` and this only parses if there's an actual range
       injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_rangereq))
       throw MissingRangeException()
     }
@@ -124,15 +122,13 @@ public sealed class Command(private var commandRange: Range, public val commandA
     }
   }
 
-  private fun checkArgument(editor: VimEditor) {
+  private fun checkArgument() {
     if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && commandArgument.isNotBlank()) {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_argforb))
-      throw NoArgumentAllowedException()
+      throw exExceptionMessage("E488", commandArgument) // E488: Trailing characters: {0}
     }
 
     if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && commandArgument.isBlank()) {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_argreq))
-      throw MissingArgumentException()
+      throw exExceptionMessage("E471")  // E471: Argument required
     }
   }
 
@@ -223,27 +219,16 @@ public sealed class Command(private var commandRange: Range, public val commandA
 
   private fun getNextArgumentToken() = commandArgument.substring(nextArgumentTokenOffset).trimStart()
 
-  public fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
-  public fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRange.getLine(editor, caret)
-
-  // TODO: Refactor getCount functions. It's confusing to pass a "check count" flag to "get count"
-  // Also, default count isn't used
-  // Migrate to getCountFromRange and getCountFromArgument, and possibly refactor/combine once semantics are understood
-  public fun getCount(editor: VimEditor, defaultCount: Int, checkCount: Boolean): Int =
-    getCount(editor, editor.currentCaret(), defaultCount, checkCount)
-
-  public fun getCount(editor: VimEditor, caret: VimCaret, defaultCount: Int, checkCount: Boolean): Int {
-    // TODO: Range.getCount does not return -1
-    val count = if (checkCount) countArgument else null
-    return count
-      ?: commandRange.getCount(editor, caret).takeUnless { it == -1 }
-      ?: defaultCount
-  }
-
+  /**
+   * Return the last line of the range as a count, one-based
+   */
   protected fun getCountFromRange(editor: VimEditor, caret: VimCaret): Int {
     return commandRange.getCount(editor, caret)
   }
 
+  /**
+   * Return the argument as a count, throwing E488 if it's invalid or there are trailing characters
+   */
   protected fun getCountFromArgument(): Int? {
     return Regex("""(?<count>\d+)\s*(?<trailing>.*)?(".*)?""").matchEntire(getNextArgumentToken())?.let { match ->
       match.groups["trailing"]?.let { trailing ->
@@ -253,8 +238,26 @@ public sealed class Command(private var commandRange: Range, public val commandA
     }
   }
 
-  public fun getLineRange(editor: VimEditor): LineRange =
-    getLineRange(editor, editor.currentCaret())
+  /**
+   * Return the first address, as a one-based line number, from the argument. Throws E16 for invalid range
+   *
+   * Given a command in the format `:[range]command {address}`, this function will return the line number for the
+   * `{address}`. If no address is specified, or is invalid, it will throw "E16: Invalid range".
+   *
+   * Note that address can be `0`, which can mean the line _before_ the first line. This is useful for `:[range]move 0`,
+   * to move a range to the very top of the file.
+   */
+  protected fun getAddressFromArgument(editor: VimEditor): Int {
+    // The simplest way to parse a range is to parse it as a command (it will default to GoToLineCommand) and ask for
+    // its line range. We should perhaps improve this in the future
+    return injector.vimscriptParser.parseCommand(getNextArgumentToken())?.getLineRange(editor)?.startLine1
+      ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
+  }
+
+  public fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
+  public fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRange.getLine(editor, caret)
+
+  public fun getLineRange(editor: VimEditor): LineRange = getLineRange(editor, editor.currentCaret())
 
   // TODO: Get rid of checkCount here. Used by getTextRange
   @JvmOverloads
@@ -283,22 +286,6 @@ public sealed class Command(private var commandRange: Range, public val commandA
     return getCountFromArgument()?.let { count ->
       LineRange(lineRange.endLine, lineRange.endLine + count - 1)
     } ?: lineRange
-  }
-
-  /**
-   * Return the first address, as a one-based line number, from the argument. Throws E16 for invalid range
-   *
-   * Given a command in the format `:[range]command {address}`, this function will return the line number for the
-   * `{address}`. If no address is specified, or is invalid, it will throw "E16: Invalid range".
-   *
-   * Note that address can be `0`, which can mean the line _before_ the first line. This is useful for `:[range]move 0`,
-   * to move a range to the very top of the file.
-   */
-  protected fun getAddressFromArgument(editor: VimEditor): Int {
-    // The simplest way to parse a range is to parse it as a command (it will default to GoToLineCommand) and ask for
-    // its line range. We should perhaps improve this in the future
-    return injector.vimscriptParser.parseCommand(getNextArgumentToken())?.getLineRange(editor)?.startLine1
-      ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
   }
 
   public fun getTextRange(editor: VimEditor): TextRange =
