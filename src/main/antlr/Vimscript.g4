@@ -101,10 +101,14 @@ command:
     (WS | COLON)* range? (WS | COLON)* EXECUTE WS* (expr WS*)* (NEW_LINE | BAR)+
     #ExecuteCommand|
 
-    (WS | COLON)* range? (WS | COLON)* lShift (WS* commandArgument = ~(NEW_LINE | BAR)+)? ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
+    (WS | COLON)* range? (WS | COLON)* lShift
+    WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR))
+    (NEW_LINE | BAR)*
     #ShiftLeftCommand|
 
-    (WS | COLON)* range? (WS | COLON)* rShift (WS* commandArgument = ~(NEW_LINE | BAR)+)? ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
+    (WS | COLON)* range? (WS | COLON)* rShift
+    WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR))
+    (NEW_LINE | BAR)*
     #ShiftRightCommand|
 
     (WS | COLON)* range? (WS | COLON)*

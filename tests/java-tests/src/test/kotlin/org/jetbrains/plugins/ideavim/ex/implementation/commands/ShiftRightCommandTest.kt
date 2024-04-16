@@ -59,6 +59,26 @@ class ShiftRightCommandTest : VimJavaTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
   @Test
+  fun `test four times right shift`() {
+    val before = """        Lorem ipsum dolor sit amet,
+                      |        ${c}consectetur adipiscing elit
+                      |        Sed in orci mauris.
+                      |        Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    configureByJavaText(before)
+
+    typeText(commandToKeys(">>>>"))
+
+    val after = """        Lorem ipsum dolor sit amet,
+                      |                        ${c}consectetur adipiscing elit
+                      |        Sed in orci mauris.
+                      |        Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
+  @Test
   fun `test range right shift`() {
     val before = """        Lorem ipsum dolor sit amet,
                       |        ${c}consectetur adipiscing elit
@@ -71,10 +91,77 @@ class ShiftRightCommandTest : VimJavaTestCase() {
 
     val after = """        Lorem ipsum dolor sit amet,
                       |        consectetur adipiscing elit
-                      |            ${c}Sed in orci mauris.
-                      |            Cras id tellus in ex imperdiet egestas.
+                      |            Sed in orci mauris.
+                      |            ${c}Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     assertState(after)
+  }
+
+  @Test
+  fun `test right shift with range and count`() {
+    doTest(
+      exCommand("3,4> 3"),
+      """
+        |        Lorem ipsum dolor sit amet,
+        |        ${c}consectetur adipiscing elit
+        |        Sed in orci mauris.
+        |        Cras id tellus in ex imperdiet egestas.
+        |        Lorem ipsum dolor sit amet,
+        |        consectetur adipiscing elit
+        |        Sed in orci mauris.
+        |        Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |        Lorem ipsum dolor sit amet,
+        |        consectetur adipiscing elit
+        |        Sed in orci mauris.
+        |            Cras id tellus in ex imperdiet egestas.
+        |            Lorem ipsum dolor sit amet,
+        |            ${c}consectetur adipiscing elit
+        |        Sed in orci mauris.
+        |        Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test right shift with count`() {
+    doTest(
+      exCommand("> 3"),
+      """
+        |        Lorem ipsum dolor sit amet,
+        |        ${c}consectetur adipiscing elit
+        |        Sed in orci mauris.
+        |        Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |        Lorem ipsum dolor sit amet,
+        |            consectetur adipiscing elit
+        |            Sed in orci mauris.
+        |            ${c}Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test right shift with invalid count`() {
+    doTest(
+      exCommand("> 3,4"),
+      """
+        |        Lorem ipsum dolor sit amet,
+        |        ${c}consectetur adipiscing elit
+        |        Sed in orci mauris.
+        |        Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |        Lorem ipsum dolor sit amet,
+        |        ${c}consectetur adipiscing elit
+        |        Sed in orci mauris.
+        |        Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E488: Trailing characters: ,4")
   }
 
   @Test
