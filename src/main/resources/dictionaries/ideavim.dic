@@ -4,6 +4,7 @@ maddyhome
 
 setglobal
 setlocal
+vglobal
 
 breakindent
 colorcolumn

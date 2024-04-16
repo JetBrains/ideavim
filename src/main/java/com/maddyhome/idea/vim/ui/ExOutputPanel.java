@@ -151,6 +151,10 @@ public class ExOutputPanel extends JPanel {
     }
   }
 
+  public String getText() {
+    return myText.getText();
+  }
+
   @SuppressWarnings("ConstantConditions")
   @Override
   public Color getForeground() {
@@ -288,7 +292,7 @@ public class ExOutputPanel extends JPanel {
     }
   }
 
-  private void close() {
+  public void close() {
     close(null);
   }
 
