@@ -9,13 +9,10 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class JoinLinesCommandTest : VimTestCase() {
-  @VimBehaviorDiffers(description = "Different caret position")
   @Test
   fun `test simple join`() {
     doTest(
@@ -31,15 +28,13 @@ class JoinLinesCommandTest : VimTestCase() {
       """
                 Lorem Ipsum
 
-                Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      Mode.NORMAL(),
     )
   }
 
-  @VimBehaviorDiffers(description = "Different caret position")
   @Test
   fun `test simple join full command`() {
     doTest(
@@ -55,15 +50,37 @@ class JoinLinesCommandTest : VimTestCase() {
       """
                 Lorem Ipsum
 
-                Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      Mode.NORMAL(),
     )
   }
 
-  @VimBehaviorDiffers(description = "Different caret position")
+  @Test
+  fun `test join on last line deletes nothing and reports error`() {
+    doTest(
+      exCommand("j"),
+      """
+                Lorem Ipsum
+
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                ${c}Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+                Lorem Ipsum
+
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                ${c}Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+    assertPluginError(true)
+  }
+
   @Test
   fun `test join with range`() {
     doTest(
@@ -80,10 +97,97 @@ class JoinLinesCommandTest : VimTestCase() {
                 Lorem Ipsum
 
                 Lorem ipsum dolor sit amet,
-                consectetur adipiscing elit Sed in orci mauris.$c Cras id tellus in ex imperdiet egestas.
+                ${c}consectetur adipiscing elit Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-      Mode.NORMAL(),
     )
+  }
+
+  @Test
+  fun `test join with visual range`() {
+    doTest(
+      listOf("vj", exCommand("'<,'>j")),
+      """
+                Lorem Ipsum
+
+                Lorem ${c}ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test join with count`() {
+    doTest(
+      exCommand("j 3"),
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test join with too large count`() {
+    doTest(
+      exCommand("j 300"),
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test join with invalid count`() {
+    doTest(
+      exCommand("j 3,4"),
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E488: Trailing characters: ,4")
   }
 
   @Test
@@ -96,6 +200,42 @@ class JoinLinesCommandTest : VimTestCase() {
                 consectetur adipiscing elit
                 Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+//    typeText(injector.parser.parseKeys("Vjj"))
+    typeText(commandToKeys("join"))
+    assertState(
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test join visual multicaret`() {
+    configureByText(
+      """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("Vjj"))
@@ -104,7 +244,9 @@ class JoinLinesCommandTest : VimTestCase() {
       """
                 Lorem Ipsum
 
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit$c Sed in orci mauris.
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed in orci mauris.
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )

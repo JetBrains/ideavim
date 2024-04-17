@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -23,7 +24,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 @ExCommand(command = "j[oin]")
 public data class JoinLinesCommand(val range: Range, val argument: String) : Command.ForEachCaret(range, argument) {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE, Flag.SAVE_VISUAL)
 
   override fun processCommand(
     editor: VimEditor,
@@ -34,22 +36,23 @@ public data class JoinLinesCommand(val range: Range, val argument: String) : Com
     val arg = argument
     val spaces = arg.isEmpty() || arg[0] != '!'
 
-    val textRange = getTextRange(editor, caret, true)
+    val lineRange = getLineRangeWithCount(editor, caret)
+    val textRange = lineRange.toTextRange(editor)
 
-    return if (injector.changeGroup.deleteJoinRange(
-        editor,
-        caret,
-        TextRange(
-          textRange.startOffset,
-          textRange.endOffset - 1,
-        ),
-        spaces,
-        operatorArguments,
-      )
-    ) {
-      ExecutionResult.Success
-    } else {
-      ExecutionResult.Error
+    // Join the given range, which might not match the current location of the caret
+    val success = injector.changeGroup.deleteJoinRange(
+      editor,
+      caret,
+      TextRange(textRange.startOffset, textRange.endOffset - 1),
+      spaces,
+      operatorArguments
+    )
+    if (success) {
+      // We've joined all the lines. The end line of the range is now the start line
+      val offset = injector.motion.moveCaretToLineStartSkipLeading(editor, lineRange.startLine)
+      caret.moveToOffset(offset)
+      return ExecutionResult.Success
     }
+    return ExecutionResult.Error
   }
 }

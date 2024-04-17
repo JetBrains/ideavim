@@ -258,10 +258,10 @@ public sealed class Command(protected var commandRange: Range, public val comman
   public fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRange.getLine(editor, caret)
 
   public fun getLineRange(editor: VimEditor): LineRange = getLineRange(editor, editor.currentCaret())
+  public fun getLineRange(editor: VimEditor, caret: VimCaret): LineRange = commandRange.getLineRange(editor, caret)
 
   // TODO: Get rid of checkCount here. Used by getTextRange
-  @JvmOverloads
-  public fun getLineRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean = false): LineRange {
+  public fun getLineRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): LineRange {
     val lineRange = commandRange.getLineRange(editor, caret)
     val count = if (checkCount) countArgument else null
     return if (checkCount && count != null) {
@@ -288,10 +288,13 @@ public sealed class Command(protected var commandRange: Range, public val comman
     } ?: lineRange
   }
 
-  public fun getTextRange(editor: VimEditor): TextRange =
-    getTextRange(editor, editor.currentCaret())
+  public fun getTextRange(editor: VimEditor): TextRange = getTextRange(editor, editor.currentCaret())
 
-  public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean = false): TextRange {
+  public fun getTextRange(editor: VimEditor, caret: VimCaret): TextRange {
+    return getLineRange(editor, caret).toTextRange(editor)
+  }
+
+  public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): TextRange {
     return getLineRange(editor, caret, checkCount).toTextRange(editor)
   }
 

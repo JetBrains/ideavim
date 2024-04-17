@@ -27,6 +27,7 @@ public interface VimMotionGroup {
   public fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int
   public fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, line: Int, caret: ImmutableVimCaret): Int
   public fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int
+  public fun moveCaretToLineEndSkipTrailing(editor: VimEditor, line: Int): Int
   public fun moveCaretToLineWithSameColumn(editor: VimEditor, line: Int, caret: ImmutableVimCaret): Int
   public fun moveCaretToLinePercent(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
 
