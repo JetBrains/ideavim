@@ -113,8 +113,10 @@ public sealed class Command(protected var commandRange: Range, public val comman
       throw MissingRangeException()
     }
 
+    // If a range isn't specified, the default range for most commands is the current line ("."). If the command is
+    // expecting a count instead of a range, the default would be a count of 1, represented as the range "1".
     if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
-      commandRange.setDefaultLine(1)
+      commandRange.defaultRange = "1"
     }
   }
 
