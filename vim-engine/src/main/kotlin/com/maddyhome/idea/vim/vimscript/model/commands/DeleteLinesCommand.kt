@@ -14,10 +14,9 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.toTextRange
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -33,16 +32,7 @@ public data class DeleteLinesCommand(val range: Range, val argument: String) : C
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
-      if (!injector.registerGroup.isValid(argument[0]) || !injector.registerGroup.isRegisterWritable(argument[0])) {
-        throw exExceptionMessage("E488", argument)  // E488: Trailing characters: {0}
-      }
-      setNextArgumentTokenOffset(1) // Skip the register
-      argument[0]
-    } else {
-      injector.registerGroup.defaultRegister
-    }
-
+    val register = consumeRegisterFromArgument()
     if (!injector.registerGroup.selectRegister(register)) return ExecutionResult.Error
 
     val textRange = getLineRangeWithCount(editor, caret).toTextRange(editor)

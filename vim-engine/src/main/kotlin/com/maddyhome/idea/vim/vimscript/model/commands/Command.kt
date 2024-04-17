@@ -239,6 +239,29 @@ public sealed class Command(protected var commandRange: Range, public val comman
   }
 
   /**
+   * Consume the register from the argument, moving the current position of the argument.
+   *
+   * This will try to find a register at the start of the argument, if available. It will only consume valid, writable
+   * registers, and will throw "E488: Trailing characters: {0}" for invalid or readonly registers. It will not consume
+   * the digit registers - these will be available as a count.
+   *
+   * When the register is consumed, the end position is remembered so that subsequent calls to [getCountFromArgument]
+   * will read the correct value. This call is obviously not idempotent.
+   */
+  protected fun consumeRegisterFromArgument(): Char {
+    val argument = getNextArgumentToken()
+    return if (argument.isNotEmpty() && !argument[0].isDigit()) {
+      if (!injector.registerGroup.isValid(argument[0]) || !injector.registerGroup.isRegisterWritable(argument[0])) {
+        throw exExceptionMessage("E488", argument)  // E488: Trailing characters: {0}
+      }
+      setNextArgumentTokenOffset(1) // Skip the register
+      argument[0]
+    } else {
+      injector.registerGroup.defaultRegister
+    }
+  }
+
+  /**
    * Return the first address, as a one-based line number, from the argument. Throws E16 for invalid range
    *
    * Given a command in the format `:[range]command {address}`, this function will return the line number for the

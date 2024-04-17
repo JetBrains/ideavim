@@ -13,10 +13,11 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.toTextRange
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -27,22 +28,18 @@ public data class YankLinesCommand(val range: Range, var argument: String) : Com
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val argument = this.argument
-    val registerGroup = injector.registerGroup
-    val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
-      this.argument = argument.substring(1)
-      argument[0]
-    } else {
-      registerGroup.defaultRegister
-    }
-
-    if (!registerGroup.selectRegister(register)) return ExecutionResult.Error
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
+    val register = consumeRegisterFromArgument()
+    if (!injector.registerGroup.selectRegister(register)) return ExecutionResult.Error
 
     val starts = ArrayList<Int>(editor.nativeCarets().size)
     val ends = ArrayList<Int>(editor.nativeCarets().size)
     for (caret in editor.nativeCarets()) {
-      val range = getTextRange(editor, caret, true)
+      val range = getLineRangeWithCount(editor, caret).toTextRange(editor)
       starts.add(range.startOffset)
       ends.add(range.endOffset)
     }
@@ -51,7 +48,7 @@ public data class YankLinesCommand(val range: Range, var argument: String) : Com
         editor,
         TextRange(starts.toIntArray(), ends.toIntArray()),
         SelectionType.LINE_WISE,
-        false,
+        false
       )
     ) {
       ExecutionResult.Success
