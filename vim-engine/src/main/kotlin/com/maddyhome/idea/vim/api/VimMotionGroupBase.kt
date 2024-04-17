@@ -210,22 +210,7 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
     val line = editor.visualLineToBufferLine(
       editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset),
     )
-    val start = editor.getLineStartOffset(line)
-    val end = editor.getLineEndOffset(line, true)
-    val chars = editor.text()
-    var pos = start
-    for (offset in end downTo start + 1) {
-      if (offset >= chars.length) {
-        break
-      }
-
-      if (!Character.isWhitespace(chars[offset])) {
-        pos = offset
-        break
-      }
-    }
-
-    return pos
+    return moveCaretToLineEndSkipTrailing(editor, line)
   }
 
   override fun repeatLastMatchChar(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
@@ -471,6 +456,25 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
 
   override fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int {
     return editor.getLeadingCharacterOffset(line)
+  }
+
+  override fun moveCaretToLineEndSkipTrailing(editor: VimEditor, line: Int): Int {
+    val start = editor.getLineStartOffset(line)
+    val end = editor.getLineEndOffset(line, true)
+    val chars = editor.text()
+    var pos = end
+    for (offset in end downTo start + 1) {
+      if (offset >= chars.length) {
+        break
+      }
+
+      if (!Character.isWhitespace(chars[offset])) {
+        pos = offset
+        break
+      }
+    }
+
+    return pos
   }
 
   public companion object {

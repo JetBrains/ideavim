@@ -9,9 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -75,18 +73,17 @@ class MultipleCaretsTest : VimTestCase() {
     val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
     typeText(commandToKeys("j"))
-    val after = "qwe\nrty$c asd\nfgh$c zxc\nvbn\n"
+    val after = "qwe\n${c}rty asd\n${c}fgh zxc\nvbn\n"
     assertState(after)
   }
 
   @Test
-  @Disabled
   fun testJoinVisualLines() {
     val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
-    typeText(parseKeys("vj"))
+    typeText("vj")
     typeText(commandToKeys("j"))
-    val after = "qwe\nrty$c asd\nfgh$c zxc\nvbn\n"
+    val after = "qwe\n${c}rty asd\n${c}fgh zxc\nvbn\n"
     fixture.checkResult(after)
   }
 
@@ -104,7 +101,7 @@ class MultipleCaretsTest : VimTestCase() {
   fun testCopyVisualText() {
     val before = "qwe\n" + "${c}rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "vbn\n"
     configureByText(before)
-    typeText(parseKeys("vj"))
+    typeText("vj")
     typeText(commandToKeys(":co 2"))
     val after =
       "qwe\n" + "rty\n" + "${c}rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
@@ -263,7 +260,7 @@ class MultipleCaretsTest : VimTestCase() {
     VimPlugin.getRegister()
       .storeText(editor.vim, editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
 
-    typeText(parseKeys("vj"))
+    typeText("vj")
     typeText(commandToKeys("pu"))
 
     val after = "qwe\n" + "rty\n" + "${c}zxc\n" + "asd\n" + "fgh\n" + "${c}zxc\n" + "zxc\n" + "vbn\n"
@@ -317,7 +314,7 @@ class MultipleCaretsTest : VimTestCase() {
     val text = lastRegister.text
     assertNotNull<Any>(text)
 
-    typeText(injector.parser.parseKeys("p"))
+    typeText("p")
     val after = """qwe
       |rty
       |${c}rty

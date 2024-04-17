@@ -1027,29 +1027,26 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     spaces: Boolean,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    // start my moving the cursor to the very end of the first line
-    caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, startLine, true))
+    // Don't move the caret until we've successfully deleted text. If we're on the last line, we don't want to move the
+    // caret and then be unable to delete
     for (i in 1 until count) {
-      val start = injector.motion.moveCaretToCurrentLineEnd(editor, caret)
-      val trailingWhitespaceStart = injector.motion.moveCaretToRelativeLineEndSkipTrailing(
-        editor,
-        caret,
-        0,
-      )
-      val hasTrailingWhitespace = start != trailingWhitespaceStart + 1
-      caret.moveToOffset(start)
-      val offset: Int = if (spaces) {
-        injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, 1)
+      val startOffset = injector.motion.moveCaretToLineEnd(editor, startLine, true)
+      val trailingWhitespaceStart = injector.motion.moveCaretToLineEndSkipTrailing(editor, startLine)
+      val hasTrailingWhitespace = startOffset > (trailingWhitespaceStart + 1) // + newline
+      val endOffset: Int = if (spaces) {
+        editor.getLeadingCharacterOffset(editor.normalizeLine(startLine + 1))
       } else {
-        injector.motion.moveCaretToLineStart(editor, caret.getBufferPosition().line + 1)
+        editor.getLineStartOffset(editor.normalizeLine(startLine + 1))
       }
-      deleteText(editor, TextRange(caret.offset, offset), null, caret, operatorArguments)
+      if (endOffset <= startOffset) {
+        return i > 1
+      }
+      // Note that caret isn't moved here; it's only used for register + mark storage
+      deleteText(editor, TextRange(startOffset, endOffset), null, caret, operatorArguments)
       if (spaces && !hasTrailingWhitespace) {
-        insertText(editor, caret, " ")
-        caret.moveToMotion(
-          injector.motion.getHorizontalMotion(editor, caret, -1, true),
-        )
+        insertText(editor, caret, startOffset, " ")
       }
+      caret.moveToOffset(startOffset)
     }
     return true
   }
