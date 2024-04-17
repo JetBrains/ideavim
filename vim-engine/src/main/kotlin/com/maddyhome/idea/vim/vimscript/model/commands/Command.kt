@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -21,9 +20,7 @@ import com.maddyhome.idea.vim.ex.MissingRangeException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -35,7 +32,6 @@ public sealed class Command(protected var commandRange: Range, public val comman
   override lateinit var rangeInScript: TextRange
 
   protected abstract val argFlags: CommandHandlerFlags
-  protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
   private var nextArgumentTokenOffset = 0
   private val logger = vimLogger<Command>()
 
@@ -213,7 +209,8 @@ public sealed class Command(protected var commandRange: Range, public val comman
     vararg flags: Flag,
   ): CommandHandlerFlags = CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
 
-  protected fun setNextArgumentTokenOffset(nextArgumentTokenOffset: Int) {
+  @Suppress("SameParameterValue")
+  private fun setNextArgumentTokenOffset(nextArgumentTokenOffset: Int) {
     this.nextArgumentTokenOffset = nextArgumentTokenOffset
   }
 
@@ -283,18 +280,6 @@ public sealed class Command(protected var commandRange: Range, public val comman
   public fun getLineRange(editor: VimEditor): LineRange = getLineRange(editor, editor.currentCaret())
   public fun getLineRange(editor: VimEditor, caret: VimCaret): LineRange = commandRange.getLineRange(editor, caret)
 
-  // TODO: Get rid of checkCount here. Used by getTextRange
-  public fun getLineRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): LineRange {
-    val lineRange = commandRange.getLineRange(editor, caret)
-    val count = if (checkCount) countArgument else null
-    return if (checkCount && count != null) {
-      // If the argument has a count, the returned range is count lines from the end of the command's range
-      LineRange(lineRange.endLine, lineRange.endLine + count - 1)
-    } else {
-      lineRange
-    }
-  }
-
   /**
    * Get the line range using the optional count argument
    *
@@ -310,17 +295,4 @@ public sealed class Command(protected var commandRange: Range, public val comman
       LineRange(lineRange.endLine, lineRange.endLine + count - 1)
     } ?: lineRange
   }
-
-  public fun getTextRange(editor: VimEditor): TextRange = getTextRange(editor, editor.currentCaret())
-
-  public fun getTextRange(editor: VimEditor, caret: VimCaret): TextRange {
-    return getLineRange(editor, caret).toTextRange(editor)
-  }
-
-  public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): TextRange {
-    return getLineRange(editor, caret, checkCount).toTextRange(editor)
-  }
-
-  private val countArgument: Int?
-    get() = getNextArgumentToken().toIntOrNull()
 }

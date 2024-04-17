@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.newapi.ij
@@ -78,7 +79,7 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
         ExecutionResult.Success
       } else {
         // Filter
-        val range = getTextRange(editor)
+        val range = getLineRange(editor).toTextRange(editor)
         val input = editor.ij.document.charsSequence.subSequence(range.startOffset, range.endOffset)
         VimPlugin.getProcess().executeCommand(editor, command, input, workingDirectory)?.let {
           ApplicationManager.getApplication().runWriteAction {
