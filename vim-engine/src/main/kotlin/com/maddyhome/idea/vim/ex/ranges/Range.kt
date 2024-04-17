@@ -23,10 +23,6 @@ public class Range {
   @TestOnly
   public val addresses: MutableList<Address> = mutableListOf()
 
-  // TODO: This isn't a default line. It's used to set a default value for count, if RANGE_IS_COUNT is set
-  // The only value used is 1, so maybe we don't need it, or RANGE_IS_COUNT?
-  private var defaultLine = -1
-
   /** Adds a range to the list */
   public fun addAddresses(range: Array<Address>) {
     addresses.addAll(range)
@@ -36,14 +32,12 @@ public class Range {
   public fun size(): Int = addresses.size
 
   /**
-   * Sets the default line to be used by this range if no range was actually given by the user. -1 is used to
-   * mean the current line.
+   * The default range for a command, if not specified.
    *
-   * @param line The line or -1 for current line
+   * Most commands default to the current line (`.`). If the command expects a count, the default range would be `1`,
+   * which would be a one-based count.
    */
-  public fun setDefaultLine(line: Int) {
-    defaultLine = line
-  }
+  public var defaultRange: String = "."
 
   /**
    * If a command expects a line, Vim uses the last line of any range passed to the command
@@ -82,20 +76,20 @@ public class Range {
   }
 
   private fun processRange(editor: VimEditor, caret: VimCaret): LineRange {
-    // Start with the range being the current line
-    var startLine1 = if (defaultLine == -1) caret.getBufferPosition().line + 1 else defaultLine
-    var endLine1 = startLine1
+    var startLine1 = 0
+    var endLine1 = 0
 
     // Now process each range component, moving the cursor if appropriate
-    var count = 0
+    val addresses = this.addresses.ifEmpty {
+      Address.createRangeAddresses(defaultRange, 0, false)?.toList()
+        ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
+    }
     for (address in addresses) {
       startLine1 = endLine1
       endLine1 = address.getLine1(editor, caret)
       if (address.isMove) {
         caret.moveToOffset(injector.motion.moveCaretToLineWithSameColumn(editor, endLine1 - 1, caret))
       }
-
-      ++count
     }
 
     // We can get a negative end line with a simple `:-10` go to line command. Vim treats this as an error
@@ -104,7 +98,7 @@ public class Range {
     }
 
     // If only one address is given, make the start and end the same
-    if (count == 1) startLine1 = endLine1
+    if (addresses.size == 1) startLine1 = endLine1
 
     return LineRange(startLine1 - 1, endLine1 - 1)
   }
@@ -116,15 +110,14 @@ public class Range {
     if (this === other) return true
     if (other !is Range) return false
 
-    if (defaultLine != other.defaultLine) return false
+    if (defaultRange != other.defaultRange) return false
     if (addresses != other.addresses) return false
 
     return true
   }
 
   override fun hashCode(): Int {
-    var result = defaultLine
-    result = 31 * result + defaultLine
+    var result = defaultRange.hashCode()
     result = 31 * result + addresses.hashCode()
     return result
   }
