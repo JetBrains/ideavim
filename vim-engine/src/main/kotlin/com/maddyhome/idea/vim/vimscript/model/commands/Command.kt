@@ -27,11 +27,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import java.util.*
 
-public sealed class Command(protected var commandRange: Range, public val commandArgument: String) : Executable {
+public sealed class Command(private val commandRange: Range, public val commandArgument: String) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
   protected abstract val argFlags: CommandHandlerFlags
+
+  protected var defaultRange: String = "."
+
   private var nextArgumentTokenOffset = 0
   private val logger = vimLogger<Command>()
 
@@ -54,12 +57,13 @@ public sealed class Command(protected var commandRange: Range, public val comman
 
   @Throws(ExException::class)
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    checkRanges(editor)
-    checkArgument()
+    validate(editor)
+
     if (editor.nativeCarets().any { it.hasSelection() } && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.removeSelection()
       editor.removeSecondaryCarets()
     }
+
     if (argFlags.access == Access.WRITABLE && !editor.isDocumentWritable()) {
       logger.info("Trying to modify readonly document")
       return ExecutionResult.Error
@@ -101,6 +105,11 @@ public sealed class Command(protected var commandRange: Range, public val comman
     return result
   }
 
+  private fun validate(editor: VimEditor) {
+    checkRanges(editor)
+    checkArgument()
+  }
+
   private fun checkRanges(editor: VimEditor) {
     if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && commandRange.size() != 0) {
       // Some commands (e.g. `:file`) throw "E474: Invalid argument" instead, while e.g. `:3ascii` throws E481
@@ -115,8 +124,15 @@ public sealed class Command(protected var commandRange: Range, public val comman
 
     // If a range isn't specified, the default range for most commands is the current line ("."). If the command is
     // expecting a count instead of a range, the default would be a count of 1, represented as the range "1".
+    // GlobalCommand is the only other command that has a different default. We could introduce another RangeFlag
+    // (and maybe make them an enum set so it can be optional and whole-file-range), or set it
+    // TODO: This is initialisation, not validation
+    // It would be nice to do this in the constructor, but argFlags is abstract, so we can't access it
     if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
       commandRange.defaultRange = "1"
+    }
+    else {
+      commandRange.defaultRange = defaultRange
     }
   }
 
@@ -218,6 +234,8 @@ public sealed class Command(protected var commandRange: Range, public val comman
 
   private fun getNextArgumentToken() = commandArgument.substring(nextArgumentTokenOffset).trimStart()
 
+  protected fun isRangeSpecified(): Boolean = commandRange.size() > 0
+
   /**
    * Return the last line of the range as a count, one-based
    */
@@ -276,11 +294,30 @@ public sealed class Command(protected var commandRange: Range, public val comman
       ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
   }
 
-  public fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
-  public fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRange.getLine(editor, caret)
+  protected fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
+  protected fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRange.getLine(editor, caret)
 
-  public fun getLineRange(editor: VimEditor): LineRange = getLineRange(editor, editor.currentCaret())
-  public fun getLineRange(editor: VimEditor, caret: VimCaret): LineRange = commandRange.getLineRange(editor, caret)
+  protected fun getLineRange(editor: VimEditor): LineRange = getLineRange(editor, editor.currentCaret())
+  protected fun getLineRange(editor: VimEditor, caret: VimCaret): LineRange = commandRange.getLineRange(editor, caret)
+
+  /**
+   * Accessor method purely for incsearch
+   *
+   * Ensures that the range and argument have been correctly initialised and validated, specifically that the default
+   * range has been set. Any validation errors are swallowed and ignored.
+   *
+   * It would be cleaner to move incsearch handling into the search Command instances, which could access this data
+   * safely.
+   */
+  public fun getLineRangeSafe(editor: VimEditor): LineRange? {
+    try {
+      validate(editor)
+    }
+    catch (t: Throwable) {
+      return null
+    }
+    return getLineRange(editor)
+  }
 
   /**
    * Get the line range using the optional count argument
@@ -291,8 +328,8 @@ public sealed class Command(protected var commandRange: Range, public val comman
    * The `{count}` argument must be a simple integer, with no trailing characters. This function will fail with "E488:
    * Trailing characters" otherwise.
    */
-  public fun getLineRangeWithCount(editor: VimEditor, caret: VimCaret): LineRange {
-    val lineRange = commandRange.getLineRange(editor, caret)
+  protected fun getLineRangeWithCount(editor: VimEditor, caret: VimCaret): LineRange {
+    val lineRange = getLineRange(editor, caret)
     return getCountFromArgument()?.let { count ->
       LineRange(lineRange.endLine, lineRange.endLine + count - 1)
     } ?: lineRange

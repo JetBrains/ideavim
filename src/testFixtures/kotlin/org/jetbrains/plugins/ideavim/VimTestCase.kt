@@ -59,7 +59,7 @@ import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjOptions
@@ -658,14 +658,14 @@ abstract class VimTestCase {
   }
 
   fun assertExOutput(expected: String) {
-    val actual = getInstance(fixture.editor).text
+    val actual = ExOutputModel.getInstance(fixture.editor).text
     assertNotNull(actual, "No Ex output")
     assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", testInfo, fixture.editor)
   }
 
   fun assertNoExOutput() {
-    val actual = getInstance(fixture.editor).text
+    val actual = ExOutputModel.getInstance(fixture.editor).text
     assertNull(actual, "Ex output not null")
   }
 

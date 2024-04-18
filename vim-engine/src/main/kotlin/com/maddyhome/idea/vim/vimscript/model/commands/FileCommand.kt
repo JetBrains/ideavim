@@ -28,7 +28,7 @@ public data class FileCommand(val range: Range, val argument: String) : Command.
     // TODO: Support the `:file {name}` argument to set the name of the current file
     // Note that `:file` doesn't really support a range or count. But `:0file` is support to remove the current file
     // name. We don't support either of these features, but by accepting a range/count, we can report the right error
-    if (commandRange.size() != 0) {
+    if (isRangeSpecified()) {
       throw ExException("E474: Invalid argument")
     }
 
