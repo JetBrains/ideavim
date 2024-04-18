@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
 import com.maddyhome.idea.vim.vimscript.model.commands.Command;
+import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand;
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import org.jetbrains.annotations.Contract;
@@ -270,11 +271,13 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
       try {
         final Editor editor = entry.getEditor();
 
+        final String labelText = label.getText(); // Either '/', '?' or ':'boolean searchCommand = false;
+
         boolean searchCommand = false;
         LineRange searchRange = null;
-        char separator = label.getText().charAt(0);
+        char separator = labelText.charAt(0);
         String searchText = entry.getActualText();
-        if (label.getText().equals(":")) {
+        if (labelText.equals(":")) {
           if (searchText.isEmpty()) return;
           final Command command = getIncsearchCommand(searchText);
           if (command == null) {
@@ -287,14 +290,18 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
             separator = argument.charAt(0);
             searchText = argument.substring(1);
           }
-          if (searchText.length() == 0) {
-            // Reset back to the original search highlights after deleting a search from a substitution command.
+          if (!searchText.isEmpty()) {
+          searchRange = command.getLineRangeSafe(new IjVimEditor(editor));
+        }
+        if (searchText.isEmpty() || searchRange == null) {
+            // Reset back to the original search highlights after deleting a search from a substitution command.Or if
+            // there is no search range (because the user entered an invalid range, e.g. mark not set).
             // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
             // back to `whatever`
             VimPlugin.getSearch().resetIncsearchHighlights();
+            resetCaretOffset(editor);
             return;
           }
-          searchRange = command.getLineRange(new IjVimEditor(editor));
         }
 
         // If we're showing highlights for the search command `/`, then the command builder will have a count already
@@ -302,7 +309,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         // obviously won't be a count.
         int count1 = Math.max(1, KeyHandler.getInstance().getKeyHandlerState().getEditorCommandBuilder().getCount());
 
-        final String labelText = label.getText();
         if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
           final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
           final String pattern;
@@ -334,8 +340,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
       if (commandText == null) return null;
       try {
         final Command exCommand = VimscriptParser.INSTANCE.parseCommand(commandText);
-        // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
-        if (exCommand instanceof SubstituteCommand) {
+        // TODO: Add smagic and snomagic here if/when the commands are supported
+        if (exCommand instanceof SubstituteCommand || exCommand instanceof GlobalCommand) {
           return exCommand;
         }
       }

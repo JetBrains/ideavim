@@ -39,19 +39,19 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 @ExCommand(command = "g[lobal],v[global]")
 internal data class GlobalCommand(val range: Range, val argument: String, val invert: Boolean) : Command.SingleExecution(range, argument) {
+
+  init {
+    // Most commands have a default range of the current line ("."). Global has a default range of the whole file
+    defaultRange = "%"
+  }
+
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     editor.removeSecondaryCarets()
     val caret = editor.currentCaret()
-
-    // For :g command the default range is %
-    val lineRange: LineRange = if (range.size() == 0) {
-      LineRange(0, editor.lineCount() - 1)
-    } else {
-      getLineRange(editor, caret)
-    }
+    val lineRange = getLineRange(editor, caret)
     if (!processGlobalCommand(editor, context, lineRange)) {
       result = ExecutionResult.Error
     }
