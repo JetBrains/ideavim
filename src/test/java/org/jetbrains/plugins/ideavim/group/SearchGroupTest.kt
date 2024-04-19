@@ -878,6 +878,16 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch highlight with force sensitive case atom`() {
+    configureByText("lorem ipsum Lorem Ipsum lorem ipsum")
+    enterCommand("set hlsearch incsearch")
+
+    typeText("/", "\\Clorem")
+
+    assertSearchHighlights("\\Clorem", "«lorem» ipsum Lorem Ipsum ‷lorem‴ ipsum")
+  }
+
+  @Test
   fun `test incsearch highlights for substitute command`() {
     configureByText(
       """I found it in a legendary land
