@@ -171,9 +171,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
     val regex = try {
-      // TODO: find better way to this with this force ignore case
-      val newPattern = (if (ignoreCase) "\\c" else "\\C") + pattern
-      VimRegex(newPattern)
+      VimRegex(pattern)
     } catch (e: VimRegexException) {
       injector.messages.showStatusBarMessage(editor, e.message)
       return emptyList()
