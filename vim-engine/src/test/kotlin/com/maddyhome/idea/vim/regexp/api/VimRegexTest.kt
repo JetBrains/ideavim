@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.api
 
+import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.END
@@ -17,6 +19,7 @@ import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.util.EnumSet
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
@@ -96,7 +99,7 @@ class VimRegexTest {
       """.trimMargin(),
         "Lorem",
         40,
-        listOf(VimRegexOptions.WRAP_SCAN)
+        enumSetOf(VimRegexOptions.WRAP_SCAN)
       )
     }
 
@@ -135,7 +138,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: List<VimRegexOptions> = emptyList()
+      options: EnumSet<VimRegexOptions> = noneOfEnum()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -150,7 +153,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: List<VimRegexOptions> = emptyList()
+      options: EnumSet<VimRegexOptions> = noneOfEnum()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -189,7 +192,7 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        options = listOf(VimRegexOptions.WRAP_SCAN)
+        options = enumSetOf(VimRegexOptions.WRAP_SCAN)
       )
     }
 
@@ -212,7 +215,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: List<VimRegexOptions> = emptyList()
+      options: EnumSet<VimRegexOptions> = noneOfEnum()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -227,7 +230,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: List<VimRegexOptions> = emptyList()
+      options: EnumSet<VimRegexOptions> = noneOfEnum()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -296,7 +299,7 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "lorem ipsum",
-        options = listOf(VimRegexOptions.IGNORE_CASE, VimRegexOptions.SMART_CASE)
+        options = enumSetOf(VimRegexOptions.IGNORE_CASE, VimRegexOptions.SMART_CASE)
       )
     }
 
@@ -312,7 +315,7 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem Ipsum",
-        options = listOf(VimRegexOptions.IGNORE_CASE, VimRegexOptions.SMART_CASE)
+        options = enumSetOf(VimRegexOptions.IGNORE_CASE, VimRegexOptions.SMART_CASE)
       )
     }
 
@@ -320,7 +323,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: List<VimRegexOptions> = emptyList()
+      options: EnumSet<VimRegexOptions> = enumSetOf()
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)

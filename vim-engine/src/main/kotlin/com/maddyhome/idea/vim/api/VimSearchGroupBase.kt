@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.regexp.VimRegex
@@ -566,7 +567,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val line1 = substituteCommandParse.range.startLine
     var line2 = substituteCommandParse.range.endLine
 
-    val options: MutableList<VimRegexOptions> = ArrayList()
+    val options = enumSetOf<VimRegexOptions>()
     if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
     if (injector.globalOptions().wrapscan) options.add(VimRegexOptions.WRAP_SCAN)
