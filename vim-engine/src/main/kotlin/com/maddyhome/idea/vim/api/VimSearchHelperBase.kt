@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.SearchOptions
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
@@ -123,7 +124,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
 
     val dir = if (searchOptions!!.contains(SearchOptions.BACKWARDS)) Direction.BACKWARDS else Direction.FORWARDS
 
-    val options: MutableList<VimRegexOptions> = mutableListOf()
+    val options = enumSetOf<VimRegexOptions>()
     if (injector.globalOptions().smartcase && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
     if (injector.globalOptions().wrapscan) options.add(VimRegexOptions.WRAP_SCAN)
@@ -167,7 +168,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     endLine: Int,
     ignoreCase: Boolean,
   ): List<TextRange> {
-    val options: MutableList<VimRegexOptions> = mutableListOf()
+    val options = enumSetOf<VimRegexOptions>()
     if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
     val regex = try {

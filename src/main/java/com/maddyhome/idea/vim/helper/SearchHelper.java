@@ -375,7 +375,7 @@ public class SearchHelper {
     final List<TextRange> results = Lists.newArrayList();
 
     if (globalIjOptions(injector).getUseNewRegex()) {
-      final List<VimRegexOptions> options = new ArrayList<>();
+      final EnumSet<VimRegexOptions> options = EnumSet.noneOf(VimRegexOptions.class);
       if (globalOptions(injector).getSmartcase()) options.add(VimRegexOptions.SMART_CASE);
       if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
       VimEditor vimEditor = new IjVimEditor(editor);
