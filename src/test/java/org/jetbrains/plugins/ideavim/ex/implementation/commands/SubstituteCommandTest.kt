@@ -875,10 +875,10 @@ class SubstituteCommandTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test replace tilde with last replace string`() {
     val before = "${c}I found it in a legendary land"
-    val after = "${c}I found zzzt in a zzzegendary land"
+    val after = "${c}I found zzzt in a zzzegendary zzzand"
 
     // Change `i` to `zzz`. Use `~` to change `l` to `zzz`
-    doTest(listOf(exCommand("s/i/zzz"), exCommand("s/l/~")), before, after)
+    doTest(listOf(exCommand("s/i/zzz"), exCommand("s/l/~"), exCommand("s/l/~")), before, after)
   }
 
   @OptionTest(

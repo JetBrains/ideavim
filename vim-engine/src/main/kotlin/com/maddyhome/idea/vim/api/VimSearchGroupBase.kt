@@ -582,7 +582,9 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val hasExpression = substituteString.length >= 2 && substituteString[0] == '\\' && substituteString[1] == '='
 
     val oldLastSubstituteString: String = lastSubstituteString ?: ""
-    lastSubstituteString = substituteString + ""
+    if (substituteString != "~") {
+      lastSubstituteString = substituteString
+    }
 
     setShouldShowSearchHighlights()
     updateSearchHighlights(true)
