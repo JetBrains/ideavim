@@ -14,10 +14,12 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.helper.CharacterHelper
+import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.history.HistoryConstants
+import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
@@ -204,6 +206,57 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       PatternType.SUBSTITUTE -> lastSubstitutePattern
       else -> null
     }
+  }
+
+  // TODO: Delete this. Fix the mess that is the multiple entwined implementations of the search group
+  // This function is required to fix a regression with the new regex engine - VIM-3348
+  // This is only used from GlobalCommand in order to access and update last search/substitute patterns. Previously,
+  // GlobalCommand would call VimSearchGroup.search_regcomp to build a regex based on the given pattern or last used
+  // patterns. It would also update the last used patterns.
+  // This method no longer exists, but we still need to be able to access and upate the last saved patterns.
+  // We can't just use VimRegex directly, but need a method to create it with the right values. Perhaps we should move
+  // GlobalCommand into VimSearchGroup? processGlobalCommand, just like we've got processSearchCommand and
+  // processSubstituteCommand?
+  public fun prepareRegex(pat: CharPointer, whichPattern: Int, patternSave: Int): VimRegex {
+    var isNewPattern = true
+    var pattern: String? = ""
+    if (pat.isNul) {
+      isNewPattern = false
+      val which = if (whichPattern == /*RE_LAST*/ 2) {
+        if (lastPatternType == PatternType.SEARCH) /*RE_SEARCH*/ 0 else /*RE_SUBST*/ 1
+      } else whichPattern
+      val errorMessage = when (which) {
+        /*RE_SEARCH*/ 0 -> {
+          pattern = lastSearchPattern
+          injector.messages.message(Msg.e_nopresub)
+        }
+
+        /*RE_SUBST*/ 1 -> {
+          pattern = lastSubstitutePattern
+          injector.messages.message("e_noprevre")
+        }
+
+        else -> null
+      }
+
+      // Pattern was never defined
+      if (pattern == null) {
+        throw ExException(errorMessage)
+      }
+    } else {
+      pattern = pat.toString()
+    }
+
+    // Set RE_SUBST and RE_LAST, but only for explicitly typed patterns. Reused patterns are not saved/updated
+    val patSave = when (patternSave) {
+      /*RE_SEARCH*/ 0 -> PatternType.SEARCH
+      /*RE_SUBST*/ 1 -> PatternType.SUBSTITUTE
+      /*RE_BOTH*/ 2 -> PatternType.BOTH
+      else -> throw ExException(injector.messages.message(Msg.e_invcmd))
+    }
+    setLastUsedPattern(pattern, patSave, isNewPattern)
+
+    return VimRegex(pat.toString())
   }
 
   /****************************************************************************/
@@ -902,6 +955,20 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   /* Helper methods                                                           */
   /****************************************************************************/
 
+  /**
+   * Set the last used pattern
+   *
+   * <p>Only updates the last used flag if the pattern is new. This prevents incorrectly setting the last used pattern
+   * when search or substitute doesn't explicitly set the pattern but uses the last saved value. It also ensures the
+   * last used pattern is updated when a new pattern with the same value is used.</p>
+   *
+   * <p>Also saves the text to the search register and history.</p>
+   *
+   * @param pattern       The pattern to remember
+   * @param patternType   Which pattern to save - RE_SEARCH, RE_SUBST or RE_BOTH
+   * @param isNewPattern  Flag to indicate if the pattern is new, or comes from a last used pattern. True means to
+   *                      update the last used pattern index
+   */
   private fun setLastUsedPattern(
     pattern: String,
     patternType: PatternType,
@@ -909,15 +976,13 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   ) {
     // Only update the last pattern with a new input pattern. Do not update if we're reusing the last pattern
     if (isNewPattern) {
-      when (patternType) {
-        PatternType.SEARCH -> {
-          lastSearchPattern = pattern
-          lastPatternType = PatternType.SEARCH
-        }
-        PatternType.SUBSTITUTE -> {
-          lastSubstitutePattern = pattern
-          lastPatternType = PatternType.SUBSTITUTE
-        }
+      if (patternType == PatternType.SEARCH || patternType == PatternType.BOTH) {
+        lastSearchPattern = pattern
+        lastPatternType = PatternType.SEARCH
+      }
+      if (patternType == PatternType.SUBSTITUTE || patternType == PatternType.BOTH) {
+        lastSubstitutePattern = pattern
+        lastPatternType = PatternType.SUBSTITUTE
       }
     }
 
@@ -1096,6 +1161,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   protected enum class PatternType {
     SEARCH,
     SUBSTITUTE,
+    BOTH
   }
 
   protected enum class ReplaceConfirmationChoice {

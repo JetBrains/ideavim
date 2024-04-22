@@ -13,6 +13,7 @@ import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -29,7 +30,6 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.RegExp
-import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -106,7 +106,7 @@ internal data class GlobalCommand(val ranges: Ranges, val argument: String, val 
 
     if (injector.globalIjOptions().useNewRegex) {
       val regex = try {
-        VimRegex(pat.toString())
+        (injector.searchGroup as VimSearchGroupBase).prepareRegex(pat, whichPat, RE_BOTH)
       } catch (e: VimRegexException) {
         injector.messages.showStatusBarMessage(editor, e.message)
         return false
