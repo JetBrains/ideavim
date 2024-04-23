@@ -1460,6 +1460,9 @@ internal class RegExp {
          * can't go before line 1 */
     return if (reg_firstlnum + lnum < 0) {
       null
+    } else if (reg_firstlnum + lnum >= reg_buf!!.lineCount()) {
+      // Must have matched the "\n" in the last line.
+      CharPointer("")
     } else {
       CharPointer(
         reg_buf!!.getLineBuffer(reg_firstlnum + lnum),

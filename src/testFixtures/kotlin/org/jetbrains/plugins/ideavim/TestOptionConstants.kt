@@ -35,6 +35,9 @@ class TestOptionConstants {
     // IdeaVim specific
     const val ideaglobalmode = "ideaglobalmode"
     const val ideatracetime = "ideatracetime"
+
+    // Temporary
+    const val usenewregex = "usenewregex"
   }
 }
 
