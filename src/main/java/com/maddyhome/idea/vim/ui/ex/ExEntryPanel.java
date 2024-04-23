@@ -254,51 +254,59 @@ public class ExEntryPanel extends JPanel {
   private final @NotNull DocumentListener incSearchDocumentListener = new DocumentAdapter() {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
-      final Editor editor = entry.getEditor();
+      try {
+        final Editor editor = entry.getEditor();
 
-      boolean searchCommand = false;
-      LineRange searchRange = null;
-      char separator = label.getText().charAt(0);
-      String searchText = entry.getActualText();
-      if (label.getText().equals(":")) {
-        if (searchText.isEmpty()) return;
-        final Command command = getIncsearchCommand(searchText);
-        if (command == null) {
-          return;
+        boolean searchCommand = false;
+        LineRange searchRange = null;
+        char separator = label.getText().charAt(0);
+        String searchText = entry.getActualText();
+        if (label.getText().equals(":")) {
+          if (searchText.isEmpty()) return;
+          final Command command = getIncsearchCommand(searchText);
+          if (command == null) {
+            return;
+          }
+          searchCommand = true;
+          searchText = "";
+          final String argument = command.getCommandArgument();
+          if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
+            separator = argument.charAt(0);
+            searchText = argument.substring(1);
+          }
+          if (searchText.length() == 0) {
+            // Reset back to the original search highlights after deleting a search from a substitution command.
+            // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
+            // back to `whatever`
+            VimPlugin.getSearch().resetIncsearchHighlights();
+            return;
+          }
+          searchRange = command.getLineRange(new IjVimEditor(editor));
         }
-        searchCommand = true;
-        searchText = "";
-        final String argument = command.getCommandArgument();
-        if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
-          separator = argument.charAt(0);
-          searchText = argument.substring(1);
+
+        final String labelText = label.getText();
+        if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
+          final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
+          final String pattern;
+          final CharPointer p = new CharPointer(searchText);
+          final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
+          pattern = p.substring(end.pointer() - p.pointer());
+
+          VimPlugin.getEditor().closeEditorSearchSession(editor);
+          final int matchOffset =
+            SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+          if (matchOffset != -1) {
+            new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
+          }
+          else {
+            resetCaretOffset(editor);
+          }
         }
-        if (searchText.length() == 0) {
-          // Reset back to the original search highlights after deleting a search from a substitution command.
-          // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
-          // back to `whatever`
-          VimPlugin.getSearch().resetIncsearchHighlights();
-          return;
-        }
-        searchRange = command.getLineRange(new IjVimEditor(editor));
       }
-
-      final String labelText = label.getText();
-      if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
-        final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
-        final String pattern;
-        final CharPointer p = new CharPointer(searchText);
-        final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
-        pattern = p.substring(end.pointer() - p.pointer());
-
-        VimPlugin.getEditor().closeEditorSearchSession(editor);
-        final int matchOffset = SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
-        if (matchOffset != -1) {
-          new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
-        }
-        else {
-          resetCaretOffset(editor);
-        }
+      catch (Throwable ex) {
+        // Make sure the exception doesn't leak out of the handler, because it can break the text entry field and
+        // require the editor to be closed/reopened. The worst that will happen is no incsearch highlights
+        logger.warn("Error while trying to show incsearch highlights", ex);
       }
     }
 
