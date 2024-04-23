@@ -1218,27 +1218,33 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       final Document document = event.getDocument();
       for (VimEditor vimEditor : injector.getEditorGroup().getEditors(new IjVimDocument(document))) {
         final Editor editor = ((IjVimEditor)vimEditor).getEditor();
-        Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
-        if (hls == null) {
+        Collection<RangeHighlighter> existingHighlighters = UserDataManager.getVimLastHighlighters(editor);
+        if (existingHighlighters == null) {
           continue;
         }
 
         if (logger.isDebugEnabled()) {
-          logger.debug("hls=" + hls);
+          logger.debug("hls=" + existingHighlighters);
           logger.debug("event=" + event);
         }
 
-        // We can only re-highlight whole lines, so clear any highlights in the affected lines
+        // We can only re-highlight whole lines, so clear any highlights in the affected lines.
+        // If we're deleting lines, this will clear + re-highlight the new current line, which hasn't been modified.
+        // However, we still want to re-highlight this line in case any highlights cross the line boundaries.
+        // If we're adding lines, this will clear + re-highlight all new lines.
         final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
         final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
         final int startLineOffset = document.getLineStartOffset(startPosition.line);
         final int endLineOffset = document.getLineEndOffset(endPosition.line);
 
-        final Iterator<RangeHighlighter> iter = hls.iterator();
+        // Remove any highlights that have already been deleted, and remove + clear those that intersect with the change
+        final Iterator<RangeHighlighter> iter = existingHighlighters.iterator();
         while (iter.hasNext()) {
           final RangeHighlighter highlighter = iter.next();
-          if (!highlighter.isValid() ||
-              (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
+          if (!highlighter.isValid()) {
+            iter.remove();
+          }
+          else if (highlighter.getTextRange().intersects(startLineOffset, endLineOffset)) {
             iter.remove();
             editor.getMarkupModel().removeHighlighter(highlighter);
           }
@@ -1247,9 +1253,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
 
         if (logger.isDebugEnabled()) {
-          hls = UserDataManager.getVimLastHighlighters(editor);
+          existingHighlighters = UserDataManager.getVimLastHighlighters(editor);
           logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
-          logger.debug("hls=" + hls);
+          logger.debug("hls=" + existingHighlighters);
         }
       }
     }
