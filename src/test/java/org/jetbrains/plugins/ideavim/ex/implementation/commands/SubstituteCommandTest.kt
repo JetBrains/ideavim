@@ -229,8 +229,10 @@ class SubstituteCommandTest : VimTestCase() {
     )
   }
 
-  // Fixes VIM-698 in the old regex engine
+  // Tests two things. Firstly, VIM-698, which was a bug in the old regex engine that would skip lines when substituting
+  // with newlines and secondly to test the special case of '\n' matching end of file
   @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
   )
@@ -254,9 +256,7 @@ class SubstituteCommandTest : VimTestCase() {
           |4,
           |,
         |""".trimMargin()
-    ) {
-      enterCommand("set nousenewregex")
-    }
+    )
   }
 
   @OptionTest(
