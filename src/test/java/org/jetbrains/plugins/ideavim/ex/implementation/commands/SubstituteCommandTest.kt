@@ -229,6 +229,36 @@ class SubstituteCommandTest : VimTestCase() {
     )
   }
 
+  // Fixes VIM-698 in the old regex engine
+  @OptionTest(
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute newlines`() {
+    // Note that this is correct Vim behaviour. AIUI, Vim (and the old regex engine) use '\0' to delimit lines while
+    // matching patterns, so when checking for '\n' checks against NULL. This also matches the end of the file, so with
+    // this pattern, we get an additional line
+    doTest(
+      exCommand("%s/\\n/,\\r/"),
+      """
+          |1
+          |2
+          |3
+          |4
+        |""".trimMargin(),
+      """
+          |1,
+          |2,
+          |3,
+          |4,
+          |,
+        |""".trimMargin()
+    ) {
+      enterCommand("set nousenewregex")
+    }
+  }
+
   @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
     VimOption(TestOptionConstants.ignorecase, limitedValues = ["true"]),

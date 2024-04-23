@@ -810,7 +810,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
         CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
         int startoff = startpos.toOffset(((IjVimEditor)editor).getEditor());
-        int endoff = endpos.toOffset(((IjVimEditor)editor).getEditor());
+        int endoff = (endpos.line >= lcount) ? (int) editor.fileSize() : endpos.toOffset(((IjVimEditor)editor).getEditor());
 
         if (do_all || line != lastLine) {
           boolean doReplace = true;
@@ -869,23 +869,23 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
         lastLine = line;
 
-        lnum += nmatch - 1;
         if (do_all && startoff != endoff) {
           if (newpos != null) {
             lnum = newpos.line;
             searchcol = newpos.column;
           }
           else {
+            lnum += Math.max(1, nmatch - 1);
             searchcol = endpos.column;
           }
         }
         else {
+          lnum += Math.max(1, nmatch - 1);
           searchcol = 0;
-          lnum++;
         }
       }
       else {
-        lnum++;
+        lnum += Math.max(1, nmatch - 1);
         searchcol = 0;
       }
     }

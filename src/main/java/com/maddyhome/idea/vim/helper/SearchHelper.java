@@ -414,7 +414,7 @@ public class SearchHelper {
         final CharacterPosition endPos = new CharacterPosition(line + regMatch.endpos[0].lnum,
           regMatch.endpos[0].col);
         int start = startPos.toOffset(editor);
-        int end = endPos.toOffset(editor);
+        int end = endPos.line >= lineCount ? editor.getDocument().getTextLength() : endPos.toOffset(editor);
         results.add(new TextRange(start, end));
 
         if (start != end) {
