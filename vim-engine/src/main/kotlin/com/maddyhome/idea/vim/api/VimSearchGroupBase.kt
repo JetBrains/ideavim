@@ -709,7 +709,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
           didReplace = true
 
           val endPositionWithReplace = editor.offsetToBufferPosition(matchRange.startOffset + match.length)
-          line += endPositionWithReplace.line - endPositionWithoutReplace.line
+          line += max(0, endPositionWithReplace.line - endPositionWithoutReplace.line)
           line2 += endPositionWithReplace.line - endPositionWithoutReplace.line
         }
       }
