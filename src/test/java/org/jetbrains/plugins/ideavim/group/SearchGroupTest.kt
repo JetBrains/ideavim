@@ -436,6 +436,56 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(6)
   }
 
+  @Test
+  fun `test search beginning of file atom`() {
+    configureByText("""
+      one
+      ${c}two
+      one
+      two
+    """.trimIndent())
+    enterSearch("""\%^one""")
+    assertPosition(0, 0)
+  }
+
+  @Test
+  fun `test search beginning of file atom with old regex engine`() {
+    configureByText("""
+      one
+      ${c}two
+      one
+      two
+    """.trimIndent())
+    enterCommand("set nousenewregex")
+    enterSearch("""\%^""")
+    assertPosition(0, 0)
+  }
+
+  @Test
+  fun `test search end of file atom`() {
+    configureByText("""
+      one
+      two
+      one
+      two
+    """.trimIndent())
+    enterSearch("""two\%$""")
+    assertPosition(3, 0)
+  }
+
+  @Test
+  fun `test search end of file atom with old regex engine`() {
+    configureByText("""
+      one
+      two
+      one
+      two
+    """.trimIndent())
+    enterCommand("set nousenewregex")
+    enterSearch("""two\%$""")
+    assertPosition(3, 0)
+  }
+
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @Test
   fun `test search word matches case`() {

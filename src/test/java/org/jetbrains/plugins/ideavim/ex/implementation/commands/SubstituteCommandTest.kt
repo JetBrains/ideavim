@@ -358,6 +358,55 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test beginning of file atom`() {
+    doTest(
+      exCommand("""%s/\%^one/three"""),
+      """
+        one
+        ${c}two
+        one
+        two
+      """.trimIndent(),
+      """
+        three
+        two
+        one
+        two
+      """.trimIndent()
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test end of file atom`() {
+    doTest(
+      exCommand("""%s/two\%$/three"""),
+      """
+        one
+        two
+        one
+        two
+      """.trimIndent(),
+      """
+        one
+        two
+        one
+        three
+      """.trimIndent()
+    )
+  }
+
+
+  @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
     VimOption(TestOptionConstants.ignorecase, limitedValues = ["true"]),
   )
