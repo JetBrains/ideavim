@@ -3310,7 +3310,7 @@ internal class RegExp {
                   if (reg_mmatch!!.endpos[no]!!.lnum == clnum) {
                     break
                   }
-                  dst.append('\r')
+                  dst.append('\n')
                   s = reg_getline(++clnum)
                   len = if (reg_mmatch!!.endpos[no]!!.lnum == clnum) {
                     reg_mmatch!!.endpos[no]!!.col

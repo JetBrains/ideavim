@@ -259,6 +259,104 @@ class SubstituteCommandTest : VimTestCase() {
     )
   }
 
+  // VIM-2141
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with multiline regex`() {
+    doTest(
+      exCommand("""%s/<div>\(\_.\{-}\)<\/div>/<h1>\1<\/h1>/"""),
+      """
+        |<div>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</div>
+        |<div>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</div>
+        |""".trimMargin(),
+      """
+        |<h1>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</h1>
+        |<h1>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</h1>
+        |""".trimMargin()
+    )
+  }
+
+  // VIM-2141
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with multiline regex 2`() {
+    doTest(
+      exCommand("""%s/<div>\(\_.\{-}\)<\/div>/Gone with the div/"""),
+      """
+        |<div>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</div>
+        |<div>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</div>
+        |""".trimMargin(),
+      """
+        |Gone with the div
+        |Gone with the div
+        |""".trimMargin()
+    )
+  }
+
+  // VIM-2141
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with multiline regex 3`() {
+    doTest(
+      exCommand("""%s/<p>\(\_.\{-}\)<\/p>/<span>\1<\/span>/"""),
+      """
+        |<div>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</div>
+        |<div>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</div>
+        |""".trimMargin(),
+      """
+        |<div>
+        |    <span>Para1</span>
+        |    <span>Para2</span>
+        |</div>
+        |<div>
+        |    <span>Para3
+        |           is two lines.</span>
+        |    <span>Para4</span>
+        |</div>
+        |""".trimMargin()
+    )
+  }
+
   @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
     VimOption(TestOptionConstants.ignorecase, limitedValues = ["true"]),
