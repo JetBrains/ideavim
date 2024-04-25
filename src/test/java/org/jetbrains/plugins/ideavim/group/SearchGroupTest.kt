@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -425,6 +426,366 @@ class SearchGroupTest : VimTestCase() {
     )
     enterSearch("rocks/+2")
     assertOffset(113)
+  }
+
+  @Test
+  fun `test search with count`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    typeText("3", "/one<CR>")
+    assertPosition(8, 0)
+  }
+
+  @Test
+  fun `test search with 0 count`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    typeText("0", "/", searchCommand("one"))  // Same as 1
+    assertPosition(4, 0)
+  }
+
+  @Test
+  fun `test search with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    assertTrue(options().wrapscan)
+    typeText("10", "/", searchCommand("one"))
+    assertPosition(6, 0)
+  }
+
+  @Test
+  fun `test search with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set nowrapscan")
+    typeText("10", "/", searchCommand("one"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: one")
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test incsearch highlights with count`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("3", "/", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        ‷one‴
+        two
+      """.trimIndent()
+      )
+    assertPosition(8, 0)
+  }
+
+  @Test
+  fun `test incsearch highlights with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("12", "/", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        ‷one‴
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+    assertPosition(6, 0)
+  }
+
+  @Test
+  fun `test incsearch highlights with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch nowrapscan")
+    typeText("12", "/", "one") // No enter
+
+    // No current match highlight
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+
+    // Back to original location
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test backwards search with count`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    typeText("3", "?one<CR>")
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test backwards search with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set wrapscan")
+    typeText("12", "?one<CR>")
+    assertPosition(4, 0)
+  }
+
+  @Test
+  fun `test backwards search with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set nowrapscan")
+    typeText("12", "?one<CR>")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E384: Search hit TOP without match for: one")
+    assertPosition(8, 0)
+  }
+
+  @Test
+  fun `test backwards incsearch with count`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("3", "?", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        ‷one‴
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test backwards incsearch highlights with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("12", "?", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        ‷one‴
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+    assertPosition(4, 0)
+  }
+
+  @Test
+  fun `test backwards incsearch highlights with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch nowrapscan")
+    typeText("12", "?", "one") // No enter
+
+    // No current match highlight
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+
+    // Back to original location
+    assertPosition(8, 0)
   }
 
   // |i_CTRL-K|
@@ -1751,7 +2112,7 @@ class SearchGroupTest : VimTestCase() {
       project,
       {
         // Does not move the caret!
-        val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, Direction.FORWARDS)
+        val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, 1, Direction.FORWARDS)
         ref.set(n?.first ?: -1)
       },
       null,

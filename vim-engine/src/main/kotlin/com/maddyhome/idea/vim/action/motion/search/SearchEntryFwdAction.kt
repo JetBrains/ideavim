@@ -42,6 +42,7 @@ public class SearchEntryFwdAction : MotionActionHandler.ForEachCaret() {
       editor,
       argument.string,
       caret.offset,
+      operatorArguments.count1,
       Direction.FORWARDS
     )
     if (offsetAndMotion == null) return Motion.Error
