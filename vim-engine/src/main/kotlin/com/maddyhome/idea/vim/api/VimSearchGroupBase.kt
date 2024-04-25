@@ -346,6 +346,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     editor: VimEditor,
     command: String,
     startOffset: Int,
+    count1: Int,
     dir: Direction,
   ): Pair<Int, MotionType>? {
 
@@ -394,7 +395,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
-    return findItOffset(editor, startOffset, 1, lastDirection)
+    return findItOffset(editor, startOffset, count1, lastDirection)
   }
 
   override fun searchWord(
@@ -1116,7 +1117,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       if (lastPatternTrailing!!.length - ppos > 2) {
         ppos++
       }
-      res = processSearchCommand(editor, lastPatternTrailing!!.substring(ppos + 1), res, nextDir)?.first ?: -1
+      res = processSearchCommand(editor, lastPatternTrailing!!.substring(ppos + 1), res, 1, nextDir)?.first ?: -1
     }
     return if (res == -1) null else Pair(res, motionType)
   }

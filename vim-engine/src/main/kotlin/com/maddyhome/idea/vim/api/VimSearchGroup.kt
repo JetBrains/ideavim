@@ -114,15 +114,16 @@ public interface VimSearchGroup {
    * Equivalent to normal.c:nv_search + search.c:do_search
    *
    * @param editor      The editor to search in
-   * @param startOffset The offset to start searching from
    * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
+   * @param startOffset The offset to start searching from
+   * @param count1      Find the nth occurrence, coerced to 1
    * @param dir         The direction to search
    * @return            Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based on
    *                    the search offset. The value will be `null` if no result is found.
    */
-  public fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, dir: Direction): Pair<Int, MotionType>?
+  public fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, count1: Int, dir: Direction): Pair<Int, MotionType>?
 
   /**
    * Search for the word under the given caret

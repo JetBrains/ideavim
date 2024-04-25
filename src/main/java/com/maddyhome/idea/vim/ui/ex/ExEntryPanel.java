@@ -18,6 +18,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
@@ -284,6 +285,12 @@ public class ExEntryPanel extends JPanel {
           searchRange = command.getLineRange(new IjVimEditor(editor));
         }
 
+        // If we're showing highlights for the search command `/`, then the command builder will have a count already
+        // coerced to 1. If we're showing highlights for an ex command such as `:s`, there won't be a command, and there
+        // obviously won't be a count.
+        int count1 =
+          Math.max(1, KeyHandler.getInstance().getKeyHandlerState().getCommandBuilder().getCurrentCommandPartCount1());
+
         final String labelText = label.getText();
         if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
           final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
@@ -294,7 +301,8 @@ public class ExEntryPanel extends JPanel {
 
           VimPlugin.getEditor().closeEditorSearchSession(editor);
           final int matchOffset =
-            SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+            SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, count1, forwards, caretOffset,
+                                                             searchRange);
           if (matchOffset != -1) {
             new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
           }

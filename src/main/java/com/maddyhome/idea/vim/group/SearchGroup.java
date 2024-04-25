@@ -277,9 +277,10 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
   public Pair<Integer, MotionType> processSearchCommand(@NotNull VimEditor editor,
                                                         @NotNull String command,
                                                         int startOffset,
+                                                        int count1,
                                                         @NotNull Direction dir) {
 
-    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchCommand(editor, command, startOffset, dir);
+    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchCommand(editor, command, startOffset, count1, dir);
 
     boolean isNewPattern = false;
     String pattern = null;
@@ -370,7 +371,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    return findItOffset(((IjVimEditor)editor).getEditor(), startOffset, 1, lastDir);
+    return findItOffset(((IjVimEditor)editor).getEditor(), startOffset, count1, lastDir);
   }
 
   /**
@@ -1397,7 +1398,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       }
 
       Pair<Integer, MotionType> offsetAndMotion =
-        processSearchCommand(new IjVimEditor(editor), lastPatternOffset.substring(ppos + 1), res, nextDir);
+        processSearchCommand(new IjVimEditor(editor), lastPatternOffset.substring(ppos + 1), res, 1, nextDir);
       res = offsetAndMotion != null ? offsetAndMotion.getFirst() : -1;
     }
 

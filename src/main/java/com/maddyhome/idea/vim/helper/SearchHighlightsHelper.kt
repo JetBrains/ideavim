@@ -12,13 +12,11 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
-import com.intellij.ui.ColorUtil
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -28,7 +26,6 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.Contract
-import java.awt.Color
 import java.awt.Font
 import java.util.*
 
@@ -38,12 +35,13 @@ internal fun updateSearchHighlights(
   showHighlights: Boolean,
   forceUpdate: Boolean,
 ) {
-  updateSearchHighlights(null, pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
+  updateSearchHighlights(null, pattern, 1, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
 
 internal fun updateIncsearchHighlights(
   editor: Editor,
   pattern: String,
+  count1: Int,
   forwards: Boolean,
   caretOffset: Int,
   searchRange: LineRange?,
@@ -58,6 +56,7 @@ internal fun updateIncsearchHighlights(
   return updateSearchHighlights(
     editor.vim,
     pattern,
+    count1,
     false,
     showHighlights,
     searchStartOffset,
@@ -90,6 +89,7 @@ internal fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, en
 private fun updateSearchHighlights(
   currentEditor: VimEditor?,
   pattern: String?,
+  count1: Int,
   shouldIgnoreSmartCase: Boolean,
   showHighlights: Boolean,
   initialOffset: Int,
@@ -111,7 +111,7 @@ private fun updateSearchHighlights(
 
     // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
     // Force update for the situations where the text is the same, but the ignore case values have changed.
-    // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
+    // E.g., Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
     // which will match smartcase. Or changing the smartcase/ignorecase settings
     if (shouldRemoveSearchHighlights(editor, pattern, showHighlights) || forceUpdate) {
       removeSearchHighlights(editor)
@@ -138,7 +138,7 @@ private fun updateSearchHighlights(
           )
         if (results.isNotEmpty()) {
           if (editor === currentEditor?.ij) {
-            currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
+            currentMatchOffset = findClosestMatch(results, initialOffset, count1, forwards)
           }
           highlightSearchResults(editor, pattern, results, currentMatchOffset)
         }
@@ -151,7 +151,7 @@ private fun updateSearchHighlights(
         if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
         if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
-        val result = injector.searchHelper.findPattern(it, pattern, initialOffset, 1, searchOptions)
+        val result = injector.searchHelper.findPattern(it, pattern, initialOffset, count1, searchOptions)
         if (result != null) {
           val results = listOf(result)
           highlightSearchResults(editor, pattern, results, result.startOffset)
@@ -159,7 +159,7 @@ private fun updateSearchHighlights(
         }
       }
     } else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) {
-      // incsearch. If nothing has changed (e.g. we've edited offset values in `/foo/e+2`) make sure we return the
+      // incsearch. If nothing has changed (e.g., we've edited offset values in `/foo/e+2`) make sure we return the
       // current match offset so the caret remains at the current incsarch match
       val offset = editor.vimIncsearchCurrentMatchOffset
       if (offset != null && editor === currentEditor?.ij) {
@@ -200,37 +200,22 @@ private fun shouldAddAllSearchHighlights(editor: Editor, newPattern: String?, hl
   return hlSearch && newPattern != null && newPattern != editor.vimLastSearch && newPattern != ""
 }
 
-private fun findClosestMatch(editor: Editor, results: List<TextRange>, initialOffset: Int, forwards: Boolean): Int {
+private fun findClosestMatch(
+  results: List<TextRange>,
+  initialOffset: Int,
+  count: Int,
+  forwards: Boolean,
+): Int {
   if (results.isEmpty() || initialOffset == -1) {
     return -1
   }
-  val size = editor.fileSize
-  val max = Collections.max(results) { r1: TextRange, r2: TextRange ->
-    val d1 = distance(r1, initialOffset, forwards, size)
-    val d2 = distance(r2, initialOffset, forwards, size)
-    if (d1 < 0 && d2 >= 0) {
-      return@max Int.MAX_VALUE
-    }
-    d2 - d1
-  }
-  if (!injector.globalOptions().wrapscan) {
-    val start = max.startOffset
-    if (forwards && start < initialOffset) {
-      return -1
-    } else if (start >= initialOffset) {
-      return -1
-    }
-  }
-  return max.startOffset
-}
 
-private fun distance(range: TextRange, pos: Int, forwards: Boolean, size: Int): Int {
-  val start = range.startOffset
-  return if (start <= pos) {
-    if (forwards) size - pos + start else pos - start
-  } else {
-    if (forwards) start - pos else pos + size - start
+  val sortedResults = results.sortedBy { it.startOffset }.let { if (!forwards) it.reversed() else it }
+  val nextIndex = sortedResults.indexOfFirst {
+    if (forwards) it.startOffset > initialOffset else it.startOffset < initialOffset
   }
+  val toDrop = (nextIndex + count - 1).let { if (injector.globalOptions().wrapscan) it % results.size else it }
+  return sortedResults.drop(toDrop).firstOrNull()?.startOffset ?: -1
 }
 
 internal fun highlightSearchResults(editor: Editor, pattern: String, results: List<TextRange>, currentMatchOffset: Int) {
@@ -251,7 +236,7 @@ private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolea
   val layer = HighlighterLayer.SELECTION - 1
   val targetArea = HighlighterTargetArea.EXACT_RANGE
   if (!current) {
-    // If we use text attribute key, it will update automatically when the editor's colour scheme changes
+    // If we use a text attribute key, it will update automatically when the editor's colour scheme changes
     val highlighter =
       editor.markupModel.addRangeHighlighter(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES, start, end, layer, targetArea)
     highlighter.errorStripeTooltip = tooltip
@@ -274,35 +259,20 @@ private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolea
 }
 
 /**
- * Return a valid error stripe colour based on editor background
- *
- *
- * Based on HighlightManager#addRangeHighlight behaviour, which we can't use because it will hide highlights
- * when hitting Escape.
- */
-private fun getFallbackErrorStripeColor(attributes: TextAttributes, colorsScheme: EditorColorsScheme): Color? {
-  if (attributes.backgroundColor != null) {
-    val isDark = ColorUtil.isDark(colorsScheme.defaultBackground)
-    return if (isDark) attributes.backgroundColor.brighter() else attributes.backgroundColor.darker()
-  }
-  return null
-}
-
-/**
- * Add search highlight for current match if hlsearch is false and we're performing incsearch highlights
+ * Add search highlight for current match if hlsearch is false, and we're performing incsearch highlights
  */
 @Contract("_, true, _ -> false")
 private fun shouldAddCurrentMatchSearchHighlight(pattern: String?, hlSearch: Boolean, initialOffset: Int): Boolean {
-  return !hlSearch && isIncrementalSearchHighlights(initialOffset) && pattern != null && pattern.isNotEmpty()
+  return !hlSearch && isIncrementalSearchHighlights(initialOffset) && !pattern.isNullOrEmpty()
 }
 
 /**
- * Keep the current match offset if the pattern is still valid and we're performing incremental search highlights
+ * Keep the current match offset if the pattern is still valid, and we're performing incremental search highlights
  * This will keep the caret position when editing the offset in e.g. `/foo/e+1`
  */
 @Contract("null, _ -> false")
 private fun shouldMaintainCurrentMatchOffset(pattern: String?, initialOffset: Int): Boolean {
-  return pattern != null && pattern.isNotEmpty() && isIncrementalSearchHighlights(initialOffset)
+  return !pattern.isNullOrEmpty() && isIncrementalSearchHighlights(initialOffset)
 }
 
 /**

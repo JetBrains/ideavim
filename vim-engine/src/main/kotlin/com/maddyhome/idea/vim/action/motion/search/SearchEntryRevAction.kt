@@ -42,6 +42,7 @@ public class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
       editor,
       argument.string,
       caret.offset,
+      operatorArguments.count1,
       Direction.BACKWARDS
     )
     if (offsetAndMotion == null) return Motion.Error

@@ -147,6 +147,15 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
     return commandParts.firstOrNull()?.argument != null
   }
 
+  /**
+   * Get the count given to the current command part, coerced to 1
+   *
+   * If there isn't a current command part, this will return 0. Not to be confused with [count], which is the count for
+   * the _next_ command part.
+   */
+  public val currentCommandPartCount1: Int
+    get() = commandParts.firstOrNull()?.count ?: 0
+
   public fun buildCommand(): Command {
     if (commandParts.last().action.id == "VimInsertCompletedDigraphAction" || commandParts.last().action.id == "VimResetModeAction") {
       expectedArgumentType = prevExpectedArgumentType
