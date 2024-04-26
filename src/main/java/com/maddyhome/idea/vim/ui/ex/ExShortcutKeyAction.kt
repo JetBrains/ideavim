@@ -13,7 +13,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.project.DumbAwareAction
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -37,12 +36,7 @@ internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : Dum
     if (keyStroke != null) {
       val editor = exEntryPanel.entry.editor
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(
-        editor.vim,
-        keyStroke,
-        injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim),
-        keyHandler.keyHandlerState
-      )
+      keyHandler.handleKey(editor.vim, keyStroke, e.dataContext.vim, keyHandler.keyHandlerState)
     }
   }
 
