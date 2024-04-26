@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.replacewithregister
 
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -64,7 +65,7 @@ internal class ReplaceWithRegister : VimExtension {
         val selectionEnd = caret.selectionEnd
 
         val visualSelection = caret to VimSelection.create(selectionStart, selectionEnd - 1, typeInEditor, editor)
-        doReplace(editor.ij, caret, PutData.VisualSelection(mapOf(visualSelection), typeInEditor))
+        doReplace(editor.ij, context.ij, caret, PutData.VisualSelection(mapOf(visualSelection), typeInEditor))
       }
       editor.exitVisualMode()
     }
@@ -92,7 +93,7 @@ internal class ReplaceWithRegister : VimExtension {
         val visualSelection = caret to VimSelection.create(lineStart, lineEnd, SelectionType.LINE_WISE, editor)
         caretsAndSelections += visualSelection
 
-        doReplace(editor.ij, caret, PutData.VisualSelection(mapOf(visualSelection), SelectionType.LINE_WISE))
+        doReplace(editor.ij, context.ij, caret, PutData.VisualSelection(mapOf(visualSelection), SelectionType.LINE_WISE))
       }
 
       editor.sortedCarets().forEach { caret ->
@@ -120,7 +121,7 @@ internal class ReplaceWithRegister : VimExtension {
         selectionType ?: SelectionType.CHARACTER_WISE,
       )
       // todo multicaret
-      doReplace(ijEditor, editor.primaryCaret(), visualSelection)
+      doReplace(ijEditor, context.ij, editor.primaryCaret(), visualSelection)
       return true
     }
 
@@ -140,7 +141,7 @@ internal class ReplaceWithRegister : VimExtension {
   }
 }
 
-private fun doReplace(editor: Editor, caret: ImmutableVimCaret, visualSelection: PutData.VisualSelection) {
+private fun doReplace(editor: Editor, context: DataContext, caret: ImmutableVimCaret, visualSelection: PutData.VisualSelection) {
   val registerGroup = injector.registerGroup
   val lastRegisterChar = if (editor.caretModel.caretCount == 1) registerGroup.currentRegister else registerGroup.getCurrentRegisterForMulticaret()
   val savedRegister = caret.registerStorage.getRegister(lastRegisterChar) ?: return
@@ -168,7 +169,7 @@ private fun doReplace(editor: Editor, caret: ImmutableVimCaret, visualSelection:
   ClipboardOptionHelper.IdeaputDisabler().use {
     VimPlugin.getPut().putText(
       vimEditor,
-      injector.executionContextManager.onEditor(editor.vim),
+      context.vim,
       putData,
       operatorArguments = OperatorArguments(
         editor.vimStateMachine?.isOperatorPending(vimEditor.mode) ?: false,
