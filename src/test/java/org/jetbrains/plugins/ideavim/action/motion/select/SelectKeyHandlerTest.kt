@@ -41,7 +41,7 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -67,7 +67,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -92,7 +92,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -117,7 +117,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -143,7 +143,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -169,7 +169,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -195,7 +195,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -221,7 +221,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -247,7 +247,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -283,7 +283,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -309,7 +309,7 @@ Mode.INSERT,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
