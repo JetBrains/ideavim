@@ -164,7 +164,7 @@ internal object IdeaSpecifics {
           if (editor.vim.inNormalMode) {
             VimPlugin.getChange().insertBeforeCursor(
               editor.vim,
-              injector.executionContextManager.onEditor(editor.vim),
+              injector.executionContextManager.getEditorExecutionContext(editor.vim),
             )
             KeyHandler.getInstance().reset(editor.vim)
           }

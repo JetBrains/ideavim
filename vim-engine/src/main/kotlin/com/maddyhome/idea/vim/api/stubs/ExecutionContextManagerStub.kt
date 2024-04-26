@@ -21,4 +21,8 @@ public class ExecutionContextManagerStub : ExecutionContextManager {
   override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
     TODO("Not yet implemented")
   }
+
+  override fun getEditorExecutionContext(editor: VimEditor): ExecutionContext {
+    TODO("Not yet implemented")
+  }
 }

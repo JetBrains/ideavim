@@ -23,4 +23,5 @@ public sealed interface ExecutionContext {
 
 public interface ExecutionContextManager {
   public fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext.Editor
+  public fun getEditorExecutionContext(editor: VimEditor): ExecutionContext
 }
