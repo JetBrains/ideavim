@@ -285,7 +285,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
             (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
             (editor.getVisualLineLength(visualLine + i) < repeatColumn)
           ) {
-            val pad = injector.engineEditorHelper.pad(editor, context, bufferLine + i, repeatColumn)
+            val pad = injector.engineEditorHelper.pad(editor, bufferLine + i, repeatColumn)
             if (pad.isNotEmpty()) {
               val offset = editor.getLineEndOffset(bufferLine + i)
               insertText(editor, caret, offset, pad)

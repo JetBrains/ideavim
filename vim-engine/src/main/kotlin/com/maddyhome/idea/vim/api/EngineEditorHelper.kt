@@ -20,7 +20,7 @@ public interface EngineEditorHelper {
   public fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
   public fun getApproximateScreenWidth(editor: VimEditor): Int
   public fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
-  public fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String
+  public fun pad(editor: VimEditor, line: Int, to: Int): String
   public fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
 }
 

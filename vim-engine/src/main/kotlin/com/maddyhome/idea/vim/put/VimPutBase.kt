@@ -319,7 +319,7 @@ public abstract class VimPutBase : VimPut {
         }
       }
 
-      val pad = injector.engineEditorHelper.pad(editor, context, currentLine, currentColumn)
+      val pad = injector.engineEditorHelper.pad(editor, currentLine, currentColumn)
 
       val insertOffset = editor.bufferPositionToOffset(BufferPosition(currentLine, currentColumn))
       updated = updated.moveToOffset(insertOffset)

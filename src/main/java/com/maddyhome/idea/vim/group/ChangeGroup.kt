@@ -236,8 +236,7 @@ public class ChangeGroup : VimChangeGroupBase() {
       }
       val lineLength = editor.lineLength(line)
       if (column < VimMotionGroupBase.LAST_COLUMN && lineLength < column) {
-        val pad =
-          EditorHelper.pad((editor as IjVimEditor).editor, (context as IjEditorExecutionContext).context, line, column)
+        val pad = EditorHelper.pad((editor as IjVimEditor).editor, line, column)
         val offset = editor.getLineEndOffset(line)
         insertText(editor, caret, offset, pad)
       }
@@ -489,7 +488,7 @@ public class ChangeGroup : VimChangeGroupBase() {
 
     // Remember the current caret column
     val intendedColumn = caret.vimLastColumn
-    val indentConfig = create((editor as IjVimEditor).editor, (context as IjEditorExecutionContext).context)
+    val indentConfig = create((editor as IjVimEditor).editor)
     val sline = editor.offsetToBufferPosition(range.startOffset).line
     val endLogicalPosition = editor.offsetToBufferPosition(range.endOffset)
     val eline = if (endLogicalPosition.column == 0) max((endLogicalPosition.line - 1).toDouble(), 0.0)

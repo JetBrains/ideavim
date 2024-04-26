@@ -9,8 +9,6 @@
 package com.maddyhome.idea.vim.common
 
 import com.intellij.application.options.CodeStyle
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings.IndentOptions
@@ -39,13 +37,12 @@ internal class IndentConfig private constructor(indentOptions: IndentOptions) {
 
   companion object {
     @JvmStatic
-    fun create(editor: Editor, context: DataContext): IndentConfig {
-      return create(editor, PlatformDataKeys.PROJECT.getData(context))
+    fun create(editor: Editor): IndentConfig {
+      return create(editor, editor.project)
     }
 
     @JvmStatic
-    @JvmOverloads
-    fun create(editor: Editor, project: Project? = editor.project): IndentConfig {
+    fun create(editor: Editor, project: Project?): IndentConfig {
       val indentOptions = if (project != null) {
         CodeStyle.getIndentOptions(project, editor.document)
       } else {

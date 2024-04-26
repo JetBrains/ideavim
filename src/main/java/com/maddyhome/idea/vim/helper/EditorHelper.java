@@ -211,15 +211,12 @@ public class EditorHelper {
     return injector.getEditorGroup().getEditors(new IjVimDocument(doc)).stream().findFirst().orElse(null);
   }
 
-  public static @NotNull String pad(final @NotNull Editor editor,
-                                    @NotNull DataContext context,
-                                    int line,
-                                    final int to) {
+  public static @NotNull String pad(final @NotNull Editor editor, int line, final int to) {
     final int len = EngineEditorHelperKt.lineLength(new IjVimEditor(editor), line);
     if (len >= to) return "";
 
     final int limit = to - len;
-    return IndentConfig.create(editor, context).createIndentBySize(limit);
+    return IndentConfig.create(editor).createIndentBySize(limit);
   }
 
   /**

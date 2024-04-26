@@ -14,7 +14,6 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.api.EngineEditorHelper
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -51,8 +50,8 @@ internal class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.getVisualLineAtBottomOfScreen(editor.ij)
   }
 
-  override fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String {
-    return EditorHelper.pad(editor.ij, context.ij, line, to)
+  override fun pad(editor: VimEditor, line: Int, to: Int): String {
+    return EditorHelper.pad(editor.ij, line, to)
   }
 
   override fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition {
