@@ -15,7 +15,9 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.CaretVisualAttributes
@@ -25,6 +27,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
@@ -64,7 +67,6 @@ import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -760,9 +762,13 @@ abstract class VimTestCase {
           val event =
             KeyEvent(editor.component, KeyEvent.KEY_PRESSED, Date().time, key.modifiers, key.keyCode, key.keyChar)
 
+          val context = SimpleDataContext.builder()
+            .setParent(EditorUtil.getEditorDataContext(editor))
+            .add(PlatformCoreDataKeys.CONTEXT_COMPONENT, editor.component)
+            .build()
           val e = AnActionEvent(
             event,
-            injector.executionContextManager.onEditor(editor.vim).ij,
+            context,
             ActionPlaces.KEYBOARD_SHORTCUT,
             VimShortcutKeyAction.instance.templatePresentation.clone(),
             ActionManager.getInstance(),
