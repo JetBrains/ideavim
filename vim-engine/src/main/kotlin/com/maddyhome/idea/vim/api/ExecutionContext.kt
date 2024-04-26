@@ -19,10 +19,8 @@ public sealed interface ExecutionContext {
   public fun updateEditor(editor: VimEditor): ExecutionContext
 
   public interface Editor : ExecutionContext
-  public interface CaretAndEditor : Editor
 }
 
 public interface ExecutionContextManager {
   public fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext.Editor
-  public fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor
 }

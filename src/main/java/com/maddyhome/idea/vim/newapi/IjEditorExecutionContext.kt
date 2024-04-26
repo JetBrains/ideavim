@@ -21,8 +21,6 @@ internal open class IjEditorExecutionContext(override val context: DataContext) 
   }
 }
 
-internal class IjCaretAndEditorExecutionContext(override val context: DataContext) : IjEditorExecutionContext(context), ExecutionContext.CaretAndEditor
-
 // This key is stored in data context when the action is started from vim
 internal val runFromVimKey = Key.create<Boolean>("RunFromVim")
 

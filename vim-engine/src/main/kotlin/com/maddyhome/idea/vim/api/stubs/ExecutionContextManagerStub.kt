@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.api.stubs
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ExecutionContextManager
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
@@ -20,10 +19,6 @@ public class ExecutionContextManagerStub : ExecutionContextManager {
   }
 
   override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
-    TODO("Not yet implemented")
-  }
-
-  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor {
     TODO("Not yet implemented")
   }
 }

@@ -126,14 +126,7 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
       return
     }
 
-    if (!baseExecute(
-        editor,
-        caret,
-        injector.executionContextManager.onCaret(caret, context),
-        cmd,
-        operatorArguments,
-      )
-    ) {
+    if (!baseExecute(editor, caret, context, cmd, operatorArguments)) {
       injector.messages.indicateError()
     }
   }
