@@ -295,7 +295,7 @@ class UiTests {
     waitFor {
       val generateDialog = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
       if (generateDialog.size == 1) {
-        return@waitFor generateDialog.single().hasText("Copy")
+        return@waitFor generateDialog.single().hasText("Copy Path/Reference…")
       }
       return@waitFor false
     }
