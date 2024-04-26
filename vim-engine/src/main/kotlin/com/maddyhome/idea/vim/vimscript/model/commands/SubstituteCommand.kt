@@ -26,7 +26,7 @@ public data class SubstituteCommand(val ranges: Ranges, val argument: String, va
     var result = true
     for (caret in editor.nativeCarets()) {
       val lineRange = getLineRange(editor, caret)
-      if (!injector.searchGroup.processSubstituteCommand(editor, caret, lineRange, command, argument, this.vimContext)) {
+      if (!injector.searchGroup.processSubstituteCommand(editor, caret, context, lineRange, command, argument, this.vimContext)) {
         result = false
       }
     }

@@ -538,20 +538,24 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    *
    * @param editor  The editor to search in
    * @param caret   The caret to use for initial search offset, and to move for interactive substitution
+   * @param context
    * @param range   Only search and substitute within the given line range. Must be valid
    * @param excmd   The command part of the ex command line, e.g. `s` or `substitute`, or `~`
    * @param exarg   The argument to the substitute command, such as `/{pattern}/{string}/[flags]`
-   * @return        True if the substitution succeeds, false on error. Will succeed even if nothing is modified
+   * @return True if the substitution succeeds, false on error. Will succeed even if nothing is modified
    */
   @Override
   @RWLockLabel.SelfSynchronized
   public boolean processSubstituteCommand(@NotNull VimEditor editor,
                                           @NotNull VimCaret caret,
+                                          @NotNull ExecutionContext context,
                                           @NotNull LineRange range,
                                           @NotNull @NonNls String excmd,
                                           @NotNull @NonNls String exarg,
                                           @NotNull VimLContext parent) {
-    if (globalIjOptions(injector).getUseNewRegex()) return super.processSubstituteCommand(editor, caret, range, excmd, exarg, parent);
+    if (globalIjOptions(injector).getUseNewRegex()) {
+      return super.processSubstituteCommand(editor, caret, context, range, excmd, exarg, parent);
+    }
 
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     List<ExException> exceptions = new ArrayList<>();

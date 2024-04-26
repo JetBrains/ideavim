@@ -31,6 +31,6 @@ public class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.Sin
   ): Boolean {
     val range = LineRange(0, editor.lineCount() - 1)
     return injector.searchGroup
-      .processSubstituteCommand(editor, editor.primaryCaret(), range, "s", "//~/&", Script(listOf()))
+      .processSubstituteCommand(editor, editor.primaryCaret(), context, range, "s", "//~/&", Script(listOf()))
   }
 }

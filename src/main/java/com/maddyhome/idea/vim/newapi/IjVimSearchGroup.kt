@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -80,6 +81,7 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
 
   override fun confirmChoice(
     editor: VimEditor,
+    context: ExecutionContext,
     match: String,
     caret: VimCaret,
     startOffset: Int,
@@ -119,7 +121,6 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       val exEntryPanel: com.maddyhome.idea.vim.ui.ex.ExEntryPanel =
         com.maddyhome.idea.vim.ui.ex.ExEntryPanel.getInstanceWithoutShortcuts()
-      val context = injector.executionContextManager.onEditor(editor, null)
       exEntryPanel.activate(
         editor.ij,
         (context as IjEditorExecutionContext).context,

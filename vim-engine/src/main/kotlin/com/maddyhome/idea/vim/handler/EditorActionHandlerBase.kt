@@ -84,7 +84,7 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     operatorArguments: OperatorArguments,
   ) {}
 
-  public fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
+  public fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
 
     // IJ platform has one issue - recursive `runForEachCaret` is not allowed. Strictly speaking, at this moment
@@ -116,7 +116,7 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     }
   }
 
-  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
+  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
     if (!injector.enabler.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)

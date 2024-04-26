@@ -119,6 +119,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
    */
   protected abstract fun confirmChoice(
     editor: VimEditor,
+    context: ExecutionContext,
     match: String,
     caret: VimCaret,
     startOffset: Int,
@@ -545,6 +546,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   override fun processSubstituteCommand(
     editor: VimEditor,
     caret: VimCaret,
+    context: ExecutionContext,
     range: LineRange,
     excmd: String,
     exarg: String,
@@ -613,7 +615,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
         if (doAsk) {
           addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
 
-          val choice: ReplaceConfirmationChoice = confirmChoice(editor, match, caret, matchRange.startOffset)
+          val choice: ReplaceConfirmationChoice = confirmChoice(editor, context, match, caret, matchRange.startOffset)
           when (choice) {
             ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
             ReplaceConfirmationChoice.SKIP -> doReplace = false

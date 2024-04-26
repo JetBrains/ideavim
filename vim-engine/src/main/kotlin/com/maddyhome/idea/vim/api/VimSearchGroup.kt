@@ -158,6 +158,7 @@ public interface VimSearchGroup {
   public fun processSubstituteCommand(
     editor: VimEditor,
     caret: VimCaret,
+    context: ExecutionContext,
     range: LineRange,
     excmd: String,
     exarg: String,
