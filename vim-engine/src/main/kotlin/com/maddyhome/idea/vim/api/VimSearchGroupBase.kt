@@ -624,7 +624,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     val options = enumSetOf<VimRegexOptions>()
     if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
-    if (injector.globalOptions().wrapscan) options.add(VimRegexOptions.WRAP_SCAN)
 
     val regex: VimRegex = try {
       VimRegex(pattern)
