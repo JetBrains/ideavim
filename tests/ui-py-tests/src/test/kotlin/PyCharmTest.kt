@@ -48,7 +48,11 @@ class PyCharmTest {
         findAllText("Python Packages").isNotEmpty() &&
         isSmartMode()
     }
-    findText("Python Console").click()
+
+    // Open tool window by id.
+    // id taken from PythonConsoleToolWindowFactory.ID but it's not resolved in robot by some reason
+    // the last 'x' is just to return some serializable value
+    callJs<String>("com.intellij.openapi.wm.ToolWindowManager.getInstance(component.project).getToolWindow('Python Console').activate(null, true); 'x'", true)
 
     Thread.sleep(10_000)
 
