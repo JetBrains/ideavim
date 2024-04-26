@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 
+@Deprecated("Do not use context wrappers, use existing provided contexts. If no context available, use `injector.getExecutionContextManager().getEditorExecutionContext(editor)`")
 internal class EditorDataContext @Deprecated("Please use `init` method") constructor(
   private val editor: Editor,
   private val editorContext: DataContext,

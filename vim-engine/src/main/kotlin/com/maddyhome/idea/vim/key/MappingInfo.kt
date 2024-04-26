@@ -85,7 +85,6 @@ public class ToKeysMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToKeys' mapping info...")
-    val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     val keyHandler = KeyHandler.getInstance()
     LOG.trace { "Adding new keys to keyStack as toKeys of mapping. State before adding keys: ${keyHandler.keyStack.dump()}" }
@@ -95,7 +94,7 @@ public class ToKeysMappingInfo(
       while (keyHandler.keyStack.hasStroke()) {
         val keyStroke = keyHandler.keyStack.feedStroke()
         val recursive = isRecursive && !(first && fromIsPrefix)
-        keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false, keyState)
+        keyHandler.handleKey(editor, keyStroke, context, recursive, false, keyState)
         first = false
       }
     } finally {
@@ -123,14 +122,13 @@ public class ToExpressionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToExpression' mapping info...")
-    val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val toKeys = injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false, keyState)
+      keyHandler.handleKey(editor, keyStroke, context, recursive, false, keyState)
       first = false
     }
   }
@@ -258,8 +256,7 @@ public class ToActionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToAction' mapping...")
-    val editorDataContext = injector.executionContextManager.onEditor(editor, context)
-    injector.actionExecutor.executeAction(action, editorDataContext)
+    injector.actionExecutor.executeAction(action, context)
   }
 
   public companion object {

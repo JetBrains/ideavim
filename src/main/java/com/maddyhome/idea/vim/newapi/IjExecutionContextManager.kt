@@ -17,13 +17,6 @@ import com.maddyhome.idea.vim.helper.EditorDataContext
 
 @Service
 internal class IjExecutionContextManager : ExecutionContextManagerBase() {
-  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
-    if (prevContext is ExecutionContext.Editor) {
-      return prevContext
-    }
-    return IjEditorExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))
-  }
-
   override fun getEditorExecutionContext(editor: VimEditor): ExecutionContext {
     return EditorUtil.getEditorDataContext(editor.ij).vim
   }

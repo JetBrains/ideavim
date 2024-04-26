@@ -79,12 +79,7 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
       try {
         val start = if (traceTime) System.currentTimeMillis() else null
         val keyHandler = KeyHandler.getInstance()
-        keyHandler.handleKey(
-          editor.vim,
-          keyStroke,
-          injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim),
-          keyHandler.keyHandlerState,
-        )
+        keyHandler.handleKey(editor.vim, keyStroke, e.dataContext.vim, keyHandler.keyHandlerState)
         if (start != null) {
           val duration = System.currentTimeMillis() - start
           LOG.info("VimShortcut update '$keyStroke': $duration ms")

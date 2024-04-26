@@ -77,7 +77,7 @@ public class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActio
       val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
       val startTime = if (traceTime) System.currentTimeMillis() else null
-      handler.handleKey(editor.vim, keyStroke, injector.executionContextManager.onEditor(editor.vim, context.vim), handler.keyHandlerState)
+      handler.handleKey(editor.vim, keyStroke, context.vim, handler.keyHandlerState)
       if (startTime != null) {
         val duration = System.currentTimeMillis() - startTime
         LOG.info("VimTypedAction '$charTyped': $duration ms")

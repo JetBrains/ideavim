@@ -821,7 +821,7 @@ abstract class VimTestCase {
 
     fun typeText(keys: List<KeyStroke?>, editor: Editor, project: Project?) {
       val keyHandler = KeyHandler.getInstance()
-      val dataContext = injector.executionContextManager.onEditor(editor.vim)
+      val dataContext = injector.executionContextManager.getEditorExecutionContext(editor.vim)
       TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
       runWriteCommand(
         project,

@@ -141,7 +141,7 @@ public object MappingProcessor: KeyConsumer {
               keyHandler.handleKey(
                 editor,
                 keyStroke,
-                injector.executionContextManager.onEditor(editor),
+                injector.executionContextManager.getEditorExecutionContext(editor),
                 allowKeyMappings = true,
                 mappingCompleted = lastKeyInSequence,
                 keyState,
@@ -202,7 +202,6 @@ public object MappingProcessor: KeyConsumer {
   ) {
     val mappingState = keyState.mappingState
     mappingState.resetMappingSequence()
-    val currentContext = context.updateEditor(editor)
     log.trace("Executing mapping info")
     try {
       mappingState.startMapExecution()
@@ -234,7 +233,7 @@ public object MappingProcessor: KeyConsumer {
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo !== currentMappingInfo) {
       log.trace("Evaluating the current key")
-      KeyHandler.getInstance().handleKey(editor, key, currentContext, allowKeyMappings = true, false, keyState)
+      KeyHandler.getInstance().handleKey(editor, key, context, allowKeyMappings = true, false, keyState)
     }
     log.trace("Success processing of mapping")
   }

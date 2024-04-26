@@ -18,10 +18,6 @@ public class ExecutionContextManagerStub : ExecutionContextManager {
     vimLogger<ExecutionContextManagerStub>().warn("ExecutionContextManagerStub is used. Please replace it with your own implementation of ExecutionContextManager.")
   }
 
-  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
-    TODO("Not yet implemented")
-  }
-
   override fun getEditorExecutionContext(editor: VimEditor): ExecutionContext {
     TODO("Not yet implemented")
   }

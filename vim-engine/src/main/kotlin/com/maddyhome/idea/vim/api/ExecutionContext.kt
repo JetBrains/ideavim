@@ -12,16 +12,10 @@ package com.maddyhome.idea.vim.api
  * This would be ideal if we could provide a typed solution, but sofar this is just a holder
  */
 
-public sealed interface ExecutionContext {
+public interface ExecutionContext {
   public val context: Any
-
-  // TODO: 10.02.2022 Not sure about this method
-  public fun updateEditor(editor: VimEditor): ExecutionContext
-
-  public interface Editor : ExecutionContext
 }
 
 public interface ExecutionContextManager {
-  public fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext.Editor
   public fun getEditorExecutionContext(editor: VimEditor): ExecutionContext
 }

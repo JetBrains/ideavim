@@ -322,7 +322,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     )
     injector.actionExecutor.executeAction(
       "EditorCloneCaretBelow",
-      injector.executionContextManager.onEditor(fixture.editor.vim),
+      injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim),
     )
     kotlin.test.assertEquals(2, fixture.editor.caretModel.caretCount)
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)

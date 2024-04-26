@@ -143,7 +143,7 @@ public object VimExtensionFacade {
    */
   @JvmStatic
   public fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
-    val context = injector.executionContextManager.onEditor(editor.vim)
+    val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
     val keyHandler = KeyHandler.getInstance()
     keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, false, keyHandler.keyHandlerState) }
   }

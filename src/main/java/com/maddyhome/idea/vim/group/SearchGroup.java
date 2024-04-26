@@ -812,7 +812,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
             RangeHighlighter hl =
               SearchHighlightsHelper.addSubstitutionConfirmationHighlight(((IjVimEditor)editor).getEditor(), startoff,
                                                                           endoff);
-            final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor)editor).getEditor(), match, ((IjVimCaret)caret).getCaret(), startoff);
+            final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor)editor).getEditor(), context, match, ((IjVimCaret)caret).getCaret(), startoff);
             ((IjVimEditor)editor).getEditor().getMarkupModel().removeHighlighter(hl);
             switch (choice) {
               case SUBSTITUTE_THIS:
@@ -841,8 +841,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
             caret.moveToOffset(startoff);
             if (expression != null) {
               try {
-                match =
-                  expression.evaluate(editor, injector.getExecutionContextManager().onEditor(editor, null), parent).toInsertableString();
+                match = expression.evaluate(editor, context, parent).toInsertableString();
               }
               catch (Exception e) {
                 exceptions.add((ExException)e);
@@ -993,7 +992,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     return new Pair<>(true, new Triple<>(regmatch, pattern, sp));
   }
 
-  private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
+  private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor,
+                                                                  @NotNull ExecutionContext context,
+                                                                  @NotNull String match, @NotNull Caret caret, int startoff) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
     final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
@@ -1027,7 +1028,6 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     else {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
       exEntryPanel.activate(editor, ((IjEditorExecutionContext)context).getContext(), MessageHelper.message("replace.with.0", match), "", 1);
       new IjVimCaret(caret).moveToOffset(startoff);
       ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);

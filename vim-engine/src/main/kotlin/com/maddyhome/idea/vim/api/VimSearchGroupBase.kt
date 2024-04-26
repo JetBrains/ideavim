@@ -636,8 +636,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
           caret.moveToOffset(matchRange.startOffset)
           if (expression != null) {
             match = try {
-              expression.evaluate(editor, injector.executionContextManager.onEditor(editor, null), parent)
-                .toInsertableString()
+              expression.evaluate(editor, context, parent).toInsertableString()
             } catch (e: Exception) {
               exceptions.add(e as ExException)
               ""

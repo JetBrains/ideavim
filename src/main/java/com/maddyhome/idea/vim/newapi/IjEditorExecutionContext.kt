@@ -12,14 +12,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
 
-internal open class IjEditorExecutionContext(override val context: DataContext) : ExecutionContext.Editor {
-  override fun updateEditor(editor: VimEditor): ExecutionContext {
-    return IjEditorExecutionContext(injector.executionContextManager.onEditor(editor, context.vim).ij)
-  }
-}
+internal open class IjEditorExecutionContext(override val context: DataContext) : ExecutionContext
 
 // This key is stored in data context when the action is started from vim
 internal val runFromVimKey = Key.create<Boolean>("RunFromVim")

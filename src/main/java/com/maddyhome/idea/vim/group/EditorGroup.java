@@ -235,7 +235,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     // Note that we need a similar check in `VimEditor.isWritable` to allow Escape to work to exit insert mode. We need
     // to know that a read-only editor that is hosting a console view with a running process can be treated as writable.
     Runnable switchToInsertMode = () -> {
-      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
+      ExecutionContext context = injector.getExecutionContextManager().getEditorExecutionContext(new IjVimEditor(editor));
       VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), context);
       KeyHandler.getInstance().reset(new IjVimEditor(editor));
     };
