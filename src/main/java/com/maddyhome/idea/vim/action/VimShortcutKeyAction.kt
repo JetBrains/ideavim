@@ -381,6 +381,10 @@ private class ActionEnableStatus(
     }
   }
 
+  override fun toString(): String {
+    return "ActionEnableStatus(isEnabled=$isEnabled, message='$message', logLevel=$logLevel)"
+  }
+
   companion object {
     private val LOG = logger<ActionEnableStatus>()
 

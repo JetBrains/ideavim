@@ -34,4 +34,8 @@ internal class IjNativeActionManager : NativeActionManager {
 public val AnAction.vim: IjNativeAction
   get() = IjNativeAction(this)
 
-public class IjNativeAction(override val action: AnAction) : NativeAction
+public class IjNativeAction(override val action: AnAction) : NativeAction {
+  override fun toString(): String {
+    return "IjNativeAction(action=$action)"
+  }
+}
