@@ -15,12 +15,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.Script
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.INSERT])
@@ -40,7 +40,7 @@ public class InsertRegisterAction : VimActionHandler.SingleExecution() {
     if (argument?.character == '=') {
       injector.application.invokeLater {
         try {
-          val expression = readExpression(editor)
+          val expression = readExpression(editor, context)
           if (expression != null) {
             if (expression.isNotEmpty()) {
               val expressionValue =
@@ -62,8 +62,8 @@ public class InsertRegisterAction : VimActionHandler.SingleExecution() {
     }
   }
 
-  private fun readExpression(editor: VimEditor): String? {
-    return injector.commandLineHelper.inputString(editor, "=", null)
+  private fun readExpression(editor: VimEditor, context: ExecutionContext): String? {
+    return injector.commandLineHelper.inputString(editor, context, "=", null)
   }
 }
 

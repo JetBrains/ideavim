@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.extension.surround
 
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
@@ -96,7 +97,7 @@ internal class VimSurroundExtension : VimExtension {
       val ijEditor = editor.ij
       val c = getChar(ijEditor)
       if (c.code == 0) return
-      val pair = getOrInputPair(c, ijEditor) ?: return
+      val pair = getOrInputPair(c, ijEditor, context.ij) ?: return
 
       editor.forEachCaret {
         val line = it.getBufferPosition().line
@@ -148,7 +149,7 @@ internal class VimSurroundExtension : VimExtension {
       val charTo = getChar(editor.ij)
       if (charTo.code == 0) return
 
-      val newSurround = getOrInputPair(charTo, editor.ij) ?: return
+      val newSurround = getOrInputPair(charTo, editor.ij, context.ij) ?: return
       runWriteAction { change(editor, context, charFrom, newSurround) }
     }
 
@@ -267,7 +268,7 @@ internal class VimSurroundExtension : VimExtension {
       val c = getChar(ijEditor)
       if (c.code == 0) return true
 
-      val pair = getOrInputPair(c, ijEditor) ?: return false
+      val pair = getOrInputPair(c, ijEditor, context.ij) ?: return false
       // XXX: Will it work with line-wise or block-wise selections?
       val range = getSurroundRange(editor.currentCaret()) ?: return false
       performSurround(pair, range, editor.currentCaret(), selectionType == SelectionType.LINE_WISE)
@@ -320,8 +321,8 @@ private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_
   null
 }
 
-private fun inputTagPair(editor: Editor): Pair<String, String>? {
-  val tagInput = inputString(editor, "<", '>')
+private fun inputTagPair(editor: Editor, context: DataContext): Pair<String, String>? {
+  val tagInput = inputString(editor, context, "<", '>')
   val matcher = tagNameAndAttributesCapturePattern.matcher(tagInput)
   return if (matcher.find()) {
     val tagName = matcher.group(1)
@@ -334,17 +335,18 @@ private fun inputTagPair(editor: Editor): Pair<String, String>? {
 
 private fun inputFunctionName(
   editor: Editor,
+  context: DataContext,
   withInternalSpaces: Boolean,
 ): Pair<String, String>? {
-  val functionNameInput = inputString(editor, "function: ", null)
+  val functionNameInput = inputString(editor, context, "function: ", null)
   if (functionNameInput.isEmpty()) return null
   return if (withInternalSpaces) "$functionNameInput( " to " )" else "$functionNameInput(" to ")"
 }
 
-private fun getOrInputPair(c: Char, editor: Editor): Pair<String, String>? = when (c) {
-  '<', 't' -> inputTagPair(editor)
-  'f' -> inputFunctionName(editor, false)
-  'F' -> inputFunctionName(editor, true)
+private fun getOrInputPair(c: Char, editor: Editor, context: DataContext): Pair<String, String>? = when (c) {
+  '<', 't' -> inputTagPair(editor, context)
+  'f' -> inputFunctionName(editor, context, false)
+  'F' -> inputFunctionName(editor, context, true)
   else -> getSurroundPair(c)
 }
 

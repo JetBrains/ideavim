@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.extension
 
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
@@ -181,8 +182,8 @@ public object VimExtensionFacade {
 
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
-  public fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
-    return service<CommandLineHelper>().inputString(editor.vim, prompt, finishOn) ?: ""
+  public fun inputString(editor: Editor, context: DataContext, prompt: String, finishOn: Char?): String {
+    return service<CommandLineHelper>().inputString(editor.vim, context.vim, prompt, finishOn) ?: ""
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */

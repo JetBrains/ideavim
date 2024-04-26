@@ -8,8 +8,9 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
 public interface VimCommandLineHelper {
-  public fun inputString(vimEditor: VimEditor, prompt: String, finishOn: Char?): String?
+  public fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String?
 }
