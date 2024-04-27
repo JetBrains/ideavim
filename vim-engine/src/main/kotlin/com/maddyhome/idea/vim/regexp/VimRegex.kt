@@ -97,6 +97,8 @@ public class VimRegex(pattern: String) {
   /**
    * Returns the first match of a pattern in the editor, that comes after the startIndex
    *
+   * Note that it is up to the caller to handle wrapscan. This is mainly so that the caller can notify the user.
+   *
    * @param editor     The editor where to look for the match in
    * @param startIndex The index to start the find
    *
@@ -121,10 +123,18 @@ public class VimRegex(pattern: String) {
       val result = simulateNonExactNFA(editor, index, options)
       index = when (result) {
         is VimMatchResult.Success -> {
-          // the match comes after the startIndex, return it
-          if (result.range.startOffset > newStartIndex) return result
-          // there is a match but starts before the startIndex, try again starting from the end of this match
-          else result.range.endOffset + if (result.range.startOffset == result.range.endOffset) 1 else 0
+          if (result.range.startOffset > newStartIndex) {
+            // The match comes after the startIndex, return it
+            return result
+          }
+          else if (result.range.startOffset == startIndex && options.contains(VimRegexOptions.CAN_MATCH_START_LOCATION)) {
+            // Accept a match at the current location. This usually means wrapscan and a match at index == 0
+            return result
+          }
+          else {
+            // There is a match but starts before the startIndex, try again starting from the end of this match
+            result.range.endOffset + if (result.range.startOffset == result.range.endOffset) 1 else 0
+          }
         }
         // no match starting here, try the next line
         is VimMatchResult.Failure -> {
@@ -134,28 +144,14 @@ public class VimRegex(pattern: String) {
         }
       }
     }
-    // no match found after startIndex, try wrapping around to file start, if wrapscan is set
-    if (options.contains(VimRegexOptions.WRAP_SCAN)) {
-      index = 0
-      while (index <= startIndex) {
-        val result = simulateNonExactNFA(editor, index, options)
-        // just return the first match found
-        when (result) {
-          is VimMatchResult.Success -> return result
-          is VimMatchResult.Failure -> {
-            val nextLine = editor.offsetToBufferPosition(index).line + 1
-            if (nextLine >= editor.lineCount()) break
-            index = editor.getLineStartOffset(nextLine)
-          }
-        }
-      }
-    }
     // entire editor was searched, but no match found
     return VimMatchResult.Failure(VimRegexErrors.E486)
   }
 
   /**
    * Returns the first match of a pattern in the editor, that comes before the startIndex
+   *
+   * Note that it is up to the caller to handle wrapscan. This is mainly so that the caller can notify the user.
    *
    * @param editor     The editor where to look for the match in
    * @param startIndex The index to start the find
@@ -173,18 +169,10 @@ public class VimRegex(pattern: String) {
         // there is a match at this line that starts before the startIndex
         return result
     } else {
-      // try searching in previous lines, line by line, and if necessary wrap around to the last line if wrapscan is set
-      var currentLine = startLine - 1
-      var wrappedAround = false
-      while (!(wrappedAround && (currentLine < startLine || !options.contains(VimRegexOptions.WRAP_SCAN)))) {
-        if (currentLine < 0) {
-          currentLine = editor.lineCount() - 1
-          wrappedAround = true
-        } else {
+      // try searching in previous lines, line by line until the start of the buffer
+      for (currentLine in startLine - 1 downTo 0) {
           val previous = findLastMatchInLine(editor, currentLine, options=options)
           if (previous is VimMatchResult.Success) return previous
-          else currentLine--
-        }
       }
       // there are no matches in the entire file
       return VimMatchResult.Failure(VimRegexErrors.E486)

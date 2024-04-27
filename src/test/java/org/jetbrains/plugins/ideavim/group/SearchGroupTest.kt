@@ -189,6 +189,124 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test search with wrapscan`() {
+    doTest(
+      searchCommand("/one"),
+      """
+        one
+        two
+        ${c}three
+      """.trimIndent(),
+      """
+        ${c}one
+        two
+        three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("search hit BOTTOM, continuing at TOP")
+  }
+
+  @Test
+  fun `test search with nowrapscan`() {
+    doTest(
+      searchCommand("/one"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    ) {
+      enterCommand("set nowrapscan")
+    }
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: one")
+  }
+
+  @Test
+  fun `test search with wrapscan and no matches`() {
+    doTest(
+      searchCommand("/banana"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+  }
+
+  @Test
+  fun `test backwards search with wrapscan`() {
+    doTest(
+      searchCommand("?three"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        two
+        ${c}three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("search hit TOP, continuing at BOTTOM")
+  }
+
+  @Test
+  fun `test backwards search with nowrapscan`() {
+    doTest(
+      searchCommand("?three"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    ) {
+      enterCommand("set nowrapscan")
+    }
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E384: Search hit TOP without match for: three")
+  }
+
+  @Test
+  fun `test backwards search with wrapscan and no matches`() {
+    doTest(
+      searchCommand("?banana"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+  }
+
+  @Test
   fun `test search for last pattern`() {
     doTest(
       listOf(searchCommand("/one"), searchCommand("//")),
@@ -501,7 +619,7 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set nowrapscan")
     typeText("10", "/", searchCommand("one"))
-    assertPluginError(true)
+    assertPluginError(false)
     assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: one")
     assertPosition(2, 0)
   }
@@ -674,7 +792,7 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set nowrapscan")
     typeText("12", "?one<CR>")
-    assertPluginError(true)
+    assertPluginError(false)
     assertPluginErrorMessageContains("E384: Search hit TOP without match for: one")
     assertPosition(8, 0)
   }

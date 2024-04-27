@@ -45,7 +45,8 @@ public class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
       operatorArguments.count1,
       Direction.BACKWARDS
     )
-    if (offsetAndMotion == null) return Motion.Error
+    // Vim doesn't treat not finding something as an error, although it might report either an error or warning message
+    if (offsetAndMotion == null) return Motion.NoMotion
     motionType = offsetAndMotion.second
     return offsetAndMotion.first.toMotionOrError()
   }

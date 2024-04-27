@@ -318,11 +318,17 @@ public class SearchHelper {
           lnum = lineCount - 1;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(top_bot_msg), TRUE);
+          if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
+            VimPlugin.showMessage(MessageHelper.message("message.search.hit.top"));
+          }
         }
         else {
           lnum = 0;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(bot_top_msg), TRUE);
+          if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
+            VimPlugin.showMessage(MessageHelper.message("message.search.hit.bottom"));
+          }
         }
       }
       //if (got_int || called_emsg || break_loop)
@@ -334,12 +340,15 @@ public class SearchHelper {
       //if ((options & SEARCH_MSG) == SEARCH_MSG)
       if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
         if (searchOptions.contains(SearchOptions.WRAP)) {
-          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+          // E486: Pattern not found: {0}
+          VimPlugin.showMessage(MessageHelper.message("E486", pattern));
         }
         else if (lnum <= 0) {
+          // E384: Search hit TOP without match for: {0}
           VimPlugin.showMessage(MessageHelper.message(Msg.E384, pattern));
         }
         else {
+          // E385: Search hit BOTTOM without match for: {0}
           VimPlugin.showMessage(MessageHelper.message(Msg.E385, pattern));
         }
       }

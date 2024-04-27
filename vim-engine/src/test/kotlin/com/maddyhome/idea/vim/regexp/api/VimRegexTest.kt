@@ -87,8 +87,9 @@ class VimRegexTest {
     }
 
     @Test
-    fun `test find single word wraps around`() {
-      doTest(
+    fun `test find single word does not wrap around`() {
+      // Wrapscan is handled by the caller
+      assertFailure(
         """
       	|${START}Lorem${END} Ipsum
         |
@@ -99,7 +100,7 @@ class VimRegexTest {
       """.trimMargin(),
         "Lorem",
         40,
-        enumSetOf(VimRegexOptions.WRAP_SCAN)
+        noneOfEnum()
       )
     }
 
@@ -181,8 +182,9 @@ class VimRegexTest {
     }
 
     @Test
-    fun `test find previous single word warps around`() {
-      doTest(
+    fun `test find previous single word does not wrap around`() {
+      // Wrapscan is handled by caller
+      assertFailure(
         """
       	|Lorem Ipsum
         |
@@ -192,7 +194,7 @@ class VimRegexTest {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
         "Lorem",
-        options = enumSetOf(VimRegexOptions.WRAP_SCAN)
+        options = noneOfEnum()
       )
     }
 
