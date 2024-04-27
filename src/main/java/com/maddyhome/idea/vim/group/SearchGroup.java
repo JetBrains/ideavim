@@ -897,7 +897,8 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
           VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
       }
       else {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+        // E486: Pattern not found: {0}
+        VimPlugin.showMessage(MessageHelper.message("E486", pattern));
       }
     }
 

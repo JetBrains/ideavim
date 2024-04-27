@@ -128,8 +128,10 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     val options = enumSetOf<VimRegexOptions>()
     if (injector.globalOptions().smartcase && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
-    if (injector.globalOptions().wrapscan) options.add(VimRegexOptions.WRAP_SCAN)
     if (searchOptions.contains(SearchOptions.WANT_ENDPOS)) options.add(VimRegexOptions.WANT_END_POSITION)
+
+    val wrap = searchOptions.contains(SearchOptions.WRAP)
+    val showMessages = searchOptions.contains(SearchOptions.SHOW_MESSAGES)
 
     val regex = try {
       VimRegex(pattern)
@@ -138,20 +140,35 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       return null
     }
 
-    var result =
-      if (dir === Direction.FORWARDS) regex.findNext(editor, startOffset, options)
-      else regex.findPrevious(editor, startOffset, options)
+    var result = if (dir === Direction.FORWARDS) {
+      findNextWithWrapscan(editor, regex, startOffset, options, wrap, showMessages)
+    } else {
+      findPreviousWithWrapscan(editor, regex, startOffset, options, wrap, showMessages)
+    }
 
     if (result is VimMatchResult.Failure) {
-      injector.messages.showStatusBarMessage(editor, "Pattern not found: $pattern")
+      if (wrap) {
+        // E486: Pattern not found {0}
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("E486", pattern))
+      } else if (dir === Direction.FORWARDS) {
+        // E385: Search hit BOTTOM without match for: {0}
+        injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E385, pattern))
+      } else {
+        // E385: Search hit TOP without match for: {0}
+        injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E384, pattern))
+      }
       return null
     }
 
     for (i in 1 until count) {
       val nextOffset = (result as VimMatchResult.Success).range.startOffset
       result =
-        if (dir === Direction.FORWARDS) regex.findNext(editor, nextOffset, options)
-        else regex.findPrevious(editor, nextOffset, options)
+        if (dir === Direction.FORWARDS) {
+          findNextWithWrapscan(editor, regex, nextOffset, options, wrap, showMessages)
+        }
+        else {
+          findPreviousWithWrapscan(editor, regex, nextOffset, options, wrap, showMessages)
+        }
       if (result is VimMatchResult.Failure) {
         // We know this isn't pattern not found...
         if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
@@ -169,6 +186,46 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     }
 
     return (result as VimMatchResult.Success).range
+  }
+
+  private fun findNextWithWrapscan(
+    editor: VimEditor,
+    regex: VimRegex,
+    startIndex: Int,
+    options: EnumSet<VimRegexOptions>,
+    wrapscan: Boolean,
+    showMessages: Boolean
+  ): VimMatchResult {
+    val result = regex.findNext(editor, startIndex, options)
+    if (result is VimMatchResult.Failure && wrapscan) {
+      if (showMessages) {
+        // search hit BOTTOM, continuing at TOP
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("message.search.hit.bottom"))
+      }
+      // Start searching from the start of the file, but accept a match at the start offset
+      val newOptions = options.clone().also { it.add(VimRegexOptions.CAN_MATCH_START_LOCATION) }
+      return regex.findNext(editor, 0, newOptions)
+    }
+    return result
+  }
+
+  private fun findPreviousWithWrapscan(
+    editor: VimEditor,
+    regex: VimRegex,
+    startIndex: Int,
+    options: EnumSet<VimRegexOptions>,
+    wrapscan: Boolean,
+    showMessages: Boolean,
+  ): VimMatchResult {
+    val result = regex.findPrevious(editor, startIndex, options)
+    if (result is VimMatchResult.Failure && wrapscan) {
+      if (showMessages) {
+        // search hit TOP, continuing at BOTTOM
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("message.search.hit.top"))
+      }
+      return regex.findPrevious(editor, editor.fileSize().toInt() - 1, options)
+    }
+    return result
   }
 
   override fun findAll(
