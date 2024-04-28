@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimPsiService
+import com.maddyhome.idea.vim.api.VimRedrawService
 import com.maddyhome.idea.vim.api.VimRegexpService
 import com.maddyhome.idea.vim.api.VimScrollGroup
 import com.maddyhome.idea.vim.api.VimSearchGroup
@@ -206,6 +207,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val systemInfoService: SystemInfoService
     get() = service()
   override val vimStorageService: VimStorageService
+    get() = service()
+  override val redrawService: VimRedrawService
     get() = service()
 
   override fun commandStateFor(editor: VimEditor): VimStateMachine {

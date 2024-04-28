@@ -1092,8 +1092,13 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
     if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS)
 
+    val pattern = getLastUsedPattern()
+    if (!pattern.isNullOrEmpty()) {
+      injector.messages.showStatusBarMessage(editor, (if (dir === Direction.FORWARDS) "/" else "?") + pattern)
+    }
+
     // Uses last pattern. We know this is always set before being called
-    val range = injector.searchHelper.findPattern(editor, getLastUsedPattern(), startOffsetMutable, count, searchOptions) ?: return null
+    val range = injector.searchHelper.findPattern(editor, pattern, startOffsetMutable, count, searchOptions) ?: return null
 
     var res = range.startOffset
     if (offsetIsLineOffset) {

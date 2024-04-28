@@ -67,6 +67,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.IjOptions
+import com.maddyhome.idea.vim.group.IjVimRedrawService
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollGroup
@@ -342,11 +343,13 @@ internal object VimListenerManager {
     override fun beforeDocumentChange(event: DocumentEvent) {
       VimMarkServiceImpl.MarkUpdater.beforeDocumentChange(event)
       SearchGroup.DocumentSearchListener.INSTANCE.beforeDocumentChange(event)
+      IjVimRedrawService.RedrawListener.beforeDocumentChange(event)
     }
 
     override fun documentChanged(event: DocumentEvent) {
       VimMarkServiceImpl.MarkUpdater.documentChanged(event)
       SearchGroup.DocumentSearchListener.INSTANCE.documentChanged(event)
+      IjVimRedrawService.RedrawListener.documentChanged(event)
     }
   }
 
@@ -364,6 +367,7 @@ internal object VimListenerManager {
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
       VimPlugin.getSearch().fileEditorManagerSelectionChangedCallback(event)
       OptionGroup.fileEditorManagerSelectionChangedCallback(event)
+      IjVimRedrawService.fileEditorManagerSelectionChangedCallback(event)
     }
   }
 

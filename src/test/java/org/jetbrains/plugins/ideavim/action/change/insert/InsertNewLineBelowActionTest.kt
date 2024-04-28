@@ -202,4 +202,13 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
     performTest("o", after, Mode.INSERT)
   }
+
+  @Test
+  fun `test insert new line above clears status line`() {
+    configureByText("lorem ipsum")
+    enterSearch("dolor")
+    assertStatusLineMessageContains("Pattern not found: dolor")
+    typeText("o")
+    assertStatusLineCleared()
+  }
 }

@@ -163,4 +163,13 @@ class InsertNewLineAboveActionTest : VimTestCase() {
       assertEquals(1, editor.carets().single().getVisualPosition().line)
     }
   }
+
+  @Test
+  fun `test insert new line above clears status line`() {
+    configureByText("lorem ipsum")
+    enterSearch("dolor")
+    assertStatusLineMessageContains("Pattern not found: dolor")
+    typeText("O")
+    assertStatusLineCleared()
+  }
 }
