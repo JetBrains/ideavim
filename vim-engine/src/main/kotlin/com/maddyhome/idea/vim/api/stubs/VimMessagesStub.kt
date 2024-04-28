@@ -25,6 +25,10 @@ public class VimMessagesStub : VimMessagesBase() {
     TODO("Not yet implemented")
   }
 
+  override fun clearStatusBarMessage() {
+    TODO("Not yet implemented")
+  }
+
   override fun indicateError() {
     TODO("Not yet implemented")
   }

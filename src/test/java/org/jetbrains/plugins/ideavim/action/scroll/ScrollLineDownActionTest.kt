@@ -130,4 +130,14 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertPosition(95, 4)
     assertVisibleArea(76, 99)
   }
+
+  @Test
+  fun `test scroll clears status line`() {
+    configureByPages(5)
+    setPositionAndScroll(29, 29)
+    enterSearch("egestas")
+    assertStatusLineMessageContains("Pattern not found: egestas")
+    typeText("<C-E>")
+    assertStatusLineCleared()
+  }
 }

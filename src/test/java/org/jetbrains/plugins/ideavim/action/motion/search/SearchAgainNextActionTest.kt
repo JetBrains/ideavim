@@ -13,6 +13,42 @@ import org.junit.jupiter.api.Test
 
 class SearchAgainNextActionTest : VimTestCase() {
   @Test
+  fun `test search next updates status line`() {
+    doTest(
+      listOf(searchCommand("/ipsum"), "n"),
+      """
+         ${c}Lorem ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+      """.trimIndent(),
+      """
+         Lorem ipsum dolor sit amet,
+         Lorem ${c}ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+      """.trimIndent(),
+    )
+    assertStatusLineMessageContains("/ipsum")
+  }
+
+  @Test
+  fun `test search next for backwards search updates status line correctly`() {
+    doTest(
+      listOf(searchCommand("?ipsum"), "n"),
+      """
+         Lorem ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+         ${c}Lorem ipsum dolor sit amet,
+      """.trimIndent(),
+      """
+         Lorem ${c}ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+      """.trimIndent(),
+    )
+    assertStatusLineMessageContains("?ipsum")
+  }
+
+  @Test
   fun `test search next after search command with offset`() {
     val before = """
       ${c}I found it in a legendary land

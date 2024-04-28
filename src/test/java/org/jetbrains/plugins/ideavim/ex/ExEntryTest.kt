@@ -80,6 +80,14 @@ class ExEntryTest : VimTestCase() {
   }
 
   @Test
+  fun `test ex entry clears status line`() {
+    enterSearch("lorem")
+    assertStatusLineMessageContains("Pattern not found: lorem")
+    typeExInput(":")
+    assertStatusLineCleared()
+  }
+
+  @Test
   fun `test caret shape`() {
     // Show block at end of input (normal)
     // Show vertical bar in insert mode

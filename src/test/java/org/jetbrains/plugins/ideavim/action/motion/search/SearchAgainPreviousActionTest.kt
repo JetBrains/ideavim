@@ -16,6 +16,42 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class SearchAgainPreviousActionTest : VimTestCase() {
+  @Test
+  fun `test search previous updates status line`() {
+    doTest(
+      listOf(searchCommand("/ipsum"), "N"),
+      """
+         Lorem ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+         ${c}Lorem ipsum dolor sit amet,
+      """.trimIndent(),
+      """
+         Lorem ipsum dolor sit amet,
+         Lorem ${c}ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+      """.trimIndent(),
+    )
+    assertStatusLineMessageContains("?ipsum")
+  }
+
+  @Test
+  fun `test search previous for backwards search updates status line correctly`() {
+    doTest(
+      listOf(searchCommand("?ipsum"), "N"),
+      """
+         Lorem ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+         ${c}Lorem ipsum dolor sit amet,
+      """.trimIndent(),
+      """
+         Lorem ipsum dolor sit amet,
+         Lorem ipsum dolor sit amet,
+         Lorem ${c}ipsum dolor sit amet,
+      """.trimIndent(),
+    )
+    assertStatusLineMessageContains("/ipsum")
+  }
+
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   @Test
   fun `test search with tabs`() {

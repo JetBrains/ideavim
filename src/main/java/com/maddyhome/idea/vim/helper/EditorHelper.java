@@ -52,6 +52,10 @@ public class EditorHelper {
     final ScrollingModel scrollingModel = editor.getScrollingModel();
     final Rectangle area = scrollingModel.getVisibleAreaOnScrollingFinished();
     scrollingModel.scroll(area.x, verticalOffset);
+    // Simulate Vim's redraw (essentially to clear messages) if the screen is scrolled
+    if (area.y != verticalOffset && area.y >= 0) {
+      injector.getRedrawService().redraw();
+    }
     return scrollingModel.getVisibleAreaOnScrollingFinished().y != area.y;
   }
 
@@ -59,6 +63,10 @@ public class EditorHelper {
     final ScrollingModel scrollingModel = editor.getScrollingModel();
     final Rectangle area = scrollingModel.getVisibleAreaOnScrollingFinished();
     scrollingModel.scroll(horizontalOffset, area.y);
+    // Simulate Vim's redraw (essentially to clear messages) if the screen is scrolled
+    if (area.x != horizontalOffset && area.x >= 0) {
+      injector.getRedrawService().redraw();
+    }
   }
 
   public static int getVisualLineAtTopOfScreen(final @NotNull Editor editor) {

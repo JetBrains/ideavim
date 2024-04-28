@@ -196,6 +196,8 @@ public interface VimInjector {
   public fun <T : Any> getLogger(clazz: Class<T>): VimLogger
   
   public val listenersNotifier: VimListenersNotifier
+
+  public val redrawService: VimRedrawService
 }
 
 public lateinit var injector: VimInjector

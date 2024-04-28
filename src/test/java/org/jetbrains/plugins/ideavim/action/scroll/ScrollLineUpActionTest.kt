@@ -158,4 +158,14 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(64, 98)
     assertVisualPosition(88, 4) // Moves caret up by scrolloff
   }
+
+  @Test
+  fun `test scroll clears status line`() {
+    configureByPages(5)
+    setPositionAndScroll(29, 29)
+    enterSearch("egestas")
+    assertStatusLineMessageContains("Pattern not found: egestas")
+    typeText("<C-Y>")
+    assertStatusLineCleared()
+  }
 }
