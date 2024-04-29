@@ -128,7 +128,8 @@ public class VimRegex(pattern: String) {
             return result
           }
           else if (result.range.startOffset == startIndex && options.contains(VimRegexOptions.CAN_MATCH_START_LOCATION)) {
-            // Accept a match at the current location. This usually means wrapscan and a match at index == 0
+            // Accept a match at the current location. This means either we want to use the end position of a match, so
+            // the current location is valid, or we've wrapped, and there's a match at index == 0.
             return result
           }
           else {

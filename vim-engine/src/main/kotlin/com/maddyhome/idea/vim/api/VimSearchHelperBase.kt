@@ -128,7 +128,12 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     val options = enumSetOf<VimRegexOptions>()
     if (injector.globalOptions().smartcase && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE)
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
-    if (searchOptions.contains(SearchOptions.WANT_ENDPOS)) options.add(VimRegexOptions.WANT_END_POSITION)
+    if (searchOptions.contains(SearchOptions.WANT_ENDPOS)) {
+      // When we want to get the end position of a search match, we can match at the current location. Having these as
+      // separate flags means we can remove CAN_MATCH_START_LOCATION for subsequent matches (i.e., count)
+      options.add(VimRegexOptions.WANT_END_POSITION)
+      options.add(VimRegexOptions.CAN_MATCH_START_LOCATION)
+    }
 
     val wrap = searchOptions.contains(SearchOptions.WRAP)
     val showMessages = searchOptions.contains(SearchOptions.SHOW_MESSAGES)
@@ -160,6 +165,9 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       return null
     }
 
+    // When trying to find the end position for a match, we're allowed to match the current position. But if we do that
+    // on subsequent matches when we have a count, then we'll get stuck at the current location. Remove the flag.
+    options.remove(VimRegexOptions.CAN_MATCH_START_LOCATION)
     for (i in 1 until count) {
       val nextOffset = (result as VimMatchResult.Success).range.startOffset
       result =

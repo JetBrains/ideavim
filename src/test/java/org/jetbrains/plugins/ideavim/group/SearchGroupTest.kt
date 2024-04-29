@@ -329,10 +329,7 @@ class SearchGroupTest : VimTestCase() {
       searchCommand("/one/e"),
       "${c}one one one",
       "on${c}e one one"
-    ) {
-      // TODO: Fix regression in new regex: VIM-3344
-      enterCommand("set nousenewregex")
-    }
+    )
   }
 
   @Test
@@ -341,10 +338,7 @@ class SearchGroupTest : VimTestCase() {
       listOf(searchCommand("/one"), searchCommand("//e")),
       "${c}one one one",
       "one on${c}e one"
-    ) {
-      // TODO: Fix regression in new regex: VIM-3344
-      enterCommand("set nousenewregex")
-    }
+    )
   }
 
   @Test
@@ -353,10 +347,7 @@ class SearchGroupTest : VimTestCase() {
       listOf(searchCommand("/one/e"), searchCommand("//e")),
       "${c}one one one",
       "one on${c}e one"
-    ) {
-      // TODO: Fix regression in new regex: VIM-3344
-      enterCommand("set nousenewregex")
-    }
+    )
   }
 
   @Test
