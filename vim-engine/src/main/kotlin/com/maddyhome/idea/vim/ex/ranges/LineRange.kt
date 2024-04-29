@@ -12,6 +12,16 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.common.TextRange
 import kotlin.math.min
 
+/**
+ * Represents a line range
+ *
+ * A line range is specified by the user as 1-based, but can include the value `0`. E.g., the copy and move commands
+ * in the form `:[range]copy {address}` treat an address with a line of 0 as meaning copy/move the range to _above_ the
+ * first line (all other values are _below_ the address).
+ *
+ * The [startLine] and [endLine] fields are 0-based, matching the rest of IdeaVim. These are coerced to a minimum value
+ * of `0`, so the range `0,$` becomes a synonym for `1,$`.
+ */
 public class LineRange(startLine: Int, endLine: Int) {
   @JvmField
   public val startLine: Int
@@ -21,11 +31,11 @@ public class LineRange(startLine: Int, endLine: Int) {
 
   init {
     if (endLine >= startLine) {
-      this.startLine = startLine
-      this.endLine = endLine
+      this.startLine = startLine.coerceAtLeast(0)
+      this.endLine = endLine.coerceAtLeast(0)
     } else {
-      this.startLine = endLine
-      this.endLine = startLine
+      this.startLine = endLine.coerceAtLeast(0)
+      this.endLine = startLine.coerceAtLeast(0)
     }
   }
 
@@ -35,7 +45,7 @@ public class LineRange(startLine: Int, endLine: Int) {
 }
 
 public fun LineRange.toTextRange(editor: VimEditor): TextRange {
-  val start = editor.getLineStartOffset(startLine)
+  val start = editor.getLineStartOffset(startLine.coerceAtLeast(0))
   val end = editor.getLineEndOffset(endLine, true) + 1
   return TextRange(start, min(end, editor.fileSize().toInt()))
 }

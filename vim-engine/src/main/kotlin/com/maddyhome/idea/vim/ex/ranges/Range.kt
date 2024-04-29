@@ -92,14 +92,18 @@ public class Range {
       }
     }
 
-    // We can get a negative end line with a simple `:-10` go to line command. Vim treats this as an error
-    if (endLine1 < 0) {
+    // Offsets might give us a negative start/end line, which Vim treats as an error. A value of 0 is still acceptable.
+    if (startLine1 < 0 || endLine1 < 0) {
       throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
     }
 
     // If only one address is given, make the start and end the same
     if (addresses.size == 1) startLine1 = endLine1
 
+    // It is valid for the 1-based lines to be 0. E.g. copy/move use an address of 0 to copy/move to the line _before_
+    // the first line (any other value is treated as _after_ that line) or `:0,$d` will delete the whole buffer, just
+    // like `:1,$d`. LineRange is constructed with 0-based lines, which are coerced to 0, while the 1-based accessors
+    // maintain the actual value we pass through (it might be neater to create LineRange with 1-based line numbers...)
     return LineRange(startLine1 - 1, endLine1 - 1)
   }
 
