@@ -80,6 +80,25 @@ class SubstituteCommandTest : VimTestCase() {
     )
   }
 
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test range from line 0 works like from line 1`() {
+    doTest(
+      exCommand("0,\$s/a/b/g"),
+      """
+        |a${c}baba
+        |ab
+      """.trimMargin(),
+      """
+        |bbbbb
+        |bb
+      """.trimMargin(),
+    )
+  }
+
   // VIM-3428
   @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),

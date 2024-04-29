@@ -52,6 +52,28 @@ class DeleteLinesCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test delete first line with 0`() {
+    doTest(
+      exCommand("0d"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    )
+  }
+
+  @Test
   fun `test delete command with line range`() {
     doTest(
       exCommand("2,5d"),
@@ -68,6 +90,49 @@ class DeleteLinesCommandTest : VimTestCase() {
         |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
       """.trimMargin()
     )
+  }
+
+  @Test
+  fun `test delete command with range starting with 0`() {
+    doTest(
+      exCommand("0,5d"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test delete command with range starting with negative offset`() {
+    doTest(
+      exCommand("-10,5d"),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E16: Invalid range")
   }
 
   @Test
