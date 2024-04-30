@@ -161,8 +161,13 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
   private fun parseRange(ctx: RangeContext?): Range {
     val range = Range()
     if (ctx?.rangeUnit() != null) {
-      for (unit in ctx.rangeUnit()) {
+      val addresses = ctx.rangeUnit()
+      for (unit in addresses) {
         range.addAddresses(parseRangeUnit(unit))
+      }
+      // If the range ends with a dangling separator, the last address is an implied current line address
+      if (addresses.last().rangeSeparator()?.text == ",") {
+        createRangeAddresses(".", 0, false)?.let { range.addAddresses(it) }
       }
     }
     return range
