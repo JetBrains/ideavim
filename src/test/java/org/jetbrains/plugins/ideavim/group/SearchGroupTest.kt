@@ -19,6 +19,8 @@ import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -29,6 +31,7 @@ import kotlin.test.assertEquals
 /**
  * @author Alex Plate
  */
+@Suppress("SpellCheckingInspection")
 class SearchGroupTest : VimTestCase() {
   @Test
   fun `test one letter`() {
@@ -1693,6 +1696,50 @@ class SearchGroupTest : VimTestCase() {
     )
 
     // TODO: Check caret position
+  }
+
+  @Test
+  fun `test incsearch updates selection when started in Visual mode`() {
+    doTest(
+      listOf("ve", "/dolor"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ipsum ${c}${se}dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+  }
+
+  @Test
+  fun `test incsearch updates block selection when started in Visual mode`() {
+    doTest(
+      listOf("ll", "<C-V>2j", "/mauris"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |Lo${s}rem ipsum ${c}d${se}olor sit amet,
+        |co${s}nsectetur ${c}a${se}dipiscing elit
+        |Se${s}d in orci ${c}m${se}auris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.BLOCK_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
   }
 
   @Test

@@ -10,11 +10,16 @@ package com.maddyhome.idea.vim.state.mode
 
 /**
  * Get the selection type if the mode is [Mode.VISUAL] or [Mode.SELECT]. Otherwise, returns null.
+ *
+ * Note that if the mode is [Mode.CMD_LINE], we return the selection type of the underlying editor. This only has an
+ * effect for (inc)search, as we switch to [Mode.NORMAL] before entering an ex command.
  */
+@Suppress("RecursivePropertyAccessor")
 public val Mode.selectionType: SelectionType?
   get() = when (this) {
     is Mode.VISUAL -> this.selectionType
     is Mode.SELECT -> this.selectionType
+    is Mode.CMD_LINE -> this.returnTo().selectionType
     else -> null
   }
 
