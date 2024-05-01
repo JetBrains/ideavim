@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.state.mode.inNormalMode
+import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -59,9 +62,28 @@ public sealed class Command(private val commandRange: Range, public val commandA
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     validate(editor)
 
-    if (editor.nativeCarets().any { it.hasSelection() } && Flag.SAVE_VISUAL !in argFlags.flags) {
-      editor.removeSelection()
-      editor.removeSecondaryCarets()
+    StrictMode.assert(editor.inNormalMode, "Command execution should only occur in normal mode")
+
+    // We are currently in Normal mode, but might still have a visual or visual block selection and/or multiple carets.
+    // Vim clears Visual mode before entering Command-line, but we can't do that because some of our commands can handle
+    // selection and multiple carets, and we have to wait until now before we can handle it.
+    // See ExEntryAction and ProcessExCommandEntryAction
+    // Unless the command needs us to keep visual (e.g. :action), remove the secondary carets that are an implementation
+    // detail for block selection, but leave all other carets. If any other caret has a selection, move the caret to the
+    // start offset of the selection, copying Vim's behaviour (with its only caret)
+    if (Flag.SAVE_VISUAL !in argFlags.flags) {
+      // Editor.inBlockSelection is not available, because we're not in Visual mode anymore. Check if the primary caret
+      // currently has a selection and if (when we still in Visual) it was a block selection.
+      if (editor.primaryCaret().hasSelection() && editor.primaryCaret().lastSelectionInfo.selectionType.isBlock) {
+        editor.removeSecondaryCarets()
+      }
+      editor.nativeCarets().forEach {
+        if (it.hasSelection()) {
+          val offset = it.selectionStart
+          it.removeSelection()
+          it.moveToOffset(offset)
+        }
+      }
     }
 
     if (argFlags.access == Access.WRITABLE && !editor.isDocumentWritable()) {

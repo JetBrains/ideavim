@@ -62,8 +62,13 @@ public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution()
     val panel = injector.commandLine.getActiveCommandLine()!!
     panel.deactivate(true)
     try {
+      // Exit Command-line mode and return to Normal before executing the command. Remember from ExEntryAction that we
+      // might still have selection and/or multiple carets, even though ExEntryAction switched us to Normal mode. This
+      // will be handled in Command.execute once we know if the Command requires keeping the selection.
       editor.mode = com.maddyhome.idea.vim.state.mode.Mode.NORMAL()
+
       logger.debug("processing command")
+
       val text = panel.text
       val shouldSkipHistory = getInstance(editor).mappingState.isExecutingMap() || injector.macro.isExecutingMacro
       injector.vimscriptExecutor.execute(text, editor, context, shouldSkipHistory, true, CommandLineVimLContext)

@@ -12,7 +12,6 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
-import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicatorProvider
@@ -22,31 +21,20 @@ import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.InvalidCommandException
 import com.maddyhome.idea.vim.helper.requestFocus
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.Mode.NORMAL
-import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
-import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
-import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.io.Reader
 import java.io.Writer
 import javax.swing.KeyStroke
-import javax.swing.SwingUtilities
 
 public class ProcessGroup : VimProcessGroupBase() {
   override var lastCommand: String? = null
@@ -67,7 +55,7 @@ public class ProcessGroup : VimProcessGroupBase() {
       return true
     } else {
       processResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
-        lambdaEditor.mode = NORMAL()
+        lambdaEditor.mode = Mode.NORMAL()
         getInstance().reset(lambdaEditor)
       }
       return false
@@ -75,7 +63,10 @@ public class ProcessGroup : VimProcessGroupBase() {
   }
 
   public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
-    editor.mode = NORMAL()
+    // TODO: Should we clear selection here?
+    // We are most likely already in Normal, but might still have a selection or multiple carets, because we maintain
+    // them until the parsed Command is executed, in case it needs them
+    editor.mode = Mode.NORMAL()
     getInstance().reset(editor)
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true, resetCaret)

@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
+@Suppress("SpellCheckingInspection")
 class MoveCommandTest : VimTestCase() {
 
   @Test
@@ -152,6 +153,29 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
       """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test move text to below current line`() {
+    doTest(
+      exCommand("2,4m."),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
     )
   }
 

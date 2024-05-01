@@ -57,8 +57,6 @@ public data class MoveTextCommand(val range: Range, val argument: String) : Comm
     // the line _before_ the first line (i.e., move to above the first line).
     val lineRange = getLineRange(editor, caret)
     val range = lineRange.toTextRange(editor)
-    // FIXME: see VIM-2884. It's absolutely not the best way to resolve this bug
-    caret.moveToOffset(range.startOffset)
     val address1 = getAddressFromArgument(editor)
 
     // Convert target one-based line to zero-based line. This means our special case of 0 will be represented by -1

@@ -36,9 +36,23 @@ internal class ExEntryAction : VimActionHandler.SingleExecution(), CmdLineAction
 
     injector.processGroup.isCommandProcessing = true
     injector.processGroup.modeBeforeCommandProcessing = currentMode
+
     val initText = getRange(editor, cmd)
+
+    // Make sure the Visual selection marks are up to date.
     injector.markService.setVisualSelectionMarks(editor)
+
+    // Note that we should remove selection and reset caret offset before we switch back to Normal mode and then enter
+    // Command-line mode. However, some IdeaVim commands can handle multiple carets, including multiple carets with
+    // selection (which might or might not be a block selection). Unfortunately, because we're just entering
+    // Command-line mode, we don't know which command is going to be entered, so we can't remove selection here.
+    // Therefore, we switch to Normal and then Command-line even though we might still have a Visual selection...
+    // On the plus side, it means we still show selection while editing the command line, which Vim also does
+    // (Normal then Command-line is not strictly necessary, but done for completeness and autocmd)
+    // Caret selection is finally handled in Command.execute
+    editor.mode = com.maddyhome.idea.vim.state.mode.Mode.NORMAL()
     editor.mode = com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE(currentMode)
+
     injector.commandLine.create(editor, context, ":", initText, 1)
     return true
   }
