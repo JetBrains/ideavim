@@ -24,7 +24,7 @@ class PrintCommandTest : VimTestCase() {
   fun `test clears output between execution`() {
     configureByText(initialText)
     typeText(commandToKeys("p"))
-    assertExOutput("    Lorem Ipsum\n")
+    assertExOutput("    Lorem Ipsum\n", clear = false)
     // TODO: We need a better way to handle output
     // We should be waiting for a keypress now, such as <Enter> or <Esc> to close the output panel. But that's handled
     // by a separate key event loop which doesn't operate in tests.
