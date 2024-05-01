@@ -54,6 +54,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     label: String,
     initialCommandText: String,
   ) {
+    // Don't allow ex commands in one line editors
     if (editor.isOneLineMode()) return
 
     val currentMode = editor.vimStateMachine.mode
@@ -64,10 +65,10 @@ public class ProcessGroup : VimProcessGroupBase() {
     isCommandProcessing = true
     modeBeforeCommandProcessing = currentMode
 
-    val initText = getRange(editor, command)
-
-    // Make sure the Visual selection marks are up to date.
+    // Make sure the Visual selection marks are up to date before we use them.
     injector.markService.setVisualSelectionMarks(editor)
+
+    val rangeText = getRange(editor, command)
 
     // Note that we should remove selection and reset caret offset before we switch back to Normal mode and then enter
     // Command-line mode. However, some IdeaVim commands can handle multiple carets, including multiple carets with
@@ -80,7 +81,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     editor.mode = Mode.NORMAL()
     editor.mode = Mode.CMD_LINE(currentMode)
 
-    injector.commandLine.create(editor, context, ":", initText, 1)
+    injector.commandLine.create(editor, context, ":", rangeText + initialCommandText, 1)
   }
 
   public override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {

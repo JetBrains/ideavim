@@ -10,11 +10,12 @@ package org.jetbrains.plugins.ideavim.ex.parser.commands
 
 import com.maddyhome.idea.vim.vimscript.model.commands.CmdFilterCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CmdFilterCommandTest {
+class CmdFilterCommandTest : VimTestCase() {
 
   // VIM-2442
   @Test
