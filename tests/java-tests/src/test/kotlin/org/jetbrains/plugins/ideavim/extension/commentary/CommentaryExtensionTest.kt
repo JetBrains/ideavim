@@ -828,30 +828,19 @@ class CommentaryExtensionTest : VimJavaTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    """
-        <caret>//final int var value1 = 42;
-        //final int var value2 = 42;
-        //final int var value3 = 42;
-  """,
-    description = "Vim exits Visual mode before entering Command mode, and resets the caret to the start of the visual selection." +
-      "When executing the Commentary command, we don't move the caret, so it should be end up at the start of the visual selection." +
-      "Note that Escape exits Visual mode, but leaves the caret where it is",
-    shouldBeFixed = true,
-  )
   @Test
   fun `test Commentary command comments visual range`() {
     doTest(
       "Vjj" + ":Commentary<CR>",
       """
-        final int var <caret>value1 = 42;
+        final int var ${c}value1 = 42;
         final int var value2 = 42;
         final int var value3 = 42;
       """.trimIndent(),
       """
-        //final int var value1 = 42;
+        ${c}//final int var value1 = 42;
         //final int var value2 = 42;
-        //final int var <caret>value3 = 42;
+        //final int var value3 = 42;
       """.trimIndent(),
       Mode.NORMAL(),
       JavaFileType.INSTANCE,

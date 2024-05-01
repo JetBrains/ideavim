@@ -10,13 +10,12 @@ package com.maddyhome.idea.vim.action.ex
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 public interface CmdLineAction {
   public fun getRange(editor: VimEditor, cmd: Command): String {
     var initText = ""
-    if (editor.vimStateMachine.mode is VISUAL) {
+    if (editor.inVisualMode) {
       initText = "'<,'>"
     } else if (cmd.rawCount > 0) {
       initText = if (cmd.count == 1) {
