@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 
@@ -34,16 +33,6 @@ public data class SortCommand(val range: Range, val argument: String) : Command.
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val sortOption = parseSortOption(argument)
     val lineComparator = LineComparator(sortOption.ignoreCase, sortOption.numeric, sortOption.reverse)
-    if (editor.inBlockSelection) {
-      val primaryCaret = editor.primaryCaret()
-      val range = getSortLineRange(editor, primaryCaret)
-      val worked = injector.changeGroup.sortRange(editor, primaryCaret, range, lineComparator, sortOption)
-      primaryCaret.moveToInlayAwareOffset(
-        injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine),
-      )
-      return if (worked) ExecutionResult.Success else ExecutionResult.Error
-    }
-
     var worked = true
     for (caret in editor.carets()) {
       val range = getSortLineRange(editor, caret)
