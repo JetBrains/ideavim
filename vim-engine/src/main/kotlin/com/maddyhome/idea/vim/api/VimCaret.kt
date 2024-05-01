@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inCommandLineMode
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import javax.swing.KeyStroke
@@ -103,6 +104,10 @@ per-caret marks.
     caretAfterMove = if (editor.inVisualMode || editor.inSelectMode) {
       // Another inconsistency with immutable caret. This method should be called on the new caret instance.
       caretAfterMove.vimMoveSelectionToCaret(this.vimSelectionStart)
+      editor.findLastVersionOfCaret(caretAfterMove) ?: caretAfterMove
+    } else if (editor.inCommandLineMode && caretAfterMove.hasSelection()) {
+      // If we're updating the caret in Command-line mode, it's most likely due to incsearch
+      caretAfterMove.setSelection(caretAfterMove.selectionStart, offset)
       editor.findLastVersionOfCaret(caretAfterMove) ?: caretAfterMove
     } else {
       editor.exitVisualMode()

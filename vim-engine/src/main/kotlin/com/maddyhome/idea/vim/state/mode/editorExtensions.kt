@@ -26,6 +26,9 @@ public val VimEditor.inNormalMode: Boolean
 public val VimEditor.inSelectMode: Boolean
   get() = this.mode is Mode.SELECT
 
+public val VimEditor.inCommandLineMode: Boolean
+  get() = this.mode is Mode.CMD_LINE
+
 public val VimEditor.singleModeActive: Boolean
   get() = this.mode.isSingleModeActive
 
