@@ -62,11 +62,15 @@ class BuiltInFunctionTest : VimTestCase() {
     // Without selection - current line
     typeText(commandToKeys("""echo line("v")"""))
     assertExOutput("3\n")
-    // With selection
+
+    // With selection - make sure to delete the '<,'> that is automatically prepended when entering Command-line mode
+    // with a selection
     typeText(injector.parser.parseKeys("vj"))
-    typeText(commandToKeys("""echo line("v")"""))
+    typeText(injector.parser.parseKeys(""":<BS><BS><BS><BS><BS>echo line("v")<CR>"""))
     assertExOutput("3\n")
-    // Remove selection and check again
+
+    // Remove selection and check again - note that exiting Command-line mode removes selection and switches back to
+    // Normal. This <esc> does nothing
     typeText(injector.parser.parseKeys("<esc>"))
     typeText(commandToKeys("""echo line("v")"""))
     assertExOutput("3\n")
@@ -106,11 +110,15 @@ class BuiltInFunctionTest : VimTestCase() {
     // Without selection - current line
     typeText(commandToKeys("""echo col("v")"""))
     assertExOutput("5\n")
-    // With selection
+
+    // With selection - make sure to delete the '<,'> that is automatically prepended when entering Command-line mode
+    // with a selection
     typeText(injector.parser.parseKeys("vll"))
-    typeText(commandToKeys("""echo col("v")"""))
+    typeText(injector.parser.parseKeys(""":<BS><BS><BS><BS><BS>echo col("v")<CR>"""))
     assertExOutput("5\n")
-    // Remove selection and check again
+
+    // Remove selection and check again - note that exiting Command-line mode removes selection and switches back to
+    // Normal. This <esc> does nothing
     typeText(injector.parser.parseKeys("<esc>"))
     typeText(commandToKeys("""echo col("v")"""))
     assertExOutput("5\n")

@@ -657,11 +657,17 @@ abstract class VimTestCase {
     assertExOutput(expected)
   }
 
-  fun assertExOutput(expected: String) {
+  fun assertExOutput(expected: String, clear: Boolean = true) {
     val actual = ExOutputModel.getInstance(fixture.editor).text
     assertNotNull(actual, "No Ex output")
     assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", testInfo, fixture.editor)
+    if (clear) {
+      // Ex output is not cleared until the output pane is activated again (we need it to persist so that :print will
+      // work when called multiple times from :global). When testing, if the previous action fails before it can
+      // activate the output pane, we'll be looking at stale results.
+      ExOutputModel.getInstance(fixture.editor).clear()
+    }
   }
 
   fun assertNoExOutput() {
