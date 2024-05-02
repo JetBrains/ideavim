@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.io.BufferedWriter
 import java.io.IOException
@@ -105,10 +106,9 @@ public class ProcessGroup : VimProcessGroupBase() {
   }
 
   public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
-    // TODO: Should we clear selection here?
-    // We are most likely already in Normal, but might still have a selection or multiple carets, because we maintain
-    // them until the parsed Command is executed, in case it needs them
-    editor.mode = Mode.NORMAL()
+    // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
+    // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.
+    editor.mode = editor.mode.returnTo()
     getInstance().reset(editor)
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true, resetCaret)

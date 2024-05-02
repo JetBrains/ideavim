@@ -2191,6 +2191,66 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test cancelling search restores Visual (characterwise)`() {
+    doTest(
+      listOf("v", "e", "/amet", "<Esc>"),
+      """
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lore${c}m${se} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    )
+  }
+
+  @Test
+  fun `test cancelling search restores Visual (linewise)`() {
+    doTest(
+      listOf("V", "2j", "/mauris", "<Esc>"),
+      """
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |${c}Sed in orci mauris.
+        |${se}Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.LINE_WISE)
+    )
+  }
+
+  @Test
+  fun `test cancelling search restores Visual (blockwise)`() {
+    doTest(
+      listOf("<C-V>", "2j", "/mauris", "<Esc>"),
+      """
+        |Lo${c}rem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |Lo${s}${c}r${se}em ipsum dolor sit amet,
+        |co${s}${c}n${se}sectetur adipiscing elit
+        |Se${s}${c}d${se} in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.BLOCK_WISE)
+    )
+  }
+
+  @Test
   fun `test highlight search results`() {
     configureByText(
       """I found it in a legendary land

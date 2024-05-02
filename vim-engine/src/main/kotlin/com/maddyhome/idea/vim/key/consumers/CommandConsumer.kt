@@ -173,6 +173,7 @@ public class CommandConsumer : KeyConsumer {
           keyState.digraphSequence.startLiteralSequence()
           KeyHandler.getInstance().setPromptCharacterEx('^')
         }
+
       else -> Unit
     }
 
