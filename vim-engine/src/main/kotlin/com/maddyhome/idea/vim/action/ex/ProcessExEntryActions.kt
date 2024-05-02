@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
+import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.util.*
 
@@ -62,10 +63,11 @@ public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution()
     val panel = injector.commandLine.getActiveCommandLine()!!
     panel.deactivate(true)
     try {
-      // Exit Command-line mode and return to Normal before executing the command. Remember from ExEntryAction that we
-      // might still have selection and/or multiple carets, even though ProcessGroup.startExEntry switched us to Normal
-      // mode. This will be handled in Command.execute once we know if the Command requires keeping the selection.
-      editor.mode = com.maddyhome.idea.vim.state.mode.Mode.NORMAL()
+      // Exit Command-line mode and return to the previous mode before executing the command (this is set to Normal in
+      // startExEntry). Remember from startExEntry that we might still have selection and/or multiple carets, even
+      // though we're in Normal. This will be handled by Command.execute once we know if we should be clearing the
+      // selection.
+      editor.mode = editor.mode.returnTo()
 
       logger.debug("processing command")
 
