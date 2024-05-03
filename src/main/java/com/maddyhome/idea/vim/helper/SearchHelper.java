@@ -10,18 +10,10 @@ package com.maddyhome.idea.vim.helper;
 
 import com.google.common.collect.Lists;
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx;
-import com.intellij.lang.CodeDocumentationAwareCommenter;
-import com.intellij.lang.Commenter;
-import com.intellij.lang.Language;
-import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.spellchecker.SpellCheckerSeveritiesProvider;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;

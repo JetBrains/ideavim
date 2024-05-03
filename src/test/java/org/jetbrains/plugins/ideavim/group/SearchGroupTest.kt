@@ -2258,6 +2258,24 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(9, res)
   }
 
+  // VIM-2510
+  @Test
+  fun `test backslash-i does not hang while trying to highlight all instances with old regex engine`() {
+    // \i - identifier character class.
+    // The old regex engine would treat '\0' as a valid identifier, which is unfortunate, because that marks the end of
+    // each search input line. There is also no validation on the column, so it would continuously match the end of line
+    // marker and increment the column even though there was no column.
+    // We should also be using 'isident' instead of Character.isJavaIdentifierPart, but let's not worry about the old
+    // engine now.
+    doTest(
+      searchCommand("/\\i"),
+      """lorem ipsum""",
+      """l${c}orem ipsum"""
+    ) {
+      enterCommand("set hlsearch nousenewregex")
+    }
+  }
+
   private fun search(pattern: String, input: String): Int {
     configureByText(input)
     val editor = fixture.editor

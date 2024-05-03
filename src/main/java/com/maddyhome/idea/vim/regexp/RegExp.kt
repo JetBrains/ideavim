@@ -1877,7 +1877,9 @@ internal class RegExp {
             reginput!!.inc()
           }
           IDENT -> {
-            if (!Character.isJavaIdentifierPart(c)) {
+            // Character.isJavaIdentifier treats '\0' as a valid identifier!
+            // Also, this should really be using 'isident' instead of Character.isJavaIdentifierPart
+            if (c == '\u0000' || !Character.isJavaIdentifierPart(c)) {
               return false
             }
             reginput!!.inc()
