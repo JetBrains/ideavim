@@ -477,6 +477,7 @@ internal class NerdTree : VimExtension {
       "r",
       NerdAction.ToIj("SynchronizeCurrentFile"),
     )
+    registerCommand("NERDTreeMapToggleHidden", "I", NerdAction.ToIj("ProjectView.ShowExcludedFiles"))
     registerCommand("NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
     registerCommand("NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
     registerCommand("NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
