@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.extension.highlightedyank
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.markup.EffectType
@@ -19,25 +19,24 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
+import com.intellij.util.Alarm
+import com.intellij.util.Alarm.ThreadToUse
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.NonNls
 import java.awt.Color
 import java.awt.Font
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
-internal const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
+internal const val DEFAULT_HIGHLIGHT_DURATION: Int = 300
 
 @NonNls
 private val HIGHLIGHT_DURATION_VARIABLE_NAME = "highlightedyank_highlight_duration"
@@ -78,111 +77,128 @@ internal class HighlightColorResetter : LafManagerListener {
  */
 internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
   private val highlightHandler = HighlightHandler()
+  private var initialised = false
 
   override fun getName() = "highlightedyank"
 
   override fun init() {
+    // Note that these listeners will still be registered when IdeaVim is disabled. However, they'll never get called
     VimPlugin.getYank().addListener(this)
     VimPlugin.getChange().addInsertListener(this)
+
+    // Register our own disposable to remove highlights when IdeaVim is disabled. Somehow, we need to re-register when
+    // IdeaVim is re-enabled. We don't get a call back for that, but because the listeners are active until the
+    // _extension_ is disabled, make sure we're properly initialised each time we're called.
+    registerIdeaVimDisabledCallback()
+    initialised = true
+  }
+
+  private fun registerIdeaVimDisabledCallback() {
+    // TODO: IdeaVim should help with lifecycle management here - VIM-3419
+    // IdeaVim should possibly unregister extensions, but it would also need to re-register them. We have to do this
+    // state management manually for now
+    Disposer.register(VimPlugin.getInstance().onOffDisposable) {
+      highlightHandler.clearYankHighlighters()
+      initialised = false
+    }
   }
 
   override fun dispose() {
+    // Called when the extension is disabled with `:set no{extension}` or if the plugin owning the extension unloads
     VimPlugin.getYank().removeListener(this)
     VimPlugin.getChange().removeInsertListener(this)
+
+    highlightHandler.clearYankHighlighters()
+    initialised = false
   }
 
   override fun yankPerformed(editor: VimEditor, range: TextRange) {
+    ensureInitialised()
     highlightHandler.highlightYankRange(editor.ij, range)
   }
 
   override fun insertModeStarted(editor: Editor) {
-    highlightHandler.clearAllYankHighlighters()
+    ensureInitialised()
+    highlightHandler.clearYankHighlighters()
+  }
+
+  private fun ensureInitialised() {
+    if (!initialised) {
+      registerIdeaVimDisabledCallback()
+      initialised = true
+    }
   }
 
   private class HighlightHandler {
-    private var editor: Editor? = null
-    private val yankHighlighters: MutableSet<RangeHighlighter> = mutableSetOf()
+    private val alarm = Alarm(ThreadToUse.SWING_THREAD)
+    private var lastEditor: Editor? = null
+    private val highlighters = mutableSetOf<RangeHighlighter>()
 
     fun highlightYankRange(editor: Editor, range: TextRange) {
       // from vim-highlightedyank docs: When a new text is yanked or user starts editing, the old highlighting would be deleted
-      clearAllYankHighlighters()
+      clearYankHighlighters()
 
-      this.editor = editor
-      val project = editor.project
-      if (project != null) {
-        Disposer.register(
-          VimProjectService.getInstance(project),
-        ) {
-          this.editor = null
-          yankHighlighters.clear()
-        }
+      lastEditor = editor
+
+      val attributes = getHighlightTextAttributes(editor)
+      for (i in 0 until range.size()) {
+        val highlighter = editor.markupModel.addRangeHighlighter(
+          range.startOffsets[i],
+          range.endOffsets[i],
+          HighlighterLayer.SELECTION,
+          attributes,
+          HighlighterTargetArea.EXACT_RANGE,
+        )
+        highlighters.add(highlighter)
       }
-
-      if (range.isMultiple) {
-        for (i in 0 until range.size()) {
-          highlightSingleRange(editor, range.startOffsets[i]..range.endOffsets[i])
-        }
-      } else {
-        highlightSingleRange(editor, range.startOffset..range.endOffset)
-      }
-    }
-
-    fun clearAllYankHighlighters() {
-      yankHighlighters.forEach { highlighter ->
-        editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
-      }
-
-      yankHighlighters.clear()
-    }
-
-    private fun highlightSingleRange(editor: Editor, range: ClosedRange<Int>) {
-      val highlighter = editor.markupModel.addRangeHighlighter(
-        range.start,
-        range.endInclusive,
-        HighlighterLayer.SELECTION,
-        getHighlightTextAttributes(),
-        HighlighterTargetArea.EXACT_RANGE,
-      )
-
-      yankHighlighters.add(highlighter)
-
-      setClearHighlightRangeTimer(highlighter)
-    }
-
-    private fun setClearHighlightRangeTimer(highlighter: RangeHighlighter) {
-      val timeout = extractUsersHighlightDuration()
 
       // from vim-highlightedyank docs: A negative number makes the highlight persistent.
+      val timeout = extractUsersHighlightDuration()
       if (timeout >= 0) {
-        Executors.newSingleThreadScheduledExecutor().schedule(
-          {
-            ApplicationManager.getApplication().invokeLater {
-              editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
-            }
-          },
+        // Note modality. This is important when highlighting an editor when a modal dialog is open, such as the resolve
+        // conflict diff view
+        alarm.addRequest(
+          { clearYankHighlighters() },
           timeout,
-          TimeUnit.MILLISECONDS,
+          ModalityState.any()
         )
       }
     }
 
-    private fun getHighlightTextAttributes() = TextAttributes(
+    fun clearYankHighlighters() {
+      alarm.cancelAllRequests()
+      // Make sure the last editor we saved is still alive before we use it. We can't just use the list of open editors
+      // because this list is empty when IdeaVim is disabled, so we're unable to clean up
+      lastEditor?.let { editor ->
+        if (!editor.isDisposed) {
+          highlighters.forEach { highlighter -> editor.markupModel.removeHighlighter(highlighter) }
+        }
+      }
+      lastEditor = null
+      highlighters.clear()
+    }
+
+    private fun getHighlightTextAttributes(editor: Editor) = TextAttributes(
       null,
       extractUsersHighlightColor(),
-      editor?.colorsScheme?.getColor(EditorColors.CARET_COLOR),
+      editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
       EffectType.SEARCH_MATCH,
       Font.PLAIN,
     )
 
-    private fun extractUsersHighlightDuration(): Long {
+    private fun extractUsersHighlightDuration(): Int {
       return extractVariable(HIGHLIGHT_DURATION_VARIABLE_NAME, DEFAULT_HIGHLIGHT_DURATION) {
-        it.toLong()
+        // toVimNumber will return 0 for an invalid string. Let's force it to throw
+        when (it) {
+          is VimString -> it.value.toInt()
+          else -> it.toVimNumber().value
+        }
       }
     }
 
     private fun extractUsersHighlightColor(): Color {
       return extractVariable(HIGHLIGHT_COLOR_VARIABLE_NAME, getDefaultHighlightTextColor()) { value ->
-        val rgba = value
+        val rgba = value.asString()
           .substring(4)
           .filter { it != '(' && it != ')' && !it.isWhitespace() }
           .split(',')
@@ -192,12 +208,11 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
       }
     }
 
-    private fun <T> extractVariable(variable: String, default: T, extractFun: (value: String) -> T): T {
+    private fun <T> extractVariable(variable: String, default: T, extractFun: (value: VimDataType) -> T): T {
       val value = VimPlugin.getVariableService().getGlobalVariableValue(variable)
-
-      if (value is VimString) {
+      if (value != null) {
         return try {
-          extractFun(value.value)
+          extractFun(value)
         } catch (e: Exception) {
           @VimNlsSafe val message = MessageHelper.message(
             "highlightedyank.invalid.value.of.0.1",
