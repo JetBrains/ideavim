@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -85,10 +84,12 @@ public class EditorHelper {
 
   public static int getNonNormalizedVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
     // The editor will return line numbers of virtual space if the text doesn't reach the end of the visible area
-    // (either because it's too short, or it's been scrolled up)
+    // (either because it's too short, or it's been scrolled up).
+    // Adjust available height if the ex entry text field is visible
     final Rectangle visibleArea = getVisibleArea(editor);
-    return getFullVisualLine(editor, visibleArea.y + visibleArea.height, visibleArea.y,
-                             visibleArea.y + visibleArea.height);
+    final int height = visibleArea.height - getExEntryHeight();
+    return getFullVisualLine(editor, visibleArea.y + height, visibleArea.y,
+                             visibleArea.y + height);
   }
 
   public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
@@ -363,22 +364,25 @@ public class EditorHelper {
   }
 
   private static int getOffsetToScrollVisualLineToBottomOfScreen(@NotNull Editor editor, int nonNormalisedVisualLine) {
-    int exPanelHeight = 0;
-    if (ExEntryPanel.getInstance().isActive()) {
-      exPanelHeight = ExEntryPanel.getInstance().getHeight();
-    }
-    if (ExEntryPanel.getInstanceWithoutShortcuts().isActive()) {
-      exPanelHeight += ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
-    }
-
     // Note that we explicitly do not normalise the visual line, as we might be trying to scroll a virtual line, at the
-    // end of the file
+    // end of the file.
+    // Adjust available height if the ex entry text field is visible
     final int lineHeight = editor.getLineHeight();
-    final int screenHeight = getVisibleArea(editor).height - exPanelHeight;
+    final int screenHeight = getVisibleArea(editor).height - getExEntryHeight();
     final int inlayHeight = EditorUtil.getInlaysHeight(editor, nonNormalisedVisualLine, false);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight;
     final int y = editor.visualLineToY(nonNormalisedVisualLine) + lineHeight + min(inlayHeight, maxInlayHeight);
     return max(0, y - screenHeight);
+  }
+
+  private static int getExEntryHeight() {
+    if (ExEntryPanel.getInstance().isActive()) {
+      return ExEntryPanel.getInstance().getHeight();
+    }
+    if (ExEntryPanel.getInstanceWithoutShortcuts().isActive()) {
+      return ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
+    }
+    return 0;
   }
 
   public static void scrollColumnToLeftOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
