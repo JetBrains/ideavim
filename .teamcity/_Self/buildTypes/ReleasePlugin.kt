@@ -147,10 +147,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Run Integrations"
       tasks = "releaseActions"
     }
-    gradle {
-      name = "Slack Notification"
-      tasks = "slackNotification"
-    }
+//    gradle {
+//      name = "Slack Notification"
+//      tasks = "slackNotification"
+//    }
   }
 
   features {
