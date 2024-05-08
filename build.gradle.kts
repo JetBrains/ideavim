@@ -77,20 +77,6 @@ plugins {
   id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
-ksp {
-  arg("generated_directory", "$projectDir/src/main/resources/ksp-generated")
-  arg("vimscript_functions_file", "intellij_vimscript_functions.json")
-  arg("ex_commands_file", "intellij_ex_commands.json")
-  arg("commands_file", "intellij_commands.json")
-}
-
-afterEvaluate {
-//  tasks.named("kspKotlin").configure { dependsOn("clean") }
-  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
-  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
-  tasks.named("kspTestKotlin").configure { enabled = false }
-}
-
 // Import variables from gradle.properties file
 val javaVersion: String by project
 val kotlinVersion: String by project
@@ -154,6 +140,8 @@ configurations {
 
 tasks {
   test {
+    useJUnitPlatform()
+
     // Set teamcity env variable locally to run additional tests for leaks.
     // By default, this test runs on TC only, but this test doesn't take a lot of time,
     //   so we can turn it on for local development
@@ -191,6 +179,10 @@ tasks {
     }
   }
 
+  runIde {
+    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
+  }
+
   downloadRobotServerPlugin {
     version.set(remoteRobotVersion)
   }
@@ -201,11 +193,33 @@ tasks {
     systemProperty("jb.privacy.policy.text", "<!--999.999-->")
     systemProperty("jb.consents.confirmation.enabled", "false")
     systemProperty("ide.show.tips.on.startup.default.value", "false")
+
     systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
   }
 
-  runIde {
-    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
+  // Add plugin open API sources to the plugin ZIP
+  val createOpenApiSourceJar by registering(Jar::class) {
+    // Java sources
+    from(sourceSets.main.get().java) {
+      include("**/com/maddyhome/idea/vim/**/*.java")
+    }
+    from(project(":vim-engine").sourceSets.main.get().java) {
+      include("**/com/maddyhome/idea/vim/**/*.java")
+    }
+    // Kotlin sources
+    from(kotlin.sourceSets.main.get().kotlin) {
+      include("**/com/maddyhome/idea/vim/**/*.kt")
+    }
+    from(project(":vim-engine").kotlin.sourceSets.main.get().kotlin) {
+      include("**/com/maddyhome/idea/vim/**/*.kt")
+    }
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+    archiveClassifier.set("src")
+  }
+
+  buildPlugin {
+    dependsOn(createOpenApiSourceJar)
+    from(createOpenApiSourceJar) { into("lib/src") }
   }
 }
 
@@ -261,31 +275,6 @@ tasks {
     teamCityOutputFormat.set(true)
   }
 
-  // Add plugin open API sources to the plugin ZIP
-  val createOpenApiSourceJar by registering(Jar::class) {
-    // Java sources
-    from(sourceSets.main.get().java) {
-      include("**/com/maddyhome/idea/vim/**/*.java")
-    }
-    from(project(":vim-engine").sourceSets.main.get().java) {
-      include("**/com/maddyhome/idea/vim/**/*.java")
-    }
-    // Kotlin sources
-    from(kotlin.sourceSets.main.get().kotlin) {
-      include("**/com/maddyhome/idea/vim/**/*.kt")
-    }
-    from(project(":vim-engine").kotlin.sourceSets.main.get().kotlin) {
-      include("**/com/maddyhome/idea/vim/**/*.kt")
-    }
-    destinationDirectory.set(layout.buildDirectory.dir("libs"))
-    archiveClassifier.set("src")
-  }
-
-  buildPlugin {
-    dependsOn(createOpenApiSourceJar)
-    from(createOpenApiSourceJar) { into("lib/src") }
-  }
-
   patchPluginXml {
     // Don't forget to update plugin.xml
     sinceBuild.set("241.15989.150")
@@ -296,13 +285,20 @@ tasks {
   }
 }
 
-// --- Tests
-
-tasks {
-  test {
-    useJUnitPlatform()
-  }
+ksp {
+  arg("generated_directory", "$projectDir/src/main/resources/ksp-generated")
+  arg("vimscript_functions_file", "intellij_vimscript_functions.json")
+  arg("ex_commands_file", "intellij_ex_commands.json")
+  arg("commands_file", "intellij_commands.json")
 }
+
+afterEvaluate {
+//  tasks.named("kspKotlin").configure { dependsOn("clean") }
+  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
+  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
+  tasks.named("kspTestKotlin").configure { enabled = false }
+}
+
 
 // --- Changelog
 
