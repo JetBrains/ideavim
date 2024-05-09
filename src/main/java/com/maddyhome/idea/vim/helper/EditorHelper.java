@@ -10,7 +10,10 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
@@ -87,7 +90,7 @@ public class EditorHelper {
     // (either because it's too short, or it's been scrolled up).
     // Adjust available height if the ex entry text field is visible
     final Rectangle visibleArea = getVisibleArea(editor);
-    final int height = visibleArea.height - getExEntryHeight();
+    final int height = visibleArea.height - getExEntryHeight() - getHorizontalScrollbarHeight(editor);
     return getFullVisualLine(editor, visibleArea.y + height, visibleArea.y,
                              visibleArea.y + height);
   }
@@ -368,7 +371,7 @@ public class EditorHelper {
     // end of the file.
     // Adjust available height if the ex entry text field is visible
     final int lineHeight = editor.getLineHeight();
-    final int screenHeight = getVisibleArea(editor).height - getExEntryHeight();
+    final int screenHeight = getVisibleArea(editor).height - getExEntryHeight() - getHorizontalScrollbarHeight(editor);
     final int inlayHeight = EditorUtil.getInlaysHeight(editor, nonNormalisedVisualLine, false);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight;
     final int y = editor.visualLineToY(nonNormalisedVisualLine) + lineHeight + min(inlayHeight, maxInlayHeight);
@@ -382,6 +385,19 @@ public class EditorHelper {
     if (ExEntryPanel.getInstanceWithoutShortcuts().isActive()) {
       return ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
     }
+    return 0;
+  }
+
+  private static int getHorizontalScrollbarHeight(@NotNull final Editor editor) {
+    // Horizontal scrollbars on macOS are either transparent AND auto-hide, so we don't need to worry about obscured
+    // text, or always visible, opaque and outside the content area, so we don't need to adjust for them
+    // Transparent scrollbars on Windows and Linux are overlays on the editor content area, and always visible. That
+    // means they can obscure text, so we want to adjust by the scrollbar height. If they are not transparent, then they
+    // are not overlays and are outside the content area. We don't need to adjust
+    if (!SystemInfo.isMac && editor instanceof EditorImpl editorImpl && Registry.is("editor.transparent.scrollbar")) {
+      return editorImpl.getScrollPane().getHorizontalScrollBar().getHeight();
+    }
+
     return 0;
   }
 
