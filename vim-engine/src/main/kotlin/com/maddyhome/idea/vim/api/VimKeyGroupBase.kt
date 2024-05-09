@@ -237,7 +237,6 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun unregisterCommandActions() {
-    requiredShortcutKeys.clear()
     keyRoots.clear()
   }
 }

@@ -102,6 +102,7 @@ class UiTests {
       `simple enter in select mode`(editor)
       testMilticaretEnterInSelectMode(editor)
       reenableIdeaVim(editor)
+      reenablingIdeaVimKeepsMappings(editor)
 
       createFile("MyTest.java", this@uiTest)
       val javaEditor = editor("MyTest.java") {
@@ -344,6 +345,51 @@ class UiTests {
       """.trimIndent(),
       editor.text,
     )
+  }
+
+  // Test for VIM-3418
+  private fun IdeaFrame.reenablingIdeaVimKeepsMappings(editor: Editor) {
+    println("Run reenablingIdeaVimKeepsMappings...")
+
+    keyboard {
+      enterText(":imap <A-Q> HEYHEY<ESC>")
+      enter()
+      enterText("i")
+      pressing(KeyEvent.VK_ALT) { enterText("q") }
+    }
+
+    assertEquals(
+      """
+      HEYHEYOne Two
+      Three Four
+      Five
+      """.trimIndent(),
+      editor.text,
+    )
+
+    toggleIdeaVim()
+    keyboard {
+      key(KeyEvent.VK_RIGHT)
+      enterText("-CHECK-")
+    }
+
+    toggleIdeaVim()
+
+    keyboard {
+      enterText("i")
+      pressing(KeyEvent.VK_ALT) { enterText("q") }
+    }
+
+    assertEquals(
+      """
+      HEYHEY-CHECK-HEYHEYOne Two
+      Three Four
+      Five
+      """.trimIndent(),
+      editor.text,
+    )
+
+    vimExit()
   }
 
   private fun IdeaFrame.toggleIdeaVim() {
