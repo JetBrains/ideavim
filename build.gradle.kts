@@ -32,6 +32,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.jetbrains.changelog.Changelog
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.kohsuke.github.GHUser
 import java.net.HttpURLConnection
 import java.net.URL
@@ -67,22 +68,20 @@ plugins {
   kotlin("jvm") version "1.9.22"
   application
   id("java-test-fixtures")
-
-  id("org.jetbrains.intellij") version "1.17.3"
+  id("org.jetbrains.intellij.platform") version "2.0.0-beta7"
   id("org.jetbrains.changelog") version "2.2.0"
-
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.0"
-
   id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
+
+val moduleSources by configurations.registering
 
 // Import variables from gradle.properties file
 val javaVersion: String by project
 val kotlinVersion: String by project
 val ideaVersion: String by project
 val ideaType: String by project
-val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
 
@@ -94,7 +93,9 @@ val youtrackToken: String by project
 
 repositories {
   mavenCentral()
-  maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
+  intellijPlatform {
+    defaultRepositories()
+  }
 }
 
 dependencies {
@@ -105,9 +106,26 @@ dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   compileOnly("org.jetbrains:annotations:24.1.0")
 
-  // --------- Test dependencies ----------
+  intellijPlatform {
+    // Note that it is also possible to use local("...") to compile against a locally installed IDE
+    // E.g. local("/Users/{user}/Applications/IntelliJ IDEA Ultimate.app")
+    // Or something like: intellijIdeaUltimate(ideaVersion)
+    create(ideaType, ideaVersion)
 
-  testImplementation(testFixtures(project(":")))
+    pluginVerifier()
+    zipSigner()
+    instrumentationTools()
+
+    testFramework(TestFrameworkType.Platform)
+    testFramework(TestFrameworkType.JUnit5)
+
+    // AceJump is an optional dependency. We use their SessionManager class to check if it's active
+    plugin("AceJump", "3.8.11")
+  }
+
+  moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
+
+  // --------- Test dependencies ----------
 
   testApi("com.squareup.okhttp3:okhttp:4.12.0")
 
@@ -179,15 +197,28 @@ tasks {
     }
   }
 
+  // Note that this will run the plugin installed in the IDE specified in dependencies. To run in a different IDE, use
+  // a custom task (see below)
   runIde {
     systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
   }
 
-  downloadRobotServerPlugin {
-    version.set(remoteRobotVersion)
-  }
+  // Uncomment to run the plugin in a custom IDE, rather than the IDE specified as a compile target in dependencies
+  // Note that the version must be greater than the plugin's target version, for obvious reasons
+//  val runIdeCustom by registering(CustomRunIdeTask::class) {
+//    type = IntelliJPlatformType.Rider
+//    version = "2024.1.2"
+//  }
 
-  runIdeForUiTests {
+  // Uncomment to run the plugin in a locally installed IDE
+//  val runIdeLocal by registering(CustomRunIdeTask::class) {
+//    localPath = file("/Users/{user}/Applications/WebStorm.app")
+//  }
+
+  // Start the default IDE with both IdeaVim and the robot server plugin installed, ready to run a UI test task. The
+  // robot server plugin is automatically added as a dependency to this task, and Gradle will take care of downloading.
+  // Note that the CustomTestIdeUiTask can be used to run tests against a different IDE
+  testIdeUi {
     systemProperty("robot-server.port", "8082")
     systemProperty("ide.mac.message.dialogs.as.sheets", "false")
     systemProperty("jb.privacy.policy.text", "<!--999.999-->")
@@ -198,28 +229,21 @@ tasks {
   }
 
   // Add plugin open API sources to the plugin ZIP
-  val createOpenApiSourceJar by registering(Jar::class) {
-    // Java sources
-    from(sourceSets.main.get().java) {
-      include("**/com/maddyhome/idea/vim/**/*.java")
-    }
-    from(project(":vim-engine").sourceSets.main.get().java) {
-      include("**/com/maddyhome/idea/vim/**/*.java")
-    }
-    // Kotlin sources
-    from(kotlin.sourceSets.main.get().kotlin) {
-      include("**/com/maddyhome/idea/vim/**/*.kt")
-    }
-    from(project(":vim-engine").kotlin.sourceSets.main.get().kotlin) {
-      include("**/com/maddyhome/idea/vim/**/*.kt")
-    }
+  val sourcesJar by registering(Jar::class) {
+    dependsOn(moduleSources)
     destinationDirectory.set(layout.buildDirectory.dir("libs"))
-    archiveClassifier.set("src")
+    archiveClassifier.set(DocsType.SOURCES)
+    from(sourceSets.main.map { it.kotlin })
+    from(provider {
+      moduleSources.map {
+        it.map { jarFile -> zipTree(jarFile) }
+      }
+    })
   }
 
   buildPlugin {
-    dependsOn(createOpenApiSourceJar)
-    from(createOpenApiSourceJar) { into("lib/src") }
+    dependsOn(sourcesJar)
+    from(sourcesJar) { into("lib/src") }
   }
 }
 
@@ -245,44 +269,41 @@ gradle.projectsEvaluated {
 
 // --- Intellij plugin
 
-intellij {
-  version.set(ideaVersion)
-  type.set(ideaType)
-  pluginName.set("IdeaVim")
+intellijPlatform {
+  pluginConfiguration {
+    name = "IdeaVim"
+    changeNotes.set(
+      """<a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>"""
+    )
 
-  updateSinceUntilBuild.set(false)
+    ideaVersion {
+      // Set the since-build value, but leave until-build open ended (default is MAJOR.*)
+      // Don't forget to update plugin.xml
+      // TODO: Do we need this to be here *and* in plugin.xml?
+      sinceBuild.set("241.15989.150")
+      untilBuild.set(provider { null })
+    }
+  }
 
-  downloadSources.set(downloadIdeaSources.toBoolean())
-  instrumentCode.set(instrumentPluginCode.toBoolean())
-  intellijRepository.set("https://www.jetbrains.com/intellij-repository")
-  plugins.set(listOf("AceJump:3.8.11"))
-}
-
-tasks {
-  publishPlugin {
+  publishing {
     channels.set(publishChannels.split(","))
     token.set(publishToken)
   }
 
-  signPlugin {
+  signing {
     certificateChain.set(providers.environmentVariable("CERTIFICATE_CHAIN"))
     privateKey.set(providers.environmentVariable("PRIVATE_KEY"))
     password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD"))
   }
 
-  runPluginVerifier {
-    downloadDir.set("${project.buildDir}/pluginVerifier/ides")
-    teamCityOutputFormat.set(true)
+  verifyPlugin {
+    teamCityOutputFormat = true
+    ides {
+      recommended()
+    }
   }
 
-  patchPluginXml {
-    // Don't forget to update plugin.xml
-    sinceBuild.set("241.15989.150")
-
-    changeNotes.set(
-      """<a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>"""
-    )
-  }
+  instrumentCode.set(instrumentPluginCode.toBoolean())
 }
 
 ksp {
@@ -884,12 +905,12 @@ fun changes(): List<Change> {
   println("Start changes processing")
   for (message in messages) {
     println("Processing '$message'...")
-    val lowercaseMessage = message.toLowerCase()
+    val lowercaseMessage = message.lowercase()
     val regex = "^fix\\((vim-\\d+)\\):".toRegex()
     val findResult = regex.find(lowercaseMessage)
     if (findResult != null) {
       println("Message matches")
-      val value = findResult.groups[1]!!.value.toUpperCase()
+      val value = findResult.groups[1]!!.value.uppercase()
       val shortMessage = message.drop(findResult.range.last + 1).trim()
       newFixes += Change(value, shortMessage)
     } else {

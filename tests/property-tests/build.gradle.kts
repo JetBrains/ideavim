@@ -1,15 +1,23 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
+import org.jetbrains.intellij.platform.gradle.tasks.CustomTestIdeTask
+
 plugins {
   java
   kotlin("jvm")
-  id("org.jetbrains.intellij")
+  id("org.jetbrains.intellij.platform.module")
 }
 
 repositories {
   mavenCentral()
-  maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
+
+  intellijPlatform {
+    defaultRepositories()
+  }
 }
 
 val kotlinVersion: String by project
+val ideaType: String by project
 val ideaVersion: String by project
 val javaVersion: String by project
 
@@ -18,6 +26,18 @@ dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
   testImplementation(testFixtures(project(":"))) // The root project
+
+  intellijPlatform {
+    create(ideaType, ideaVersion)
+    bundledPlugins("com.intellij.java")
+    testFramework(TestFrameworkType.Platform)
+    testFramework(TestFrameworkType.JUnit5)
+    instrumentationTools()
+  }
+}
+
+intellijPlatform {
+  buildSearchableOptions = false
 }
 
 tasks {
@@ -28,32 +48,10 @@ tasks {
     enabled = false
   }
 
-  register<Test>("testPropertyBased") {
+  register<CustomTestIdeTask>("testPropertyBased") {
     group = "verification"
     useJUnitPlatform()
   }
-
-  verifyPlugin {
-    enabled = false
-  }
-
-  publishPlugin {
-    enabled = false
-  }
-
-  runIde {
-    enabled = false
-  }
-
-  runPluginVerifier {
-    enabled = false
-  }
-}
-
-intellij {
-  version.set(ideaVersion)
-  type.set("IC")
-  plugins.set(listOf("java"))
 }
 
 java {
