@@ -157,6 +157,9 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
     prefixes = HashMap()
   }
 
+  // Internal structures that used in tests to make sure shortcuts are initialized properly and,
+  //  for example, we didn't make two similar shortcuts for two different actions
+  //  These structures are not initialized during production
   private var identityChecker: MutableMap<MappingMode, MutableSet<MutableList<KeyStroke>>>? = null
   private var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
 
@@ -236,7 +239,5 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
   override fun unregisterCommandActions() {
     requiredShortcutKeys.clear()
     keyRoots.clear()
-    identityChecker?.clear()
-    prefixes?.clear()
   }
 }
