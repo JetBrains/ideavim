@@ -16,10 +16,10 @@ object GitHub : Project({
   name = "Pull Requests checks"
   description = "Automatic checking of GitHub Pull Requests"
 
-  buildType(Github("clean test", "Tests"))
+  buildType(GithubBuildType("clean test", "Tests"))
 })
 
-class Github(command: String, desc: String) : IdeaVimBuildType({
+class GithubBuildType(command: String, desc: String) : IdeaVimBuildType({
   name = "GitHub Pull Requests $desc"
   description = "Test GitHub pull requests $desc"
 
