@@ -809,18 +809,20 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
        * Small incompatibility: vi sees '\n' as end of the command, but in
        * Vim we want to use '\n' to find/substitute a NUL.
        */
-      val tmpSub = exarg.substring(substituteStringStartIndex) // remember the start of the substitution
-      var substituteStringEndIndex = tmpSub.length
-      trailingOptionsStartIndex = substituteStringStartIndex + substituteStringEndIndex
-      for (i in tmpSub.indices) {
-        if (tmpSub[i] == delimiter && (i == 0 || tmpSub[i - 1] != '\\')) {
+      var substituteStringEndIndex = exarg.length
+      var i = substituteStringStartIndex
+      while (i < exarg.length) {
+        if (exarg[i] == delimiter) {
           substituteStringEndIndex = i
-          trailingOptionsStartIndex = substituteStringStartIndex + substituteStringEndIndex + 1
           break
         }
+        else if (exarg[i] == '\\' && (i + 1) < exarg.length) {
+          i++
+        }
+        i++
       }
-      sub = tmpSub.substring(0, substituteStringEndIndex)
-
+      sub = exarg.substring(substituteStringStartIndex, substituteStringEndIndex)
+      trailingOptionsStartIndex = substituteStringEndIndex + 1
     } else {
       // use previous pattern and substitution
       if (lastSubstituteString == null) {
