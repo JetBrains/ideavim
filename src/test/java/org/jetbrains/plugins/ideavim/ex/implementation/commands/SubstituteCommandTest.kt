@@ -80,6 +80,33 @@ class SubstituteCommandTest : VimTestCase() {
     )
   }
 
+  // VIM-3428
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute pattern ends with backslash`() {
+    doTest(
+      exCommand("""s/#/b\\\\/g"""), // :s/#/b\\/g
+      "#a#",
+      """b\ab\"""
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute pattern contains escaped backslash`() {
+    doTest(
+      exCommand("""s/#/b\\\\c/g"""), // :s/#/b\\c/g
+      "#a#",
+      """b\cab\c"""
+    )
+  }
+
   // VIM-146
   @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
