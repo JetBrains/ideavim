@@ -33,6 +33,8 @@ import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.CustomRunIdeTask
+import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
 import org.kohsuke.github.GHUser
 import java.net.HttpURLConnection
 import java.net.URL
@@ -84,6 +86,7 @@ val ideaVersion: String by project
 val ideaType: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
+val splitModeVersion: String by project
 
 val publishChannels: String by project
 val publishToken: String by project
@@ -214,6 +217,15 @@ tasks {
 //  val runIdeLocal by registering(CustomRunIdeTask::class) {
 //    localPath = file("/Users/{user}/Applications/WebStorm.app")
 //  }
+
+  val runIdeSplitMode by registering(CustomRunIdeTask::class) {
+    splitMode = true
+    splitModeTarget = SplitModeAware.SplitModeTarget.FRONTEND
+
+    // Frontend split mode support requires 242+
+    // TODO: Remove this once IdeaVim targets 242, as the task will naturally use the target version to run
+    version.set(splitModeVersion)
+  }
 
   // Start the default IDE with both IdeaVim and the robot server plugin installed, ready to run a UI test task. The
   // robot server plugin is automatically added as a dependency to this task, and Gradle will take care of downloading.
