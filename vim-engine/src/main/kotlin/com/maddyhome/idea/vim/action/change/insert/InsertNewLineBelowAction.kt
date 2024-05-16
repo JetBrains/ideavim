@@ -65,7 +65,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
   val moves: MutableSet<Pair<VimCaret, Int>> = HashSet()
   for (caret in editor.nativeCarets()) {
     val offset: Int
-    if (caret.getVisualPosition().line == 0) {
+    if (caret.getBufferPosition().line == 0) {
       // Fake indenting for the first line. Works well for plain text to match the existing indent
       offset = injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret)
       firstLiners.add(caret)
