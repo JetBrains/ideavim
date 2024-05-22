@@ -1,20 +1,21 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+
 package com.maddyhome.idea.vim.action.ex
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -22,8 +23,20 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
+
+@CommandOrMotion(keys = ["<Esc>", "<C-[>", "<C-C>"], modes = [Mode.CMD_LINE])
+public class LeaveCommandLineAction : VimActionHandler.SingleExecution() {
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_END_EX)
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    return true
+  }
+}
 
 @CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.CMD_LINE])
 public class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
@@ -38,13 +51,7 @@ public class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
 public class ProcessSearchEntryAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getOffset(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
+  override fun getOffset(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
     if (argument == null) return Motion.Error
     return when (argument.character) {
       '/' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, Direction.FORWARDS).toMotionOrError()
@@ -57,13 +64,8 @@ public class ProcessSearchEntryAction : MotionActionHandler.ForEachCaret() {
 public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun getOffset(
-    editor: VimEditor,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    VimPlugin.getProcess().processExEntry(editor, context)
+  override fun getOffset(editor: VimEditor, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
+    injector.processGroup.processExEntry(editor, context)
     // TODO support motions for commands
     return Motion.NoMotion
   }
