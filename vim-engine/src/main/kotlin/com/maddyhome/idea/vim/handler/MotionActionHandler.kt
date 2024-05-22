@@ -83,6 +83,14 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     ): Motion
   }
 
+  /**
+   * Support for commands that can be executed either once or for each caret depending on some circumstances
+   * TODO this class should not exist at all, changes to command execution are required
+   */
+  public abstract class AmbiguousExecution : MotionActionHandler() {
+    public abstract fun getMotionActionHandler(argument: Argument?): MotionActionHandler
+  }
+
   public abstract val motionType: MotionType
 
   final override val type: Command.Type = Command.Type.MOTION
@@ -94,9 +102,11 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return when (this) {
-      is SingleExecution -> getOffset(editor, context, argument, operatorArguments)
-      is ForEachCaret -> getOffset(editor, caret, context, argument, operatorArguments)
+    val handler = if (this is AmbiguousExecution) this.getMotionActionHandler(argument) else this
+    return when (handler) {
+      is SingleExecution -> handler.getOffset(editor, context, argument, operatorArguments)
+      is ForEachCaret -> handler.getOffset(editor, caret, context, argument, operatorArguments)
+      is AmbiguousExecution -> throw RuntimeException("Ambiguous handler cannot hold another ambiguous handler")
     }
   }
 
@@ -109,9 +119,10 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   ): Boolean {
     val blockSubmodeActive = editor.inBlockSelection
 
-    when (this) {
+    val handler = if (this is AmbiguousExecution) this.getMotionActionHandler(cmd.argument) else this
+    when (handler) {
       is SingleExecution -> run {
-        val offset = getOffset(editor, context, cmd.argument, operatorArguments)
+        val offset = handler.getOffset(editor, context, cmd.argument, operatorArguments)
 
         // In this scenario, caret is the primary caret
         when (offset) {
@@ -125,13 +136,13 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
         when {
           blockSubmodeActive || editor.carets().size == 1 -> {
             val primaryCaret = editor.primaryCaret()
-            doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
+            handler.doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
           }
           else -> {
             try {
               editor.addCaretListener(CaretMergingWatcher)
               editor.forEachCaret { caret ->
-                doExecuteForEach(
+                handler.doExecuteForEach(
                   editor,
                   caret,
                   context,
@@ -145,6 +156,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           }
         }
       }
+      is AmbiguousExecution -> throw RuntimeException("Ambiguous handler cannot hold another ambiguous handler")
     }
 
     return true
