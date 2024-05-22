@@ -26,6 +26,8 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
+import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.util.*
 
 @CommandOrMotion(keys = ["<Esc>", "<C-[>", "<C-C>"], modes = [Mode.CMD_LINE])
@@ -65,7 +67,24 @@ public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution()
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: VimEditor, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
-    injector.processGroup.processExEntry(editor, context)
+    val panel = injector.commandLine.getActiveCommandLine()!!
+    panel.deactivate(true)
+    try {
+      editor.mode = com.maddyhome.idea.vim.state.mode.Mode.NORMAL()
+      logger.debug("processing command")
+      val text = panel.text
+      val shouldSkipHistory = getInstance(editor).mappingState.isExecutingMap() || injector.macro.isExecutingMacro
+      injector.vimscriptExecutor.execute(text, editor, context, shouldSkipHistory, true, CommandLineVimLContext)
+    } catch (e: ExException) {
+      injector.messages.showStatusBarMessage(null, e.message)
+      injector.messages.indicateError()
+    } catch (bad: Exception) {
+      logger.error("Error during command execution", bad)
+      injector.messages.indicateError()
+    } finally {
+      injector.processGroup.isCommandProcessing = false
+      injector.processGroup.modeBeforeCommandProcessing = null
+    }
     // TODO support motions for commands
     return Motion.NoMotion
   }

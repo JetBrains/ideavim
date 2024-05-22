@@ -14,17 +14,14 @@ import javax.swing.KeyStroke
 
 public interface VimProcessGroup {
   public val lastCommand: String?
-  public val isCommandProcessing: Boolean
-  public val modeBeforeCommandProcessing: Mode?
+  public var isCommandProcessing: Boolean
+  public var modeBeforeCommandProcessing: Mode?
 
-  // TODO remove me
-  public fun endSearchCommand(): String
   // TODO remove me
   public fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
   public fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
   // TODO remove me
   public fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
-  public fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean
   public fun cancelExEntry(editor: VimEditor, resetCaret: Boolean)
 
   @kotlin.jvm.Throws(java.lang.Exception::class)

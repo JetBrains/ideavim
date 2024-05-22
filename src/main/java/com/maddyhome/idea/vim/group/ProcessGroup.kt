@@ -54,13 +54,6 @@ public class ProcessGroup : VimProcessGroupBase() {
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
 
-  public override fun endSearchCommand(): String {
-    val panel = ExEntryPanel.getInstance()
-    panel.deactivate(true)
-
-    return panel.text
-  }
-
   public override fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
     // Don't allow ex commands in one line editors
     if (editor.isOneLineMode()) return
@@ -97,50 +90,6 @@ public class ProcessGroup : VimProcessGroupBase() {
       }
       return false
     }
-  }
-
-  public override fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean {
-    val panel = ExEntryPanel.getInstance()
-    panel.deactivate(true)
-    var res = true
-    try {
-      editor.mode = NORMAL()
-
-      logger.debug("processing command")
-
-      val text = panel.text
-
-      if (panel.label != ":") {
-        // Search is handled via Argument.Type.EX_STRING. Although ProcessExEntryAction is registered as the handler for
-        // <CR> in both command and search modes, it's only invoked for command mode (see KeyHandler.handleCommandNode).
-        // We should never be invoked for anything other than an actual ex command.
-        throw InvalidCommandException("Expected ':' command. Got '" + panel.label + "'", text)
-      }
-
-      logger.debug {
-        "swing=" + SwingUtilities.isEventDispatchThread()
-      }
-
-      injector.vimscriptExecutor.execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext)
-    } catch (e: ExException) {
-      VimPlugin.showMessage(e.message)
-      VimPlugin.indicateError()
-      res = false
-    } catch (bad: Exception) {
-      logger.error(bad)
-      VimPlugin.indicateError()
-      res = false
-    } finally {
-      isCommandProcessing = false
-      modeBeforeCommandProcessing = null
-    }
-
-    return res
-  }
-
-  // commands executed from map command / macro should not be added to history
-  private fun skipHistory(editor: VimEditor): Boolean {
-    return getInstance(editor).mappingState.isExecutingMap() || injector.macro.isExecutingMacro
   }
 
   public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
