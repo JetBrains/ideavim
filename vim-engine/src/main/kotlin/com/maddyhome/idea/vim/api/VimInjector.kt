@@ -181,6 +181,8 @@ public interface VimInjector {
   // !! in progress
   public val variableService: VariableService
 
+  public val commandLine: VimCommandLineService
+
   // !! in progress
   public val functionService: VimscriptFunctionService
 

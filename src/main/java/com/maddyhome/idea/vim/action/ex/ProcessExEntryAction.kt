@@ -11,25 +11,60 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.common.Direction
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import java.util.*
 
-/**
- * Called by KeyHandler to process the contents of the ex entry panel
- *
- * The mapping for this action means that the ex command is executed as a write action
- */
 @CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.CMD_LINE])
-public class ProcessExEntryAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+public class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP, CommandFlags.FLAG_END_EX)
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_COMPLETE_EX)
+  override fun getMotionActionHandler(argument: Argument?): MotionActionHandler {
+    return if (argument?.character == ':') ProcessExCommandEntryAction() else ProcessSearchEntryAction()
+  }
+}
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    return VimPlugin.getProcess().processExEntry(editor, context)
+public class ProcessSearchEntryAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
+  override fun getOffset(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    if (argument == null) return Motion.Error
+    return when (argument.character) {
+      '/' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, Direction.FORWARDS).toMotionOrError()
+      '?' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, Direction.BACKWARDS).toMotionOrError()
+      else -> throw ExException("Unexpected search label ${argument.character}")
+    }
+  }
+}
+
+public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
+  override val motionType: MotionType = MotionType.LINE_WISE
+
+  override fun getOffset(
+    editor: VimEditor,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    VimPlugin.getProcess().processExEntry(editor, context)
+    // TODO support motions for commands
+    return Motion.NoMotion
   }
 }

@@ -159,8 +159,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
           action.id == "VimMotionSentencePreviousStartAction" ||
           action.id == "VimMotionSentenceNextStartAction" ||
           action.id == "VimMotionGotoFileMarkAction" ||
-          action.id == "VimSearchEntryFwdAction" ||
-          action.id == "VimSearchEntryRevAction" ||
+          action.id == "VimProcessExEntryAction" ||
           action.id == "VimSearchAgainNextAction" ||
           action.id == "VimSearchAgainPreviousAction" ||
           action.id == "VimMotionParagraphNextAction" ||

@@ -98,6 +98,14 @@ public class CommandConsumer : KeyConsumer {
     // The user entered a valid command. Create the command and add it to the stack.
     val action = node.actionHolder.instance
     val keyState = processBuilder.state
+
+    if (action.flags.contains(CommandFlags.FLAG_START_EX)) {
+      keyState.enterCommandLine()
+    }
+    if (action.flags.contains(CommandFlags.FLAG_END_EX)) {
+      keyState.leaveCommandLine()
+    }
+
     val commandBuilder = keyState.commandBuilder
     val expectedArgumentType = commandBuilder.expectedArgumentType
     commandBuilder.pushCommandPart(action)
@@ -122,29 +130,14 @@ public class CommandConsumer : KeyConsumer {
     }
 
     processBuilder.addExecutionStep { _, lambdaEditor, _ ->
-      // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
-      if (expectedArgumentType === Argument.Type.EX_STRING && action.flags.contains(CommandFlags.FLAG_COMPLETE_EX)) {
-        /* The only action that implements FLAG_COMPLETE_EX is ProcessExEntryAction.
-     * When pressing ':', ExEntryAction is chosen as the command. Since it expects no arguments, it is invoked and
-       calls ProcessGroup#startExCommand, pushes CMD_LINE mode, and the action is popped. The ex handler will push
-       the final <CR> through handleKey, which chooses ProcessExEntryAction. Because we're not expecting EX_STRING,
-       this branch does NOT fire, and ProcessExEntryAction handles the ex cmd line entry.
-     * When pressing '/' or '?', SearchEntry(Fwd|Rev)Action is chosen as the command. This expects an argument of
-       EX_STRING, so startWaitingForArgument calls ProcessGroup#startSearchCommand. The ex handler pushes the final
-       <CR> through handleKey, which chooses ProcessExEntryAction, and we hit this branch. We don't invoke
-       ProcessExEntryAction, but pop it, set the search text as an argument on SearchEntry(Fwd|Rev)Action and invoke
-       that instead.
-     * When using '/' or '?' as part of a motion (e.g. "d/foo"), the above happens again, and all is good. Because
-       the text has been applied as an argument on the last command, '.' will correctly repeat it.
-
-     It's hard to see how to improve this. Removing EX_STRING means starting ex input has to happen in ExEntryAction
-     and SearchEntry(Fwd|Rev)Action, and the ex command invoked in ProcessExEntryAction, but that breaks any initial
-     operator, which would be invoked first (e.g. 'd' in "d/foo").
-  */
+      if (action.flags.contains(CommandFlags.FLAG_END_EX)) {
         logger.trace("Processing ex_string")
-        val text = injector.processGroup.endSearchCommand()
-        commandBuilder.popCommandPart() // Pop ProcessExEntryAction
-        commandBuilder.completeCommandPart(Argument(text)) // Set search text on SearchEntry(Fwd|Rev)Action
+        val commandLine = injector.commandLine.getActiveCommandLine()!!
+        val label = commandLine.label
+        val text = commandLine.text
+        commandLine.deactivate(true)
+
+        commandBuilder.completeCommandPart(Argument(label[0], text))
         lambdaEditor.mode = lambdaEditor.mode.returnTo()
       }
     }

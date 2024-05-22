@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -48,7 +49,7 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 /**
  * This is used to enter ex commands such as searches and "colon" commands
  */
-public class ExEntryPanel extends JPanel {
+public class ExEntryPanel extends JPanel implements VimCommandLine {
   private static ExEntryPanel instance;
   private static ExEntryPanel instanceWithoutShortcuts;
 

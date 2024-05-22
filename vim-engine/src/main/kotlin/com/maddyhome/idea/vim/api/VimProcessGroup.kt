@@ -17,10 +17,14 @@ public interface VimProcessGroup {
   public val isCommandProcessing: Boolean
   public val modeBeforeCommandProcessing: Mode?
 
+  // TODO remove me
   public fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char)
+  // TODO remove me
   public fun endSearchCommand(): String
+  // TODO remove me
   public fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
   public fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
+  // TODO remove me
   public fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command)
   public fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean
   public fun cancelExEntry(editor: VimEditor, resetCaret: Boolean)

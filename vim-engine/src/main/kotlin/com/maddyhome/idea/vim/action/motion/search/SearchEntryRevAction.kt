@@ -10,37 +10,29 @@ package com.maddyhome.idea.vim.action.motion.search
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import java.util.*
 
 @CommandOrMotion(keys = ["?"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
+public class SearchEntryRevAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+
   override val argumentType: Argument.Type = Argument.Type.EX_STRING
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
-
-  override fun getOffset(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    if (argument == null) return Motion.Error
-    return injector.searchGroup
-      .processSearchCommand(editor, argument.string, caret.offset, Direction.BACKWARDS).toMotionOrError()
+  override fun execute( editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    injector.processGroup.startSearchCommand(editor, context, cmd.count, '?')
+    val currentMode = editor.mode
+    check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
+    editor.mode = com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE(currentMode)
+    return true
   }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

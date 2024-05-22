@@ -18,6 +18,7 @@ import java.util.*
 
 /**
  * This represents a command argument.
+ * TODO please make it a sealed class and not a giant collection of fields with default values, it's not safe
  */
 public class Argument private constructor(
   public val character: Char = 0.toChar(),
@@ -28,7 +29,7 @@ public class Argument private constructor(
 ) {
   public constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
   public constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
-  public constructor(strArg: String) : this(string = strArg, type = Type.EX_STRING)
+  public constructor(label: Char, strArg: String) : this(character = label, string = strArg, type = Type.EX_STRING)
   public constructor(offsets: Map<ImmutableVimCaret, VimSelection>) : this(offsets = offsets, type = Type.OFFSETS)
 
   public enum class Type {

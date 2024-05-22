@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimCommandGroup
+import com.maddyhome.idea.vim.api.VimCommandLine
+import com.maddyhome.idea.vim.api.VimCommandLineService
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
@@ -197,6 +199,11 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<Executor>()
   override val vimscriptParser: VimscriptParser
     get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+  override val commandLine: VimCommandLineService = object : VimCommandLineService {
+    override fun getActiveCommandLine(): VimCommandLine? {
+      return com.maddyhome.idea.vim.ui.ex.ExEntryPanel.getInstance()
+    }
+  }
 
   override val optionGroup: VimOptionGroup
     get() = service()
