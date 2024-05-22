@@ -36,3 +36,19 @@ public class SearchEntryFwdAction : VimActionHandler.SingleExecution() {
     return true
   }
 }
+
+@CommandOrMotion(keys = ["?"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+public class SearchEntryRevAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+
+  override val argumentType: Argument.Type = Argument.Type.EX_STRING
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
+
+  override fun execute( editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    injector.processGroup.startSearchCommand(editor, context, cmd.count, '?')
+    val currentMode = editor.mode
+    check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
+    editor.mode = com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE(currentMode)
+    return true
+  }
+}
