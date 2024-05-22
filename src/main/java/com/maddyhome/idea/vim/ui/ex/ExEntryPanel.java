@@ -50,7 +50,7 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
  * This is used to enter ex commands such as searches and "colon" commands
  */
 public class ExEntryPanel extends JPanel implements VimCommandLine {
-  private static ExEntryPanel instance;
+  public static ExEntryPanel instance;
   private static ExEntryPanel instanceWithoutShortcuts;
 
   private ExEntryPanel(boolean enableShortcuts) {

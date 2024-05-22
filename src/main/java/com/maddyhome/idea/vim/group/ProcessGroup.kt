@@ -54,17 +54,6 @@ public class ProcessGroup : VimProcessGroupBase() {
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
 
-  public override fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char) {
-    // Don't allow searching in one line editors
-    if (editor.isOneLineMode()) return
-
-    val initText = ""
-    val label = leader.toString()
-
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, label, initText, count)
-  }
-
   public override fun endSearchCommand(): String {
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true)

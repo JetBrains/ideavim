@@ -18,8 +18,6 @@ public interface VimProcessGroup {
   public val modeBeforeCommandProcessing: Mode?
 
   // TODO remove me
-  public fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char)
-  // TODO remove me
   public fun endSearchCommand(): String
   // TODO remove me
   public fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean

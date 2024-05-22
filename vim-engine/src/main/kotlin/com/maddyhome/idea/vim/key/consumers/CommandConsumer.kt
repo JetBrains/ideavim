@@ -183,11 +183,11 @@ public class CommandConsumer : KeyConsumer {
       Argument.Type.EX_STRING -> {
         // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
         // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
-        injector.processGroup.startSearchCommand(editor, context, commandBuilder.count, key)
+//        injector.processGroup.startSearchCommand(editor, context, commandBuilder.count, key)
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
-        val currentMode = editorState.mode
-        check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
-        editor.mode = Mode.CMD_LINE(currentMode)
+//        val currentMode = editorState.mode
+//        check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
+//        editor.mode = Mode.CMD_LINE(currentMode)
       }
 
       else -> Unit

@@ -29,10 +29,6 @@ public class VimProcessGroupStub : VimProcessGroupBase() {
   override val modeBeforeCommandProcessing: Mode?
     get() = TODO("Not yet implemented")
 
-  override fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char) {
-    TODO("Not yet implemented")
-  }
-
   override fun endSearchCommand(): String {
     TODO("Not yet implemented")
   }

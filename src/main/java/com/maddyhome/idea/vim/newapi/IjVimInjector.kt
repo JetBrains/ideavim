@@ -199,11 +199,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<Executor>()
   override val vimscriptParser: VimscriptParser
     get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-  override val commandLine: VimCommandLineService = object : VimCommandLineService {
-    override fun getActiveCommandLine(): VimCommandLine? {
-      return com.maddyhome.idea.vim.ui.ex.ExEntryPanel.getInstance()
-    }
-  }
+  override val commandLine: VimCommandLineService
+    get() = service()
 
   override val optionGroup: VimOptionGroup
     get() = service()
