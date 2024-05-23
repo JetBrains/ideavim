@@ -27,7 +27,7 @@ Plug 'nerdtree'
 ### Preview
 
 <details>
-<summary>Click to the the preview</summary>
+<summary>Click for the preview</summary>
 <img src="images/nerdtree.gif" alt="NERDTree example"/>
 </details>
 
