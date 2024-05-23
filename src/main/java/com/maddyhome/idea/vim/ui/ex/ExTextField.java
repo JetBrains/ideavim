@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimCommandLineCaret;
 import com.maddyhome.idea.vim.group.EditorHolderService;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.history.HistoryConstants;
@@ -408,7 +409,7 @@ public class ExTextField extends JTextField {
     caret.setAttributes(GuiCursorOptionHelper.INSTANCE.getAttributes(GuiCursorMode.CMD_LINE_REPLACE));
   }
 
-  private static class CommandLineCaret extends DefaultCaret {
+  private static class CommandLineCaret extends DefaultCaret implements VimCommandLineCaret {
 
     private GuiCursorType mode;
     private int thickness = 100;
@@ -556,6 +557,16 @@ public class ExTextField extends JTextField {
         return max(1.0, fullHeight * thickness / 100.0);
       }
       return fullHeight;
+    }
+
+    @Override
+    public int getOffset() {
+      return getDot();
+    }
+
+    @Override
+    public void setOffset(int i) {
+      setDot(i);
     }
   }
 

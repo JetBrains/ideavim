@@ -618,7 +618,6 @@
  * |c_CTRL-N|             {@link com.maddyhome.idea.vim.ui.ex.HistoryDownAction}
  * |c_CTRL-P|             {@link com.maddyhome.idea.vim.ui.ex.HistoryUpAction}
  * |c_CTRL-Q|             Handled by KeyHandler
- * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ex.InsertRegisterAction}
  * |c_CTRL-R_CTRL-A|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-F|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-L|      TO BE IMPLEMENTED

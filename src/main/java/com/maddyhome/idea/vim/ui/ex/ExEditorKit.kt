@@ -38,9 +38,6 @@ internal object ExEditorKit : DefaultEditorKit() {
   val ToggleInsertReplace: String = "toggle-insert"
 
   @NonNls
-  val InsertRegister: String = "insert-register"
-
-  @NonNls
   val HistoryUp: String = "history-up"
 
   @NonNls
@@ -107,7 +104,6 @@ internal object ExEditorKit : DefaultEditorKit() {
     HistoryUpFilterAction(),
     HistoryDownFilterAction(),
     ToggleInsertReplaceAction(),
-    InsertRegisterAction(),
   )
 
   class DefaultExKeyHandler : DefaultKeyTypedAction() {

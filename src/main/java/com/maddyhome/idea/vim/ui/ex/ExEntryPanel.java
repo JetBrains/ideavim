@@ -20,6 +20,7 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimCommandLine;
+import com.maddyhome.idea.vim.api.VimCommandLineCaret;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -357,6 +358,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     return entry.getActualText();
   }
 
+  @Override
+  public void setText(@NotNull String s) {
+    entry.setText(s);
+  }
+
   public @NotNull ExTextField getEntry() {
     return entry;
   }
@@ -450,6 +456,12 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   };
 
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
+
+  @NotNull
+  @Override
+  public VimCommandLineCaret getCaret() {
+    return (VimCommandLineCaret) entry.getCaret();
+  }
 
   public static class LafListener implements LafManagerListener {
     @Override

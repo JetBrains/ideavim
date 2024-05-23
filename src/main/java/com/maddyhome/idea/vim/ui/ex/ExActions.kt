@@ -58,51 +58,6 @@ internal class HistoryDownFilterAction : TextAction(ExEditorKit.HistoryDownFilte
   }
 }
 
-internal class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAction {
-  private enum class State {
-    SKIP_CTRL_R, WAIT_REGISTER
-  }
-
-  private var state = State.SKIP_CTRL_R
-
-  override fun actionPerformed(e: ActionEvent) {
-    val target = getTextComponent(e) as ExTextField
-    val key = ExEditorKit.convert(e)
-    if (key != null) {
-      when (state) {
-        State.SKIP_CTRL_R -> {
-          state = State.WAIT_REGISTER
-          target.setCurrentAction(this, '\"')
-        }
-        State.WAIT_REGISTER -> {
-          state = State.SKIP_CTRL_R
-          target.clearCurrentAction()
-          val c = key.keyChar
-          if (c != KeyEvent.CHAR_UNDEFINED) {
-            val register = VimPlugin.getRegister().getRegister(c)
-            if (register != null) {
-              val oldText = target.actualText
-              val text = register.text
-              if (text != null) {
-                val offset = target.caretPosition
-                target.text = oldText.substring(0, offset) + text + oldText.substring(offset)
-                target.caretPosition = offset + text.length
-              }
-            }
-          } else if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0 && key.keyCode == KeyEvent.VK_C) {
-            // Eat any unused keys, unless it's <C-C>, in which case forward on and cancel entry
-            target.handleKey(key)
-          }
-        }
-      }
-    }
-  }
-
-  override fun reset() {
-    state = State.SKIP_CTRL_R
-  }
-}
-
 internal class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     logger.debug("complete entry")

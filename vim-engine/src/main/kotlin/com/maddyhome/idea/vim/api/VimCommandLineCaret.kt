@@ -8,10 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimCommandLine {
-  public val label: String
-  public var text: String
-  public val caret: VimCommandLineCaret
-
-  public fun deactivate(refocusOwningEditor: Boolean)
+public interface VimCommandLineCaret {
+  public var offset: Int
 }
