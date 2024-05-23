@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.key.consumers
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.action.change.LazyVimCommand
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -29,7 +28,6 @@ import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
 
@@ -55,7 +53,7 @@ public class CommandConsumer : KeyConsumer {
     when (node) {
       is CommandNode<LazyVimCommand> -> {
         logger.trace("Node is a command node")
-        handleCommandNode(key, node, keyProcessResultBuilder)
+        handleCommandNode(node, keyProcessResultBuilder)
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ -> lambdaKeyState.commandBuilder.addKey(key) }
         return true
       }
@@ -89,11 +87,7 @@ public class CommandConsumer : KeyConsumer {
     }
   }
 
-  private fun handleCommandNode(
-    key: KeyStroke,
-    node: CommandNode<LazyVimCommand>,
-    processBuilder: KeyProcessResult.KeyProcessResultBuilder,
-  ) {
+  private fun handleCommandNode(node: CommandNode<LazyVimCommand>, processBuilder: KeyProcessResult.KeyProcessResultBuilder) {
     logger.trace("Handle command node")
     // The user entered a valid command. Create the command and add it to the stack.
     val action = node.actionHolder.instance
@@ -111,8 +105,8 @@ public class CommandConsumer : KeyConsumer {
     commandBuilder.pushCommandPart(action)
     if (!checkArgumentCompatibility(expectedArgumentType, action)) {
       logger.trace("Return from command node handling")
-      processBuilder.addExecutionStep { lamdaKeyState, lambdaEditor, _ ->
-        KeyHandler.getInstance().setBadCommand(lambdaEditor, lamdaKeyState)
+      processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, _ ->
+        KeyHandler.getInstance().setBadCommand(lambdaEditor, lambdaKeyState)
       }
       return
     }
@@ -120,11 +114,11 @@ public class CommandConsumer : KeyConsumer {
       logger.trace("Set command state to READY")
       commandBuilder.commandState = CurrentCommandState.READY
     } else {
-      processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
+      processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, _ ->
         logger.trace("Set waiting for the argument")
         val argumentType = action.argumentType
         val editorState = lambdaEditor.vimStateMachine
-        startWaitingForArgument(lambdaEditor, lambdaContext, key.keyChar, action, argumentType!!, lambdaKeyState, editorState)
+        startWaitingForArgument(lambdaEditor, action, argumentType!!, lambdaKeyState, editorState)
         lambdaKeyState.partialReset(editorState.mode)
       }
     }
@@ -149,8 +143,6 @@ public class CommandConsumer : KeyConsumer {
 
   private fun startWaitingForArgument(
     editor: VimEditor,
-    context: ExecutionContext,
-    key: Char,
     action: EditorActionHandlerBase,
     argument: Argument.Type,
     keyState: KeyHandlerState,
@@ -178,19 +170,7 @@ public class CommandConsumer : KeyConsumer {
         } else if (action.id == "VimInsertCompletedLiteralAction") {
           keyState.digraphSequence.startLiteralSequence()
           KeyHandler.getInstance().setPromptCharacterEx('^')
-        }
-
-      Argument.Type.EX_STRING -> {
-        // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
-        // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
-//        injector.processGroup.startSearchCommand(editor, context, commandBuilder.count, key)
-        commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
-//        val currentMode = editorState.mode
-//        check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
-//        editor.mode = Mode.CMD_LINE(currentMode)
-      }
-
-      else -> Unit
+        } else -> Unit
     }
 
     // Another special case. Force a mode change to update the caret shape
