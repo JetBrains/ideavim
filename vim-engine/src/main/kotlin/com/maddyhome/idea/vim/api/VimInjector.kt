@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
-import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
@@ -168,9 +167,6 @@ public interface VimInjector {
   public val undo: VimUndoRedo
 
   public val psiService: VimPsiService
-
-  // !! in progress
-  public val commandLineHelper: VimCommandLineHelper
 
   // Can't be fully moved to vim-engine.
   public val vimscriptExecutor: VimscriptExecutor

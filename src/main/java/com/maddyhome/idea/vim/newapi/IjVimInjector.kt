@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimCommandGroup
-import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineService
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
@@ -76,12 +75,10 @@ import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
-import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
-import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
@@ -153,8 +150,6 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<UndoRedoHelper>()
   override val psiService: VimPsiService
     get() = service<IjVimPsiService>()
-  override val commandLineHelper: VimCommandLineHelper
-    get() = service<CommandLineHelper>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

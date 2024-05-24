@@ -63,7 +63,7 @@ public class InsertRegisterAction : VimActionHandler.SingleExecution() {
   }
 
   private fun readExpression(editor: VimEditor, context: ExecutionContext): String? {
-    return injector.commandLineHelper.inputString(editor, context, "=", null)
+    return injector.commandLine.inputString(editor, context, "=", null)
   }
 }
 

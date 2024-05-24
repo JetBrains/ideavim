@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -183,7 +182,7 @@ public object VimExtensionFacade {
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
   public fun inputString(editor: Editor, context: DataContext, prompt: String, finishOn: Char?): String {
-    return service<CommandLineHelper>().inputString(editor.vim, context.vim, prompt, finishOn) ?: ""
+    return injector.commandLine.inputString(editor.vim, context.vim, prompt, finishOn) ?: ""
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */

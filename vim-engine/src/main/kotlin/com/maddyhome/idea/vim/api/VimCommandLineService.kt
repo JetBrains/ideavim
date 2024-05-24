@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.api
 public interface VimCommandLineService {
   public fun getActiveCommandLine(): VimCommandLine?
 
+  public fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String?
+
   /**
    * Turns on the command line for the given editor
    *
