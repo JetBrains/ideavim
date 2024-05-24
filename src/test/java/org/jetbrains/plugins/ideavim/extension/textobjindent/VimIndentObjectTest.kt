@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.extension.textobjindent
 
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -252,6 +253,30 @@ class VimIndentObjectTest : VimTestCase() {
         four
 
       """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testSelectNestedTabs() {
+    doTest(
+      "vii",
+      """
+      {
+      .second level with tab. will still select all before fix
+      .${c}{
+      ..third level with tab. Will select also the second level before fix
+      .}
+      }
+      """.trimIndent().dotToTab(),
+      """
+      {
+      ${s}.second level with tab. will still select all before fix
+      .{
+      ..third level with tab. Will select also the second level before fix
+      .}$se
+      }
+      """.trimIndent().dotToTab(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 }
