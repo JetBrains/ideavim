@@ -136,7 +136,7 @@
  * |-|                    {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction}
  * |.|                    {@link com.maddyhome.idea.vim.action.change.RepeatChangeAction}
  * |/|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction}
- * |:|                    {@link com.maddyhome.idea.vim.action.ExEntryAction}
+ * |:|                    {@link com.maddyhome.idea.vim.action.ex.ExEntryAction}
  * |;|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction}
  * |<|                    {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction}
  * |<<|                   translated to <_
