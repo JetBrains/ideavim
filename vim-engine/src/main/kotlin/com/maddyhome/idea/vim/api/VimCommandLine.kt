@@ -8,10 +8,13 @@
 
 package com.maddyhome.idea.vim.api
 
+import javax.swing.KeyStroke
+
 public interface VimCommandLine {
   public val label: String
   public var text: String
   public val caret: VimCommandLineCaret
 
-  public fun deactivate(refocusOwningEditor: Boolean)
+  public fun handleKey(key: KeyStroke)
+  public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean = true)
 }
