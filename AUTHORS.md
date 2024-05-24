@@ -503,6 +503,10 @@ Contributors:
   [![icon][github]](https://github.com/Parker7123)
   &nbsp;
   FilipParker
+* [![icon][mail]](mailto:7138209+duhaesbaert@users.noreply.github.com)
+  [![icon][github]](https://github.com/duhaesbaert)
+  &nbsp;
+  Eduardo Haesbaert
 
 Previous contributors:
 
