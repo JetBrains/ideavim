@@ -31,14 +31,6 @@ public class VimProcessGroupStub : VimProcessGroupBase() {
     TODO("Not yet implemented")
   }
 
-  public override fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    TODO("Not yet implemented")
-  }
-
-  public override fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    TODO("Not yet implemented")
-  }
-
   override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
     TODO("Not yet implemented")
   }

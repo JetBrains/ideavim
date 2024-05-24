@@ -54,24 +54,6 @@ public class ProcessGroup : VimProcessGroupBase() {
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
 
-  public override fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    // Don't allow ex commands in one line editors
-    if (editor.isOneLineMode()) return
-
-    val currentMode = editor.vimStateMachine.mode
-    check(currentMode is ReturnableFromCmd) {
-      "Cannot enable cmd mode from current mode $currentMode"
-    }
-
-    isCommandProcessing = true
-    modeBeforeCommandProcessing = currentMode
-    val initText = getRange(editor, cmd)
-    injector.markService.setVisualSelectionMarks(editor)
-    editor.mode = Mode.CMD_LINE(currentMode)
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, ":", initText, 1)
-  }
-
   public override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
@@ -97,30 +79,6 @@ public class ProcessGroup : VimProcessGroupBase() {
     getInstance().reset(editor)
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true, resetCaret)
-  }
-
-  public override fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    val initText = getRange(editor, cmd) + "!"
-    val currentMode = editor.mode
-    check(currentMode is ReturnableFromCmd) { "Cannot enable cmd mode from $currentMode" }
-    editor.mode = Mode.CMD_LINE(currentMode)
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, ":", initText, 1)
-  }
-
-  private fun getRange(editor: VimEditor, cmd: Command): String {
-    var initText = ""
-    if (editor.vimStateMachine.mode is VISUAL) {
-      initText = "'<,'>"
-    } else if (cmd.rawCount > 0) {
-      initText = if (cmd.count == 1) {
-        "."
-      } else {
-        ".,.+" + (cmd.count - 1)
-      }
-    }
-
-    return initText
   }
 
   @Throws(ExecutionException::class, ProcessCanceledException::class)
