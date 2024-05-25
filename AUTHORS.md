@@ -507,6 +507,10 @@ Contributors:
   [![icon][github]](https://github.com/duhaesbaert)
   &nbsp;
   Eduardo Haesbaert
+* [![icon][mail]](mailto:nikolaevsky.egor@gmail.com)
+  [![icon][github]](https://github.com/Aisper)
+  &nbsp;
+  Egor Nikolaevsky
 
 Previous contributors:
 
