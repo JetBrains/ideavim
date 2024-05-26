@@ -13,6 +13,7 @@ import javax.swing.KeyStroke
 import javax.swing.text.DefaultEditorKit
 import javax.swing.text.JTextComponent.KeyBinding
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal object ExKeyBindings {
 
   // TODO - add the following keys:

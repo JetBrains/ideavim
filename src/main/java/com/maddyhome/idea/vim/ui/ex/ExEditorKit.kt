@@ -20,6 +20,7 @@ import javax.swing.text.DefaultEditorKit
 import javax.swing.text.Document
 import javax.swing.text.TextAction
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal object ExEditorKit : DefaultEditorKit() {
 
   @NonNls
