@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.group
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimRedrawService
 import com.maddyhome.idea.vim.api.injector
 
@@ -40,6 +41,7 @@ public class IjVimRedrawService : VimRedrawService {
    */
   public object RedrawListener : DocumentListener {
     override fun documentChanged(event: DocumentEvent) {
+      if (VimPlugin.isNotEnabled()) return
       if (event.newFragment.contains("\n") || event.oldFragment.contains("\n")) {
         injector.redrawService.redraw()
       }
