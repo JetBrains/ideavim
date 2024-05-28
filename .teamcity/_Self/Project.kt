@@ -11,7 +11,7 @@ import _Self.subprojects.GitHub
 import _Self.subprojects.OldTests
 import _Self.subprojects.Releases
 import _Self.vcsRoots.GitHubPullRequest
-import _Self.vcsRoots.ReleasesRoot
+import _Self.vcsRoots.ReleasesVcsRoot
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
@@ -22,7 +22,7 @@ object Project : Project({
 
   // VCS roots
   vcsRoot(GitHubPullRequest)
-  vcsRoot(ReleasesRoot)
+  vcsRoot(ReleasesVcsRoot)
 
   // Active tests
   buildType(TestingBuildType("Latest EAP", "<default>", version = "LATEST-EAP-SNAPSHOT"))
