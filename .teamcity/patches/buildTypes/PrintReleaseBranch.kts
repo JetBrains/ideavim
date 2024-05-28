@@ -14,6 +14,6 @@ changeBuildType(RelativeId("PrintReleaseBranch")) {
         check(branchFilter == "+:refs/heads/releases/*") {
             "Unexpected option value: branchFilter = $branchFilter"
         }
-        branchFilter = "+:heads/*"
+        branchFilter = "+:heads/releases/*"
     }
 }
