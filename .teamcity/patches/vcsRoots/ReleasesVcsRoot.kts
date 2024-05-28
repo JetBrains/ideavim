@@ -26,7 +26,7 @@ changeVcsRoot(RelativeId("ReleasesVcsRoot")) {
 
     (this as GitVcsRoot).apply {
         branch = "refs/heads/master"
-        branchSpec = "+:*"
+        branchSpec = "+:refs/heads/releases/*"
     }
 
 }
