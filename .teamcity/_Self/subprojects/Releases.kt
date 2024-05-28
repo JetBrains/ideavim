@@ -1,6 +1,7 @@
 package _Self.subprojects
 
 import _Self.buildTypes.CreateNewReleaseBranchFromMaster
+import _Self.buildTypes.PrintReleaseBranch
 import _Self.buildTypes.PublishVimEngine
 import _Self.buildTypes.ReleaseDev
 import _Self.buildTypes.ReleaseEap
@@ -41,4 +42,5 @@ object Releases : Project({
   buildType(PublishVimEngine)
 
   buildType(CreateNewReleaseBranchFromMaster)
+  buildType(PrintReleaseBranch)
 })
