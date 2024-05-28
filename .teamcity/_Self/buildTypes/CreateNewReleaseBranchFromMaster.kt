@@ -32,8 +32,8 @@ object CreateNewReleaseBranchFromMaster : IdeaVimBuildType({
         # Fetch all remote branches
         git fetch --all
 
-        # Get a list of all branches matching the pattern release/x.y.z
-        branches=${'$'}(git branch -r | grep -oE 'release/[0-9]+\.[0-9]+\.x')
+        # Get a list of all branches matching the pattern releases/x.y.z
+        branches=${'$'}(git branch -r | grep -oE 'releases/[0-9]+\.[0-9]+\.x')
 
         # If no matching branches are found, print a message and exit
         if [[ -z "${'$'}branches" ]]; then
