@@ -11,6 +11,7 @@ package _Self.buildTypes
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 
 object CreateNewReleaseBranchFromMaster : IdeaVimBuildType({
@@ -61,5 +62,11 @@ object CreateNewReleaseBranchFromMaster : IdeaVimBuildType({
 
   params {
     param("env.POTENTIAL_VERSION", "")
+  }
+
+  features {
+    sshAgent {
+      teamcitySshKey = "IdeaVim ssh keys"
+    }
   }
 })
