@@ -9,8 +9,8 @@
 package _Self.buildTypes
 
 import _Self.IdeaVimBuildType
+import _Self.vcsRoots.ReleasesRoot
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
-import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 
@@ -18,7 +18,7 @@ object PrintReleaseBranch : IdeaVimBuildType({
   name = "EXP: Print release branch"
 
   vcs {
-    root(DslContext.settingsRoot)
+    root(ReleasesRoot)
     branchFilter = "+:refs/heads/releases/*"
 
     checkoutMode = CheckoutMode.AUTO
