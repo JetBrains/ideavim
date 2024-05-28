@@ -94,11 +94,12 @@ public class CommandConsumer : KeyConsumer {
     val keyState = processBuilder.state
 
     if (action.flags.contains(CommandFlags.FLAG_START_EX)) {
-      injector.redrawService.redrawStatusLine()
       keyState.enterCommandLine()
+      injector.redrawService.redrawStatusLine()
     }
     if (action.flags.contains(CommandFlags.FLAG_END_EX)) {
       keyState.leaveCommandLine()
+      injector.redrawService.redrawStatusLine()
     }
 
     val commandBuilder = keyState.commandBuilder

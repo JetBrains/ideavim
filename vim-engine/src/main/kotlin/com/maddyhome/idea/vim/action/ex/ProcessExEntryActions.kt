@@ -30,23 +30,28 @@ import java.util.*
 @CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.CMD_LINE])
 public class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP, CommandFlags.FLAG_END_EX)
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+  override var motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getMotionActionHandler(argument: Argument?): MotionActionHandler {
-    return if (argument?.character == ':') ProcessExCommandEntryAction() else ProcessSearchEntryAction()
+    return if (argument?.character == ':') ProcessExCommandEntryAction() else ProcessSearchEntryAction(this)
   }
 }
 
-public class ProcessSearchEntryAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+public class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType
+    get() = throw RuntimeException("Parent motion type should be used, as only it is accessed by other code")
 
   override fun getOffset(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
     if (argument == null) return Motion.Error
-    return when (argument.character) {
-      '/' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, Direction.FORWARDS).toMotionOrError()
-      '?' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, Direction.BACKWARDS).toMotionOrError()
+    val offsetAndMotion = when (argument.character) {
+      '/' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, operatorArguments.count1, Direction.FORWARDS)
+      '?' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, operatorArguments.count1, Direction.BACKWARDS)
       else -> throw ExException("Unexpected search label ${argument.character}")
     }
+    // Vim doesn't treat not finding something as an error, although it might report either an error or warning message
+    if (offsetAndMotion == null) return Motion.NoMotion
+    parentAction.motionType = offsetAndMotion.second
+    return offsetAndMotion.first.toMotionOrError()
   }
 }
 
