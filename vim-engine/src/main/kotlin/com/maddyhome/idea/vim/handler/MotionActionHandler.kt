@@ -89,6 +89,19 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    */
   public abstract class AmbiguousExecution : MotionActionHandler() {
     public abstract fun getMotionActionHandler(argument: Argument?): MotionActionHandler
+
+    final override fun process(cmd: Command) {
+      super.process(cmd)
+    }
+
+    final override fun postExecute(
+      editor: VimEditor,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments
+    ) {
+      super.postExecute(editor, context, cmd, operatorArguments)
+    }
   }
 
   public abstract val motionType: MotionType

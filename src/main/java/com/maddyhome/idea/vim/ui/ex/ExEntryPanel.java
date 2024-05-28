@@ -185,6 +185,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   /**
    * Turns off the ex entry field and optionally puts the focus back to the original component
    */
+  @Override
   public void deactivate(boolean refocusOwningEditor, boolean resetCaret) {
     logger.info("Deactivate ex entry panel");
     if (!active) return;
@@ -336,6 +337,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    *
    * @return The ex entry label
    */
+  @Override
   public String getLabel() {
     return label.getText();
   }
@@ -363,6 +365,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    *
    * @return The user entered text
    */
+  @Override
   public @NotNull String getText() {
     return entry.getActualText();
   }
@@ -381,6 +384,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    *
    * @param stroke The keystroke
    */
+  @Override
   public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
   }
