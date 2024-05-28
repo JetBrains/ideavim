@@ -109,10 +109,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
     }
-//    script {
-//      name = "Run tests"
-//      scriptContent = "./gradlew test"
-//    }
+    script {
+      name = "Run tests"
+      scriptContent = "./gradlew test"
+    }
     gradle {
       name = "Publish release"
       tasks = "publishPlugin"
