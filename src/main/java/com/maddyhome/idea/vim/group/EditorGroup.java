@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -363,16 +364,22 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private Stream<Editor> getLocalEditors() {
     // Always fetch local editors. If we're hosting a Code With Me session, any connected guests will create hidden
     // editors to handle syntax highlighting, completion requests, etc. We need to make sure that IdeaVim only makes
-    // changes (e.g. adding search highlights) to local editors, so things don't incorrectly flow through to any Clients.
+    // changes (e.g., adding search highlights) to local editors so things don't incorrectly flow through to any Clients.
     // In non-CWM scenarios, or if IdeaVim is installed on the Client, there are only ever local editors, so this will
     // also work there. In Gateway remote development scenarios, IdeaVim should not be installed on the host, only the
     // Client, so all should work there too.
     // Note that most IdeaVim operations are in response to interactive keystrokes, which would mean that
     // ClientEditorManager.getCurrentInstance would return local editors. However, some operations are in response to
-    // events such as document change (to update search highlights) and these can come from CWM guests, and we'd get the
-    // remote editors.
-    // This invocation will always get local editors, regardless of current context.
-    final ClientAppSession localSession = ClientSessionsManager.getAppSessions(ClientKind.LOCAL).get(0);
-    return localSession.getService(ClientEditorManager.class).editors();
+    // events such as document change (to update search highlights), and these can come from CWM guests, and we'd get
+    // the remote editors.
+    // This invocation will always get local editors, regardless of the current context.
+    List<ClientAppSession> appSessions = ClientSessionsManager.getAppSessions(ClientKind.ALL);
+    if (!appSessions.isEmpty()) {
+      ClientAppSession localSession = appSessions.get(0);
+      return localSession.getService(ClientEditorManager.class).editors();
+    }
+    else {
+      return Stream.empty();
+    }
   }
 }

@@ -131,10 +131,11 @@ public class VimIndentObject implements VimExtension {
         // This is done as a separate step so that it works even when the caret is inside the indentation.
         int offset = caretLineStartOffset;
         int indentSize = 0;
-        while (++offset < charSequence.length()) {
+        while (offset < charSequence.length()) {
           final char ch = charSequence.charAt(offset);
           if (ch == ' ' || ch == '\t') {
             ++indentSize;
+            ++offset;
           } else {
             break;
           }

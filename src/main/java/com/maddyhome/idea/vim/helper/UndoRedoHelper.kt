@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.components.Service
@@ -21,7 +20,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.undo.UndoRedoBase
@@ -40,12 +38,7 @@ internal class UndoRedoHelper : UndoRedoBase() {
       val scrollingModel = editor.getScrollingModel()
       scrollingModel.accumulateViewportChanges()
 
-      // [VERSION UPDATE] 241+ remove this if
-      if (ApplicationInfo.getInstance().build.baselineVersion >= 241) {
-        undoFor241plus(editor, undoManager, fileEditor)
-      } else {
-        undoForLessThan241(undoManager, fileEditor, editor)
-      }
+      performUndo(editor, undoManager, fileEditor)
 
       scrollingModel.flushViewportChanges()
 
@@ -54,32 +47,7 @@ internal class UndoRedoHelper : UndoRedoBase() {
     return false
   }
 
-  private fun undoForLessThan241(
-    undoManager: UndoManager,
-    fileEditor: TextEditor,
-    editor: VimEditor,
-  ) {
-    if (injector.globalIjOptions().oldundo) {
-      SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
-    } else {
-      // TODO refactor me after VIM-308 when restoring selection and caret movement will be ignored by undo
-      editor.runWithChangeTracking {
-        undoManager.undo(fileEditor)
-
-        // We execute undo one more time if the previous one just restored selection
-        if (!hasChanges && hasSelection(editor) && undoManager.isUndoAvailable(fileEditor)) {
-          undoManager.undo(fileEditor)
-        }
-      }
-
-      CommandProcessor.getInstance().runUndoTransparentAction {
-        removeSelections(editor)
-      }
-    }
-  }
-
-
-  private fun undoFor241plus(
+  private fun performUndo(
     editor: VimEditor,
     undoManager: UndoManager,
     fileEditor: TextEditor,
@@ -119,47 +87,14 @@ internal class UndoRedoHelper : UndoRedoBase() {
     val fileEditor = TextEditorProvider.getInstance().getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
     if (undoManager.isRedoAvailable(fileEditor)) {
-      // [VERSION UPDATE] 241+ remove this if
-      if (ApplicationInfo.getInstance().build.baselineVersion >= 241) {
-        redoFor241Plus(undoManager, fileEditor, editor)
-      } else {
-        redoForLessThan241(undoManager, fileEditor, editor)
-      }
+      performRedo(undoManager, fileEditor, editor)
 
       return true
     }
     return false
   }
 
-  private fun redoForLessThan241(
-    undoManager: UndoManager,
-    fileEditor: TextEditor,
-    editor: VimEditor,
-  ) {
-    if (injector.globalIjOptions().oldundo) {
-      SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
-    } else {
-      undoManager.redo(fileEditor)
-      CommandProcessor.getInstance().runUndoTransparentAction {
-        editor.carets().forEach { it.ij.removeSelection() }
-      }
-      // TODO refactor me after VIM-308 when restoring selection and caret movement will be ignored by undo
-      editor.runWithChangeTracking {
-        undoManager.redo(fileEditor)
-
-        // We execute undo one more time if the previous one just restored selection
-        if (!hasChanges && hasSelection(editor) && undoManager.isRedoAvailable(fileEditor)) {
-          undoManager.redo(fileEditor)
-        }
-      }
-
-      CommandProcessor.getInstance().runUndoTransparentAction {
-        removeSelections(editor)
-      }
-    }
-  }
-
-  private fun redoFor241Plus(
+  private fun performRedo(
     undoManager: UndoManager,
     fileEditor: TextEditor,
     editor: VimEditor,

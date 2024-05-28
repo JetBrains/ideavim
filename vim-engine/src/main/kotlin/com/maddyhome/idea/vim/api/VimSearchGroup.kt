@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -98,26 +99,31 @@ public interface VimSearchGroup {
   /**
    * Process the search command, searching for the pattern from the given document offset
    *
-   * <p>Parses the pattern from the search command and will search for the given pattern, immediately saving the last used
+   * Parses the pattern from the search command and will search for the given pattern, immediately saving the last used
    * search pattern. Updates the search register and history and search highlights. Also updates last pattern offset and
-   * direction. scanwrap and ignorecase come from options.
+   * direction. The `'scanwrap'` and `'ignorecase'` options are used by the implementation.
    *
-   * <p>Will parse the entire command, including patterns separated by `;`</p>
+   * Will parse the entire command, including patterns separated by `;`.
    *
-   * <p>Note that this method should only be called when the ex command argument should be parsed, and start should be
-   * updated. I.e. only for the search commands. Consider using SearchHelper.findPattern to find text.</p>
+   * If the search command is being used by an operator, and the pattern contains an offset (`/{pattern}/{offset}`), the
+   * motion type for the operator becomes exclusive or linewise. See `:help search-offset`.
    *
-   * <p>Equivalent to normal.c:nv_search + search.c:do_search</p>
+   * Note that this method should only be called when the ex command argument should be parsed, and start should be
+   * updated. I.e. only for the search commands. Consider using SearchHelper.findPattern to find text.
+   *
+   * Equivalent to normal.c:nv_search + search.c:do_search
    *
    * @param editor      The editor to search in
-   * @param startOffset The offset to start searching from
    * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
+   * @param startOffset The offset to start searching from
+   * @param count1      Find the nth occurrence, coerced to 1
    * @param dir         The direction to search
-   * @return            Offset to the next occurrence of the pattern or -1 if not found
+   * @return            Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based on
+   *                    the search offset. The value will be `null` if no result is found.
    */
-  public fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, dir: Direction): Int
+  public fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, count1: Int, dir: Direction): Pair<Int, MotionType>?
 
   /**
    * Search for the word under the given caret

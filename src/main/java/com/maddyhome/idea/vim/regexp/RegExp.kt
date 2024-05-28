@@ -1460,6 +1460,9 @@ internal class RegExp {
          * can't go before line 1 */
     return if (reg_firstlnum + lnum < 0) {
       null
+    } else if (reg_firstlnum + lnum >= reg_buf!!.lineCount()) {
+      // Must have matched the "\n" in the last line.
+      CharPointer("")
     } else {
       CharPointer(
         reg_buf!!.getLineBuffer(reg_firstlnum + lnum),
@@ -1507,7 +1510,7 @@ internal class RegExp {
     reg_buf = buf
     // reg_win = win;
     reg_firstlnum = lnum
-    reg_maxline = lcount - lnum
+    reg_maxline = lcount - lnum - 1 // Remember, lnum is 0-based, while in Vim, it's 1-based
     ireg_ic = rmp.rmm_ic
 
     /* Need to switch to buffer "buf" to make vim_iswordc() work. */
@@ -1874,7 +1877,9 @@ internal class RegExp {
             reginput!!.inc()
           }
           IDENT -> {
-            if (!Character.isJavaIdentifierPart(c)) {
+            // Character.isJavaIdentifier treats '\0' as a valid identifier!
+            // Also, this should really be using 'isident' instead of Character.isJavaIdentifierPart
+            if (c == '\u0000' || !Character.isJavaIdentifierPart(c)) {
               return false
             }
             reginput!!.inc()
@@ -2488,7 +2493,7 @@ internal class RegExp {
             return false
           }
           NEWL -> {
-            if (c != '\u0000' || reglnum == reg_maxline) {
+            if (c != '\u0000' || reglnum > reg_maxline) {
               return false
             }
             reg_nextline()
@@ -2530,7 +2535,7 @@ internal class RegExp {
           ++count
           scan.inc()
         }
-        if (!WITH_NL(p.OP()) || reglnum == reg_maxline || count == maxcount) {
+        if (!WITH_NL(p.OP()) || reglnum > reg_maxline || count == maxcount) {
           break
         }
         ++count /* count the line-break */
@@ -2548,7 +2553,7 @@ internal class RegExp {
           ) {
             scan.inc()
           } else if (scan.isNul) {
-            if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+            if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
               break
             }
             reg_nextline()
@@ -2568,7 +2573,7 @@ internal class RegExp {
         ) {
           scan.inc()
         } else if (scan.isNul) {
-          if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+          if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
             break
           }
           reg_nextline()
@@ -2587,7 +2592,7 @@ internal class RegExp {
           if (CharacterClasses.isWord(scan.charAt()) && (testval == 1 || !Character.isDigit(scan.charAt()))) {
             scan.inc()
           } else if (scan.isNul) {
-            if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+            if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
               break
             }
             reg_nextline()
@@ -2605,7 +2610,7 @@ internal class RegExp {
         if (CharacterClasses.isWord(scan.charAt()) && (testval == 1 || !Character.isDigit(scan.charAt()))) {
           scan.inc()
         } else if (scan.isNul) {
-          if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+          if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
             break
           }
           reg_nextline()
@@ -2624,7 +2629,7 @@ internal class RegExp {
           if (CharacterClasses.isFile(scan.charAt()) && (testval == 1 || !Character.isDigit(scan.charAt()))) {
             scan.inc()
           } else if (scan.isNul) {
-            if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+            if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
               break
             }
             reg_nextline()
@@ -2642,7 +2647,7 @@ internal class RegExp {
         if (CharacterClasses.isFile(scan.charAt()) && (testval == 1 || !Character.isDigit(scan.charAt()))) {
           scan.inc()
         } else if (scan.isNul) {
-          if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+          if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
             break
           }
           reg_nextline()
@@ -2659,7 +2664,7 @@ internal class RegExp {
         testval = 1
         while (count < maxcount) {
           if (scan.isNul) {
-            if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+            if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
               break
             }
             reg_nextline()
@@ -2679,7 +2684,7 @@ internal class RegExp {
       }
       SPRINT, SPRINT + ADD_NL -> while (count < maxcount) {
         if (scan.isNul) {
-          if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+          if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
             break
           }
           reg_nextline()
@@ -2765,7 +2770,7 @@ internal class RegExp {
         testval = 1
         while (count < maxcount) {
           if (scan.isNul) {
-            if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+            if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
               break
             }
             reg_nextline()
@@ -2784,7 +2789,7 @@ internal class RegExp {
       }
       ANYBUT, ANYBUT + ADD_NL -> while (count < maxcount) {
         if (scan.isNul) {
-          if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+          if (!WITH_NL(p.OP()) || reglnum > reg_maxline) {
             break
           }
           reg_nextline()
@@ -2800,7 +2805,7 @@ internal class RegExp {
         }
         ++count
       }
-      NEWL -> while (count < maxcount && scan.isNul && reglnum < reg_maxline) {
+      NEWL -> while (count < maxcount && scan.isNul && reglnum <= reg_maxline) {
         count++
         reg_nextline()
         scan = reginput!!.ref(0)
@@ -2813,7 +2818,7 @@ internal class RegExp {
     if (mask != 0) {
       while (count < maxcount) {
         if (scan.isNul) {
-          if (!WITH_NL(p.OP()) || reglnum == reg_maxline) {
+          if (!WITH_NL(p.OP()) || reglnum < reg_maxline) {
             break
           }
           reg_nextline()
@@ -3165,7 +3170,7 @@ internal class RegExp {
     reg_mmatch = rmp
     // reg_buf = curbuf;           /* always works on the current buffer! */
     reg_firstlnum = lnum
-    reg_maxline = reg_buf!!.lineCount() - lnum
+    reg_maxline = reg_buf!!.lineCount() - lnum - 1 // lnum is 0-based, so make sure maxline is too
     return vim_regsub_both(source, magic, backslash)
   }
 
@@ -3307,7 +3312,7 @@ internal class RegExp {
                   if (reg_mmatch!!.endpos[no]!!.lnum == clnum) {
                     break
                   }
-                  dst.append('\r')
+                  dst.append('\n')
                   s = reg_getline(++clnum)
                   len = if (reg_mmatch!!.endpos[no]!!.lnum == clnum) {
                     reg_mmatch!!.endpos[no]!!.col

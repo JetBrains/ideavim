@@ -10,18 +10,10 @@ package com.maddyhome.idea.vim.helper;
 
 import com.google.common.collect.Lists;
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx;
-import com.intellij.lang.CodeDocumentationAwareCommenter;
-import com.intellij.lang.Commenter;
-import com.intellij.lang.Language;
-import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.spellchecker.SpellCheckerSeveritiesProvider;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
@@ -318,11 +310,17 @@ public class SearchHelper {
           lnum = lineCount - 1;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(top_bot_msg), TRUE);
+          if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
+            VimPlugin.showMessage(MessageHelper.message("message.search.hit.top"));
+          }
         }
         else {
           lnum = 0;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(bot_top_msg), TRUE);
+          if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
+            VimPlugin.showMessage(MessageHelper.message("message.search.hit.bottom"));
+          }
         }
       }
       //if (got_int || called_emsg || break_loop)
@@ -334,12 +332,15 @@ public class SearchHelper {
       //if ((options & SEARCH_MSG) == SEARCH_MSG)
       if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
         if (searchOptions.contains(SearchOptions.WRAP)) {
-          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+          // E486: Pattern not found: {0}
+          VimPlugin.showMessage(MessageHelper.message("E486", pattern));
         }
         else if (lnum <= 0) {
+          // E384: Search hit TOP without match for: {0}
           VimPlugin.showMessage(MessageHelper.message(Msg.E384, pattern));
         }
         else {
+          // E385: Search hit BOTTOM without match for: {0}
           VimPlugin.showMessage(MessageHelper.message(Msg.E385, pattern));
         }
       }
@@ -375,7 +376,7 @@ public class SearchHelper {
     final List<TextRange> results = Lists.newArrayList();
 
     if (globalIjOptions(injector).getUseNewRegex()) {
-      final List<VimRegexOptions> options = new ArrayList<>();
+      final EnumSet<VimRegexOptions> options = EnumSet.noneOf(VimRegexOptions.class);
       if (globalOptions(injector).getSmartcase()) options.add(VimRegexOptions.SMART_CASE);
       if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
       VimEditor vimEditor = new IjVimEditor(editor);
@@ -414,7 +415,7 @@ public class SearchHelper {
         final CharacterPosition endPos = new CharacterPosition(line + regMatch.endpos[0].lnum,
           regMatch.endpos[0].col);
         int start = startPos.toOffset(editor);
-        int end = endPos.toOffset(editor);
+        int end = endPos.line >= lineCount ? editor.getDocument().getTextLength() : endPos.toOffset(editor);
         results.add(new TextRange(start, end));
 
         if (start != end) {

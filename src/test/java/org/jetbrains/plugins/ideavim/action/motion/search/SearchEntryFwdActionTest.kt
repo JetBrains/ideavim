@@ -16,6 +16,15 @@ import org.junit.jupiter.api.Test
 
 class SearchEntryFwdActionTest : VimTestCase() {
   @Test
+  fun `test search clears status line`() {
+    configureByText("lorem ipsum")
+    enterSearch("dolor")  // Shows "pattern not found message"
+    assertPluginErrorMessageContains("Pattern not found: dolor")
+    typeText("/")  // No <CR>
+    assertStatusLineCleared()
+  }
+
+  @Test
   fun `search in visual mode`() {
     doTest(
       "v/id<CR>",

@@ -244,4 +244,13 @@ class DeleteMotionActionTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun `test delete line clears status line`() {
+    configureByPages(5) // Lorem ipsum
+    enterSearch("egestas")
+    assertStatusLineMessageContains("Pattern not found: egestas")
+    typeText("dd")
+    assertStatusLineCleared()
+  }
 }

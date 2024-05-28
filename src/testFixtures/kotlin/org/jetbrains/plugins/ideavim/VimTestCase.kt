@@ -141,7 +141,8 @@ abstract class VimTestCase {
 
     NeovimTesting.setUp(testInfo)
 
-    VimPlugin.clearError()
+    injector.messages.clearError()
+    injector.messages.clearStatusBarMessage()
 
     this.testInfo = testInfo
   }
@@ -207,7 +208,6 @@ abstract class VimTestCase {
     bookmarksManager?.bookmarks?.forEach { bookmark ->
       bookmarksManager.remove(bookmark)
     }
-    fixture.editor?.let { injector.messages.showStatusBarMessage(it.vim, "") }
     SelectionVimListenerSuppressor.lock().use { fixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
     VimPlugin.getVariableService().clear()
@@ -675,6 +675,14 @@ abstract class VimTestCase {
 
   fun assertPluginErrorMessageContains(message: String) {
     assertContains(VimPlugin.getMessage(), message)
+  }
+
+  fun assertStatusLineMessageContains(message: String) {
+    assertContains(VimPlugin.getMessage(), message)
+  }
+
+  fun assertStatusLineCleared() {
+    assertNull(VimPlugin.getMessage())
   }
 
   protected fun assertCaretsVisualAttributes() {

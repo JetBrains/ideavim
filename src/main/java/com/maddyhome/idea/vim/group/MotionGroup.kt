@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.anyNonWhitespace
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.api.normalizeVisualLine
@@ -46,13 +47,12 @@ import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.AppCodeTemplates
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.annotations.Range
 import kotlin.math.max
 import kotlin.math.min
@@ -302,16 +302,21 @@ internal class MotionGroup : VimMotionGroupBase() {
     }
 
     fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
-      ExEntryPanel.deactivateAll()
       val fileEditor = event.oldEditor
       if (fileEditor is TextEditor) {
         val editor = fileEditor.editor
         if (!editor.isDisposed) {
-          ExOutputModel.getInstance(editor).clear()
           editor.vim.let { vimEditor ->
-            if (VimStateMachine.getInstance(vimEditor).mode is Mode.VISUAL) {
-              vimEditor.exitVisualMode()
-              KeyHandler.getInstance().reset(vimEditor)
+            when (vimEditor.vimStateMachine.mode) {
+              is Mode.VISUAL -> {
+                vimEditor.exitVisualMode()
+                KeyHandler.getInstance().reset(vimEditor)
+              }
+              is Mode.CMD_LINE -> {
+                injector.processGroup.cancelExEntry(vimEditor, false)
+                ExOutputModel.getInstance(editor).clear()
+              }
+              else -> {}
             }
           }
         }

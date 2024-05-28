@@ -174,6 +174,24 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  // VIM-3348
+  @Test
+  fun `test substitution`() {
+    doTest(
+      "g/red cow/s//green horse/g",
+      """
+        |in the big race a red cow is in the lead
+        |in the big race a red car is in the lead
+        |in the big race a red cow is in the lead
+      """.trimMargin(),
+      """
+        |in the big race a green horse is in the lead
+        |in the big race a red car is in the lead
+        |in the big race a green horse is in the lead
+      """.trimMargin()
+    )
+  }
+
   @Test
   fun `test check history`() {
     VimPlugin.getHistory().clear()
@@ -232,26 +250,11 @@ class GlobalCommandTest : VimTestCase() {
   @Test
   fun `test g with one separator and pattern and separator`() {
     doTest(
-      "g/found",
+      "g/found/",
       initialText,
       initialText,
     )
     assertExOutput("I found it in a legendary land\n")
-  }
-
-  private fun doTest(command: String, before: String, after: String) {
-    doTest(listOf(exCommand(command)), before, after, Mode.NORMAL())
-  }
-
-  companion object {
-    private val initialText = """
-                A Discovery
-    
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass. 
-    """.trimIndent()
   }
 
   @Test
@@ -273,5 +276,20 @@ class GlobalCommandTest : VimTestCase() {
                 hard by the torrent of a mountain pass. 
       """.trimIndent(),
     )
+  }
+
+  private fun doTest(command: String, before: String, after: String) {
+    doTest(listOf(exCommand(command)), before, after, Mode.NORMAL())
+  }
+
+  companion object {
+    private val initialText = """
+                A Discovery
+    
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass. 
+    """.trimIndent()
   }
 }

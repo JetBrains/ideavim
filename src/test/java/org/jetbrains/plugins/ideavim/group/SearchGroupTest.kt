@@ -19,15 +19,19 @@ import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 /**
  * @author Alex Plate
  */
+@Suppress("SpellCheckingInspection")
 class SearchGroupTest : VimTestCase() {
   @Test
   fun `test one letter`() {
@@ -178,12 +182,175 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(4)
   }
 
+  @Test
+  fun `test search motion for text at caret moves to next occurrence`() {
+    doTest(
+      searchCommand("/one"),
+      "${c}one one one",
+      "one ${c}one one"
+    )
+  }
+
+  @Test
+  fun `test search with wrapscan`() {
+    doTest(
+      searchCommand("/one"),
+      """
+        one
+        two
+        ${c}three
+      """.trimIndent(),
+      """
+        ${c}one
+        two
+        three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("search hit BOTTOM, continuing at TOP")
+  }
+
+  @Test
+  fun `test search with nowrapscan`() {
+    doTest(
+      searchCommand("/one"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    ) {
+      enterCommand("set nowrapscan")
+    }
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: one")
+  }
+
+  @Test
+  fun `test search with wrapscan and no matches`() {
+    doTest(
+      searchCommand("/banana"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+  }
+
+  @Test
+  fun `test backwards search with wrapscan`() {
+    doTest(
+      searchCommand("?three"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        two
+        ${c}three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("search hit TOP, continuing at BOTTOM")
+  }
+
+  @Test
+  fun `test backwards search with nowrapscan`() {
+    doTest(
+      searchCommand("?three"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    ) {
+      enterCommand("set nowrapscan")
+    }
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E384: Search hit TOP without match for: three")
+  }
+
+  @Test
+  fun `test backwards search with wrapscan and no matches`() {
+    doTest(
+      searchCommand("?banana"),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent(),
+      """
+        one
+        ${c}two
+        three
+      """.trimIndent()
+    )
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+  }
+
+  @Test
+  fun `test search for last pattern`() {
+    doTest(
+      listOf(searchCommand("/one"), searchCommand("//")),
+      "${c}one one one",
+      "one one ${c}one"
+    )
+  }
+
   // |/pattern/e|
   @Test
   fun `test search e motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/e")
     assertOffset(6)
+  }
+
+  @Test
+  fun `test search e motion offset for text at caret`() {
+    doTest(
+      searchCommand("/one/e"),
+      "${c}one one one",
+      "on${c}e one one"
+    )
+  }
+
+  @Test
+  fun `test search for last pattern with e motion offset`() {
+    doTest(
+      listOf(searchCommand("/one"), searchCommand("//e")),
+      "${c}one one one",
+      "one on${c}e one"
+    )
+  }
+
+  @Test
+  fun `test search for last pattern with e motion offset 2`() {
+    doTest(
+      listOf(searchCommand("/one/e"), searchCommand("//e")),
+      "${c}one one one",
+      "one on${c}e one"
+    )
   }
 
   @Test
@@ -373,6 +540,366 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(113)
   }
 
+  @Test
+  fun `test search with count`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    typeText("3", "/one<CR>")
+    assertPosition(8, 0)
+  }
+
+  @Test
+  fun `test search with 0 count`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    typeText("0", "/", searchCommand("one"))  // Same as 1
+    assertPosition(4, 0)
+  }
+
+  @Test
+  fun `test search with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    assertTrue(options().wrapscan)
+    typeText("10", "/", searchCommand("one"))
+    assertPosition(6, 0)
+  }
+
+  @Test
+  fun `test search with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set nowrapscan")
+    typeText("10", "/", searchCommand("one"))
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: one")
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test incsearch highlights with count`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("3", "/", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        ‷one‴
+        two
+      """.trimIndent()
+      )
+    assertPosition(8, 0)
+  }
+
+  @Test
+  fun `test incsearch highlights with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("12", "/", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        ‷one‴
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+    assertPosition(6, 0)
+  }
+
+  @Test
+  fun `test incsearch highlights with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        ${c}one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch nowrapscan")
+    typeText("12", "/", "one") // No enter
+
+    // No current match highlight
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+
+    // Back to original location
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test backwards search with count`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    typeText("3", "?one<CR>")
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test backwards search with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set wrapscan")
+    typeText("12", "?one<CR>")
+    assertPosition(4, 0)
+  }
+
+  @Test
+  fun `test backwards search with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set nowrapscan")
+    typeText("12", "?one<CR>")
+    assertPluginError(false)
+    assertPluginErrorMessageContains("E384: Search hit TOP without match for: one")
+    assertPosition(8, 0)
+  }
+
+  @Test
+  fun `test backwards incsearch with count`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("3", "?", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        ‷one‴
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+    assertPosition(2, 0)
+  }
+
+  @Test
+  fun `test backwards incsearch highlights with large count and wrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("12", "?", "one") // No enter
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        ‷one‴
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+    assertPosition(4, 0)
+  }
+
+  @Test
+  fun `test backwards incsearch highlights with large count and nowrapscan`() {
+    configureByText(
+      """
+        one
+        two
+        one
+        two
+        one
+        two
+        one
+        two
+        ${c}one
+        two
+      """.trimIndent()
+    )
+    enterCommand("set hlsearch incsearch nowrapscan")
+    typeText("12", "?", "one") // No enter
+
+    // No current match highlight
+    assertSearchHighlights("one",
+      """
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+        «one»
+        two
+      """.trimIndent()
+    )
+
+    // Back to original location
+    assertPosition(8, 0)
+  }
+
   // |i_CTRL-K|
   @Test
   fun `test search digraph`() {
@@ -380,6 +907,56 @@ class SearchGroupTest : VimTestCase() {
     // enterSearch doesn't parse the special keys
     typeText("/", "<C-K>O:", "<Enter>")
     assertOffset(6)
+  }
+
+  @Test
+  fun `test search beginning of file atom`() {
+    configureByText("""
+      one
+      ${c}two
+      one
+      two
+    """.trimIndent())
+    enterSearch("""\%^one""")
+    assertPosition(0, 0)
+  }
+
+  @Test
+  fun `test search beginning of file atom with old regex engine`() {
+    configureByText("""
+      one
+      ${c}two
+      one
+      two
+    """.trimIndent())
+    enterCommand("set nousenewregex")
+    enterSearch("""\%^""")
+    assertPosition(0, 0)
+  }
+
+  @Test
+  fun `test search end of file atom`() {
+    configureByText("""
+      one
+      two
+      one
+      two
+    """.trimIndent())
+    enterSearch("""two\%$""")
+    assertPosition(3, 0)
+  }
+
+  @Test
+  fun `test search end of file atom with old regex engine`() {
+    configureByText("""
+      one
+      two
+      one
+      two
+    """.trimIndent())
+    enterCommand("set nousenewregex")
+    enterSearch("""two\%$""")
+    assertPosition(3, 0)
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
@@ -824,6 +1401,16 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch highlight with force sensitive case atom`() {
+    configureByText("lorem ipsum Lorem Ipsum lorem ipsum")
+    enterCommand("set hlsearch incsearch")
+
+    typeText("/", "\\Clorem")
+
+    assertSearchHighlights("\\Clorem", "«lorem» ipsum Lorem Ipsum ‷lorem‴ ipsum")
+  }
+
+  @Test
   fun `test incsearch highlights for substitute command`() {
     configureByText(
       """I found it in a legendary land
@@ -889,6 +1476,86 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
+           |hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test incsearch highlights for substitute command if range larger than file`() {
+    configureByText(
+      """
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |${c}hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+
+    typeText(":", "1,300s/and")
+
+    assertSearchHighlights(
+      "and",
+      """I found it in a legendary l‷and‴
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent «and» rush of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test incsearch highlights for substitute command with reversed range`() {
+    configureByText(
+      """
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |${c}hard by the torrent and rush of a mountain pass.
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+
+    typeText(":", "8,2s/and")
+
+    assertSearchHighlights(
+      "and",
+      """
+        |I found it in a legendary land
+        |all rocks ‷and‴ lavender «and» tufted grass,
+        |where it was settled on some sodden s«and»
+        |hard by the torrent «and» rush of a mountain pass.
+        |I found it in a legendary l«and»
+        |all rocks «and» lavender «and» tufted grass,
+        |where it was settled on some sodden s«and»
+        |hard by the torrent «and» rush of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test incsearch highlights nothing for substitute with range after end of file`() {
+    configureByText(
+      """I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |${c}hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+
+    typeText(":", "100,300s/and")
+
+    assertSearchHighlights(
+      "and",
+      """I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
            |hard by the torrent and rush of a mountain pass.
       """.trimMargin(),
     )
@@ -1032,6 +1699,50 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch updates selection when started in Visual mode`() {
+    doTest(
+      listOf("ve", "/dolor"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ipsum ${c}${se}dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+  }
+
+  @Test
+  fun `test incsearch updates block selection when started in Visual mode`() {
+    doTest(
+      listOf("ll", "<C-V>2j", "/mauris"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |Lo${s}rem ipsum ${c}d${se}olor sit amet,
+        |co${s}nsectetur ${c}a${se}dipiscing elit
+        |Se${s}d in orci ${c}m${se}auris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.BLOCK_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+  }
+
+  @Test
   fun `test highlight search results`() {
     configureByText(
       """I found it in a legendary land
@@ -1107,6 +1818,32 @@ class SearchGroupTest : VimTestCase() {
     enterSearch("and")
     enterCommand("nohlsearch")
     assertNoSearchHighlights()
+  }
+
+  @Test
+  fun `test set 'hlsearch' option after nohlsearch command shows highlights`() {
+    configureByText(
+      """I found it in a legendary land
+         |${c}all rocks and lavender and tufted grass,
+         |where it was settled on some sodden sand
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch")
+
+    val pattern = "and"
+    enterSearch(pattern)
+    enterCommand("nohlsearch")
+    enterCommand("set hlsearch")
+
+    assertSearchHighlights(
+      pattern,
+      """I found it in a legendary l«and»
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
   }
 
   @Test
@@ -1521,6 +2258,24 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(9, res)
   }
 
+  // VIM-2510
+  @Test
+  fun `test backslash-i does not hang while trying to highlight all instances with old regex engine`() {
+    // \i - identifier character class.
+    // The old regex engine would treat '\0' as a valid identifier, which is unfortunate, because that marks the end of
+    // each search input line. There is also no validation on the column, so it would continuously match the end of line
+    // marker and increment the column even though there was no column.
+    // We should also be using 'isident' instead of Character.isJavaIdentifierPart, but let's not worry about the old
+    // engine now.
+    doTest(
+      searchCommand("/\\i"),
+      """lorem ipsum""",
+      """l${c}orem ipsum"""
+    ) {
+      enterCommand("set hlsearch nousenewregex")
+    }
+  }
+
   private fun search(pattern: String, input: String): Int {
     configureByText(input)
     val editor = fixture.editor
@@ -1531,8 +2286,8 @@ class SearchGroupTest : VimTestCase() {
       project,
       {
         // Does not move the caret!
-        val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, Direction.FORWARDS)
-        ref.set(n)
+        val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, 1, Direction.FORWARDS)
+        ref.set(n?.first ?: -1)
       },
       null,
       null,

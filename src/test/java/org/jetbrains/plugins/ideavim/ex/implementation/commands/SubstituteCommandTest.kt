@@ -80,6 +80,33 @@ class SubstituteCommandTest : VimTestCase() {
     )
   }
 
+  // VIM-3428
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute pattern ends with backslash`() {
+    doTest(
+      exCommand("""s/#/b\\\\/g"""), // :s/#/b\\/g
+      "#a#",
+      """b\ab\"""
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute pattern contains escaped backslash`() {
+    doTest(
+      exCommand("""s/#/b\\\\c/g"""), // :s/#/b\\c/g
+      "#a#",
+      """b\cab\c"""
+    )
+  }
+
   // VIM-146
   @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
@@ -228,6 +255,183 @@ class SubstituteCommandTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  // Tests two things. Firstly, VIM-698, which was a bug in the old regex engine that would skip lines when substituting
+  // with newlines and secondly to test the special case of '\n' matching end of file
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute newlines`() {
+    // Note that this is correct Vim behaviour. AIUI, Vim (and the old regex engine) use '\0' to delimit lines while
+    // matching patterns, so when checking for '\n' checks against NULL. This also matches the end of the file, so with
+    // this pattern, we get an additional line
+    doTest(
+      exCommand("%s/\\n/,\\r/"),
+      """
+          |1
+          |2
+          |3
+          |4
+        |""".trimMargin(),
+      """
+          |1,
+          |2,
+          |3,
+          |4,
+          |,
+        |""".trimMargin()
+    )
+  }
+
+  // VIM-2141
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with multiline regex`() {
+    doTest(
+      exCommand("""%s/<div>\(\_.\{-}\)<\/div>/<h1>\1<\/h1>/"""),
+      """
+        |<div>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</div>
+        |<div>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</div>
+        |""".trimMargin(),
+      """
+        |<h1>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</h1>
+        |<h1>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</h1>
+        |""".trimMargin()
+    )
+  }
+
+  // VIM-2141
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with multiline regex 2`() {
+    doTest(
+      exCommand("""%s/<div>\(\_.\{-}\)<\/div>/Gone with the div/"""),
+      """
+        |<div>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</div>
+        |<div>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</div>
+        |""".trimMargin(),
+      """
+        |Gone with the div
+        |Gone with the div
+        |""".trimMargin()
+    )
+  }
+
+  // VIM-2141
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with multiline regex 3`() {
+    doTest(
+      exCommand("""%s/<p>\(\_.\{-}\)<\/p>/<span>\1<\/span>/"""),
+      """
+        |<div>
+        |    <p>Para1</p>
+        |    <p>Para2</p>
+        |</div>
+        |<div>
+        |    <p>Para3
+        |           is two lines.</p>
+        |    <p>Para4</p>
+        |</div>
+        |""".trimMargin(),
+      """
+        |<div>
+        |    <span>Para1</span>
+        |    <span>Para2</span>
+        |</div>
+        |<div>
+        |    <span>Para3
+        |           is two lines.</span>
+        |    <span>Para4</span>
+        |</div>
+        |""".trimMargin()
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test beginning of file atom`() {
+    doTest(
+      exCommand("""%s/\%^one/three"""),
+      """
+        one
+        ${c}two
+        one
+        two
+      """.trimIndent(),
+      """
+        three
+        two
+        one
+        two
+      """.trimIndent()
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.usenewregex),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test end of file atom`() {
+    doTest(
+      exCommand("""%s/two\%$/three"""),
+      """
+        one
+        two
+        one
+        two
+      """.trimIndent(),
+      """
+        one
+        two
+        one
+        three
+      """.trimIndent()
+    )
+  }
+
 
   @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
@@ -875,10 +1079,10 @@ class SubstituteCommandTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test replace tilde with last replace string`() {
     val before = "${c}I found it in a legendary land"
-    val after = "${c}I found zzzt in a zzzegendary land"
+    val after = "${c}I found zzzt in a zzzegendary zzzand"
 
     // Change `i` to `zzz`. Use `~` to change `l` to `zzz`
-    doTest(listOf(exCommand("s/i/zzz"), exCommand("s/l/~")), before, after)
+    doTest(listOf(exCommand("s/i/zzz"), exCommand("s/l/~"), exCommand("s/l/~")), before, after)
   }
 
   @OptionTest(

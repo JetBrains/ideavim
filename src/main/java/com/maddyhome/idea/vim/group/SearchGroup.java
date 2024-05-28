@@ -24,6 +24,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -60,23 +61,19 @@ import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
 
+/**
+ * @deprecated Replace with IjVimSearchGroup
+ */
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 @Deprecated
-/**
- * @deprecated Replace with IjVimSearchGroup
- */
 public class SearchGroup extends IjVimSearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
     super();
     if (!globalIjOptions(injector).getUseNewRegex()) {
-      // TODO: Investigate migrating these listeners to use the effective value change listener
-      // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
-      // the highlights in that project's current document's open editors (see VIM-2779).
-      // However, we probably only want to update the editors associated with the current document, so maybe the whole
-      // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
-      // changes in the search options.
+      // We use the global option listener instead of the effective listener that gets called for each affected editor
+      // because we handle updating the affected editors ourselves (e.g., we can filter for visible windows).
       VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch, () -> {
         resetShowSearchHighlight();
         forceUpdateSearchHighlights();
@@ -150,11 +147,11 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
   @Override
   protected @Nullable String getLastUsedPattern() {
     if (globalIjOptions(injector).getUseNewRegex()) return super.getLastUsedPattern();
-    switch (lastPatternIdx) {
-      case RE_SEARCH: return lastSearch;
-      case RE_SUBST:  return lastSubstitute;
-    }
-    return null;
+    return switch (lastPatternIdx) {
+      case RE_SEARCH -> lastSearch;
+      case RE_SUBST -> lastSubstitute;
+      default -> null;
+    };
   }
 
   /**
@@ -272,11 +269,18 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
    * @param dir         The direction to search
-   * @return            Offset to the next occurrence of the pattern or -1 if not found
+   * @return            Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based on
+   *                    the search offset. The value will be `null` if no result is found.
    */
+  @Nullable
   @Override
-  public int processSearchCommand(@NotNull VimEditor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
-    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchCommand(editor, command, startOffset, dir);
+  public Pair<Integer, MotionType> processSearchCommand(@NotNull VimEditor editor,
+                                                        @NotNull String command,
+                                                        int startOffset,
+                                                        int count1,
+                                                        @NotNull Direction dir) {
+
+    if (globalIjOptions(injector).getUseNewRegex()) return super.processSearchCommand(editor, command, startOffset, count1, dir);
 
     boolean isNewPattern = false;
     String pattern = null;
@@ -284,7 +288,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     final char type = dir == Direction.FORWARDS ? '/' : '?';
 
-    if (command.length() > 0) {
+    if (!command.isEmpty()) {
       if (command.charAt(0) != type) {
         CharPointer p = new CharPointer(command);
         CharPointer end = RegExp.skip_regexp(p.ref(0), type, true);
@@ -336,16 +340,18 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     // Direction is saved in do_search
     // IgnoreSmartCase is only ever set for searching words (`*`, `#`, `g*`, etc.) and is reset for all other operations
 
-    if (pattern == null || pattern.length() == 0) {
+    if (pattern == null || pattern.isEmpty()) {
       pattern = getLastSearchPattern();
-      patternOffset = lastPatternOffset;
-      if (pattern == null || pattern.length() == 0) {
+      if (pattern == null || pattern.isEmpty()) {
         isNewPattern = true;
         pattern = getLastSubstitutePattern();
-        if (pattern == null || pattern.length() == 0) {
+        if (pattern == null || pattern.isEmpty()) {
           VimPlugin.showMessage(MessageHelper.message("e_noprevre"));
-          return -1;
+          return null;
         }
+      }
+      if (patternOffset == null || patternOffset.isEmpty()) {
+        patternOffset = lastPatternOffset;
       }
     }
 
@@ -365,7 +371,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    return findItOffset(((IjVimEditor)editor).getEditor(), startOffset, 1, lastDir);
+    return findItOffset(((IjVimEditor)editor).getEditor(), startOffset, count1, lastDir);
   }
 
   /**
@@ -407,7 +413,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    final int result = findItOffset(editor, startOffset, 1, lastDir);
+    final Pair<Integer, MotionType> result = findItOffset(editor, startOffset, 1, lastDir);
 
     // Set lastPatternOffset AFTER searching so it doesn't affect the result
     lastPatternOffset = patternOffset != 0 ? Integer.toString(patternOffset) : "";
@@ -418,7 +424,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       logger.debug("lastDir=" + lastDir);
     }
 
-    return result;
+    return result != null ? result.getFirst() : -1;
   }
 
   /**
@@ -463,8 +469,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    final int offset = findItOffset(((IjVimEditor)editor).getEditor(), range.getStartOffset(), count, lastDir);
-    return offset == -1 ? range.getStartOffset() : offset;
+    final Pair<Integer, MotionType> offsetAndMotion =
+      findItOffset(((IjVimEditor)editor).getEditor(), range.getStartOffset(), count, lastDir);
+    return offsetAndMotion == null ? range.getStartOffset() : offsetAndMotion.getFirst();
   }
 
   /**
@@ -507,14 +514,14 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     resetShowSearchHighlight();
     updateSearchHighlights();
     final int startOffset = caret.getOffset();
-    int offset = findItOffset(editor, startOffset, count, dir);
-    if (offset == startOffset) {
+    Pair<Integer, MotionType> offsetAndMotion = findItOffset(editor, startOffset, count, dir);
+    if (offsetAndMotion != null && offsetAndMotion.getFirst() == startOffset) {
       /* Avoid getting stuck on the current cursor position, which can
        * happen when an offset is given and the cursor is on the last char
        * in the buffer: Repeat with count + 1. */
-      offset = findItOffset(editor, startOffset, count + 1, dir);
+      offsetAndMotion = findItOffset(editor, startOffset, count + 1, dir);
     }
-    return offset;
+    return offsetAndMotion != null ? offsetAndMotion.getFirst() : -1;
   }
 
 
@@ -804,7 +811,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
         CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
         int startoff = startpos.toOffset(((IjVimEditor)editor).getEditor());
-        int endoff = endpos.toOffset(((IjVimEditor)editor).getEditor());
+        int endoff = (endpos.line >= lcount) ? (int) editor.fileSize() : endpos.toOffset(((IjVimEditor)editor).getEditor());
 
         if (do_all || line != lastLine) {
           boolean doReplace = true;
@@ -863,23 +870,23 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
         lastLine = line;
 
-        lnum += nmatch - 1;
         if (do_all && startoff != endoff) {
           if (newpos != null) {
             lnum = newpos.line;
             searchcol = newpos.column;
           }
           else {
+            lnum += Math.max(1, nmatch - 1);
             searchcol = endpos.column;
           }
         }
         else {
+          lnum += Math.max(1, nmatch - 1);
           searchcol = 0;
-          lnum++;
         }
       }
       else {
-        lnum++;
+        lnum += Math.max(1, nmatch - 1);
         searchcol = 0;
       }
     }
@@ -890,7 +897,8 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
           VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
       }
       else {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+        // E486: Pattern not found: {0}
+        VimPlugin.showMessage(MessageHelper.message("E486", pattern));
       }
     }
 
@@ -952,17 +960,17 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       if (which_pat == RE_LAST) {
         which_pat = lastPatternIdx;
       }
-      String errorMessage = null;
-      switch (which_pat) {
-        case RE_SEARCH:
+      String errorMessage = switch (which_pat) {
+        case RE_SEARCH -> {
           pattern = lastSearch;
-          errorMessage = MessageHelper.message("e_nopresub");
-          break;
-        case RE_SUBST:
+          yield MessageHelper.message("e_nopresub");
+        }
+        case RE_SUBST -> {
           pattern = lastSubstitute;
-          errorMessage = MessageHelper.message("e_noprevre");
-          break;
-      }
+          yield MessageHelper.message("e_noprevre");
+        }
+        default -> null;
+      };
 
       // Pattern was never defined
       if (pattern == null) {
@@ -1212,27 +1220,33 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       final Document document = event.getDocument();
       for (VimEditor vimEditor : injector.getEditorGroup().getEditors(new IjVimDocument(document))) {
         final Editor editor = ((IjVimEditor)vimEditor).getEditor();
-        Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
-        if (hls == null) {
+        Collection<RangeHighlighter> existingHighlighters = UserDataManager.getVimLastHighlighters(editor);
+        if (existingHighlighters == null) {
           continue;
         }
 
         if (logger.isDebugEnabled()) {
-          logger.debug("hls=" + hls);
+          logger.debug("hls=" + existingHighlighters);
           logger.debug("event=" + event);
         }
 
-        // We can only re-highlight whole lines, so clear any highlights in the affected lines
+        // We can only re-highlight whole lines, so clear any highlights in the affected lines.
+        // If we're deleting lines, this will clear + re-highlight the new current line, which hasn't been modified.
+        // However, we still want to re-highlight this line in case any highlights cross the line boundaries.
+        // If we're adding lines, this will clear + re-highlight all new lines.
         final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
         final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
         final int startLineOffset = document.getLineStartOffset(startPosition.line);
         final int endLineOffset = document.getLineEndOffset(endPosition.line);
 
-        final Iterator<RangeHighlighter> iter = hls.iterator();
+        // Remove any highlights that have already been deleted, and remove + clear those that intersect with the change
+        final Iterator<RangeHighlighter> iter = existingHighlighters.iterator();
         while (iter.hasNext()) {
           final RangeHighlighter highlighter = iter.next();
-          if (!highlighter.isValid() ||
-              (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
+          if (!highlighter.isValid()) {
+            iter.remove();
+          }
+          else if (highlighter.getTextRange().intersects(startLineOffset, endLineOffset)) {
             iter.remove();
             editor.getMarkupModel().removeHighlighter(highlighter);
           }
@@ -1241,9 +1255,9 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
 
         if (logger.isDebugEnabled()) {
-          hls = UserDataManager.getVimLastHighlighters(editor);
+          existingHighlighters = UserDataManager.getVimLastHighlighters(editor);
           logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
-          logger.debug("hls=" + hls);
+          logger.debug("hls=" + existingHighlighters);
         }
       }
     }
@@ -1269,9 +1283,11 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
    * @param startOffset   The offset to search from
    * @param count         Find the nth occurrence
    * @param dir           The direction to search in
-   * @return              The offset to the occurrence or -1 if not found
+   * @return              Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based
+   *                      on the search offset. The value will be `null` if no result is found.
    */
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
+  @Nullable
+  private Pair<Integer, MotionType> findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
     boolean wrap = globalOptions(injector).getWrapscan();
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
@@ -1281,7 +1297,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     ParsePosition pp = new ParsePosition(0);
 
-    if (lastPatternOffset.length() > 0) {
+    if (!lastPatternOffset.isEmpty()) {
       if (Character.isDigit(lastPatternOffset.charAt(0)) || lastPatternOffset.charAt(0) == '+' || lastPatternOffset.charAt(0) == '-') {
         offsetIsLineOffset = true;
 
@@ -1317,6 +1333,18 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
       }
     }
 
+    // `/{pattern}/{offset}` is inclusive if offset contains `e`, and linewise if there's a line offset
+    final MotionType motionType;
+    if (offset != 0 && !hasEndOffset) {
+      motionType = MotionType.LINE_WISE;
+    }
+    else if (hasEndOffset) {
+      motionType = MotionType.INCLUSIVE;
+    }
+    else {
+      motionType = MotionType.EXCLUSIVE;
+    }
+
     /*
      * If there is a character offset, subtract it from the current
      * position, so we don't get stuck at "?pat?e+2" or "/pat/s-2".
@@ -1338,7 +1366,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     TextRange range = injector.getSearchHelper().findPattern(new IjVimEditor(editor), getLastUsedPattern(), startOffset, count, searchOptions);
     if (range == null) {
       logger.warn("No range is found");
-      return -1;
+      return null;
     }
 
     int res = range.getStartOffset();
@@ -1346,8 +1374,6 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     if (offsetIsLineOffset) {
       int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
       int newLine = EngineEditorHelperKt.normalizeLine(new IjVimEditor(editor), line + offset);
-
-      // TODO: Don't move the caret!
       res = VimPlugin.getMotion().moveCaretToLineStart(new IjVimEditor(editor), newLine);
     }
     else if (hasEndOffset || offset != 0) {
@@ -1365,16 +1391,19 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         nextDir = Direction.BACKWARDS;
       }
       else {
-        return res;
+        return new Pair(res, motionType);
       }
 
       if (lastPatternOffset.length() - ppos > 2) {
         ppos++;
       }
 
-      res = processSearchCommand(new IjVimEditor(editor), lastPatternOffset.substring(ppos + 1), res, nextDir);
+      Pair<Integer, MotionType> offsetAndMotion =
+        processSearchCommand(new IjVimEditor(editor), lastPatternOffset.substring(ppos + 1), res, 1, nextDir);
+      res = offsetAndMotion != null ? offsetAndMotion.getFirst() : -1;
     }
-    return res;
+
+    return new Pair<Integer, MotionType>(res, motionType);
   }
 
 
@@ -1390,7 +1419,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     addOptionalTextElement(search, "last-search", lastSearch);
     addOptionalTextElement(search, "last-substitute", lastSubstitute);
-    addOptionalTextElement(search, "last-offset", lastPatternOffset.length() > 0 ? lastPatternOffset : null);
+    addOptionalTextElement(search, "last-offset", !lastPatternOffset.isEmpty() ? lastPatternOffset : null);
     addOptionalTextElement(search, "last-replace", lastReplace);
     addOptionalTextElement(search, "last-pattern", lastPatternIdx == RE_SEARCH ? lastSearch : lastSubstitute);
     addOptionalTextElement(search, "last-dir", Integer.toString(lastDir.toInt()));

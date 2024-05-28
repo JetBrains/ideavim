@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -34,14 +36,10 @@ import javax.swing.KeyStroke
 public open class IjVimSearchGroup : VimSearchGroupBase() {
 
   init {
-    // TODO: Investigate migrating these listeners to use the effective value change listener
-    // This would allow us to update the editor we're told to update, rather than looping over all projects and updating
-    // the highlights in that project's current document's open editors (see VIM-2779).
-    // However, we probably only want to update the editors associated with the current document, so maybe the whole
-    // code needs to be reworked. We're currently using the same update code for changes in the search term as well as
-    // changes in the search options.
+    // We use the global option listener instead of the effective listener that gets called for each affected editor
+    // because we handle updating the affected editors ourselves (e.g., we can filter for visible windows).
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.hlsearch) {
-      resetSearchHighlight()
+      setShouldShowSearchHighlights()
       updateSearchHighlights(true)
     }
 
@@ -135,13 +133,19 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
     return result.get()
   }
 
-  override fun addSubstitutionConfirmationHighlight(editor: VimEditor, startOffset: Int, endOffset: Int) {
-    val hl = addSubstitutionConfirmationHighlight(
-      (editor as IjVimEditor).editor,
+  override fun addSubstitutionConfirmationHighlight(
+    editor: VimEditor,
+    startOffset: Int,
+    endOffset: Int,
+  ): SearchHighlight {
+
+    val ijEditor = (editor as IjVimEditor).editor
+    val highlighter = addSubstitutionConfirmationHighlight(
+      ijEditor,
       startOffset,
       endOffset
     )
-    editor.editor.markupModel.removeHighlighter(hl)
+    return IjSearchHighlight(ijEditor, highlighter)
   }
 
   override fun setLatestMatch(match: String) {
@@ -165,12 +169,20 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
     showSearchHighlight = injector.globalOptions().hlsearch
   }
 
-  override fun resetSearchHighlight() {
+  override fun setShouldShowSearchHighlights() {
     showSearchHighlight = injector.globalOptions().hlsearch
   }
 
   override fun clearSearchHighlight() {
     showSearchHighlight = false
     updateSearchHighlights(false)
+  }
+
+  private class IjSearchHighlight(private val editor: Editor, private val highlighter: RangeHighlighter) :
+    SearchHighlight() {
+
+    override fun remove() {
+      editor.markupModel.removeHighlighter(highlighter)
+    }
   }
 }

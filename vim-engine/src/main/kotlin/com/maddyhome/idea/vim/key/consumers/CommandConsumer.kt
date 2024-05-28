@@ -94,6 +94,7 @@ public class CommandConsumer : KeyConsumer {
     val keyState = processBuilder.state
 
     if (action.flags.contains(CommandFlags.FLAG_START_EX)) {
+      injector.redrawService.redrawStatusLine()
       keyState.enterCommandLine()
     }
     if (action.flags.contains(CommandFlags.FLAG_END_EX)) {
@@ -170,7 +171,8 @@ public class CommandConsumer : KeyConsumer {
         } else if (action.id == "VimInsertCompletedLiteralAction") {
           keyState.digraphSequence.startLiteralSequence()
           KeyHandler.getInstance().setPromptCharacterEx('^')
-        } else -> Unit
+        }
+      else -> Unit
     }
 
     // Another special case. Force a mode change to update the caret shape

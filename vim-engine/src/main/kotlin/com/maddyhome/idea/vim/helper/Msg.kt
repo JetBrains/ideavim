@@ -58,7 +58,6 @@ public interface Msg {
     public const val E369: String = "E369"
     public const val E384: String = "E384"
     public const val E385: String = "E385"
-    public const val e_patnotf2: String = "e_patnotf2"
     public const val unkopt: String = "unkopt"
     public const val e_invarg: String = "e_invarg"
     public const val E475: String = "E475"

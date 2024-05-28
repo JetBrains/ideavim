@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.*
 import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
@@ -21,7 +20,7 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 public fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) {
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
   val editor = caret.editor
-  val subMode = editor.mode.selectionType ?: CHARACTER_WISE
+  val subMode = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
   val mode = editor.mode
   when (subMode) {
     SelectionType.CHARACTER_WISE -> {

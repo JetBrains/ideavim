@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.api
 public interface VimMessages {
   public fun showStatusBarMessage(editor: VimEditor?, message: String?)
   public fun getStatusBarMessage(): String?
+  public fun clearStatusBarMessage()
   public fun indicateError()
   public fun clearError()
   public fun isError(): Boolean
