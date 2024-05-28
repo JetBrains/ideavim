@@ -18,9 +18,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
+import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
+import com.maddyhome.idea.vim.api.VimKeyGroupBase;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -46,6 +49,7 @@ import java.awt.event.ComponentListener;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
@@ -73,6 +77,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
     if (enableShortcuts) {
       // This does not need to be unregistered, it's registered as a custom UI property on this
+      EventFacade.getInstance().registerCustomShortcutSet(
+        VimShortcutKeyAction.getInstance(),
+        toShortcutSet(((VimKeyGroupBase) injector.getKeyGroup()).getRequiredShortcutKeys()),
+        entry
+      );
       new ExShortcutKeyAction(this).registerCustomShortcutSet();
     }
 
