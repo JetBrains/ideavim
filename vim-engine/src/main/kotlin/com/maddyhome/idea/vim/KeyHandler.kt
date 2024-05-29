@@ -294,10 +294,8 @@ public class KeyHandler {
   }
 
   public fun setPromptCharacterEx(promptCharacter: Char) {
-    val exEntryPanel = injector.exEntryPanel
-    if (exEntryPanel.isActive()) {
-      exEntryPanel.setCurrentActionPromptCharacter(promptCharacter)
-    }
+    val commandLine = injector.commandLine.getActiveCommandLine() ?: return
+    commandLine.setCurrentActionPromptCharacter(promptCharacter)
   }
 
   /**

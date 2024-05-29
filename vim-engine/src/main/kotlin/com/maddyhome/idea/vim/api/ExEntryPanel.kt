@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 public interface ExEntryPanel {
-  public fun isActive(): Boolean
+  @Deprecated("Remove it after completely removing Swing TextActions")
   public fun clearCurrentAction()
-  public fun setCurrentActionPromptCharacter(char: Char)
 }

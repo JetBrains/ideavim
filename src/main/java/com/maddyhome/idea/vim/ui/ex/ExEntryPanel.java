@@ -499,6 +499,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     return (VimCommandLineCaret) entry.getCaret();
   }
 
+  @Override
+  public void setCurrentActionPromptCharacter(char c) {
+    entry.setCurrentActionPromptCharacter(c);
+  }
+
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
