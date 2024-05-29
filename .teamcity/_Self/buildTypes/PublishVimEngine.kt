@@ -26,7 +26,7 @@ object PublishVimEngine : IdeaVimBuildType({
 
   vcs {
     root(DslContext.settingsRoot)
-    branchFilter = "+:<default>"
+    branchFilter = "+:fleet"
 
     checkoutMode = CheckoutMode.AUTO
   }

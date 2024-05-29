@@ -19,7 +19,7 @@ object PrintReleaseBranch : IdeaVimBuildType({
 
   vcs {
     root(ReleasesVcsRoot)
-    branchFilter = "+:refs/heads/releases/*"
+    branchFilter = "+:heads/releases/*"
 
     checkoutMode = CheckoutMode.AUTO
   }
