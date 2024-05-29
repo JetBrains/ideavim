@@ -98,7 +98,6 @@ import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ShowCmdWidgetUpdater
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.macro.macroWidgetOptionListener
 import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetListener
@@ -708,10 +707,10 @@ internal object VimListenerManager {
       logger.debug("Mouse clicked")
 
       if (event.area == EditorMouseEventArea.EDITING_AREA) {
-        VimPlugin.getMotion()
         val editor = event.editor
-        if (ExEntryPanel.getInstance().isActive) {
-          VimPlugin.getProcess().cancelExEntry(editor.vim, false)
+        val commandLine = injector.commandLine.getActiveCommandLine()
+        if (commandLine != null) {
+          injector.processGroup.cancelExEntry(editor.vim, false)
         }
 
         ExOutputModel.getInstance(editor).clear()
@@ -740,9 +739,9 @@ internal object VimListenerManager {
         event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
         event.mouseEvent.button != MouseEvent.BUTTON3
       ) {
-        VimPlugin.getMotion()
-        if (ExEntryPanel.getInstance().isActive) {
-          VimPlugin.getProcess().cancelExEntry(event.editor.vim, false)
+        val commandLine = injector.commandLine.getActiveCommandLine()
+        if (commandLine != null) {
+          injector.processGroup.cancelExEntry(event.editor.vim, false)
         }
 
         ExOutputModel.getInstance(event.editor).clear()
