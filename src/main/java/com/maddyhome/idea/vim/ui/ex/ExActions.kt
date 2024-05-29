@@ -26,10 +26,12 @@ import javax.swing.text.TextAction
 import kotlin.math.abs
 import kotlin.math.min
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal interface MultiStepAction : Action {
   fun reset()
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class HistoryUpAction : TextAction(ExEditorKit.HistoryUp) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
@@ -37,6 +39,7 @@ internal class HistoryUpAction : TextAction(ExEditorKit.HistoryUp) {
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class HistoryDownAction : TextAction(ExEditorKit.HistoryDown) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
@@ -44,6 +47,7 @@ internal class HistoryDownAction : TextAction(ExEditorKit.HistoryDown) {
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class HistoryUpFilterAction : TextAction(ExEditorKit.HistoryUpFilter) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
@@ -51,6 +55,7 @@ internal class HistoryUpFilterAction : TextAction(ExEditorKit.HistoryUpFilter) {
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class HistoryDownFilterAction : TextAction(ExEditorKit.HistoryDownFilter) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
@@ -58,51 +63,7 @@ internal class HistoryDownFilterAction : TextAction(ExEditorKit.HistoryDownFilte
   }
 }
 
-internal class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAction {
-  private enum class State {
-    SKIP_CTRL_R, WAIT_REGISTER
-  }
-
-  private var state = State.SKIP_CTRL_R
-
-  override fun actionPerformed(e: ActionEvent) {
-    val target = getTextComponent(e) as ExTextField
-    val key = ExEditorKit.convert(e)
-    if (key != null) {
-      when (state) {
-        State.SKIP_CTRL_R -> {
-          state = State.WAIT_REGISTER
-          target.setCurrentAction(this, '\"')
-        }
-        State.WAIT_REGISTER -> {
-          state = State.SKIP_CTRL_R
-          target.clearCurrentAction()
-          val c = key.keyChar
-          if (c != KeyEvent.CHAR_UNDEFINED) {
-            val register = VimPlugin.getRegister().getRegister(c)
-            if (register != null) {
-              val oldText = target.actualText
-              val text = register.text
-              if (text != null) {
-                val offset = target.caretPosition
-                target.text = oldText.substring(0, offset) + text + oldText.substring(offset)
-                target.caretPosition = offset + text.length
-              }
-            }
-          } else if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0 && key.keyCode == KeyEvent.VK_C) {
-            // Eat any unused keys, unless it's <C-C>, in which case forward on and cancel entry
-            target.handleKey(key)
-          }
-        }
-      }
-    }
-  }
-
-  override fun reset() {
-    state = State.SKIP_CTRL_R
-  }
-}
-
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     logger.debug("complete entry")
@@ -123,6 +84,7 @@ internal class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class CancelEntryAction : TextAction(ExEditorKit.CancelEntry) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
@@ -130,6 +92,7 @@ internal class CancelEntryAction : TextAction(ExEditorKit.CancelEntry) {
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class EscapeCharAction : TextAction(ExEditorKit.EscapeChar) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
@@ -137,6 +100,7 @@ internal class EscapeCharAction : TextAction(ExEditorKit.EscapeChar) {
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal abstract class DeleteCharAction internal constructor(name: String?) : TextAction(name) {
   @kotlin.jvm.Throws(BadLocationException::class)
   fun deleteSelection(doc: Document, dot: Int, mark: Int): Boolean {
@@ -184,6 +148,7 @@ internal abstract class DeleteCharAction internal constructor(name: String?) : T
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNextCharAction) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
@@ -202,6 +167,7 @@ internal class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNe
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.deletePrevCharAction) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
@@ -222,6 +188,7 @@ internal class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.dele
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordAction) {
   /**
    * Invoked when an action occurs.
@@ -258,6 +225,7 @@ internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrev
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
   /**
    * Invoked when an action occurs.
@@ -275,6 +243,7 @@ internal class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
   }
 }
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal class ToggleInsertReplaceAction : TextAction(ExEditorKit.ToggleInsertReplace) {
   /**
    * Invoked when an action occurs.

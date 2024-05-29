@@ -20,6 +20,7 @@ import javax.swing.text.DefaultEditorKit
 import javax.swing.text.Document
 import javax.swing.text.TextAction
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal object ExEditorKit : DefaultEditorKit() {
 
   @NonNls
@@ -36,9 +37,6 @@ internal object ExEditorKit : DefaultEditorKit() {
 
   @NonNls
   val ToggleInsertReplace: String = "toggle-insert"
-
-  @NonNls
-  val InsertRegister: String = "insert-register"
 
   @NonNls
   val HistoryUp: String = "history-up"
@@ -107,7 +105,6 @@ internal object ExEditorKit : DefaultEditorKit() {
     HistoryUpFilterAction(),
     HistoryDownFilterAction(),
     ToggleInsertReplaceAction(),
-    InsertRegisterAction(),
   )
 
   class DefaultExKeyHandler : DefaultKeyTypedAction() {

@@ -54,42 +54,6 @@ public class ProcessGroup : VimProcessGroupBase() {
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
 
-  public override fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char) {
-    // Don't allow searching in one line editors
-    if (editor.isOneLineMode()) return
-
-    val initText = ""
-    val label = leader.toString()
-
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, label, initText, count)
-  }
-
-  public override fun endSearchCommand(): String {
-    val panel = ExEntryPanel.getInstance()
-    panel.deactivate(true)
-
-    return panel.text
-  }
-
-  public override fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    // Don't allow ex commands in one line editors
-    if (editor.isOneLineMode()) return
-
-    val currentMode = editor.vimStateMachine.mode
-    check(currentMode is ReturnableFromCmd) {
-      "Cannot enable cmd mode from current mode $currentMode"
-    }
-
-    isCommandProcessing = true
-    modeBeforeCommandProcessing = currentMode
-    val initText = getRange(editor, cmd)
-    injector.markService.setVisualSelectionMarks(editor)
-    editor.mode = Mode.CMD_LINE(currentMode)
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, ":", initText, 1)
-  }
-
   public override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
@@ -110,79 +74,11 @@ public class ProcessGroup : VimProcessGroupBase() {
     }
   }
 
-  public override fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean {
-    val panel = ExEntryPanel.getInstance()
-    panel.deactivate(true)
-    var res = true
-    try {
-      editor.mode = NORMAL()
-
-      logger.debug("processing command")
-
-      val text = panel.text
-
-      if (panel.label != ":") {
-        // Search is handled via Argument.Type.EX_STRING. Although ProcessExEntryAction is registered as the handler for
-        // <CR> in both command and search modes, it's only invoked for command mode (see KeyHandler.handleCommandNode).
-        // We should never be invoked for anything other than an actual ex command.
-        throw InvalidCommandException("Expected ':' command. Got '" + panel.label + "'", text)
-      }
-
-      logger.debug {
-        "swing=" + SwingUtilities.isEventDispatchThread()
-      }
-
-      injector.vimscriptExecutor.execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext)
-    } catch (e: ExException) {
-      VimPlugin.showMessage(e.message)
-      VimPlugin.indicateError()
-      res = false
-    } catch (bad: Exception) {
-      logger.error(bad)
-      VimPlugin.indicateError()
-      res = false
-    } finally {
-      isCommandProcessing = false
-      modeBeforeCommandProcessing = null
-    }
-
-    return res
-  }
-
-  // commands executed from map command / macro should not be added to history
-  private fun skipHistory(editor: VimEditor): Boolean {
-    return getInstance(editor).mappingState.isExecutingMap() || injector.macro.isExecutingMacro
-  }
-
   public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
     editor.mode = NORMAL()
     getInstance().reset(editor)
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true, resetCaret)
-  }
-
-  public override fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    val initText = getRange(editor, cmd) + "!"
-    val currentMode = editor.mode
-    check(currentMode is ReturnableFromCmd) { "Cannot enable cmd mode from $currentMode" }
-    editor.mode = Mode.CMD_LINE(currentMode)
-    val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, ":", initText, 1)
-  }
-
-  private fun getRange(editor: VimEditor, cmd: Command): String {
-    var initText = ""
-    if (editor.vimStateMachine.mode is VISUAL) {
-      initText = "'<,'>"
-    } else if (cmd.rawCount > 0) {
-      initText = if (cmd.count == 1) {
-        "."
-      } else {
-        ".,.+" + (cmd.count - 1)
-      }
-    }
-
-    return initText
   }
 
   @Throws(ExecutionException::class, ProcessCanceledException::class)

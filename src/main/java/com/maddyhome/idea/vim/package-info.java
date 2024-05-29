@@ -136,7 +136,7 @@
  * |-|                    {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction}
  * |.|                    {@link com.maddyhome.idea.vim.action.change.RepeatChangeAction}
  * |/|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction}
- * |:|                    {@link com.maddyhome.idea.vim.action.ExEntryAction}
+ * |:|                    {@link com.maddyhome.idea.vim.action.ex.ExEntryAction}
  * |;|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction}
  * |<|                    {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction}
  * |<<|                   translated to <_
@@ -618,7 +618,6 @@
  * |c_CTRL-N|             {@link com.maddyhome.idea.vim.ui.ex.HistoryDownAction}
  * |c_CTRL-P|             {@link com.maddyhome.idea.vim.ui.ex.HistoryUpAction}
  * |c_CTRL-Q|             Handled by KeyHandler
- * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ex.InsertRegisterAction}
  * |c_CTRL-R_CTRL-A|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-F|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-L|      TO BE IMPLEMENTED

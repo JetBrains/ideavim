@@ -73,14 +73,8 @@ public enum class CommandFlags {
    */
   FLAG_ALLOW_DIGRAPH,
 
-  /**
-   * Indicates that a command handles completing ex input.
-   *
-   * When performing a search, the search action command requires an EX_STRING as input. This is completed by a command
-   * that has FLAG_COMPLETE_EX. That command isn't called and the ex string becomes an argument for the previous command
-   * that started the EX_STRING.
-   */
-  FLAG_COMPLETE_EX,
+  FLAG_START_EX,
+  FLAG_END_EX,
 
   FLAG_TEXT_BLOCK,
 }

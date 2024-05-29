@@ -13,6 +13,7 @@ import javax.swing.KeyStroke
 import javax.swing.text.DefaultEditorKit
 import javax.swing.text.JTextComponent.KeyBinding
 
+@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
 internal object ExKeyBindings {
 
   // TODO - add the following keys:
@@ -70,8 +71,6 @@ internal object ExKeyBindings {
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.StartDigraph),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.StartLiteral),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.StartLiteral),
-
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.InsertRegister),
 
       // These appear to be non-Vim shortcuts
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction),

@@ -19,9 +19,21 @@ import com.maddyhome.idea.vim.state.mode.Mode
 public data class KeyHandlerState(
   public val mappingState: MappingState,
   public val digraphSequence: DigraphSequence,
-  public val commandBuilder: CommandBuilder,
+  public val editorCommandBuilder: CommandBuilder,
+  public var commandLineCommandBuilder: CommandBuilder?,
 ): Cloneable {
-  public constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)))
+  public constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)), null)
+
+  public val commandBuilder: CommandBuilder
+    get() = commandLineCommandBuilder ?: editorCommandBuilder
+
+  public fun enterCommandLine() {
+    commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.CMD_LINE))
+  }
+
+  public fun leaveCommandLine() {
+    commandLineCommandBuilder = null
+  }
 
   public fun partialReset(mode: Mode) {
     mappingState.resetMappingSequence()
@@ -31,14 +43,17 @@ public data class KeyHandlerState(
   public fun reset(mode: Mode) {
     digraphSequence.reset()
     mappingState.resetMappingSequence()
-    commandBuilder.resetAll(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
+
+    commandLineCommandBuilder = null
+    editorCommandBuilder.resetAll(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
   }
 
   public override fun clone(): KeyHandlerState {
     return KeyHandlerState(
       mappingState.clone(),
       digraphSequence.clone(),
-      commandBuilder.clone()
+      editorCommandBuilder.clone(),
+      commandLineCommandBuilder?.clone(),
     )
   }
 }

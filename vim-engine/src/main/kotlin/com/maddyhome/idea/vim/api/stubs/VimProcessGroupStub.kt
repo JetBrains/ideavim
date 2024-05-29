@@ -24,32 +24,10 @@ public class VimProcessGroupStub : VimProcessGroupBase() {
 
   override val lastCommand: String
     get() = TODO("Not yet implemented")
-  override val isCommandProcessing: Boolean
-    get() = TODO("Not yet implemented")
-  override val modeBeforeCommandProcessing: Mode?
-    get() = TODO("Not yet implemented")
-
-  override fun startSearchCommand(editor: VimEditor, context: ExecutionContext, count: Int, leader: Char) {
-    TODO("Not yet implemented")
-  }
-
-  override fun endSearchCommand(): String {
-    TODO("Not yet implemented")
-  }
+  override var isCommandProcessing: Boolean = false
+  override var modeBeforeCommandProcessing: Mode? = null
 
   override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
-    TODO("Not yet implemented")
-  }
-
-  public override fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    TODO("Not yet implemented")
-  }
-
-  public override fun startExCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    TODO("Not yet implemented")
-  }
-
-  override fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean {
     TODO("Not yet implemented")
   }
 

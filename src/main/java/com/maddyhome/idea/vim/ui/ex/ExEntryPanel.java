@@ -18,8 +18,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
+import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
+import com.maddyhome.idea.vim.api.VimCommandLine;
+import com.maddyhome.idea.vim.api.VimCommandLineCaret;
+import com.maddyhome.idea.vim.api.VimKeyGroupBase;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -45,12 +50,13 @@ import java.awt.event.ComponentListener;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
  */
-public class ExEntryPanel extends JPanel {
-  private static ExEntryPanel instance;
+public class ExEntryPanel extends JPanel implements VimCommandLine {
+  public static ExEntryPanel instance;
   private static ExEntryPanel instanceWithoutShortcuts;
 
   private ExEntryPanel(boolean enableShortcuts) {
@@ -72,6 +78,11 @@ public class ExEntryPanel extends JPanel {
 
     if (enableShortcuts) {
       // This does not need to be unregistered, it's registered as a custom UI property on this
+      EventFacade.getInstance().registerCustomShortcutSet(
+        VimShortcutKeyAction.getInstance(),
+        toShortcutSet(((VimKeyGroupBase) injector.getKeyGroup()).getRequiredShortcutKeys()),
+        entry
+      );
       new ExShortcutKeyAction(this).registerCustomShortcutSet();
     }
 
@@ -175,6 +186,7 @@ public class ExEntryPanel extends JPanel {
   /**
    * Turns off the ex entry field and optionally puts the focus back to the original component
    */
+  @Override
   public void deactivate(boolean refocusOwningEditor, boolean resetCaret) {
     logger.info("Deactivate ex entry panel");
     if (!active) return;
@@ -288,8 +300,7 @@ public class ExEntryPanel extends JPanel {
         // If we're showing highlights for the search command `/`, then the command builder will have a count already
         // coerced to 1. If we're showing highlights for an ex command such as `:s`, there won't be a command, and there
         // obviously won't be a count.
-        int count1 =
-          Math.max(1, KeyHandler.getInstance().getKeyHandlerState().getCommandBuilder().getCurrentCommandPartCount1());
+        int count1 = Math.max(1, KeyHandler.getInstance().getKeyHandlerState().getEditorCommandBuilder().getCount());
 
         final String labelText = label.getText();
         if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
@@ -341,6 +352,7 @@ public class ExEntryPanel extends JPanel {
    *
    * @return The ex entry label
    */
+  @Override
   public String getLabel() {
     return label.getText();
   }
@@ -368,8 +380,14 @@ public class ExEntryPanel extends JPanel {
    *
    * @return The user entered text
    */
+  @Override
   public @NotNull String getText() {
     return entry.getActualText();
+  }
+
+  @Override
+  public void setText(@NotNull String s) {
+    entry.setText(s);
   }
 
   public @NotNull ExTextField getEntry() {
@@ -381,6 +399,7 @@ public class ExEntryPanel extends JPanel {
    *
    * @param stroke The keystroke
    */
+  @Override
   public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
   }
@@ -465,6 +484,12 @@ public class ExEntryPanel extends JPanel {
   };
 
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
+
+  @NotNull
+  @Override
+  public VimCommandLineCaret getCaret() {
+    return (VimCommandLineCaret) entry.getCaret();
+  }
 
   public static class LafListener implements LafManagerListener {
     @Override

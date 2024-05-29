@@ -216,7 +216,10 @@ public class KeyHandler {
     )
 
     // If we were in "operator pending" mode, reset back to normal mode.
-    editor.resetOpPending()
+    // But opening command line should not reset operator pending mode (e.g. `d/foo`
+    if (!command.flags.contains(CommandFlags.FLAG_START_EX)) {
+      editor.resetOpPending()
+    }
 
     // Save off the command we are about to execute
     editorState.executingCommand = command
