@@ -17,4 +17,6 @@ public interface VimCommandLine {
 
   public fun handleKey(key: KeyStroke)
   public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean = true)
+
+  public fun setCurrentActionPromptCharacter(char: Char)
 }

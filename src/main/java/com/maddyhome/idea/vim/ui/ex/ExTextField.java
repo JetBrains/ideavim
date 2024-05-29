@@ -306,11 +306,6 @@ public class ExTextField extends JTextField {
     }
   }
 
-  public void setCurrentAction(@NotNull MultiStepAction action, char pendingIndicator) {
-    this.currentAction = action;
-    setCurrentActionPromptCharacter(pendingIndicator);
-  }
-
   public void clearCurrentAction() {
     if (currentAction != null) {
       currentAction.reset();

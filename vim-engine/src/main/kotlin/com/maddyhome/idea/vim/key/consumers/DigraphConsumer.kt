@@ -59,15 +59,15 @@ public class DigraphConsumer : KeyConsumer {
     when (res.result) {
       DigraphResult.RES_HANDLED -> {
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ ->
-          if (injector.exEntryPanel.isActive()) {
-            keyHandler.setPromptCharacterEx(if (lambdaKeyState.commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
-          }
+          val commandLine = injector.commandLine.getActiveCommandLine()
+          commandLine?.setCurrentActionPromptCharacter(if (lambdaKeyState.commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
           lambdaKeyState.commandBuilder.addKey(key)
         }
         return true
       }
       DigraphResult.RES_DONE -> {
-        if (injector.exEntryPanel.isActive()) {
+        val commandLine = injector.commandLine.getActiveCommandLine()
+        if (commandLine != null) {
           if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
             return false
           } else {
@@ -90,7 +90,8 @@ public class DigraphConsumer : KeyConsumer {
         return true
       }
       DigraphResult.RES_BAD -> {
-        if (injector.exEntryPanel.isActive()) {
+        val commandLine = injector.commandLine.getActiveCommandLine()
+        if (commandLine != null) {
           if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
             return false
           } else {
