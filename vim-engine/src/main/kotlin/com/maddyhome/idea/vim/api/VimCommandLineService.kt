@@ -23,4 +23,6 @@ public interface VimCommandLineService {
    * @param count    TODO
    */
   public fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String, count: Int): VimCommandLine
+
+  public fun fullReset()
 }

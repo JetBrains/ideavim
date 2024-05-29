@@ -25,7 +25,8 @@ import javax.swing.KeyStroke
 
 public class ExEntryPanelService : VimCommandLineService {
   public override fun getActiveCommandLine(): VimCommandLine? {
-    return ExEntryPanel.instance
+    val instance = ExEntryPanel.instance ?: return null
+    return if (instance.isActive) instance else null
   }
 
   override fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String? {
@@ -92,5 +93,9 @@ public class ExEntryPanelService : VimCommandLineService {
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, label, initText, count)
     return panel
+  }
+
+  override fun fullReset() {
+    ExEntryPanel.fullReset()
   }
 }

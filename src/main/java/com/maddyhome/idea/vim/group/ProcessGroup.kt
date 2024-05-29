@@ -21,16 +21,15 @@ import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.helper.requestFocus
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.Mode.NORMAL
 import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.returnTo
@@ -89,10 +88,10 @@ public class ProcessGroup : VimProcessGroupBase() {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
-    val panel = ExEntryPanel.getInstance()
-    if (panel.isActive) {
+    val panel = injector.commandLine.getActiveCommandLine()
+    if (panel != null) {
       processResultBuilder.addExecutionStep { _, _, _ ->
-        requestFocus(panel.entry)
+        requestFocus((panel as ExEntryPanel).entry)
         panel.handleKey(stroke)
       }
       return true
