@@ -60,8 +60,8 @@ public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution()
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: VimEditor, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
-    val panel = injector.commandLine.getActiveCommandLine()!!
-    panel.deactivate(true)
+    if (argument == null) return Motion.Error
+
     try {
       // Exit Command-line mode and return to the previous mode before executing the command (this is set to Normal in
       // startExEntry). Remember from startExEntry that we might still have selection and/or multiple carets, even
@@ -71,7 +71,7 @@ public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution()
 
       logger.debug("processing command")
 
-      val text = panel.text
+      val text = argument.string
       val shouldSkipHistory = getInstance(editor).mappingState.isExecutingMap() || injector.macro.isExecutingMacro
       injector.vimscriptExecutor.execute(text, editor, context, shouldSkipHistory, true, CommandLineVimLContext)
     } catch (e: ExException) {

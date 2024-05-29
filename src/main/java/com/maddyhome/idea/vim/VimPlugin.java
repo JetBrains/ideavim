@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
 import org.jdom.Element;
@@ -46,6 +45,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
 import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
 import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc;
@@ -283,11 +283,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       try {
-        VimInjectorKt.injector.getOptionGroup().startInitVimRc();
+        injector.getOptionGroup().startInitVimRc();
         executeIdeaVimRc(editor);
       }
       finally {
-        VimInjectorKt.injector.getOptionGroup().endInitVimRc();
+        injector.getOptionGroup().endInitVimRc();
       }
     }
   }
@@ -352,7 +352,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (unsubscribe) {
       VimListenerManager.INSTANCE.turnOff();
     }
-    ExEntryPanel.fullReset();
+    injector.getCommandLine().fullReset();
 
     // Unregister vim actions in command mode
     RegisterActions.unregisterActions();
