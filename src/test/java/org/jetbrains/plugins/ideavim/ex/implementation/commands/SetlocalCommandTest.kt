@@ -34,7 +34,6 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
-    enterCommand("setlocal fileformat=unix")
     enterCommand("setlocal shell=/dummy/path/to/bash")
     enterCommand("setlocal shellcmdflag=-x")
     enterCommand("setlocal shellxescape=@")
@@ -449,6 +448,10 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified local option and unset global-local values`() {
+    // 'fileformat' will always be "unix" because the platform normalises line endings to `\n`, but the default is
+    // different for Mac/Unix and DOS. For the sake of tests, reset to the OS default
+    enterCommand("setlocal fileformat&")
+
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     assertCommandOutput("setlocal", """
       |--- Local option values ---
@@ -462,6 +465,10 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified local option and unset global-local values 2`() {
+    // 'fileformat' will always be "unix" because the platform normalises line endings to `\n`, but the default is
+    // different for Mac/Unix and DOS. For the sake of tests, reset to the OS default
+    enterCommand("setlocal fileformat&")
+
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("setlocal number relativenumber scrolloff=10 nrformats=alpha,hex,octal sidescrolloff=10")
     assertCommandOutput("setlocal", """
@@ -528,6 +535,10 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified local option values in single column`() {
+    // 'fileformat' will always be "unix" because the platform normalises line endings to `\n`, but the default is
+    // different for Mac/Unix and DOS. For the sake of tests, reset to the OS default
+    enterCommand("setlocal fileformat&")
+
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     assertCommandOutput("setlocal!", """
       |--- Local option values ---

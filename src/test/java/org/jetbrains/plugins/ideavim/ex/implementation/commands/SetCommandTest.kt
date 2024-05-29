@@ -32,7 +32,6 @@ class SetCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
-    enterCommand("set fileformat=unix")
     enterCommand("set shell=/dummy/path/to/bash")
     enterCommand("set shellcmdflag=-x")
     enterCommand("set shellxescape=@")
@@ -149,6 +148,10 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified effective option values`() {
+    // 'fileformat' will always be "unix" because the platform normalises line endings to `\n`, but the default is
+    // different for Mac/Unix and DOS. For the sake of tests, reset to the OS default
+    enterCommand("setlocal fileformat&")
+
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
     assertCommandOutput("set",
@@ -213,6 +216,10 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified option values in single column`() {
+    // 'fileformat' will always be "unix" because the platform normalises line endings to `\n`, but the default is
+    // different for Mac/Unix and DOS. For the sake of tests, reset to the OS default
+    enterCommand("setlocal fileformat&")
+
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
     assertCommandOutput("set!",
