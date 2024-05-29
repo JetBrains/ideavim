@@ -64,6 +64,31 @@ enum class ReleaseType {
   STABLE_NO_PATCH, // Version that ends on 0. Like 2.5.0
 }
 
+internal fun getVersionsExistingVersionsFor(
+  majorVersion: Int,
+  minorVersion: Int,
+  projectDir: String,
+): Map<Semver, ObjectId> {
+  val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+  val git = Git(repository)
+  println(git.log().call().first())
+  println(git.tagList().call().first())
+
+  return git.tagList().call().mapNotNull { ref ->
+    runCatching {
+      // Git has two types of tags: light and annotated. This code detect hash of the commit for both types of tags
+      val revWalk = RevWalk(repository)
+      val tag = revWalk.parseAny(ref.objectId)
+      val commitHash = revWalk.peel(tag).id
+      val semver = Semver(ref.name.removePrefix("refs/tags/"))
+      if (semver.major == majorVersion && semver.minor == minorVersion) {
+        semver to commitHash
+      } else null
+    }.getOrNull()
+  }
+    .toMap()
+}
+
 internal fun getVersion(projectDir: String, releaseType: ReleaseType): Pair<Semver, ObjectId> {
   val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
   val git = Git(repository)

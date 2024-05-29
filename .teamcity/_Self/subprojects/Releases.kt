@@ -5,6 +5,7 @@ import _Self.buildTypes.PrintReleaseBranch
 import _Self.buildTypes.PublishVimEngine
 import _Self.buildTypes.ReleaseDev
 import _Self.buildTypes.ReleaseEap
+import _Self.buildTypes.ReleaseEapFromBranch
 import _Self.buildTypes.ReleaseMajor
 import _Self.buildTypes.ReleaseMinor
 import _Self.buildTypes.ReleasePatch
@@ -43,4 +44,5 @@ object Releases : Project({
 
   buildType(CreateNewReleaseBranchFromMaster)
   buildType(PrintReleaseBranch)
+  buildType(ReleaseEapFromBranch)
 })
