@@ -3,8 +3,8 @@ package _Self.buildTypes
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE_EAP
 import _Self.IdeaVimBuildType
+import _Self.vcsRoots.ReleasesVcsRoot
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
-import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
@@ -39,9 +39,9 @@ object ReleaseEapFromBranch : IdeaVimBuildType({
   }
 
   vcs {
-    root(DslContext.settingsRoot)
+    root(ReleasesVcsRoot)
     branchFilter = """
-      +:heads/releases/*
+      +:heads/(releases/*)
       """.trimIndent()
 
     checkoutMode = CheckoutMode.AUTO
