@@ -24,5 +24,7 @@ public interface VimCommandLineService {
    */
   public fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String, count: Int): VimCommandLine
 
+  public fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String, count: Int): VimCommandLine
+
   public fun fullReset()
 }

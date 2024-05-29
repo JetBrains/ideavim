@@ -117,11 +117,9 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
       }
     } else {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
-      val exEntryPanel: com.maddyhome.idea.vim.ui.ex.ExEntryPanel =
-        com.maddyhome.idea.vim.ui.ex.ExEntryPanel.getInstanceWithoutShortcuts()
-      exEntryPanel.activate(
-        editor.ij,
-        (context as IjEditorExecutionContext).context,
+      val exEntryPanel = injector.commandLine.createWithoutShortcuts(
+        editor,
+        context,
         MessageHelper.message("replace.with.0", match),
         "",
         1
