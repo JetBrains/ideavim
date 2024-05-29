@@ -25,7 +25,7 @@ import javax.swing.KeyStroke
 
 public class ExEntryPanelService : VimCommandLineService {
   public override fun getActiveCommandLine(): VimCommandLine? {
-    val instance = ExEntryPanel.instance ?: return null
+    val instance = ExEntryPanel.instance ?: ExEntryPanel.instanceWithoutShortcuts ?: return null
     return if (instance.isActive) instance else null
   }
 
@@ -91,6 +91,18 @@ public class ExEntryPanelService : VimCommandLineService {
 
   public override fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String, count: Int): VimCommandLine {
     val panel = ExEntryPanel.getInstance()
+    panel.activate(editor.ij, context.ij, label, initText, count)
+    return panel
+  }
+
+  public override fun createWithoutShortcuts(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    initText: String,
+    count: Int
+  ): VimCommandLine {
+    val panel = ExEntryPanel.getInstanceWithoutShortcuts()
     panel.activate(editor.ij, context.ij, label, initText, count)
     return panel
   }

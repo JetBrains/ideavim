@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ModalEntry;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.VimLContext;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
@@ -1035,8 +1034,13 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
     }
     else {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
-      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-      exEntryPanel.activate(editor, ((IjEditorExecutionContext)context).getContext(), MessageHelper.message("replace.with.0", match), "", 1);
+      final VimCommandLine exEntryPanel = injector.getCommandLine().createWithoutShortcuts(
+        new IjVimEditor(editor),
+        context,
+        MessageHelper.message("replace.with.0", match),
+        "",
+        1
+      );
       new IjVimCaret(caret).moveToOffset(startoff);
       ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);

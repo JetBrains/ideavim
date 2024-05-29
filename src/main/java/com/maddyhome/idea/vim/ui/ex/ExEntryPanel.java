@@ -58,7 +58,7 @@ import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
  */
 public class ExEntryPanel extends JPanel implements VimCommandLine {
   public static ExEntryPanel instance;
-  private static ExEntryPanel instanceWithoutShortcuts;
+  public static ExEntryPanel instanceWithoutShortcuts;
 
   private ExEntryPanel(boolean enableShortcuts) {
     label = new JLabel(" ");
