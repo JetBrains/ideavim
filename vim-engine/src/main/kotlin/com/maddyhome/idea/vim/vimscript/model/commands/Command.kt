@@ -67,7 +67,7 @@ public sealed class Command(private val commandRange: Range, public val commandA
     // We are currently in Normal mode, but might still have a visual or visual block selection and/or multiple carets.
     // Vim clears Visual mode before entering Command-line, but we can't do that because some of our commands can handle
     // selection and multiple carets, and we have to wait until now before we can handle it.
-    // See ExEntryAction and ProcessExCommandEntryAction
+    // See ProcessGroup.startExEntry and ProcessExCommandEntryAction
     // Unless the command needs us to keep visual (e.g. :action), remove the secondary carets that are an implementation
     // detail for block selection, but leave all other carets. If any other caret has a selection, move the caret to the
     // start offset of the selection, copying Vim's behaviour (with its only caret)

@@ -27,6 +27,16 @@ public class VimProcessGroupStub : VimProcessGroupBase() {
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
 
+  override fun startExEntry(
+    editor: VimEditor,
+    context: ExecutionContext,
+    command: Command,
+    label: String,
+    initialCommandText: String
+  ) {
+    TODO("Not yet implemented")
+  }
+
   override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     TODO("Not yet implemented")
   }

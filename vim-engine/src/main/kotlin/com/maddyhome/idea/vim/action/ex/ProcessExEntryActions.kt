@@ -63,8 +63,8 @@ public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution()
     panel.deactivate(true)
     try {
       // Exit Command-line mode and return to Normal before executing the command. Remember from ExEntryAction that we
-      // might still have selection and/or multiple carets, even though ExEntryAction switched us to Normal mode. This
-      // will be handled in Command.execute once we know if the Command requires keeping the selection.
+      // might still have selection and/or multiple carets, even though ProcessGroup.startExEntry switched us to Normal
+      // mode. This will be handled in Command.execute once we know if the Command requires keeping the selection.
       editor.mode = com.maddyhome.idea.vim.state.mode.Mode.NORMAL()
 
       logger.debug("processing command")
