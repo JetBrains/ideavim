@@ -132,13 +132,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    * @param context  The data context
    * @param label    The label for the ex entry (i.e. :, /, or ?)
    * @param initText The initial text for the entry
-   * @param count    A holder for the ex entry count
    */
-  public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
+  public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText) {
     logger.info("Activate ex entry panel");
     this.label.setText(label);
     this.label.setFont(UiHelper.selectFont(label));
-    this.count = count;
     entry.reset();
     entry.setEditor(editor, context);
     entry.setText(initText);
@@ -366,15 +364,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   /**
-   * Gets the count given during activation
-   *
-   * @return The count
-   */
-  public int getCount() {
-    return count;
-  }
-
-  /**
    * Checks if the ex entry panel is currently active
    *
    * @return true if active, false if not
@@ -469,7 +458,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   private boolean active;
-  private int count;
 
   // UI stuff
   private @Nullable JComponent parent;

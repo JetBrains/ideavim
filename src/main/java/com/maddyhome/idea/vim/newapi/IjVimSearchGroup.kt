@@ -122,7 +122,6 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
         context,
         MessageHelper.message("replace.with.0", match),
         "",
-        1
       )
       caret.moveToOffset(startOffset)
       ModalEntry.activate(editor, keyStrokeProcessor)

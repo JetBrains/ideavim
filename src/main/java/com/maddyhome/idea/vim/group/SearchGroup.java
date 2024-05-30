@@ -1038,8 +1038,7 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
         new IjVimEditor(editor),
         context,
         MessageHelper.message("replace.with.0", match),
-        "",
-        1
+        ""
       );
       new IjVimCaret(caret).moveToOffset(startoff);
       ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
