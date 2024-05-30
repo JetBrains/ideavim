@@ -21,14 +21,47 @@ import javax.swing.KeyStroke
 
 public class CommandBuilder(
   private var currentCommandPartNode: CommandPartNode<LazyVimCommand>,
-  initialUncommittedCount: Int = 0,
+  initialUncommittedRawCount: Int = 0,
 ) : Cloneable {
   private var commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
   public var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
-  public var count: Int = initialUncommittedCount
+
+  /**
+   * The current uncommitted count for the currently in-progress command part
+   *
+   * TODO: Investigate usages. This value cannot be trusted
+   * TODO: Rename to uncommittedRawCount
+   *
+   * This value is not coerced, and can be 0.
+   *
+   * There are very few reasons for using this value. It is incomplete (the user could type another digit), and there
+   * can be other committed command parts, such as operator and multiple register selections, each of which will can a
+   * count (e.g., `2"a3"b4"c5d6` waiting for a motion). The count is only final after [buildCommand], and then only via
+   * [Command.count] or [Command.rawCount].
+   *
+   * The [aggregatedUncommittedCount] property can be used to get the current total count across all command parts,
+   * although this value is also not guaranteed to be final.
+   */
+  public var count: Int = initialUncommittedRawCount
     private set
+
+  /**
+   * The current aggregated, but uncommitted count for all command parts in the command builder, coerced to 1
+   *
+   * This value multiplies together the count for command parts currently committed, such as operator and multiple
+   * register selections, as well as the current uncommitted count for the next command part. E.g., `2"a3"b4"c5d6` will
+   * multiply each count together to get what would be the final count. All counts are coerced to at least 1 before
+   * multiplying, which means the result will also be at least 1.
+   *
+   * Note that there are very few uses for this value. The final value should be retrieved from [Command.count] or
+   * [Command.rawCount] after a call to [buildCommand]. This value is expected to be used for `'incsearch'`
+   * highlighting.
+   */
+  public val aggregatedUncommittedCount: Int
+    get() = (commandParts.map { it.count }.reduceOrNull { acc, i -> acc * i } ?: 1) * count.coerceAtLeast(1)
+
   public val keys: Iterable<KeyStroke> get() = keyList
   public val register: Char?
     get() = commandParts.lastOrNull()?.register
@@ -169,8 +202,8 @@ public class CommandBuilder(
     var command: Command = commandParts.removeFirst()
     while (commandParts.size > 0) {
       val next = commandParts.removeFirst()
-      next.count = if (command.rawCount == 0 && next.rawCount == 0) 0 else command.count * next.count
-      command.count = 0
+      next.rawCount = if (command.rawCount == 0 && next.rawCount == 0) 0 else command.count * next.count
+      command.rawCount = 0
       if (command.type == Command.Type.SELECT_REGISTER) {
         next.register = command.register
         command.register = null

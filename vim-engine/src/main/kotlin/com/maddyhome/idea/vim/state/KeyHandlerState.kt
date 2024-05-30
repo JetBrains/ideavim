@@ -38,7 +38,6 @@ public data class KeyHandlerState(
     // We do not reset the uncommitted count in the editor command builder. The Ex actions ignore it, preferring the
     // range in the text command. The search actions use it, and it will be combined with an operator count as expected.
     // E.g., `2d3/foo` will delete up to the 6th occurrence of `foo`
-    // TODO: 2d3/foo doesn't handle incsearch properly!
     commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.CMD_LINE), editorCommandBuilder.count)
   }
 

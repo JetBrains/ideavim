@@ -40,11 +40,8 @@ public data class Command(
     action.process(this)
   }
 
-  var count: Int
+  val count: Int
     get() = rawCount.coerceAtLeast(1)
-    set(value) {
-      rawCount = value
-    }
 
   var argument: Argument? = null
   var register: Char? = null

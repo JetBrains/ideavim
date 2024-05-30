@@ -58,11 +58,11 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
       )
     } else if (!repeatHandler && lastCommand != null) {
       if (cmd.rawCount > 0) {
-        lastCommand.count = cmd.count
+        lastCommand.rawCount = cmd.count
         val arg = lastCommand.argument
         if (arg != null) {
           val mot = arg.motion
-          mot.count = 0
+          mot.rawCount = 0
         }
       }
       state.executingCommand = lastCommand
