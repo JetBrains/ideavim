@@ -12,7 +12,6 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -27,7 +26,7 @@ public class SearchEntryFwdAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
 
   override fun execute( editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    startSearchCommand('/', editor, context, cmd)
+    startSearchCommand('/', editor, context)
     return true
   }
 }
@@ -38,7 +37,7 @@ public class SearchEntryRevAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    startSearchCommand('?', editor, context, cmd)
+    startSearchCommand('?', editor, context)
     return true
   }
 }

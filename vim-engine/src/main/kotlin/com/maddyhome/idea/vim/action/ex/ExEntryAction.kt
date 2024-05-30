@@ -17,6 +17,8 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import java.util.*
 
 @CommandOrMotion(keys = [":"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])

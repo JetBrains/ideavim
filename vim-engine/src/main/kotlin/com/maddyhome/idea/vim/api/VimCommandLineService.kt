@@ -20,11 +20,10 @@ public interface VimCommandLineService {
    * @param context  The data context
    * @param label    The label for the command line (i.e. :, /, or ?)
    * @param initText The initial text for the entry
-   * @param count    TODO
    */
-  public fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String, count: Int): VimCommandLine
+  public fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
 
-  public fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String, count: Int): VimCommandLine
+  public fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
 
   public fun fullReset()
 }

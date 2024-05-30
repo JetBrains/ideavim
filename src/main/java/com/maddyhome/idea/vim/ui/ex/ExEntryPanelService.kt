@@ -58,7 +58,7 @@ public class ExEntryPanelService : VimCommandLineService {
     } else {
       var text: String? = null
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
-      val commandLine = injector.commandLine.create(vimEditor, context, prompt.ifEmpty { " " }, "", 1)
+      val commandLine = injector.commandLine.create(vimEditor, context, prompt.ifEmpty { " " }, "")
       ModalEntry.activate(editor.vim) { key: KeyStroke ->
         return@activate when {
           key.isCloseKeyStroke() -> {
@@ -89,21 +89,15 @@ public class ExEntryPanelService : VimCommandLineService {
     }
   }
 
-  public override fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String, count: Int): VimCommandLine {
+  public override fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {
     val panel = ExEntryPanel.getInstance()
-    panel.activate(editor.ij, context.ij, label, initText, count)
+    panel.activate(editor.ij, context.ij, label, initText)
     return panel
   }
 
-  public override fun createWithoutShortcuts(
-    editor: VimEditor,
-    context: ExecutionContext,
-    label: String,
-    initText: String,
-    count: Int
-  ): VimCommandLine {
+  public override fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {
     val panel = ExEntryPanel.getInstanceWithoutShortcuts()
-    panel.activate(editor.ij, context.ij, label, initText, count)
+    panel.activate(editor.ij, context.ij, label, initText)
     return panel
   }
 
