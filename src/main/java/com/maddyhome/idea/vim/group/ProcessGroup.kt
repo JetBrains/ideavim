@@ -21,13 +21,18 @@ import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.helper.requestFocus
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.io.BufferedWriter
 import java.io.IOException
@@ -41,6 +46,42 @@ public class ProcessGroup : VimProcessGroupBase() {
     private set
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
+
+  public override fun startExEntry(
+    editor: VimEditor,
+    context: ExecutionContext,
+    command: Command,
+    label: String,
+    initialCommandText: String,
+  ) {
+    if (editor.isOneLineMode()) return
+
+    val currentMode = editor.vimStateMachine.mode
+    check(currentMode is ReturnableFromCmd) {
+      "Cannot enable cmd mode from current mode $currentMode"
+    }
+
+    isCommandProcessing = true
+    modeBeforeCommandProcessing = currentMode
+
+    val initText = getRange(editor, command)
+
+    // Make sure the Visual selection marks are up to date.
+    injector.markService.setVisualSelectionMarks(editor)
+
+    // Note that we should remove selection and reset caret offset before we switch back to Normal mode and then enter
+    // Command-line mode. However, some IdeaVim commands can handle multiple carets, including multiple carets with
+    // selection (which might or might not be a block selection). Unfortunately, because we're just entering
+    // Command-line mode, we don't know which command is going to be entered, so we can't remove selection here.
+    // Therefore, we switch to Normal and then Command-line even though we might still have a Visual selection...
+    // On the plus side, it means we still show selection while editing the command line, which Vim also does
+    // (Normal then Command-line is not strictly necessary, but done for completeness and autocmd)
+    // Caret selection is finally handled in Command.execute
+    editor.mode = Mode.NORMAL()
+    editor.mode = Mode.CMD_LINE(currentMode)
+
+    injector.commandLine.create(editor, context, ":", initText, 1)
+  }
 
   public override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
@@ -70,6 +111,21 @@ public class ProcessGroup : VimProcessGroupBase() {
     getInstance().reset(editor)
     val panel = ExEntryPanel.getInstance()
     panel.deactivate(true, resetCaret)
+  }
+
+  private fun getRange(editor: VimEditor, cmd: Command): String {
+    var initText = ""
+    if (editor.inVisualMode) {
+      initText = "'<,'>"
+    } else if (cmd.rawCount > 0) {
+      initText = if (cmd.count == 1) {
+        "."
+      } else {
+        ".,.+" + (cmd.count - 1)
+      }
+    }
+
+    return initText
   }
 
   @Throws(ExecutionException::class, ProcessCanceledException::class)
