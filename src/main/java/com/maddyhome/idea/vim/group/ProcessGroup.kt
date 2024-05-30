@@ -114,19 +114,11 @@ public class ProcessGroup : VimProcessGroupBase() {
     panel.deactivate(true, resetCaret)
   }
 
-  private fun getRange(editor: VimEditor, cmd: Command): String {
-    var initText = ""
-    if (editor.inVisualMode) {
-      initText = "'<,'>"
-    } else if (cmd.rawCount > 0) {
-      initText = if (cmd.count == 1) {
-        "."
-      } else {
-        ".,.+" + (cmd.count - 1)
-      }
-    }
-
-    return initText
+  private fun getRange(editor: VimEditor, cmd: Command) = when {
+    editor.inVisualMode -> "'<,'>"
+    cmd.rawCount == 1 -> "."
+    cmd.rawCount > 1 -> ".,.+" + (cmd.count - 1)
+    else -> ""
   }
 
   @Throws(ExecutionException::class, ProcessCanceledException::class)
