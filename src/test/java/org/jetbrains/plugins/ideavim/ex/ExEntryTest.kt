@@ -26,11 +26,42 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+// TODO: Split this class
+// This class should handle simple ex entry features, such as starting ex entry, accepting/cancelling, cursor shape etc.
+// Individual actions such as c_CTRL-B or c_CTRL-E (beginning/end of line), c_CTRL-R (insert register), insert digraph
+// or literal, etc. should have individual test classes in the ideavim.ex.action package
+// :cmap should also be tested separately
+
 class ExEntryTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     configureByText("\n")
+  }
+
+  @Test
+  fun `test initial text set to empty string`() {
+    typeExInput(":")
+    assertExText("")
+  }
+
+  @Test
+  fun `test initial text set to current line range with count of 1`() {
+    typeExInput("1:")
+    assertExText(".")
+  }
+
+  @Test
+  fun `test initial text set to current line with offset for count greater than 1`() {
+    typeExInput("10:")
+    assertExText(".,.+9")
+  }
+
+  @Test
+  fun `test initial text set to visual marks when invoked in Visual mode`() {
+    configureByText("lorem ipsum\nlorem ipsum")
+    typeText("V", ":")
+    assertExText("'<,'>")
   }
 
   @Test
@@ -642,8 +673,8 @@ class ExEntryTest : VimTestCase() {
 
   private fun typeExInput(text: String) {
     assertTrue(
-      text.startsWith(":") || text.startsWith('/') || text.startsWith('?'),
-      "Ex command must start with ':', '/' or '?'",
+      Regex("""\d*[:/?].*""").matches(text),
+      "Ex command must start with '[count]:', '[count]/' or '[count]?'",
     )
 
     val keys = mutableListOf<KeyStroke>()

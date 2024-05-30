@@ -19,12 +19,15 @@ import com.maddyhome.idea.vim.key.RootNode
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
-public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<LazyVimCommand>): Cloneable {
+public class CommandBuilder(
+  private var currentCommandPartNode: CommandPartNode<LazyVimCommand>,
+  initialUncommittedCount: Int = 0,
+) : Cloneable {
   private var commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
   public var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
-  public var count: Int = 0
+  public var count: Int = initialUncommittedCount
     private set
   public val keys: Iterable<KeyStroke> get() = keyList
   public val register: Char?
@@ -230,11 +233,10 @@ public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<
   }
 
   public override fun clone(): CommandBuilder {
-    val result = CommandBuilder(currentCommandPartNode)
+    val result = CommandBuilder(currentCommandPartNode, count)
     result.commandParts = ArrayDeque(commandParts)
     result.keyList = keyList.toMutableList()
     result.commandState = commandState
-    result.count = count
     result.expectedArgumentType = expectedArgumentType
     result.prevExpectedArgumentType = prevExpectedArgumentType
 
