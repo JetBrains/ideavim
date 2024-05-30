@@ -304,10 +304,12 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
           }
         }
 
-        // If we're showing highlights for the search command `/`, then the command builder will have a count already
-        // coerced to 1. If we're showing highlights for an ex command such as `:s`, there won't be a command, and there
-        // obviously won't be a count.
-        int count1 = Math.max(1, KeyHandler.getInstance().getKeyHandlerState().getEditorCommandBuilder().getCount());
+        // Get the current count from the command builder. This value is coerced to at least 1, so will always be valid.
+        // The aggregated value includes any counts for operator and register selections, and the uncommitted count for
+        // the search command (`/` or `?`). E.g., `2"a3"b4"c5d6/` would return 720.
+        // If we're showing highlights for an ex command like `:s`, there won't be a command, but the value is already
+        // coerced to at least 1.
+        int count1 = KeyHandler.getInstance().getKeyHandlerState().getEditorCommandBuilder().getAggregatedUncommittedCount();
 
         if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
           final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards

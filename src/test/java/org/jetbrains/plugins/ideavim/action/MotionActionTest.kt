@@ -703,6 +703,24 @@ class MotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun testDeleteToSearchResultWithCount() {
+    doTest(
+      "d3/ipsum<CR>",
+      "lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum",
+      "ipsum lorem 4 ipsum lorem 5 ipsum"
+    )
+  }
+
+  @Test
+  fun testDeleteToSearchResultWithCountAndOperatorCount() {
+    doTest(
+      "2d3/ipsum<CR>",
+      "lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum lorem 6 ipsum lorem 7 ipsum",
+      "ipsum lorem 7 ipsum"
+    )
+  }
+
+  @Test
   fun testDeleteToSearchResultWithLinewiseOffset() {
     val before = """
       |First line

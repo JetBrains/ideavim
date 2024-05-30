@@ -728,6 +728,15 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch highlights with count and operator count`() {
+    configureByText("lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum lorem 6 ipsum lorem 7 ipsum")
+    enterCommand("set hlsearch incsearch")
+    typeText("2d", "3/ipsum") // No enter
+    assertSearchHighlights("ipsum",
+      "lorem 1 «ipsum» lorem 2 «ipsum» lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 ‷ipsum‴ lorem 7 «ipsum»")
+  }
+
+  @Test
   fun `test backwards search with count`() {
     configureByText(
       """
@@ -898,6 +907,15 @@ class SearchGroupTest : VimTestCase() {
 
     // Back to original location
     assertPosition(8, 0)
+  }
+
+  @Test
+  fun `test backwards incsearch highlights with count and operator count`() {
+    configureByText("lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum lorem 6 ipsum lorem 7 ipsu${c}m")
+    enterCommand("set hlsearch incsearch")
+    typeText("2d", "3?ipsum") // No enter
+    assertSearchHighlights("ipsum",
+      "lorem 1 «ipsum» lorem 2 ‷ipsum‴ lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 «ipsum» lorem 7 «ipsum»")
   }
 
   // |i_CTRL-K|

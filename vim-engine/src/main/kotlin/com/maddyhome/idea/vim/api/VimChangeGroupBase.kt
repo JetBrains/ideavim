@@ -1180,7 +1180,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
         if (operatorArguments.count1 > 1) {
           count0--
         } else if (motion.count > 1) {
-          motion.count = motion.count - 1
+          motion.rawCount = motion.count - 1
         } else {
           motion.flags = EnumSet.noneOf(CommandFlags::class.java)
         }
