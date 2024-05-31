@@ -333,7 +333,7 @@ public class ExTextField extends JTextField {
     setCaretPosition(currentActionPromptCharacterOffset);
   }
 
-  private void clearCurrentActionPromptCharacter() {
+  void clearCurrentActionPromptCharacter() {
     final int offset = getCaretPosition();
     final String text = removePromptCharacter();
     updateText(text);

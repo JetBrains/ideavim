@@ -72,7 +72,7 @@ public class DigraphConsumer : KeyConsumer {
             return false
           } else {
             keyProcessResultBuilder.addExecutionStep { _, _, _ ->
-              injector.exEntryPanel.clearCurrentAction()
+              commandLine.clearCurrentAction()
             }
           }
         }
@@ -96,7 +96,7 @@ public class DigraphConsumer : KeyConsumer {
             return false
           } else {
             keyProcessResultBuilder.addExecutionStep { _, _, _ ->
-              injector.exEntryPanel.clearCurrentAction()
+              commandLine.clearCurrentAction()
             }
           }
         }
