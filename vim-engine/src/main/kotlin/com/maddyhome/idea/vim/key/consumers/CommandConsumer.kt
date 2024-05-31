@@ -130,7 +130,7 @@ public class CommandConsumer : KeyConsumer {
         logger.trace("Processing ex_string")
         val commandLine = injector.commandLine.getActiveCommandLine()!!
         val label = commandLine.label
-        val text = commandLine.text
+        val text = commandLine.actualText
         commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
 
         commandBuilder.completeCommandPart(Argument(label[0], text))

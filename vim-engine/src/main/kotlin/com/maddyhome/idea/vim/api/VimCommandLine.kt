@@ -12,9 +12,22 @@ import javax.swing.KeyStroke
 
 public interface VimCommandLine {
   public val label: String
-  public var text: String
+
+  /**
+   * The actual text present in the command line, excluding special characters like the `?` displayed during digraph input.
+   * This text represents the real content that is being processed or executed.
+   */
+  public val actualText: String
+
+  /**
+   * The text content displayed in the command line, including any additional characters or symbols
+   * that might be shown to the user, such as the `?` during digraph input.
+   * This is the text that the user sees on the screen.
+   */
+  public val visibleText: String
   public val caret: VimCommandLineCaret
 
+  public fun setText(string: String)
   public fun handleKey(key: KeyStroke)
   public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
 

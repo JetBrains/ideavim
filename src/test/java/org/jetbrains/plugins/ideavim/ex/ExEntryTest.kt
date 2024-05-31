@@ -518,7 +518,7 @@ class ExEntryTest : VimTestCase() {
     // this isn't true - digraph entry is stopped, but command line mode continues
     typeExInput(":<C-K>O<Esc>K")
     assertIsActive()
-    assertEquals("K", exEntryPanel.text)
+    assertEquals("K", exEntryPanel.actualText)
 
     deactivateExEntry()
   }

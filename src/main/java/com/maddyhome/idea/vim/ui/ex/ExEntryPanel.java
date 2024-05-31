@@ -255,7 +255,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   private final @NotNull DocumentListener fontListener = new DocumentAdapter() {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
-      String text = entry.getActualText();
+      String text = entry.getText();
       Font newFont = UiHelper.selectFont(text);
       if (newFont != entry.getFont()) {
         entry.setFont(newFont);
@@ -372,19 +372,14 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     return active;
   }
 
-  /**
-   * Gets the text entered by the user. This includes any initial text but does not include the label
-   *
-   * @return The user entered text
-   */
   @Override
-  public @NotNull String getText() {
-    return entry.getActualText();
+  public @NotNull String getVisibleText() {
+    return entry.getText();
   }
 
   @Override
-  public void setText(@NotNull String s) {
-    entry.setText(s);
+  public @NotNull String getActualText() {
+    return entry.getText();
   }
 
   public @NotNull ExTextField getEntry() {
@@ -490,6 +485,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   @Override
   public void setCurrentActionPromptCharacter(char c) {
     entry.setCurrentActionPromptCharacter(c);
+  }
+
+  @Override
+  public void setText(@NotNull String string) {
+    entry.updateText(string);
   }
 
   public static class LafListener implements LafManagerListener {
