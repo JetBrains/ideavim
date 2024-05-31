@@ -16,7 +16,7 @@ public interface VimCommandLine {
   public val caret: VimCommandLineCaret
 
   public fun handleKey(key: KeyStroke)
-  public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean = true)
+  public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
 
   public fun setCurrentActionPromptCharacter(char: Char)
 }

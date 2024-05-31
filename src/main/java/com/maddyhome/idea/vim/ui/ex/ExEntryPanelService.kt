@@ -62,18 +62,18 @@ public class ExEntryPanelService : VimCommandLineService {
       ModalEntry.activate(editor.vim) { key: KeyStroke ->
         return@activate when {
           key.isCloseKeyStroke() -> {
-            commandLine.deactivate(true)
+            commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
           key.keyCode == KeyEvent.VK_ENTER -> {
             text = commandLine.text
-            commandLine.deactivate(true)
+            commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
           finishOn != null && key.keyChar == finishOn -> {
             commandLine.handleKey(key)
             text = commandLine.text
-            commandLine.deactivate(true)
+            commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
           else -> {

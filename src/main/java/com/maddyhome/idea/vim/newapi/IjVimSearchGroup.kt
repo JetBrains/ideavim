@@ -125,7 +125,7 @@ public open class IjVimSearchGroup : VimSearchGroupBase() {
       )
       caret.moveToOffset(startOffset)
       ModalEntry.activate(editor, keyStrokeProcessor)
-      exEntryPanel.deactivate(true, false)
+      exEntryPanel.deactivate(refocusOwningEditor = true, resetCaret = false)
     }
     return result.get()
   }
