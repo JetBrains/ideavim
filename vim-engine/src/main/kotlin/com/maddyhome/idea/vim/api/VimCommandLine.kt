@@ -33,4 +33,7 @@ public interface VimCommandLine {
   public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
 
   public fun setPromptCharacter(char: Char)
+  public fun clearPromptCharacter()
+
+  public fun clearCurrentAction()
 }

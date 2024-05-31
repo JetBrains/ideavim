@@ -492,6 +492,16 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     entry.updateText(string);
   }
 
+  @Override
+  public void clearPromptCharacter() {
+    entry.clearCurrentActionPromptCharacter();
+  }
+
+  @Override
+  public void clearCurrentAction() {
+    entry.clearCurrentAction();
+  }
+
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {

@@ -109,9 +109,6 @@ public interface VimInjector {
   public val actionExecutor: VimActionExecutor
 
   // Can't be fully moved to vim-engine.
-  public val exEntryPanel: ExEntryPanel
-
-  // Can't be fully moved to vim-engine.
   public val exOutputPanel: VimExOutputPanelService
 
   // Can't be fully moved to vim-engine.

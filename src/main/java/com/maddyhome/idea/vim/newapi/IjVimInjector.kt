@@ -14,7 +14,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.api.EngineEditorHelper
-import com.maddyhome.idea.vim.api.ExEntryPanel
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.NativeActionManager
@@ -107,8 +106,6 @@ internal class IjVimInjector : VimInjectorBase() {
 
   override val actionExecutor: VimActionExecutor
     get() = service<IjActionExecutor>()
-  override val exEntryPanel: ExEntryPanel
-    get() = service<IjExEntryPanel>()
   override val exOutputPanel: VimExOutputPanelService
     get() = object : VimExOutputPanelService {
       override fun getPanel(editor: VimEditor): VimExOutputPanel {
