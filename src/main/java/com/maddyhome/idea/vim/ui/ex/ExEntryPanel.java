@@ -189,7 +189,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   public void deactivate(boolean refocusOwningEditor, boolean resetCaret) {
     logger.info("Deactivate ex entry panel");
     if (!active) return;
-    active = false;
 
     try {
       entry.getDocument().removeDocumentListener(fontListener);
@@ -232,6 +231,9 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
       parent = null;
     }
+
+    // We have this in the end, because `entry.deactivate()` communicates with active panel during deactivation
+    active = false;
   }
 
   private void reset() {
@@ -377,11 +379,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     return entry.getText();
   }
 
-  @Override
-  public @NotNull String getActualText() {
-    return entry.getText();
-  }
-
   public @NotNull ExTextField getEntry() {
     return entry;
   }
@@ -429,7 +426,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   private void setFontForElements() {
     label.setFont(UiHelper.selectFont(label.getText()));
-    entry.setFont(UiHelper.selectFont(entry.getActualText()));
+    entry.setFont(UiHelper.selectFont(getVisibleText()));
   }
 
   private void positionPanel() {
@@ -483,24 +480,30 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   @Override
-  public void setPromptCharacter(char c) {
-    entry.setCurrentActionPromptCharacter(c);
-  }
-
-  @Override
   public void setText(@NotNull String string) {
+    // It's a feature of Swing that caret is moved when we set new text. However, our API is Swing independent and we do not expect this
+    int offset = getCaret().getOffset();
     entry.updateText(string);
-  }
-
-  @Override
-  public void clearPromptCharacter() {
-    entry.clearCurrentActionPromptCharacter();
+    getCaret().setOffset(Math.min(offset, getVisibleText().length()));
   }
 
   @Override
   public void clearCurrentAction() {
     entry.clearCurrentAction();
   }
+
+  @Nullable
+  @Override
+  public Integer getPromptCharacterOffset() {
+    int offset = entry.currentActionPromptCharacterOffset;
+    return offset == -1 ? null : offset;
+  }
+
+  @Override
+  public void setPromptCharacterOffset(@Nullable Integer integer) {
+    entry.currentActionPromptCharacterOffset = integer == null ? -1 : integer;
+  }
+
 
   public static class LafListener implements LafManagerListener {
     @Override

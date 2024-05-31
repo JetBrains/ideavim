@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
 import com.maddyhome.idea.vim.group.EditorHolderService;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -40,6 +41,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Date;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.lang.Math.*;
 
 /**
@@ -205,15 +207,6 @@ public class ExTextField extends JTextField {
     super.setFont(UiHelper.selectFont(stringToDisplay));
   }
 
-  @NotNull
-  String getActualText() {
-    if (actualText != null) {
-      return actualText;
-    }
-    final String text = super.getText();
-    return text == null ? "" : text;
-  }
-
   void setEditor(@NotNull Editor editor, DataContext context) {
     this.context = context;
     EditorHolderService.getInstance().setEditor(editor);
@@ -311,42 +304,8 @@ public class ExTextField extends JTextField {
       currentAction.reset();
     }
     currentAction = null;
-    clearCurrentActionPromptCharacter();
-  }
-
-  /**
-   * Text to show while composing a digraph or inserting a literal or register
-   * <p>
-   * The prompt character is inserted directly into the text of the text field, rather than drawn over the top of the
-   * current character. When the action has been completed, the new character(s) are either inserted or overwritten,
-   * depending on the insert/overwrite status of the text field. This mimics Vim's behaviour.
-   *
-   * @param promptCharacter The character to show as prompt
-   */
-  public void setCurrentActionPromptCharacter(char promptCharacter) {
-    actualText = removePromptCharacter();
-    this.currentActionPromptCharacter = promptCharacter;
-    currentActionPromptCharacterOffset = currentActionPromptCharacterOffset == -1 ? getCaretPosition() : currentActionPromptCharacterOffset;
-    StringBuilder sb = new StringBuilder(actualText);
-    sb.insert(currentActionPromptCharacterOffset, currentActionPromptCharacter);
-    updateText(sb.toString());
-    setCaretPosition(currentActionPromptCharacterOffset);
-  }
-
-  void clearCurrentActionPromptCharacter() {
-    final int offset = getCaretPosition();
-    final String text = removePromptCharacter();
-    updateText(text);
-    setCaretPosition(min(offset, text.length()));
-    currentActionPromptCharacter = '\0';
-    currentActionPromptCharacterOffset = -1;
-    actualText = null;
-  }
-
-  private String removePromptCharacter() {
-    return currentActionPromptCharacterOffset == -1
-      ? super.getText()
-      : StringsKt.removeRange(super.getText(), currentActionPromptCharacterOffset, currentActionPromptCharacterOffset + 1).toString();
+    VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
+    if (commandLine != null) commandLine.clearPromptCharacter();
   }
 
   @Nullable
@@ -574,12 +533,10 @@ public class ExTextField extends JTextField {
   private DataContext context;
   private final CommandLineCaret caret;
   private String lastEntry;
-  private String actualText;
   private List<HistoryEntry> history;
   private int histIndex = 0;
   private @Nullable MultiStepAction currentAction;
-  private char currentActionPromptCharacter;
-  private int currentActionPromptCharacterOffset = -1;
+  int currentActionPromptCharacterOffset = -1;
 
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());
 }
