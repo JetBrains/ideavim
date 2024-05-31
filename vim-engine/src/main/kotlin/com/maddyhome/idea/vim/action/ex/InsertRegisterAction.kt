@@ -36,7 +36,7 @@ public class InsertRegisterAction: VimActionHandler.SingleExecution() {
     } else {
       throw ExException("Not yet implemented")
     } ?: return false
-    cmdLine.text = StringBuilder(cmdLine.text).insert(caretOffset, pasteContent).toString()
+    cmdLine.setText(StringBuilder(cmdLine.actualText).insert(caretOffset, pasteContent).toString())
     cmdLine.caret.offset = caretOffset + pasteContent.length
     return true
   }

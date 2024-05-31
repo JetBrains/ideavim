@@ -187,7 +187,7 @@ public class ExTextField extends JTextField {
     }
   }
 
-  private void updateText(String string) {
+  void updateText(String string) {
     super.setText(string);
     setFontToJField(string);
   }
