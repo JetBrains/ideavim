@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.api
 import javax.swing.KeyStroke
 
 public interface VimCommandLine {
+  public val caret: VimCommandLineCaret
+
   public val label: String
 
   /**
@@ -25,11 +27,10 @@ public interface VimCommandLine {
    * This is the text that the user sees on the screen.
    */
   public val visibleText: String
-  public val caret: VimCommandLineCaret
 
   public fun setText(string: String)
   public fun handleKey(key: KeyStroke)
   public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
 
-  public fun setCurrentActionPromptCharacter(char: Char)
+  public fun setPromptCharacter(char: Char)
 }
