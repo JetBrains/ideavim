@@ -483,7 +483,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   @Override
-  public void setCurrentActionPromptCharacter(char c) {
+  public void setPromptCharacter(char c) {
     entry.setCurrentActionPromptCharacter(c);
   }
 

@@ -295,7 +295,7 @@ public class KeyHandler {
 
   public fun setPromptCharacterEx(promptCharacter: Char) {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return
-    commandLine.setCurrentActionPromptCharacter(promptCharacter)
+    commandLine.setPromptCharacter(promptCharacter)
   }
 
   /**
