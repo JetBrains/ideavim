@@ -12,13 +12,13 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.maddyhome.idea.vim.group.EditorHolderService
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 
 @Service(Service.Level.PROJECT)
 internal class VimProjectService(val project: Project) : Disposable {
   override fun dispose() {
     // Not sure if this is a best solution
-    EditorHolderService.getInstance().editor = null
+    ExEntryPanel.getInstance().editor = null
   }
 
   companion object {

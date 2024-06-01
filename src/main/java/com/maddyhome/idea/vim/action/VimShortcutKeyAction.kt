@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.EditorHolderService
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.handler.enableOctopus
@@ -45,6 +44,7 @@ import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ex.ExTextField
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.InputEvent
@@ -257,7 +257,7 @@ public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible
   private fun getEditor(e: AnActionEvent): Editor? {
     return e.getData(PlatformDataKeys.EDITOR)
       ?: if (e.getData(PlatformDataKeys.CONTEXT_COMPONENT) is ExTextField) {
-        EditorHolderService.getInstance().editor
+        ExEntryPanel.getInstance().editor
       } else {
         null
       }
