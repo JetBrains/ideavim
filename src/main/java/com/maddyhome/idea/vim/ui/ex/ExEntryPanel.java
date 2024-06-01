@@ -48,6 +48,7 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.lang.ref.WeakReference;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
@@ -60,6 +61,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   public static ExEntryPanel instance;
   public static ExEntryPanel instanceWithoutShortcuts;
   private boolean isReplaceMode = false;
+  private WeakReference<Editor> weakEditor = null;
 
   private ExEntryPanel(boolean enableShortcuts) {
     label = new JLabel(" ");
@@ -123,6 +125,18 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     if (isInstanceWithoutShortcutsActive()) {
       instanceWithoutShortcuts.reset();
       instanceWithoutShortcuts = null;
+    }
+  }
+
+  public @Nullable Editor getEditor() {
+    return weakEditor.get();
+  }
+
+  public void setEditor(@Nullable Editor editor) {
+    if (editor == null) {
+      weakEditor = null;
+    } else {
+      weakEditor = new WeakReference<>(editor);
     }
   }
 

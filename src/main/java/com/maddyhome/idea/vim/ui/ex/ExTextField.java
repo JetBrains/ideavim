@@ -16,7 +16,6 @@ import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
-import com.maddyhome.idea.vim.group.EditorHolderService;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.history.HistoryEntry;
@@ -25,7 +24,6 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType;
-import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,7 +81,7 @@ public class ExTextField extends JTextField {
 
   void deactivate() {
     clearCurrentAction();
-    EditorHolderService.getInstance().setEditor(null);
+    ExEntryPanel.getInstance().setEditor(null);
     context = null;
   }
 
@@ -209,11 +207,11 @@ public class ExTextField extends JTextField {
 
   void setEditor(@NotNull Editor editor, DataContext context) {
     this.context = context;
-    EditorHolderService.getInstance().setEditor(editor);
+    ExEntryPanel.getInstance().setEditor(editor);
   }
 
   public Editor getEditor() {
-    return EditorHolderService.getInstance().getEditor();
+    return ExEntryPanel.getInstance().getEditor();
   }
 
   public DataContext getContext() {
@@ -293,7 +291,7 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    Editor editor = EditorHolderService.getInstance().getEditor();
+    Editor editor = ExEntryPanel.instance.getEditor();
     if (editor != null) {
       VimPlugin.getProcess().cancelExEntry(new IjVimEditor(editor), true);
     }
