@@ -8,9 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.impl.state.toMappingMode
 import javax.swing.KeyStroke
 import kotlin.math.min
 
@@ -18,6 +15,9 @@ public interface VimCommandLine {
   public val caret: VimCommandLineCaret
 
   public val label: String
+  public val isReplaceMode: Boolean
+
+  public fun toggleReplaceMode()
 
   /**
    * The actual text present in the command line, excluding special characters like the `?` displayed during digraph input.
@@ -37,6 +37,16 @@ public interface VimCommandLine {
   public var promptCharacterOffset: Int?
 
   public fun setText(string: String)
+  public fun insertText(offset: Int, string: String) {
+    val newText = if (isReplaceMode) {
+      val endOffset = min(offset + string.length, actualText.length)
+      StringBuilder(actualText).replace(offset, endOffset, string)
+    } else {
+      StringBuilder(actualText).insert(offset, string)
+    }.toString()
+    setText(newText)
+  }
+
   public fun handleKey(key: KeyStroke)
 
   /**
