@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.ui.ex;
 
 import com.intellij.openapi.util.SystemInfo;
+import com.maddyhome.idea.vim.api.VimCommandLine;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.text.*;
@@ -17,6 +18,8 @@ import java.awt.im.InputMethodHighlight;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.Map;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 /**
  * This document provides insert/overwrite mode
@@ -29,6 +32,10 @@ public class ExDocument extends PlainDocument {
    * Toggles the insert/overwrite state
    */
   void toggleInsertReplace() {
+    VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
+    if (commandLine != null) {
+      commandLine.toggleReplaceMode();
+    }
     overwrite = !overwrite;
   }
 

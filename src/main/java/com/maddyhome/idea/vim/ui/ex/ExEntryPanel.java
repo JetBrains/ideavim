@@ -59,6 +59,7 @@ import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
 public class ExEntryPanel extends JPanel implements VimCommandLine {
   public static ExEntryPanel instance;
   public static ExEntryPanel instanceWithoutShortcuts;
+  private boolean isReplaceMode = false;
 
   private ExEntryPanel(boolean enableShortcuts) {
     label = new JLabel(" ");
@@ -212,6 +213,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         VimPlugin.getSearch().resetIncsearchHighlights();
       }
 
+      isReplaceMode = false;
       entry.deactivate();
     }
     finally {
@@ -365,6 +367,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     return label.getText();
   }
 
+  @Override
+  public void toggleReplaceMode() {
+    isReplaceMode = !isReplaceMode;
+  }
+
   /**
    * Checks if the ex entry panel is currently active
    *
@@ -504,6 +511,10 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     entry.currentActionPromptCharacterOffset = integer == null ? -1 : integer;
   }
 
+  @Override
+  public boolean isReplaceMode() {
+    return isReplaceMode;
+  }
 
   public static class LafListener implements LafManagerListener {
     @Override
