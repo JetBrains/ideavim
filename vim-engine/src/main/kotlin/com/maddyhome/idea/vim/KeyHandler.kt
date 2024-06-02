@@ -409,8 +409,8 @@ public sealed interface KeyProcessResult {
         if (keyHandler.keyHandlerState != originalState) {
           logger.error("Unexpected editor state. Aborting command execution.")
         }
-        processing(preProcessState, editor, context)
         keyHandler.updateState(preProcessState)
+        processing(preProcessState, editor, context)
       }
     }
   }
