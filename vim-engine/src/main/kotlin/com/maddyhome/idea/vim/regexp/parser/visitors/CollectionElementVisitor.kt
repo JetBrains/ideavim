@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
+import com.maddyhome.idea.vim.parser.generated.RegexParser
+import com.maddyhome.idea.vim.parser.generated.RegexParserBaseVisitor
 
 /**
  * A tree visitor for visiting nodes representing a collection.

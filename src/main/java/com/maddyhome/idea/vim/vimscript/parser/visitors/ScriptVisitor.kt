@@ -9,8 +9,8 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
 import com.maddyhome.idea.vim.vimscript.model.Script
-import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
-import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
+import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 
 internal object ScriptVisitor : VimscriptBaseVisitor<Script>() {
 

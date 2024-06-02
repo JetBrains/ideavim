@@ -30,8 +30,8 @@ import com.maddyhome.idea.vim.vimscript.model.statements.loops.ContinueStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoop
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoopWithList
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.WhileLoop
-import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
-import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
+import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 
 internal object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
 

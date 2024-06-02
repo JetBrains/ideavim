@@ -41,8 +41,8 @@ import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.StartOfFileMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.StartOfLineMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.StartOfWordMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.VisualAreaMatcher
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
+import com.maddyhome.idea.vim.parser.generated.RegexParser
+import com.maddyhome.idea.vim.parser.generated.RegexParserBaseVisitor
 
 /**
  * A tree visitor for converting a parsed Vim pattern into an internal

@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.regexp.parser.error
 
 import com.maddyhome.idea.vim.regexp.VimRegexErrors
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexLexer
+import com.maddyhome.idea.vim.parser.generated.RegexLexer
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.LexerNoViableAltException
 

@@ -63,7 +63,6 @@ buildscript {
 }
 
 plugins {
-  antlr
   java
   kotlin("jvm") version "1.9.22"
   application
@@ -87,7 +86,6 @@ ksp {
 
 afterEvaluate {
 //  tasks.named("kspKotlin").configure { dependsOn("clean") }
-  tasks.named("kspKotlin").configure { dependsOn("generateGrammarSource") }
   tasks.named("kspTestFixturesKotlin").configure { enabled = false }
   tasks.named("kspTestFixturesKotlin").configure { enabled = false }
   tasks.named("kspTestKotlin").configure { enabled = false }
@@ -122,7 +120,6 @@ dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   compileOnly("org.jetbrains:annotations:24.1.0")
   runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
-  antlr("org.antlr:antlr4:$antlrVersion")
 
   // --------- Test dependencies ----------
 
@@ -266,25 +263,8 @@ tasks {
     teamCityOutputFormat.set(true)
   }
 
-  generateGrammarSource {
-    maxHeapSize = "128m"
-    arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.vimscript.parser.generated", "-visitor"))
-    outputDirectory = file("src/main/java/com/maddyhome/idea/vim/vimscript/parser/generated")
-  }
-
-  named("compileKotlin") {
-    dependsOn("generateGrammarSource")
-  }
-  named("compileTestKotlin") {
-    dependsOn("generateTestGrammarSource")
-  }
-  named("compileTestFixturesKotlin") {
-    dependsOn("generateTestFixturesGrammarSource")
-  }
-
   // Add plugin open API sources to the plugin ZIP
   val createOpenApiSourceJar by registering(Jar::class) {
-    dependsOn("generateGrammarSource")
     // Java sources
     from(sourceSets.main.get().java) {
       include("**/com/maddyhome/idea/vim/**/*.java")
