@@ -16,8 +16,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.ExCommandTree
 import com.maddyhome.idea.vim.vimscript.model.commands.IntellijExCommandProvider
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptLexer
-import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
+import com.maddyhome.idea.vim.parser.generated.VimscriptLexer
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.visitors.CommandVisitor
 import com.maddyhome.idea.vim.vimscript.parser.visitors.ExpressionVisitor
 import com.maddyhome.idea.vim.vimscript.parser.visitors.ScriptVisitor

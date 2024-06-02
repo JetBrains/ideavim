@@ -8,9 +8,8 @@
 
 package com.maddyhome.idea.vim.regexp.parser.visitors
 
-import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserException
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexParser
-import com.maddyhome.idea.vim.regexp.parser.generated.RegexParserBaseVisitor
+import com.maddyhome.idea.vim.parser.generated.RegexParser
+import com.maddyhome.idea.vim.parser.generated.RegexParserBaseVisitor
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 
