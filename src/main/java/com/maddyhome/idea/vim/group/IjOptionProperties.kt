@@ -32,7 +32,6 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
   // Temporary options to control work-in-progress behaviour
   public var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
   public var commandOrMotionAnnotation: Boolean by optionProperty(IjOptions.commandOrMotionAnnotation)
-  public var exCommandAnnotation: Boolean by optionProperty(IjOptions.exCommandAnnotation)
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
   public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
   public var useNewRegex: Boolean by optionProperty(IjOptions.useNewRegex)
