@@ -42,7 +42,7 @@ public class SearchEntryRevAction : VimActionHandler.SingleExecution() {
   }
 }
 
-private fun startSearchCommand(label: Char, editor: VimEditor, context: ExecutionContext, cmd: Command) {
+private fun startSearchCommand(label: Char, editor: VimEditor, context: ExecutionContext) {
   // Don't allow searching in one line editors
   if (editor.isOneLineMode()) return
 
@@ -53,5 +53,5 @@ private fun startSearchCommand(label: Char, editor: VimEditor, context: Executio
   check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
   editor.mode = com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE(currentMode)
 
-  injector.commandLine.create(editor, context, label.toString(), "", cmd.count)
+  injector.commandLine.create(editor, context, label.toString(), "")
 }
