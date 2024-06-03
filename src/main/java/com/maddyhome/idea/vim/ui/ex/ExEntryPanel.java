@@ -16,6 +16,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollingModel;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.EventFacade;
@@ -528,6 +529,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   @Override
   public boolean isReplaceMode() {
     return isReplaceMode;
+  }
+
+  @Override
+  public void focus() {
+    IdeFocusManager.findInstance().requestFocus(this, true);
   }
 
   public static class LafListener implements LafManagerListener {
