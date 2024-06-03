@@ -533,7 +533,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   @Override
   public void focus() {
-    IdeFocusManager.findInstance().requestFocus(this, true);
+    IdeFocusManager.findInstance().requestFocus(entry, true);
   }
 
   public static class LafListener implements LafManagerListener {
