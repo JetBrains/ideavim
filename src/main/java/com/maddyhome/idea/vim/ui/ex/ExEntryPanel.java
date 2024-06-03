@@ -293,7 +293,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         boolean searchCommand = false;
         LineRange searchRange = null;
         char separator = labelText.charAt(0);
-        String searchText = entry.getActualText();
+        String searchText = getActualText();
         if (labelText.equals(":")) {
           if (searchText.isEmpty()) return;
           final Command command = getIncsearchCommand(searchText);

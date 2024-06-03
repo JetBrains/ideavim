@@ -14,15 +14,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Address
 import com.maddyhome.idea.vim.ex.ranges.Address.Companion.createRangeAddresses
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.vimscript.model.commands.ActionCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.ActionListCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.AsciiCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.BufferCloseCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand
-import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
-import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.CallCommandContext
