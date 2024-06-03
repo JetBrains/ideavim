@@ -94,6 +94,7 @@ import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
+import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
@@ -351,13 +352,13 @@ internal object VimListenerManager {
   private object VimDocumentListener : DocumentListener {
     override fun beforeDocumentChange(event: DocumentEvent) {
       VimMarkServiceImpl.MarkUpdater.beforeDocumentChange(event)
-      SearchGroup.DocumentSearchListener.INSTANCE.beforeDocumentChange(event)
+      IjVimSearchGroup.DocumentSearchListener.INSTANCE.beforeDocumentChange(event)
       IjVimRedrawService.RedrawListener.beforeDocumentChange(event)
     }
 
     override fun documentChanged(event: DocumentEvent) {
       VimMarkServiceImpl.MarkUpdater.documentChanged(event)
-      SearchGroup.DocumentSearchListener.INSTANCE.documentChanged(event)
+      IjVimSearchGroup.DocumentSearchListener.INSTANCE.documentChanged(event)
       IjVimRedrawService.RedrawListener.documentChanged(event)
     }
   }

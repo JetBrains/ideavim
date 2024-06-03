@@ -14,6 +14,8 @@ import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.event.DocumentEvent
+import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
@@ -34,10 +36,12 @@ import com.maddyhome.idea.vim.helper.highlightSearchResults
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
+import com.maddyhome.idea.vim.helper.vimLastHighlighters
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.ui.ModalEntry
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler
 import org.jdom.Element
+import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
@@ -275,6 +279,62 @@ public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateCompon
 
     override fun remove() {
       editor.markupModel.removeHighlighter(highlighter)
+    }
+  }
+
+
+  /**
+   * Removes and adds highlights for current search pattern when the document is edited
+   */
+  public class DocumentSearchListener @Contract(pure = true) private constructor() : DocumentListener {
+    public override fun documentChanged(event: DocumentEvent) {
+      // Loop over all local editors for the changed document, across all projects, and update search highlights.
+      // Note that the change may have come from a remote guest in Code With Me scenarios (in which case
+      // ClientId.current will be a guest ID), but we don't care - we still need to add/remove highlights for the
+      // changed text. Make sure we only update local editors, though.
+      val document = event.document
+      for (vimEditor in injector.editorGroup.getEditors(IjVimDocument(document))) {
+        val editor = (vimEditor as IjVimEditor).editor
+        var existingHighlighters = editor.vimLastHighlighters ?: continue
+
+        if (logger.isDebug()) {
+          logger.debug("hls=$existingHighlighters")
+          logger.debug("event=$event")
+        }
+
+        // We can only re-highlight whole lines, so clear any highlights in the affected lines.
+        // If we're deleting lines, this will clear + re-highlight the new current line, which hasn't been modified.
+        // However, we still want to re-highlight this line in case any highlights cross the line boundaries.
+        // If we're adding lines, this will clear + re-highlight all new lines.
+        val startPosition = editor.offsetToLogicalPosition(event.offset)
+        val endPosition = editor.offsetToLogicalPosition(event.offset + event.newLength)
+        val startLineOffset = document.getLineStartOffset(startPosition.line)
+        val endLineOffset = document.getLineEndOffset(endPosition.line)
+
+        // Remove any highlights that have already been deleted, and remove + clear those that intersect with the change
+        val iter = existingHighlighters.iterator()
+        while (iter.hasNext()) {
+          val highlighter = iter.next()
+          if (!highlighter.isValid) {
+            iter.remove()
+          } else if (highlighter.textRange.intersects(startLineOffset, endLineOffset)) {
+            iter.remove()
+            editor.markupModel.removeHighlighter(highlighter)
+          }
+        }
+
+        (injector.searchGroup as VimSearchGroupBase).highlightSearchLines(editor.vim, startPosition.line, endPosition.line)
+
+        if (logger.isDebug()) {
+          existingHighlighters = editor.vimLastHighlighters!!
+          logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line)
+          logger.debug("hls=$existingHighlighters")
+        }
+      }
+    }
+
+    public companion object {
+      public var INSTANCE: DocumentSearchListener = DocumentSearchListener()
     }
   }
 }
