@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
+import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
@@ -123,12 +124,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return (FileGroup)VimInjectorKt.getInjector().getFile();
   }
 
-  public static @NotNull SearchGroup getSearch() {
-    return ApplicationManager.getApplication().getService(SearchGroup.class);
+  public static @NotNull IjVimSearchGroup getSearch() {
+    return ApplicationManager.getApplication().getService(IjVimSearchGroup.class);
   }
 
-  public static @Nullable SearchGroup getSearchIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(SearchGroup.class);
+  public static @Nullable IjVimSearchGroup getSearchIfCreated() {
+    return ApplicationManager.getApplication().getServiceIfCreated(IjVimSearchGroup.class);
   }
 
   public static @NotNull ProcessGroup getProcess() {
@@ -345,7 +346,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   private void turnOffPlugin(boolean unsubscribe) {
-    SearchGroup searchGroup = getSearchIfCreated();
+    IjVimSearchGroup searchGroup = getSearchIfCreated();
     if (searchGroup != null) {
       searchGroup.turnOff();
     }

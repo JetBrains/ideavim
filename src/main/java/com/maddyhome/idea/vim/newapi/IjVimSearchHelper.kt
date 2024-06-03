@@ -38,28 +38,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     return PsiHelper.findMethodStart(editor.ij, caret.ij.offset, count)
   }
 
-  override fun findPattern(
-    editor: VimEditor,
-    pattern: String?,
-    startOffset: Int,
-    count: Int,
-    searchOptions: EnumSet<SearchOptions>?,
-  ): TextRange? {
-    return if (injector.globalIjOptions().useNewRegex) super.findPattern(editor, pattern, startOffset, count, searchOptions)
-    else SearchHelper.findPattern(editor.ij, pattern, startOffset, count, searchOptions)
-  }
-
-  override fun findAll(
-    editor: VimEditor,
-    pattern: String,
-    startLine: Int,
-    endLine: Int,
-    ignoreCase: Boolean,
-  ): List<TextRange> {
-    return if (injector.globalIjOptions().useNewRegex) super.findAll(editor, pattern, startLine, endLine, ignoreCase)
-    else SearchHelper.findAll(editor.ij, pattern, startLine, endLine, ignoreCase)
-  }
-
   override fun findMisspelledWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     val startOffset: Int
     val endOffset: Int

@@ -34,7 +34,6 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
   public var commandOrMotionAnnotation: Boolean by optionProperty(IjOptions.commandOrMotionAnnotation)
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
   public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
-  public var useNewRegex: Boolean by optionProperty(IjOptions.useNewRegex)
   public var vimscriptFunctionAnnotation: Boolean by optionProperty(IjOptions.vimscriptFunctionAnnotation)
 }
 

@@ -110,7 +110,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
   /**
    * Reset the search highlights to the last used pattern after highlighting incsearch results.
    */
-  protected abstract fun resetIncsearchHighlights()
+  public abstract fun resetIncsearchHighlights()
 
   /**
    * Asks the user how to deal with a substitution confirmation choice.

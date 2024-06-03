@@ -203,7 +203,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
 
   private fun doTestWithSearch(keys: String, before: String, after: String) {
     doTest(keys, before, after) {
-      VimPlugin.getSearch().setLastSearchState(it, "all", "", Direction.FORWARDS)
+      VimPlugin.getSearch().setLastSearchState("all", "", Direction.FORWARDS)
     }
   }
 }

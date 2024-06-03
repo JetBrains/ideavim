@@ -19,7 +19,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"
                         serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.SearchGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryPanelService"
