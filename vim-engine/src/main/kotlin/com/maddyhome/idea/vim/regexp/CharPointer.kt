@@ -13,7 +13,7 @@ import java.util.*
 @Deprecated("Remove once old regex engine is removed")
 public class CharPointer {
   private var seq: CharSequence
-  private var pointer = 0
+  public var pointer: Int = 0
   private var readonly: Boolean
 
   public constructor(text: String) {
