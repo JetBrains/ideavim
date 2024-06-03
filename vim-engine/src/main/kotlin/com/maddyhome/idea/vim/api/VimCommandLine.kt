@@ -77,4 +77,7 @@ public interface VimCommandLine {
   public fun clearCurrentAction()
 
   public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
+
+  // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name
+  public fun focus()
 }

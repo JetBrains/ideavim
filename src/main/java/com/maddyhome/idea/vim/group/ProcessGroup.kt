@@ -18,8 +18,6 @@ import com.intellij.openapi.progress.ProgressIndicatorProvider
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.CharSequenceReader
-import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
-import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
@@ -39,7 +37,6 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.io.Reader
 import java.io.Writer
-import javax.swing.KeyStroke
 
 public class ProcessGroup : VimProcessGroupBase() {
   override var lastCommand: String? = null
