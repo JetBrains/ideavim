@@ -261,6 +261,48 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     return VimRegex(pat.toString())
   }
 
+  // TODO I think that this method (and the method above) should be part of the global command
+  public fun parseGlobalCommand(argument: String): GlobalCommandArguments? {
+    var cmd = CharPointer(StringBuffer(argument))
+
+    val pat: CharPointer
+    val delimiter: Char
+    var whichPat = 2 // RE_LAST
+
+    val messages = injector.messages
+    /*
+     * undocumented vi feature:
+     * "\/" and "\?": use previous search pattern.
+     *   "\&": use previous substitute pattern.
+     */
+    if (argument.isEmpty()) {
+      messages.showStatusBarMessage(null, messages.message("E148"))
+      messages.indicateError()
+      return null
+    } else if (cmd.charAt() == '\\') {
+      cmd.inc()
+      if ("/?&".indexOf(cmd.charAt()) == -1) {
+        messages.showStatusBarMessage(null, messages.message(Msg.e_backslash))
+        return null
+      }
+      whichPat = if (cmd.charAt() == '&') 1 /* RE_SUBST */ else 0 /* RE_SEARCH */
+      cmd.inc()
+      pat = CharPointer("") /* empty search pattern */
+    } else {
+      delimiter = cmd.charAt() /* get the delimiter */
+      cmd.inc()
+      pat = cmd.ref(0) /* remember start of pattern */
+      val endOfPattern = findEndOfPattern(cmd.toString(), delimiter)
+      if (cmd.charAt(endOfPattern) == delimiter) {
+        cmd.set('\u0000', endOfPattern)
+      }
+      cmd.pointer = endOfPattern + 2
+    }
+    return GlobalCommandArguments(pat, whichPat, cmd.toString())
+  }
+
+  public data class GlobalCommandArguments(val pattern: CharPointer, val whichPattern: Int, val command: String)
+
   /****************************************************************************/
   /* Search related methods                                                   */
   /****************************************************************************/
