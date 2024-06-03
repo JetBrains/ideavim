@@ -94,7 +94,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
    * @param startLine The number of the line where to start highlighting (inclusive)
    * @param endLine   The number of the line where to stop highlighting (inclusive)
    */
-  protected abstract fun highlightSearchLines(
+  public abstract fun highlightSearchLines(
     editor: VimEditor,
     startLine: Int,
     endLine: Int,
