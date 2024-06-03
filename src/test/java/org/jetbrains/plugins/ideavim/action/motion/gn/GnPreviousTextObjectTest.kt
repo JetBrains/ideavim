@@ -63,7 +63,7 @@ class GnPreviousTextObjectTest : VimTestCase() {
 
   private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
     configureByText(before)
-    VimPlugin.getSearch().setLastSearchState(fixture.editor, "test", "", Direction.FORWARDS)
+    VimPlugin.getSearch().setLastSearchState("test", "", Direction.FORWARDS)
     typeText(keys)
     assertState(after)
     assertState(Mode.NORMAL())

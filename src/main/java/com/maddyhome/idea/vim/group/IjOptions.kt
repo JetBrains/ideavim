@@ -141,7 +141,6 @@ public object IjOptions {
   public val commandOrMotionAnnotation: ToggleOption = addOption(ToggleOption("commandormotionannotation", GLOBAL, "commandormotionannotation", true, isHidden = true))
   public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isHidden = true))
   public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true, isHidden = true))
-  public val useNewRegex: ToggleOption = addOption(ToggleOption("usenewregex", GLOBAL, "usenewregex", true, isHidden = true))
   public val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", GLOBAL, "vimscriptfunctionannotation", true, isHidden = true))
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which

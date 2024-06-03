@@ -44,7 +44,6 @@ import java.util.regex.Pattern;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
-import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 
 /**
  * Helper methods for searching text
@@ -375,65 +374,22 @@ public class SearchHelper {
                                                  boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
 
-    if (globalIjOptions(injector).getUseNewRegex()) {
-      final EnumSet<VimRegexOptions> options = EnumSet.noneOf(VimRegexOptions.class);
-      if (globalOptions(injector).getSmartcase()) options.add(VimRegexOptions.SMART_CASE);
-      if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
-      VimEditor vimEditor = new IjVimEditor(editor);
-      try {
-        // TODO: we shouldn't care about the ignoreCase argument, and instead just look into the editor options.
-        // It would require a refactor, so for now prepend \c or \C to "force" ignoreCase
-        String newPattern = (ignoreCase ? "\\c" : "\\C") + pattern;
-        VimRegex regex = new VimRegex(newPattern);
-        List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine), vimEditor.getLineEndOffset(endLine == -1 ? vimEditor.lineCount() - 1 : endLine) + 1, options);
-        for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
-        return results;
-      } catch (VimRegexException e) {
-        injector.getMessages().showStatusBarMessage(vimEditor, e.getMessage());
-        return results;
-      }
-    }
-
-    final int lineCount = new IjVimEditor(editor).lineCount();
-    final int actualEndLine = endLine == -1 ? lineCount - 1 : endLine;
-
-    final RegExp.regmmatch_T regMatch = new RegExp.regmmatch_T();
-    final RegExp regExp = new RegExp();
-    regMatch.regprog = regExp.vim_regcomp(pattern, 1);
-    if (regMatch.regprog == null) {
+    final EnumSet<VimRegexOptions> options = EnumSet.noneOf(VimRegexOptions.class);
+    if (globalOptions(injector).getSmartcase()) options.add(VimRegexOptions.SMART_CASE);
+    if (globalOptions(injector).getIgnorecase()) options.add(VimRegexOptions.IGNORE_CASE);
+    VimEditor vimEditor = new IjVimEditor(editor);
+    try {
+      // TODO: we shouldn't care about the ignoreCase argument, and instead just look into the editor options.
+      // It would require a refactor, so for now prepend \c or \C to "force" ignoreCase
+      String newPattern = (ignoreCase ? "\\c" : "\\C") + pattern;
+      VimRegex regex = new VimRegex(newPattern);
+      List<VimMatchResult.Success> foundMatches = regex.findAll(vimEditor, vimEditor.getLineStartOffset(startLine), vimEditor.getLineEndOffset(endLine == -1 ? vimEditor.lineCount() - 1 : endLine) + 1, options);
+      for (VimMatchResult.Success match : foundMatches) results.add(match.getRange());
+      return results;
+    } catch (VimRegexException e) {
+      injector.getMessages().showStatusBarMessage(vimEditor, e.getMessage());
       return results;
     }
-
-    regMatch.rmm_ic = ignoreCase;
-
-    int col = 0;
-    for (int line = startLine; line <= actualEndLine; ) {
-      int matchedLines = regExp.vim_regexec_multi(regMatch, new IjVimEditor(editor), lineCount, line, col);
-      if (matchedLines > 0) {
-        final CharacterPosition startPos = new CharacterPosition(line + regMatch.startpos[0].lnum,
-          regMatch.startpos[0].col);
-        final CharacterPosition endPos = new CharacterPosition(line + regMatch.endpos[0].lnum,
-          regMatch.endpos[0].col);
-        int start = startPos.toOffset(editor);
-        int end = endPos.line >= lineCount ? editor.getDocument().getTextLength() : endPos.toOffset(editor);
-        results.add(new TextRange(start, end));
-
-        if (start != end) {
-          line += matchedLines - 1;
-          col = endPos.column;
-        }
-        else {
-          line += matchedLines;
-          col = 0;
-        }
-      }
-      else {
-        line++;
-        col = 0;
-      }
-    }
-
-    return results;
   }
 
   /**

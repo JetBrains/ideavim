@@ -70,7 +70,6 @@ import com.maddyhome.idea.vim.group.IjVimOptionGroup
 import com.maddyhome.idea.vim.group.IjVimPsiService
 import com.maddyhome.idea.vim.group.MacroGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
@@ -133,7 +132,7 @@ internal class IjVimInjector : VimInjectorBase() {
   override val templateManager: VimTemplateManager
     get() = service<IjTemplateManager>()
   override val searchGroup: VimSearchGroup
-    get() = service<SearchGroup>()
+    get() = service<IjVimSearchGroup>()
   override val put: VimPut
     get() = service<PutGroup>()
   override val window: VimWindowGroup

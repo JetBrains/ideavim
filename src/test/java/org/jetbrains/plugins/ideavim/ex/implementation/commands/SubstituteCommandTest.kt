@@ -278,7 +278,6 @@ class SubstituteCommandTest : VimTestCase() {
   // Tests two things. Firstly, VIM-698, which was a bug in the old regex engine that would skip lines when substituting
   // with newlines and secondly to test the special case of '\n' matching end of file
   @OptionTest(
-    VimOption(TestOptionConstants.usenewregex),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
   )
@@ -307,7 +306,6 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-2141
   @OptionTest(
-    VimOption(TestOptionConstants.usenewregex),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
   )
@@ -342,7 +340,6 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-2141
   @OptionTest(
-    VimOption(TestOptionConstants.usenewregex),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
   )
@@ -370,7 +367,6 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-2141
   @OptionTest(
-    VimOption(TestOptionConstants.usenewregex),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
   )
@@ -404,7 +400,6 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(TestOptionConstants.usenewregex),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
   )
@@ -428,7 +423,6 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(TestOptionConstants.usenewregex),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
   )

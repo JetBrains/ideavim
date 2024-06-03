@@ -17,6 +17,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -274,6 +275,24 @@ public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateCompon
   public override fun loadState(state: Element) {
     readData(state)
   }
+
+  /**
+   * Updates search highlights when the selected editor changes
+   */
+  public fun fileEditorManagerSelectionChangedCallback(@Suppress("unused") event: FileEditorManagerEvent) {
+    updateSearchHighlights(false)
+  }
+
+  public fun turnOn() {
+    updateSearchHighlights(false)
+  }
+
+  public fun turnOff() {
+    val show = showSearchHighlight
+    clearSearchHighlight()
+    showSearchHighlight = show
+  }
+
   private class IjSearchHighlight(private val editor: Editor, private val highlighter: RangeHighlighter) :
     SearchHighlight() {
 

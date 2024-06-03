@@ -54,7 +54,7 @@ class VisualSelectPreviousSearchTest : VimTestCase() {
   @Test
   fun testWithoutSpaces() {
     configureByText("tes<caret>ttest")
-    VimPlugin.getSearch().setLastSearchState(fixture.editor, "test", "", Direction.FORWARDS)
+    VimPlugin.getSearch().setLastSearchState("test", "", Direction.FORWARDS)
     typeText(injector.parser.parseKeys("gN"))
     assertOffset(0)
     assertSelection("test")
