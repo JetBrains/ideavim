@@ -22,8 +22,7 @@ public class VimProcessGroupStub : VimProcessGroupBase() {
     vimLogger<ExecutionContextManagerStub>().warn("VimProcessGroupStub is used. Please replace it with your own implementation of VimProcessGroup.")
   }
 
-  override val lastCommand: String
-    get() = TODO("Not yet implemented")
+  override var lastCommand: String? = null
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
 
