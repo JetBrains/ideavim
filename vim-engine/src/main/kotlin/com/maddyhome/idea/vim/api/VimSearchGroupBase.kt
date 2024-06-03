@@ -48,22 +48,34 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     /**
      * Last string trailing a pattern. E.g. in '/pattern/e+2', 'e+2' is trailing.
      */
-    private var lastPatternTrailing: String? = ""
+    public var lastPatternTrailing: String? = ""
 
     /**
      * Last used search direction.
      */
-    private var lastDirection: Direction = Direction.FORWARDS
+    @JvmStatic
+    protected var lastDirection: Direction = Direction.FORWARDS
+      @JvmStatic
+      get
+      @JvmStatic
+      set
 
     /**
      * The type of the last used pattern.
      */
-    private var lastPatternType: PatternType? = null
+    @JvmStatic
+    protected var lastPatternType: PatternType? = null
+      @JvmStatic
+      get
+      @JvmStatic
+      set
 
     /**
      * Last used substitute string.
      */
     private var lastSubstituteString: String? = null
+
+    public var lastReplaceString: String? = null
 
     private val CLASS_NAMES: List<String> = listOf(
       "alnum:]",
@@ -936,6 +948,7 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
 
     // Set last substitute pattern, but only for explicitly typed patterns. Reused patterns are not saved/updated
     setLastUsedPattern(pattern, PatternType.SUBSTITUTE, isNewPattern)
+    lastReplaceString = sub
 
     // Always reset after checking, only set for nv_ident
     lastIgnoreSmartCase = false

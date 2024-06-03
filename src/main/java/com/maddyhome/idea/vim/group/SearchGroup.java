@@ -8,10 +8,6 @@
 package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.RoamingType;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
@@ -63,11 +59,8 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 /**
  * @deprecated Replace with IjVimSearchGroup
  */
-@State(name = "VimSearchSettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
-})
 @Deprecated
-public class SearchGroup extends IjVimSearchGroup implements PersistentStateComponent<Element> {
+public class SearchGroup extends IjVimSearchGroup {
   public SearchGroup() {
     super();
     if (!globalIjOptions(injector).getUseNewRegex()) {
@@ -1408,101 +1401,6 @@ public class SearchGroup extends IjVimSearchGroup implements PersistentStateComp
 
     return new Pair<Integer, MotionType>(res, motionType);
   }
-
-
-  // *******************************************************************************************************************
-  //
-  // Persistent state
-  //
-  // *******************************************************************************************************************
-  //region Persistent state
-  public void saveData(@NotNull Element element) {
-    logger.debug("saveData");
-    Element search = new Element("search");
-
-    addOptionalTextElement(search, "last-search", lastSearch);
-    addOptionalTextElement(search, "last-substitute", lastSubstitute);
-    addOptionalTextElement(search, "last-offset", !lastPatternOffset.isEmpty() ? lastPatternOffset : null);
-    addOptionalTextElement(search, "last-replace", lastReplace);
-    addOptionalTextElement(search, "last-pattern", lastPatternIdx == RE_SEARCH ? lastSearch : lastSubstitute);
-    addOptionalTextElement(search, "last-dir", Integer.toString(lastDir.toInt()));
-    addOptionalTextElement(search, "show-last", Boolean.toString(showSearchHighlight));
-
-    element.addContent(search);
-  }
-
-  private static void addOptionalTextElement(@NotNull Element element, @NotNull String name, @Nullable String text) {
-    if (text != null) {
-      element.addContent(VimPlugin.getXML().setSafeXmlText(new Element(name), text));
-    }
-  }
-
-  public void readData(@NotNull Element element) {
-    logger.debug("readData");
-    Element search = element.getChild("search");
-    if (search == null) {
-      return;
-    }
-
-    lastSearch = getSafeChildText(search, "last-search");
-    lastSubstitute = getSafeChildText(search, "last-substitute");
-    lastReplace = getSafeChildText(search, "last-replace");
-    lastPatternOffset = getSafeChildText(search, "last-offset", "");
-
-    final String lastPatternText = getSafeChildText(search, "last-pattern");
-    if (lastPatternText == null || lastPatternText.equals(lastSearch)) {
-      lastPatternIdx = RE_SEARCH;
-    }
-    else {
-      lastPatternIdx = RE_SUBST;
-    }
-
-    Element dir = search.getChild("last-dir");
-    try {
-      lastDir = Direction.Companion.fromInt(Integer.parseInt(dir.getText()));
-    }
-    catch (NumberFormatException e) {
-      lastDir = Direction.FORWARDS;
-    }
-
-    Element show = search.getChild("show-last");
-    final boolean disableHighlight = globalOptions(injector).getViminfo().contains("h");
-    showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
-    if (logger.isDebugEnabled()) {
-      logger.debug("show=" + show + "(" + show.getText() + ")");
-      logger.debug("showSearchHighlight=" + showSearchHighlight);
-    }
-  }
-
-  private static @Nullable String getSafeChildText(@NotNull Element element, @NotNull String name) {
-    final Element child = element.getChild(name);
-    return child != null ? VimPlugin.getXML().getSafeXmlText(child) : null;
-  }
-
-  @SuppressWarnings("SameParameterValue")
-  private static @NotNull String getSafeChildText(@NotNull Element element, @NotNull String name, @NotNull String defaultValue) {
-    final Element child = element.getChild(name);
-    if (child != null) {
-      final String value = VimPlugin.getXML().getSafeXmlText(child);
-      return value != null ? value : defaultValue;
-    }
-    return defaultValue;
-  }
-
-  @Nullable
-  @Override
-  public Element getState() {
-    Element element = new Element("search");
-    saveData(element);
-    return element;
-  }
-
-  @Override
-  public void loadState(@NotNull Element state) {
-    readData(state);
-  }
-  //endregion
-
 
   private enum ReplaceConfirmationChoice {
     SUBSTITUTE_THIS,
