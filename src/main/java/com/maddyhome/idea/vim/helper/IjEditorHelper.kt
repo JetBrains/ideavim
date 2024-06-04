@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimRangeMarker
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -56,5 +57,19 @@ internal class IjEditorHelper : EngineEditorHelper {
 
   override fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition {
     return EditorUtil.inlayAwareOffsetToVisualPosition(editor.ij, offset).vim
+  }
+
+  override fun createRangeMarker(editor: VimEditor, startOffset: Int, endOffset: Int): VimRangeMarker {
+    val ijRangeMarker = editor.ij.document.createRangeMarker(startOffset, endOffset)
+    return object : VimRangeMarker {
+      override val startOffset: Int
+        get() = ijRangeMarker.startOffset
+      override val endOffset: Int
+        get() = ijRangeMarker.endOffset
+
+      override fun dispose() {
+        ijRangeMarker.dispose()
+      }
+    }
   }
 }
