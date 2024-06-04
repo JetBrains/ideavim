@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -27,14 +27,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 // FIXME: I'm such a mess, please refactor me, responsible developer
 @ExCommand(command = "g[lobal],v[global]")
-internal data class GlobalCommand(val range: Range, val argument: String, val invert: Boolean) : Command.SingleExecution(range, argument) {
+public data class GlobalCommand(val range: Range, val argument: String, val invert: Boolean) : Command.SingleExecution(range, argument) {
 
   init {
     // Most commands have a default range of the current line ("."). Global has a default range of the whole file
     defaultRange = "%"
   }
 
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
@@ -140,10 +140,10 @@ internal data class GlobalCommand(val range: Range, val argument: String, val in
     }
   }
 
-  companion object {
+  public companion object {
     private var globalBusy = false
 
     // Interrupted. Not used at the moment
-    var gotInt: Boolean = false
+    public var gotInt: Boolean = false
   }
 }
