@@ -53,22 +53,12 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     /**
      * Last used search direction.
      */
-    @JvmStatic
-    protected var lastDirection: Direction = Direction.FORWARDS
-      @JvmStatic
-      get
-      @JvmStatic
-      set
+    public var lastDirection: Direction = Direction.FORWARDS
 
     /**
      * The type of the last used pattern.
      */
-    @JvmStatic
-    protected var lastPatternType: PatternType? = null
-      @JvmStatic
-      get
-      @JvmStatic
-      set
+    public var lastPatternType: PatternType? = null
 
     /**
      * Last used substitute string.
