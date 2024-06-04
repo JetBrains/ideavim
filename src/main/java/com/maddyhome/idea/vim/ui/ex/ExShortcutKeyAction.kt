@@ -42,7 +42,7 @@ internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : Dum
       //   e.dataContext will refer to the ex-entry editor and commands will be executed on it,
       //   thus it should not be used. For example, `:action EditorSelectWord` will not work with this context
       val mainEditorContext = exEntryPanel.entry.context.vim
-      keyHandler.handleKey(editor.vim, keyStroke, mainEditorContext, keyHandler.keyHandlerState)
+      keyHandler.handleKey(editor!!.vim, keyStroke, mainEditorContext, keyHandler.keyHandlerState)
     }
   }
 

@@ -76,7 +76,7 @@ internal class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
     // * The key handler routines get the chance to clean up and reset state
     val entry = ExEntryPanel.getInstance().entry
     val keyHandler = KeyHandler.getInstance()
-    keyHandler.handleKey(entry.editor.vim, stroke, entry.context.vim, keyHandler.keyHandlerState)
+    keyHandler.handleKey(entry.editor!!.vim, stroke, entry.context.vim, keyHandler.keyHandlerState)
   }
 
   companion object {
@@ -198,7 +198,7 @@ internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrev
     target.saveLastEntry()
     val doc = target.document
     val caret = target.caret
-    val project = target.editor.project
+    val project = target.editor!!.project
 
     // Create a VimEditor instance on the Swing text field which we can pass to the search helpers. We need an editor
     // rather than just working on a buffer because the search helpers need local options (specifically the local to
@@ -208,7 +208,7 @@ internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrev
     // This will mean we always have an editor that has been initialised for options, etc. But also means that we can
     // share the command line entry actions between IdeaVim implementations
     val editor = TextComponentEditorImpl(project, target).vim
-    injector.optionGroup.initialiseLocalOptions(editor, target.editor.vim, LocalOptionInitialisationScenario.CMD_LINE)
+    injector.optionGroup.initialiseLocalOptions(editor, target.editor!!.vim, LocalOptionInitialisationScenario.CMD_LINE)
 
     val offset = injector.searchHelper.findNextWord(editor, caret.dot, -1, bigWord = false, spaceWords = false)
     if (logger.isDebugEnabled) logger.debug("offset=$offset")

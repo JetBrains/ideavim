@@ -210,7 +210,7 @@ public class ExTextField extends JTextField {
     ExEntryPanel.getInstance().setEditor(editor);
   }
 
-  public Editor getEditor() {
+  public @Nullable Editor getEditor() {
     return ExEntryPanel.getInstance().getEditor();
   }
 

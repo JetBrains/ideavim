@@ -122,7 +122,7 @@ internal object ExEditorKit : DefaultEditorKit() {
               val entry = ExEntryPanel.getInstance().entry
               val editor = entry.editor
               val keyHandler = KeyHandler.getInstance()
-              keyHandler.handleKey(editor.vim, key, entry.context.vim, keyHandler.keyHandlerState)
+              keyHandler.handleKey(editor!!.vim, key, entry.context.vim, keyHandler.keyHandlerState)
             } else {
               val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
               super.actionPerformed(event)
