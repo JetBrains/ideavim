@@ -22,6 +22,7 @@ public interface EngineEditorHelper {
   public fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
   public fun pad(editor: VimEditor, line: Int, to: Int): String
   public fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
+  public fun createRangeMarker(editor: VimEditor, startOffset: Int, endOffset: Int): VimRangeMarker
 }
 
 public fun VimEditor.endsWithNewLine(): Boolean {
@@ -298,4 +299,11 @@ public fun VimEditor.coerceOffset(offset: Int): Int {
   if (offset < 0) return 0
   if (offset > this.fileSize()) return this.fileSize().toInt()
   return offset
+}
+
+public interface VimRangeMarker {
+  public val startOffset: Int
+  public val endOffset: Int
+
+  public fun dispose()
 }

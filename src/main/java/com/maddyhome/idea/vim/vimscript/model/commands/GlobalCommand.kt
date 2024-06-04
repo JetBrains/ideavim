@@ -8,17 +8,16 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.editor.RangeMarker
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimRangeMarker
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -89,13 +88,13 @@ internal data class GlobalCommand(val range: Range, val argument: String, val in
         editor.getLineEndOffset(line2),
       )
       val marks = if (!invert) matches.map {
-        editor.ij.document.createRangeMarker(editor.getLineStartForOffset(it.range.startOffset), editor.getLineStartForOffset(it.range.startOffset))
+        injector.engineEditorHelper.createRangeMarker(editor, editor.getLineStartForOffset(it.range.startOffset), editor.getLineStartForOffset(it.range.startOffset))
         // filter out lines that contain a match
       } else (line1..line2).filterNot { line ->
         matches.map { match ->
           editor.offsetToBufferPosition(match.range.startOffset).line
         }.contains(line)
-      }.map { editor.ij.document.createRangeMarker(editor.getLineStartOffset(it), editor.getLineStartOffset(it)) }
+      }.map { injector.engineEditorHelper.createRangeMarker(editor, editor.getLineStartOffset(it), editor.getLineStartOffset(it)) }
 
       if (gotInt) {
         messages.showStatusBarMessage(null, messages.message("e_interr"))
@@ -112,7 +111,7 @@ internal data class GlobalCommand(val range: Range, val argument: String, val in
     return true
   }
 
-  private fun globalExe(editor: VimEditor, context: ExecutionContext, marks: List<RangeMarker>, cmd: String) {
+  private fun globalExe(editor: VimEditor, context: ExecutionContext, marks: List<VimRangeMarker>, cmd: String) {
     globalBusy = true
     try {
       for (mark in marks) {
