@@ -17,6 +17,7 @@ public interface VimscriptParser {
   public val exCommands: ExCommandTree
 
   public fun parse(script: String): Script
+  public fun parseLetCommand(text: String): Command?
   public fun parseCommand(command: String): Command?
   public fun parseExpression(expression: String): Expression?
 }

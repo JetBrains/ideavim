@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
-import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Address
 import com.maddyhome.idea.vim.ex.ranges.Address.Companion.createRangeAddresses
@@ -51,9 +51,9 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
 
-internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
+public object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
-  private val logger = logger<CommandVisitor>()
+  private val logger = vimLogger<CommandVisitor>()
   private val expressionVisitor: ExpressionVisitor = ExpressionVisitor
 
   private fun parseRangeOffset(ctx: RangeOffsetContext?): Int {
@@ -249,7 +249,7 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
-    val command = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(Range(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = injector.vimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(Range(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
     command.rangeInScript = ctx.getTextRange()
     return command
   }

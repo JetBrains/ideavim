@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.loops.WhileLoop
 import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 
-internal object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
+public object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
 
   override fun visitBlockMember(ctx: VimscriptParser.BlockMemberContext): Executable? {
     return when {
