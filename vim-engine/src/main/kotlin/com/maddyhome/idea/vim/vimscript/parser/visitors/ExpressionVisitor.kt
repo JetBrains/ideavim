@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -57,7 +57,7 @@ import com.maddyhome.idea.vim.parser.generated.VimscriptParser.VariableExpressio
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.WrappedExpressionContext
 import org.antlr.v4.runtime.ParserRuleContext
 
-internal object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
+public object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
   override fun visitDictionaryExpression(ctx: DictionaryExpressionContext): Expression {
     val dict: LinkedHashMap<Expression, Expression> = LinkedHashMap()

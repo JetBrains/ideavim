@@ -96,7 +96,7 @@ internal object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
     }
   }
 
-  fun parseLetCommand(text: String): Command? {
+  override fun parseLetCommand(text: String): Command? {
     val parser = getParser(addNewlineIfMissing(text), true)
     val AST: ParseTree = parser.letCommands()
     if (linesWithErrors.isNotEmpty()) {
