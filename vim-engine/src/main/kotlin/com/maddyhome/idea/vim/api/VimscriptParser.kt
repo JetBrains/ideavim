@@ -14,6 +14,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.ExCommandTree
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 public interface VimscriptParser {
+  public val linesWithErrors: MutableList<Int>
+
   public val exCommands: ExCommandTree
 
   public fun parse(script: String): Script
