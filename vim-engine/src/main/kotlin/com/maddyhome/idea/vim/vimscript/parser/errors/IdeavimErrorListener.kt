@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,15 +8,14 @@
 
 package com.maddyhome.idea.vim.vimscript.parser.errors
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.logger
-import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 
 internal class IdeavimErrorListener : BaseErrorListener() {
-  private val logger = logger<IdeavimErrorListener>()
+  private val logger = vimLogger<IdeavimErrorListener>()
   companion object {
     val testLogger = mutableListOf<String>()
   }
@@ -29,9 +28,9 @@ internal class IdeavimErrorListener : BaseErrorListener() {
     msg: String?,
     e: RecognitionException?,
   ) {
-    VimscriptParser.linesWithErrors.add(line)
+    injector.vimscriptParser.linesWithErrors.add(line)
     val message = "line $line:$charPositionInLine $msg"
-    if (ApplicationManager.getApplication().isUnitTestMode) {
+    if (injector.application.isUnitTest()) {
       testLogger.add(message)
     } else {
       logger.warn(message)
