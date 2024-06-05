@@ -135,6 +135,9 @@ public class ExOutputPanel extends JPanel {
       myText.setBorder(null);
       myScrollPane.setBorder(null);
       myLabel.setForeground(myText.getForeground());
+
+      // Make sure the panel is positioned correctly in case we're changing font size
+      positionPanel();
     }
   }
 
@@ -144,7 +147,7 @@ public class ExOutputPanel extends JPanel {
     }
 
     myText.setText(data);
-    myText.setFont(UiHelper.selectFont(data));
+    myText.setFont(UiHelper.selectEditorFont(myEditor, data));
     myText.setCaretPosition(0);
     if (!data.isEmpty()) {
       activate();
@@ -213,8 +216,8 @@ public class ExOutputPanel extends JPanel {
   }
 
   private void setFontForElements() {
-    myText.setFont(UiHelper.selectFont(myText.getText()));
-    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
+    myText.setFont(UiHelper.selectEditorFont(myEditor, myText.getText()));
+    myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
 
   private void scrollLine() {
@@ -242,7 +245,7 @@ public class ExOutputPanel extends JPanel {
 
   private void badKey() {
     myLabel.setText(MessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
-    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
+    myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
 
   private void scrollOffset(int more) {
@@ -258,7 +261,7 @@ public class ExOutputPanel extends JPanel {
     else {
       myLabel.setText(MessageHelper.message("ex.output.panel.more"));
     }
-    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
+    myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
 
   private void positionPanel() {
