@@ -13,11 +13,14 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimRangeMarker
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.regexp.VimRegexException
+import com.maddyhome.idea.vim.regexp.VimRegexOptions
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -70,8 +73,12 @@ public data class GlobalCommand(val range: Range, val argument: String, val inve
       return false
     }
 
+    val options = enumSetOf<VimRegexOptions>()
+    if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
+    if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
+
     if (globalBusy) {
-      val match = regex.findInLine(editor, editor.currentCaret().getLine())
+      val match = regex.findInLine(editor, editor.currentCaret().getLine(), 0, options)
       if (match is VimMatchResult.Success == !invert) {
         globalExecuteOne(editor, context, editor.getLineStartOffset(editor.currentCaret().getLine()), globalCommandArguments.command)
       }
@@ -85,6 +92,7 @@ public data class GlobalCommand(val range: Range, val argument: String, val inve
         editor,
         editor.getLineStartOffset(line1),
         editor.getLineEndOffset(line2),
+        options,
       )
       val matchesLines = matches.map { it.getLine(editor) }.toSet()
       val linesForGlobalCommand = if (invert) {

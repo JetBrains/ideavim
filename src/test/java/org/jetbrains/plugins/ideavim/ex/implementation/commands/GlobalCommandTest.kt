@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.history.HistoryConstants
-import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -205,6 +204,36 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test match ignores case`() {
+    doTest(
+      exCommand("g/test/p"),
+      """
+        |one test
+        |two
+        |three Test
+        |four
+        |five TEST
+      """.trimMargin(),
+      """
+        |one test
+        |two
+        |three Test
+        |four
+        |five TEST
+      """.trimMargin()
+    ) {
+      enterCommand("set ignorecase")
+    }
+    assertExOutput(
+      """
+        |one test
+        |three Test
+        |five TEST
+      """.trimMargin()
+    )
+  }
+
+  @Test
   fun `test check history`() {
     VimPlugin.getHistory().clear()
     val initialEntries = VimPlugin.getHistory().getEntries(HistoryConstants.COMMAND, 0, 0)
@@ -335,6 +364,6 @@ end
   }
 
   private fun doTest(command: String, before: String, after: String) {
-    doTest(listOf(exCommand(command)), before, after, Mode.NORMAL())
+    doTest(listOf(exCommand(command)), before, after)
   }
 }
