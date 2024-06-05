@@ -44,7 +44,8 @@ public data class PrintCommand(val range: Range, val argument: String) : Command
       // make sure it's clear
       exOutputModel.clear()
     }
-    exOutputModel.output((exOutputModel.text ?: "") + text)
+    val existingText = exOutputModel.text?.let { if (it.isNotEmpty()) it.plus("\n") else it } ?: ""
+    exOutputModel.output(existingText + text)
     return ExecutionResult.Success
   }
 }
