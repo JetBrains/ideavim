@@ -28,14 +28,18 @@ public class ExOutputModel private constructor(private val myEditor: Editor) : V
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
       ExOutputPanel.getInstance(myEditor).text
     } else {
-      field
+      // ExOutputPanel always returns a non-null string
+      field ?: ""
     }
     set(value) {
+      // ExOutputPanel will strip a trailing newline. We'll do it now so that tests have the same behaviour. We also
+      // never pass null to ExOutputPanel, but we do store it for tests, so we know if we're active or not
+      val newValue = value?.removeSuffix("\n")
       if (!ApplicationManager.getApplication().isUnitTestMode) {
-        ExOutputPanel.getInstance(myEditor).setText(value ?: "")
+        ExOutputPanel.getInstance(myEditor).setText(newValue ?: "")
       } else {
-        field = value
-        isActiveInTestMode = !value.isNullOrEmpty()
+        field = newValue
+        isActiveInTestMode = !newValue.isNullOrEmpty()
       }
     }
 

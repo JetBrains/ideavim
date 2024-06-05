@@ -255,7 +255,7 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput("I found it in a legendary land\n")
+    assertExOutput("I found it in a legendary land")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -269,7 +269,7 @@ class GlobalCommandTest : VimTestCase() {
     assertExOutput("""
       |I found it in a legendary land
       |where it was settled on some sodden sand
-      |""".trimMargin())
+      """.trimMargin())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -280,7 +280,7 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput("I found it in a legendary land\n")
+    assertExOutput("I found it in a legendary land")
   }
 
   @Test
