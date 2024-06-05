@@ -10,8 +10,13 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.ide.ui.UISettings
+import com.intellij.ide.ui.UISettingsUtils
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.wm.IdeFocusManager
 import java.awt.Font
 import javax.swing.JComponent
@@ -32,11 +37,21 @@ internal fun runAfterGotFocus(runnable: Runnable) {
   IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable, ModalityState.defaultModalityState())
 }
 
-internal fun selectFont(forStr: String): Font {
-  val scheme = EditorColorsManager.getInstance().globalScheme
+internal fun selectEditorFont(editor: Editor?, forText: String): Font {
+  val fontSize = when {
+    editor is EditorImpl -> editor.fontSize2D
+    UISettings.getInstance().presentationMode -> UISettingsUtils.getInstance().presentationModeFontSize
+    editor?.editorKind == EditorKind.CONSOLE -> UISettingsUtils.getInstance().scaledConsoleFontSize
+    else -> UISettingsUtils.getInstance().scaledEditorFontSize
+  }
 
-  val fontName = scheme.fontPreferences.realFontFamilies.firstOrNull {
-    Font(it, Font.PLAIN, scheme.editorFontSize).canDisplayUpTo(forStr) == -1
-  } ?: return Font(scheme.editorFontName, Font.PLAIN, scheme.editorFontSize)
-  return Font(fontName, Font.PLAIN, scheme.editorFontSize)
+  val scheme = EditorColorsManager.getInstance().globalScheme
+  scheme.fontPreferences.realFontFamilies.forEach { fontName ->
+    val font = Font(fontName, Font.PLAIN, scheme.editorFontSize)
+    if (font.canDisplayUpTo(forText) == -1) {
+      return font.deriveFont(fontSize)
+    }
+  }
+
+  return Font(scheme.editorFontName, Font.PLAIN, scheme.editorFontSize).deriveFont(fontSize)
 }

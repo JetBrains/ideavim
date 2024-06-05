@@ -202,7 +202,7 @@ public class ExTextField extends JTextField {
 
   // VIM-570
   private void setFontToJField(String stringToDisplay) {
-    super.setFont(UiHelper.selectFont(stringToDisplay));
+    super.setFont(UiHelper.selectEditorFont(getEditor(), stringToDisplay));
   }
 
   void setEditor(@NotNull Editor editor, DataContext context) {
@@ -411,12 +411,22 @@ public class ExTextField extends JTextField {
       try {
         final JTextComponent component = getComponent();
 
-        g2d.setColor(component.getCaretColor());
-        g2d.setXORMode(component.getBackground());
+        g2d.setColor(component.getBackground());
+        g2d.setXORMode(component.getCaretColor());
 
         final Rectangle2D r = modelToView(getDot());
         if (r == null) {
           return;
+        }
+
+        // Make sure our clip region is still up to date. It might get out of sync due to the IDE scale changing.
+        // (Note that the DefaultCaret class makes this check)
+        if (width > 0 && height > 0 && !contains(r)) {
+          Rectangle clip = g2d.getClipBounds();
+          if (clip != null && !clip.contains(this)) {
+            repaint();
+          }
+          damage(r.getBounds());
         }
 
         // Make sure not to use the saved bounds! There is no guarantee that damage() has been called first, especially
@@ -432,7 +442,8 @@ public class ExTextField extends JTextField {
         else {
           final double caretHeight = getCaretHeight(r.getHeight());
           final double caretWidth = getCaretWidth(fm, r.getX(), thickness);
-          g2d.fill(new Rectangle2D.Double(r.getX(), r.getY() + r.getHeight() - caretHeight, caretWidth, caretHeight));
+          Double rect = new Double(r.getX(), r.getY() + r.getHeight() - caretHeight, caretWidth, caretHeight);
+          g2d.fill(rect);
         }
       }
       finally {

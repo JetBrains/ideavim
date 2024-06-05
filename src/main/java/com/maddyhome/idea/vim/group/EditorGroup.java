@@ -20,11 +20,13 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -38,6 +40,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -208,6 +212,11 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
     initLineNumbers(editor);
 
+    // Listen for changes to the font size, so we can hide the ex text field/output panel
+    if (editor instanceof EditorEx editorEx) {
+      editorEx.addPropertyChangeListener(FontSizeChangeListener.INSTANCE);
+    }
+
     // We add Vim bindings to all opened editors, even read-only editors. We also add bindings to editors that are used
     // elsewhere in the IDE, rather than just for editing project files. This includes editors used as part of the UI,
     // such as the VCS commit message, or used as read-only viewers for text output, such as log files in run
@@ -253,6 +262,9 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(new IjVimEditor(editor));
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
+    if (editor instanceof EditorEx editorEx) {
+      editorEx.removePropertyChangeListener(FontSizeChangeListener.INSTANCE);
+    }
   }
 
   public void notifyIdeaJoin(@Nullable Project project, @NotNull VimEditor editor) {
@@ -380,6 +392,32 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
     else {
       return Stream.empty();
+    }
+  }
+
+  /**
+   * Listens to property changes from the editor to hide ex text field/output panel when the editor's font is zoomed
+   */
+  private static class FontSizeChangeListener implements PropertyChangeListener {
+    public static FontSizeChangeListener INSTANCE = new FontSizeChangeListener();
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (VimPlugin.isNotEnabled()) return;
+      if (evt.getPropertyName().equals(EditorEx.PROP_FONT_SIZE)) {
+        Object source = evt.getSource();
+        if (source instanceof Editor editor) {
+          // The editor is being zoomed, so hide the command line or output panel, if they're being shown. On the one
+          // hand, it's a little rude to cancel a command line for the user, but on the other, the panels obscure the
+          // zoom indicator, so it looks nicer if we hide them.
+          // Note that IDE scale is handled by LafManager.lookAndFeelChanged
+          VimCommandLine activeCommandLine = injector.getCommandLine().getActiveCommandLine();
+          if (activeCommandLine != null) {
+            injector.getProcessGroup().cancelExEntry(new IjVimEditor(editor), false);
+          }
+          ExOutputModel.getInstance(editor).close();
+        }
+      }
     }
   }
 }
