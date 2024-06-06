@@ -12,10 +12,12 @@ import com.intellij.application.options.CodeStyle
 import com.intellij.codeStyle.AbstractConvertLineSeparatorsAction
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ScrollPositionCalculator
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.intellij.openapi.editor.impl.softwrap.SoftWrapAppliancePlaces
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
@@ -1228,23 +1230,63 @@ private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAcce
     setIsUseSoftWraps(editor, value.asBoolean())
   }
 
-  private fun getGlobalIsUseSoftWraps(editor: VimEditor): Boolean {
-    val settings = EditorSettingsExternalizable.getInstance()
-    if (settings.isUseSoftWraps) {
-      val masks = settings.softWrapFileMasks
-      if (masks.trim() == "*") return true
+  override fun canInitialiseOptionFrom(sourceEditor: VimEditor, targetEditor: VimEditor): Boolean {
+    // IntelliJ's soft-wrap settings are based on editor kind, so there can be different wrap options for consoles,
+    // main editors, etc. This is particularly noticeable in the console when running an application. The main editor
+    // might have the Vim default with line wrap enabled. Initialising the run console will also have a default value,
+    // and won't be updated by the options subsystem. It might have wrap enabled or not. If the editors were the same
+    // kind, the same default value would be used.
+    // However, if the main editor has 'wrap' explicitly set, this value is copied to the console, so the behaviour is
+    // inconsistent. Furthermore, the run console has a soft-wraps toggle button that works at the global level, and
+    // IdeaVim only sets the local value, so the toggle button can be inconsistent too.
+    // By denying copying the main editor value during initialisation, the console gets the default value, and the IDE
+    // decides what it should be. The behaviour is now more consistent.
+    // We're happy to initialise diff editors from main editors, as there isn't a different soft wrap setting there.
+    // Preview tabs might also have different settings, but because they're a type of main editor, it doesn't matter
+    // so much
+    fun editorKindToSoftWrapAppliancesPlace(kind: EditorKind) = when (kind) {
+      EditorKind.UNTYPED,
+      EditorKind.DIFF,
+      EditorKind.MAIN_EDITOR -> SoftWrapAppliancePlaces.MAIN_EDITOR
+      EditorKind.CONSOLE -> SoftWrapAppliancePlaces.CONSOLE
+      // Treat PREVIEW as a kind of MAIN_EDITOR instead of SWAP.PREVIEW. There are fewer noticeable differences
+      EditorKind.PREVIEW -> SoftWrapAppliancePlaces.MAIN_EDITOR
+    }
 
-      editor.ij.virtualFile?.let { file ->
-        masks.split(";").forEach { mask ->
-          val trimmed = mask.trim()
-          if (trimmed.isNotEmpty() && PatternUtil.fromMask(trimmed).matcher(file.name).matches()) {
-            return true
+    val sourceKind = editorKindToSoftWrapAppliancesPlace(sourceEditor.ij.editorKind)
+    val targetKind = editorKindToSoftWrapAppliancesPlace(targetEditor.ij.editorKind)
+    return sourceKind == targetKind
+  }
+
+
+  private fun getGlobalIsUseSoftWraps(editor: VimEditor): Boolean {
+    val softWrapAppliancePlace = when (editor.ij.editorKind) {
+      EditorKind.UNTYPED,
+      EditorKind.DIFF,
+      EditorKind.MAIN_EDITOR -> SoftWrapAppliancePlaces.MAIN_EDITOR
+      EditorKind.CONSOLE -> SoftWrapAppliancePlaces.CONSOLE
+      EditorKind.PREVIEW -> SoftWrapAppliancePlaces.PREVIEW
+    }
+
+    val settings = EditorSettingsExternalizable.getInstance()
+    if (softWrapAppliancePlace == SoftWrapAppliancePlaces.MAIN_EDITOR) {
+      if (settings.isUseSoftWraps) {
+        val masks = settings.softWrapFileMasks
+        if (masks.trim() == "*") return true
+
+        editor.ij.virtualFile?.let { file ->
+          masks.split(";").forEach { mask ->
+            val trimmed = mask.trim()
+            if (trimmed.isNotEmpty() && PatternUtil.fromMask(trimmed).matcher(file.name).matches()) {
+              return true
+            }
           }
         }
       }
+      return false
     }
 
-    return false
+    return settings.isUseSoftWraps(softWrapAppliancePlace)
   }
 
   private fun getEffectiveIsUseSoftWraps(editor: VimEditor) = editor.ij.settings.isUseSoftWraps

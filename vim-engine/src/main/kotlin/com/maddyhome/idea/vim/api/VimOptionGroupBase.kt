@@ -372,6 +372,14 @@ public interface LocalOptionValueOverride<T : VimDataType> : OptionValueOverride
    * changed, not if the value has changed from [OptionValue.Default] to [OptionValue.User].
    */
   public fun setLocalValue(storedValue: OptionValue<T>?, newValue: OptionValue<T>, editor: VimEditor): Boolean
+
+  /**
+   * Allows the override to veto copying the option value from the source editor to the target editor
+   *
+   * This is required for the `'wrap'` option in IntelliJ IDEs, because IntelliJ has different options for different
+   * editor kinds which can lead to unexpected results when trying to initialise a console editor from a main editor.
+   */
+  public fun canInitialiseOptionFrom(sourceEditor: VimEditor, targetEditor: VimEditor): Boolean = true
 }
 
 /**
@@ -924,6 +932,32 @@ private class OptionStorage {
     }
   }
 
+  fun <T : VimDataType> getOptionValueForInitialisation(
+    option: Option<T>,
+    sourceScope: OptionAccessScope,
+    targetScope: OptionAccessScope,
+  ): OptionValue<T> {
+    fun getScopeEditor(scope: OptionAccessScope) = when (scope) {
+      is OptionAccessScope.EFFECTIVE -> null  // Should never happen
+      is OptionAccessScope.GLOBAL -> scope.editor
+      is OptionAccessScope.LOCAL -> scope.editor
+    }
+
+    // If this option is a local option, and has an override, give it the chance to veto initialising the option from
+    // the source editor. If it's not a local option, getLocalOptionValueOverride will return null.
+    // This is currently required to handle 'wrap' in IntelliJ, which stores different values based on editor kind, so
+    // we don't initialise a console editor with defaults/current values from a main editor
+    val sourceEditor = getScopeEditor(sourceScope)
+    val targetEditor = getScopeEditor(targetScope)
+    return if (sourceEditor != null && targetEditor != null
+      && getLocalOptionValueOverride(option)?.canInitialiseOptionFrom(sourceEditor, targetEditor) == false) {
+      OptionValue.Default(option.defaultValue)
+    }
+    else {
+      getOptionValue(option, sourceScope)
+    }
+  }
+
   fun isOptionStorageInitialised(editor: VimEditor): Boolean {
     // Local window option storage will exist if we've previously initialised this editor
     return injector.vimStorageService.getDataFromWindow(editor, localOptionsKey) != null
@@ -1212,7 +1246,7 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val sourceGlobalScope = OptionAccessScope.GLOBAL(sourceEditor)
     val targetGlobalScope = OptionAccessScope.GLOBAL(targetEditor)
     forEachOption(LOCAL_TO_WINDOW) { option ->
-      val value = getOptionValueForInitialisation(option, sourceGlobalScope)
+      val value = getOptionValueForInitialisation(option, sourceGlobalScope, targetGlobalScope)
       storage.setOptionValue(option, targetGlobalScope, value)
     }
   }
@@ -1222,7 +1256,7 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
       val globalScope = OptionAccessScope.GLOBAL(editor)
       val localScope = OptionAccessScope.LOCAL(editor)
       forEachOption(LOCAL_TO_BUFFER) { option ->
-        val value = getOptionValueForInitialisation(option, globalScope)
+        val value = getOptionValueForInitialisation(option, globalScope, localScope)
         storage.setOptionValue(option, localScope, value)
       }
       forEachOption(GLOBAL_OR_LOCAL_TO_BUFFER) { option ->
@@ -1235,11 +1269,11 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
     val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
     forEachOption(LOCAL_TO_BUFFER) { option ->
-      val value = getOptionValueForInitialisation(option, sourceLocalScope)
+      val value = getOptionValueForInitialisation(option, sourceLocalScope, targetLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_BUFFER) { option ->
-      val value = getOptionValueForInitialisation(option, sourceLocalScope)
+      val value = getOptionValueForInitialisation(option, sourceLocalScope, targetLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
   }
@@ -1248,7 +1282,7 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val globalScope = OptionAccessScope.GLOBAL(editor)
     val localScope = OptionAccessScope.LOCAL(editor)
     forEachOption(LOCAL_TO_WINDOW) { option ->
-      val value = getOptionValueForInitialisation(option, globalScope)
+      val value = getOptionValueForInitialisation(option, globalScope, localScope)
       storage.setOptionValue(option, localScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_WINDOW) { option ->
@@ -1265,11 +1299,11 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
     val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
     forEachOption(LOCAL_TO_WINDOW) { option ->
-      val value = getOptionValueForInitialisation(option, sourceLocalScope)
+      val value = getOptionValueForInitialisation(option, sourceLocalScope, targetLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_WINDOW) { option ->
-      val value = getOptionValueForInitialisation(option, sourceLocalScope)
+      val value = getOptionValueForInitialisation(option, sourceLocalScope, targetLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
   }
@@ -1291,12 +1325,16 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
    * value is always set to default, which will use the current value detected by the IDE.
    * See `:help local-noglobal`
    */
-  private fun getOptionValueForInitialisation(option: Option<VimDataType>, scope: OptionAccessScope): OptionValue<VimDataType> {
+  private fun getOptionValueForInitialisation(
+    option: Option<VimDataType>,
+    sourceScope: OptionAccessScope,
+    targetScope: OptionAccessScope,
+  ): OptionValue<VimDataType> {
     return if (option.isLocalNoGlobal) {
       OptionValue.Default(option.defaultValue)
     }
     else {
-      storage.getOptionValue(option, scope)
+      storage.getOptionValueForInitialisation(option, sourceScope, targetScope)
     }
   }
 }
