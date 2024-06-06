@@ -17,34 +17,34 @@ class EchoCommandTest : VimTestCase() {
   fun `test echo with a string`() {
     configureByText("\n")
     typeText(commandToKeys("echo \"Hello, World!\""))
-    assertExOutput("Hello, World!\n")
+    assertExOutput("Hello, World!")
   }
 
   @Test
   fun `test echo with an expression`() {
     configureByText("\n")
     typeText(commandToKeys("echo 3 + 7"))
-    assertExOutput("10\n")
+    assertExOutput("10")
   }
 
   @Test
   fun `test echo with multiple expressions`() {
     configureByText("\n")
     typeText(commandToKeys("echo 3 + 7 'Hello ' . 'world'"))
-    assertExOutput("10 Hello world\n")
+    assertExOutput("10 Hello world")
   }
 
   @Test
   fun `test ec`() {
     configureByText("\n")
     typeText(commandToKeys("ec 3"))
-    assertExOutput("3\n")
+    assertExOutput("3")
   }
 
   @Test
   fun `test echo without spaces`() {
     configureByText("\n")
     typeText(commandToKeys("echo(42)(999)"))
-    assertExOutput("42 999\n")
+    assertExOutput("42 999")
   }
 }

@@ -16,41 +16,41 @@ class GetFunctionTest : VimTestCase() {
   fun `test get with dictionary`() {
     configureByText("\n")
     typeText(commandToKeys("echo get({1: 'one', 2: 'two', 3: 'three'}, '2')"))
-    assertExOutput("two\n")
+    assertExOutput("two")
   }
 
   @Test
   fun `test get by nonexistent key in dictionary`() {
     configureByText("\n")
     typeText(commandToKeys("echo get({1: 'one', 2: 'two', 3: 'three'}, '10')"))
-    assertExOutput("0\n")
+    assertExOutput("0")
   }
 
   @Test
   fun `test get by nonexistent key in dictionary with default value`() {
     configureByText("\n")
     typeText(commandToKeys("echo get({1: 'one', 2: 'two', 3: 'three'}, '10', 'null')"))
-    assertExOutput("null\n")
+    assertExOutput("null")
   }
 
   @Test
   fun `test get with list`() {
     configureByText("\n")
     typeText(commandToKeys("echo get(['one', 'two', 'three'], 1)"))
-    assertExOutput("two\n")
+    assertExOutput("two")
   }
 
   @Test
   fun `test get by nonexistent index in list`() {
     configureByText("\n")
     typeText(commandToKeys("echo get(['one', 'two', 'three'], 10)"))
-    assertExOutput("-1\n")
+    assertExOutput("-1")
   }
 
   @Test
   fun `test get by nonexistent index in list with default value`() {
     configureByText("\n")
     typeText(commandToKeys("echo get(['one', 'two', 'three'], 10, 'null')"))
-    assertExOutput("null\n")
+    assertExOutput("null")
   }
 }

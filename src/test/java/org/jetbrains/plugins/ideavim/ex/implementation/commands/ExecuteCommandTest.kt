@@ -17,7 +17,7 @@ class ExecuteCommandTest : VimTestCase() {
   fun `test execute with one expression`() {
     configureByText("\n")
     typeText(commandToKeys("execute 'echo 42'"))
-    assertExOutput("42\n")
+    assertExOutput("42")
   }
 
   @Test
@@ -32,20 +32,20 @@ class ExecuteCommandTest : VimTestCase() {
   fun `test execute multiple expressions`() {
     configureByText("\n")
     typeText(commandToKeys("execute 'echo' 4 + 2 * 3"))
-    assertExOutput("10\n")
+    assertExOutput("10")
   }
 
   @Test
   fun `test execute adds space between expressions if missing`() {
     configureByText("\n")
     typeText(commandToKeys("execute 'echo ' . \"'result =\"4+2*3.\"'\""))
-    assertExOutput("result = 10\n")
+    assertExOutput("result = 10")
   }
 
   @Test
   fun `test execute without spaces`() {
     configureByText("\n")
     typeText(commandToKeys("execute('echo '.42)"))
-    assertExOutput("42\n")
+    assertExOutput("42")
   }
 }

@@ -17,28 +17,28 @@ class PrintCommandTest : VimTestCase() {
   fun `test default range`() {
     configureByText(initialText)
     typeText(commandToKeys("p"))
-    assertExOutput("    Lorem Ipsum\n")
+    assertExOutput("    Lorem Ipsum")
   }
 
   @Test
   fun `test clears output between execution`() {
     configureByText(initialText)
     typeText(commandToKeys("p"))
-    assertExOutput("    Lorem Ipsum\n", clear = false)
+    assertExOutput("    Lorem Ipsum", clear = false)
     // TODO: We need a better way to handle output
     // We should be waiting for a keypress now, such as <Enter> or <Esc> to close the output panel. But that's handled
     // by a separate key event loop which doesn't operate in tests.
     // Simulate closing the output panel in the same way as if we'd entered the right key
     ExOutputModel.getInstance(fixture.editor).close()
     typeText(commandToKeys("p"))
-    assertExOutput("    Lorem Ipsum\n")
+    assertExOutput("    Lorem Ipsum")
   }
 
   @Test
   fun `test default range with P`() {
     configureByText(initialText)
     typeText(commandToKeys("P"))
-    assertExOutput("    Lorem Ipsum\n")
+    assertExOutput("    Lorem Ipsum")
   }
 
   @Test
@@ -67,7 +67,7 @@ class PrintCommandTest : VimTestCase() {
       |    Lorem ipsum dolor sit amet,
       |    consectetur adipiscing elit
       |    Sed in orci mauris.
-      |""".trimMargin(),
+      """.trimMargin(),
     )
   }
 
@@ -89,7 +89,7 @@ class PrintCommandTest : VimTestCase() {
       |    Lorem Ipsum
       |
       |    Lorem ipsum dolor sit amet,
-      |""".trimMargin(),
+      """.trimMargin(),
     )
   }
 

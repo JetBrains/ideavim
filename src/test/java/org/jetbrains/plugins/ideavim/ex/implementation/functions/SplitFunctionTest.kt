@@ -16,27 +16,27 @@ class SplitFunctionTest : VimTestCase() {
   fun `test split with default delimiter`() {
     configureByText("\n")
     typeText(commandToKeys("echo split('Hello world')"))
-    assertExOutput("['Hello', 'world']\n")
+    assertExOutput("['Hello', 'world']")
   }
 
   @Test
   fun `test split comma separated text`() {
     configureByText("\n")
     typeText(commandToKeys("echo split('a,b,c,d', ',')"))
-    assertExOutput("['a', 'b', 'c', 'd']\n")
+    assertExOutput("['a', 'b', 'c', 'd']")
   }
 
   @Test
   fun `test split comma separated text 2`() {
     configureByText("\n")
     typeText(commandToKeys("echo split(',a,b,c,d,', ',')"))
-    assertExOutput("['a', 'b', 'c', 'd']\n")
+    assertExOutput("['a', 'b', 'c', 'd']")
   }
 
   @Test
   fun `test split comma separated text with keepempty flag`() {
     configureByText("\n")
     typeText(commandToKeys("echo split(',a,b,c,,d,', ',', 1)"))
-    assertExOutput("['', 'a', 'b', 'c', '', 'd', '']\n")
+    assertExOutput("['', 'a', 'b', 'c', '', 'd', '']")
   }
 }

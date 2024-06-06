@@ -101,92 +101,92 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     // IntelliJ only has one setting for visual guides and hard-wrap typing margin, so we have to report a special value
     // of "+0", which makes Vim show a highlight column at 'textwidth' (IntelliJ shows it even if 'textwidth' is 0)
     fixture.editor.settings.isRightMarginShown = true
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
   }
 
   @Test
   fun `test 'colorcolumn' reports '+0' at end of visual guide list`() {
     fixture.editor.settings.isRightMarginShown = true
     fixture.editor.settings.setSoftMargins(listOf(10,20,30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
   }
 
   @Test
   fun `test 'colorcolumn' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isRightMarginShown = true
     setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
     setGlobalSoftMargins(listOf(90, 80, 70))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
 
     setGlobalSoftMargins(emptyList())
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
 
     EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
   }
 
   @Test
   fun `test local 'colorcolumn' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isRightMarginShown = true
     setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0")
 
     setGlobalSoftMargins(listOf(90, 80, 70))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
 
     setGlobalSoftMargins(emptyList())
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0")
 
     EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
   }
 
   @Test
   fun `test 'colorcolumn' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isRightMarginShown = true
     fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
     fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
 
     fixture.editor.settings.setSoftMargins(emptyList())
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
 
     fixture.editor.settings.isRightMarginShown = false
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
   }
 
   @Test
   fun `test local 'colorcolumn' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isRightMarginShown = true
     fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0")
 
     fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
 
     fixture.editor.settings.setSoftMargins(emptyList())
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0")
 
     fixture.editor.settings.isRightMarginShown = false
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
   }
 
   @Test
   fun `test 'colorcolumn' does not report current visual guides if global right margin option is disabled`() {
     EditorSettingsExternalizable.getInstance().isRightMarginShown = false
     fixture.editor.settings.setSoftMargins(listOf(10,20,30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
   }
 
   @Test
   fun `test 'colorcolumn' does not report current visual guides if local right margin option is disabled`() {
     fixture.editor.settings.isRightMarginShown = false
     fixture.editor.settings.setSoftMargins(listOf(10,20,30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
   }
 
   @Test
@@ -241,10 +241,10 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   fun `test setglobal 'colorcolumn' option affects IdeaVim global value only`() {
     assertFalse(EditorSettingsExternalizable.getInstance().isRightMarginShown)
     assertEmpty(getGlobalSoftMargins())
-    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=")
 
     enterCommand("setglobal colorcolumn=10,20,30")
-    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=10,20,30\n")
+    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=10,20,30")
     assertFalse(EditorSettingsExternalizable.getInstance().isRightMarginShown)
     assertEmpty(getGlobalSoftMargins())
   }
@@ -252,8 +252,8 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   @Test
   fun `test set 'colorcolumn' updates IdeaVim global value as well as local`() {
     enterCommand("set colorcolumn=10,20,30")
-    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=10,20,30\n")
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=10,20,30")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
   }
 
   @Test
@@ -262,9 +262,9 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     // affects the local value
     fixture.editor.settings.isRightMarginShown = true
     fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0\n")
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0\n")
-    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
+    assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=")
   }
 
   @Test
@@ -286,7 +286,7 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
 
     enterCommand("set colorcolumn&")
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
     assertFalse(fixture.editor.settings.isRightMarginShown)
     assertEmpty(fixture.editor.settings.softMargins)
 
@@ -301,7 +301,7 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
 
     enterCommand("setlocal colorcolumn&")
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
     assertFalse(fixture.editor.settings.isRightMarginShown)
     assertEmpty(fixture.editor.settings.softMargins)
 
@@ -314,18 +314,18 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   fun `test open new window without setting ideavim option will initialise 'colorcolumn' to defaults`() {
     EditorSettingsExternalizable.getInstance().isRightMarginShown = true
     setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
     openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
     // Changing the global value should update the editor
     setGlobalSoftMargins(listOf(40, 50, 60, 70))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,70,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,70,+0")
 
     EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
   }
 
   @Test
@@ -333,15 +333,15 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().isRightMarginShown = true
     setGlobalSoftMargins(listOf(10, 20, 30))
     enterCommand("set colorcolumn=40,50,60")
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
 
     openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
 
     // Changing the global value should NOT update the editor
     setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
   }
 
   @Test
@@ -350,11 +350,11 @@ class ColorColumnOptionMapperTest : VimTestCase() {
 
     openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
     // Changing the global value should NOT update the editor
     setGlobalSoftMargins(listOf(40, 50, 60))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0\n")
+    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
   }
 
   private fun getGlobalSoftMargins(): List<Int> {

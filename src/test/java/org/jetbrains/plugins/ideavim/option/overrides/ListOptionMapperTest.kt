@@ -54,39 +54,39 @@ class ListOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'list' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
 
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
   }
 
   @Test
   fun `test local 'list' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
 
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
   }
 
   @Test
   fun `test 'list' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isWhitespacesShown = true
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
 
     // View | Active Editor | Show Whitespaces
     fixture.editor.settings.isWhitespacesShown = false
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
   }
 
   @Test
   fun `test local 'list' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isWhitespacesShown = true
-    assertCommandOutput("setlocal list?", "  list\n")
+    assertCommandOutput("setlocal list?", "  list")
 
     // View | Active Editor | Show Whitespaces
     fixture.editor.settings.isWhitespacesShown = false
-    assertCommandOutput("setlocal list?", "nolist\n")
+    assertCommandOutput("setlocal list?", "nolist")
   }
 
   @Test
@@ -122,17 +122,17 @@ class ListOptionMapperTest : VimTestCase() {
   @Test
   fun `test setglobal 'list' option affects IdeaVim global value only`() {
     assertFalse(IjOptions.list.defaultValue.asBoolean())  // Vim default
-    assertCommandOutput("setglobal list?", "nolist\n")
+    assertCommandOutput("setglobal list?", "nolist")
 
     enterCommand("setglobal list")
-    assertCommandOutput("setglobal list?", "  list\n")
+    assertCommandOutput("setglobal list?", "  list")
     assertFalse(EditorSettingsExternalizable.getInstance().isWhitespacesShown)
   }
 
   @Test
   fun `test set 'list' updates IdeaVim global value as well as local`() {
     enterCommand("set list")
-    assertCommandOutput("setglobal list?", "  list\n")
+    assertCommandOutput("setglobal list?", "  list")
   }
 
   @Test
@@ -141,9 +141,9 @@ class ListOptionMapperTest : VimTestCase() {
     // affects the local value
     // View | Active Editor | Show Whitespaces
     fixture.editor.settings.isWhitespacesShown = true
-    assertCommandOutput("setlocal list?", "  list\n")
-    assertCommandOutput("set list?", "  list\n")
-    assertCommandOutput("setglobal list?", "nolist\n")
+    assertCommandOutput("setlocal list?", "  list")
+    assertCommandOutput("set list?", "  list")
+    assertCommandOutput("setglobal list?", "nolist")
   }
 
   @Test
@@ -151,16 +151,16 @@ class ListOptionMapperTest : VimTestCase() {
     enterCommand("set list")
 
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
-    assertCommandOutput("setlocal list?", "  list\n")
-    assertCommandOutput("set list?", "  list\n")
-    assertCommandOutput("setglobal list?", "  list\n")
+    assertCommandOutput("setlocal list?", "  list")
+    assertCommandOutput("set list?", "  list")
+    assertCommandOutput("setglobal list?", "  list")
 
     enterCommand("set nolist")
 
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
-    assertCommandOutput("setlocal list?", "nolist\n")
-    assertCommandOutput("set list?", "nolist\n")
-    assertCommandOutput("setglobal list?", "nolist\n")
+    assertCommandOutput("setlocal list?", "nolist")
+    assertCommandOutput("set list?", "nolist")
+    assertCommandOutput("setglobal list?", "nolist")
   }
 
   @Test
@@ -178,9 +178,9 @@ class ListOptionMapperTest : VimTestCase() {
     }
 
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
-    assertCommandOutput("setlocal list?", "nolist\n")
-    assertCommandOutput("set list?", "nolist\n")
-    assertCommandOutput("setglobal list?", "nolist\n")
+    assertCommandOutput("setlocal list?", "nolist")
+    assertCommandOutput("set list?", "nolist")
+    assertCommandOutput("setglobal list?", "nolist")
   }
 
   @Test
@@ -199,7 +199,7 @@ class ListOptionMapperTest : VimTestCase() {
   fun `test reset 'list' to default copies current global intellij setting`() {
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
     fixture.editor.settings.isWhitespacesShown = false
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
 
     enterCommand("set list&")
     assertTrue(fixture.editor.settings.isWhitespacesShown)
@@ -214,7 +214,7 @@ class ListOptionMapperTest : VimTestCase() {
   fun `test reset local 'list' to default copies current global intellij setting`() {
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
     fixture.editor.settings.isWhitespacesShown = false
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
 
     enterCommand("setlocal list&")
     assertTrue(fixture.editor.settings.isWhitespacesShown)
@@ -229,60 +229,60 @@ class ListOptionMapperTest : VimTestCase() {
   fun `test open new window without setting the option copies value as not-explicitly set`() {
     // New window will clone local and global local-to-window options, then apply global to local. This tests that our
     // handling of per-window "global" values is correct.
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
 
     // Changing the global setting should update the new editor
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
   }
 
 
   @Test
   fun `test open new window after setting option copies value as explicitly set`() {
     enterCommand("set list")
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
   }
 
   @Test
   fun `test setglobal 'list' used when opening new window`() {
     enterCommand("setglobal list")
-    assertCommandOutput("setglobal list?", "  list\n")
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("setglobal list?", "  list")
+    assertCommandOutput("set list?", "nolist")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
   }
 
   @Test
   fun `test setlocal 'list' then open new window uses value from setglobal`() {
     enterCommand("setlocal list")
-    assertCommandOutput("setglobal list?", "nolist\n")
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("setglobal list?", "nolist")
+    assertCommandOutput("set list?", "  list")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = true
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
   }
 
   @Test
@@ -301,10 +301,10 @@ class ListOptionMapperTest : VimTestCase() {
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set list?", "  list\n")
+    assertCommandOutput("set list?", "  list")
 
     // Changing the global setting should update the editor, because it was initially set during plugin startup
     EditorSettingsExternalizable.getInstance().isWhitespacesShown = false
-    assertCommandOutput("set list?", "nolist\n")
+    assertCommandOutput("set list?", "nolist")
   }
 }

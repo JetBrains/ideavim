@@ -17,28 +17,28 @@ class BasicStringFunctions : VimTestCase() {
   fun `test toupper`() {
     configureByText("\n")
     typeText(commandToKeys("echo toupper('Vim is awesome')"))
-    assertExOutput("VIM IS AWESOME\n")
+    assertExOutput("VIM IS AWESOME")
   }
 
   @Test
   fun `test tolower`() {
     configureByText("\n")
     typeText(commandToKeys("echo tolower('Vim is awesome')"))
-    assertExOutput("vim is awesome\n")
+    assertExOutput("vim is awesome")
   }
 
   @Test
   fun `test join`() {
     configureByText("\n")
     typeText(commandToKeys("echo join(['Vim', 'is', 'awesome'], '_')"))
-    assertExOutput("Vim_is_awesome\n")
+    assertExOutput("Vim_is_awesome")
   }
 
   @Test
   fun `test join without second argument`() {
     configureByText("\n")
     typeText(commandToKeys("echo join(['Vim', 'is', 'awesome'])"))
-    assertExOutput("Vim is awesome\n")
+    assertExOutput("Vim is awesome")
   }
 
   @Test

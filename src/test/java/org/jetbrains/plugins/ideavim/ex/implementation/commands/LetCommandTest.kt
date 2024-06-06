@@ -36,47 +36,47 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test assignment to string`() {
     enterCommand("let s = \"foo\"")
-    assertCommandOutput("echo s", "foo\n")
+    assertCommandOutput("echo s", "foo")
   }
 
   @Test
   fun `test assignment to number`() {
     enterCommand("let s = 100")
-    assertCommandOutput("echo s", "100\n")
+    assertCommandOutput("echo s", "100")
   }
 
   @Test
   fun `test assignment to expression`() {
     enterCommand("let s = 10 + 20 * 4")
-    assertCommandOutput("echo s", "90\n")
+    assertCommandOutput("echo s", "90")
   }
 
   @Test
   fun `test adding new pair to dictionary`() {
     enterCommand("let s = {'key1' : 1}")
     enterCommand("let s['key2'] = 2")
-    assertCommandOutput("echo s", "{'key1': 1, 'key2': 2}\n")
+    assertCommandOutput("echo s", "{'key1': 1, 'key2': 2}")
   }
 
   @Test
   fun `test editing existing pair in dictionary`() {
     enterCommand("let s = {'key1' : 1}")
     enterCommand("let s['key1'] = 2")
-    assertCommandOutput("echo s", "{'key1': 2}\n")
+    assertCommandOutput("echo s", "{'key1': 2}")
   }
 
   @Test
   fun `test assignment plus operator`() {
     enterCommand("let s = 10")
     enterCommand("let s += 5")
-    assertCommandOutput("echo s", "15\n")
+    assertCommandOutput("echo s", "15")
   }
 
   @Test
   fun `test changing list item`() {
     enterCommand("let s = [1, 1]")
     enterCommand("let s[1] = 2")
-    assertCommandOutput("echo s", "[1, 2]\n")
+    assertCommandOutput("echo s", "[1, 2]")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -92,7 +92,7 @@ class LetCommandTest : VimTestCase() {
   fun `test changing list with sublist expression`() {
     enterCommand("let s = [1, 2, 3]")
     enterCommand("let s[0:1] = [5, 4]")
-    assertCommandOutput("echo s", "[5, 4, 3]\n")
+    assertCommandOutput("echo s", "[5, 4, 3]")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -117,7 +117,7 @@ class LetCommandTest : VimTestCase() {
   fun `test changing list with sublist expression and undefined end`() {
     enterCommand("let s = [1, 2, 3]")
     enterCommand("let s[1:] = [5, 5, 5, 5]")
-    assertCommandOutput("echo s", "[1, 5, 5, 5, 5]\n")
+    assertCommandOutput("echo s", "[1, 5, 5, 5, 5]")
   }
 
   @Test
@@ -227,13 +227,13 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test comment`() {
     enterCommand("let s = [1, 2, 3] \" my list for storing numbers")
-    assertCommandOutput("echo s", "[1, 2, 3]\n")
+    assertCommandOutput("echo s", "[1, 2, 3]")
   }
 
   @Test
   fun `test vimScriptGlobalEnvironment`() {
     enterCommand("let g:WhichKey_ShowVimActions = \"true\"")
-    assertCommandOutput("echo g:WhichKey_ShowVimActions", "true\n")
+    assertCommandOutput("echo g:WhichKey_ShowVimActions", "true")
     assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
   }
 
@@ -242,7 +242,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let list = [1, 2, 3]")
     enterCommand("let l2 = list")
     enterCommand("let list += [4]")
-    assertCommandOutput("echo l2", "[1, 2, 3, 4]\n")
+    assertCommandOutput("echo l2", "[1, 2, 3, 4]")
   }
 
   @Test
@@ -250,7 +250,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let list = [1, 2, 3, []]")
     enterCommand("let l2 = list")
     enterCommand("let list[3] += [4]")
-    assertCommandOutput("echo l2", "[1, 2, 3, [4]]\n")
+    assertCommandOutput("echo l2", "[1, 2, 3, [4]]")
   }
 
   @Test
@@ -259,7 +259,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let dict = {}")
     enterCommand("let dict.l2 = list")
     enterCommand("let list[3] += [4]")
-    assertCommandOutput("echo dict.l2", "[1, 2, 3, [4]]\n")
+    assertCommandOutput("echo dict.l2", "[1, 2, 3, [4]]")
   }
 
   @Test
@@ -268,7 +268,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let dict = {}")
     enterCommand("let dict.l2 = list")
     enterCommand("let dict.l2 += [4]")
-    assertCommandOutput("echo dict.l2", "[1, 2, 3, 4]\n")
+    assertCommandOutput("echo dict.l2", "[1, 2, 3, 4]")
   }
 
   @Test
@@ -276,7 +276,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let number = 10")
     enterCommand("let n2 = number")
     enterCommand("let number += 2")
-    assertCommandOutput("echo n2", "10\n")
+    assertCommandOutput("echo n2", "10")
   }
 
   @Test
@@ -284,7 +284,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let string = 'abc'")
     enterCommand("let str2 = string")
     enterCommand("let string .= 'd'")
-    assertCommandOutput("echo str2", "abc\n")
+    assertCommandOutput("echo str2", "abc")
   }
 
   @Test
@@ -293,7 +293,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let dict2 = dictionary")
     enterCommand("let dictionary.one = 1")
     enterCommand("let dictionary['two'] = 2")
-    assertCommandOutput("echo dict2", "{'one': 1, 'two': 2}\n")
+    assertCommandOutput("echo dict2", "{'one': 1, 'two': 2}")
   }
 
   @Test
@@ -301,13 +301,13 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let list = [1, 2, 3, {'a': 'b'}]")
     enterCommand("let dict = list[3]")
     enterCommand("let list[3].key = 'value'")
-    assertCommandOutput("echo dict", "{'a': 'b', 'key': 'value'}\n")
+    assertCommandOutput("echo dict", "{'a': 'b', 'key': 'value'}")
   }
 
   @Test
   fun `test numbered register`() {
     enterCommand("let @4 = 'inumber register works'")
-    assertCommandOutput("echo @4", "inumber register works\n")
+    assertCommandOutput("echo @4", "inumber register works")
 
     typeText("@4")
     assertState("number register works\n")
@@ -316,7 +316,7 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test lowercase letter register`() {
     enterCommand("let @o = 'ilowercase letter register works'")
-    assertCommandOutput("echo @o", "ilowercase letter register works\n")
+    assertCommandOutput("echo @o", "ilowercase letter register works")
 
     typeText("@o")
     assertState("lowercase letter register works\n")
@@ -325,20 +325,20 @@ class LetCommandTest : VimTestCase() {
   @Test
   fun `test uppercase letter register`() {
     enterCommand("let @O = 'iuppercase letter register works'")
-    assertCommandOutput("echo @O", "iuppercase letter register works\n")
+    assertCommandOutput("echo @O", "iuppercase letter register works")
 
     typeText("@O")
     assertState("uppercase letter register works\n")
     typeText("<Esc>")
 
     enterCommand("let @O = '!'")
-    assertCommandOutput("echo @O", "iuppercase letter register works!\n")
+    assertCommandOutput("echo @O", "iuppercase letter register works!")
   }
 
   @Test
   fun `test unnamed register`() {
     enterCommand("let @\" = 'iunnamed register works'")
-    assertCommandOutput("echo @\"", "iunnamed register works\n")
+    assertCommandOutput("echo @\"", "iunnamed register works")
 
     typeText("@\"")
     assertState("unnamed register works\n")

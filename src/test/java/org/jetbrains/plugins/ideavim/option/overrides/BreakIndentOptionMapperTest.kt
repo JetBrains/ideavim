@@ -61,39 +61,39 @@ class BreakIndentOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'breakindent' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
 
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
   }
 
   @Test
   fun `test local 'breakindent' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
-    assertCommandOutput("setlocal breakindent?", "nobreakindent\n")
+    assertCommandOutput("setlocal breakindent?", "nobreakindent")
 
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
-    assertCommandOutput("setlocal breakindent?", "  breakindent\n")
+    assertCommandOutput("setlocal breakindent?", "  breakindent")
   }
 
   @Test
   fun `test 'breakindent' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isUseCustomSoftWrapIndent = false
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
 
     // Note that there is no actual UI in the IDE to set this
     fixture.editor.settings.isUseCustomSoftWrapIndent = true
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
   }
 
   @Test
   fun `test local 'breakindent' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isUseCustomSoftWrapIndent = false
-    assertCommandOutput("setlocal breakindent?", "nobreakindent\n")
+    assertCommandOutput("setlocal breakindent?", "nobreakindent")
 
     // Note that there is no actual UI in the IDE to set this
     fixture.editor.settings.isUseCustomSoftWrapIndent = true
-    assertCommandOutput("setlocal breakindent?", "  breakindent\n")
+    assertCommandOutput("setlocal breakindent?", "  breakindent")
   }
 
   @Test
@@ -127,17 +127,17 @@ class BreakIndentOptionMapperTest : VimTestCase() {
   @Test
   fun `test setglobal 'breakindent' option affects IdeaVim global value only`() {
     assertFalse(IjOptions.breakindent.defaultValue.asBoolean()) // Vim default
-    assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
+    assertCommandOutput("setglobal breakindent?", "nobreakindent")
 
     enterCommand("setglobal breakindent")
-    assertCommandOutput("setglobal breakindent?", "  breakindent\n")
+    assertCommandOutput("setglobal breakindent?", "  breakindent")
     assertFalse(EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent)
   }
 
   @Test
   fun `test set updates IdeaVim global value as well as local`() {
     enterCommand("set breakindent")
-    assertCommandOutput("setglobal breakindent?", "  breakindent\n")
+    assertCommandOutput("setglobal breakindent?", "  breakindent")
   }
 
   @Test
@@ -146,9 +146,9 @@ class BreakIndentOptionMapperTest : VimTestCase() {
     // affects the local value
     // Note that there is no actual UI in the IDE to set this
     fixture.editor.settings.isUseCustomSoftWrapIndent = true
-    assertCommandOutput("setlocal breakindent?", "  breakindent\n")
-    assertCommandOutput("set breakindent?", "  breakindent\n")
-    assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
+    assertCommandOutput("setlocal breakindent?", "  breakindent")
+    assertCommandOutput("set breakindent?", "  breakindent")
+    assertCommandOutput("setglobal breakindent?", "nobreakindent")
   }
 
   @Test
@@ -156,16 +156,16 @@ class BreakIndentOptionMapperTest : VimTestCase() {
     enterCommand("set breakindent")
 
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
-    assertCommandOutput("setlocal breakindent?", "  breakindent\n")
-    assertCommandOutput("set breakindent?", "  breakindent\n")
-    assertCommandOutput("setglobal breakindent?", "  breakindent\n")
+    assertCommandOutput("setlocal breakindent?", "  breakindent")
+    assertCommandOutput("set breakindent?", "  breakindent")
+    assertCommandOutput("setglobal breakindent?", "  breakindent")
 
     enterCommand("set nobreakindent")
 
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
-    assertCommandOutput("setlocal breakindent?", "nobreakindent\n")
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
-    assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
+    assertCommandOutput("setlocal breakindent?", "nobreakindent")
+    assertCommandOutput("set breakindent?", "nobreakindent")
+    assertCommandOutput("setglobal breakindent?", "nobreakindent")
   }
 
   @Test
@@ -185,9 +185,9 @@ class BreakIndentOptionMapperTest : VimTestCase() {
     }
 
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
-    assertCommandOutput("setlocal breakindent?", "nobreakindent\n")
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
-    assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
+    assertCommandOutput("setlocal breakindent?", "nobreakindent")
+    assertCommandOutput("set breakindent?", "nobreakindent")
+    assertCommandOutput("setglobal breakindent?", "nobreakindent")
   }
 
   @Test
@@ -206,7 +206,7 @@ class BreakIndentOptionMapperTest : VimTestCase() {
   fun `test reset 'breakindent' to default copies current global intellij setting`() {
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
     fixture.editor.settings.isUseCustomSoftWrapIndent = false
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
 
     enterCommand("set breakindent&")
     assertTrue(fixture.editor.settings.isUseCustomSoftWrapIndent)
@@ -221,7 +221,7 @@ class BreakIndentOptionMapperTest : VimTestCase() {
   fun `test reset local 'breakindent' to default copies current global intellij setting`() {
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
     fixture.editor.settings.isUseCustomSoftWrapIndent = false
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
 
     enterCommand("setlocal breakindent&")
     assertTrue(fixture.editor.settings.isUseCustomSoftWrapIndent)
@@ -236,58 +236,58 @@ class BreakIndentOptionMapperTest : VimTestCase() {
   fun `test open new window without setting the option copies value as not-explicitly set`() {
     // New window will clone local and global local-to-window options, then apply global to local. This tests that our
     // handling of per-window "global" values is correct.
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
 
     // Changing the global setting should update the new editor
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
   }
 
   @Test
   fun `test open new window after setting option copies value as explicitly set`() {
     enterCommand("set breakindent")
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
   }
 
   @Test
   fun `test setglobal 'breakindent' used when opening new window`() {
     enterCommand("setglobal breakindent")
-    assertCommandOutput("setglobal breakindent?", "  breakindent\n")
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("setglobal breakindent?", "  breakindent")
+    assertCommandOutput("set breakindent?", "nobreakindent")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
   }
 
   @Test
   fun `test setlocal 'breakindent' then open new window uses value from setglobal`() {
     enterCommand("setlocal breakindent")
-    assertCommandOutput("setglobal breakindent?", "nobreakindent\n")
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("setglobal breakindent?", "nobreakindent")
+    assertCommandOutput("set breakindent?", "  breakindent")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = true
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
   }
 
   @Test
@@ -308,10 +308,10 @@ class BreakIndentOptionMapperTest : VimTestCase() {
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set breakindent?", "  breakindent\n")
+    assertCommandOutput("set breakindent?", "  breakindent")
 
     // Changing the global setting should update the editor, because it was initially set during plugin startup
     EditorSettingsExternalizable.getInstance().isUseCustomSoftWrapIndent = false
-    assertCommandOutput("set breakindent?", "nobreakindent\n")
+    assertCommandOutput("set breakindent?", "nobreakindent")
   }
 }

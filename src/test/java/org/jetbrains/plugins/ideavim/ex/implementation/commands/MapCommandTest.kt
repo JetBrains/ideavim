@@ -107,18 +107,18 @@ class MapCommandTest : VimTestCase() {
     typeText(commandToKeys("imap"))
     assertExOutput(
       """
-  i  <C-Down>      <C-O>gt
-  i  bar           <Esc>
-  i  foo           bar
-  
-      """.trimIndent(),
+        |i  <C-Down>      <C-O>gt
+        |i  bar           <Esc>
+        |i  foo           bar
+      """.trimMargin(),
     )
     typeText(commandToKeys("map"))
     assertExOutput(
-      """   <C-Down>      gt
-n  <Plug>Foo     iHello<Esc>
-n  ,f            <Plug>Foo
-""",
+      """
+        |   <C-Down>      gt
+        |n  <Plug>Foo     iHello<Esc>
+        |n  ,f            <Plug>Foo
+        """.trimMargin(),
     )
   }
 
@@ -167,10 +167,9 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("imap"))
     assertExOutput(
       """
-  i  foo           bar
-  i  jj          * <Esc>
-  
-      """.trimIndent(),
+        |i  foo           bar
+        |i  jj          * <Esc>
+      """.trimMargin(),
     )
   }
 
@@ -197,7 +196,7 @@ n  ,f            <Plug>Foo
     )
     assertOffset(1)
     typeText(commandToKeys("nmap"))
-    assertExOutput("n  <Right>     * <Nop>\n")
+    assertExOutput("n  <Right>     * <Nop>")
   }
 
   @Test
@@ -213,14 +212,13 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("nmap"))
     assertExOutput(
       """
-  n  ,a            /a<CR>
-  n  ,b            /b<CR>
-  n  ,c            /c<CR>
-  n  ,d            /d<CR>
-  n  ,f            '/f<CR>'
-  n  ,g            /g<CR>
-  
-      """.trimIndent(),
+        |n  ,a            /a<CR>
+        |n  ,b            /b<CR>
+        |n  ,c            /c<CR>
+        |n  ,d            /d<CR>
+        |n  ,f            '/f<CR>'
+        |n  ,g            /g<CR>
+      """.trimMargin(),
     )
   }
 
@@ -311,7 +309,7 @@ n  ,f            <Plug>Foo
     assertState("#\n")
     assertMode(Mode.NORMAL())
     typeText(commandToKeys("imap"))
-    assertExOutput("i  #           * X<C-H>#\n")
+    assertExOutput("i  #           * X<C-H>#")
   }
 
   // VIM-679 |:map|
@@ -336,7 +334,7 @@ n  ,f            <Plug>Foo
     )
     assertMode(Mode.NORMAL())
     typeText(commandToKeys("map"))
-    assertExOutput("   <C-X>i        dd\n")
+    assertExOutput("   <C-X>i        dd")
     typeText(injector.parser.parseKeys("<C-X>i"))
     assertState("bar\n")
   }
@@ -642,17 +640,16 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("nmap"))
     assertExOutput(
       """
-n  ,a            <Action>(Back)
-n  ,b            <Action>(Back)
-n  ,c            <Action>(Back)
-n  ,d            <Action>(Back)
-n  ,e            <Action>(Back)
-n  ,f            <Action>(Back)
-n  ,g            <Action>(Back)
-n  ,h            <Action>(Back)
-n  ,i            <Action>(Back)
-
-      """.trimIndent(),
+        |n  ,a            <Action>(Back)
+        |n  ,b            <Action>(Back)
+        |n  ,c            <Action>(Back)
+        |n  ,d            <Action>(Back)
+        |n  ,e            <Action>(Back)
+        |n  ,f            <Action>(Back)
+        |n  ,g            <Action>(Back)
+        |n  ,h            <Action>(Back)
+        |n  ,i            <Action>(Back)
+      """.trimMargin(),
     )
   }
 
@@ -671,17 +668,16 @@ n  ,i            <Action>(Back)
     typeText(commandToKeys("nnoremap"))
     assertExOutput(
       """
-n  ,a            <Action>(Back)
-n  ,b            <Action>(Back)
-n  ,c            <Action>(Back)
-n  ,d            <Action>(Back)
-n  ,e            <Action>(Back)
-n  ,f            <Action>(Back)
-n  ,g            <Action>(Back)
-n  ,h            <Action>(Back)
-n  ,i            <Action>(Back)
-
-      """.trimIndent(),
+        |n  ,a            <Action>(Back)
+        |n  ,b            <Action>(Back)
+        |n  ,c            <Action>(Back)
+        |n  ,d            <Action>(Back)
+        |n  ,e            <Action>(Back)
+        |n  ,f            <Action>(Back)
+        |n  ,g            <Action>(Back)
+        |n  ,h            <Action>(Back)
+        |n  ,i            <Action>(Back)
+      """.trimMargin(),
     )
   }
 
@@ -690,7 +686,7 @@ n  ,i            <Action>(Back)
     configureByText("\n")
     typeText(commandToKeys("map A :echo 42<CR>"))
     typeText(injector.parser.parseKeys("A"))
-    assertExOutput("42\n")
+    assertExOutput("42")
     kotlin.test.assertEquals(
       "map A :echo 42<CR>",
       injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry,

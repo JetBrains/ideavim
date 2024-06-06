@@ -30,7 +30,7 @@ class DictionaryFunctionTest : VimTestCase() {
     )
     typeText(commandToKeys("let dict = {'data': [], 'print': function('Print')}"))
     typeText(commandToKeys("call dict.print()"))
-    assertExOutput("[]\n")
+    assertExOutput("[]")
 
     typeText(commandToKeys("delfunction! Print"))
   }
@@ -51,7 +51,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("let PrintFr = function('Print')"))
     typeText(commandToKeys("let dict.print = PrintFr"))
     typeText(commandToKeys("call dict.print()"))
-    assertExOutput("dict_name\n")
+    assertExOutput("dict_name")
 
     typeText(commandToKeys("delfunction! Print"))
   }
@@ -96,7 +96,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo dict"))
     assertExOutput("{'name': 'dict', 'print': function('Print')}")
     typeText(commandToKeys("call dict.print()"))
-    assertExOutput("dict\n")
+    assertExOutput("dict")
 
     typeText(commandToKeys("let dict2 = {'name': 'dict2', 'print': dict.print}"))
     typeText(commandToKeys("echo dict2.print"))
@@ -104,7 +104,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo dict2"))
     assertExOutput("{'name': 'dict2', 'print': function('Print', {name: 'dict', 'print': function('Print')})}")
     typeText(commandToKeys("call dict2.print()"))
-    assertExOutput("dict2\n")
+    assertExOutput("dict2")
 
     typeText(commandToKeys("delfunction! Print"))
   }
@@ -126,10 +126,10 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("let dict2.print = dict.print"))
 
     typeText(commandToKeys("call dict2.print()"))
-    assertExOutput("dict2\n")
+    assertExOutput("dict2")
 
     typeText(commandToKeys("call dict.print()"))
-    assertExOutput("dict\n")
+    assertExOutput("dict")
 
     typeText(commandToKeys("delfunction! Print"))
   }
@@ -150,10 +150,10 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("let dict2 = {'name': 'dict2', 'print': dict.print}"))
 
     typeText(commandToKeys("call dict2.print()"))
-    assertExOutput("dict2\n")
+    assertExOutput("dict2")
 
     typeText(commandToKeys("call dict.print()"))
-    assertExOutput("dict\n")
+    assertExOutput("dict")
 
     typeText(commandToKeys("delfunction! Print"))
   }
@@ -173,11 +173,11 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("let dict = {'name': 'dict'}"))
     typeText(commandToKeys("let dict.print = function('Print', dict)"))
     typeText(commandToKeys("call dict.print()"))
-    assertExOutput("dict\n")
+    assertExOutput("dict")
 
     typeText(commandToKeys("let dict2 = {'name': 'dict2', 'print': dict.print}"))
     typeText(commandToKeys("call dict2.print()"))
-    assertExOutput("dict\n")
+    assertExOutput("dict")
 
     typeText(commandToKeys("delfunction! Print"))
   }
@@ -217,7 +217,7 @@ class DictionaryFunctionTest : VimTestCase() {
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'innerDict': {'name': 'innerDict', 'print': function('Print')}}"))
     typeText(commandToKeys("call dict.innerDict.print()"))
-    assertExOutput("innerDict\n")
+    assertExOutput("innerDict")
 
     typeText(commandToKeys("delfunction! Print"))
   }

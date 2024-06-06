@@ -17,7 +17,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':echo ' .. v:count .. \"\\<CR>\"")
     typeText("n")
-    assertExOutput("0\n")
+    assertExOutput("0")
   }
 
   @Test
@@ -25,7 +25,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':' .. \"\\<C-u>\" .. 'echo ' .. v:count .. \"\\<CR>\"")
     typeText("5n")
-    assertExOutput("5\n")
+    assertExOutput("5")
   }
 
   @Test
@@ -33,7 +33,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':echo ' .. v:count1 .. \"\\<CR>\"")
     typeText("n")
-    assertExOutput("1\n")
+    assertExOutput("1")
   }
 
   @Test
@@ -41,7 +41,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':' .. \"\\<C-u>\" .. 'echo ' .. v:count1 .. \"\\<CR>\"")
     typeText("5n")
-    assertExOutput("5\n")
+    assertExOutput("5")
   }
 
   @Test

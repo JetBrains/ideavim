@@ -62,11 +62,11 @@ class ScrollJumpOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'scrolljump' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 7
-    assertCommandOutput("set scrolljump?", "  scrolljump=7\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=7")
 
     // Also tests the value being modified in the IDE's settings
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 3
-    assertCommandOutput("set scrolljump?", "  scrolljump=3\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=3")
   }
 
   // 'scrolljump' is a global option, so we don't need to test `:setlocal` or `:setglobal`
@@ -77,11 +77,11 @@ class ScrollJumpOptionMapperTest : VimTestCase() {
     // values for scrolling during typing (when IdeaVim's scroll implementation isn't called early enough), we set the
     // local value for all editors
     fixture.editor.settings.verticalScrollJump = 7
-    assertCommandOutput("set scrolljump?", "  scrolljump=7\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=7")
 
     // Also tests the value being modified in the IDE's settings
     fixture.editor.settings.verticalScrollJump = 3
-    assertCommandOutput("set scrolljump?", "  scrolljump=3\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=3")
   }
 
   @Test
@@ -102,25 +102,25 @@ class ScrollJumpOptionMapperTest : VimTestCase() {
     enterCommand("set scrolljump=-25")
     assertEquals(0, fixture.editor.settings.verticalScrollJump)
     assertEquals(10, EditorSettingsExternalizable.getInstance().verticalScrollJump)
-    assertCommandOutput("setlocal scrolljump?", "  scrolljump=-25\n")
-    assertCommandOutput("set scrolljump?", "  scrolljump=-25\n")
-    assertCommandOutput("setglobal scrolljump?", "  scrolljump=-25\n")
+    assertCommandOutput("setlocal scrolljump?", "  scrolljump=-25")
+    assertCommandOutput("set scrolljump?", "  scrolljump=-25")
+    assertCommandOutput("setglobal scrolljump?", "  scrolljump=-25")
   }
 
   @Test
   fun `test setting global IDE value will update IdeaVim value`() {
     enterCommand("set scrolljump=7")
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 3
-    assertCommandOutput("setlocal scrolljump?", "  scrolljump=3\n")
-    assertCommandOutput("set scrolljump?", "  scrolljump=3\n")
-    assertCommandOutput("setglobal scrolljump?", "  scrolljump=3\n")
+    assertCommandOutput("setlocal scrolljump?", "  scrolljump=3")
+    assertCommandOutput("set scrolljump?", "  scrolljump=3")
+    assertCommandOutput("setglobal scrolljump?", "  scrolljump=3")
   }
 
   @Test
   fun `test reset 'scrolljump' to default resets to global intellij setting`() {
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 20
     fixture.editor.settings.verticalScrollJump = 10
-    assertCommandOutput("set scrolljump?", "  scrolljump=10\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=10")
 
     enterCommand("set scrolljump&")
     assertEquals(20, fixture.editor.settings.verticalScrollJump)
@@ -129,21 +129,21 @@ class ScrollJumpOptionMapperTest : VimTestCase() {
     // Unlike many other overridden options, this one allows us to reset it back to global-local, so it will correctly
     // pick up the global value
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 30
-    assertCommandOutput("set scrolljump?", "  scrolljump=30\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=30")
   }
 
   @Test
   fun `test open new window without setting the option correctly keeps global intellij setting`() {
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 20
-    assertCommandOutput("set scrolljump?", "  scrolljump=20\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=20")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set scrolljump?", "  scrolljump=20\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=20")
 
     // Changing the global intellij setting should update the new editor
     EditorSettingsExternalizable.getInstance().verticalScrollJump = 30
-    assertCommandOutput("set scrolljump?", "  scrolljump=30\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=30")
   }
 
   @Test
@@ -153,7 +153,7 @@ class ScrollJumpOptionMapperTest : VimTestCase() {
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set scrolljump?", "  scrolljump=20\n")
+    assertCommandOutput("set scrolljump?", "  scrolljump=20")
   }
 
   @Test

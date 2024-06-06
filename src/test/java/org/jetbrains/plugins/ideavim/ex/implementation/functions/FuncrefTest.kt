@@ -38,10 +38,10 @@ class FuncrefTest : VimTestCase() {
     )
     typeText(commandToKeys("let Ff = funcref('Abs', [-10])"))
     typeText(commandToKeys("echo Ff()"))
-    assertExOutput("10\n")
+    assertExOutput("10")
 
     typeText(commandToKeys("echo Ff"))
-    assertExOutput("function('Abs', [-10])\n")
+    assertExOutput("function('Abs', [-10])")
 
     typeText(commandToKeys("delfunction! Abs"))
   }
@@ -118,7 +118,7 @@ class FuncrefTest : VimTestCase() {
     )
     typeText(commandToKeys("let Ff = funcref('SayHi')"))
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hello\n")
+    assertExOutput("hello")
 
     typeText(
       commandToKeys(
@@ -130,7 +130,7 @@ class FuncrefTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hello\n")
+    assertExOutput("hello")
 
     typeText(commandToKeys("delfunction! SayHi"))
   }
