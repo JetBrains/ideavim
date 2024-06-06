@@ -55,24 +55,24 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'sidescrolloff' option reports global intellij setting if not set`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
   }
 
   @Test
   fun `test local 'sidescrolloff' option reports unset value if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
   }
 
   @Test
   fun `test global 'sidescrolloff' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
   }
 
   @Test
@@ -81,8 +81,8 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     enterCommand("set sidescrolloff=20")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(10, EditorSettingsExternalizable.getInstance().horizontalScrollOffset)
 
     // We set the local value to 0 so that IntelliJ's scrolling does nothing, so IdeaVim can control scrolling
@@ -95,8 +95,8 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     enterCommand("setlocal sidescrolloff=20")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20")
     assertEquals(10, EditorSettingsExternalizable.getInstance().horizontalScrollOffset)
 
     // We set the local value to 0 so that IntelliJ's scrolling does nothing, so IdeaVim can control scrolling
@@ -143,9 +143,9 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     enterCommand("set sidescrolloff=10")
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
   }
 
   @Test
@@ -153,9 +153,9 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     enterCommand("setlocal sidescrolloff=10")
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
   }
 
   @Test
@@ -164,31 +164,31 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
 
     // Changing the global setting should update the new editor
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
   }
 
   @Test
   fun `test open new window after setting the global option correctly updates local intellij value for new window`() {
     enterCommand("set sidescrolloff=20")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
 
     // Changing the global IntelliJ setting syncs with the global Vim value
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
 
     // We don't support externally changing the local editor setting
     enterCommand("setlocal sidescrolloff=30")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
     assertEquals(10, EditorSettingsExternalizable.getInstance().horizontalScrollOffset)
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
@@ -200,7 +200,7 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
   }
 
   // :set[local|global] {option}& - reset to default value
@@ -210,20 +210,20 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
 
     enterCommand("set sidescrolloff=10")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     // Vim: global=10, local=-1 => global=default, local=unset
     enterCommand("set sidescrolloff&")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 15
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
   }
 
   @Test
@@ -235,9 +235,9 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     // Vim: global=10, local=20 => global=default, local=default
     enterCommand("set sidescrolloff&")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=5\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=5\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=5\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=5")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=5")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=5")
 
     // Note that global=default, local=default is the same as global=default, local=unset
     // Changing the IDE value is reflected in the global Vim value, and also the local value
@@ -245,9 +245,9 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     // would also change the local value, so it's reasonable that changing the default value (by changing the IDE value)
     // is reflected in the local Vim value.
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 15
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15")
   }
 
   @Test
@@ -259,25 +259,25 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     switchToNewFile("bbb.txt", "lorem ipsum")
 
     enterCommand("set sidescrolloff=10")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(10, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
 
     enterCommand("set sidescrolloff&")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(20, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 15
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(15, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
@@ -294,9 +294,9 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     enterCommand("set sidescrolloff=10")
     enterCommand("setlocal sidescrolloff=5")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=5\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=5\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=5")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=5")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
@@ -304,17 +304,17 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     // Vim: global=10, local=5 => global=default, local=default
     // local=default behaves like local=unset
     enterCommand("set sidescrolloff&")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 15
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
@@ -329,26 +329,26 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     switchToNewFile("bbb.txt", "lorem ipsum")
 
     enterCommand("set sidescrolloff=10")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // `set sidescrolloff?` for first editor
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
 
     // Vim: global=10, local=-1 => global=default, local=unset
     enterCommand("set sidescrolloff&")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // `set sidescrolloff?` for first editor
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 15
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // `set sidescrolloff?` for first editor
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
@@ -365,9 +365,9 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     enterCommand("set sidescrolloff=10")
     enterCommand("setlocal sidescrolloff=5")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=5\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=5\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=5")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=5")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
@@ -376,17 +376,17 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     // Note that global=default, local=default behaves the same as global=default, local=unset
     enterCommand("set sidescrolloff&")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
 
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 15
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=15")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15")
     assertEquals(7, injector.options(firstEditor.vim).sidescrolloff) // Equivalent to `set sidescrolloff?`
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
     assertEquals(0, firstEditor.settings.horizontalScrollOffset)
@@ -402,16 +402,16 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     // This resets global to default + local to unset, but doesn't modify the local intellij value
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Changing the intellij default value is reflected in IdeaVim
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 30
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
 
@@ -425,16 +425,16 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     // set global value to default, but not resetting the local intellij value...
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n") // Vim is default of 0, but we want to use global intellij value
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20") // Vim is default of 0, but we want to use global intellij value
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Changing the intellij default value is reflected in IdeaVim global, but not local
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 30
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
 
@@ -443,22 +443,22 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
     enterCommand("setglobal sidescrolloff=10")
     enterCommand("setlocal sidescrolloff=15")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15\n")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=15")
 
     // Vim: global=10, local=15 => global=10, local=default
     // IdeaVim's defaults are transparent, so this should come from the IDE default value
     enterCommand("setlocal sidescrolloff&")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Changing the intellij default value is reflected in IdeaVim
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 30
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
 
@@ -471,16 +471,16 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     // local=default behaves like local=unset
     enterCommand("setlocal sidescrolloff&")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n") // Was originally default
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20") // Was originally default
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Changing the intellij default value is reflected in IdeaVim
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 30
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=30")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=30")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
 
@@ -493,26 +493,26 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
   fun `test reset effective 'sidescrolloff' to global default value does not modify unset local value`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     // The local value is unset, so "set {option}<" does not modify it (effective value is still global)
     // See `:help :setlocal` and https://github.com/vim/vim/issues/14062
     enterCommand("set sidescrolloff<")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Global is default and local is unset, so this should affect values
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
@@ -522,27 +522,27 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
 
     enterCommand("setlocal sidescrolloff=10")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
 
     // The local value has been set, so "set {option}<" copies the global value (effective value is still global)
     // Global was default, so now local is default too
     // See `:help :setlocal` and https://github.com/vim/vim/issues/14062
     enterCommand("set sidescrolloff<")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=20")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Both global and local values should be defaults, so this should affect both
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
@@ -552,26 +552,26 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
 
     enterCommand("set sidescrolloff=20")  // No longer default
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     // The local value has been set, so "set {option}<" copies the global value (effective value is still global)
     // See `:help :setlocal` and https://github.com/vim/vim/issues/14062
     enterCommand("set sidescrolloff<")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Global is explicitly set, and local is unset. Global changes should not affect values
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
@@ -581,26 +581,26 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
 
     enterCommand("setlocal sidescrolloff=10")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
 
     // "setlocal {option}<" always unsets number-based global-local options
     // See `:help :setlocal` and https://github.com/vim/vim/issues/14062
     enterCommand("setlocal sidescrolloff<")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Global is default, so this should affect global only
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
@@ -611,26 +611,26 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
 
     enterCommand("set sidescrolloff=20")  // No longer default
     enterCommand("setlocal sidescrolloff=10")
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
 
     // "setlocal {option}<" always unsets number-based global-local options
     // See `:help :setlocal` and https://github.com/vim/vim/issues/14062
     enterCommand("setlocal sidescrolloff<")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 
     // Global is not default, so should not be affected by this change
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 10
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
   }
@@ -639,15 +639,15 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
   fun `test reset global 'sidescrolloff' to global value does nothing`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollOffset = 20
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
 
     // This copies the global value to the global value. It's a no-op
     enterCommand("setglobal sidescrolloff<")
 
-    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20\n")
-    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1\n")
+    assertCommandOutput("set sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20")
+    assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=-1")
   }
 }

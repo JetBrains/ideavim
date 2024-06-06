@@ -61,24 +61,24 @@ class SetCommandTest : VimTestCase() {
   fun `test number option`() {
     enterCommand("set scrolloff&")
     assertEquals(0, options().scrolloff)
-    assertCommandOutput("set scrolloff?", "  scrolloff=0\n")
+    assertCommandOutput("set scrolloff?", "  scrolloff=0")
     enterCommand("set scrolloff=5")
     assertEquals(5, options().scrolloff)
-    assertCommandOutput("set scrolloff?", "  scrolloff=5\n")
+    assertCommandOutput("set scrolloff?", "  scrolloff=5")
   }
 
   @Test
   fun `test toggle option as a number`() {
     enterCommand("set digraph&")   // Local to window. Reset local + per-window "global" value to default: nodigraph
     assertEquals(0, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
-    assertCommandOutput("set digraph?", "nodigraph\n")
+    assertCommandOutput("set digraph?", "nodigraph")
 
     // Should have the same effect as `:set` (although `:set` doesn't allow assigning a number to a boolean)
     // I.e. this sets the local value and the per-window "global" value
     enterCommand("let &dg=1000")
     assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble().toInt())
     assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
-    assertCommandOutput("set digraph?", "  digraph\n")
+    assertCommandOutput("set digraph?", "  digraph")
   }
 
   @Test
@@ -130,20 +130,20 @@ class SetCommandTest : VimTestCase() {
   fun `test string option`() {
     enterCommand("set selection&")
     assertEquals("inclusive", options().selection)
-    assertCommandOutput("set selection?", "  selection=inclusive\n")
+    assertCommandOutput("set selection?", "  selection=inclusive")
     enterCommand("set selection=exclusive")
     assertEquals("exclusive", options().selection)
-    assertCommandOutput("set selection?", "  selection=exclusive\n")
+    assertCommandOutput("set selection?", "  selection=exclusive")
   }
 
   @Test
   fun `test show numbered value`() {
-    assertCommandOutput("set so", "  scrolloff=0\n")
+    assertCommandOutput("set so", "  scrolloff=0")
   }
 
   @Test
   fun `test show numbered value with question mark`() {
-    assertCommandOutput("set so?", "  scrolloff=0\n")
+    assertCommandOutput("set so?", "  scrolloff=0")
   }
 
   @Test
@@ -159,7 +159,6 @@ class SetCommandTest : VimTestCase() {
         |--- Options ---
         |  number              relativenumber
         |  fileencoding=utf-8
-        |
       """.trimMargin())
   }
 
@@ -202,7 +201,6 @@ class SetCommandTest : VimTestCase() {
         |  shell=/dummy/path/to/bash
         |novim-paragraph-motion
         |  viminfo='100,<50,s10,h
-        |
       """.trimMargin())
   }
 
@@ -210,7 +208,7 @@ class SetCommandTest : VimTestCase() {
   fun `test show named options`() {
     assertCommandOutput("set number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex     nonumber            norelativenumber      scrolloff=0
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -228,7 +226,7 @@ class SetCommandTest : VimTestCase() {
       |  fileencoding=utf-8
       |  number
       |  relativenumber
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -312,7 +310,7 @@ class SetCommandTest : VimTestCase() {
       |  whichwrap=b,s
       |  wrap
       |  wrapscan
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -323,7 +321,7 @@ class SetCommandTest : VimTestCase() {
       |nonumber
       |norelativenumber
       |  scrolloff=0
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -333,21 +331,21 @@ class SetCommandTest : VimTestCase() {
 
     enterCommand("set nrformats&")
 
-    assertCommandOutput("set nrformats?", "  nrformats=hex\n")
+    assertCommandOutput("set nrformats?", "  nrformats=hex")
   }
 
   @Test
   fun `test reset local value for global-local option`() {
     enterCommand("set virtualedit=block") // Sets the global + effective values. Local is unset
     enterCommand("setlocal virtualedit=onemore")  // Sets the local + effective values
-    assertCommandOutput("set virtualedit?", "  virtualedit=onemore\n")
-    assertCommandOutput("setlocal virtualedit?", "  virtualedit=onemore\n")
+    assertCommandOutput("set virtualedit?", "  virtualedit=onemore")
+    assertCommandOutput("setlocal virtualedit?", "  virtualedit=onemore")
 
     // This is like setting the global-local value to its own global value. :set with a global-local option will set the
     // global value and unset the local value
     enterCommand("set virtualedit<")
 
-    assertCommandOutput("set virtualedit?", "  virtualedit=block\n")
-    assertCommandOutput("setlocal virtualedit?", "  virtualedit=\n")
+    assertCommandOutput("set virtualedit?", "  virtualedit=block")
+    assertCommandOutput("setlocal virtualedit?", "  virtualedit=")
   }
 }

@@ -63,7 +63,7 @@ class LongerScriptTest : VimTestCase() {
     println(parsingTime)
     executeVimscript(function)
     typeText(commandToKeys("echo F('s[ubstitute]')"))
-    assertExOutput("'s' | 'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';\n")
+    assertExOutput("'s' | 'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';")
   }
 
   @Test

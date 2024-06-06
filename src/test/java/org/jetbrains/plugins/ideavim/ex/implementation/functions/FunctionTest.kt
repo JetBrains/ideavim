@@ -20,10 +20,10 @@ class FunctionTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs')"))
     typeText(commandToKeys("echo Ff(-10)"))
-    assertExOutput("10\n")
+    assertExOutput("10")
 
     typeText(commandToKeys("echo Ff"))
-    assertExOutput("abs\n")
+    assertExOutput("abs")
   }
 
   @Test
@@ -31,10 +31,10 @@ class FunctionTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', [-10])"))
     typeText(commandToKeys("echo Ff()"))
-    assertExOutput("10\n")
+    assertExOutput("10")
 
     typeText(commandToKeys("echo Ff"))
-    assertExOutput("function('abs', [-10])\n")
+    assertExOutput("function('abs', [-10])")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -88,7 +88,7 @@ class FunctionTest : VimTestCase() {
     )
     typeText(commandToKeys("let Ff = function('SayHi')"))
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hello\n")
+    assertExOutput("hello")
 
     typeText(
       commandToKeys(
@@ -100,7 +100,7 @@ class FunctionTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hi\n")
+    assertExOutput("hi")
 
     typeText(commandToKeys("delfunction! SayHi"))
   }

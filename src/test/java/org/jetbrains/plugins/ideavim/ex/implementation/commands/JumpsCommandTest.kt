@@ -17,7 +17,7 @@ class JumpsCommandTest : VimTestCase() {
   fun `test shows empty list`() {
     configureByText("")
     enterCommand("jumps")
-    assertExOutput(" jump line  col file/text\n>\n")
+    assertExOutput(" jump line  col file/text\n>")
   }
 
   @Test
@@ -48,7 +48,6 @@ class JumpsCommandTest : VimTestCase() {
                      |   2     7   12 to science: shape and shade -- the special tinge,
                      |   1     2    4 all rocks and lavender and tufted grass,
                      |>
-                     |
       """.trimMargin(),
     )
   }
@@ -83,7 +82,6 @@ class JumpsCommandTest : VimTestCase() {
                      |>  0     7   12 to science: shape and shade -- the special tinge,
                      |   1     2    4 all rocks and lavender and tufted grass,
                      |   2     9   10 the dingy underside, the checquered fringe.
-                     |
       """.trimMargin(),
     )
   }
@@ -101,7 +99,6 @@ class JumpsCommandTest : VimTestCase() {
       """ jump line  col file/text
                      |   1     1    0 ${text.substring(0, 200)}
                      |>
-                     |
       """.trimMargin(),
     )
   }
@@ -114,10 +111,10 @@ class JumpsCommandTest : VimTestCase() {
 
     enterCommand("jumps")
     assertExOutput(
-      """ jump line  col file/text
-                     |   1     1    0 Hello^FWorld^?
-                     |>
-                     |
+      """
+        | jump line  col file/text
+        |   1     1    0 Hello^FWorld^?
+        |>
       """.trimMargin(),
     )
   }

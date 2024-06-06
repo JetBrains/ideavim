@@ -30,7 +30,7 @@ class ForTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("aabbccddeeff\n")
+    assertExOutput("aabbccddeeff")
   }
 
   @Test
@@ -47,7 +47,7 @@ class ForTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("hello\n")
+    assertExOutput("hello")
   }
 
   @Test
@@ -68,7 +68,7 @@ class ForTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("hello!!\n")
+    assertExOutput("hello!!")
   }
 
   @Test
@@ -88,7 +88,7 @@ class ForTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("123\n")
+    assertExOutput("123")
   }
 
   @Test
@@ -110,7 +110,7 @@ class ForTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("3\n")
+    assertExOutput("3")
   }
 
   @Test
@@ -129,7 +129,7 @@ class ForTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("123 abc\n")
+    assertExOutput("123 abc")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)

@@ -17,21 +17,21 @@ class SublistExpressionTest : VimTestCase() {
   fun `test strung sublist`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[0:1]"))
-    assertExOutput("ab\n")
+    assertExOutput("ab")
   }
 
   @Test
   fun `test negative index with sting`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[-1]"))
-    assertExOutput("\n")
+    assertExOutput("")
   }
 
   @Test
   fun `test index greater than size with string`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[1000]"))
-    assertExOutput("\n")
+    assertExOutput("")
   }
 
   @Test
@@ -52,48 +52,48 @@ class SublistExpressionTest : VimTestCase() {
   fun `test list with correct index`() {
     configureByText("\n")
     typeText(commandToKeys("echo [1, 2][1]"))
-    assertExOutput("2\n")
+    assertExOutput("2")
   }
 
   @Test
   fun `test negative first index`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[-1:]"))
-    assertExOutput("c\n")
+    assertExOutput("c")
   }
 
   @Test
   fun `test negative last index`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[0:-2]"))
-    assertExOutput("ab\n")
+    assertExOutput("ab")
   }
 
   @Test
   fun `test negative last index2`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[0:-1]"))
-    assertExOutput("abc\n")
+    assertExOutput("abc")
   }
 
   @Test
   fun `test last index bigger sting size`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[1:10000]"))
-    assertExOutput("bc\n")
+    assertExOutput("bc")
   }
 
   @Test
   fun `test both indexes bigger sting size`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[100:10000]"))
-    assertExOutput("\n")
+    assertExOutput("")
   }
 
   @Test
   fun `test first index is bigger than second`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[100:10]"))
-    assertExOutput("\n")
+    assertExOutput("")
   }
 }

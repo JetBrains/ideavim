@@ -672,7 +672,7 @@ abstract class VimTestCase {
 
   fun assertNoExOutput() {
     val actual = ExOutputModel.getInstance(fixture.editor).text
-    assertNull(actual, "Ex output not null")
+    assertEquals("", actual)
   }
 
   fun assertPluginError(isError: Boolean) {

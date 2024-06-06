@@ -57,32 +57,32 @@ class CursorLineOptionMapperTest : VimTestCase() {
   fun `test 'cursorline' option reports global intellij setting if not explicitly set`() {
     (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
     assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
-    assertCommandOutput("set cursorline?", "  cursorline\n")
+    assertCommandOutput("set cursorline?", "  cursorline")
   }
 
   @Test
   fun `test local 'cursorline' option reports global intellij setting if not explicitly set`() {
     (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
     assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
-    assertCommandOutput("setlocal cursorline?", "  cursorline\n")
+    assertCommandOutput("setlocal cursorline?", "  cursorline")
   }
 
   @Test
   fun `test 'cursorline' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isCaretRowShown = false
-    assertCommandOutput("set cursorline?", "nocursorline\n")
+    assertCommandOutput("set cursorline?", "nocursorline")
 
     fixture.editor.settings.isCaretRowShown = true
-    assertCommandOutput("set cursorline?", "  cursorline\n")
+    assertCommandOutput("set cursorline?", "  cursorline")
   }
 
   @Test
   fun `test local 'cursorline' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isCaretRowShown = false
-    assertCommandOutput("setlocal cursorline?", "nocursorline\n")
+    assertCommandOutput("setlocal cursorline?", "nocursorline")
 
     fixture.editor.settings.isCaretRowShown = true
-    assertCommandOutput("setlocal cursorline?", "  cursorline\n")
+    assertCommandOutput("setlocal cursorline?", "  cursorline")
   }
 
   @Test
@@ -116,20 +116,20 @@ class CursorLineOptionMapperTest : VimTestCase() {
   @Test
   fun `test setglobal 'cursorline' option affects IdeaVim global value only`() {
     assertFalse(IjOptions.cursorline.defaultValue.asBoolean())
-    assertCommandOutput("setglobal cursorline?", "nocursorline\n")
+    assertCommandOutput("setglobal cursorline?", "nocursorline")
 
     enterCommand("setglobal cursorline")
-    assertCommandOutput("setglobal cursorline?", "  cursorline\n")
+    assertCommandOutput("setglobal cursorline?", "  cursorline")
 
     enterCommand("setglobal nocursorline")
-    assertCommandOutput("setglobal cursorline?", "nocursorline\n")
+    assertCommandOutput("setglobal cursorline?", "nocursorline")
     assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
   }
 
   @Test
   fun `test set updateds IdeaVim global value as well as local`() {
     enterCommand("set cursorline")
-    assertCommandOutput("setglobal cursorline?", "  cursorline\n")
+    assertCommandOutput("setglobal cursorline?", "  cursorline")
   }
 
   @Test
@@ -138,9 +138,9 @@ class CursorLineOptionMapperTest : VimTestCase() {
     // affects the local value
     enterCommand("setglobal cursorline")
     fixture.editor.settings.isCaretRowShown = false
-    assertCommandOutput("setlocal cursorline?", "nocursorline\n")
-    assertCommandOutput("set cursorline?", "nocursorline\n")
-    assertCommandOutput("setglobal cursorline?", "  cursorline\n")
+    assertCommandOutput("setlocal cursorline?", "nocursorline")
+    assertCommandOutput("set cursorline?", "nocursorline")
+    assertCommandOutput("setglobal cursorline?", "  cursorline")
   }
 
   @Test
@@ -159,7 +159,7 @@ class CursorLineOptionMapperTest : VimTestCase() {
   @Test
   fun `test rest 'cursorline' to default copies current global intellij setting`() {
     fixture.editor.settings.isCaretRowShown = false
-    assertCommandOutput("set cursorline?", "nocursorline\n")
+    assertCommandOutput("set cursorline?", "nocursorline")
 
     enterCommand("set cursorline&")
     assertTrue(fixture.editor.settings.isCaretRowShown)
@@ -171,7 +171,7 @@ class CursorLineOptionMapperTest : VimTestCase() {
   @Test
   fun `test reset local 'cursorline' to default copies current global intellij setting`() {
     fixture.editor.settings.isCaretRowShown = false
-    assertCommandOutput("set cursorline?", "nocursorline\n")
+    assertCommandOutput("set cursorline?", "nocursorline")
 
     enterCommand("setlocal cursorline&")
     assertTrue(fixture.editor.settings.isCaretRowShown)
@@ -185,11 +185,11 @@ class CursorLineOptionMapperTest : VimTestCase() {
     // New window will clone local and global local-to-window options, then apply global to local. This tests that our
     // handling of per-window "global" values is correct.
     (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
-    assertCommandOutput("set cursorline?", "  cursorline\n")
+    assertCommandOutput("set cursorline?", "  cursorline")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set cursorline?", "  cursorline\n")
+    assertCommandOutput("set cursorline?", "  cursorline")
 
     // Can't prove that it was copied as a default value because we can't change the global value
   }
@@ -197,11 +197,11 @@ class CursorLineOptionMapperTest : VimTestCase() {
   @Test
   fun `test open new window after setting option copies value as explicitly set`() {
     enterCommand("set nocursorline")
-    assertCommandOutput("set cursorline?", "nocursorline\n")
+    assertCommandOutput("set cursorline?", "nocursorline")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set cursorline?", "nocursorline\n")
+    assertCommandOutput("set cursorline?", "nocursorline")
 
     // Can't prove that it was copied as a default value because we can't change the global value and see it update
   }
@@ -209,12 +209,12 @@ class CursorLineOptionMapperTest : VimTestCase() {
   @Test
   fun `test setglobal 'cursorline' used when opening new window`() {
     enterCommand("setglobal cursorline")
-    assertCommandOutput("setglobal cursorline?", "  cursorline\n")
-    assertCommandOutput("set cursorline?", "nocursorline\n")
+    assertCommandOutput("setglobal cursorline?", "  cursorline")
+    assertCommandOutput("set cursorline?", "nocursorline")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set cursorline?", "  cursorline\n")
+    assertCommandOutput("set cursorline?", "  cursorline")
 
     // Can't prove that it was copied as a locally set value because we can't change the global value
   }
@@ -222,12 +222,12 @@ class CursorLineOptionMapperTest : VimTestCase() {
   @Test
   fun `test setlocal 'cursorline' then open new window uses value from setglobal`() {
     enterCommand("setlocal nocursorline")
-    assertCommandOutput("setglobal cursorline?", "nocursorline\n")
-    assertCommandOutput("set cursorline?", "nocursorline\n")
+    assertCommandOutput("setglobal cursorline?", "nocursorline")
+    assertCommandOutput("set cursorline?", "nocursorline")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set cursorline?", "  cursorline\n")
+    assertCommandOutput("set cursorline?", "  cursorline")
 
     // Can't prove that it was copied as a locally set value because we can't change the global value
   }

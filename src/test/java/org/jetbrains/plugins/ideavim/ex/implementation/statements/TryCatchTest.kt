@@ -29,7 +29,7 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     assertPluginError(false)
-    assertExOutput("caught\n")
+    assertExOutput("caught")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -134,7 +134,7 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     assertPluginError(false)
-    assertExOutput("finally block\n")
+    assertExOutput("finally block")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -155,7 +155,7 @@ class TryCatchTest : VimTestCase() {
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("my exception")
-    assertExOutput("finally block\n")
+    assertExOutput("finally block")
   }
 
   @Test
@@ -176,6 +176,6 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo x .. ' ' .. y"))
-    assertExOutput("0 1\n")
+    assertExOutput("0 1")
   }
 }

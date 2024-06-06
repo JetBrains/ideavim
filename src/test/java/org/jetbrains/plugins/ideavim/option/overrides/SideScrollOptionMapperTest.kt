@@ -62,11 +62,11 @@ class SideScrollOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'sidescroll' option reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 7
-    assertCommandOutput("set sidescroll?", "  sidescroll=7\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=7")
 
     // Also tests the value being modified in the IDE's settings
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 3
-    assertCommandOutput("set sidescroll?", "  sidescroll=3\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=3")
   }
 
   // 'sidescroll' is a global option, so we don't need to test `:setlocal` or `:setglobal`
@@ -77,11 +77,11 @@ class SideScrollOptionMapperTest : VimTestCase() {
     // values for scrolling during typing (when IdeaVim's scroll implementation isn't called early enough), we set the
     // local value for all editors
     fixture.editor.settings.horizontalScrollJump = 7
-    assertCommandOutput("set sidescroll?", "  sidescroll=7\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=7")
 
     // Also tests the value being modified in the IDE's settings
     fixture.editor.settings.horizontalScrollJump = 3
-    assertCommandOutput("set sidescroll?", "  sidescroll=3\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=3")
   }
 
   @Test
@@ -98,16 +98,16 @@ class SideScrollOptionMapperTest : VimTestCase() {
   fun `test setting global IDE value will update IdeaVim value`() {
     enterCommand("set sidescroll=7")
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 3
-    assertCommandOutput("setlocal sidescroll?", "  sidescroll=3\n")
-    assertCommandOutput("set sidescroll?", "  sidescroll=3\n")
-    assertCommandOutput("setglobal sidescroll?", "  sidescroll=3\n")
+    assertCommandOutput("setlocal sidescroll?", "  sidescroll=3")
+    assertCommandOutput("set sidescroll?", "  sidescroll=3")
+    assertCommandOutput("setglobal sidescroll?", "  sidescroll=3")
   }
 
   @Test
   fun `test reset 'sidescroll' to default resets to global intellij setting`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 20
     fixture.editor.settings.horizontalScrollJump = 10
-    assertCommandOutput("set sidescroll?", "  sidescroll=10\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=10")
 
     enterCommand("set sidescroll&")
     assertEquals(20, fixture.editor.settings.horizontalScrollJump)
@@ -116,21 +116,21 @@ class SideScrollOptionMapperTest : VimTestCase() {
     // Unlike many other overridden options, this one allows us to reset it back to global-local, so it will correctly
     // pick up the global value
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 30
-    assertCommandOutput("set sidescroll?", "  sidescroll=30\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=30")
   }
 
   @Test
   fun `test open new window without setting the option correctly keeps global intellij setting`() {
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 20
-    assertCommandOutput("set sidescroll?", "  sidescroll=20\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=20")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set sidescroll?", "  sidescroll=20\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=20")
 
     // Changing the global intellij setting should update the new editor
     EditorSettingsExternalizable.getInstance().horizontalScrollJump = 30
-    assertCommandOutput("set sidescroll?", "  sidescroll=30\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=30")
   }
 
   @Test
@@ -140,7 +140,7 @@ class SideScrollOptionMapperTest : VimTestCase() {
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set sidescroll?", "  sidescroll=20\n")
+    assertCommandOutput("set sidescroll?", "  sidescroll=20")
   }
 
   @Test

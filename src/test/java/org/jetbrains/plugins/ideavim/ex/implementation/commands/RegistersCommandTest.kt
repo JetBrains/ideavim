@@ -22,7 +22,7 @@ class RegistersCommandTest : VimTestCase() {
   fun `test list empty registers`() {
     configureByText("")
     enterCommand("registers")
-    assertExOutput("Type Name Content\n")
+    assertExOutput("Type Name Content")
   }
 
   @Test
@@ -77,7 +77,7 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     enterCommand("registers Z")
-    assertExOutput("Type Name Content\n")
+    assertExOutput("Type Name Content")
   }
 
   @Test
@@ -92,8 +92,9 @@ class RegistersCommandTest : VimTestCase() {
     // Does not trim whitespace
     enterCommand("registers a")
     assertExOutput(
-      """Type Name Content
-                     |  c  "a   ${(indent + text).take(200)}
+      """
+        |Type Name Content
+        |  c  "a   ${(indent + text).take(200)}
       """.trimMargin(),
     )
   }
@@ -106,8 +107,9 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-                     |  c  "a   ^IHello World^J^[
+      """
+        |Type Name Content
+        |  c  "a   ^IHello World^J^[
       """.trimMargin(),
     )
   }
@@ -123,10 +125,11 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("display abc")
     assertExOutput(
-      """Type Name Content
-      |  c  "a   Content for register a
-      |  c  "b   Content for register b
-      |  c  "c   Content for register c
+      """
+        |Type Name Content
+        |  c  "a   Content for register a
+        |  c  "b   Content for register b
+        |  c  "c   Content for register c
       """.trimMargin(),
     )
   }
@@ -181,48 +184,49 @@ class RegistersCommandTest : VimTestCase() {
     // "= expression register
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  ""   s
-      |  c  "0   last yank 
-      |  l  "1   line 9^J
-      |  l  "2   line 8^J
-      |  l  "3   line 7^J
-      |  l  "4   line 6^J
-      |  l  "5   line 5^J
-      |  l  "6   line 4^J
-      |  l  "7   line 3^J
-      |  l  "8   line 2^J
-      |  l  "9   line 1^J
-      |  c  "a   Hello world a
-      |  c  "b   Hello world b
-      |  c  "c   Hello world c
-      |  c  "d   Hello world d
-      |  c  "e   Hello world e
-      |  c  "f   Hello world f
-      |  c  "g   Hello world g
-      |  c  "h   Hello world h
-      |  c  "i   Hello world i
-      |  c  "j   Hello world j
-      |  c  "k   Hello world k
-      |  c  "l   Hello world l
-      |  c  "m   Hello world m
-      |  c  "n   Hello world n
-      |  c  "o   Hello world o
-      |  c  "p   Hello world p
-      |  c  "q   Hello world q
-      |  c  "r   Hello world r
-      |  c  "s   Hello world s
-      |  c  "t   Hello world t
-      |  c  "u   Hello world u
-      |  c  "v   Hello world v
-      |  c  "w   Hello world w
-      |  c  "x   Hello world x
-      |  c  "y   Hello world y
-      |  c  "z   Hello world z
-      |  c  "-   s
-      |  c  "*   clipboard content
-      |  c  ":   ascii
-      |  c  "/   search pattern
+      """
+        |Type Name Content
+        |  c  ""   s
+        |  c  "0   last yank 
+        |  l  "1   line 9^J
+        |  l  "2   line 8^J
+        |  l  "3   line 7^J
+        |  l  "4   line 6^J
+        |  l  "5   line 5^J
+        |  l  "6   line 4^J
+        |  l  "7   line 3^J
+        |  l  "8   line 2^J
+        |  l  "9   line 1^J
+        |  c  "a   Hello world a
+        |  c  "b   Hello world b
+        |  c  "c   Hello world c
+        |  c  "d   Hello world d
+        |  c  "e   Hello world e
+        |  c  "f   Hello world f
+        |  c  "g   Hello world g
+        |  c  "h   Hello world h
+        |  c  "i   Hello world i
+        |  c  "j   Hello world j
+        |  c  "k   Hello world k
+        |  c  "l   Hello world l
+        |  c  "m   Hello world m
+        |  c  "n   Hello world n
+        |  c  "o   Hello world o
+        |  c  "p   Hello world p
+        |  c  "q   Hello world q
+        |  c  "r   Hello world r
+        |  c  "s   Hello world s
+        |  c  "t   Hello world t
+        |  c  "u   Hello world u
+        |  c  "v   Hello world v
+        |  c  "w   Hello world w
+        |  c  "x   Hello world x
+        |  c  "y   Hello world y
+        |  c  "z   Hello world z
+        |  c  "-   s
+        |  c  "*   clipboard content
+        |  c  ":   ascii
+        |  c  "/   search pattern
       """.trimMargin(),
     )
   }
@@ -237,8 +241,9 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  "*   clipboard content
+      """
+        |Type Name Content
+        |  c  "*   clipboard content
       """.trimMargin(),
     )
   }
@@ -252,11 +257,12 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "0   line
-      |  c  "*   line
-      |  c  ":   set clipboard=unnamed,unnamedplus
+      """
+        |Type Name Content
+        |  c  ""   line
+        |  c  "0   line
+        |  c  "*   line
+        |  c  ":   set clipboard=unnamed,unnamedplus
       """.trimMargin(),
     )
     enterCommand("set clipboard&")
@@ -271,11 +277,12 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "-   line
-      |  c  "*   line
-      |  c  ":   set clipboard=unnamed,unnamedplus
+      """
+        |Type Name Content
+        |  c  ""   line
+        |  c  "-   line
+        |  c  "*   line
+        |  c  ":   set clipboard=unnamed,unnamedplus
       """.trimMargin(),
     )
     enterCommand("set clipboard&")
@@ -290,11 +297,12 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "-   line
-      |  c  "*   line
-      |  c  ":   set clipboard=unnamedplus
+      """
+        |Type Name Content
+        |  c  ""   line
+        |  c  "-   line
+        |  c  "*   line
+        |  c  ":   set clipboard=unnamedplus
       """.trimMargin(),
     )
     enterCommand("set clipboard&")
@@ -316,9 +324,10 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-                     |  c  "a   ^IHello World^J^[
-                     |  c  "*   
+      """
+        |Type Name Content
+        |  c  "a   ^IHello World^J^[
+        |  c  "*   
       """.trimMargin(),
     )
   }
@@ -374,49 +383,50 @@ class RegistersCommandTest : VimTestCase() {
     // "= expression register
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  ""   s
-      |  c  "0   last yank 
-      |  l  "1   line 9^J
-      |  l  "2   line 8^J
-      |  l  "3   line 7^J
-      |  l  "4   line 6^J
-      |  l  "5   line 5^J
-      |  l  "6   line 4^J
-      |  l  "7   line 3^J
-      |  l  "8   line 2^J
-      |  l  "9   line 1^J
-      |  c  "a   Hello world a
-      |  c  "b   Hello world b
-      |  c  "c   Hello world c
-      |  c  "d   Hello world d
-      |  c  "e   Hello world e
-      |  c  "f   Hello world f
-      |  c  "g   Hello world g
-      |  c  "h   Hello world h
-      |  c  "i   Hello world i
-      |  c  "j   Hello world j
-      |  c  "k   Hello world k
-      |  c  "l   Hello world l
-      |  c  "m   Hello world m
-      |  c  "n   Hello world n
-      |  c  "o   Hello world o
-      |  c  "p   Hello world p
-      |  c  "q   Hello world q
-      |  c  "r   Hello world r
-      |  c  "s   Hello world s
-      |  c  "t   Hello world t
-      |  c  "u   Hello world u
-      |  c  "v   Hello world v
-      |  c  "w   Hello world w
-      |  c  "x   Hello world x
-      |  c  "y   Hello world y
-      |  c  "z   Hello world z
-      |  c  "-   s
-      |  c  "*   mall delete register
-      |  c  "+   clipboard content
-      |  c  ":   ascii
-      |  c  "/   search pattern
+      """
+        |Type Name Content
+        |  c  ""   s
+        |  c  "0   last yank 
+        |  l  "1   line 9^J
+        |  l  "2   line 8^J
+        |  l  "3   line 7^J
+        |  l  "4   line 6^J
+        |  l  "5   line 5^J
+        |  l  "6   line 4^J
+        |  l  "7   line 3^J
+        |  l  "8   line 2^J
+        |  l  "9   line 1^J
+        |  c  "a   Hello world a
+        |  c  "b   Hello world b
+        |  c  "c   Hello world c
+        |  c  "d   Hello world d
+        |  c  "e   Hello world e
+        |  c  "f   Hello world f
+        |  c  "g   Hello world g
+        |  c  "h   Hello world h
+        |  c  "i   Hello world i
+        |  c  "j   Hello world j
+        |  c  "k   Hello world k
+        |  c  "l   Hello world l
+        |  c  "m   Hello world m
+        |  c  "n   Hello world n
+        |  c  "o   Hello world o
+        |  c  "p   Hello world p
+        |  c  "q   Hello world q
+        |  c  "r   Hello world r
+        |  c  "s   Hello world s
+        |  c  "t   Hello world t
+        |  c  "u   Hello world u
+        |  c  "v   Hello world v
+        |  c  "w   Hello world w
+        |  c  "x   Hello world x
+        |  c  "y   Hello world y
+        |  c  "z   Hello world z
+        |  c  "-   s
+        |  c  "*   mall delete register
+        |  c  "+   clipboard content
+        |  c  ":   ascii
+        |  c  "/   search pattern
       """.trimMargin(),
     )
   }
@@ -431,9 +441,10 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  "*   line 0 
-      |  c  "+   clipboard content
+      """
+        |Type Name Content
+        |  c  "*   line 0 
+        |  c  "+   clipboard content
       """.trimMargin(),
     )
   }
@@ -447,12 +458,13 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "0   line
-      |  c  "*   line
-      |  c  "+   line
-      |  c  ":   set clipboard=unnamed,unnamedplus
+      """
+        |Type Name Content
+        |  c  ""   line
+        |  c  "0   line
+        |  c  "*   line
+        |  c  "+   line
+        |  c  ":   set clipboard=unnamed,unnamedplus
       """.trimMargin(),
     )
     enterCommand("set clipboard&")
@@ -467,12 +479,13 @@ class RegistersCommandTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput(
-      """Type Name Content
-      |  c  ""   line
-      |  c  "-   line
-      |  c  "*   
-      |  c  "+   line
-      |  c  ":   set clipboard=unnamed,unnamedplus
+      """
+        |Type Name Content
+        |  c  ""   line
+        |  c  "-   line
+        |  c  "*   
+        |  c  "+   line
+        |  c  ":   set clipboard=unnamed,unnamedplus
       """.trimMargin(),
     )
     enterCommand("set clipboard&")

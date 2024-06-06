@@ -156,7 +156,7 @@ class MarksCommandTest : VimTestCase() {
   fun `test list empty marks`() {
     configureByText("")
     enterCommand("marks")
-    assertExOutput("mark line  col file/text\n")
+    assertExOutput("mark line  col file/text")
   }
 
   @Test
@@ -172,8 +172,9 @@ class MarksCommandTest : VimTestCase() {
 
     enterCommand("marks")
     assertExOutput(
-      """mark line  col file/text
-                     | a      3    8 where it was settled on some sodden sand
+      """
+        |mark line  col file/text
+        | a      3    8 where it was settled on some sodden sand
       """.trimMargin(),
     )
   }
@@ -191,8 +192,9 @@ class MarksCommandTest : VimTestCase() {
 
     enterCommand("marks")
     assertExOutput(
-      """mark line  col file/text
-                     | a      1    0 Lorem ipsum dolor sit amet,
+      """
+        |mark line  col file/text
+        | a      1    0 Lorem ipsum dolor sit amet,
       """.trimMargin(),
     )
   }
@@ -213,11 +215,12 @@ class MarksCommandTest : VimTestCase() {
 
     enterCommand("marks")
     assertExOutput(
-      """mark line  col file/text
-                     | a      1    8 I found it in a legendary land
-                     | b      2    9 all rocks and lavender and tufted grass,
-                     | c      3   10 where it was settled on some sodden sand
-                     | d      4   11 hard by the torrent of a mountain pass.
+      """
+        |mark line  col file/text
+        | a      1    8 I found it in a legendary land
+        | b      2    9 all rocks and lavender and tufted grass,
+        | c      3   10 where it was settled on some sodden sand
+        | d      4   11 hard by the torrent of a mountain pass.
       """.trimMargin(),
     )
   }
@@ -236,9 +239,10 @@ class MarksCommandTest : VimTestCase() {
 
     enterCommand("marks")
     assertExOutput(
-      """mark line  col file/text
-                     | A      1    8 I found it in a legendary land
-                     | B      2   10 all rocks and lavender and tufted grass,
+      """
+        |mark line  col file/text
+        | A      1    8 I found it in a legendary land
+        | B      2   10 all rocks and lavender and tufted grass,
       """.trimMargin(),
     )
   }
@@ -259,9 +263,10 @@ class MarksCommandTest : VimTestCase() {
 
     enterCommand("marks bdD")
     assertExOutput(
-      """mark line  col file/text
-                     | b      2    9 consectetur adipiscing elit
-                     | D      4   11 Cras id tellus in ex imperdiet egestas.
+      """
+        |mark line  col file/text
+        | b      2    9 consectetur adipiscing elit
+        | D      4   11 Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
   }
@@ -277,7 +282,7 @@ class MarksCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("ma" + "jl"))
     enterCommand("marks b")
-    assertExOutput("mark line  col file/text\n")
+    assertExOutput("mark line  col file/text")
   }
 
   @Test
@@ -293,8 +298,9 @@ class MarksCommandTest : VimTestCase() {
     injector.markService.setMark(vimEditor.primaryCaret(), 'a', 100000)
     enterCommand("marks")
     assertExOutput(
-      """mark line  col file/text
-                     | a      4   39 Cras id tellus in ex imperdiet egestas.
+      """
+        |mark line  col file/text
+        | a      4   39 Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
   }
@@ -305,10 +311,11 @@ class MarksCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("ma" + "j" + "mb" + "j" + "mc"))
     enterCommand("marks abc")
     assertExOutput(
-      """mark line  col file/text
-                     | a      1    0 Hello world
-                     | b      2    0 ^F
-                     | c      3    0 ^?
+      """
+        |mark line  col file/text
+        | a      1    0 Hello world
+        | b      2    0 ^F
+        | c      3    0 ^?
       """.trimMargin(),
     )
   }
@@ -321,8 +328,9 @@ class MarksCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("ma"))
     enterCommand("marks a")
     assertExOutput(
-      """mark line  col file/text
-                     | a      1  100 ${text.substring(0, 200)}
+      """
+        |mark line  col file/text
+        | a      1  100 ${text.substring(0, 200)}
       """.trimMargin(),
     )
   }
@@ -359,18 +367,19 @@ class MarksCommandTest : VimTestCase() {
     // Can't easily test 0-9 or " (locations of previously closed files from vim-info)
     enterCommand("marks")
     assertExOutput(
-      """mark line  col file/text
-                     | '      8   20 akin replaced content its blue,
-                     | a      1    8 I found it in a legendary land
-                     | b      1   11 I found it in a legendary land
-                     | A      4    6 hard by the torrent of a mountain pass.
-                     | B      3    6 where it was settled on some sodden sand
-                     | [      8    5 akin replaced content its blue,
-                     | ]      8   21 akin replaced content its blue,
-                     | ^      8   21 akin replaced content its blue,
-                     | .      8   20 akin replaced content its blue,
-                     | <      2   10 all rocks and lavender and tufted grass,
-                     | >      2   16 all rocks and lavender and tufted grass,
+      """
+        |mark line  col file/text
+        | '      8   20 akin replaced content its blue,
+        | a      1    8 I found it in a legendary land
+        | b      1   11 I found it in a legendary land
+        | A      4    6 hard by the torrent of a mountain pass.
+        | B      3    6 where it was settled on some sodden sand
+        | [      8    5 akin replaced content its blue,
+        | ]      8   21 akin replaced content its blue,
+        | ^      8   21 akin replaced content its blue,
+        | .      8   20 akin replaced content its blue,
+        | <      2   10 all rocks and lavender and tufted grass,
+        | >      2   16 all rocks and lavender and tufted grass,
       """.trimMargin(),
     )
   }

@@ -30,7 +30,7 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo dict.pi()"))
-    assertExOutput("3.1415\n")
+    assertExOutput("3.1415")
   }
 
   // todo. `commandToKeys` is executed as if it would from the command line. so no script - no scope ¯\_(ツ)_/¯
@@ -49,7 +49,7 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo s:dict.pi()"))
-    assertExOutput("3.1415\n")
+    assertExOutput("3.1415")
   }
 
   @Test
@@ -66,7 +66,7 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo dict.getName()"))
-    assertExOutput("dict\n")
+    assertExOutput("dict")
   }
 
   @Test
@@ -83,7 +83,7 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("call dict.dict2.dict3.sayHi()"))
-    assertExOutput("hi\n")
+    assertExOutput("hi")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -144,7 +144,7 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo dict.abs(-10)"))
-    assertExOutput("10\n")
+    assertExOutput("10")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)

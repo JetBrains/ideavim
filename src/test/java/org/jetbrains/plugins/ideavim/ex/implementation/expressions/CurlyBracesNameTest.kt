@@ -18,7 +18,7 @@ class CurlyBracesNameTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let x1 = 10"))
     typeText(commandToKeys("echo x{0 + 1}"))
-    assertExOutput("10\n")
+    assertExOutput("10")
   }
 
   @Test
@@ -28,7 +28,7 @@ class CurlyBracesNameTest : VimTestCase() {
     typeText(commandToKeys("let z = 1"))
     typeText(commandToKeys("let y1 = 'leven'"))
     typeText(commandToKeys("echo e{y{z}}"))
-    assertExOutput("11\n")
+    assertExOutput("11")
   }
 
   @Test
@@ -41,9 +41,9 @@ class CurlyBracesNameTest : VimTestCase() {
     typeText(commandToKeys("let twelve = 42"))
 
     typeText(commandToKeys("echo {x1}{x2}{x3}"))
-    assertExOutput("twelve\n")
+    assertExOutput("twelve")
 
     typeText(commandToKeys("echo {{x1}{x2}{x3}}"))
-    assertExOutput("42\n")
+    assertExOutput("42")
   }
 }

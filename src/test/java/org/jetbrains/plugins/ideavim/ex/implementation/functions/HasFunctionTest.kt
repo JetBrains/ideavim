@@ -19,21 +19,21 @@ class HasFunctionTest : VimTestCase() {
   fun `test has for supported feature`() {
     configureByText("\n")
     typeText(commandToKeys("echo has('ide')"))
-    assertExOutput("1\n")
+    assertExOutput("1")
   }
 
   @Test
   fun `test has for unsupported feature`() {
     configureByText("\n")
     typeText(commandToKeys("echo has('autocmd')"))
-    assertExOutput("0\n")
+    assertExOutput("0")
   }
 
   @Test
   fun `test has for int as an argument`() {
     configureByText("\n")
     typeText(commandToKeys("echo has(42)"))
-    assertExOutput("0\n")
+    assertExOutput("0")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)

@@ -72,37 +72,37 @@ class WrapOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'wrap' option reports current global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
 
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap")
   }
 
   @Test
   fun `test local 'wrap' option reports current global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
-    assertCommandOutput("setlocal wrap?", "nowrap\n")
+    assertCommandOutput("setlocal wrap?", "nowrap")
 
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
-    assertCommandOutput("setlocal wrap?", "  wrap\n")
+    assertCommandOutput("setlocal wrap?", "  wrap")
   }
 
   @Test
   fun `test 'wrap' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isUseSoftWraps = true
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap")
 
     fixture.editor.settings.isUseSoftWraps = false
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
   }
 
   @Test
   fun `test local 'wrap' option reports local intellij setting if set via IDE`() {
     fixture.editor.settings.isUseSoftWraps = true
-    assertCommandOutput("setlocal wrap?", "  wrap\n")
+    assertCommandOutput("setlocal wrap?", "  wrap")
 
     fixture.editor.settings.isUseSoftWraps = false
-    assertCommandOutput("setlocal wrap?", "nowrap\n")
+    assertCommandOutput("setlocal wrap?", "nowrap")
   }
 
   @Test
@@ -132,11 +132,11 @@ class WrapOptionMapperTest : VimTestCase() {
   @Test
   fun `test setglobal 'wrap' option affects IdeaVim global value only`() {
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
-    assertCommandOutput("setglobal wrap?", "  wrap\n")  // Default for IdeaVim option is true
+    assertCommandOutput("setglobal wrap?", "  wrap")  // Default for IdeaVim option is true
 
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
     enterCommand("setglobal nowrap")
-    assertCommandOutput("setglobal wrap?", "nowrap\n")
+    assertCommandOutput("setglobal wrap?", "nowrap")
     assertTrue(EditorSettingsExternalizable.getInstance().isUseSoftWraps)
   }
 
@@ -144,7 +144,7 @@ class WrapOptionMapperTest : VimTestCase() {
   fun `test set updates IdeaVim global value as well as local`() {
     // `:set` will update both the local value, and the IdeaVim-only global value
     enterCommand("set nowrap")
-    assertCommandOutput("setglobal wrap?", "nowrap\n")
+    assertCommandOutput("setglobal wrap?", "nowrap")
   }
 
   @Test
@@ -152,9 +152,9 @@ class WrapOptionMapperTest : VimTestCase() {
     // If we use `:set`, it updates the local and per-window global values. If we set the value from the IDE, it only
     // affects the local value
     fixture.editor.settings.isUseSoftWraps = false
-    assertCommandOutput("setlocal wrap?", "nowrap\n")
-    assertCommandOutput("set wrap?", "nowrap\n")
-    assertCommandOutput("setglobal wrap?", "  wrap\n")
+    assertCommandOutput("setlocal wrap?", "nowrap")
+    assertCommandOutput("set wrap?", "nowrap")
+    assertCommandOutput("setglobal wrap?", "  wrap")
   }
 
   @Test
@@ -162,14 +162,14 @@ class WrapOptionMapperTest : VimTestCase() {
     enterCommand("set nowrap")
 
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
-    assertCommandOutput("setlocal wrap?", "nowrap\n")
-    assertCommandOutput("set wrap?", "nowrap\n")
-    assertCommandOutput("setglobal wrap?", "nowrap\n")
+    assertCommandOutput("setlocal wrap?", "nowrap")
+    assertCommandOutput("set wrap?", "nowrap")
+    assertCommandOutput("setglobal wrap?", "nowrap")
 
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
-    assertCommandOutput("setlocal wrap?", "nowrap\n")
-    assertCommandOutput("set wrap?", "nowrap\n")
-    assertCommandOutput("setglobal wrap?", "nowrap\n")
+    assertCommandOutput("setlocal wrap?", "nowrap")
+    assertCommandOutput("set wrap?", "nowrap")
+    assertCommandOutput("setglobal wrap?", "nowrap")
   }
 
   @Test
@@ -185,9 +185,9 @@ class WrapOptionMapperTest : VimTestCase() {
     // Default is true, so reset it to false, then set back to true
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
-    assertCommandOutput("setlocal wrap?", "  wrap\n")
-    assertCommandOutput("set wrap?", "  wrap\n")
-    assertCommandOutput("setglobal wrap?", "  wrap\n")
+    assertCommandOutput("setlocal wrap?", "  wrap")
+    assertCommandOutput("set wrap?", "  wrap")
+    assertCommandOutput("setglobal wrap?", "  wrap")
   }
 
   @Test
@@ -206,7 +206,7 @@ class WrapOptionMapperTest : VimTestCase() {
   fun `test reset 'wrap' to default copies current global intellij setting`() {
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
     fixture.editor.settings.isUseSoftWraps = false
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
 
     enterCommand("set wrap&")
     assertTrue(fixture.editor.settings.isUseSoftWraps)
@@ -220,7 +220,7 @@ class WrapOptionMapperTest : VimTestCase() {
   @Test
   fun `test reset local 'wrap' to default copies current global intellij setting`() {
     fixture.editor.settings.isUseSoftWraps = false
-    assertCommandOutput("setlocal wrap?", "nowrap\n")
+    assertCommandOutput("setlocal wrap?", "nowrap")
 
     enterCommand("setlocal wrap&")
     assertTrue(fixture.editor.settings.isUseSoftWraps)
@@ -235,59 +235,59 @@ class WrapOptionMapperTest : VimTestCase() {
   fun `test open new window without setting the option copies value as not-explicitly set`() {
     // New window will clone local and global local-to-window options, then apply global to local. This tests that our
     // handling of per-window "global" values is correct.
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap")
 
     // Changing the global setting should update the new editor
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
   }
 
   @Test
   fun `test open new window after setting option copies value as explicitly set`() {
     enterCommand("set nowrap")
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
   }
 
   @Test
   fun `test setglobal 'wrap' used when opening new window`() {
     enterCommand("setglobal nowrap")
-    assertCommandOutput("setglobal wrap?", "nowrap\n")
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("setglobal wrap?", "nowrap")
+    assertCommandOutput("set wrap?", "  wrap")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
   }
 
   @Test
   fun `test setlocal 'wrap' then open new window uses value from setglobal`() {
     enterCommand("setlocal nowrap")
-    assertCommandOutput("setglobal wrap?", "  wrap\n")
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("setglobal wrap?", "  wrap")
+    assertCommandOutput("set wrap?", "nowrap")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap")
   }
 
   @Test
@@ -301,12 +301,12 @@ class WrapOptionMapperTest : VimTestCase() {
     }
 
     switchToNewFile("bbb.txt", "lorem ipsum")
-    assertCommandOutput("set wrap?", "nowrap\n")
+    assertCommandOutput("set wrap?", "nowrap")
 
     // Changing the global setting should update the editor, because it was initially set during plugin startup
     // Default is true, so reset before changing again
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = false
     EditorSettingsExternalizable.getInstance().isUseSoftWraps = true
-    assertCommandOutput("set wrap?", "  wrap\n")
+    assertCommandOutput("set wrap?", "  wrap")
   }
 }

@@ -103,46 +103,46 @@ class TextWidthOptionMapperTest : VimTestCase() {
   fun `test 'textwidth' option reports global intellij setting if not explicitly set`() {
     globalWrapOnTyping = true
     globalRightMargin = 50
-    assertCommandOutput("set textwidth?", "  textwidth=50\n")
+    assertCommandOutput("set textwidth?", "  textwidth=50")
 
     globalWrapOnTyping = false
-    assertCommandOutput("set textwidth?", "  textwidth=0\n")
+    assertCommandOutput("set textwidth?", "  textwidth=0")
   }
 
   @Test
   fun `test local 'textwidth' option reports global intellij setting if not explicitly set`() {
     globalWrapOnTyping = true
     globalRightMargin = 50
-    assertCommandOutput("setlocal textwidth?", "  textwidth=50\n")
+    assertCommandOutput("setlocal textwidth?", "  textwidth=50")
 
     globalWrapOnTyping = false
-    assertCommandOutput("setlocal textwidth?", "  textwidth=0\n")
+    assertCommandOutput("setlocal textwidth?", "  textwidth=0")
   }
 
   @Test
   fun `test 'textwidth' option reports local intellij setting if set via IDE`() {
     localWrapOnTyping = true
     localRightMargin = 60
-    assertCommandOutput("set textwidth?", "  textwidth=60\n")
+    assertCommandOutput("set textwidth?", "  textwidth=60")
 
     localRightMargin = 70
-    assertCommandOutput("set textwidth?", "  textwidth=70\n")
+    assertCommandOutput("set textwidth?", "  textwidth=70")
 
     localWrapOnTyping = false
-    assertCommandOutput("set textwidth?", "  textwidth=0\n")
+    assertCommandOutput("set textwidth?", "  textwidth=0")
   }
 
   @Test
   fun `test local 'textwidth' option reports local intellij setting if set via IDE`() {
     localWrapOnTyping = true
     localRightMargin = 60
-    assertCommandOutput("setlocal textwidth?", "  textwidth=60\n")
+    assertCommandOutput("setlocal textwidth?", "  textwidth=60")
 
     localRightMargin = 70
-    assertCommandOutput("setlocal textwidth?", "  textwidth=70\n")
+    assertCommandOutput("setlocal textwidth?", "  textwidth=70")
 
     localWrapOnTyping = false
-    assertCommandOutput("setlocal textwidth?", "  textwidth=0\n")
+    assertCommandOutput("setlocal textwidth?", "  textwidth=0")
   }
 
   @Test
@@ -194,10 +194,10 @@ class TextWidthOptionMapperTest : VimTestCase() {
   fun `test setglobal 'textwidth' does not modify global intellij setting`() {
     assertFalse(globalWrapOnTyping)
     assertEquals(defaultRightMargin, globalRightMargin)
-    assertCommandOutput("setglobal textwidth?", "  textwidth=0\n")
+    assertCommandOutput("setglobal textwidth?", "  textwidth=0")
 
     enterCommand("setglobal textwidth=60")
-    assertCommandOutput("setglobal textwidth?", "  textwidth=60\n")
+    assertCommandOutput("setglobal textwidth?", "  textwidth=60")
     assertFalse(globalWrapOnTyping)
     assertEquals(defaultRightMargin, globalRightMargin)
   }
@@ -205,8 +205,8 @@ class TextWidthOptionMapperTest : VimTestCase() {
   @Test
   fun `test set 'textwidth' updates local and global ideavim values`() {
     enterCommand("set textwidth=40")
-    assertCommandOutput("set textwidth?", "  textwidth=40\n")
-    assertCommandOutput("setglobal textwidth?", "  textwidth=40\n")
+    assertCommandOutput("set textwidth?", "  textwidth=40")
+    assertCommandOutput("setglobal textwidth?", "  textwidth=40")
   }
 
   @Test
@@ -215,9 +215,9 @@ class TextWidthOptionMapperTest : VimTestCase() {
     // local value
     localWrapOnTyping = true
     localRightMargin = 80
-    assertCommandOutput("setlocal textwidth?", "  textwidth=80\n")
-    assertCommandOutput("set textwidth?", "  textwidth=80\n")
-    assertCommandOutput("setglobal textwidth?", "  textwidth=0\n")
+    assertCommandOutput("setlocal textwidth?", "  textwidth=80")
+    assertCommandOutput("set textwidth?", "  textwidth=80")
+    assertCommandOutput("setglobal textwidth?", "  textwidth=0")
   }
 
   @Test
@@ -227,16 +227,16 @@ class TextWidthOptionMapperTest : VimTestCase() {
 
     localWrapOnTyping = false
     localRightMargin = 90
-    assertCommandOutput("set textwidth?", "  textwidth=0\n")
+    assertCommandOutput("set textwidth?", "  textwidth=0")
 
     enterCommand("set textwidth&")
-    assertCommandOutput("set textwidth?", "  textwidth=80\n")
+    assertCommandOutput("set textwidth?", "  textwidth=80")
     assertTrue(localWrapOnTyping)
     assertEquals(80, localRightMargin)
 
     // Verify that we've only copied the values instead of resetting the editor local settings
     globalWrapOnTyping = false
-    assertCommandOutput("set textwidth?", "  textwidth=80\n")
+    assertCommandOutput("set textwidth?", "  textwidth=80")
   }
 
   @Test
@@ -246,16 +246,16 @@ class TextWidthOptionMapperTest : VimTestCase() {
 
     localWrapOnTyping = false
     localRightMargin = 90
-    assertCommandOutput("set textwidth?", "  textwidth=0\n")
+    assertCommandOutput("set textwidth?", "  textwidth=0")
 
     enterCommand("setlocal textwidth&")
-    assertCommandOutput("set textwidth?", "  textwidth=80\n")
+    assertCommandOutput("set textwidth?", "  textwidth=80")
     assertTrue(localWrapOnTyping)
     assertEquals(80, localRightMargin)
 
     // Verify that we've only copied the values instead of resetting the editor local settings
     globalWrapOnTyping = false
-    assertCommandOutput("set textwidth?", "  textwidth=80\n")
+    assertCommandOutput("set textwidth?", "  textwidth=80")
   }
 
   @Test
@@ -263,15 +263,15 @@ class TextWidthOptionMapperTest : VimTestCase() {
     // 'textwidth' is local-to-buffer, so doesn't get copied to new windows. We should have the default
     globalWrapOnTyping = true
     globalRightMargin = 80
-    assertCommandOutput("set textwidth?", "  textwidth=80\n")
+    assertCommandOutput("set textwidth?", "  textwidth=80")
 
     openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set textwidth?", "  textwidth=80\n")
+    assertCommandOutput("set textwidth?", "  textwidth=80")
 
     // Changing the global setting should update the new editor
     globalRightMargin = 100
-    assertCommandOutput("set textwidth?", "  textwidth=100\n")
+    assertCommandOutput("set textwidth?", "  textwidth=100")
   }
 
   @Test
@@ -279,15 +279,15 @@ class TextWidthOptionMapperTest : VimTestCase() {
     globalWrapOnTyping = true
     globalRightMargin = 80
     enterCommand("set textwidth=78")
-    assertCommandOutput("set textwidth?", "  textwidth=78\n")
+    assertCommandOutput("set textwidth?", "  textwidth=78")
 
     openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set textwidth?", "  textwidth=78\n")
+    assertCommandOutput("set textwidth?", "  textwidth=78")
 
     // Changing the global setting should NOT update the new editor
     globalRightMargin = 100
-    assertCommandOutput("set textwidth?", "  textwidth=78\n")
+    assertCommandOutput("set textwidth?", "  textwidth=78")
   }
 
   @Test
@@ -296,11 +296,11 @@ class TextWidthOptionMapperTest : VimTestCase() {
 
     openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set textwidth?", "  textwidth=50\n")
+    assertCommandOutput("set textwidth?", "  textwidth=50")
 
     // Changing the global value should NOT update the editor
     globalWrapOnTyping = false
-    assertCommandOutput("set textwidth?", "  textwidth=50\n")
+    assertCommandOutput("set textwidth?", "  textwidth=50")
   }
 
   @Test

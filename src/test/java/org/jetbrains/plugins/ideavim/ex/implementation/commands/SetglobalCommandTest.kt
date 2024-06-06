@@ -57,20 +57,20 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test set toggle option global value`() {
     enterCommand("setglobal rnu")
-    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
-    assertCommandOutput("setlocal rnu?", "norelativenumber\n")
+    assertCommandOutput("setglobal rnu?", "  relativenumber")
+    assertCommandOutput("setlocal rnu?", "norelativenumber")
 
     enterCommand("setglobal nornu")
-    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
-    assertCommandOutput("setlocal rnu?", "norelativenumber\n")
+    assertCommandOutput("setglobal rnu?", "norelativenumber")
+    assertCommandOutput("setlocal rnu?", "norelativenumber")
 
     enterCommand("setglobal rnu!")
-    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
-    assertCommandOutput("setlocal rnu?", "norelativenumber\n")
+    assertCommandOutput("setglobal rnu?", "  relativenumber")
+    assertCommandOutput("setlocal rnu?", "norelativenumber")
 
     enterCommand("setglobal invrnu")
-    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
-    assertCommandOutput("setlocal rnu?", "norelativenumber\n")
+    assertCommandOutput("setglobal rnu?", "norelativenumber")
+    assertCommandOutput("setlocal rnu?", "norelativenumber")
   }
 
   @Test
@@ -110,29 +110,29 @@ class SetglobalCommandTest : VimTestCase() {
 
   @Test
   fun `test show toggle option global value`() {
-    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
+    assertCommandOutput("setglobal rnu?", "norelativenumber")
 
     enterCommand("setglobal invrnu")
-    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
+    assertCommandOutput("setglobal rnu?", "  relativenumber")
   }
 
   @Test
   fun `test reset global toggle option value to default value`() {
     enterCommand("setglobal rnu") // Local option, global value
-    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
+    assertCommandOutput("setglobal rnu?", "  relativenumber")
 
     enterCommand("setglobal rnu&")
-    assertCommandOutput("setglobal rnu?", "norelativenumber\n")
+    assertCommandOutput("setglobal rnu?", "norelativenumber")
   }
 
   @Test
   fun `test reset global toggle option value to global value does nothing`() {
     enterCommand("setglobal relativenumber") // Local option, global value
-    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
+    assertCommandOutput("setglobal rnu?", "  relativenumber")
 
     // Copies the global value to itself, doesn't change anything
     enterCommand("setglobal relativenumber<")
-    assertCommandOutput("setglobal rnu?", "  relativenumber\n")
+    assertCommandOutput("setglobal rnu?", "  relativenumber")
   }
 
   @Test
@@ -143,14 +143,14 @@ class SetglobalCommandTest : VimTestCase() {
 
       enterCommand("setglobal test")
       enterCommand("setlocal notest")
-      assertCommandOutput("setglobal test?", "  test\n")
-      assertCommandOutput("setlocal test?", "notest\n")
+      assertCommandOutput("setglobal test?", "  test")
+      assertCommandOutput("setlocal test?", "notest")
 
       // Reset global value to default
       enterCommand("setglobal test&")
 
-      assertCommandOutput("setglobal test?", "notest\n")
-      assertCommandOutput("setlocal test?", "notest\n")
+      assertCommandOutput("setglobal test?", "notest")
+      assertCommandOutput("setlocal test?", "notest")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -165,14 +165,14 @@ class SetglobalCommandTest : VimTestCase() {
 
       enterCommand("setglobal test")
       enterCommand("setlocal notest")
-      assertCommandOutput("setglobal test?", "  test\n")
-      assertCommandOutput("setlocal test?", "notest\n")
+      assertCommandOutput("setglobal test?", "  test")
+      assertCommandOutput("setlocal test?", "notest")
 
       // Copies the global value to the target scope (i.e. global, this is a no-op)
       enterCommand("setglobal test<")
 
-      assertCommandOutput("setglobal test?", "  test\n")
-      assertCommandOutput("setlocal test?", "notest\n")
+      assertCommandOutput("setglobal test?", "  test")
+      assertCommandOutput("setlocal test?", "notest")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -182,28 +182,28 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test set number option global value`() {
     enterCommand("setglobal scroll&")
-    assertCommandOutput("setglobal scroll?", "  scroll=0\n")
-    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=0")
+    assertCommandOutput("setlocal scroll?", "  scroll=0")
 
     enterCommand("setglobal scroll=5")
-    assertCommandOutput("setglobal scroll?", "  scroll=5\n")
-    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=5")
+    assertCommandOutput("setlocal scroll?", "  scroll=0")
 
     enterCommand("setglobal scroll:10")
-    assertCommandOutput("setglobal scroll?", "  scroll=10\n")
-    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=10")
+    assertCommandOutput("setlocal scroll?", "  scroll=0")
 
     enterCommand("setglobal scroll+=5")
-    assertCommandOutput("setglobal scroll?", "  scroll=15\n")
-    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=15")
+    assertCommandOutput("setlocal scroll?", "  scroll=0")
 
     enterCommand("setglobal scroll-=10")
-    assertCommandOutput("setglobal scroll?", "  scroll=5\n")
-    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=5")
+    assertCommandOutput("setlocal scroll?", "  scroll=0")
 
     enterCommand("setglobal scroll^=2")
-    assertCommandOutput("setglobal scroll?", "  scroll=10\n")
-    assertCommandOutput("setlocal scroll?", "  scroll=0\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=10")
+    assertCommandOutput("setlocal scroll?", "  scroll=0")
   }
 
   @Test
@@ -228,13 +228,13 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test show number option global value`() {
     enterCommand("setglobal scroll=10")
-    assertCommandOutput("setglobal scroll?", "  scroll=10\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=10")
   }
 
   @Test
   fun `test number option with no arguments shows current global value`() {
     enterCommand("setglobal scroll=10")
-    assertCommandOutput("setglobal scroll", "  scroll=10\n")
+    assertCommandOutput("setglobal scroll", "  scroll=10")
   }
 
   @Test
@@ -242,7 +242,7 @@ class SetglobalCommandTest : VimTestCase() {
     enterCommand("setglobal scroll=10")  // Default global value is 0
 
     enterCommand("setglobal scroll&")
-    assertCommandOutput("setglobal scroll?", "  scroll=0\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=0")
   }
 
   @Test
@@ -250,7 +250,7 @@ class SetglobalCommandTest : VimTestCase() {
     enterCommand("setglobal scroll=10")  // Default global value is 0
 
     enterCommand("setglobal scroll<")
-    assertCommandOutput("setglobal scroll?", "  scroll=10\n")
+    assertCommandOutput("setglobal scroll?", "  scroll=10")
   }
 
   @Test
@@ -261,14 +261,14 @@ class SetglobalCommandTest : VimTestCase() {
 
       enterCommand("setglobal test=20")
       enterCommand("setlocal test=30")
-      assertCommandOutput("setglobal test?", "  test=20\n")
-      assertCommandOutput("setlocal test?", "  test=30\n")
+      assertCommandOutput("setglobal test?", "  test=20")
+      assertCommandOutput("setlocal test?", "  test=30")
 
       // setglobal {option}< copies the global value to the target scope
       enterCommand("setglobal test&")
 
-      assertCommandOutput("setglobal test?", "  test=10\n")
-      assertCommandOutput("setlocal test?", "  test=30\n")
+      assertCommandOutput("setglobal test?", "  test=10")
+      assertCommandOutput("setlocal test?", "  test=30")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -283,14 +283,14 @@ class SetglobalCommandTest : VimTestCase() {
 
       enterCommand("setglobal test=20")
       enterCommand("setlocal test=30")
-      assertCommandOutput("setglobal test?", "  test=20\n")
-      assertCommandOutput("setlocal test?", "  test=30\n")
+      assertCommandOutput("setglobal test?", "  test=20")
+      assertCommandOutput("setlocal test?", "  test=30")
 
       // setglobal {option}< copies the global value to the target scope
       enterCommand("setglobal test<")
 
-      assertCommandOutput("setglobal test?", "  test=20\n")
-      assertCommandOutput("setlocal test?", "  test=30\n")
+      assertCommandOutput("setglobal test?", "  test=20")
+      assertCommandOutput("setlocal test?", "  test=30")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -300,24 +300,24 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test set string option global value`() {
     enterCommand("setglobal nrformats=octal")
-    assertCommandOutput("setglobal nrformats", "  nrformats=octal\n")
-    assertCommandOutput("setlocal nrformats", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats", "  nrformats=octal")
+    assertCommandOutput("setlocal nrformats", "  nrformats=hex")
 
     enterCommand("setglobal nrformats:alpha")
-    assertCommandOutput("setglobal nrformats", "  nrformats=alpha\n")
-    assertCommandOutput("setlocal nrformats", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats", "  nrformats=alpha")
+    assertCommandOutput("setlocal nrformats", "  nrformats=hex")
 
     enterCommand("setglobal nrformats+=hex")
-    assertCommandOutput("setglobal nrformats", "  nrformats=alpha,hex\n")
-    assertCommandOutput("setlocal nrformats", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats", "  nrformats=alpha,hex")
+    assertCommandOutput("setlocal nrformats", "  nrformats=hex")
 
     enterCommand("setglobal nrformats-=hex")
-    assertCommandOutput("setglobal nrformats", "  nrformats=alpha\n")
-    assertCommandOutput("setlocal nrformats", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats", "  nrformats=alpha")
+    assertCommandOutput("setlocal nrformats", "  nrformats=hex")
 
     enterCommand("setglobal nrformats^=hex")
-    assertCommandOutput("setglobal nrformats", "  nrformats=hex,alpha\n")
-    assertCommandOutput("setlocal nrformats", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats", "  nrformats=hex,alpha")
+    assertCommandOutput("setlocal nrformats", "  nrformats=hex")
   }
 
   @Test
@@ -341,29 +341,29 @@ class SetglobalCommandTest : VimTestCase() {
 
   @Test
   fun `test show string option global value`() {
-    assertCommandOutput("setglobal nrformats?", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats?", "  nrformats=hex")
 
     enterCommand("setglobal nrformats+=alpha")
-    assertCommandOutput("setglobal nrformats?", "  nrformats=hex,alpha\n")
+    assertCommandOutput("setglobal nrformats?", "  nrformats=hex,alpha")
   }
 
   @Test
   fun `test string option with no arguments shows current global value`() {
-    assertCommandOutput("setglobal nrformats", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats", "  nrformats=hex")
   }
 
   @Test
   fun `test reset string global option value to default value`() {
     enterCommand("setglobal nrformats=alpha")
     enterCommand("setglobal nrformats&")
-    assertCommandOutput("setglobal nrformats?", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats?", "  nrformats=hex")
   }
 
   @Test
   fun `test reset string global option value to global value does nothing`() {
     enterCommand("setglobal nrformats=alpha")
     enterCommand("setglobal nrformats<")
-    assertCommandOutput("setglobal nrformats?", "  nrformats=alpha\n")
+    assertCommandOutput("setglobal nrformats?", "  nrformats=alpha")
   }
 
   @Test
@@ -378,7 +378,7 @@ class SetglobalCommandTest : VimTestCase() {
       // Copies the default value to the target scope
       enterCommand("setglobal test&")
 
-      assertCommandOutput("setglobal test?", "  test=testValue\n")
+      assertCommandOutput("setglobal test?", "  test=testValue")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -397,7 +397,7 @@ class SetglobalCommandTest : VimTestCase() {
       // Copies the global value to the target scope (i.e. global, this is a no-op)
       enterCommand("setglobal test<")
 
-      assertCommandOutput("setglobal test?", "  test=globalValue\n")
+      assertCommandOutput("setglobal test?", "  test=globalValue")
     }
     finally {
       injector.optionGroup.removeOption(option.name)
@@ -408,14 +408,14 @@ class SetglobalCommandTest : VimTestCase() {
   fun `test reset string option to default value`() {
     enterCommand("setglobal nrformats=alpha")
     enterCommand("setglobal nrformats&")
-    assertCommandOutput("setglobal nrformats?", "  nrformats=hex\n")
+    assertCommandOutput("setglobal nrformats?", "  nrformats=hex")
   }
 
   @Test
   fun `test show all modified global option values`() {
     assertCommandOutput("setglobal", """
       |--- Global option values ---
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -426,7 +426,7 @@ class SetglobalCommandTest : VimTestCase() {
       |--- Global option values ---
       |  number              relativenumber      scrolloff=10        sidescrolloff=10
       |  nrformats=alpha,hex,octal
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -466,7 +466,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  shell=/dummy/path/to/bash
       |novim-paragraph-motion
       |  viminfo='100,<50,s10,h
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -474,7 +474,7 @@ class SetglobalCommandTest : VimTestCase() {
   fun `test show named options`() {
     assertCommandOutput("setglobal number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex     nonumber            norelativenumber      scrolloff=0
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -482,7 +482,7 @@ class SetglobalCommandTest : VimTestCase() {
   fun `test show all modified global option values in single column`() {
     assertCommandOutput("setglobal!", """
       |--- Global option values ---
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -496,7 +496,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  relativenumber
       |  scrolloff=10
       |  sidescrolloff=10
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -579,7 +579,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  whichwrap=b,s
       |  wrap
       |  wrapscan
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 
@@ -590,7 +590,7 @@ class SetglobalCommandTest : VimTestCase() {
       |nonumber
       |norelativenumber
       |  scrolloff=0
-      |""".trimMargin()
+      """.trimMargin()
     )
   }
 }

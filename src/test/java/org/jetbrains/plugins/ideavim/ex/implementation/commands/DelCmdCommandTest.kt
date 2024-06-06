@@ -22,7 +22,7 @@ class DelCmdCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("command"))
     assertPluginError(false)
-    assertExOutput("Name        Args       Definition\n") // There should not be any aliases.
+    assertExOutput("Name        Args       Definition") // There should not be any aliases.
 
     typeText(commandToKeys("command Vs vs"))
     assertPluginError(false)

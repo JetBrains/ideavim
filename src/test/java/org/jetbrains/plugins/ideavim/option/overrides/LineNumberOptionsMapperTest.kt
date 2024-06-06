@@ -65,67 +65,67 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   @Test
   fun `test 'number' and 'relativenumber' options reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("set number?", "nonumber\n")
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set number?", "nonumber")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.HYBRID
-    assertCommandOutput("set number?", "  number\n")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set number?", "  number")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
   }
 
   @Test
   fun `test local 'number' and 'relativenumber' options reports global intellij setting if not explicitly set`() {
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("setlocal number?", "nonumber\n")
-    assertCommandOutput("setlocal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setlocal number?", "nonumber")
+    assertCommandOutput("setlocal relativenumber?", "norelativenumber")
 
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.HYBRID
-    assertCommandOutput("setlocal number?", "  number\n")
-    assertCommandOutput("setlocal relativenumber?", "  relativenumber\n")
+    assertCommandOutput("setlocal number?", "  number")
+    assertCommandOutput("setlocal relativenumber?", "  relativenumber")
   }
 
   @Test
   fun `test 'number' and 'relativenumber' options report local intellij settings if set via IDE`() {
     fixture.editor.settings.isLineNumbersShown = false
-    assertCommandOutput("set number?", "nonumber\n")
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set number?", "nonumber")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     // View | Active Editor | Show Line Numbers. There is no UI for line numeration type
     fixture.editor.settings.isLineNumbersShown = true
     fixture.editor.settings.lineNumerationType = LineNumerationType.HYBRID
-    assertCommandOutput("set number?", "  number\n")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set number?", "  number")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
 
     fixture.editor.settings.lineNumerationType = LineNumerationType.ABSOLUTE
-    assertCommandOutput("set number?", "  number\n")
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set number?", "  number")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     fixture.editor.settings.lineNumerationType = LineNumerationType.RELATIVE
-    assertCommandOutput("set number?", "nonumber\n")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set number?", "nonumber")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
   }
 
   @Test
   fun `test local 'number' and 'relativenumber' options report local intellij settings if set via IDE`() {
     fixture.editor.settings.isLineNumbersShown = false
-    assertCommandOutput("setlocal number?", "nonumber\n")
-    assertCommandOutput("setlocal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setlocal number?", "nonumber")
+    assertCommandOutput("setlocal relativenumber?", "norelativenumber")
 
     // View | Active Editor | Show Line Numbers. There is no UI for line numeration type
     fixture.editor.settings.isLineNumbersShown = true
     fixture.editor.settings.lineNumerationType = LineNumerationType.HYBRID
-    assertCommandOutput("setlocal number?", "  number\n")
-    assertCommandOutput("setlocal relativenumber?", "  relativenumber\n")
+    assertCommandOutput("setlocal number?", "  number")
+    assertCommandOutput("setlocal relativenumber?", "  relativenumber")
 
     fixture.editor.settings.lineNumerationType = LineNumerationType.ABSOLUTE
-    assertCommandOutput("setlocal number?", "  number\n")
-    assertCommandOutput("setlocal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setlocal number?", "  number")
+    assertCommandOutput("setlocal relativenumber?", "norelativenumber")
 
     fixture.editor.settings.lineNumerationType = LineNumerationType.RELATIVE
-    assertCommandOutput("setlocal number?", "nonumber\n")
-    assertCommandOutput("setlocal relativenumber?", "  relativenumber\n")
+    assertCommandOutput("setlocal number?", "nonumber")
+    assertCommandOutput("setlocal relativenumber?", "  relativenumber")
   }
 
   @Test
@@ -199,10 +199,10 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   @Test
   fun `test set global 'number' option affects IdeaVim global value only`() {
     assertFalse(IjOptions.number.defaultValue.asBoolean())
-    assertCommandOutput("setglobal number?", "nonumber\n")
+    assertCommandOutput("setglobal number?", "nonumber")
 
     enterCommand("setglobal number")
-    assertCommandOutput("setglobal number?", "  number\n")
+    assertCommandOutput("setglobal number?", "  number")
     assertFalse(EditorSettingsExternalizable.getInstance().isLineNumbersShown)
     assertFalse(fixture.editor.settings.isLineNumbersShown)
   }
@@ -210,10 +210,10 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   @Test
   fun `test set global 'relativenumber' option affects IdeaVim global value only`() {
     assertFalse(IjOptions.number.defaultValue.asBoolean())
-    assertCommandOutput("setglobal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setglobal relativenumber?", "norelativenumber")
 
     enterCommand("setglobal relativenumber")
-    assertCommandOutput("setglobal relativenumber?", "  relativenumber\n")
+    assertCommandOutput("setglobal relativenumber?", "  relativenumber")
     assertFalse(EditorSettingsExternalizable.getInstance().isLineNumbersShown)
     assertFalse(fixture.editor.settings.isLineNumbersShown)
   }
@@ -221,13 +221,13 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   @Test
   fun `test set 'number' updates IdeaVim global value as well as local`() {
     enterCommand("set number")
-    assertCommandOutput("setglobal number?", "  number\n")
+    assertCommandOutput("setglobal number?", "  number")
   }
 
   @Test
   fun `test set 'relativenumber' updates IdeaVim global value as well as local`() {
     enterCommand("set relativenumber")
-    assertCommandOutput("setglobal relativenumber?", "  relativenumber\n")
+    assertCommandOutput("setglobal relativenumber?", "  relativenumber")
   }
 
   @Test
@@ -237,13 +237,13 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     fixture.editor.settings.isLineNumbersShown = true
     fixture.editor.settings.lineNumerationType = LineNumerationType.HYBRID
 
-    assertCommandOutput("setlocal number?", "  number\n")
-    assertCommandOutput("set number?", "  number\n")
-    assertCommandOutput("setglobal number?", "nonumber\n")
+    assertCommandOutput("setlocal number?", "  number")
+    assertCommandOutput("set number?", "  number")
+    assertCommandOutput("setglobal number?", "nonumber")
 
-    assertCommandOutput("setlocal relativenumber?", "  relativenumber\n")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
-    assertCommandOutput("setglobal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setlocal relativenumber?", "  relativenumber")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
+    assertCommandOutput("setglobal relativenumber?", "norelativenumber")
   }
 
   @Test
@@ -251,16 +251,16 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     enterCommand("set number relativenumber")
 
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("setlocal number?", "  number\n")
-    assertCommandOutput("set number?", "  number\n")
-    assertCommandOutput("setglobal number?", "  number\n")
+    assertCommandOutput("setlocal number?", "  number")
+    assertCommandOutput("set number?", "  number")
+    assertCommandOutput("setglobal number?", "  number")
 
     enterCommand("set nonumber")
 
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-    assertCommandOutput("setlocal number?", "nonumber\n")
-    assertCommandOutput("set number?", "nonumber\n")
-    assertCommandOutput("setglobal number?", "nonumber\n")
+    assertCommandOutput("setlocal number?", "nonumber")
+    assertCommandOutput("set number?", "nonumber")
+    assertCommandOutput("setglobal number?", "nonumber")
   }
 
   @Test
@@ -268,16 +268,16 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     enterCommand("set number relativenumber")
 
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
-    assertCommandOutput("setlocal relativenumber?", "  relativenumber\n")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
-    assertCommandOutput("setglobal relativenumber?", "  relativenumber\n")
+    assertCommandOutput("setlocal relativenumber?", "  relativenumber")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
+    assertCommandOutput("setglobal relativenumber?", "  relativenumber")
 
     enterCommand("set norelativenumber")
 
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.HYBRID
-    assertCommandOutput("setlocal relativenumber?", "norelativenumber\n")
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
-    assertCommandOutput("setglobal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setlocal relativenumber?", "norelativenumber")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
+    assertCommandOutput("setglobal relativenumber?", "norelativenumber")
   }
 
   @Test
@@ -297,9 +297,9 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     }
 
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("setlocal number?", "nonumber\n")
-    assertCommandOutput("set number?", "nonumber\n")
-    assertCommandOutput("setglobal number?", "nonumber\n")
+    assertCommandOutput("setlocal number?", "nonumber")
+    assertCommandOutput("set number?", "nonumber")
+    assertCommandOutput("setglobal number?", "nonumber")
   }
 
   @Test
@@ -317,9 +317,9 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     }
 
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
-    assertCommandOutput("setlocal relativenumber?", "norelativenumber\n")
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
-    assertCommandOutput("setglobal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setlocal relativenumber?", "norelativenumber")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
+    assertCommandOutput("setglobal relativenumber?", "norelativenumber")
   }
 
   @Test
@@ -327,7 +327,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
     fixture.editor.settings.isLineNumbersShown = false
-    assertCommandOutput("set number?", "nonumber\n")
+    assertCommandOutput("set number?", "nonumber")
 
     enterCommand("set number&")
     assertTrue(fixture.editor.settings.isLineNumbersShown)
@@ -347,7 +347,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
     // Value becomes External(true) because the user is explicitly setting it
     fixture.editor.settings.isLineNumbersShown = false
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     enterCommand("set relativenumber&")
     assertTrue(fixture.editor.settings.isLineNumbersShown)
@@ -364,7 +364,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
     fixture.editor.settings.isLineNumbersShown = false
-    assertCommandOutput("set number?", "nonumber\n")
+    assertCommandOutput("set number?", "nonumber")
 
     enterCommand("setlocal number&")
     assertTrue(fixture.editor.settings.isLineNumbersShown)
@@ -384,7 +384,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
     // Value becomes External(true) because the user is explicitly setting it
     fixture.editor.settings.isLineNumbersShown = false
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     enterCommand("setlocal relativenumber&")
     assertTrue(fixture.editor.settings.isLineNumbersShown)
@@ -400,120 +400,120 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   fun `test open new window without setting 'number' copies value as not-explicitly set`() {
     // New window will clone local and global local-to-window options, then apply global to local. This tests that our
     // handling of per-window "global" values is correct.
-    assertCommandOutput("set number?", "nonumber\n")
+    assertCommandOutput("set number?", "nonumber")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set number?", "nonumber\n")
+    assertCommandOutput("set number?", "nonumber")
 
     // Changing the global setting should update the new editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("set number?", "  number")
   }
 
   @Test
   fun `test open new window without setting 'relativenumber' copies value as not-explicitly set`() {
     // New window will clone local and global local-to-window options, then apply global to local. This tests that our
     // handling of per-window "global" values is correct.
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     // Changing the global setting should update the new editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.RELATIVE
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
   }
 
   @Test
   fun `test open new window after setting 'number' copies value as explicitly set`() {
     enterCommand("set number")
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("set number?", "  number")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("set number?", "  number")
 
     // Changing the global setting should NOT update the new editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("set number?", "  number")
   }
 
   @Test
   fun `test open new window after setting 'relativenumber' copies value as explicitly set`() {
     enterCommand("set relativenumber")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
 
     // Changing the global setting should NOT update the new editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
   }
 
   @Test
   fun `test setglobal 'number' used when opening new window`() {
     enterCommand("setglobal number")
-    assertCommandOutput("setglobal number?", "  number\n")
-    assertCommandOutput("set number?", "nonumber\n")
+    assertCommandOutput("setglobal number?", "  number")
+    assertCommandOutput("set number?", "nonumber")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("set number?", "  number")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("set number?", "  number")
   }
 
   @Test
   fun `test setglobal 'relativenumber' used when opening new window`() {
     enterCommand("setglobal relativenumber")
-    assertCommandOutput("setglobal relativenumber?", "  relativenumber\n")
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setglobal relativenumber?", "  relativenumber")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
   }
 
   @Test
   fun `test setlocal 'number' then open new window uses value from setglobal`() {
     enterCommand("setlocal number")
-    assertCommandOutput("setglobal number?", "nonumber\n")
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("setglobal number?", "nonumber")
+    assertCommandOutput("set number?", "  number")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set number?", "nonumber\n")
+    assertCommandOutput("set number?", "nonumber")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-    assertCommandOutput("set number?", "nonumber\n")
+    assertCommandOutput("set number?", "nonumber")
   }
 
   @Test
   fun `test setlocal 'relativenumber' then open new window uses value from setglobal`() {
     enterCommand("setlocal relativenumber")
-    assertCommandOutput("setglobal relativenumber?", "norelativenumber\n")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("setglobal relativenumber?", "norelativenumber")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
 
     switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
 
     // Changing the global setting should NOT update the editor
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
   }
 
   @Test
@@ -531,12 +531,12 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     }
 
     switchToNewFile("bbb.txt", "lorem ipsum")
-    assertCommandOutput("set number?", "  number\n")
+    assertCommandOutput("set number?", "  number")
 
     EditorSettingsExternalizable.getInstance().isLineNumbersShown = false
-    assertCommandOutput("setlocal number?", "nonumber\n")
-    assertCommandOutput("set number?", "nonumber\n")
-    assertCommandOutput("setglobal number?", "nonumber\n")
+    assertCommandOutput("setlocal number?", "nonumber")
+    assertCommandOutput("set number?", "nonumber")
+    assertCommandOutput("setglobal number?", "nonumber")
   }
 
   @Test
@@ -554,11 +554,11 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     }
 
     switchToNewFile("bbb.txt", "lorem ipsum")
-    assertCommandOutput("set relativenumber?", "  relativenumber\n")
+    assertCommandOutput("set relativenumber?", "  relativenumber")
 
     EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
-    assertCommandOutput("setlocal relativenumber?", "norelativenumber\n")
-    assertCommandOutput("set relativenumber?", "norelativenumber\n")
-    assertCommandOutput("setglobal relativenumber?", "norelativenumber\n")
+    assertCommandOutput("setlocal relativenumber?", "norelativenumber")
+    assertCommandOutput("set relativenumber?", "norelativenumber")
+    assertCommandOutput("setglobal relativenumber?", "norelativenumber")
   }
 }
