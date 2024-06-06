@@ -14,10 +14,10 @@ import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 
-internal class IdeavimErrorListener : BaseErrorListener() {
+public class IdeavimErrorListener : BaseErrorListener() {
   private val logger = vimLogger<IdeavimErrorListener>()
-  companion object {
-    val testLogger = mutableListOf<String>()
+  public companion object {
+    public val testLogger: MutableList<String> = mutableListOf<String>()
   }
 
   override fun syntaxError(
