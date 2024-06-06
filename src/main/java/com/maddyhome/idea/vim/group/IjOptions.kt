@@ -63,7 +63,7 @@ public object IjOptions {
   public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
 
   // These options are not explicitly listed as local-noglobal in Vim's help, but are set when a new buffer is edited,
-  // based on the value of 'fileformats' or 'fileencodings'. To prevent unexpected file cnversion, we treat them as
+  // based on the value of 'fileformats' or 'fileencodings'. To prevent unexpected file conversion, we treat them as
   // local-noglobal. See `:help local-noglobal`, `:help 'fileformats'` and `:help 'fileencodings'`
   public val bomb: ToggleOption =
     addOption(ToggleOption("bomb", LOCAL_TO_BUFFER, "bomb", false, isLocalNoGlobal = true))

@@ -1212,7 +1212,7 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val sourceGlobalScope = OptionAccessScope.GLOBAL(sourceEditor)
     val targetGlobalScope = OptionAccessScope.GLOBAL(targetEditor)
     forEachOption(LOCAL_TO_WINDOW) { option ->
-      val value = storage.getOptionValue(option, sourceGlobalScope)
+      val value = getOptionValueForInitialisation(option, sourceGlobalScope)
       storage.setOptionValue(option, targetGlobalScope, value)
     }
   }
@@ -1222,7 +1222,7 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
       val globalScope = OptionAccessScope.GLOBAL(editor)
       val localScope = OptionAccessScope.LOCAL(editor)
       forEachOption(LOCAL_TO_BUFFER) { option ->
-        val value = storage.getOptionValue(option, globalScope)
+        val value = getOptionValueForInitialisation(option, globalScope)
         storage.setOptionValue(option, localScope, value)
       }
       forEachOption(GLOBAL_OR_LOCAL_TO_BUFFER) { option ->
@@ -1235,17 +1235,11 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
     val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
     forEachOption(LOCAL_TO_BUFFER) { option ->
-      // Some local options are not initialised by copying their global value. See `:help local-noglobal`
-      val value = if (option.isLocalNoGlobal) {
-        OptionValue.Default(option.defaultValue)
-      }
-      else {
-        storage.getOptionValue(option, sourceLocalScope)
-      }
+      val value = getOptionValueForInitialisation(option, sourceLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_BUFFER) { option ->
-      val value = storage.getOptionValue(option, sourceLocalScope)
+      val value = getOptionValueForInitialisation(option, sourceLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
   }
@@ -1254,13 +1248,7 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val globalScope = OptionAccessScope.GLOBAL(editor)
     val localScope = OptionAccessScope.LOCAL(editor)
     forEachOption(LOCAL_TO_WINDOW) { option ->
-      // Some local options are not initialised by copying their global value. See `:help local-noglobal`
-      val value = if (option.isLocalNoGlobal) {
-        OptionValue.Default(option.defaultValue)
-      }
-      else {
-        storage.getOptionValue(option, globalScope)
-      }
+      val value = getOptionValueForInitialisation(option, globalScope)
       storage.setOptionValue(option, localScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_WINDOW) { option ->
@@ -1277,17 +1265,39 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
     val sourceLocalScope = OptionAccessScope.LOCAL(sourceEditor)
     val targetLocalScope = OptionAccessScope.LOCAL(targetEditor)
     forEachOption(LOCAL_TO_WINDOW) { option ->
-      val value = storage.getOptionValue(option, sourceLocalScope)
+      val value = getOptionValueForInitialisation(option, sourceLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
     forEachOption(GLOBAL_OR_LOCAL_TO_WINDOW) { option ->
-      val value = storage.getOptionValue(option, sourceLocalScope)
+      val value = getOptionValueForInitialisation(option, sourceLocalScope)
       storage.setOptionValue(option, targetLocalScope, value)
     }
   }
 
   private fun forEachOption(scope: OptionDeclaredScope, action: (Option<VimDataType>) -> Unit) {
     Options.getAllOptions().forEach { option -> if (option.declaredScope == scope) action(option) }
+  }
+
+  /**
+   * Get the option value for initialisation. Either the value from scope, or default, if the option is local-noglobal
+   *
+   * Some options should not be copied from global, or from another source, during initialisation.
+   * For example, Vim doesn't copy 'scroll' from one window to another, or 'filetype' from one buffer to another.
+   * IntelliJ extends this with 'bomb', 'fileencoding' and 'fileformat', because they don't behave the same as Vim.
+   * Vim will use these options when saving. IntelliJ doesn't work like that - it will convert the file immediately
+   * (and saving is a little non-deterministic). So if we copy the value, and it's different to what the IDE detects,
+   * we will erroneously try to modify the file.
+   * Therefore, we treat these additional options as local-noglobal, and don't copy them during initialisation. The
+   * value is always set to default, which will use the current value detected by the IDE.
+   * See `:help local-noglobal`
+   */
+  private fun getOptionValueForInitialisation(option: Option<VimDataType>, scope: OptionAccessScope): OptionValue<VimDataType> {
+    return if (option.isLocalNoGlobal) {
+      OptionValue.Default(option.defaultValue)
+    }
+    else {
+      storage.getOptionValue(option, scope)
+    }
   }
 }
 
