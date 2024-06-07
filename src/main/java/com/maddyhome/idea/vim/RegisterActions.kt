@@ -25,8 +25,8 @@ public object RegisterActions {
   }
 
   public fun findAction(id: String): EditorActionHandlerBase? {
-    val commandBean = EngineCommandProvider.getCommands().firstOrNull { it.actionId == id }
-      ?: IntellijCommandProvider.getCommands().firstOrNull { it.actionId == id } ?: return null
+    val commandBean = IntellijCommandProvider.getCommands().firstOrNull { it.actionId == id }
+      ?: EngineCommandProvider.getCommands().firstOrNull { it.actionId == id } ?: return null
     return commandBean.instance
   }
 
@@ -42,8 +42,8 @@ public object RegisterActions {
 
   private fun registerVimCommandActions() {
     val parser = VimPlugin.getKey()
-    EngineCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
     IntellijCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
+    EngineCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
   }
 
   private fun registerShortcutsWithoutActions() {
