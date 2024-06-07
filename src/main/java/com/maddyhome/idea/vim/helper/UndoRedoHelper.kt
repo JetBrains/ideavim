@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.common.InsertSequence
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.undo.UndoRedoBase
@@ -88,7 +89,6 @@ internal class UndoRedoHelper : UndoRedoBase() {
       }
 
       CommandProcessor.getInstance().runUndoTransparentAction {
-        // TODO get insert for the lastUndoTime and move carets to insertStart
         removeSelections(editor)
       }
     }
@@ -119,8 +119,8 @@ internal class UndoRedoHelper : UndoRedoBase() {
     (caret as IjVimCaret).endInsertSequence(endOffset, endNanoTime)
   }
 
-  override fun getInsertSequence(caret: VimCaret, nanoTime: Long) {
-    (caret as IjVimCaret).getInsertSequenceForTime(nanoTime)
+  override fun getInsertSequence(caret: VimCaret, nanoTime: Long): InsertSequence? {
+    return (caret as IjVimCaret).getInsertSequenceForTime(nanoTime)
   }
 
   private fun performRedo(
@@ -161,7 +161,9 @@ internal class UndoRedoHelper : UndoRedoBase() {
       }
 
       CommandProcessor.getInstance().runUndoTransparentAction {
-        // TODO get insert for the lastUndoTime and move carets to insertStart
+        // TODO all the carets should be moved to their corresponding insertInfo.startOffset
+        // It's a bit tricky because the offsets where calculated before text in input sequence was inserted
+        // So it will require adjusting offsets to proper one in multicaret case
         removeSelections(editor)
       }
     }

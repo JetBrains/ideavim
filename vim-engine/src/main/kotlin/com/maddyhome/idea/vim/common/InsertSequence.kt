@@ -6,15 +6,15 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.common
 
 import kotlin.properties.Delegates
 
-internal data class InsertSequence(val startOffset: Int, val startNanoTime: Long) {
-  var endOffset by Delegates.notNull<Int>()
-  var endNanoTime by Delegates.notNull<Long>()
+public data class InsertSequence(val startOffset: Int, val startNanoTime: Long) {
+  var endOffset: Int by Delegates.notNull()
+  var endNanoTime: Long by Delegates.notNull()
 
-  fun contains(nanoTime: Long): Boolean {
+  public fun contains(nanoTime: Long): Boolean {
     return nanoTime in startNanoTime..endNanoTime
   }
 }

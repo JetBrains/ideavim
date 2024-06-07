@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
-import com.maddyhome.idea.vim.newapi.InsertSequence
+import com.maddyhome.idea.vim.common.InsertSequence
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode

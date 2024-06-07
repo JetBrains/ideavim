@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.undo
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.InsertSequence
 
 public interface VimUndoRedo {
   public fun undo(editor: VimEditor, context: ExecutionContext): Boolean
@@ -18,5 +19,5 @@ public interface VimUndoRedo {
 
   public fun startInsertSequence(caret: VimCaret, startOffset: Int, startNanoTime: Long)
   public fun endInsertSequence(caret: VimCaret, endOffset: Int, endNanoTime: Long)
-  public fun getInsertSequence(caret: VimCaret, nanoTime: Long)
+  public fun getInsertSequence(caret: VimCaret, nanoTime: Long): InsertSequence?
 }
