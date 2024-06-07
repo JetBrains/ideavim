@@ -181,14 +181,14 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     return null
   }
 
-  internal fun startInsert(startOffset: Int, startNanoTime: Long) {
+  internal fun startInsertSequence(startOffset: Int, startNanoTime: Long) {
     if (caret.currentInsert != null) {
       return
     }
     caret.currentInsert = InsertSequence(startOffset, startNanoTime)
   }
 
-  internal fun endInsert(endInsert: Int, endNanoTime: Long) {
+  internal fun endInsertSequence(endInsert: Int, endNanoTime: Long) {
     val currentInsert = caret.currentInsert ?: return
     currentInsert.endNanoTime = endNanoTime
     currentInsert.endOffset = endInsert

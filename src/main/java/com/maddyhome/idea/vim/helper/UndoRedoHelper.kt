@@ -94,6 +94,18 @@ internal class UndoRedoHelper : UndoRedoBase() {
     return false
   }
 
+  override fun startInsertSequence(caret: VimCaret, startOffset: Int, startNanoTime: Long) {
+    (caret as IjVimCaret).startInsertSequence(startOffset, startNanoTime)
+  }
+
+  override fun endInsertSequence(caret: VimCaret, endOffset: Int, endNanoTime: Long) {
+    (caret as IjVimCaret).endInsertSequence(endOffset, endNanoTime)
+  }
+
+  override fun getInsertSequence(caret: VimCaret, nanoTime: Long) {
+    (caret as IjVimCaret).getInsertSequenceForTime(nanoTime)
+  }
+
   private fun performRedo(
     undoManager: UndoManager,
     fileEditor: TextEditor,
