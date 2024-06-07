@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.put
 
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -392,7 +391,7 @@ public abstract class VimPutBase : VimPut {
   @RWLockLabel.SelfSynchronized
   protected fun prepareDocumentAndGetStartOffsets(
     vimEditor: VimEditor,
-    vimCaret: ImmutableVimCaret,
+    vimCaret: VimCaret,
     typeInRegister: SelectionType,
     data: PutData,
     additionalData: Map<String, Any>,
@@ -402,7 +401,7 @@ public abstract class VimPutBase : VimPut {
     if (visualSelection != null) {
       return when {
         visualSelection.typeInEditor.isChar && typeInRegister.isLine -> {
-          application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret.offset, "\n") }
+          application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret, vimCaret.offset, "\n") }
           listOf(vimCaret.offset + 1)
         }
         visualSelection.typeInEditor.isBlock -> {
@@ -416,7 +415,7 @@ public abstract class VimPutBase : VimPut {
               data.insertTextBeforeCaret -> listOf(vimEditor.getLineStartOffset(line))
               else -> {
                 val pos = vimEditor.getLineEndOffset(line, true)
-                application.runWriteAction { (vimEditor as MutableVimEditor).insertText(pos, "\n") }
+                application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret, pos, "\n") }
                 listOf(pos + 1)
               }
             }
@@ -439,7 +438,7 @@ public abstract class VimPutBase : VimPut {
             null
           }
           if (vimCaret.offset == vimEditor.fileSize().toInt() && vimEditor.fileSize().toInt() != 0 && lastChar != '\n') {
-            application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret.offset, "\n") }
+            application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret, vimCaret.offset, "\n") }
             listOf(vimCaret.offset + 1)
           } else {
             listOf(vimCaret.offset)
@@ -464,10 +463,10 @@ public abstract class VimPutBase : VimPut {
           // At the end of a notebook cell the next symbol is a guard,
           // so we add a newline to be able to paste. Fixes VIM-2577
           if (startOffset > 0 && vimEditor.document.getOffsetGuard(startOffset) != null) {
-            application.runWriteAction { (vimEditor as MutableVimEditor).insertText((startOffset - 1), "\n") }
+            application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret, (startOffset - 1), "\n") }
           }
           if (startOffset > 0 && startOffset == vimEditor.text().length && vimEditor.text()[startOffset - 1] != '\n') {
-            application.runWriteAction { (vimEditor as MutableVimEditor).insertText(startOffset, "\n") }
+            application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret, startOffset, "\n") }
             startOffset++
           }
         }

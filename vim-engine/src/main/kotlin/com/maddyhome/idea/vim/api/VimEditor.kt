@@ -320,7 +320,7 @@ public interface VimEditor {
 
 public interface MutableVimEditor : VimEditor {
   public fun addLine(atPosition: Int): Int?
-  public fun insertText(atPosition: Int, text: CharSequence)
+  public fun insertText(caret: VimCaret, atPosition: Int, text: CharSequence)
   public fun replaceString(start: Int, end: Int, newString: String)
 }
 

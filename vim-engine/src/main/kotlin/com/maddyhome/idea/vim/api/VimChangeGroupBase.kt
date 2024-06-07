@@ -202,7 +202,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
    * @param str    The text to insert
    */
   override fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret {
-    (editor as MutableVimEditor).insertText(offset, str)
+    (editor as MutableVimEditor).insertText(caret, offset, str)
     val newCaret = caret.moveToInlayAwareOffset(offset + str.length)
 
     injector.markService.setMark(newCaret, MARK_CHANGE_POS, offset)

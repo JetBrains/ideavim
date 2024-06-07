@@ -118,11 +118,9 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return atPosition
   }
 
-  override fun insertText(atPosition: Int, text: CharSequence) {
+  override fun insertText(caret: VimCaret, atPosition: Int, text: CharSequence) {
     if (editor.isInsertMode) {
-      val undo = injector.undo
-      val nanoTime = System.nanoTime()
-      forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+      injector.undo.startInsertSequence(caret, atPosition, System.nanoTime())
     }
     editor.document.insertString(atPosition, text)
   }
