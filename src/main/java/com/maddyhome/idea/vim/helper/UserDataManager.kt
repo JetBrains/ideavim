@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
+import com.maddyhome.idea.vim.newapi.InsertSequence
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -127,6 +128,9 @@ internal var Editor.vimExOutput: ExOutputModel? by userData()
 internal var Editor.vimTestInputModel: TestInputModel? by userData()
 
 internal var Editor.vimChangeActionSwitchMode: Mode? by userData()
+
+internal var Caret.currentInsert: InsertSequence? by userData()
+internal val Caret.insertHistory: MutableList<InsertSequence> by userDataOr { mutableListOf() }
 
 /**
  * Function for delegated properties.

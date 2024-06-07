@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.group.visual.VisualChange
+import com.maddyhome.idea.vim.helper.currentInsert
+import com.maddyhome.idea.vim.helper.insertHistory
 import com.maddyhome.idea.vim.helper.lastSelectionInfo
 import com.maddyhome.idea.vim.helper.markStorage
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
@@ -168,6 +170,32 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override fun removeSelection() {
     caret.removeSelection()
   }
+
+  internal fun getInsertSequenceForTime(time: Long): InsertSequence? {
+    val insertHistory = caret.insertHistory
+    for (i in insertHistory.lastIndex downTo 0) {
+      val insertInfo = insertHistory[i]
+      if (time > insertInfo.endNanoTime) return null
+      if (time >= insertInfo.startNanoTime) return insertInfo
+    }
+    return null
+  }
+
+  internal fun startInsert(startOffset: Int, startNanoTime: Long) {
+    if (caret.currentInsert != null) {
+      return
+    }
+    caret.currentInsert = InsertSequence(startOffset, startNanoTime)
+  }
+
+  internal fun endInsert(endInsert: Int, endNanoTime: Long) {
+    val currentInsert = caret.currentInsert ?: return
+    currentInsert.endNanoTime = endNanoTime
+    currentInsert.endOffset = endInsert
+    caret.insertHistory.add(currentInsert)
+    caret.currentInsert = null
+  }
+
 
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret
 
