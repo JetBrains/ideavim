@@ -80,31 +80,61 @@ class UndoActionTest : VimTestCase() {
     kotlin.test.assertFalse(hasSelection())
   }
 
-//  @Test
-//  @TestFor(issues = ["VIM-308"])
-//  fun `test cursor movements do not require additional undo`() {
-//    if (!optionsIjNoEditor().oldundo) {
-//      val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
-//      val before = """
-//                Lorem Ipsum
-//
-//                ${c}Lorem ipsum dolor sit amet,
-//                consectetur adipiscing elit
-//                Sed in orci mauris.
-//                Cras id tellus in ex imperdiet egestas.
-//      """.trimIndent()
-//      val after = """
-//                Lorem Ipsum
-//
-//                I1 found$c it in a legendary land
-//                consectetur adipiscing elit
-//                Sed in orci mauris.
-//                Cras id tellus in ex imperdiet egestas.
-//      """.trimIndent()
-//      doTest(keys, before, after, Mode.NORMAL())
-//      kotlin.test.assertFalse(hasSelection())
-//    }
-//  }
+  @Test
+  @TestFor(issues = ["VIM-308"])
+  fun `test cursor movements do not require additional undo`() {
+    if (!optionsIjNoEditor().oldundo) {
+      val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
+      val before = """
+                Lorem Ipsum
+
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+      val after = """
+                Lorem Ipsum
+
+                L1orem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+      doTest(keys, before, after, Mode.NORMAL())
+      kotlin.test.assertFalse(hasSelection())
+    }
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-547"])
+  fun `test typed text requires one undo`() {
+    configureByText("Lorem ipsu${c}m")
+    typeText("a dolor sit amet,<CR>consectetur adipiscing elit<Esc>")
+    assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit")
+    typeText("u")
+    assertState("Lorem ipsum")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-547"])
+  fun `test breaking insert sequence`() {
+    configureByText("Lorem ipsu${c}m")
+    typeText("a dolor sit amet,<CR>consectetur <C-G>uadipiscing elit<Esc>")
+    assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit")
+    typeText("u")
+    assertState("Lorem ipsum dolor sit amet,\nconsectetur ")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-547"])
+  fun `test moving caret breaks insert sequence`() {
+    configureByText("Lorem ipsu${c}m")
+    typeText("a dolor sit amet,<CR>consectetur  <Left>adipiscing elit<Esc>")
+    assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit ")
+    typeText("u")
+    assertState("Lorem ipsum dolor sit amet,\nconsectetur  ")
+  }
 
   private fun hasSelection(): Boolean {
     val editor = fixture.editor
