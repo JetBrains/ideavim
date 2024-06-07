@@ -92,6 +92,7 @@ import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
@@ -145,6 +146,9 @@ internal object VimListenerManager {
     injector.listenersNotifier.modeChangeListeners.add(caretVisualAttributesListener)
     injector.listenersNotifier.isReplaceCharListeners.add(caretVisualAttributesListener)
     caretVisualAttributesListener.updateAllEditorsCaretsVisual()
+
+    val insertTimeRecorder = InsertTimeRecorder()
+    injector.listenersNotifier.modeChangeListeners.add(insertTimeRecorder)
 
     val modeWidgetListener = ModeWidgetListener()
     injector.listenersNotifier.modeChangeListeners.add(modeWidgetListener)

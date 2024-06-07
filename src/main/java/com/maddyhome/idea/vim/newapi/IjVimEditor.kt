@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
+import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -118,6 +119,11 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 
   override fun insertText(atPosition: Int, text: CharSequence) {
+    if (editor.isInsertMode) {
+      val undo = injector.undo
+      val nanoTime = System.nanoTime()
+      forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+    }
     editor.document.insertString(atPosition, text)
   }
 
@@ -501,3 +507,14 @@ public val VimEditor.ij: Editor
 
 public val com.intellij.openapi.util.TextRange.vim: TextRange
   get() = TextRange(this.startOffset, this.endOffset)
+
+internal class InsertTimeRecorder: ModeChangeListener {
+  override fun modeChanged(editor: VimEditor, oldMode: Mode) {
+    editor as IjVimEditor
+    if (oldMode == Mode.INSERT) {
+      val undo = injector.undo
+      val nanoTime = System.nanoTime()
+      editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+    }
+  }
+}

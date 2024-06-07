@@ -489,6 +489,12 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       val action = injector.nativeActionManager.enterAction
       if (action != null) {
+        // We use enter action for `o`, `O` commands. If we want to undo the added \n and indent, we should record start of insert
+        if (editor.mode == Mode.INSERT) {
+          val undo = injector.undo
+          val nanoTime = System.nanoTime()
+          editor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+        }
         strokes.add(action)
         injector.actionExecutor.executeAction(editor, action, context)
       }

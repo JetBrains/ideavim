@@ -83,6 +83,11 @@ internal class PutGroup : VimPutBase() {
     val editor = (vimEditor as IjVimEditor).editor
     val context = vimContext.context as DataContext
     val carets: MutableMap<Caret, RangeMarker> = mutableMapOf()
+    if (editor.isInsertMode) {
+      val undo = injector.undo
+      val nanoTime = System.nanoTime()
+      vimEditor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+    }
     EditorHelper.getOrderedCaretsList(editor).forEach { caret ->
       val startOffset =
         prepareDocumentAndGetStartOffsets(

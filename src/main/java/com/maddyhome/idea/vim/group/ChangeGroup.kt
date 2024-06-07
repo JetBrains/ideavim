@@ -103,6 +103,9 @@ public class ChangeGroup : VimChangeGroupBase() {
     val editor = (vimEditor as IjVimEditor).editor
     val ijContext = context.ij
     val doc = vimEditor.editor.document
+    val undo = injector.undo
+    val nanoTime = System.nanoTime()
+    vimEditor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
     CommandProcessor.getInstance().executeCommand(
       editor.project, {
         ApplicationManager.getApplication()
