@@ -36,6 +36,18 @@ internal class VimEditorDelete : IdeActionHandler(IdeActions.ACTION_EDITOR_DELET
 internal class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN) {
   override val type: Command.Type = Command.Type.MOTION
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
+  ): Boolean {
+    val undo = injector.undo
+    val nanoTime = System.nanoTime()
+    editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+    return super.execute(editor, context, cmd, operatorArguments)
+  }
 }
 
 @CommandOrMotion(keys = ["<Tab>", "<C-I>"], modes = [Mode.INSERT])
@@ -48,6 +60,18 @@ internal class VimEditorTab : IdeActionHandler(IdeActions.ACTION_EDITOR_TAB) {
 internal class VimEditorUp : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP) {
   override val type: Command.Type = Command.Type.MOTION
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
+  ): Boolean {
+    val undo = injector.undo
+    val nanoTime = System.nanoTime()
+    editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+    return super.execute(editor, context, cmd, operatorArguments)
+  }
 }
 
 @CommandOrMotion(keys = ["K"], modes = [Mode.NORMAL])

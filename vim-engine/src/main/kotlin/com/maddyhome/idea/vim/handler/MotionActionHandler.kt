@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 
@@ -135,6 +136,11 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     val handler = if (this is AmbiguousExecution) this.getMotionActionHandler(cmd.argument) else this
     when (handler) {
       is SingleExecution -> run {
+        if (editor.mode == Mode.INSERT) {
+          val undo = injector.undo
+          val nanoTime = System.nanoTime()
+          editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+        }
         val offset = handler.getOffset(editor, context, cmd.argument, operatorArguments)
 
         // In this scenario, caret is the primary caret
@@ -182,6 +188,9 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ) {
+    if (editor.mode == Mode.INSERT) {
+      injector.undo.endInsertSequence(caret, caret.offset, System.nanoTime())
+    }
     val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
     when (offset) {
       is Motion.AdjustedOffset -> moveToAdjustedOffset(editor, caret, cmd, offset)
