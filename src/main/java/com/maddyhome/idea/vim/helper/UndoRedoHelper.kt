@@ -13,13 +13,16 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.intellij.openapi.util.registry.Registry
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
+import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.undo.UndoRedoBase
@@ -29,6 +32,10 @@ import com.maddyhome.idea.vim.undo.UndoRedoBase
  */
 @Service
 internal class UndoRedoHelper : UndoRedoBase() {
+  companion object {
+    private val logger = logger<UndoRedoHelper>()
+  }
+
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
@@ -68,10 +75,20 @@ internal class UndoRedoHelper : UndoRedoBase() {
       }
     } else {
       runWithBooleanRegistryOption("ide.undo.transparent.caret.movement", true) {
-        undoManager.undo(fileEditor)
+        var nextUndoNanoTime = undoManager.getNextUndoNanoTime(fileEditor)
+        val insertInfo = (editor.primaryCaret() as IjVimCaret).getInsertSequenceForTime(nextUndoNanoTime)
+        if (insertInfo == null) {
+          undoManager.undo(fileEditor)
+        } else {
+          while (insertInfo.contains(nextUndoNanoTime)) {
+            undoManager.undo(fileEditor)
+            nextUndoNanoTime = undoManager.getNextUndoNanoTime(fileEditor)
+          }
+        }
       }
 
       CommandProcessor.getInstance().runUndoTransparentAction {
+        // TODO get insert for the lastUndoTime and move carets to insertStart
         removeSelections(editor)
       }
     }
@@ -131,10 +148,20 @@ internal class UndoRedoHelper : UndoRedoBase() {
       }
     } else {
       runWithBooleanRegistryOption("ide.undo.transparent.caret.movement", true) {
-        undoManager.redo(fileEditor)
+        var nextRedoNanoTime = undoManager.getNextRedoNanoTime(fileEditor)
+        val insertInfo = (editor.primaryCaret() as IjVimCaret).getInsertSequenceForTime(nextRedoNanoTime)
+        if (insertInfo == null) {
+          undoManager.redo(fileEditor)
+        } else {
+          while (insertInfo.contains(nextRedoNanoTime)) {
+            undoManager.redo(fileEditor)
+            nextRedoNanoTime = undoManager.getNextRedoNanoTime(fileEditor)
+          }
+        }
       }
 
       CommandProcessor.getInstance().runUndoTransparentAction {
+        // TODO get insert for the lastUndoTime and move carets to insertStart
         removeSelections(editor)
       }
     }
