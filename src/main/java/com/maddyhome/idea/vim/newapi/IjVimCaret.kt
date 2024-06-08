@@ -197,6 +197,9 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.currentInsert = null
   }
 
+  internal fun abandonCurrentInsertSequece() {
+    caret.currentInsert = null
+  }
 
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret
 

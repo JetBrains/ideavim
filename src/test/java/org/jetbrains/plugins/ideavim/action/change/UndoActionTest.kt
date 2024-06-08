@@ -136,6 +136,16 @@ class UndoActionTest : VimTestCase() {
     assertState("Lorem ipsum dolor sit amet,\nconsectetur  ")
   }
 
+  @Test
+  @TestFor(issues = ["VIM-547"])
+  fun `test change action is included in insert sequence`() {
+    configureByText("Lorem ${c}ipsum dolor sit amet")
+    typeText("celorem")
+    configureByText("Lorem lorem${c} dolor sit amet")
+    typeText("u")
+    configureByText("Lorem ${c}ipsum dolor sit amet")
+  }
+
   private fun hasSelection(): Boolean {
     val editor = fixture.editor
     return editor.caretModel.primaryCaret.hasSelection()

@@ -17,22 +17,21 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["c"], modes = [Mode.NORMAL])
-public class ChangeMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+public class ChangeMotionAction : ChangeInInsertSequenceAction(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
 
   override val duplicateWith: Char = 'c'
 
-  override fun execute(
+  override fun executeInInsertSequence(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments,
+    operatorArguments: OperatorArguments
   ): Boolean {
     return argument != null && injector.changeGroup.changeMotion(
       editor,

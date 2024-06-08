@@ -19,5 +19,6 @@ public interface VimUndoRedo {
 
   public fun startInsertSequence(caret: VimCaret, startOffset: Int, startNanoTime: Long)
   public fun endInsertSequence(caret: VimCaret, endOffset: Int, endNanoTime: Long)
+  public fun abandonCurrentInsertSequence(caret: VimCaret)
   public fun getInsertSequence(caret: VimCaret, nanoTime: Long): InsertSequence?
 }

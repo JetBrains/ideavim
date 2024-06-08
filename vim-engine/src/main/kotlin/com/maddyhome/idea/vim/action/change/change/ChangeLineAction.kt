@@ -19,17 +19,16 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_NO_REPEAT_INSERT
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["S"], modes = [Mode.NORMAL])
-public class ChangeLineAction : ChangeEditorActionHandler.ForEachCaret() {
+public class ChangeLineAction : ChangeInInsertSequenceAction() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_NO_REPEAT_INSERT)
 
-  override fun execute(
+  override fun executeInInsertSequence(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
