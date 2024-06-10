@@ -98,7 +98,6 @@ val ideaVersion: String by project
 val ideaType: String by project
 val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
-val antlrVersion: String by project
 val remoteRobotVersion: String by project
 
 val publishChannels: String by project
@@ -115,11 +114,10 @@ repositories {
 dependencies {
   api(project(":vim-engine"))
   ksp(project(":annotation-processors"))
-  implementation(project(":annotation-processors"))
+  compileOnly(project(":annotation-processors"))
 
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   compileOnly("org.jetbrains:annotations:24.1.0")
-  runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
 
   // --------- Test dependencies ----------
 
