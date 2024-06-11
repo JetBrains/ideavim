@@ -175,6 +175,9 @@ tasks {
   }
 
   compileJava {
+    // CodeQL can't resolve the 'by project' property, so we need to give it a hint. This is the minimum version we need
+    // so doesn't have to match exactly
+    // Hint for the CodeQL autobuilder: sourceCompatibility = 17
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
 
