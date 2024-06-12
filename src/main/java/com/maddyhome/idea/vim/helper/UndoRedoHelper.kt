@@ -78,12 +78,13 @@ internal class UndoRedoHelper : UndoRedoBase() {
       runWithBooleanRegistryOption("ide.undo.transparent.caret.movement", true) {
         var nextUndoNanoTime = undoManager.getNextUndoNanoTime(fileEditor)
         val insertInfo = (editor.primaryCaret() as IjVimCaret).getInsertSequenceForTime(nextUndoNanoTime)
-        if (insertInfo == null) {
+        if (insertInfo == null || undoManager.isNextUndoAskConfirmation(fileEditor)) {
           undoManager.undo(fileEditor)
         } else {
           while (insertInfo.contains(nextUndoNanoTime)) {
             undoManager.undo(fileEditor)
             nextUndoNanoTime = undoManager.getNextUndoNanoTime(fileEditor)
+            if (undoManager.isNextUndoAskConfirmation(fileEditor)) break
           }
         }
       }
@@ -154,12 +155,13 @@ internal class UndoRedoHelper : UndoRedoBase() {
       runWithBooleanRegistryOption("ide.undo.transparent.caret.movement", true) {
         var nextRedoNanoTime = undoManager.getNextRedoNanoTime(fileEditor)
         val insertInfo = (editor.primaryCaret() as IjVimCaret).getInsertSequenceForTime(nextRedoNanoTime)
-        if (insertInfo == null) {
+        if (insertInfo == null || undoManager.isNextRedoAskConfirmation(fileEditor)) {
           undoManager.redo(fileEditor)
         } else {
           while (insertInfo.contains(nextRedoNanoTime)) {
             undoManager.redo(fileEditor)
             nextRedoNanoTime = undoManager.getNextRedoNanoTime(fileEditor)
+            if (undoManager.isNextRedoAskConfirmation(fileEditor)) break
           }
         }
       }
