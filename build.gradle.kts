@@ -72,7 +72,7 @@ plugins {
   id("org.jetbrains.changelog") version "2.2.0"
 
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
-  id("com.dorongold.task-tree") version "3.0.0"
+  id("com.dorongold.task-tree") version "4.0.0"
 
   id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
