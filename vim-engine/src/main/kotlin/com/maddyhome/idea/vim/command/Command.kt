@@ -54,6 +54,10 @@ public data class Command(
     }
   }
 
+  override fun toString(): String {
+    return "Action = ${action.id}"
+  }
+
   public enum class Type {
     /**
      * Represents commands that actually move the cursor and can be arguments to operators.

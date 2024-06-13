@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.KeyConsumer
@@ -35,6 +36,7 @@ public class EditorResetConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered EditorResetConsumer" }
     if (!isEditorReset(key, editor)) return false
     keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext -> handleEditorReset(lambdaEditor, key, lambdaKeyState, lambdaContext) }
     return true

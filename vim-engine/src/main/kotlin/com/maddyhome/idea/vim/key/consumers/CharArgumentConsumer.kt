@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
@@ -32,6 +33,7 @@ public class CharArgumentConsumer: KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered CharArgumentConsumer" }
     if (!isExpectingCharArgument(keyProcessResultBuilder.state.commandBuilder)) return false
 
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar

@@ -37,6 +37,7 @@ public object MappingProcessor: KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    log.trace { "Entered MappingProcessor" }
     if (!allowKeyMappings) return false
 
     log.debug("Start processing key mappings.")

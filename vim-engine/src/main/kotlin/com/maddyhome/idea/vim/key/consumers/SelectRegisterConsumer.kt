@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.key.consumers
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.KeyConsumer
@@ -32,6 +33,7 @@ public class SelectRegisterConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered SelectRegisterConsumer" }
     val state = keyProcessResultBuilder.state
     if (!isSelectRegister(key, state, editor.vimStateMachine)) return false
 

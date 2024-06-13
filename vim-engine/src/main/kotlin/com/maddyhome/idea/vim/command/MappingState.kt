@@ -103,6 +103,10 @@ public class MappingState: Cloneable {
     return result
   }
 
+  override fun toString(): String {
+    return "Map depth = $mapDepth, keys = ${ injector.parser.toKeyNotation(keys.toList()) }"
+  }
+
   public companion object {
     private val LOG = vimLogger<MappingState>()
   }

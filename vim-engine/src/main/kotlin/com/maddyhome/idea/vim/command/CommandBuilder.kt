@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.action.change.LazyVimCommand
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -274,6 +275,10 @@ public class CommandBuilder(
     result.prevExpectedArgumentType = prevExpectedArgumentType
 
     return result
+  }
+
+  override fun toString(): String {
+    return "Command state = $commandState, key list = ${ injector.parser.toKeyNotation(keyList) }, command parts = ${ commandParts }, count = $count"
   }
 
   public companion object {

@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
@@ -32,6 +33,7 @@ public class DeleteCommandConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered DeleteCommandConsumer" }
     if (!isDeleteCommandCountKey(key, keyProcessResultBuilder.state, editor.mode)) return false
     keyProcessResultBuilder.state.commandBuilder.deleteCountCharacter()
     return true

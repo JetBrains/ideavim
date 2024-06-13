@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.common.DigraphResult
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.InputEvent
@@ -33,6 +34,7 @@ public class DigraphConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered DigraphConsumer" }
     logger.debug("Handling digraph")
     // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
     // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our

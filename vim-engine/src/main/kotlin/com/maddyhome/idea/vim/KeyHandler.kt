@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
+import kotlin.math.log
 
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -107,17 +108,19 @@ public class KeyHandler {
     processBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): KeyProcessResult {
     synchronized(lock) {
-      LOG.trace {
+      logger.trace {
         """
         ------- Key Handler -------
         Start key processing. allowKeyMappings: $allowKeyMappings, mappingCompleted: $mappingCompleted
         Key: $key
       """.trimIndent()
       }
+      logger.trace { processBuilder.state.toString() }
+      logger.trace { "Mode = ${editor.mode}" }
       val maxMapDepth = injector.globalOptions().maxmapdepth
       if (handleKeyRecursionCount >= maxMapDepth) {
         processBuilder.addExecutionStep { _, lambdaEditor, _ ->
-          LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
+          logger.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
           injector.messages.showStatusBarMessage(lambdaEditor, injector.messages.message("E223"))
           injector.messages.indicateError()
         }
@@ -134,6 +137,7 @@ public class KeyHandler {
           it.consumeKey(key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord)
         }
         if (isProcessed) {
+          logger.trace { "Key was successfully caught by consumer" }
           processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
             finishedCommandPreparation(lambdaEditor, lambdaContext, key, shouldRecord, lambdaKeyState)
           }
@@ -163,7 +167,7 @@ public class KeyHandler {
     val commandBuilder = keyState.commandBuilder
 
     if (commandBuilder.isReady) {
-      LOG.trace("Ready command builder. Execute command.")
+      logger.trace("Ready command builder. Execute command.")
       executeCommand(editor, context, editor.vimStateMachine, keyState)
     }
 
@@ -176,12 +180,12 @@ public class KeyHandler {
 
     // This will update immediately, if we're on the EDT (which we are)
     injector.messages.updateStatusBar(editor)
-    LOG.trace("----------- Key Handler Finished -----------")
+    logger.trace("----------- Key Handler Finished -----------")
   }
 
   private fun onUnknownKey(editor: VimEditor, keyState: KeyHandlerState) {
+    logger.trace("Command builder is set to BAD")
     keyState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-    LOG.trace("Command builder is set to BAD")
     editor.resetOpPending()
     editor.vimStateMachine.resetRegisterPending()
     editor.isReplaceCharacter = false
@@ -207,7 +211,7 @@ public class KeyHandler {
     editorState: VimStateMachine,
     keyState: KeyHandlerState,
   ) {
-    LOG.trace("Command execution")
+    logger.trace("Command execution")
     val command = keyState.commandBuilder.buildCommand()
     val operatorArguments = OperatorArguments(
       editor.mode is Mode.OP_PENDING,
@@ -228,7 +232,7 @@ public class KeyHandler {
       if (!editor.isWritable()) {
         injector.messages.indicateError()
         reset(keyState, editorState.mode)
-        LOG.warn("File is not writable")
+        logger.warn("File is not writable")
         return
       }
     }
@@ -253,6 +257,7 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public fun partialReset(editor: VimEditor) {
+    logger.trace { "Partial reset is executed" }
     keyHandlerState.partialReset(editor.mode)
   }
 
@@ -262,11 +267,13 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public fun reset(editor: VimEditor) {
+    logger.trace { "Reset is executed" }
     keyHandlerState.partialReset(editor.mode)
     keyHandlerState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
   }
 
   public fun reset(keyState: KeyHandlerState, mode: Mode) {
+    logger.trace { "Reset is executed" }
     keyHandlerState.partialReset(mode)
     keyState.commandBuilder.resetAll(getKeyRoot(mode.toMappingMode()))
   }
@@ -276,6 +283,8 @@ public class KeyHandler {
   }
 
   public fun updateState(keyState: KeyHandlerState) {
+    logger.trace { "State updated" }
+    logger.trace { keyState.toString() }
     this.keyHandlerState = keyState
   }
 
@@ -286,6 +295,7 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public fun fullReset(editor: VimEditor) {
+    logger.trace { "Full reset" }
     injector.messages.clearError()
     editor.resetState()
     reset(keyHandlerState, editor.mode)
@@ -351,7 +361,7 @@ public class KeyHandler {
 
   public companion object {
     public val lock: Any = Object()
-    private val LOG: VimLogger = vimLogger<KeyHandler>()
+    private val logger: VimLogger = vimLogger<KeyHandler>()
 
     internal fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
       if (list1.size > list2.size) {

@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -30,6 +31,7 @@ public class ModeInputConsumer: KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered ModeInputConsumer" }
     val isProcessed = when (editor.mode) {
       Mode.INSERT, Mode.REPLACE -> {
         logger.trace("Process insert or replace")

@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.KeyConsumer
@@ -31,6 +32,7 @@ public class RegisterConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered RegisterConsumer" }
     if (!editor.vimStateMachine.isRegisterPending) return false
 
     logger.trace("Pending mode.")

@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.argumentCaptured
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -44,6 +45,7 @@ public class CommandConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
+    logger.trace { "Entered CommandConsumer" }
     val commandBuilder = keyProcessResultBuilder.state.commandBuilder
     // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
     // return the node matching this keystroke

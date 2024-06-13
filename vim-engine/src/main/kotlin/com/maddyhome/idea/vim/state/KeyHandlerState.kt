@@ -66,4 +66,18 @@ public data class KeyHandlerState(
       commandLineCommandBuilder?.clone(),
     )
   }
+
+  override fun toString(): String {
+    return """
+      KeyHandlerState:
+      Mapping state:
+      $mappingState
+      Digraph sequence:
+      $digraphSequence
+      Editor command builder:
+      $editorCommandBuilder
+      Command line command builder:
+      $commandLineCommandBuilder
+      """.trimMargin()
+  }
 }

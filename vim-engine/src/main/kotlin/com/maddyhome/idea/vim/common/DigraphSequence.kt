@@ -267,6 +267,10 @@ public class DigraphSequence: Cloneable {
     return result
   }
 
+  override fun toString(): String {
+    return "State = $digraphState, char = $digraphChar"
+  }
+
   public companion object {
     private const val DIG_STATE_PENDING = 1
     private const val DIG_STATE_DIG_ONE = 2
