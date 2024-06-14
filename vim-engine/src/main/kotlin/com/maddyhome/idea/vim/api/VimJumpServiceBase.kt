@@ -58,6 +58,11 @@ public abstract class VimJumpServiceBase : VimJumpService {
     projectToJumps[projectId]?.removeLastOrNull()
   }
 
+  override fun clearJumps(projectId: String) {
+    projectToJumps.remove(projectId)
+    projectToJumpSpot.remove(projectId)
+  }
+
   override fun updateJumpsFromInsert(projectId: String, startOffset: Int, length: Int) {
     TODO("Not yet implemented")
   }
