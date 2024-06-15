@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.key
 
+import com.maddyhome.idea.vim.api.injector
 import javax.swing.KeyStroke
 
 /**
@@ -42,7 +43,11 @@ import javax.swing.KeyStroke
 public interface Node<T>
 
 /** Represents a complete command */
-public data class CommandNode<T>(public val actionHolder: T) : Node<T>
+public data class CommandNode<T>(public val actionHolder: T) : Node<T> {
+  override fun toString(): String {
+    return "COMMAND NODE (${ actionHolder.toString() })"
+  }
+}
 
 /** Represents a part of the command */
 public open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
@@ -55,6 +60,14 @@ public open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
 
   override fun hashCode(): Int {
     return super.hashCode()
+  }
+
+  override fun toString(): String {
+    return """
+      COMMAND PART NODE(
+      ${entries.joinToString(separator = "\n") { "    " + injector.parser.toKeyNotation(it.key) + " - " + it.value }}
+      )
+      """.trimIndent()
   }
 }
 

@@ -40,4 +40,8 @@ public open class LazyVimCommand(
     result = 31 * result + actionId.hashCode()
     return result
   }
+
+  override fun toString(): String {
+    return actionId
+  }
 }

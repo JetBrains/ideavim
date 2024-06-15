@@ -42,7 +42,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
-import kotlin.math.log
 
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea

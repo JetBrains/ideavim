@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.common.DigraphSequence
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 
@@ -23,6 +24,10 @@ public data class KeyHandlerState(
   public var commandLineCommandBuilder: CommandBuilder?,
 ): Cloneable {
   public constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)), null)
+
+  public companion object {
+    private val logger = vimLogger<KeyHandlerState>()
+  }
 
   public val commandBuilder: CommandBuilder
     get() = commandLineCommandBuilder ?: editorCommandBuilder
@@ -46,11 +51,13 @@ public data class KeyHandlerState(
   }
 
   public fun partialReset(mode: Mode) {
+    logger.trace("entered partialReset. mode: $mode")
     mappingState.resetMappingSequence()
     commandBuilder.resetInProgressCommandPart(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
   }
 
   public fun reset(mode: Mode) {
+    logger.trace("entered reset. mode: $mode")
     digraphSequence.reset()
     mappingState.resetMappingSequence()
 

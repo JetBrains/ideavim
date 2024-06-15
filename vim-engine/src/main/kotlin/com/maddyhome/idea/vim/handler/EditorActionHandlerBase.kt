@@ -135,6 +135,10 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
     // No-op
   }
 
+  override fun toString(): String {
+    return "EditorActionHandlerBase($id)"
+  }
+
   public companion object {
     private val logger = vimLogger<EditorActionHandlerBase>()
 
