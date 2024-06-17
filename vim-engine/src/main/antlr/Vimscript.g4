@@ -119,6 +119,7 @@ command:
         | PROMPT_REPLACE | P_LOWERCASE | P_UPPERCASE | PRINT | PREVIOUS_TAB | N_UPPERCASE | PREVIOUS_FILE | PLUG
         | ONLY | NO_HL_SEARCH | NEXT_TAB | N_LOWERCASE | NEXT_FILE | M_LOWERCASE | MOVE_TEXT | MARKS | K_LOWERCASE
         | MARK_COMMAND | JUMPS | J_LOWERCASE | JOIN_LINES | HISTORY | GO_TO_CHAR | SYMBOL | FIND | CLASS | F_LOWERCASE
+        | CLEARJUMPS
         | FILE | EXIT | E_LOWERCASE | EDIT_FILE | DUMP_LINE | DIGRAPH | DEL_MARKS | D_LOWERCASE | DEL_LINES | DELCMD
         | T_LOWERCASE | COPY | CMD_CLEAR | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
         | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR | PACKADD | TABMOVE
@@ -618,6 +619,7 @@ BUFFER_CLOSE:           'bd' | 'bde' | 'bdel' | 'bdele' | 'bdelet' | 'bdelete';
 BUFFER_LIST:            'buffers' | 'ls' | 'files';
 CALL:                   'cal' | 'call';
 CLASS:                  'cla' | 'clas' | 'class';
+CLEARJUMPS:             'cle' | 'clea' | 'clear' | 'clearj' | 'clearju' | 'clearjum' | 'clearjump' | 'clearjumps';
 CMD:                    'com' | 'comm' | 'comma' | 'comman' | 'command';
 CMD_CLEAR:              'comc' | 'comcl' | 'comcle' | 'comclea' | 'comclear';
 COPY:                   'co' | 'cop' | 'copy';
