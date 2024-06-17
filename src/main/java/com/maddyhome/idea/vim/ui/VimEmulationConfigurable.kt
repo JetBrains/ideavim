@@ -91,6 +91,7 @@ internal class VimEmulationConfigurable : Configurable {
       decorator.setToolbarPosition(ActionToolbarPosition.RIGHT)
       decorator.addExtraAction(CopyForRcAction(model))
       decorator.addExtraAction(ResetHandlersAction(model, shortcutConflictsTable))
+      decorator.addExtraAction(SetAllToIdeAction(model, shortcutConflictsTable))
       val scrollPane = decorator.createPanel()
       scrollPane.border = LineBorder(JBColor.border())
       val conflictsPanel = JPanel(BorderLayout())
@@ -325,6 +326,38 @@ internal class VimEmulationConfigurable : Configurable {
       }
       val data = stringBuilder.toString()
       injector.clipboardManager.setClipboardText(data, data, emptyList())
+    }
+  }
+
+  private class SetAllToIdeAction(
+    private val myModel: VimShortcutConflictsTable.Model,
+    private val myTable: VimShortcutConflictsTable,
+  ) : DumbAwareAction(
+    "Toggle all Handlers",
+    "Toggle all action handlers to use either IDE or Vim shortcuts",
+    AllIcons.Actions.ChangeView,
+  ) {
+    override fun update(e: AnActionEvent) {
+      e.presentation.isEnabled = true
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
+
+    override fun actionPerformed(e: AnActionEvent) {
+      TableUtil.stopEditing(myTable)
+
+      val lastRowOwner = myModel.rows.last().owner;
+
+      for (row in myModel.rows) {
+        val owner: ShortcutOwnerInfo = row.owner
+        if (owner is AllModes) {
+          row.owner =
+            if (lastRowOwner == ShortcutOwnerInfo.allIde) ShortcutOwnerInfo.allVim else ShortcutOwnerInfo.allIde
+        }
+      }
+      IdeFocusManager.getGlobalInstance()
+        .doWhenFocusSettlesDown { IdeFocusManager.getGlobalInstance().requestFocus(myTable, true) }
+      TableUtil.updateScroller(myTable)
     }
   }
 
