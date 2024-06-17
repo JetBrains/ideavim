@@ -91,7 +91,7 @@ internal class VimEmulationConfigurable : Configurable {
       decorator.setToolbarPosition(ActionToolbarPosition.RIGHT)
       decorator.addExtraAction(CopyForRcAction(model))
       decorator.addExtraAction(ResetHandlersAction(model, shortcutConflictsTable))
-      decorator.addExtraAction(SetAllToIdeAction(model, shortcutConflictsTable))
+      decorator.addExtraAction(ToggleAllHandlersAction(model, shortcutConflictsTable))
       val scrollPane = decorator.createPanel()
       scrollPane.border = LineBorder(JBColor.border())
       val conflictsPanel = JPanel(BorderLayout())
@@ -329,7 +329,7 @@ internal class VimEmulationConfigurable : Configurable {
     }
   }
 
-  private class SetAllToIdeAction(
+  private class ToggleAllHandlersAction(
     private val myModel: VimShortcutConflictsTable.Model,
     private val myTable: VimShortcutConflictsTable,
   ) : DumbAwareAction(
