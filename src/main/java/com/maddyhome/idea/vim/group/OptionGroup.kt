@@ -926,7 +926,9 @@ private class ScrollJumpOptionMapper(option: NumberOption, internalOptionValueAc
   override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.verticalScrollJump.asVimInt()
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    editor.ij.settings.verticalScrollJump = value.value
+    // Note that Vim supports -1 to -100 as a percentage value. IntelliJ does not have any validation, but does not
+    // handle or expect negative values
+    editor.ij.settings.verticalScrollJump = value.value.coerceAtLeast(0)
   }
 
   override fun resetLocalExternalValue(editor: VimEditor, defaultValue: VimInt) {
