@@ -34,6 +34,7 @@ public interface VimJumpService {
   
   public fun removeJump(projectId: String, jump: Jump)
   public fun dropLastJump(projectId: String)
+  public fun clearJumps(projectId: String)
   
   public fun updateJumpsFromInsert(projectId: String, startOffset: Int, length: Int)
   public fun updateJumpsFromDelete(projectId: String, startOffset: Int, length: Int)

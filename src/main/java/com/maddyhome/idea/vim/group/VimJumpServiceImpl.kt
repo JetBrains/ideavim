@@ -94,7 +94,7 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
       if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously, and
       // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
-      jumpService.addJump(project.basePath ?: IjVimEditor.DEFAULT_PROJECT_ID, jump, true)
+      jumpService.addJump(injector.file.getProjectId(project), jump, true)
     }
   }
 
@@ -106,7 +106,7 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
       if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously, and
       // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
-      jumpService.removeJump(project.basePath ?: IjVimEditor.DEFAULT_PROJECT_ID, jump)
+      jumpService.removeJump(injector.file.getProjectId(project), jump)
     }
   }
 
