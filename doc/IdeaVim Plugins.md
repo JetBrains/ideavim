@@ -129,8 +129,16 @@ Original plugin: [vim-multiple-cursors](https://github.com/terryma/vim-multiple-
       </details>
    
 ### Instructions
-   
+
 https://github.com/terryma/vim-multiple-cursors/blob/master/doc/multiple_cursors.txt
+
+For default behavior, add the following to your `.ideavimrc` file...
+
+```
+map <C-n> <Plug>NextOccurrence
+```
+
+This will map `Ctrl+n` to trigger multiple cursors.
 
 </details>
 
