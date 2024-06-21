@@ -117,9 +117,10 @@ public data class MoveTextCommand(val range: Range, val argument: String) : Comm
   }
 
   private fun shiftLocalMark(caret: VimCaret, mark: Mark, shift: Int) {
-    val editor = caret.editor
-    val path = editor.getPath() ?: return
-    val mark = VimMark(mark.key, mark.line + shift, mark.col, path, editor.extractProtocol())
+    val virtualFile = caret.editor.getVirtualFile() ?: return
+    val path = virtualFile.path
+    val protocol = virtualFile.protocol
+    val mark = VimMark(mark.key, mark.line + shift, mark.col, path, protocol)
     injector.markService.setMark(caret, mark)
   }
 

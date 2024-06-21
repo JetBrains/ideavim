@@ -282,11 +282,11 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
   override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
     val jumpService = injector.jumpService
     val spot = jumpService.getJumpSpot(editor)
-    val (line, col, fileName) = jumpService.getJump(editor, count) ?: return Motion.Error
+    val (line, col, fileName, protocol) = jumpService.getJump(editor, count) ?: return Motion.Error
     val lp = BufferPosition(line, col, false)
     return if (editor.getPath() != fileName) {
       // TODO [vakhitov] come up with a more gentle way to handle protocol
-      injector.file.selectEditor(editor.projectId, fileName, "file")?.let { newEditor ->
+      injector.file.selectEditor(editor.projectId, fileName, protocol)?.let { newEditor ->
         if (spot == -1) {
           jumpService.addJump(editor, false)
         }

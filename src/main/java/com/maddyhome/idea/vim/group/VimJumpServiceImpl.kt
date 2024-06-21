@@ -53,6 +53,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
         jumpElem.setAttribute("line", jump.line.toString())
         jumpElem.setAttribute("column", jump.col.toString())
         jumpElem.setAttribute("filename", StringUtil.notNullize(jump.filepath))
+        jumpElem.setAttribute("protocol", StringUtil.notNullize(jump.protocol))
         projectElement.addContent(jumpElem)
         if (logger.isDebug()) {
           logger.debug("saved jump = $jump")
@@ -73,6 +74,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
           Integer.parseInt(jumpElement.getAttributeValue("line")),
           Integer.parseInt(jumpElement.getAttributeValue("column")),
           jumpElement.getAttributeValue("filename"),
+          jumpElement.getAttributeValue("protocol", "file"),
         )
         jumps.add(jump)
       }
@@ -120,6 +122,6 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
     val path = place.file.path
 
-    return Jump(line, col, path)
+    return Jump(line, col, path, place.file.fileSystem.protocol)
   }
 }

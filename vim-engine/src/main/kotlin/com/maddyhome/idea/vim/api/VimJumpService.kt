@@ -46,9 +46,11 @@ public interface VimJumpService {
 }
 
 public fun VimJumpService.addJump(editor: VimEditor, reset: Boolean) {
-  val path = editor.getPath() ?: return
+  val virtualFile = editor.getVirtualFile() ?: return
+  val path = virtualFile.path
+  val protocol = virtualFile.protocol
   val position = editor.offsetToBufferPosition(editor.currentCaret().offset)
-  val jump = Jump(position.line, position.column, path)
+  val jump = Jump(position.line, position.column, path, protocol)
   addJump(editor, jump, reset)
 }
 

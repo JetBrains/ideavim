@@ -17,7 +17,7 @@ public interface Mark {
   public val line: Int // 0-based
   public val col: Int // 0-based
   public val filepath: String
-  public val protocol: String?
+  public val protocol: String
 
   public fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(line, col))
 
@@ -36,7 +36,7 @@ public data class VimMark(
   override var line: Int,
   override val col: Int,
   override val filepath: String,
-  override val protocol: String?,
+  override val protocol: String,
 ) : Mark {
   public companion object {
     @JvmStatic

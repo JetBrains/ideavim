@@ -10,4 +10,5 @@ package com.maddyhome.idea.vim.api
 
 public interface VirtualFile {
   public val path: String
+  public val protocol: String
 }

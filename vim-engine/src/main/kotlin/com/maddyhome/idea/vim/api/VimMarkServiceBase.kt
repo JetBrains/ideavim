@@ -182,7 +182,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
       markChar.isLocalMark() -> {
         if (caret.isPrimary) {
           if (mark.key == BEFORE_JUMP_MARK) {
-            val jump = Jump(mark.line, mark.col, mark.filepath)
+            val jump = Jump(mark.line, mark.col, mark.filepath, mark.protocol)
             injector.jumpService.addJump(editor, jump, true)
           }
           getLocalMarks(mark.filepath)[markChar] = mark
@@ -206,8 +206,9 @@ public abstract class VimMarkServiceBase : VimMarkService {
     if (!markChar.isGlobalMark()) return null
     if (!markChar.isOperationValidOnMark(VimMarkService.Operation.SET, editor.primaryCaret())) return null
     val position = editor.offsetToBufferPosition(offset)
-    val path = editor.getPath() ?: return null
-    return VimMark(markChar, position.line, position.column, path, editor.extractProtocol())
+    val virtualFile = editor.getVirtualFile() ?: return null
+    val path = virtualFile.path
+    return VimMark(markChar, position.line, position.column, path, virtualFile.protocol)
   }
 
   override fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean {
@@ -484,7 +485,8 @@ public abstract class VimMarkServiceBase : VimMarkService {
   }
 
   private fun getParagraphMark(editor: VimEditor, caret: ImmutableVimCaret, char: Char): VimMark? {
-    val path = editor.getPath() ?: return null
+    val virtualFile = editor.getVirtualFile() ?: return null
+    val path = virtualFile.path
     val count = when (char) {
       PARAGRAPH_START_MARK -> -1
       PARAGRAPH_END_MARK -> 1
@@ -497,11 +499,13 @@ public abstract class VimMarkServiceBase : VimMarkService {
     }
     offset = editor.normalizeOffset(offset, false)
     val lp = editor.offsetToBufferPosition(offset)
-    return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())
+    val protocol = virtualFile.protocol
+    return VimMark(char, lp.line, lp.column, path, protocol)
   }
 
   private fun getSentenceMark(editor: VimEditor, caret: ImmutableVimCaret, char: Char): VimMark? {
-    val path = editor.getPath() ?: return null
+    val virtualFile = editor.getVirtualFile() ?: return null
+    val path = virtualFile.path
     val count = when (char) {
       SENTENCE_START_MARK -> -1
       SENTENCE_END_MARK -> 1
@@ -510,7 +514,8 @@ public abstract class VimMarkServiceBase : VimMarkService {
     var offset = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true) ?: return null
     offset = editor.normalizeOffset(offset, false)
     val lp = editor.offsetToBufferPosition(offset)
-    return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())
+    val protocol = virtualFile.protocol
+    return VimMark(char, lp.line, lp.column, path, protocol)
   }
 
   protected fun createSelectionStartMark(caret: ImmutableVimCaret): Mark? {
@@ -559,8 +564,9 @@ public abstract class VimMarkServiceBase : VimMarkService {
 
   private fun createMark(caret: ImmutableVimCaret, char: Char, offset: Int): Mark? {
     val editor = caret.editor
+    val virtualFile = editor.getVirtualFile() ?: return null
     val position = editor.offsetToBufferPosition(offset)
-    return VimMark(char, position.line, position.column, editor.getPath() ?: return null, editor.extractProtocol())
+    return VimMark(char, position.line, position.column, virtualFile.path, virtualFile.protocol)
   }
 
   protected fun Char.normalizeMarkChar(): Char = if (this == '`') '\'' else this
