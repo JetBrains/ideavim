@@ -470,7 +470,7 @@ public class FileGroup extends VimFileBase {
   @NotNull
   @Override
   public String getProjectId(@NotNull Object project) {
-    if (!(project instanceof Project)) throw new IllegalArgumentException();
-    return ((Project) project).getName();
+    if (!(project instanceof Project ijProject)) throw new IllegalArgumentException();
+    return ijProject.getName() + "-" + ijProject.getLocationHash();
   }
 }

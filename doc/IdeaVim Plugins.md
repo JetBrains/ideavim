@@ -129,8 +129,26 @@ Original plugin: [vim-multiple-cursors](https://github.com/terryma/vim-multiple-
       </details>
    
 ### Instructions
-   
-https://github.com/terryma/vim-multiple-cursors/blob/master/doc/multiple_cursors.txt
+
+At the moment, the default key binds for this plugin do not get mapped correctly in IdeaVim (see [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178)). To enable the default key binds, add the following to your `.ideavimrc` file...
+
+```
+" Remap multiple-cursors shortcuts to match terryma/vim-multiple-cursors
+nmap <C-n> <Plug>NextWholeOccurrence
+xmap <C-n> <Plug>NextWholeOccurrence
+nmap g<C-n> <Plug>NextOccurrence
+xmap g<C-n> <Plug>NextOccurrence
+xmap <C-x> <Plug>SkipOccurrence
+xmap <C-p> <Plug>RemoveOccurrence
+
+" Note that the default <A-n> and g<A-n> shortcuts don't work on Mac due to dead keys.
+" <A-n> is used to enter accented text e.g. ñ
+" Feel free to pick your own mappings that are not affected. I like to use <leader>
+nmap <leader><C-n> <Plug>AllWholeOccurrences
+xmap <leader><C-n> <Plug>AllWholeOccurrences
+nmap <leader>g<C-n> <Plug>AllOccurrences
+xmap <leader>g<C-n> <Plug>AllOccurrences
+```
 
 </details>
 
