@@ -24,11 +24,6 @@
   <version>SNAPSHOT</version>
   <vendor>JetBrains</vendor>
 
-  <!-- Please search for "[VERSION UPDATE]" in project in case you update the since-build version -->
-  <!-- Check for [Version Update] tag in YouTrack as well -->
-  <!-- Also, please update the value in build.gradle.kts file-->
-  <idea-version since-build="241.15989.150"/>
-
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform (including CWM) -->
   <depends>com.intellij.modules.platform</depends>
   <resource-bundle>messages.IdeaVimBundle</resource-bundle>
