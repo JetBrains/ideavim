@@ -511,6 +511,14 @@ Contributors:
   [![icon][github]](https://github.com/Aisper)
   &nbsp;
   Egor Nikolaevsky
+* [![icon][mail]](mailto:77796630+throwaway69420-69420@users.noreply.github.com)
+  [![icon][github]](https://github.com/kun-codes)
+  &nbsp;
+  Bishwa Saha, 
+* [![icon][mail]](mailto:alexfu@fastmail.com)
+  [![icon][github]](https://github.com/alexfu)
+  &nbsp;
+  Alex Fu
 
 Previous contributors:
 
