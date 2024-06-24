@@ -482,6 +482,7 @@ internal class NerdTree : VimExtension {
     registerCommand("NERDTreeMapNewDir", "N", NerdAction.ToIj("NewDir"))
     registerCommand("NERDTreeMapDelete", "d", NerdAction.ToIj("\$Delete"))
     registerCommand("NERDTreeMapCopy", "y", NerdAction.ToIj("\$Copy"))
+    registerCommand("NERDTreeMapPaste", "v", NerdAction.ToIj("\$Paste"))
     registerCommand("NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
     registerCommand("NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
     registerCommand("NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
