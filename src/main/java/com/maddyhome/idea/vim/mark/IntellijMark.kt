@@ -12,7 +12,6 @@ import com.intellij.ide.bookmark.BookmarkType
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFileManager
 import java.lang.ref.WeakReference
 
 internal class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Project?) : Mark {
@@ -24,8 +23,8 @@ internal class IntellijMark(bookmark: LineBookmark, override val col: Int, proje
     get() = getMark()?.line ?: 0
   override val filepath: String
     get() = getMark()?.file?.path ?: ""
-  override val protocol: String?
-    get() = getMark()?.file?.let { VirtualFileManager.extractProtocol(it.url) } ?: ""
+  override val protocol: String
+    get() = getMark()?.file?.fileSystem?.protocol ?: ""
 
   fun clear() {
     val mark = getMark() ?: return

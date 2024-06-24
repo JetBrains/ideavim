@@ -16,6 +16,12 @@ plugins {
     antlr
 }
 
+val sourcesJarArtifacts by configurations.registering {
+  attributes {
+    attribute(DocsType.DOCS_TYPE_ATTRIBUTE, objects.named(DocsType.SOURCES))
+  }
+}
+
 val kotlinVersion: String by project
 val kotlinxSerializationVersion: String by project
 
@@ -98,6 +104,8 @@ java {
   withSourcesJar()
   withJavadocJar()
 }
+
+artifacts.add(sourcesJarArtifacts.name, tasks.named("sourcesJar"))
 
 val spaceUsername: String by project
 val spacePassword: String by project

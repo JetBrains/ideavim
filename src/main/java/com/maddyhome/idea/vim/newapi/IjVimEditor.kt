@@ -260,7 +260,8 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     val vf = EditorHelper.getVirtualFile(editor)
     return vf?.let {
       object : VirtualFile {
-        override val path = vf.path
+        override val path: String = vf.path
+        override val protocol: String = vf.fileSystem.protocol
       }
     }
   }

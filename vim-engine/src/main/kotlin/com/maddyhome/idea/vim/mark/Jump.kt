@@ -8,4 +8,5 @@
 
 package com.maddyhome.idea.vim.mark
 
-public data class Jump(var line: Int, val col: Int, var filepath: String) // Todo maybe we should use something like IDE's RangeMarker here?
+// Todo maybe we should use something like IDE's RangeMarker here?
+public data class Jump(var line: Int, val col: Int, var filepath: String, val protocol: String)

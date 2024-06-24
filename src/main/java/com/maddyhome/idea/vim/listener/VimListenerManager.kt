@@ -91,6 +91,7 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
+import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
 import com.maddyhome.idea.vim.newapi.ij
@@ -275,6 +276,11 @@ internal object VimListenerManager {
       // to - we explicitly call VimListenerManager.removeAll from VimPlugin.turnOffPlugin, and this disposes each
       // editor's disposable individually.
       val disposable = editor.project?.vimDisposable ?: return
+
+      // Protect against double initialisation
+      if (editor.getUserData(editorListenersDisposableKey) != null) {
+        return
+      }
 
       val listenersDisposable = Disposer.newDisposable(disposable)
       editor.putUserData(editorListenersDisposableKey, listenersDisposable)
@@ -467,6 +473,9 @@ internal object VimListenerManager {
       editorsWithProviders.forEach {
         (it.fileEditor as? TextEditor)?.editor?.let { editor ->
           if (vimDisabled(editor)) return@let
+
+          // Protect against double initialisation, in case the editor was already initialised in editorCreated
+          if (editor.vimInitialised) return@let
 
           val openingEditor = editor.removeUserData(openingEditorKey)
           val owningEditorWindow = getOwningEditorWindow(editor)

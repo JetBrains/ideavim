@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="IdeaVim full verification" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Start IJ with IdeaVim (Split Mode)" type="GradleRunConfiguration" factoryName="Gradle">
     <log_file alias="idea.log" path="$PROJECT_DIR$/build/idea-sandbox/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
@@ -11,8 +11,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="check" />
-          <option value="verifyPlugin" />
+          <option value="runIdeSplitMode" />
         </list>
       </option>
       <option name="vmOptions" value="" />

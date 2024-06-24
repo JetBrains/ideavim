@@ -926,7 +926,9 @@ private class ScrollJumpOptionMapper(option: NumberOption, internalOptionValueAc
   override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.verticalScrollJump.asVimInt()
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    editor.ij.settings.verticalScrollJump = value.value
+    // Note that Vim supports -1 to -100 as a percentage value. IntelliJ does not have any validation, but does not
+    // handle or expect negative values
+    editor.ij.settings.verticalScrollJump = value.value.coerceAtLeast(0)
   }
 
   override fun resetLocalExternalValue(editor: VimEditor, defaultValue: VimInt) {
@@ -975,26 +977,35 @@ private class SideScrollOptionMapper(option: NumberOption, internalOptionValueAc
  * setting value, and there is no UI to modify the local IntelliJ settings. Once the value has been set in IdeaVim, it
  * takes precedence over the global, persistent setting until the option is reset with either `:set scrolloff&` or
  * `:setlocal scrolloff<`.
+ *
+ * Note that when the IdeaVim value is set, we set the IntelliJ local value to 0 rather than sharing the value. This is
+ * to prevent conflicts between IntelliJ and IdeaVim's separate implementations for scrolling. IntelliJ's scrolling
+ * includes virtual space at the bottom of the file, while (Idea)Vim doesn't. Combining this with a non-zero
+ * `'scrolloff'` value can reposition the bottom of the file. E.g., using `G` will position the last line at the bottom
+ * of the file, but then IntelliJ moves it up `'scrolloff'` when the caret is moved.
+ *
+ * With a large value like `999`, IntelliJ will try to move the current line to the centre of the screen, but then
+ * IdeaVim will try to reposition. Normally, this doesn't cause too much of a problem, because setting the scroll
+ * position will cancel any outstanding animations. However, using backspace updates the scroll position with animations
+ * disabled, so the scroll happens immediately, with a visible "twitch" as the editor scrolls for IntelliJ and then back
+ * for IdeaVim.
+ *
+ * We should consider implementing [ScrollPositionCalculator] which would allow IdeaVim to completely take over
+ * scrolling from IntelliJ. This would be a non-trivial change, and it might be better to move the scrolling to
+ * vim-engine so it can also work in Fleet.
  */
-private class ScrollOffOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor)
-  : GlobalLocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
+private class ScrollOffOptionMapper(
+  scrollOffOption: NumberOption,
+  internalOptionValueAccessor: InternalOptionValueAccessor,
+) : OneWayGlobalLocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(scrollOffOption, internalOptionValueAccessor) {
 
   override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_VERTICAL_SCROLL_OFFSET
 
-  // The IntelliJ setting is in practice global. The base implementation relies on this fact
-  override val canUserModifyExternalLocalValue: Boolean = false
+  override fun getExternalGlobalValue() =
+    EditorSettingsExternalizable.getInstance().verticalScrollOffset.asVimInt()
 
-  override fun getGlobalExternalValue() = EditorSettingsExternalizable.getInstance().verticalScrollOffset.asVimInt()
-  override fun getEffectiveExternalValue(editor: VimEditor) = editor.ij.settings.verticalScrollOffset.asVimInt()
-
-  override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    editor.ij.settings.verticalScrollOffset = value.value
-  }
-
-  override fun removeLocalExternalValue(editor: VimEditor) {
-    // Unexpectedly, verticalScrollOffset accepts `-1` as a value to clear any local overrides, and this will reset the
-    // effective value to return the global value
-    editor.ij.settings.verticalScrollOffset = -1
+  override fun suppressExternalLocalValue(editor: VimEditor) {
+    editor.ij.settings.verticalScrollOffset = 0
   }
 }
 
@@ -1002,15 +1013,14 @@ private class ScrollOffOptionMapper(option: NumberOption, internalOptionValueAcc
 /**
  * Map the `'sidescrolloff'` global-local Vim option to the IntelliJ global-local horizontal scroll offset setting
  *
- * Ideally, we would implement this in a similar manner to [SideScrollOptionMapper], setting the external local
- * horizontal scroll offset value when the user explicitly sets the Vim value, so that IntelliJ could also use the
- * value. Unfortunately, IntelliJ's scrolling calculation logic is based on integer font width maths, which causes
- * problems with fractional font widths (such as on a Mac when running tests).
+ * IntelliJ supports horizontal scroll offset in a similar manner to Vim. However, the implementation calculates offsets
+ * using integer font sizes, which can lead to minor inaccuracies when compared to the IdeaVim implementation, such as
+ * differences running tests on a Mac.
  *
  * For example, given a `'sidescrolloff'` value of `10`, and a fractional font width of `7.8`, IntelliJ will scroll `80`
  * pixels instead of `78`. This is a very minor difference, but because it overshoots, it means that IdeaVim doesn't
- * need to scroll, which in turn can cause issues with `'sidescroll'`, because IntelliJ doesn't support `sidescroll=0`,
- * which would scroll to position the caret in the middle of the display.
+ * need to scroll, which in turn can cause issues with `'sidescroll'` (jump), because IntelliJ doesn't support
+ * `sidescroll=0`, which would scroll to position the caret in the middle of the display.
  *
  * It also causes precision problems in the tests. The display is scrolled to a couple of pixels _before_ the leftmost
  * column, which means the rightmost column ends a couple of pixels _after_ the rightmost edge of the display. The tests
@@ -1028,78 +1038,98 @@ private class ScrollOffOptionMapper(option: NumberOption, internalOptionValueAcc
  * vim-engine so it can also work in Fleet.
  */
 private class SideScrollOffOptionMapper(
-  private val sideScrollOffOption: NumberOption,
-  private val internalOptionValueAccessor: InternalOptionValueAccessor,
-) : GlobalOptionValueOverride<VimInt>, LocalOptionValueOverride<VimInt>, IdeaBackedOptionValueOverride {
+  sideScrollOffOption: NumberOption,
+  internalOptionValueAccessor: InternalOptionValueAccessor,
+) : OneWayGlobalLocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(sideScrollOffOption, internalOptionValueAccessor) {
 
   override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_HORIZONTAL_SCROLL_OFFSET
 
-  override fun getGlobalValue(storedValue: OptionValue<VimInt>, editor: VimEditor?): OptionValue<VimInt> {
+  override fun getExternalGlobalValue() =
+    EditorSettingsExternalizable.getInstance().horizontalScrollOffset.asVimInt()
+
+  override fun suppressExternalLocalValue(editor: VimEditor) {
+    editor.ij.settings.horizontalScrollOffset = 0
+  }
+}
+
+/**
+ * An abstract base class to map a global-local IDEA setting to a global-local Vim option. The IDEA setting is not
+ * updated to reflect the Vim changes, but is kept at a neutral value.
+ *
+ * This class is used for Vim options that have an IDEA equivalent, but the implementation is handled by IdeaVim, e.g.,
+ * scroll jumps and offsets. The IDEA value is not updated, and kept to a neutral value, so that the IDEA implementation
+ * does not interfere with the IdeaVim implementation.
+ */
+private abstract class OneWayGlobalLocalOptionToGlobalLocalIdeaSettingMapper<T : VimDataType>(
+  private val option: Option<T>,
+  private val internalOptionValueAccessor: InternalOptionValueAccessor,
+) : GlobalOptionValueOverride<T>, LocalOptionValueOverride<T>, IdeaBackedOptionValueOverride {
+
+  override fun getGlobalValue(storedValue: OptionValue<T>, editor: VimEditor?): OptionValue<T> {
     if (storedValue is OptionValue.Default) {
-      return OptionValue.Default(EditorSettingsExternalizable.getInstance().horizontalScrollOffset.asVimInt())
+      return OptionValue.Default(getExternalGlobalValue())
     }
 
-    // If it's not the default value, it's got to be the stored value
     return storedValue
   }
 
-  override fun setGlobalValue(
-    storedValue: OptionValue<VimInt>,
-    newValue: OptionValue<VimInt>,
-    editor: VimEditor?,
-  ): Boolean {
-    // The user has typed `:setlocal`. Just make sure that the IntelliJ value doesn't interfere with the Vim value
-    injector.editorGroup.getEditors().forEach { it.ij.settings.horizontalScrollOffset = 0 }
+  override fun setGlobalValue(storedValue: OptionValue<T>, newValue: OptionValue<T>, editor: VimEditor?): Boolean {
+    // The user is updating the global Vim value, via `:setglobal`. IdeaVim scrolling will be using this value. Make
+    // sure the IntelliJ values won't interfere
+    // Note that we don't reset the local IntelliJ value for `:set {option}&` or `:set {option}<` because the current
+    // global IntelliJ value might still interfere with IdeaVim's implementation. We continue to suppress the IntelliJ
+    // value.
+    injector.editorGroup.getEditors().forEach { suppressExternalLocalValue(it) }
     return storedValue.value != newValue.value
   }
 
-  override fun getLocalValue(storedValue: OptionValue<VimInt>?, editor: VimEditor): OptionValue<VimInt> {
+  override fun getLocalValue(storedValue: OptionValue<T>?, editor: VimEditor): OptionValue<T> {
     if (storedValue == null) {
       // Initialisation. Report the global value of the setting. We ignore the local value because the user doesn't have
-      // a way to set it, and we set it to 0 so that it doesn't affect our scroll calculations (because IntelliJ doesn't
-      // handle sidescroll=0 to mean half a page)
-      return OptionValue.Default(EditorSettingsExternalizable.getInstance().horizontalScrollOffset.asVimInt())
+      // a way to set it. If it has been changed (unlikely if stored value hasn't been set yet), then it would be 0
+      return OptionValue.Default(getExternalGlobalValue())
     }
 
-    if (storedValue is OptionValue.Default && storedValue.value != sideScrollOffOption.unsetValue) {
-      // The local value is set to the default value (as a copy of the global value), so return the global external
-      // value as a default
-      return OptionValue.Default(EditorSettingsExternalizable.getInstance().horizontalScrollOffset.asVimInt())
+    if (storedValue is OptionValue.Default && storedValue.value != option.unsetValue) {
+      // The local value has been reset to Default. It's not the Vim default of "unset", but a copy of the global value.
+      // Return the current value of the global external value
+      return OptionValue.Default(getExternalGlobalValue())
     }
 
     // Whatever is left is either explicitly set by the user, or option.unsetValue
     return storedValue
   }
 
-  override fun setLocalValue(
-    storedValue: OptionValue<VimInt>?,
-    newValue: OptionValue<VimInt>,
-    editor: VimEditor,
-  ): Boolean {
-    // This is setting the Vim local value. We do nothing but reset the local horizontal scroll jump so IntelliJ's
-    // scrolling doesn't affect our scrolling
-    editor.ij.settings.horizontalScrollOffset = 0
+  override fun setLocalValue(storedValue: OptionValue<T>?, newValue: OptionValue<T>, editor: VimEditor): Boolean {
+    // Vim local value is being set. We do nothing but set the local IntelliJ value to 0, so IntelliJ's scrolling
+    // doesn't affect IdeaVim's scrolling
+    suppressExternalLocalValue(editor)
     return storedValue?.value != newValue.value
   }
 
   override fun onGlobalIdeaValueChanged(propertyName: String) {
     if (propertyName == ideaPropertyName) {
-      // Again, just make sure the IntelliJ local value is 0
-      injector.editorGroup.getEditors().forEach { it.ij.settings.horizontalScrollOffset = 0 }
+      // The IntelliJ global value has changed. We want to use this as the Vim global value. Since we control scrolling,
+      // set the local IntelliJ value to 0
+      injector.editorGroup.getEditors().forEach { suppressExternalLocalValue(it) }
 
-      // Update the stored Vim global value. This will not override any existing local values
+      // Now update the Vim global value to match the new IntelliJ global value. If the current Vim global value is
+      // Default, then it will already reflect the current global external value. Otherwise, update the Vim global value
+      // to the external global value.
       val globalScope = OptionAccessScope.GLOBAL(null)
-      val storedValue = internalOptionValueAccessor.getOptionValueInternal(sideScrollOffOption, globalScope)
+      val storedValue = internalOptionValueAccessor.getOptionValueInternal(option, globalScope)
       if (storedValue !is OptionValue.Default) {
-        val externalGlobalValue = EditorSettingsExternalizable.getInstance().horizontalScrollOffset
         internalOptionValueAccessor.setOptionValueInternal(
-          sideScrollOffOption,
+          option,
           globalScope,
-          OptionValue.External(VimInt(externalGlobalValue))
+          OptionValue.External(getExternalGlobalValue())
         )
       }
     }
   }
+
+  protected abstract fun getExternalGlobalValue(): T
+  protected abstract fun suppressExternalLocalValue(editor: VimEditor)
 }
 
 
