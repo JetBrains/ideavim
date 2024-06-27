@@ -304,6 +304,7 @@ public fun VimEditor.coerceOffset(offset: Int): Int {
 public interface VimRangeMarker {
   public val startOffset: Int
   public val endOffset: Int
+  public val isValid: Boolean
 
   public fun dispose()
 }
