@@ -371,7 +371,11 @@ internal class VimEmulationConfigurable : Configurable {
       for (rowIndex in rowsToBeChangedOnToggleAllHandlers) {
         val row = myModel.rows[rowIndex]
         row.owner =
-          if (row.owner == ShortcutOwnerInfo.allUndefined) ShortcutOwnerInfo.allVim else if (row.owner == ShortcutOwnerInfo.allVim) ShortcutOwnerInfo.allIde else ShortcutOwnerInfo.allUndefined
+          when (row.owner) {
+            ShortcutOwnerInfo.allUndefined -> ShortcutOwnerInfo.allVim
+            ShortcutOwnerInfo.allVim -> ShortcutOwnerInfo.allIde
+            else -> ShortcutOwnerInfo.allUndefined
+          }
       }
 
       IdeFocusManager.getGlobalInstance()
