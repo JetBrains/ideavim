@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.key.consumers
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.action.change.LazyVimCommand
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -122,11 +123,11 @@ public class CommandConsumer : KeyConsumer {
       logger.trace("Set command state to READY")
       commandBuilder.commandState = CurrentCommandState.READY
     } else {
-      processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, _ ->
+      processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
         logger.trace("Set waiting for the argument")
         val argumentType = action.argumentType
         val editorState = lambdaEditor.vimStateMachine
-        startWaitingForArgument(lambdaEditor, action, argumentType!!, lambdaKeyState, editorState)
+        startWaitingForArgument(lambdaEditor, lambdaContext, action, argumentType!!, lambdaKeyState, editorState)
         lambdaKeyState.partialReset(editorState.mode)
       }
     }
@@ -151,6 +152,7 @@ public class CommandConsumer : KeyConsumer {
 
   private fun startWaitingForArgument(
     editor: VimEditor,
+    context: ExecutionContext,
     action: EditorActionHandlerBase,
     argument: Argument.Type,
     keyState: KeyHandlerState,
@@ -189,6 +191,7 @@ public class CommandConsumer : KeyConsumer {
     if (action.id == "VimChangeCharacterAction" || action.id == "VimChangeVisualCharacterAction") {
       editor.isReplaceCharacter = true
     }
+    action.onStartWaitingForArgument(editor, context)
   }
 
   private fun checkArgumentCompatibility(

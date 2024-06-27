@@ -58,6 +58,12 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
   public open val argumentType: Argument.Type? = null
 
   /**
+   * This method will be executed only for actions with [argumentType != null]
+   * when such actions start to await for their argument
+   */
+  public open fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext) {}
+
+  /**
    * Returns various binary flags for the command.
    *
    * These legacy flags will be refactored in future releases.

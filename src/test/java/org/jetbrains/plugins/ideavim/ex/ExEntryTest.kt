@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -25,6 +26,7 @@ import javax.swing.KeyStroke
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 // TODO: Split this class
 // This class should handle simple ex entry features, such as starting ex entry, accepting/cancelling, cursor shape etc.
@@ -669,6 +671,18 @@ class ExEntryTest : VimTestCase() {
     typeText(injector.parser.stringToKeys(":cmap d <C-R>") + injector.parser.parseKeys("<CR>"))
     typeExInput(":de")
     assertExText("hello world")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3506"])
+  fun `test quote when awaiting for register during insert`() {
+    injector.registerGroup.setKeys('w', injector.parser.parseKeys("world"))
+    configureByText("")
+    typeText(":hello <C-R>")
+    val cmdLine = injector.commandLine.getActiveCommandLine() ?: fail()
+    assertEquals("hello \"", cmdLine.visibleText)
+    typeText("w")
+    assertEquals("hello world", cmdLine.visibleText)
   }
 
   private fun typeExInput(text: String) {
