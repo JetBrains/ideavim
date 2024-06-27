@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimRangeMarker
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
-import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -87,14 +86,13 @@ public data class GlobalCommand(val range: Range, val argument: String, val inve
         editor.getLineStartOffset(line1),
         editor.getLineEndOffset(line2),
       )
-      val marks = if (!invert) matches.map {
-        injector.engineEditorHelper.createRangeMarker(editor, editor.getLineStartForOffset(it.range.startOffset), editor.getLineStartForOffset(it.range.startOffset))
-        // filter out lines that contain a match
-      } else (line1..line2).filterNot { line ->
-        matches.map { match ->
-          editor.offsetToBufferPosition(match.range.startOffset).line
-        }.contains(line)
-      }.map { injector.engineEditorHelper.createRangeMarker(editor, editor.getLineStartOffset(it), editor.getLineStartOffset(it)) }
+      val matchesLines = matches.map { it.getLine(editor) }.toSet()
+      val linesForGlobalCommand = if (invert) {
+        ((line1 .. line2).toSet() - matchesLines).toList().sorted()
+      } else {
+        matchesLines.toList().sorted()
+      }
+      val marks = linesForGlobalCommand.map { injector.engineEditorHelper.createRangeMarker(editor, editor.getLineStartOffset(it), editor.getLineStartOffset(it)) }
 
       if (gotInt) {
         messages.showStatusBarMessage(null, messages.message("e_interr"))
@@ -111,6 +109,10 @@ public data class GlobalCommand(val range: Range, val argument: String, val inve
     return true
   }
 
+  private fun VimMatchResult.Success.getLine(editor: VimEditor): Int {
+    return editor.offsetToBufferPosition(range.startOffset).line
+  }
+
   private fun globalExe(editor: VimEditor, context: ExecutionContext, marks: List<VimRangeMarker>, cmd: String) {
     globalBusy = true
     try {
@@ -118,7 +120,9 @@ public data class GlobalCommand(val range: Range, val argument: String, val inve
         if (gotInt) break
         if (!globalBusy) break
         val startOffset = mark.startOffset
+        val isValid = mark.isValid
         mark.dispose()
+        if (!isValid) continue
         globalExecuteOne(editor, context, startOffset, cmd)
         // TODO: 26.05.2021 break check
       }

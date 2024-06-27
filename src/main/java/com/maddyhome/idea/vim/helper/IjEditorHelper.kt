@@ -66,6 +66,8 @@ internal class IjEditorHelper : EngineEditorHelper {
         get() = ijRangeMarker.startOffset
       override val endOffset: Int
         get() = ijRangeMarker.endOffset
+      override val isValid: Boolean
+        get() = ijRangeMarker.isValid
 
       override fun dispose() {
         ijRangeMarker.dispose()

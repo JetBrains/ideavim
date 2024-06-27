@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -299,6 +300,36 @@ class GlobalCommandTest : VimTestCase() {
     
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3501"])
+  fun `test global is executed once per line`() {
+    doTest(
+      "g/aaa/d",
+      """
+aaa bbb ccc aaa aaa
+bbbbbb
+bbbbbb
+aaa bbb ccc aaa aaa aaa aaa aaa
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+end
+      """.trimIndent(),
+      """
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+end
       """.trimIndent(),
     )
   }
