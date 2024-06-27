@@ -1063,6 +1063,38 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 14)
   }
 
+  @Test
+  fun `test incsearch + hlsearch at bottom of file with wrapscan`() {
+    // Make sure the caret wraps during incsearch
+    configureByText(
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci ${c}mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin()
+    )
+    enterCommand("set incsearch hlsearch wrapscan")
+    typeText("/it")
+    assertPosition(0, 19)
+  }
+
+  @Test
+  fun `test incsearch + hlsearch at bottom of file with nowrapscan`() {
+    // This will highlight the occurrences above/before the caret, but should not move the caret
+    configureByText(
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci ${c}mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin()
+    )
+    enterCommand("set incsearch hlsearch nowrapscan")
+    typeText("/it")
+    assertPosition(2, 12)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @Test
   fun `test incsearch moves caret to start of first match (backwards)`() {

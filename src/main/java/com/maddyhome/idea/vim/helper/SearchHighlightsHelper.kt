@@ -210,12 +210,28 @@ private fun findClosestMatch(
     return -1
   }
 
-  val sortedResults = results.sortedBy { it.startOffset }.let { if (!forwards) it.reversed() else it }
-  val nextIndex = sortedResults.indexOfFirst {
-    if (forwards) it.startOffset > initialOffset else it.startOffset < initialOffset
+  val sortedResults = if (forwards) {
+    results.sortedBy { it.startOffset }
+  } else {
+    results.sortedByDescending { it.startOffset }
   }
-  val toDrop = (nextIndex + count - 1).let { if (injector.globalOptions().wrapscan) it % results.size else it }
-  return sortedResults.drop(toDrop).firstOrNull()?.startOffset ?: -1
+  val closestIndex = if (forwards) {
+    sortedResults.indexOfFirst { it.startOffset > initialOffset }
+  }
+  else {
+    sortedResults.indexOfFirst { it.startOffset < initialOffset }
+  }
+
+  if (closestIndex == -1 && !injector.globalOptions().wrapscan) {
+    return -1
+  }
+
+  val nextIndex = closestIndex.coerceAtLeast(0) + (count - 1)
+  if (nextIndex >= sortedResults.size && !injector.globalOptions().wrapscan) {
+    return -1
+  }
+
+  return sortedResults[nextIndex % results.size].startOffset
 }
 
 internal fun highlightSearchResults(editor: Editor, pattern: String, results: List<TextRange>, currentMatchOffset: Int) {
