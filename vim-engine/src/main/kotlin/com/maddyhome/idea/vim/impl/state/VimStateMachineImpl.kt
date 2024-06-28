@@ -47,23 +47,6 @@ class VimStateMachineImpl : VimStateMachine {
     }
   }
 
-  /**
-   * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
-   * mode.
-   */
-  override fun toggleInsertOverwrite() {
-    val oldMode = this.mode
-    var newMode = oldMode
-    if (oldMode == Mode.INSERT) {
-      newMode = Mode.REPLACE
-    } else if (oldMode == Mode.REPLACE) {
-      newMode = Mode.INSERT
-    }
-    if (oldMode != newMode) {
-      mode = newMode
-    }
-  }
-
   companion object {
     @Contract(pure = true)
     fun modeToMappingMode(mode: Mode): MappingMode {

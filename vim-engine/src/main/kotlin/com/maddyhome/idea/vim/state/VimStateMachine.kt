@@ -40,12 +40,6 @@ interface VimStateMachine {
 
   fun resetRegisterPending()
 
-  /**
-   * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
-   * mode.
-   */
-  fun toggleInsertOverwrite()
-
   companion object {
     private val globalState = VimStateMachineImpl()
 
