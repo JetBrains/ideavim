@@ -50,6 +50,7 @@ public class VimStateMachineImpl : VimStateMachine {
     return keyHandler.isOperatorPending(mode, keyHandler.keyHandlerState)
   }
 
+  @Deprecated("Please use KeyHandler instead")
   override fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode): Boolean {
     val keyHandler = KeyHandler.getInstance()
     return keyHandler.isDuplicateOperatorKeyStroke(key, mode, keyHandler.keyHandlerState)
@@ -65,16 +66,19 @@ public class VimStateMachineImpl : VimStateMachine {
     }
   }
 
+  @Deprecated("Please use KeyHandler instead")
   override fun startDigraphSequence() {
     val keyHandler = KeyHandler.getInstance()
     keyHandler.keyHandlerState.digraphSequence.startDigraphSequence()
   }
 
+  @Deprecated("Please use KeyHandler instead")
   override fun startLiteralSequence() {
     val keyHandler = KeyHandler.getInstance()
     keyHandler.keyHandlerState.digraphSequence.startLiteralSequence()
   }
 
+  @Deprecated("Please use KeyHandler instead")
   override fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     val keyHandler = KeyHandler.getInstance()
     return keyHandler.keyHandlerState.digraphSequence.processKey(key, editor)

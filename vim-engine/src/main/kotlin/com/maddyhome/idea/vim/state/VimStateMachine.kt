@@ -43,10 +43,13 @@ public interface VimStateMachine {
   public fun isOperatorPending(mode: Mode): Boolean
   public val executingCommandFlags: EnumSet<CommandFlags>
 
+  @Deprecated("Please use KeyHandler instead")
   public fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode): Boolean
 
   public fun resetRegisterPending()
+  @Deprecated("Please use KeyHandler instead")
   public fun startLiteralSequence()
+  @Deprecated("Please use KeyHandler instead")
   public fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult
 
   /**
@@ -55,6 +58,7 @@ public interface VimStateMachine {
    */
   public fun toggleInsertOverwrite()
 
+  @Deprecated("Please use KeyHandler instead")
   public fun startDigraphSequence()
 
   public companion object {
