@@ -296,6 +296,8 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       if (cmd.charAt(endOfPattern) == delimiter) {
         cmd.set('\u0000', endOfPattern)
       }
+      // It is needed for the following [cmd.toString()]
+      // `endOfPattern + 1` is delimiter and `endOfPattern + 2` is char after the delimiter (command start)
       cmd.pointer = endOfPattern + 2
     }
     return GlobalCommandArguments(pat, whichPat, cmd.toString())
