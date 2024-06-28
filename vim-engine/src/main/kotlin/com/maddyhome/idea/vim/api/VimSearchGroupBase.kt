@@ -473,6 +473,36 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
     return if (offset == -1) range.startOffset else offset
   }
 
+  public override fun findEndOfPattern(
+    command: String,
+    delimiter: Char,
+    startIndex: Int,
+  ): Int {
+    var magic = true
+
+    var i = startIndex
+    while (i < command.length) {
+      // delimiter found
+      if (command[i] == delimiter) break
+
+      // collection start found, ignore until end of collection
+      if (magic && command[i] == '[' ||
+        !magic && command[i] == '\\' && i + 1 < command.length && command[i + 1] == '[') {
+
+        i = findEndOfCollection(command, i)
+        // skip escaped char
+      } else if (command[i] == '\\' && i + 1 < command.length) {
+        i++
+        // update magic
+        if (command[i] == 'v' || command[i] == 'm') magic = true
+        if (command[i] == 'V' || command[i] == 'M') magic = false
+      }
+      i++
+    }
+    return i
+  }
+
+
   private fun findNextSearchForGn(
     editor: VimEditor,
     count: Int,
@@ -524,35 +554,6 @@ public abstract class VimSearchGroupBase : VimSearchGroup {
       offset = findItOffset(editor, startOffset, count + 1, dir)?.first ?: -1
     }
     return offset
-  }
-
-  private fun findEndOfPattern(
-    command: String,
-    delimiter: Char,
-    startIndex: Int = 0
-  ): Int {
-    var magic = true
-
-    var i = startIndex
-    while (i < command.length) {
-      // delimiter found
-      if (command[i] == delimiter) break
-
-      // collection start found, ignore until end of collection
-      if (magic && command[i] == '[' ||
-        !magic && command[i] == '\\' && i + 1 < command.length && command[i + 1] == '[') {
-
-        i = findEndOfCollection(command, i)
-      // skip escaped char
-      } else if (command[i] == '\\' && i + 1 < command.length) {
-        i++
-        // update magic
-        if (command[i] == 'v' || command[i] == 'm') magic = true
-        if (command[i] == 'V' || command[i] == 'M') magic = false
-      }
-      i++
-    }
-    return i
   }
 
   private fun findEndOfCollection(

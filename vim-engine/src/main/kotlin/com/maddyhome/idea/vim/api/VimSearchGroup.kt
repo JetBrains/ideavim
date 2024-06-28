@@ -143,6 +143,17 @@ public interface VimSearchGroup {
   public fun searchWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int, whole: Boolean, dir: Direction): Int
 
   /**
+   * If [command] contains a pattern, this function finds the end of it that is marked with [delimiter].
+   *
+   * This is useful for commands like `:%s/123/321/s` to detect the end of `123` pattern. `/` will be a [delimiter].
+   */
+  public fun findEndOfPattern(
+    command: String,
+    delimiter: Char,
+    startIndex: Int = 0
+  ): Int
+
+  /**
    * Parse and execute the substitute command
    *
    * <p>Updates state for the last substitute pattern and last replacement text. Updates search
