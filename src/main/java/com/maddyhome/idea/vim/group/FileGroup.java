@@ -34,10 +34,7 @@ import com.intellij.psi.search.ProjectScope;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.EditorHelperRt;
-import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.newapi.ExecuteExtensionKt;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -51,6 +48,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.countWords;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 
 public class FileGroup extends VimFileBase {
@@ -329,7 +327,7 @@ public class FileGroup extends VimFileBase {
 
       msg.append("; Line ").append(lline + 1).append(" of ").append(total);
 
-      SearchHelper.CountPosition cp = SearchHelper.countWords(editor);
+      CountPosition cp = countWords(editor);
 
       msg.append("; Word ").append(cp.getPosition()).append(" of ").append(cp.getCount());
 
@@ -346,7 +344,7 @@ public class FileGroup extends VimFileBase {
       vr.normalize();
 
       int lines;
-      SearchHelper.CountPosition cp = SearchHelper.countWords(editor);
+      CountPosition cp = countWords(editor);
       int words = cp.getCount();
       int word = 0;
       if (vr.isMultiple()) {
@@ -356,7 +354,7 @@ public class FileGroup extends VimFileBase {
         msg.append(cols).append(" Cols; ");
 
         for (int i = 0; i < vr.size(); i++) {
-          cp = SearchHelper.countWords(editor, vr.getStartOffsets()[i], vr.getEndOffsets()[i] - 1);
+          cp = countWords(editor, vr.getStartOffsets()[i], vr.getEndOffsets()[i] - 1);
           word += cp.getCount();
         }
       }
@@ -366,7 +364,7 @@ public class FileGroup extends VimFileBase {
 
         lines = elp.line - slp.line + 1;
 
-        cp = SearchHelper.countWords(editor, vr.getStartOffset(), vr.getEndOffset() - 1);
+        cp = countWords(editor, vr.getStartOffset(), vr.getEndOffset() - 1);
         word = cp.getCount();
       }
 
