@@ -303,6 +303,23 @@ interface VimEditor {
       }
     }
   }
+
+  /**
+   * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
+   * mode.
+   */
+  public fun toggleInsertOverwrite() {
+    val oldMode = this.mode
+    var newMode = oldMode
+    if (oldMode == Mode.INSERT) {
+      newMode = Mode.REPLACE
+    } else if (oldMode == Mode.REPLACE) {
+      newMode = Mode.INSERT
+    }
+    if (oldMode != newMode) {
+      mode = newMode
+    }
+  }
 }
 
 interface MutableVimEditor : VimEditor {
