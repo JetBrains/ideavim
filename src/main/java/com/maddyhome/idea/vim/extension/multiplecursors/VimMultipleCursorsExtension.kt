@@ -30,11 +30,11 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.userData
@@ -235,7 +235,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
       val text = if (editor.inVisualMode) {
         primaryCaret.selectedText ?: return
       } else {
-        val range = SearchHelper.findWordUnderCursor(editor, primaryCaret) ?: return
+        val range = findWordUnderCursor(editor, primaryCaret) ?: return
         if (range.startOffset > primaryCaret.offset) return
         IjVimEditor(editor).getText(range)
       }
@@ -300,7 +300,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
   }
 
   private fun selectWordUnderCaret(editor: Editor, caret: Caret): TextRange? {
-    val range = SearchHelper.findWordUnderCursor(editor, caret) ?: return null
+    val range = findWordUnderCursor(editor, caret) ?: return null
     if (range.startOffset > caret.offset) return null
 
     enterVisualMode(editor.vim)

@@ -13,14 +13,10 @@ import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchHelperBase
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.PsiHelper
-import com.maddyhome.idea.vim.helper.SearchHelper
-import com.maddyhome.idea.vim.helper.SearchOptions
+import com.maddyhome.idea.vim.helper.findMisspelledWords
 import it.unimi.dsi.fastutil.ints.IntComparator
 import it.unimi.dsi.fastutil.ints.IntComparators
-import java.util.*
 
 @Service
 internal class IjVimSearchHelper : VimSearchHelperBase() {
@@ -58,6 +54,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     }
 
     // TODO add it to PsiService
-    return SearchHelper.findMisspelledWords(editor.ij, startOffset, endOffset, skipCount, offsetOrdering)
+    return findMisspelledWords(editor.ij, startOffset, endOffset, skipCount, offsetOrdering)
   }
 }

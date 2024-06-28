@@ -57,8 +57,9 @@ import com.maddyhome.idea.vim.helper.CharacterHelper.changeCase
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.NumberType
-import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.findNumberUnderCursor
+import com.maddyhome.idea.vim.helper.findNumbersInRange
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
@@ -657,7 +658,7 @@ public class ChangeGroup : VimChangeGroupBase() {
     val alpha = nf.contains("alpha")
     val hex = nf.contains("hex")
     val octal = nf.contains("octal")
-    val numberRanges = SearchHelper.findNumbersInRange((editor as IjVimEditor).editor, selectedRange, alpha, hex, octal)
+    val numberRanges = findNumbersInRange((editor as IjVimEditor).editor, selectedRange, alpha, hex, octal)
     val newNumbers: MutableList<String?> = ArrayList()
     for (i in numberRanges.indices) {
       val numberRange = numberRanges[i]
@@ -680,8 +681,7 @@ public class ChangeGroup : VimChangeGroupBase() {
     val alpha = nf.contains("alpha")
     val hex = nf.contains("hex")
     val octal = nf.contains("octal")
-    val range =
-      SearchHelper.findNumberUnderCursor((editor as IjVimEditor).editor, (caret as IjVimCaret).caret, alpha, hex, octal)
+    val range = findNumberUnderCursor((editor as IjVimEditor).editor, (caret as IjVimCaret).caret, alpha, hex, octal)
     if (range == null) {
       logger.debug("no number on line")
       return false
