@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.ExceptionHandler
@@ -593,7 +592,7 @@ n  ,f            <Plug>Foo
     assertPluginError(false)
     assertState("text\n")
 
-    typeText(parseKeys("t"))
+    typeText(injector.parser.parseKeys("t"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:var")
   }

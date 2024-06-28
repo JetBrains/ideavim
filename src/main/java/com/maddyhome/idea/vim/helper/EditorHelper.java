@@ -101,15 +101,6 @@ public class EditorHelper {
   }
 
   /**
-   * COMPATIBILITY-LAYER: Created a function
-   * Please see: <a href="https://jb.gg/zo8n0r">doc</a>
-   */
-  public static int getVisualLineCount(final @NotNull Editor editor) {
-    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
-    return EngineEditorHelperKt.getVisualLineCount(editor1);
-  }
-
-  /**
    * Best efforts to ensure that scroll offset doesn't overlap itself.
    * <p>
    * This is a sanity check that works fine if there are no visible block inlays. Otherwise, the screen height depends

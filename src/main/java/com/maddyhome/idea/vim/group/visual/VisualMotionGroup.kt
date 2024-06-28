@@ -9,13 +9,9 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.find.FindManager
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
-import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.engine
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
@@ -30,13 +26,5 @@ internal class VisualMotionGroup : VimVisualMotionGroupBase() {
     }
 
     return super.autodetectVisualSubmode(editor)
-  }
-
-  /**
-   * COMPATIBILITY-LAYER: Added a method
-   * Please see: https://jb.gg/zo8n0r
-   */
-  fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode? = null): Boolean {
-    return this.enterVisualMode(editor.vim, subMode?.engine)
   }
 }

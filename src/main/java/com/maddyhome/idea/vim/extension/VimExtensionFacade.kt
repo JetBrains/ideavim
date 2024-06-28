@@ -9,7 +9,6 @@ package com.maddyhome.idea.vim.extension
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
@@ -68,12 +67,13 @@ public object VimExtensionFacade {
   }
 
 
-  /**
-   * COMPATIBILITY-LAYER: Additional method
-   * Please see: https://jb.gg/zo8n0r
-   */
-  /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
+  @Deprecated("Use VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)",
+    ReplaceWith(
+      "VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)",
+      "com.maddyhome.idea.vim.VimPlugin"
+    )
+  )
   public fun putExtensionHandlerMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
