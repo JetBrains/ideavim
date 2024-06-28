@@ -7,6 +7,7 @@
  */
 package org.jetbrains.plugins.ideavim.action
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -74,7 +75,7 @@ class MotionActionTest : VimTestCase() {
     assertPluginError(false)
     val vimCommandState = fixture.editor.vimStateMachine
     kotlin.test.assertNotNull(vimCommandState)
-    assertEmpty(vimCommandState.commandBuilder.keys.toList())
+    assertEmpty(KeyHandler.getInstance().keyHandlerState.commandBuilder.keys.toList())
   }
 
   // |h| |l|

@@ -14,6 +14,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -91,22 +92,23 @@ internal class Matchit : VimExtension {
   private class MatchitHandler(private val reverse: Boolean) : ExtensionHandler {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val commandState = editor.vimStateMachine
-      val count = commandState.commandBuilder.count
+      val keyHandler = KeyHandler.getInstance()
+      val keyState = keyHandler.keyHandlerState
+      val count = keyState.commandBuilder.count
 
       // Reset the command count so it doesn't transfer onto subsequent commands.
-      editor.vimStateMachine.commandBuilder.resetCount()
+      keyState.commandBuilder.resetCount()
 
       // Normally we want to jump to the start of the matching pair. But when moving forward in operator
       // pending mode, we want to include the entire match. isInOpPending makes that distinction.
-      val isInOpPending = commandState.isOperatorPending(editor.mode)
+      val isInOpPending = keyHandler.isOperatorPending(editor.mode, keyState)
 
       if (isInOpPending) {
         val matchitAction = MatchitAction()
         matchitAction.reverse = reverse
         matchitAction.isInOpPending = true
 
-        commandState.commandBuilder.completeCommandPart(
+        keyState.commandBuilder.completeCommandPart(
           Argument(
             Command(
               count,

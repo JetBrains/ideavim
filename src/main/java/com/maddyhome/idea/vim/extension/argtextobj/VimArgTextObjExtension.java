@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.argtextobj;
 
 import com.intellij.openapi.editor.Document;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
@@ -23,7 +24,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.state.VimStateMachine;
+import com.maddyhome.idea.vim.state.KeyHandlerState;
 import com.maddyhome.idea.vim.state.mode.Mode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jetbrains.annotations.Nls;
@@ -244,19 +245,18 @@ public class VimArgTextObjExtension implements VimExtension {
 
     @Override
     public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
-
-      IjVimEditor vimEditor = (IjVimEditor) editor;
-      @NotNull VimStateMachine vimStateMachine = VimStateMachine.Companion.getInstance(vimEditor);
-      int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());
+      @NotNull KeyHandler keyHandler = KeyHandler.getInstance();
+      @NotNull KeyHandlerState keyHandlerState = KeyHandler.getInstance().getKeyHandlerState();
+      int count = Math.max(1, keyHandlerState.getCommandBuilder().getCount());
 
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
-      if (!vimStateMachine.isOperatorPending(editor.getMode())) {
+      if (!keyHandler.isOperatorPending(editor.getMode(), keyHandlerState)) {
         editor.nativeCarets().forEach((VimCaret caret) -> {
           final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              if (vimStateMachine.getMode() instanceof Mode.VISUAL) {
+              if (editor.getMode() instanceof Mode.VISUAL) {
                 com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt.vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
                 InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret)caret).getCaret(), range.getStartOffset());
@@ -265,7 +265,7 @@ public class VimArgTextObjExtension implements VimExtension {
           }
         });
       } else {
-        vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
+        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
                                                                                          textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))));
       }
     }

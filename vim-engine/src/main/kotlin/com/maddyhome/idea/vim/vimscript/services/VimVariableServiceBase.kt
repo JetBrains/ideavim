@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
@@ -174,11 +175,11 @@ public abstract class VimVariableServiceBase : VariableService {
   protected open fun getVimVariable(name: String, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType? {
     return when (name) {
       "count" -> {
-        val count = VimStateMachine.getInstance(editor).commandBuilder.count
+        val count = KeyHandler.getInstance().keyHandlerState.commandBuilder.count
         VimInt(count)
       }
       "count1" -> {
-        val count1 = VimStateMachine.getInstance(editor).commandBuilder.count.coerceAtLeast(1)
+        val count1 = KeyHandler.getInstance().keyHandlerState.commandBuilder.count.coerceAtLeast(1)
         VimInt(count1)
       }
       "searchforward" -> {

@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.action.ex
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -72,7 +73,8 @@ public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution()
       logger.debug("processing command")
 
       val text = argument.string
-      val shouldSkipHistory = getInstance(editor).mappingState.isExecutingMap() || injector.macro.isExecutingMacro
+      val keyState = KeyHandler.getInstance().keyHandlerState
+      val shouldSkipHistory = keyState.mappingState.isExecutingMap() || injector.macro.isExecutingMacro
       injector.vimscriptExecutor.execute(text, editor, context, shouldSkipHistory, true, CommandLineVimLContext)
     } catch (e: ExException) {
       injector.messages.showStatusBarMessage(null, e.message)

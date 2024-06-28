@@ -18,6 +18,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -183,10 +184,10 @@ internal class CommentaryExtension : VimExtension {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val commandState = editor.vimStateMachine
-
       val command = Command(operatorArguments.count1, CommentaryTextObjectMotionHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java))
-      commandState.commandBuilder.completeCommandPart(Argument(command))
+
+      val keyState = KeyHandler.getInstance().keyHandlerState
+      keyState.commandBuilder.completeCommandPart(Argument(command))
     }
   }
 

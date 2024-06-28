@@ -8,10 +8,9 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.idea.TestFor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -147,7 +146,7 @@ class CopyActionTest : VimTestCase() {
      
       """.trimIndent(),
     )
-    assertTrue(fixture.editor.vim.vimStateMachine.commandBuilder.isEmpty)
+    assertTrue(KeyHandler.getInstance().keyHandlerState.commandBuilder.isEmpty)
   }
 
   @Test

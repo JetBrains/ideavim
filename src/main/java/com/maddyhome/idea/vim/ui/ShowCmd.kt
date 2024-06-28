@@ -19,6 +19,7 @@ import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.util.Consumer
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
@@ -61,8 +62,8 @@ internal object ShowCmd {
   fun getFullText(editor: Editor?): String {
     if (!injector.globalOptions().showcmd || editor == null || editor.isDisposed) return ""
 
-    val editorState = editor.vim.vimStateMachine
-    return EngineStringHelper.toPrintableCharacters(editorState.commandBuilder.keys + editorState.mappingState.keys)
+    val keyState = KeyHandler.getInstance().keyHandlerState
+    return EngineStringHelper.toPrintableCharacters(keyState.commandBuilder.keys + keyState.mappingState.keys)
   }
 }
 

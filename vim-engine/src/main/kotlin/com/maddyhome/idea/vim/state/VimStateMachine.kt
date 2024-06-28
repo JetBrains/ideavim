@@ -12,11 +12,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.common.DigraphResult
-import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.util.*
@@ -26,13 +23,6 @@ import javax.swing.KeyStroke
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
 public interface VimStateMachine {
-  @Deprecated("Please use KeyHandlerState instead")
-  public val commandBuilder: CommandBuilder
-  @Deprecated("Please use KeyHandlerState instead")
-  public val mappingState: MappingState
-  @Deprecated("Please use KeyHandlerState instead")
-  public val digraphSequence: DigraphSequence
-
   public val mode: Mode
   public var isDotRepeatInProgress: Boolean
   public var isRegisterPending: Boolean

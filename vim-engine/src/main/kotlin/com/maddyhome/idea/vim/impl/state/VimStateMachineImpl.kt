@@ -27,13 +27,6 @@ import javax.swing.KeyStroke
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
 public class VimStateMachineImpl : VimStateMachine {
-  @Deprecated("Please use KeyHandlerState instead")
-  override val commandBuilder: CommandBuilder = KeyHandler.getInstance().keyHandlerState.commandBuilder
-  @Deprecated("Please use KeyHandlerState instead")
-  override val mappingState: MappingState = KeyHandler.getInstance().keyHandlerState.mappingState
-  @Deprecated("Please use KeyHandlerState instead")
-  override val digraphSequence: DigraphSequence = KeyHandler.getInstance().keyHandlerState.digraphSequence
-
   override var mode: Mode = Mode.NORMAL()
   override var isDotRepeatInProgress: Boolean = false
   override var isRegisterPending: Boolean = false

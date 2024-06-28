@@ -25,7 +25,8 @@ abstract class VimPropertyTestBase : VimTestCase() {
   }
 
   protected fun reset(editor: Editor) {
-    editor.vim.vimStateMachine.mappingState.resetMappingSequence()
+    val keyState = KeyHandler.getInstance().keyHandlerState
+    keyState.mappingState.resetMappingSequence()
     VimPlugin.getKey().resetKeyMappings()
 
     KeyHandler.getInstance().fullReset(editor.vim)
