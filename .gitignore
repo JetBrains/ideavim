@@ -11,6 +11,8 @@
 !/.idea/runConfigurations
 !/.idea/codeStyles
 !/.idea/vcs.xml
+!/.idea/misc.xml
+!/.idea/.name
 
 **/build/
 **/out/
