@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
-import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -293,18 +292,6 @@ public interface VimEditor {
    *   instance and need to search for a new version.
    */
   public fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T?
-
-  /**
-   * Resets the command, mode, visual mode, and mapping mode to initial values.
-   */
-  public fun resetState() {
-    mode = Mode.NORMAL()
-    vimStateMachine.executingCommand = null
-    vimStateMachine.digraphSequence.reset()
-    vimStateMachine.commandBuilder.resetInProgressCommandPart(
-      injector.keyGroup.getKeyRoot(mode.toMappingMode())
-    )
-  }
 
   public fun resetOpPending() {
     if (this.mode is Mode.OP_PENDING) {

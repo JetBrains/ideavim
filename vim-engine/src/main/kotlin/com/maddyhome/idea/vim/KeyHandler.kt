@@ -296,7 +296,11 @@ public class KeyHandler {
   public fun fullReset(editor: VimEditor) {
     logger.trace { "Full reset" }
     injector.messages.clearError()
-    editor.resetState()
+
+    editor.mode = Mode.NORMAL()
+    editor.vimStateMachine.executingCommand = null
+    keyHandlerState.digraphSequence.reset()
+
     reset(keyHandlerState, editor.mode)
     injector.registerGroupIfCreated?.resetRegister()
     editor.removeSelection()

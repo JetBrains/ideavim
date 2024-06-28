@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.annotations.Contract
