@@ -49,6 +49,7 @@ public interface VimStateMachine {
    * This field is reset after the command has been executed.
    */
   public var executingCommand: Command?
+  @Deprecated("Please use KeyHandler instead")
   public fun isOperatorPending(mode: Mode): Boolean
   public val executingCommandFlags: EnumSet<CommandFlags>
 

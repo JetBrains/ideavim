@@ -52,6 +52,7 @@ public class VimStateMachineImpl : VimStateMachine {
    */
   override var executingCommand: Command? = null
 
+  @Deprecated("Please use KeyHandler instead")
   override fun isOperatorPending(mode: Mode): Boolean {
     val keyHandler = KeyHandler.getInstance()
     return keyHandler.isOperatorPending(mode, keyHandler.keyHandlerState)
