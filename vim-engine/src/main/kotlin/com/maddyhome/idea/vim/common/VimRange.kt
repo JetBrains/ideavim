@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.LineDeleteShift
-import com.maddyhome.idea.vim.api.VimEditor
 
 sealed class OperatedRange {
   class Lines(

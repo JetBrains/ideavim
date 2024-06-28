@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.ui.ex
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim

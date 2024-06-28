@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.state.mode.mode
 
 @CommandOrMotion(keys = ["<C-\\><C-N>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING, Mode.INSERT, Mode.CMD_LINE])
 class ResetModeAction : VimActionHandler.ConditionalMulticaret() {

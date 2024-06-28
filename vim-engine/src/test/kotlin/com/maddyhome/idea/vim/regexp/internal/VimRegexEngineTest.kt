@@ -8,22 +8,18 @@
 
 package com.maddyhome.idea.vim.regexp.internal
 
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.CARET
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.END
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.MARK
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_END
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.VISUAL_START
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.START
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.getMatchRanges
-import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockCaret
 import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditor
-import com.maddyhome.idea.vim.regexp.match.VimMatchResult
-import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
+import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.engine.VimRegexEngine
+import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.DotMatcher
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParser
 import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor

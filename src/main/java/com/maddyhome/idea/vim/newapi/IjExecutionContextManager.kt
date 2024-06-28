@@ -13,7 +13,6 @@ import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ExecutionContextManagerBase
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.helper.EditorDataContext
 
 @Service
 internal class IjExecutionContextManager : ExecutionContextManagerBase() {

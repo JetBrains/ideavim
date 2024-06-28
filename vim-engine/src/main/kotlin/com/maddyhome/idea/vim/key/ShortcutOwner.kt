@@ -9,7 +9,6 @@ package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.mode
 import org.jetbrains.annotations.NonNls
 
 sealed class ShortcutOwnerInfo {

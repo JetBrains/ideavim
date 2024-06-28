@@ -27,9 +27,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import org.jetbrains.annotations.NonNls
 import java.awt.Component

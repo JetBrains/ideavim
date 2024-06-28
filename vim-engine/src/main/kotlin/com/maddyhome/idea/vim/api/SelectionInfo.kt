@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.mode
 import kotlin.math.max
 import kotlin.math.min
 

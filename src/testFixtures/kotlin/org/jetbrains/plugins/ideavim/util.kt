@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.mode
 import org.junit.jupiter.params.provider.Arguments
 import kotlin.test.fail
 

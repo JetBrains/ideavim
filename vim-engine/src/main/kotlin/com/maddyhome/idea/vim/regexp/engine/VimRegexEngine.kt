@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.VimRegexErrors
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.engine.strategies.BacktrackingStrategy
-import com.maddyhome.idea.vim.regexp.engine.strategies.ImplicitDFAStrategy
 import com.maddyhome.idea.vim.regexp.engine.strategies.SimulationResult
 import com.maddyhome.idea.vim.regexp.engine.strategies.SimulationStrategy
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult

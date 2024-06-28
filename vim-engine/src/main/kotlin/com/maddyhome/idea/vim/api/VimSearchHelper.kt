@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.SearchOptions
-import org.jetbrains.annotations.NotNull
 import java.util.*
 
 interface VimSearchHelper {

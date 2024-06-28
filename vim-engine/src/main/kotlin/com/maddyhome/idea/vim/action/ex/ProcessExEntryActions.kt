@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.util.*
