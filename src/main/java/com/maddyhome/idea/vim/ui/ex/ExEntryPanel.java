@@ -31,8 +31,6 @@ import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.regexp.CharPointer;
-import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
 import com.maddyhome.idea.vim.vimscript.model.commands.Command;
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand;
