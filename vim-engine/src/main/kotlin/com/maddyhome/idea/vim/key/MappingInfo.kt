@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.state.KeyHandlerState
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -148,12 +147,12 @@ public class ToHandlerMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToHandler' mapping info...")
-    val vimStateMachine = VimStateMachine.getInstance(editor)
+    val keyHandler = KeyHandler.getInstance()
 
     // Cache isOperatorPending in case the extension changes the mode while moving the caret
     // See CommonExtensionTest
     // TODO: Is this legal? Should we assert in this case?
-    val shouldCalculateOffsets: Boolean = vimStateMachine.isOperatorPending(editor.mode)
+    val shouldCalculateOffsets: Boolean = keyHandler.isOperatorPending(editor.mode, keyState)
 
     val startOffsets: Map<ImmutableVimCaret, Int> = editor.carets().associateWith { it.offset }
 
@@ -181,7 +180,7 @@ public class ToHandlerMappingInfo(
       }
     }
 
-    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending(editor.mode), keyState.commandBuilder.count, vimStateMachine.mode)
+    val operatorArguments = OperatorArguments(keyHandler.isOperatorPending(editor.mode, keyState), keyState.commandBuilder.count, editor.mode)
     val register = keyState.commandBuilder.register
     if (register != null) {
       injector.registerGroup.selectRegister(register)

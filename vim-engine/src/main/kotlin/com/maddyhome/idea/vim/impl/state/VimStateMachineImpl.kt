@@ -7,21 +7,14 @@
  */
 package com.maddyhome.idea.vim.impl.state
 
-import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.MappingState
-import com.maddyhome.idea.vim.common.DigraphResult
-import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.annotations.Contract
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
@@ -44,18 +37,6 @@ public class VimStateMachineImpl : VimStateMachine {
    */
   override var executingCommand: Command? = null
 
-  @Deprecated("Please use KeyHandler instead")
-  override fun isOperatorPending(mode: Mode): Boolean {
-    val keyHandler = KeyHandler.getInstance()
-    return keyHandler.isOperatorPending(mode, keyHandler.keyHandlerState)
-  }
-
-  @Deprecated("Please use KeyHandler instead")
-  override fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode): Boolean {
-    val keyHandler = KeyHandler.getInstance()
-    return keyHandler.isDuplicateOperatorKeyStroke(key, mode, keyHandler.keyHandlerState)
-  }
-
   override val executingCommandFlags: EnumSet<CommandFlags>
     get() = executingCommand?.flags ?: noneOfEnum()
 
@@ -64,24 +45,6 @@ public class VimStateMachineImpl : VimStateMachine {
     if (isRegisterPending) {
       isRegisterPending = false
     }
-  }
-
-  @Deprecated("Please use KeyHandler instead")
-  override fun startDigraphSequence() {
-    val keyHandler = KeyHandler.getInstance()
-    keyHandler.keyHandlerState.digraphSequence.startDigraphSequence()
-  }
-
-  @Deprecated("Please use KeyHandler instead")
-  override fun startLiteralSequence() {
-    val keyHandler = KeyHandler.getInstance()
-    keyHandler.keyHandlerState.digraphSequence.startLiteralSequence()
-  }
-
-  @Deprecated("Please use KeyHandler instead")
-  override fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult {
-    val keyHandler = KeyHandler.getInstance()
-    return keyHandler.keyHandlerState.digraphSequence.processKey(key, editor)
   }
 
   /**

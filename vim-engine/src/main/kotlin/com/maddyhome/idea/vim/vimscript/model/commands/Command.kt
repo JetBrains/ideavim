@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,7 +23,6 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.StrictMode
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.vimscript.model.Executable
@@ -91,8 +91,10 @@ public sealed class Command(private val commandRange: Range, public val commandA
       return ExecutionResult.Error
     }
 
+    val keyHandler = KeyHandler.getInstance()
+    val keyState = keyHandler.keyHandlerState
     val operatorArguments = OperatorArguments(
-      editor.vimStateMachine.isOperatorPending(editor.mode),
+      keyHandler.isOperatorPending(editor.mode, keyState),
       0,
       editor.mode,
     )

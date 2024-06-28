@@ -8,16 +8,13 @@
 
 package com.maddyhome.idea.vim.state
 
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
@@ -39,27 +36,15 @@ public interface VimStateMachine {
    * This field is reset after the command has been executed.
    */
   public var executingCommand: Command?
-  @Deprecated("Please use KeyHandler instead")
-  public fun isOperatorPending(mode: Mode): Boolean
   public val executingCommandFlags: EnumSet<CommandFlags>
 
-  @Deprecated("Please use KeyHandler instead")
-  public fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode): Boolean
-
   public fun resetRegisterPending()
-  @Deprecated("Please use KeyHandler instead")
-  public fun startLiteralSequence()
-  @Deprecated("Please use KeyHandler instead")
-  public fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult
 
   /**
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
    * mode.
    */
   public fun toggleInsertOverwrite()
-
-  @Deprecated("Please use KeyHandler instead")
-  public fun startDigraphSequence()
 
   public companion object {
     private val globalState = VimStateMachineImpl()
