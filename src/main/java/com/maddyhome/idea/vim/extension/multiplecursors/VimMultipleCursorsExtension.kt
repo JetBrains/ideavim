@@ -327,6 +327,6 @@ internal class VimMultipleCursorsExtension : VimExtension {
 
   private fun makePattern(text: String, whole: Boolean): String {
     // Pattern is "very nomagic" (ignore regex chars) and "force case sensitive". This is vim-multiple-cursors behaviour
-    return "\\V\\C" + SearchHelper.makeSearchPattern(text, whole)
+    return "\\V\\C" + if (whole) "\\<$text\\>" else text
   }
 }
