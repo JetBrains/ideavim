@@ -33,6 +33,8 @@ public class InsertRegisterAction: VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val cmdLine = injector.commandLine.getActiveCommandLine() ?: return false
+    cmdLine.clearCurrentAction()
+
     val caretOffset = cmdLine.caret.offset
 
     val keyStroke = KeyStroke.getKeyStroke(cmd.argument!!.character)
