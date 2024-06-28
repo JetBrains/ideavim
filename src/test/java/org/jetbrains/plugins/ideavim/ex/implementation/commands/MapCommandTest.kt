@@ -270,7 +270,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c"))
     typeText(injector.parser.parseKeys("ia"))
-    assertState("b | cfoo\n")
+    assertState("b \\| cfoo\n")
   }
 
   // VIM-666 |:imap|
@@ -280,7 +280,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c    |"))
     typeText(injector.parser.parseKeys("ia"))
-    assertState("b | c    foo\n")
+    assertState("b \\| c    foo\n")
   }
 
   // VIM-670 |:map|
@@ -290,6 +290,15 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map ab abcd"))
     typeText(injector.parser.parseKeys("ab"))
     assertState("bcd\n")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3507"])
+  fun `test bar in mapping in search`() {
+    configureByText("${c}I found it in a legendary land")
+    typeText(commandToKeys(":map t /4\\\\|a<CR>"))
+    typeText("t")
+    assertState("I found it in ${c}a legendary land")
   }
 
   // VIM-676 |:map|
