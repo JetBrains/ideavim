@@ -19,22 +19,22 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
  * options
  */
 @Suppress("SpellCheckingInspection")
-public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope) {
-  public var ide: String by optionProperty(IjOptions.ide)
-  public var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)
-  public var ideastatusicon: String by optionProperty(IjOptions.ideastatusicon)
-  public val ideavimsupport: StringListOptionValue by optionProperty(IjOptions.ideavimsupport)
-  public var ideawrite: String by optionProperty(IjOptions.ideawrite)
-  public val lookupkeys: StringListOptionValue by optionProperty(IjOptions.lookupkeys)
-  public var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
-  public var visualdelay: Int by optionProperty(IjOptions.visualdelay)
+open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope) {
+  var ide: String by optionProperty(IjOptions.ide)
+  var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)
+  var ideastatusicon: String by optionProperty(IjOptions.ideastatusicon)
+  val ideavimsupport: StringListOptionValue by optionProperty(IjOptions.ideavimsupport)
+  var ideawrite: String by optionProperty(IjOptions.ideawrite)
+  val lookupkeys: StringListOptionValue by optionProperty(IjOptions.lookupkeys)
+  var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
+  var visualdelay: Int by optionProperty(IjOptions.visualdelay)
 
   // Temporary options to control work-in-progress behaviour
-  public var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
-  public var commandOrMotionAnnotation: Boolean by optionProperty(IjOptions.commandOrMotionAnnotation)
-  public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
-  public var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
-  public var vimscriptFunctionAnnotation: Boolean by optionProperty(IjOptions.vimscriptFunctionAnnotation)
+  var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
+  var commandOrMotionAnnotation: Boolean by optionProperty(IjOptions.commandOrMotionAnnotation)
+  var oldundo: Boolean by optionProperty(IjOptions.oldundo)
+  var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
+  var vimscriptFunctionAnnotation: Boolean by optionProperty(IjOptions.vimscriptFunctionAnnotation)
 }
 
 /**
@@ -42,20 +42,20 @@ public open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesB
  *
  * As a convenience, this class also provides access to the IntelliJ specific global options, via inheritance.
  */
-public class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(scope) {
+class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(scope) {
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
-  public var breakindent: Boolean by optionProperty(IjOptions.breakindent)
-  public val colorcolumn: StringListOptionValue by optionProperty(IjOptions.colorcolumn)
-  public var cursorline: Boolean by optionProperty(IjOptions.cursorline)
-  public var fileformat: String by optionProperty(IjOptions.fileformat)
-  public var list: Boolean by optionProperty(IjOptions.list)
-  public var number: Boolean by optionProperty(IjOptions.number)
-  public var relativenumber: Boolean by optionProperty(IjOptions.relativenumber)
-  public var textwidth: Int by optionProperty(IjOptions.textwidth)
-  public var wrap: Boolean by optionProperty(IjOptions.wrap)
+  var breakindent: Boolean by optionProperty(IjOptions.breakindent)
+  val colorcolumn: StringListOptionValue by optionProperty(IjOptions.colorcolumn)
+  var cursorline: Boolean by optionProperty(IjOptions.cursorline)
+  var fileformat: String by optionProperty(IjOptions.fileformat)
+  var list: Boolean by optionProperty(IjOptions.list)
+  var number: Boolean by optionProperty(IjOptions.number)
+  var relativenumber: Boolean by optionProperty(IjOptions.relativenumber)
+  var textwidth: Int by optionProperty(IjOptions.textwidth)
+  var wrap: Boolean by optionProperty(IjOptions.wrap)
 
   // IntelliJ specific options
-  public var ideacopypreprocess: Boolean by optionProperty(IjOptions.ideacopypreprocess)
-  public var ideajoin: Boolean by optionProperty(IjOptions.ideajoin)
-  public var idearefactormode: String by optionProperty(IjOptions.idearefactormode)
+  var ideacopypreprocess: Boolean by optionProperty(IjOptions.ideacopypreprocess)
+  var ideajoin: Boolean by optionProperty(IjOptions.ideajoin)
+  var idearefactormode: String by optionProperty(IjOptions.idearefactormode)
 }

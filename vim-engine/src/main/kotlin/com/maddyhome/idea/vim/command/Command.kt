@@ -20,14 +20,14 @@ import java.util.*
  * This represents a single Vim command to be executed (operator, motion, text object, etc.). It may optionally include
  * an argument if appropriate for the command. The command has a count and a type.
  */
-public data class Command(
+data class Command(
   var rawCount: Int,
   var action: EditorActionHandlerBase,
   val type: Type,
   var flags: EnumSet<CommandFlags>,
 ) {
 
-  public constructor(rawCount: Int, register: Char) : this(
+  constructor(rawCount: Int, register: Char) : this(
     rawCount,
     NonExecutableActionHandler,
     Type.SELECT_REGISTER,
@@ -46,7 +46,7 @@ public data class Command(
   var argument: Argument? = null
   var register: Char? = null
 
-  public fun isLinewiseMotion(): Boolean {
+  fun isLinewiseMotion(): Boolean {
     return when (action) {
       is TextObjectActionHandler -> (action as TextObjectActionHandler).visualType == TextObjectVisualType.LINE_WISE
       is MotionActionHandler -> (action as MotionActionHandler).motionType == MotionType.LINE_WISE
@@ -58,7 +58,7 @@ public data class Command(
     return "Action = ${action.id}"
   }
 
-  public enum class Type {
+  enum class Type {
     /**
      * Represents commands that actually move the cursor and can be arguments to operators.
      */
@@ -99,13 +99,13 @@ public data class Command(
 
     ;
 
-    public val isRead: Boolean
+    val isRead: Boolean
       get() = when (this) {
         MOTION, COPY, OTHER_READONLY -> true
         else -> false
       }
 
-    public val isWrite: Boolean
+    val isWrite: Boolean
       get() = when (this) {
         INSERT, DELETE, CHANGE, PASTE, OTHER_WRITABLE -> true
         else -> false

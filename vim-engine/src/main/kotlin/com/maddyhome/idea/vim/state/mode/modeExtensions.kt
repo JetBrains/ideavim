@@ -15,7 +15,7 @@ package com.maddyhome.idea.vim.state.mode
  * effect for (inc)search, as we switch to [Mode.NORMAL] before entering an ex command.
  */
 @Suppress("RecursivePropertyAccessor")
-public val Mode.selectionType: SelectionType?
+val Mode.selectionType: SelectionType?
   get() = when (this) {
     is Mode.VISUAL -> this.selectionType
     is Mode.SELECT -> this.selectionType
@@ -27,7 +27,7 @@ public val Mode.selectionType: SelectionType?
  * Get the mode that we need to return to if the one-command-mode (':h i_Ctrl-o') is active.
  * Otherwise, returns null.
  */
-public val Mode.returnTo: ReturnTo?
+val Mode.returnTo: ReturnTo?
   get() = when (this) {
     is Mode.NORMAL -> this.returnTo
     is Mode.SELECT -> this.returnTo
@@ -39,7 +39,7 @@ public val Mode.returnTo: ReturnTo?
 /**
  * Check if one-command-mode (':h i_Ctrl-o') is active.
  */
-public val Mode.isSingleModeActive: Boolean
+val Mode.isSingleModeActive: Boolean
   get() = returnTo != null
 
 /**
@@ -47,15 +47,15 @@ public val Mode.isSingleModeActive: Boolean
  *
  * `onemore` option is ignored.
  */
-public val Mode.isEndAllowedIgnoringOnemore: Boolean
+val Mode.isEndAllowedIgnoringOnemore: Boolean
   get() = when (this) {
     is Mode.INSERT, is Mode.VISUAL, is Mode.SELECT -> true
     else -> false
   }
 
-public val SelectionType.isLine: Boolean get() = this == SelectionType.LINE_WISE
-public val SelectionType.isChar: Boolean get() = this == SelectionType.CHARACTER_WISE
-public val SelectionType.isBlock: Boolean get() = this == SelectionType.BLOCK_WISE
+val SelectionType.isLine: Boolean get() = this == SelectionType.LINE_WISE
+val SelectionType.isChar: Boolean get() = this == SelectionType.CHARACTER_WISE
+val SelectionType.isBlock: Boolean get() = this == SelectionType.BLOCK_WISE
 
 /**
  * Convert the IdeaVim [Mode] into a string according to the rules of `mode()` function in Vim.
@@ -105,7 +105,7 @@ public val SelectionType.isBlock: Boolean get() = this == SelectionType.BLOCK_WI
  *   be added. It's better not to compare the whole string but only
  *   the leading character(s).
  */
-public fun Mode.toVimNotation(): String {
+fun Mode.toVimNotation(): String {
   return when (this) {
     is Mode.NORMAL -> "n"
     is Mode.VISUAL -> when (selectionType) {
@@ -127,7 +127,7 @@ public fun Mode.toVimNotation(): String {
   }
 }
 
-public fun Mode.returnTo(): Mode {
+fun Mode.returnTo(): Mode {
   return when (this) {
     is Mode.CMD_LINE -> {
       val returnMode = returnTo as Mode
@@ -168,7 +168,7 @@ public fun Mode.returnTo(): Mode {
   }
 }
 
-public val Mode.toReturnTo: ReturnTo
+val Mode.toReturnTo: ReturnTo
   get() = when (this) {
     Mode.INSERT -> ReturnTo.INSERT
     Mode.REPLACE -> ReturnTo.REPLACE

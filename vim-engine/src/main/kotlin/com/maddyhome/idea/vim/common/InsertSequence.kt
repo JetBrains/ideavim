@@ -10,11 +10,11 @@ package com.maddyhome.idea.vim.common
 
 import kotlin.properties.Delegates
 
-public data class InsertSequence(val startOffset: Int, val startNanoTime: Long) {
+data class InsertSequence(val startOffset: Int, val startNanoTime: Long) {
   var endOffset: Int by Delegates.notNull()
   var endNanoTime: Long by Delegates.notNull()
 
-  public fun contains(nanoTime: Long): Boolean {
+  fun contains(nanoTime: Long): Boolean {
     return nanoTime in startNanoTime..endNanoTime
   }
 }

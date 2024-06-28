@@ -12,6 +12,6 @@ package com.maddyhome.idea.vim.api
  * This is terrible, just unbind VimPlugin from IJ
  * THis class is created only to move some other classes to vim-engine
  */
-public interface VimEnabler {
-  public fun isEnabled(): Boolean
+interface VimEnabler {
+  fun isEnabled(): Boolean
 }

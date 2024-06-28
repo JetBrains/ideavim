@@ -11,61 +11,61 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.mark.Mark
 
-public interface VimMarkService {
-  public companion object {
-    public const val SELECTION_START_MARK: Char = '<'
-    public const val SELECTION_END_MARK: Char = '>'
+interface VimMarkService {
+  companion object {
+    const val SELECTION_START_MARK: Char = '<'
+    const val SELECTION_END_MARK: Char = '>'
 
-    public const val CHANGE_START_MARK: Char = '['
-    public const val CHANGE_END_MARK: Char = ']'
+    const val CHANGE_START_MARK: Char = '['
+    const val CHANGE_END_MARK: Char = ']'
 
-    public const val PARAGRAPH_START_MARK: Char = '{'
-    public const val PARAGRAPH_END_MARK: Char = '}'
+    const val PARAGRAPH_START_MARK: Char = '{'
+    const val PARAGRAPH_END_MARK: Char = '}'
 
-    public const val SENTENCE_START_MARK: Char = '('
-    public const val SENTENCE_END_MARK: Char = ')'
+    const val SENTENCE_START_MARK: Char = '('
+    const val SENTENCE_END_MARK: Char = ')'
 
-    public const val BEFORE_JUMP_MARK: Char = '\''
-    public const val INSERT_EXIT_MARK: Char = '^'
-    public const val LAST_BUFFER_POSITION: Char = '"'
-    public const val LAST_CHANGE_MARK: Char = '.'
+    const val BEFORE_JUMP_MARK: Char = '\''
+    const val INSERT_EXIT_MARK: Char = '^'
+    const val LAST_BUFFER_POSITION: Char = '"'
+    const val LAST_CHANGE_MARK: Char = '.'
 
-    public const val UPPERCASE_MARKS: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    public const val LOWERCASE_MARKS: String = "abcdefghijklmnopqrstuvwxyz"
-    public const val NUMBERED_MARKS: String = "0123456789"
+    const val UPPERCASE_MARKS: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const val LOWERCASE_MARKS: String = "abcdefghijklmnopqrstuvwxyz"
+    const val NUMBERED_MARKS: String = "0123456789"
   }
 
   /**
    * Get global mark
    */
-  public fun getGlobalMark(char: Char): Mark?
+  fun getGlobalMark(char: Char): Mark?
 
   /**
    * Get mark for specified caret
    */
-  public fun getMark(caret: ImmutableVimCaret, char: Char): Mark?
+  fun getMark(caret: ImmutableVimCaret, char: Char): Mark?
 
   /**
    * Gets all marks for caret
    */
-  public fun getAllLocalMarks(caret: ImmutableVimCaret): Set<Mark>
+  fun getAllLocalMarks(caret: ImmutableVimCaret): Set<Mark>
 
   /**
    * Get all marks for specified filepath (for all carets in all editors)
    * @param editor  The editor with required file
    * @return list or pairs caret to mark (caret is null for global marks)
    */
-  public fun getAllMarksForFile(editor: VimEditor): List<Pair<ImmutableVimCaret?, Set<Mark>>>
+  fun getAllMarksForFile(editor: VimEditor): List<Pair<ImmutableVimCaret?, Set<Mark>>>
 
   /**
    * Gets all global marks
    */
-  public fun getAllGlobalMarks(): Set<Mark>
+  fun getAllGlobalMarks(): Set<Mark>
 
   /**
    * Gets global marks for specified file
    */
-  public fun getGlobalMarks(editor: VimEditor): Set<Mark>
+  fun getGlobalMarks(editor: VimEditor): Set<Mark>
 
   /**
    * Sets current caret position as mark for each caret in the editor
@@ -74,16 +74,16 @@ public interface VimMarkService {
    * @param char    The mark to set
    * @return True if a valid, writable mark, false if not
    */
-  public fun setMark(editor: VimEditor, char: Char): Boolean
-  public fun setMark(caret: ImmutableVimCaret, mark: Mark): Boolean
-  public fun setMark(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
-  public fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean
-  public fun setGlobalMark(mark: Mark): Boolean
+  fun setMark(editor: VimEditor, char: Char): Boolean
+  fun setMark(caret: ImmutableVimCaret, mark: Mark): Boolean
+  fun setMark(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
+  fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean
+  fun setGlobalMark(mark: Mark): Boolean
 
-  public fun setVisualSelectionMarks(editor: VimEditor)
-  public fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange?
+  fun setVisualSelectionMarks(editor: VimEditor)
+  fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange?
 
-  public fun getChangeMarks(caret: ImmutableVimCaret): TextRange?
+  fun getChangeMarks(caret: ImmutableVimCaret): TextRange?
 
   /**
    * Sets the specified mark to the specified location
@@ -93,21 +93,21 @@ public interface VimMarkService {
    * @param offset  The offset to set the mark to
    * @return True if a valid, writable mark, false if not
    */
-  public fun setMarkForCaret(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
+  fun setMarkForCaret(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
 
   /**
    * Removes mark for all carets in the editor
    */
-  public fun removeMark(editor: VimEditor, char: Char)
+  fun removeMark(editor: VimEditor, char: Char)
 
   /**
    * Removes mark for the given caret
    */
-  public fun removeLocalMark(caret: ImmutableVimCaret, char: Char)
+  fun removeLocalMark(caret: ImmutableVimCaret, char: Char)
 
   // used to override it with IDE marks logic
   // or make it protected in base class?
-  public fun removeGlobalMark(char: Char)
+  fun removeGlobalMark(char: Char)
 
   /**
    * This updates all the marks for a file whenever text is inserted into the file. If the line that contains a mark
@@ -117,7 +117,7 @@ public interface VimMarkService {
    * @param insertStartOffset   The insertion point
    * @param insertLength        The length of the insertion
    */
-  public fun updateMarksFromInsert(editor: VimEditor, insertStartOffset: Int, insertLength: Int)
+  fun updateMarksFromInsert(editor: VimEditor, insertStartOffset: Int, insertLength: Int)
 
   /**
    * This updates all the marks for a file whenever text is deleted from the file. If the line that contains a mark
@@ -128,17 +128,17 @@ public interface VimMarkService {
    * @param delStartOffset  The offset within the editor where the deletion occurred
    * @param delLength       The length of the deleted text
    */
-  public fun updateMarksFromDelete(editor: VimEditor, delStartOffset: Int, delLength: Int)
+  fun updateMarksFromDelete(editor: VimEditor, delStartOffset: Int, delLength: Int)
 
-  public fun editorReleased(editor: VimEditor)
+  fun editorReleased(editor: VimEditor)
 
-  public fun resetAllMarksForCaret(caret: ImmutableVimCaret)
+  fun resetAllMarksForCaret(caret: ImmutableVimCaret)
 
-  public fun resetAllMarks()
+  fun resetAllMarks()
 
-  public fun isValidMark(char: Char, operation: Operation, isCaretPrimary: Boolean): Boolean
+  fun isValidMark(char: Char, operation: Operation, isCaretPrimary: Boolean): Boolean
 
-  public enum class Operation {
+  enum class Operation {
     GET,
     SET,
     REMOVE,
@@ -146,12 +146,12 @@ public interface VimMarkService {
   }
 }
 
-public fun VimMarkService.setChangeMarks(caret: ImmutableVimCaret, range: TextRange) {
+fun VimMarkService.setChangeMarks(caret: ImmutableVimCaret, range: TextRange) {
   setMark(caret, VimMarkService.CHANGE_START_MARK, range.startOffset)
   setMark(caret, VimMarkService.CHANGE_END_MARK, range.endOffset - 1)
 }
 
-public fun VimMarkService.setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange) {
+fun VimMarkService.setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange) {
   setMark(caret, VimMarkService.SELECTION_START_MARK, range.startOffset)
   setMark(caret, VimMarkService.SELECTION_END_MARK, range.endOffset)
 }

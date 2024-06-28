@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-public enum class TillCharacterMotionType {
+enum class TillCharacterMotionType {
   LAST_F,
   LAST_SMALL_F,
   LAST_T,
@@ -33,19 +33,19 @@ public enum class TillCharacterMotionType {
 }
 
 @CommandOrMotion(keys = ["F"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionLeftMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_F, false)
+class MotionLeftMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_F, false)
 
 @CommandOrMotion(keys = ["T"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionLeftTillMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_T, true)
+class MotionLeftTillMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_T, true)
 
 @CommandOrMotion(keys = ["f"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionRightMatchCharAction : TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_F, false)
+class MotionRightMatchCharAction : TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_F, false)
 
 @CommandOrMotion(keys = ["t"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionRightTillMatchCharAction :
+class MotionRightTillMatchCharAction :
   TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_T, true)
 
-public sealed class TillCharacterMotion(
+sealed class TillCharacterMotion(
   private val direction: Direction,
   private val tillCharacterMotionType: TillCharacterMotionType,
   private val finishBeforeCharacter: Boolean,

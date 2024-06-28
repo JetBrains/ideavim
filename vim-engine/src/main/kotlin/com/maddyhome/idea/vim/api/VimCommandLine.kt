@@ -11,19 +11,19 @@ package com.maddyhome.idea.vim.api
 import javax.swing.KeyStroke
 import kotlin.math.min
 
-public interface VimCommandLine {
-  public val caret: VimCommandLineCaret
+interface VimCommandLine {
+  val caret: VimCommandLineCaret
 
-  public val label: String
-  public val isReplaceMode: Boolean
+  val label: String
+  val isReplaceMode: Boolean
 
-  public fun toggleReplaceMode()
+  fun toggleReplaceMode()
 
   /**
    * The actual text present in the command line, excluding special characters like the `?` displayed during digraph input.
    * This text represents the real content that is being processed or executed.
    */
-  public val actualText: String
+  val actualText: String
     get() = if (promptCharacterOffset == null) visibleText else {
       visibleText.removeRange(promptCharacterOffset!!, promptCharacterOffset!! + 1)
     }
@@ -33,11 +33,11 @@ public interface VimCommandLine {
    * that might be shown to the user, such as the `?` during digraph input.
    * This is the text that the user sees on the screen.
    */
-  public val visibleText: String
-  public var promptCharacterOffset: Int?
+  val visibleText: String
+  var promptCharacterOffset: Int?
 
-  public fun setText(string: String)
-  public fun insertText(offset: Int, string: String) {
+  fun setText(string: String)
+  fun insertText(offset: Int, string: String) {
     val newText = if (isReplaceMode) {
       val endOffset = min(offset + string.length, actualText.length)
       StringBuilder(actualText).replace(offset, endOffset, string)
@@ -47,7 +47,7 @@ public interface VimCommandLine {
     setText(newText)
   }
 
-  public fun handleKey(key: KeyStroke)
+  fun handleKey(key: KeyStroke)
 
   /**
    * Text to show while composing a digraph or inserting a literal or register
@@ -58,7 +58,7 @@ public interface VimCommandLine {
    *
    * @param promptCharacter The character to show as prompt
    */
-  public fun setPromptCharacter(char: Char) {
+  fun setPromptCharacter(char: Char) {
     val stringBuilder = StringBuilder(actualText)
 
     val offset = promptCharacterOffset ?: caret.offset // TODO is there a case where caret is not at the [promptCharacterOffset]?
@@ -68,16 +68,16 @@ public interface VimCommandLine {
 
     caret.offset = offset
   }
-  public fun clearPromptCharacter() {
+  fun clearPromptCharacter() {
     setText(actualText)
     caret.offset = min(caret.offset, visibleText.length)
     promptCharacterOffset = null
   }
 
-  public fun clearCurrentAction()
+  fun clearCurrentAction()
 
-  public fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
+  fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
 
   // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name
-  public fun focus()
+  fun focus()
 }

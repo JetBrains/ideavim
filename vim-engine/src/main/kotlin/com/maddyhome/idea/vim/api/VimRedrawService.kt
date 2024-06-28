@@ -15,18 +15,18 @@ package com.maddyhome.idea.vim.api
  * Command-line mode, etc. Typically, in an IDE, redrawing the editor is automatic, but it can be necessary to force a
  * redraw, particularly when updating the status line.
  */
-public interface VimRedrawService {
+interface VimRedrawService {
   /**
    * Redraw the screen.
    *
    * Used when the screen is scrolled or when lines are added/removed.
    */
-  public fun redraw()
+  fun redraw()
 
   /**
    * Clears and redraws the status line.
    *
    * Used when the status line needs to be redrawn, e.g., when entering Command-line mode.
    */
-  public fun redrawStatusLine()
+  fun redrawStatusLine()
 }

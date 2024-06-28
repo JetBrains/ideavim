@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 // FIXME: I'm such a mess, please refactor me, responsible developer
 @ExCommand(command = "g[lobal],v[global]")
-public data class GlobalCommand(val range: Range, val argument: String, val invert: Boolean) : Command.SingleExecution(range, argument) {
+data class GlobalCommand(val range: Range, val argument: String, val invert: Boolean) : Command.SingleExecution(range, argument) {
 
   init {
     // Most commands have a default range of the current line ("."). Global has a default range of the whole file
@@ -152,10 +152,10 @@ public data class GlobalCommand(val range: Range, val argument: String, val inve
     }
   }
 
-  public companion object {
+  companion object {
     private var globalBusy = false
 
     // Interrupted. Not used at the moment
-    public var gotInt: Boolean = false
+    var gotInt: Boolean = false
   }
 }

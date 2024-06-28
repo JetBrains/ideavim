@@ -24,7 +24,7 @@ import javax.swing.KeyStroke
  */
 
 @CommandOrMotion(keys = ["<BS>", "<DEL>"], modes = [Mode.SELECT])
-public class SelectDeleteAction : VimActionHandler.SingleExecution() {
+class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT
 

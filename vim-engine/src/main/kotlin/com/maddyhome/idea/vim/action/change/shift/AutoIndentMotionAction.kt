@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
  * @author Aleksey Lagoshin
  */
 @CommandOrMotion(keys = ["="], modes = [Mode.NORMAL])
-public class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION

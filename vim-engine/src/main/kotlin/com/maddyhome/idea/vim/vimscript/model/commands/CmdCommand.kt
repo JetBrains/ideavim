@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :command"
  */
 @ExCommand(command = "com[mand]")
-public data class CmdCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+data class CmdCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   private val unsupportedArgs = listOf(

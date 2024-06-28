@@ -24,11 +24,11 @@ import javax.swing.KeyStroke
 /**
  * @author dhleong
  */
-public object ModalEntry {
+object ModalEntry {
 
-  public val LOG: Logger = logger<ModalEntry>()
+  val LOG: Logger = logger<ModalEntry>()
 
-  public inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
+  inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
     // Firstly we pull the unfinished keys of the current mapping
     val mappingStack = KeyHandler.getInstance().keyStack
     LOG.trace("Dumping key stack:")

@@ -8,6 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimCaretListener {
-  public fun caretRemoved(caret: ImmutableVimCaret?)
+interface VimCaretListener {
+  fun caretRemoved(caret: ImmutableVimCaret?)
 }

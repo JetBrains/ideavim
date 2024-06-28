@@ -7,4 +7,4 @@
  */
 package com.maddyhome.idea.vim.group
 
-public abstract class WindowGroupBase : VimWindowGroup
+abstract class WindowGroupBase : VimWindowGroup

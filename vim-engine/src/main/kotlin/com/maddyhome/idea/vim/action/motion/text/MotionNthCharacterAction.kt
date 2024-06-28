@@ -25,7 +25,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @CommandOrMotion(keys = ["go"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionNthCharacterAction : MotionActionHandler.ForEachCaret() {
+class MotionNthCharacterAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

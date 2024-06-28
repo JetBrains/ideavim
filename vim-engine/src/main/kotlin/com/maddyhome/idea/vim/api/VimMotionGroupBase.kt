@@ -28,7 +28,7 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.min
 
-public abstract class VimMotionGroupBase : VimMotionGroup {
+abstract class VimMotionGroupBase : VimMotionGroup {
   override var lastFTCmd: TillCharacterMotionType = TillCharacterMotionType.LAST_SMALL_T
   override var lastFTChar: Char = ' '
 
@@ -477,7 +477,7 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
     return pos
   }
 
-  public companion object {
-    public const val LAST_COLUMN: Int = 9999
+  companion object {
+    const val LAST_COLUMN: Int = 9999
   }
 }

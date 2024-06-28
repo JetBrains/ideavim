@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["S"], modes = [Mode.NORMAL])
-public class ChangeLineAction : ChangeInInsertSequenceAction() {
+class ChangeLineAction : ChangeInInsertSequenceAction() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_NO_REPEAT_INSERT)

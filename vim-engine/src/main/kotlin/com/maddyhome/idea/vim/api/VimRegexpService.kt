@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimRegexpService {
-  public fun matches(pattern: String, text: String?, ignoreCase: Boolean = false): Boolean
-  public fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
+interface VimRegexpService {
+  fun matches(pattern: String, text: String?, ignoreCase: Boolean = false): Boolean
+  fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
 }

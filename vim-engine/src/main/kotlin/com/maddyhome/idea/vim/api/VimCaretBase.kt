@@ -15,10 +15,10 @@ import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 import javax.swing.KeyStroke
 
-public abstract class VimCaretBase : VimCaret
+abstract class VimCaretBase : VimCaret
 
-public open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : CaretRegisterStorage, VimRegisterGroupBase() {
-  public companion object {
+open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : CaretRegisterStorage, VimRegisterGroupBase() {
+  companion object {
     private const val ALLOWED_TO_STORE_REGISTERS = RegisterConstants.RECORDABLE_REGISTERS +
       RegisterConstants.SMALL_DELETION_REGISTER +
       RegisterConstants.BLACK_HOLE_REGISTER +

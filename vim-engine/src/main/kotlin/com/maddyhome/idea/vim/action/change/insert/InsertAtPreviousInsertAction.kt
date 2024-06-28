@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.handler.Motion
 
 @CommandOrMotion(keys = ["gi"], modes = [Mode.NORMAL])
-public class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
+class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(

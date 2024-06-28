@@ -50,15 +50,15 @@ import javax.swing.KeyStroke
 // TODO for future refactorings (PRs are welcome)
 // 1. avoid using handleKeyRecursionCount & shouldRecord
 // 2. maybe we can live without allowKeyMappings: Boolean & mappingCompleted: Boolean
-public class KeyHandler {
+class KeyHandler {
   private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
   private var handleKeyRecursionCount = 0
 
-  public var keyHandlerState: KeyHandlerState = KeyHandlerState()
+  var keyHandlerState: KeyHandlerState = KeyHandlerState()
     private set
 
-  public val keyStack: KeyStack = KeyStack()
-  public val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
+  val keyStack: KeyStack = KeyStack()
+  val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
 
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
@@ -68,7 +68,7 @@ public class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  public fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
+  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
     handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false, keyState)
   }
 
@@ -78,7 +78,7 @@ public class KeyHandler {
    * @param allowKeyMappings - If we allow key mappings or not
    * @param mappingCompleted - if true, we don't check if the mapping is incomplete
    */
-  public fun handleKey(
+  fun handleKey(
     editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
@@ -99,7 +99,7 @@ public class KeyHandler {
    * Alternatively, if we understand the key, we return a 'KeyProcessResult.Executable', which contains a runnable that
    * could execute the key if needed.
    */
-  public fun processKey(
+  fun processKey(
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
@@ -191,16 +191,16 @@ public class KeyHandler {
     reset(keyState, editor.mode)
   }
 
-  public fun setBadCommand(editor: VimEditor, keyState: KeyHandlerState) {
+  fun setBadCommand(editor: VimEditor, keyState: KeyHandlerState) {
     onUnknownKey(editor, keyState)
     injector.messages.indicateError()
   }
 
-  public fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode, keyState: KeyHandlerState): Boolean {
+  fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode, keyState: KeyHandlerState): Boolean {
     return isOperatorPending(mode, keyState) && keyState.commandBuilder.isDuplicateOperatorKeyStroke(key)
   }
 
-  public fun isOperatorPending(mode: Mode, keyState: KeyHandlerState): Boolean {
+  fun isOperatorPending(mode: Mode, keyState: KeyHandlerState): Boolean {
     return mode is Mode.OP_PENDING && !keyState.commandBuilder.isEmpty
   }
 
@@ -255,7 +255,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public fun partialReset(editor: VimEditor) {
+  fun partialReset(editor: VimEditor) {
     logger.trace { "Partial reset is executed" }
     keyHandlerState.partialReset(editor.mode)
   }
@@ -265,13 +265,13 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public fun reset(editor: VimEditor) {
+  fun reset(editor: VimEditor) {
     logger.trace { "Reset is executed" }
     keyHandlerState.partialReset(editor.mode)
     keyHandlerState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
   }
 
-  public fun reset(keyState: KeyHandlerState, mode: Mode) {
+  fun reset(keyState: KeyHandlerState, mode: Mode) {
     logger.trace { "Reset is executed" }
     keyHandlerState.partialReset(mode)
     keyState.commandBuilder.resetAll(getKeyRoot(mode.toMappingMode()))
@@ -281,7 +281,7 @@ public class KeyHandler {
     return injector.keyGroup.getKeyRoot(mappingMode)
   }
 
-  public fun updateState(keyState: KeyHandlerState) {
+  fun updateState(keyState: KeyHandlerState) {
     logger.trace { "State updated" }
     logger.trace { keyState.toString() }
     this.keyHandlerState = keyState
@@ -293,7 +293,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public fun fullReset(editor: VimEditor) {
+  fun fullReset(editor: VimEditor) {
     logger.trace { "Full reset" }
     injector.messages.clearError()
 
@@ -306,7 +306,7 @@ public class KeyHandler {
     editor.removeSelection()
   }
 
-  public fun setPromptCharacterEx(promptCharacter: Char) {
+  fun setPromptCharacterEx(promptCharacter: Char) {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return
     commandLine.setPromptCharacter(promptCharacter)
   }
@@ -362,8 +362,8 @@ public class KeyHandler {
     }
   }
 
-  public companion object {
-    public val lock: Any = Object()
+  companion object {
+    val lock: Any = Object()
     private val logger: VimLogger = vimLogger<KeyHandler>()
 
     internal fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
@@ -381,10 +381,10 @@ public class KeyHandler {
     private val instance = KeyHandler()
 
     @JvmStatic
-    public fun getInstance(): KeyHandler = instance
+    fun getInstance(): KeyHandler = instance
   }
 
-  public data class MutableBoolean(public var value: Boolean)
+  data class MutableBoolean(var value: Boolean)
 }
 
 /**
@@ -392,11 +392,11 @@ public class KeyHandler {
  * Fleet needs to synchronously determine if the key will be handled by the plugin or should be passed elsewhere.
  * The key processing itself will be executed asynchronously at a later time.
  */
-public sealed interface KeyProcessResult {
+sealed interface KeyProcessResult {
   /**
    * Key input that is not recognized by IdeaVim and should be passed to IDE.
    */
-  public object Unknown: KeyProcessResult
+  object Unknown: KeyProcessResult
 
   /**
    * Key input that is recognized by IdeaVim and can be executed.
@@ -406,17 +406,17 @@ public sealed interface KeyProcessResult {
    * This class should be returned after the first step is complete.
    * It will continue the key handling and finish the process.
    */
-  public class Executable(
+  class Executable(
     private val originalState: KeyHandlerState,
     private val preProcessState: KeyHandlerState,
     private val processing: KeyProcessing,
   ): KeyProcessResult {
 
-    public companion object {
+    companion object {
       private val logger = vimLogger<KeyProcessResult>()
     }
 
-    public fun execute(editor: VimEditor, context: ExecutionContext) {
+    fun execute(editor: VimEditor, context: ExecutionContext) {
       synchronized(KeyHandler.lock) {
         val keyHandler = KeyHandler.getInstance()
         if (keyHandler.keyHandlerState != originalState) {
@@ -442,23 +442,23 @@ public sealed interface KeyProcessResult {
    * If there's need to alter the state following any of the execution steps, wrap the state modification as an
    * execution step. This will allow state modification to occur later rather than immediately.
    */
-  public abstract class KeyProcessResultBuilder {
-    public abstract val state: KeyHandlerState
+  abstract class KeyProcessResultBuilder {
+    abstract val state: KeyHandlerState
     protected val processings: MutableList<KeyProcessing> = mutableListOf()
-    public var onFinish: (() -> Unit)? = null // FIXME I'm a dirty hack to support recursion counter
+    var onFinish: (() -> Unit)? = null // FIXME I'm a dirty hack to support recursion counter
 
-    public fun addExecutionStep(keyProcessing: KeyProcessing) {
+    fun addExecutionStep(keyProcessing: KeyProcessing) {
       processings.add(keyProcessing)
     }
 
-    public abstract fun build(): KeyProcessResult
+    abstract fun build(): KeyProcessResult
   }
 
   // Works with existing state and modifies it during execution
   // It's the way IdeaVim worked for the long time and for this class we do not create
   // unnecessary objects and assume that the code will be executed immediately
-  public class SynchronousKeyProcessBuilder(public override val state: KeyHandlerState): KeyProcessResultBuilder() {
-    public override fun build(): KeyProcessResult {
+  class SynchronousKeyProcessBuilder(override val state: KeyHandlerState): KeyProcessResultBuilder() {
+    override fun build(): KeyProcessResult {
       return Executable(state, state) { keyHandlerState, vimEditor, executionContext ->
         try {
           for (processing in processings) {
@@ -473,11 +473,11 @@ public sealed interface KeyProcessResult {
 
   // Works with a clone of current state, nothing is modified during the builder work (key processing)
   // The new state will be applied later, when we run Executable.execute() (it may not be run at all)
-  public class AsyncKeyProcessBuilder(originalState: KeyHandlerState): KeyProcessResultBuilder() {
+  class AsyncKeyProcessBuilder(originalState: KeyHandlerState): KeyProcessResultBuilder() {
     private val originalState: KeyHandlerState = KeyHandler.getInstance().keyHandlerState
-    public override val state: KeyHandlerState = originalState.clone()
+    override val state: KeyHandlerState = originalState.clone()
 
-    public override fun build(): KeyProcessResult {
+    override fun build(): KeyProcessResult {
       return Executable(originalState, state) { keyHandlerState, vimEditor, executionContext ->
         try {
           for (processing in processings) {
@@ -492,7 +492,7 @@ public sealed interface KeyProcessResult {
   }
 }
 
-public class KeyHandlerStateResetter : EditorListener {
+class KeyHandlerStateResetter : EditorListener {
   override fun focusGained(editor: VimEditor) {
     KeyHandler.getInstance().reset(editor)
   }
@@ -503,4 +503,4 @@ public class KeyHandlerStateResetter : EditorListener {
   }
 }
 
-public typealias KeyProcessing = (KeyHandlerState, VimEditor, ExecutionContext) -> Unit
+typealias KeyProcessing = (KeyHandlerState, VimEditor, ExecutionContext) -> Unit

@@ -12,11 +12,11 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 
-public object ClipboardOptionHelper {
-  public var ideaputDisabled: Boolean = false
+object ClipboardOptionHelper {
+  var ideaputDisabled: Boolean = false
     private set
 
-  public class IdeaputDisabler : AutoCloseable {
+  class IdeaputDisabler : AutoCloseable {
     private val containedBefore =
       injector.globalOptions().clipboard.contains(OptionConstants.clipboard_ideaput)
 

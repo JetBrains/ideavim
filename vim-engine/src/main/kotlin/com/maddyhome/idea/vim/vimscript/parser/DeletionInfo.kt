@@ -11,15 +11,15 @@ package com.maddyhome.idea.vim.vimscript.parser
 /**
  * It's a helper class to store information about all the deleted substrings during parsing
  */
-public class DeletionInfo {
+class DeletionInfo {
   // First number is deletion offset, the second one - number of deleted chars
   private val deletions = mutableListOf<Pair<Int, Int>>()
 
-  public fun registerDeletion(startOffset: Int, length: Int) {
+  fun registerDeletion(startOffset: Int, length: Int) {
     deletions.add(Pair(startOffset, length))
   }
 
-  public fun restoreOriginalOffset(finalOffset: Int): Int {
+  fun restoreOriginalOffset(finalOffset: Int): Int {
     var result = finalOffset
     for ((i, length) in deletions.reversed()) {
       if (result >= i) {
@@ -29,7 +29,7 @@ public class DeletionInfo {
     return result
   }
 
-  public fun reset() {
+  fun reset() {
     deletions.clear()
   }
 }

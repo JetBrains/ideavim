@@ -8,6 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimExceptionUtil {
-  public fun currentStackTrace(): String
+interface VimExceptionUtil {
+  fun currentStackTrace(): String
 }

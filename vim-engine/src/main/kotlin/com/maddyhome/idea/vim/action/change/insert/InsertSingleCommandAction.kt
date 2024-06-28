@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-O>"], modes = [Mode.INSERT])
-public class InsertSingleCommandAction : VimActionHandler.SingleExecution() {
+class InsertSingleCommandAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES, CommandFlags.FLAG_EXPECT_MORE)

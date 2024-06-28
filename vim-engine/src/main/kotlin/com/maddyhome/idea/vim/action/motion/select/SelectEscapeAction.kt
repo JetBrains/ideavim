@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 
 @CommandOrMotion(keys = ["<Esc>"], modes = [Mode.SELECT])
-public class SelectEscapeAction : VimActionHandler.SingleExecution() {
+class SelectEscapeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

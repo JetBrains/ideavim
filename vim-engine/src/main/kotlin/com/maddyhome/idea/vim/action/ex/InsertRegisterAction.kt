@@ -22,7 +22,7 @@ import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
-public class InsertRegisterAction: VimActionHandler.SingleExecution() {
+class InsertRegisterAction: VimActionHandler.SingleExecution() {
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 

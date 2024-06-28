@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 
 @CommandOrMotion(keys = ["<C-q>", "<C-v>"], modes = [Mode.NORMAL, Mode.VISUAL])
-public class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
+class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

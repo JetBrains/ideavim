@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
 
-public class VimRegexServiceBase : VimRegexpService {
+class VimRegexServiceBase : VimRegexpService {
   override fun matches(pattern: String, text: String?, ignoreCase: Boolean): Boolean {
     if (text == null) {
       return false

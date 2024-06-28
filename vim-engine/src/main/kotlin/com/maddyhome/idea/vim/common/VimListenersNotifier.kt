@@ -14,54 +14,54 @@ import org.jetbrains.annotations.ApiStatus.Internal
 import java.util.concurrent.ConcurrentLinkedDeque
 
 @Internal // please do not use this class in your plugins, API is not final and will be changed in future releases
-public class VimListenersNotifier {
-  public val modeChangeListeners: MutableCollection<ModeChangeListener> = ConcurrentLinkedDeque()
-  public val myEditorListeners: MutableCollection<EditorListener> = ConcurrentLinkedDeque()
-  public val macroRecordingListeners: MutableCollection<MacroRecordingListener> = ConcurrentLinkedDeque()
-  public val vimPluginListeners: MutableCollection<VimPluginListener> = ConcurrentLinkedDeque()
-  public val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
+class VimListenersNotifier {
+  val modeChangeListeners: MutableCollection<ModeChangeListener> = ConcurrentLinkedDeque()
+  val myEditorListeners: MutableCollection<EditorListener> = ConcurrentLinkedDeque()
+  val macroRecordingListeners: MutableCollection<MacroRecordingListener> = ConcurrentLinkedDeque()
+  val vimPluginListeners: MutableCollection<VimPluginListener> = ConcurrentLinkedDeque()
+  val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
   
-  public fun notifyModeChanged(editor: VimEditor, oldMode: Mode) {
+  fun notifyModeChanged(editor: VimEditor, oldMode: Mode) {
     modeChangeListeners.forEach { it.modeChanged(editor, oldMode) }
   }
 
-  public fun notifyEditorCreated(editor: VimEditor) {
+  fun notifyEditorCreated(editor: VimEditor) {
     myEditorListeners.forEach { it.created(editor) }
   }
 
-  public fun notifyEditorReleased(editor: VimEditor) {
+  fun notifyEditorReleased(editor: VimEditor) {
     myEditorListeners.forEach { it.released(editor) }
   }
 
-  public fun notifyEditorFocusGained(editor: VimEditor) {
+  fun notifyEditorFocusGained(editor: VimEditor) {
     myEditorListeners.forEach { it.focusGained(editor) }
   }
 
-  public fun notifyEditorFocusLost(editor: VimEditor) {
+  fun notifyEditorFocusLost(editor: VimEditor) {
     myEditorListeners.forEach { it.focusLost(editor) }
   }
 
-  public fun notifyMacroRecordingStarted() {
+  fun notifyMacroRecordingStarted() {
     macroRecordingListeners.forEach { it.recordingStarted() }
   }
   
-  public fun notifyMacroRecordingFinished() {
+  fun notifyMacroRecordingFinished() {
     macroRecordingListeners.forEach { it.recordingFinished() }
   }
 
-  public fun notifyPluginTurnedOn() {
+  fun notifyPluginTurnedOn() {
     vimPluginListeners.forEach { it.turnedOn() }
   }
 
-  public fun notifyPluginTurnedOff() {
+  fun notifyPluginTurnedOff() {
     vimPluginListeners.forEach { it.turnedOff() }
   }
 
-  public fun notifyIsReplaceCharChanged(editor: VimEditor) {
+  fun notifyIsReplaceCharChanged(editor: VimEditor) {
     isReplaceCharListeners.forEach { it.isReplaceCharChanged(editor) }
   }
 
-  public fun reset() {
+  fun reset() {
     modeChangeListeners.clear()
     myEditorListeners.clear()
     macroRecordingListeners.clear()

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-public data class VimFuncref(
+data class VimFuncref(
   val handler: FunctionHandler,
   val arguments: VimList,
   var dictionary: VimDictionary?,
@@ -30,9 +30,9 @@ public data class VimFuncref(
 
   var isSelfFixed: Boolean = false
 
-  public companion object {
-    public var lambdaCounter: Int = 1
-    public var anonymousCounter: Int = 1
+  companion object {
+    var lambdaCounter: Int = 1
+    var anonymousCounter: Int = 1
   }
 
   override fun asDouble(): Double {
@@ -64,7 +64,7 @@ public data class VimFuncref(
     throw ExException("E703: using Funcref as a Number")
   }
 
-  public fun execute(name: String, args: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  fun execute(name: String, args: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
       if (dictionary == null) {
         throw ExException("E725: Calling dict function without Dictionary: $name")
@@ -105,7 +105,7 @@ public data class VimFuncref(
     this.isLocked = false
   }
 
-  public enum class Type {
+  enum class Type {
     LAMBDA,
     FUNCREF,
     FUNCTION,

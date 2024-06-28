@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :bdelete"
  */
 @ExCommand(command = "bd[elete]")
-public data class BufferCloseCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+data class BufferCloseCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

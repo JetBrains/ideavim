@@ -50,8 +50,8 @@ import javax.swing.KeyStroke
   name = "VimSearchSettings",
   storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
 )
-public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Element> {
-  public companion object {
+open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Element> {
+  companion object {
     private val logger = vimLogger<IjVimSearchGroup>()
   }
 
@@ -195,7 +195,7 @@ public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateCompon
     updateSearchHighlights(false)
   }
 
-  public fun saveData(element: Element) {
+  fun saveData(element: Element) {
     logger.debug("saveData")
     val search = Element("search")
 
@@ -220,7 +220,7 @@ public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateCompon
     }
   }
 
-  public fun readData(element: Element) {
+  fun readData(element: Element) {
     logger.debug("readData")
     val search = element.getChild("search") ?: return
 
@@ -266,28 +266,28 @@ public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateCompon
     return defaultValue
   }
 
-  public override fun getState(): Element? {
+  override fun getState(): Element? {
     val element = Element("search")
     saveData(element)
     return element
   }
 
-  public override fun loadState(state: Element) {
+  override fun loadState(state: Element) {
     readData(state)
   }
 
   /**
    * Updates search highlights when the selected editor changes
    */
-  public fun fileEditorManagerSelectionChangedCallback(@Suppress("unused") event: FileEditorManagerEvent) {
+  fun fileEditorManagerSelectionChangedCallback(@Suppress("unused") event: FileEditorManagerEvent) {
     updateSearchHighlights(false)
   }
 
-  public fun turnOn() {
+  fun turnOn() {
     updateSearchHighlights(false)
   }
 
-  public fun turnOff() {
+  fun turnOff() {
     val show = showSearchHighlight
     clearSearchHighlight()
     showSearchHighlight = show
@@ -305,8 +305,8 @@ public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateCompon
   /**
    * Removes and adds highlights for current search pattern when the document is edited
    */
-  public class DocumentSearchListener @Contract(pure = true) private constructor() : DocumentListener {
-    public override fun documentChanged(event: DocumentEvent) {
+  class DocumentSearchListener @Contract(pure = true) private constructor() : DocumentListener {
+    override fun documentChanged(event: DocumentEvent) {
       // Loop over all local editors for the changed document, across all projects, and update search highlights.
       // Note that the change may have come from a remote guest in Code With Me scenarios (in which case
       // ClientId.current will be a guest ID), but we don't care - we still need to add/remove highlights for the
@@ -352,8 +352,8 @@ public open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateCompon
       }
     }
 
-    public companion object {
-      public var INSTANCE: DocumentSearchListener = DocumentSearchListener()
+    companion object {
+      var INSTANCE: DocumentSearchListener = DocumentSearchListener()
     }
   }
 }

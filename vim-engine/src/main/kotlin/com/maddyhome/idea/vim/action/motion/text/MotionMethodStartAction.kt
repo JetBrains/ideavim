@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["]m"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionMethodNextStartAction : MotionActionHandler.ForEachCaret() {
+class MotionMethodNextStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -41,7 +41,7 @@ public class MotionMethodNextStartAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["[m"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionMethodPreviousStartAction : MotionActionHandler.ForEachCaret() {
+class MotionMethodPreviousStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

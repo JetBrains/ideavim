@@ -8,15 +8,15 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimScrollGroup {
-  public fun scrollCaretIntoView(editor: VimEditor)
-  public fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
-  public fun scrollHalfPage(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
-  public fun scrollLines(editor: VimEditor, lines: Int): Boolean
-  public fun scrollCurrentLineToDisplayTop(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  public fun scrollCurrentLineToDisplayMiddle(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  public fun scrollCurrentLineToDisplayBottom(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  public fun scrollColumns(editor: VimEditor, columns: Int): Boolean
-  public fun scrollCaretColumnToDisplayLeftEdge(vimEditor: VimEditor): Boolean
-  public fun scrollCaretColumnToDisplayRightEdge(editor: VimEditor): Boolean
+interface VimScrollGroup {
+  fun scrollCaretIntoView(editor: VimEditor)
+  fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
+  fun scrollHalfPage(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
+  fun scrollLines(editor: VimEditor, lines: Int): Boolean
+  fun scrollCurrentLineToDisplayTop(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollCurrentLineToDisplayMiddle(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollCurrentLineToDisplayBottom(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollColumns(editor: VimEditor, columns: Int): Boolean
+  fun scrollCaretColumnToDisplayLeftEdge(vimEditor: VimEditor): Boolean
+  fun scrollCaretColumnToDisplayRightEdge(editor: VimEditor): Boolean
 }

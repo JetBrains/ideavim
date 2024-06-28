@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["y"], modes = [Mode.NORMAL])
-public class YankMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
+class YankMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.COPY
 
   override val argumentType: Argument.Type = Argument.Type.MOTION

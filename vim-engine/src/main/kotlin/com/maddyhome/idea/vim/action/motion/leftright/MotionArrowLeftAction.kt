@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 
 @CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
+class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun motion(

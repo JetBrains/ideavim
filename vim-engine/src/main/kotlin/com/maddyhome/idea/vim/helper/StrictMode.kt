@@ -12,17 +12,17 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
-public object StrictMode {
+object StrictMode {
   private val LOG = vimLogger<StrictMode>()
 
   @JvmName("assertTrue")
-  public fun assert(condition: Boolean, message: String) {
+  fun assert(condition: Boolean, message: String) {
     if (!condition) {
       fail(message)
     }
   }
 
-  public fun fail(message: String) {
+  fun fail(message: String) {
     if (injector.globalOptions().ideastrictmode) {
       error(message)
     }

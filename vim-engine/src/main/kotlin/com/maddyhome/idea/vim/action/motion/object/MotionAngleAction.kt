@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["i>", "i<lt>"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockAngleAction : TextObjectActionHandler() {
+class MotionInnerBlockAngleAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -40,7 +40,7 @@ public class MotionInnerBlockAngleAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["iB", "i{", "i}"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockBraceAction : TextObjectActionHandler() {
+class MotionInnerBlockBraceAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -58,7 +58,7 @@ public class MotionInnerBlockBraceAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["i[", "i]"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockBracketAction : TextObjectActionHandler() {
+class MotionInnerBlockBracketAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -76,7 +76,7 @@ public class MotionInnerBlockBracketAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["ib", "i(", "i)"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockParenAction : TextObjectActionHandler() {
+class MotionInnerBlockParenAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -94,7 +94,7 @@ public class MotionInnerBlockParenAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a<", "a>"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockAngleAction : TextObjectActionHandler() {
+class MotionOuterBlockAngleAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -112,7 +112,7 @@ public class MotionOuterBlockAngleAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["aB", "a{", "a}"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockBraceAction : TextObjectActionHandler() {
+class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -130,7 +130,7 @@ public class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a[", "a]"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockBracketAction : TextObjectActionHandler() {
+class MotionOuterBlockBracketAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -148,7 +148,7 @@ public class MotionOuterBlockBracketAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["ab", "a(", "a)"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockParenAction : TextObjectActionHandler() {
+class MotionOuterBlockParenAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimRedrawService
 import com.maddyhome.idea.vim.api.injector
 
-public class IjVimRedrawService : VimRedrawService {
+class IjVimRedrawService : VimRedrawService {
   override fun redraw() {
     // The only thing IntelliJ needs to redraw is the status line. Everything else is handled automatically.
     redrawStatusLine()
@@ -25,11 +25,11 @@ public class IjVimRedrawService : VimRedrawService {
     injector.messages.clearStatusBarMessage()
   }
 
-  public companion object {
+  companion object {
     /**
      * Simulate Vim's redraw when the current editor changes
      */
-    public fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
+    fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
       injector.redrawService.redraw()
     }
   }
@@ -39,7 +39,7 @@ public class IjVimRedrawService : VimRedrawService {
    *
    * Only redraw if lines are added/removed.
    */
-  public object RedrawListener : DocumentListener {
+  object RedrawListener : DocumentListener {
     override fun documentChanged(event: DocumentEvent) {
       if (VimPlugin.isNotEnabled()) return
       if (event.newFragment.contains("\n") || event.oldFragment.contains("\n")) {

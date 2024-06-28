@@ -53,12 +53,12 @@ import javax.swing.Timer
  *   no adjustment gets performed and IdeaVim stays in insert mode.
  */
 // Do not remove until it's used in EasyMotion plugin in tests
-public object VimVisualTimer {
+object VimVisualTimer {
 
-  public var swingTimer: Timer? = null
-  public var mode: Mode? = null
+  var swingTimer: Timer? = null
+  var mode: Mode? = null
 
-  public inline fun singleTask(currentMode: Mode, crossinline task: (initialMode: Mode?) -> Unit) {
+  inline fun singleTask(currentMode: Mode, crossinline task: (initialMode: Mode?) -> Unit) {
     swingTimer?.stop()
 
     if (mode == null) mode = currentMode
@@ -70,7 +70,7 @@ public object VimVisualTimer {
     swingTimer = timer
   }
 
-  public fun doNow() {
+  fun doNow() {
     val swingTimer1 = swingTimer
     if (swingTimer1 != null) {
       swingTimer1.stop()
@@ -80,12 +80,12 @@ public object VimVisualTimer {
     }
   }
 
-  public fun drop() {
+  fun drop() {
     swingTimer?.stop()
     swingTimer = null
   }
 
-  public inline fun timerAction(task: (initialMode: Mode?) -> Unit) {
+  inline fun timerAction(task: (initialMode: Mode?) -> Unit) {
     task(mode)
     swingTimer = null
     mode = null

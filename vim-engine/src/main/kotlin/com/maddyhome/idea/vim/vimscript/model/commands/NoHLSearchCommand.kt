@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :nohlsearch"
  */
 @ExCommand(command = "noh[lsearch]")
-public data class NoHLSearchCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class NoHLSearchCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     injector.searchGroup.clearSearchHighlight()

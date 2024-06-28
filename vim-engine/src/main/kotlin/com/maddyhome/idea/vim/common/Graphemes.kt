@@ -40,11 +40,11 @@ package com.maddyhome.idea.vim.common
  *
  * https://www.unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries
  */
-public object Graphemes {
+object Graphemes {
   /**
    * Returns the next extended grapheme cluster boundary or `null` if the end of text has been reached.
    */
-  public fun next(charSeq: CharSequence, start: Int): Int? {
+  fun next(charSeq: CharSequence, start: Int): Int? {
     require(start >= 0) { "'start' is out of bounds." }
 
     if (start >= charSeq.length) return null
@@ -61,7 +61,7 @@ public object Graphemes {
   /**
    * Returns the previous extended grapheme cluster boundary or `null` if the start of text has been reached.
    */
-  public fun prev(charSeq: CharSequence, start: Int): Int? {
+  fun prev(charSeq: CharSequence, start: Int): Int? {
     require(start <= charSeq.length) { "'start' is out of bounds" }
 
     if (start <= 0) return null

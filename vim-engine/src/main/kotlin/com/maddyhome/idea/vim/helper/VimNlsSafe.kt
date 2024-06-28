@@ -9,4 +9,4 @@
 package com.maddyhome.idea.vim.helper
 
 @VimNlsSafe
-public annotation class VimNlsSafe
+annotation class VimNlsSafe

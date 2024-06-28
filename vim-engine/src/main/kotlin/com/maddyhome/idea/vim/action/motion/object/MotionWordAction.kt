@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.state.mode.Mode
 
 @CommandOrMotion(keys = ["iW"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
-public class MotionInnerBigWordAction : TextObjectActionHandler() {
+class MotionInnerBigWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -35,7 +35,7 @@ public class MotionInnerBigWordAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["aW"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
-public class MotionOuterBigWordAction : TextObjectActionHandler() {
+class MotionOuterBigWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -51,7 +51,7 @@ public class MotionOuterBigWordAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["iw"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
-public class MotionInnerWordAction : TextObjectActionHandler() {
+class MotionInnerWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -67,7 +67,7 @@ public class MotionInnerWordAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["aw"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
-public class MotionOuterWordAction : TextObjectActionHandler() {
+class MotionOuterWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 

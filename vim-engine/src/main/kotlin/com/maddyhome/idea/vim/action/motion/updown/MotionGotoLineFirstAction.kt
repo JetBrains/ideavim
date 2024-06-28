@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["gg", "<C-Home>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
 
@@ -45,7 +45,7 @@ public class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<C-Home>"], modes = [Mode.INSERT])
-public class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)

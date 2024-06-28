@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * @author vlan
  */
 @CommandOrMotion(keys = ["I"], modes = [Mode.VISUAL])
-public class VisualBlockInsertAction : VisualOperatorActionHandler.SingleExecution() {
+class VisualBlockInsertAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun executeForAllCarets(

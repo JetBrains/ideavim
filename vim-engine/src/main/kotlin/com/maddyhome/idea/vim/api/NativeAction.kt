@@ -8,16 +8,16 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface NativeAction {
-  public val action: Any
+interface NativeAction {
+  val action: Any
 }
 
-public interface NativeActionManager {
-  public val enterAction: NativeAction?
-  public val createLineAboveCaret: NativeAction?
-  public val joinLines: NativeAction?
-  public val indentLines: NativeAction?
-  public val saveAll: NativeAction?
-  public val saveCurrent: NativeAction?
-  public val deleteAction: NativeAction?
+interface NativeActionManager {
+  val enterAction: NativeAction?
+  val createLineAboveCaret: NativeAction?
+  val joinLines: NativeAction?
+  val indentLines: NativeAction?
+  val saveAll: NativeAction?
+  val saveCurrent: NativeAction?
+  val deleteAction: NativeAction?
 }

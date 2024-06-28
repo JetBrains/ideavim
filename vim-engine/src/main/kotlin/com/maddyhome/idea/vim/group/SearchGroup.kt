@@ -17,9 +17,9 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import kotlin.math.max
 
-public const val BLOCK_CHARS: String = "{}()[]<>"
+const val BLOCK_CHARS: String = "{}()[]<>"
 
-public fun isInsideComment(editor: VimEditor, pos: Int): Boolean {
+fun isInsideComment(editor: VimEditor, pos: Int): Boolean {
   return injector.psiService.getCommentAtPos(editor, pos) != null
 }
 
@@ -33,7 +33,7 @@ public fun isInsideComment(editor: VimEditor, pos: Int): Boolean {
  *                - If set to false, the positions of the quote characters enclosing a string are considered part of the string.
  *                  This means the caret is considered inside the string even if it's directly on one of the quotes.
  */
-public fun isInsideSingleQuotes(editor: VimEditor, pos: Int, isInner: Boolean): Boolean {
+fun isInsideSingleQuotes(editor: VimEditor, pos: Int, isInner: Boolean): Boolean {
   val range = injector.psiService.getSingleQuotedString(editor, pos, isInner) ?: return false
   return pos in range
 }
@@ -48,7 +48,7 @@ public fun isInsideSingleQuotes(editor: VimEditor, pos: Int, isInner: Boolean): 
  *                - If set to false, the positions of the quote characters enclosing a string are considered part of the string.
  *                  This means the caret is considered inside the string even if it's directly on one of the quotes.
  */
-public fun isInsideDoubleQuotes(editor: VimEditor, pos: Int, isInner: Boolean): Boolean {
+fun isInsideDoubleQuotes(editor: VimEditor, pos: Int, isInner: Boolean): Boolean {
   val range = injector.psiService.getDoubleQuotedString(editor, pos, isInner) ?: return false
   return pos in range
 }
@@ -62,7 +62,7 @@ public fun isInsideDoubleQuotes(editor: VimEditor, pos: Int, isInner: Boolean): 
  *                - If true, the caret needs to be between the quote marks to be within the string.
  *                - If false, caret positions on the quote marks are counted as within the string.
  */
-public fun isInsideString(editor: VimEditor, pos: Int, isInner: Boolean): Boolean {
+fun isInsideString(editor: VimEditor, pos: Int, isInner: Boolean): Boolean {
   val range = getStringAtPos(editor, pos, isInner) ?: return false
   return pos in range
 }
@@ -78,7 +78,7 @@ public fun isInsideString(editor: VimEditor, pos: Int, isInner: Boolean): Boolea
  *
  * NOTE: Regardless of the [isInner] value, a TextRange will be returned if the caret is positioned on a quote character.
  */
-public fun getStringAtPos(editor: VimEditor, pos: Int, isInner: Boolean): TextRange? {
+fun getStringAtPos(editor: VimEditor, pos: Int, isInner: Boolean): TextRange? {
   return injector.psiService.getDoubleQuotedString(editor, pos, isInner) ?: injector.psiService.getSingleQuotedString(editor, pos, isInner)
 }
 
@@ -86,7 +86,7 @@ public fun getStringAtPos(editor: VimEditor, pos: Int, isInner: Boolean): TextRa
  * This method emulates the Vim '%' command for comments.
  * If the caret is positioned over a comment boundary, this method returns the position of the opposing boundary.
  */
-public fun getCommentsOppositeBoundary(editor: VimEditor, pos: Int): Int? {
+fun getCommentsOppositeBoundary(editor: VimEditor, pos: Int): Int? {
   val (range, prefixToSuffix) = injector.psiService.getCommentAtPos(editor, pos) ?: return null
   if (prefixToSuffix == null) return null
 
@@ -109,7 +109,7 @@ public fun getCommentsOppositeBoundary(editor: VimEditor, pos: Int): Int? {
  * were found on the remainder of the current line.
  */
 //  TODO [vakhitov] it would be better to make this search PSI-aware and skip chars in strings and comments
-public fun findMatchingPairOnCurrentLine(editor: VimEditor, caret: ImmutableVimCaret): Int? {
+fun findMatchingPairOnCurrentLine(editor: VimEditor, caret: ImmutableVimCaret): Int? {
   var pos = caret.offset
 
   val commentPos = getCommentsOppositeBoundary(editor, pos)
@@ -151,7 +151,7 @@ private fun parsMatchPairsOption(editor: VimEditor): Map<Char, Char> {
  * We don't just count for opening and closing braces till their number will be equal, but keep context in mind.
  * If the first brace is inside string or comment, then the second one should be also in the same string or comment; otherwise there is no match.
  */
-public fun findMatchingChar(editor: VimEditor, start: Int, charToMatch: Char, pairChar: Char, direction: Direction): Int? {
+fun findMatchingChar(editor: VimEditor, start: Int, charToMatch: Char, pairChar: Char, direction: Direction): Int? {
   // If we are inside string, we search for the pair inside the string only
   val stringRange = getStringAtPos(editor, start, true)
   if (stringRange != null && start in stringRange) {
@@ -222,7 +222,7 @@ private fun findPreviousNonWhitespaceChar(chars: CharSequence, startIndex: Int):
  * @see    `[{`, `]}` and similar Vim commands.
  * @return position of [count] unmatched [type]
  */
-public fun findUnmatchedBlock(editor: VimEditor, pos: Int, type: Char, count: Int): Int? {
+fun findUnmatchedBlock(editor: VimEditor, pos: Int, type: Char, count: Int): Int? {
   val chars: CharSequence = editor.text()
 
   val loc = BLOCK_CHARS.indexOf(type)
@@ -307,7 +307,7 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
  * @return When the block is found, return text range matching where end offset is exclusive, otherwise return null
  */
 // TODO please refactor me
-public fun findBlockRange(
+fun findBlockRange(
   editor: VimEditor,
   caret: ImmutableVimCaret,
   type: Char,
@@ -455,10 +455,10 @@ private fun CharSequence.indexOfAnyOrNullInDirection(chars: CharArray, startInde
   }
 }
 
-public fun getDoubleQuotesRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boolean): TextRange? =
+fun getDoubleQuotesRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boolean): TextRange? =
   getQuoteRangeNoPSI(chars, currentPos, isInner, false)
 
-public fun getSingleQuotesRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boolean): TextRange? =
+fun getSingleQuotesRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boolean): TextRange? =
   getQuoteRangeNoPSI(chars, currentPos, isInner, true)
 
 private fun getQuoteRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boolean, isSingleQuotes: Boolean): TextRange? {

@@ -12,21 +12,21 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import java.io.File
 
-public interface VimscriptExecutor {
+interface VimscriptExecutor {
 
   /**
    * True if Vimscript is under execution. This might be reading of .ideavimrc file, some :source command,
    *   command from the ex-command line, or any other case.
    */
-  public var executingVimscript: Boolean
+  var executingVimscript: Boolean
 
   /**
    * This variable is set to true when we execute .ideavimrc configuration. This might be _ideavimrc file on windows
    *   or the file from XGD config directory, according to the settings.
    */
-  public var executingIdeaVimRcConfiguration: Boolean
+  var executingIdeaVimRcConfiguration: Boolean
 
-  public fun execute(
+  fun execute(
     script: String,
     editor: VimEditor,
     context: ExecutionContext,
@@ -35,12 +35,12 @@ public interface VimscriptExecutor {
     vimContext: VimLContext? = null,
   ): ExecutionResult
 
-  public fun executeFile(
+  fun executeFile(
     file: File,
     editor: VimEditor,
     fileIsIdeaVimRcConfig: Boolean,
     indicateErrors: Boolean = false,
   )
 
-  public fun executeLastCommand(editor: VimEditor, context: ExecutionContext): Boolean
+  fun executeLastCommand(editor: VimEditor, context: ExecutionContext): Boolean
 }

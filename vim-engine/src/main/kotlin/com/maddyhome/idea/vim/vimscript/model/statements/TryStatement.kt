@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
-public data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) :
+data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) :
   Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
@@ -76,7 +76,7 @@ public data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<Cat
   }
 }
 
-public data class TryBlock(val body: List<Executable>) : Executable {
+data class TryBlock(val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
@@ -90,7 +90,7 @@ public data class TryBlock(val body: List<Executable>) : Executable {
   }
 }
 
-public data class CatchBlock(val pattern: String, val body: List<Executable>) : Executable {
+data class CatchBlock(val pattern: String, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
@@ -104,7 +104,7 @@ public data class CatchBlock(val pattern: String, val body: List<Executable>) : 
   }
 }
 
-public data class FinallyBlock(val body: List<Executable>) : Executable {
+data class FinallyBlock(val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
@@ -118,7 +118,7 @@ public data class FinallyBlock(val body: List<Executable>) : Executable {
   }
 }
 
-public fun executeBody(
+fun executeBody(
   body: List<Executable>,
   editor: VimEditor,
   context: ExecutionContext,

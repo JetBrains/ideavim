@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<C-V>", "<C-Q>"], modes = [Mode.INSERT, Mode.CMD_LINE])
-public class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
+class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 

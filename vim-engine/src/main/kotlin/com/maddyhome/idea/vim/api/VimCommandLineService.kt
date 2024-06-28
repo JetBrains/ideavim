@@ -8,10 +8,10 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimCommandLineService {
-  public fun getActiveCommandLine(): VimCommandLine?
+interface VimCommandLineService {
+  fun getActiveCommandLine(): VimCommandLine?
 
-  public fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String?
+  fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String?
 
   /**
    * Turns on the command line for the given editor
@@ -21,9 +21,9 @@ public interface VimCommandLineService {
    * @param label    The label for the command line (i.e. :, /, or ?)
    * @param initText The initial text for the entry
    */
-  public fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
+  fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
 
-  public fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
+  fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
 
-  public fun fullReset()
+  fun fullReset()
 }

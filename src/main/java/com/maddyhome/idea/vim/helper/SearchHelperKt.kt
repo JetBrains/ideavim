@@ -58,7 +58,7 @@ private fun containsUpperCase(pattern: String): Boolean {
 /**
  * This counts all the words in the file.
  */
-public fun countWords(
+fun countWords(
   vimEditor: VimEditor,
   start: Int = 0,
   end: Long = vimEditor.fileSize(),
@@ -97,7 +97,7 @@ public fun countWords(
   return CountPosition(count, position)
 }
 
-public fun findNumbersInRange(
+fun findNumbersInRange(
   editor: Editor,
   textRange: TextRange,
   alpha: Boolean,
@@ -133,7 +133,7 @@ public fun findNumbersInRange(
   return result
 }
 
-public fun findNumberUnderCursor(
+fun findNumberUnderCursor(
   editor: Editor,
   caret: Caret,
   alpha: Boolean,
@@ -163,7 +163,7 @@ public fun findNumberUnderCursor(
  * @param startPosOnLine - start offset to search
  * @return - text range with number
  */
-public fun findNumberInText(
+fun findNumberInText(
   textInRange: String,
   startPosOnLine: Int,
   alpha: Boolean,
@@ -308,7 +308,7 @@ private fun isNumberChar(ch: Char, alpha: Boolean, hex: Boolean, octal: Boolean,
  * @param caret  The caret to find word under
  * @return The text range of the found word or null if there is no word under/after the cursor on the line
  */
-public fun findWordUnderCursor(editor: Editor, caret: Caret): TextRange? {
+fun findWordUnderCursor(editor: Editor, caret: Caret): TextRange? {
   val vimEditor = IjVimEditor(editor)
   val chars = editor.document.charsSequence
   val stop = vimEditor.getLineEndOffset(caret.logicalPosition.line, true)
@@ -359,7 +359,7 @@ public fun findWordUnderCursor(editor: Editor, caret: Caret): TextRange? {
   return TextRange(start, end)
 }
 
-public fun findMisspelledWords(
+fun findMisspelledWords(
   editor: Editor,
   startOffset: Int,
   endOffset: Int,
@@ -401,7 +401,7 @@ private fun skip(iterator: IntIterator, n: Int) {
   while (i-- != 0 && iterator.hasNext()) iterator.nextInt()
 }
 
-public class CountPosition(public val count: Int, public val position: Int)
+class CountPosition(val count: Int, val position: Int)
 
 private val logger = logger<SearchLogger>()
 private class SearchLogger

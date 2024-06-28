@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-W>"], modes = [Mode.INSERT])
-public class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
+class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)

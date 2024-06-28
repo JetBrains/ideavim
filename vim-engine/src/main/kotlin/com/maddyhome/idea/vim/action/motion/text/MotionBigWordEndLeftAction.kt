@@ -22,18 +22,18 @@ import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 @CommandOrMotion(keys = ["gE"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, true)
+class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, true)
 
 @CommandOrMotion(keys = ["E"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, true)
+class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, true)
 
 @CommandOrMotion(keys = ["ge"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, false)
+class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, false)
 
 @CommandOrMotion(keys = ["e"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
+class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
 
-public sealed class WordEndAction(public val direction: Direction, public val bigWord: Boolean) : MotionActionHandler.ForEachCaret() {
+sealed class WordEndAction(val direction: Direction, val bigWord: Boolean) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
 @CommandOrMotion(keys = ["_"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
+class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
  * @author Alex Plate
  */
 @CommandOrMotion(keys = ["<S-Home>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
-public class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
+class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

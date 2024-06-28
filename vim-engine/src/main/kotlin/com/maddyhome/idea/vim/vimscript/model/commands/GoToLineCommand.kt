@@ -20,7 +20,7 @@ import java.lang.Integer.min
 /**
  * see "h :[range]"
  */
-public data class GoToLineCommand(val range: Range) :
+data class GoToLineCommand(val range: Range) :
   Command.ForEachCaret(range) {
 
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)

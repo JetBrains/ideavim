@@ -30,7 +30,7 @@ import java.util.*
  * @author vlan
  */
 @CommandOrMotion(keys = ["C"], modes = [Mode.VISUAL])
-public class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
+class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE)

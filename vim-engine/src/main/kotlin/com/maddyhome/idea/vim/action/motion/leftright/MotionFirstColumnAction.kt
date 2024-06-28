@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["0"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
+class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -41,7 +41,7 @@ public class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
 
 // TODO we have the same command but for NX modes
 @CommandOrMotion(keys = ["<Home>"], modes = [Mode.INSERT])
-public class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
+class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)

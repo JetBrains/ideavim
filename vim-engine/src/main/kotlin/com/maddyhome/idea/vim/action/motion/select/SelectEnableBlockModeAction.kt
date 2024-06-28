@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  */
 
 @CommandOrMotion(keys = ["g<C-h>"], modes = [Mode.NORMAL])
-public class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
+class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

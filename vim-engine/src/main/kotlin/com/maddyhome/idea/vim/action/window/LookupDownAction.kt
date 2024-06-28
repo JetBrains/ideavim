@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 @CommandOrMotion(keys = ["<C-N>"], modes = [Mode.INSERT])
-public class LookupDownAction : VimActionHandler.SingleExecution() {
+class LookupDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-N>")
 

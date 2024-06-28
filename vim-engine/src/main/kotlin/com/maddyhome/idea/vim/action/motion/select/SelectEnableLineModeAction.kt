@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  */
 
 @CommandOrMotion(keys = ["gH"], modes = [Mode.NORMAL])
-public class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
+class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

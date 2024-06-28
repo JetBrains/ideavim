@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.vimscript.parser.visitors
 import com.maddyhome.idea.vim.common.TextRange
 import org.antlr.v4.runtime.ParserRuleContext
 
-public fun ParserRuleContext.getTextRange(): TextRange {
+fun ParserRuleContext.getTextRange(): TextRange {
   val startOffset = this.start.startIndex
   val endOffset = this.stop.stopIndex + 1
   return TextRange(startOffset, endOffset)

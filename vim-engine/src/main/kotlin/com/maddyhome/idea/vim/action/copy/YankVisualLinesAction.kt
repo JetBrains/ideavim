@@ -27,7 +27,7 @@ import java.util.*
  * @author vlan
  */
 @CommandOrMotion(keys = ["Y"], modes = [Mode.VISUAL])
-public class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
+class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.COPY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)

@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 
-public data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
+data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val dict = VimDictionary(linkedMapOf())

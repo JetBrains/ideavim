@@ -17,24 +17,24 @@ import java.awt.datatransfer.Transferable
  * - **Primary**: This is a concept specific to Linux. It stores the most recently visually selected text and pastes its content on a middle mouse click.
  * - **Clipboard**: This is supported by all operating systems. It functions as a storage for the common 'copy and paste' operations typically done with Ctrl-C and Ctrl-V.
  */
-public interface VimClipboardManager {
-  public fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>?
+interface VimClipboardManager {
+  fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>?
   /**
    * Returns the string currently on the system clipboard.
    *
    * @return The clipboard string or null if data isn't plain text
    */
-  public fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>?
+  fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>?
 
   /**
    * Puts the supplied text into the system clipboard
    */
-  public fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
-  public fun setPrimaryText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
+  fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
+  fun setPrimaryText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
 
-  public fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any>
+  fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any>
 
-  public fun preprocessText(
+  fun preprocessText(
     vimEditor: VimEditor,
     textRange: TextRange,
     text: String,

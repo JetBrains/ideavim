@@ -35,18 +35,18 @@ import kotlin.math.min
  *
  * All starts are included and ends are excluded
  */
-public sealed class VimSelection {
-  public abstract val type: SelectionType
-  public abstract val vimStart: Int
-  public abstract val vimEnd: Int
+sealed class VimSelection {
+  abstract val type: SelectionType
+  abstract val vimStart: Int
+  abstract val vimEnd: Int
   protected abstract val editor: VimEditor
 
-  public abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
+  abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
 
-  public abstract fun getNativeStartAndEnd(): Pair<Int, Int>
+  abstract fun getNativeStartAndEnd(): Pair<Int, Int>
 
-  public companion object {
-    public fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor): VimSelection = when (type) {
+  companion object {
+    fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor): VimSelection = when (type) {
       CHARACTER_WISE -> {
         val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(SelectionType.CHARACTER_WISE))
         VimCharacterSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
@@ -86,19 +86,19 @@ public sealed class VimSelection {
  *
  * All starts are included and ends are excluded
  */
-public sealed class VimSimpleSelection : VimSelection() {
-  public abstract val nativeStart: Int
-  public abstract val nativeEnd: Int
-  public abstract val normNativeStart: Int
-  public abstract val normNativeEnd: Int
+sealed class VimSimpleSelection : VimSelection() {
+  abstract val nativeStart: Int
+  abstract val nativeEnd: Int
+  abstract val normNativeStart: Int
+  abstract val normNativeEnd: Int
 
   override fun getNativeStartAndEnd(): Pair<Int, Int> = normNativeStart to normNativeEnd
 
-  public companion object {
+  companion object {
     /**
      * Create character- and linewise selection if native selection is already known. Doesn't work for block selection
      */
-    public fun createWithNative(
+    fun createWithNative(
       vimStart: Int,
       vimEnd: Int,
       nativeStart: Int,
@@ -113,7 +113,7 @@ public sealed class VimSimpleSelection : VimSelection() {
   }
 }
 
-public class VimCharacterSelection(
+class VimCharacterSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val nativeStart: Int,
@@ -127,7 +127,7 @@ public class VimCharacterSelection(
   override fun toVimTextRange(skipNewLineForLineMode: Boolean): TextRange = TextRange(normNativeStart, normNativeEnd)
 }
 
-public class VimLineSelection(
+class VimLineSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val nativeStart: Int,
@@ -146,7 +146,7 @@ public class VimLineSelection(
     }
 }
 
-public class VimBlockSelection(
+class VimBlockSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val editor: VimEditor,

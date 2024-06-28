@@ -52,10 +52,10 @@ import java.io.Closeable
  * SelectionVimListenerSuppressor.lock().use { ... }
  * ```
  */
-public sealed class VimListenerSuppressor {
+sealed class VimListenerSuppressor {
   private var caretListenerSuppressor = 0
 
-  public fun lock(): Locked {
+  fun lock(): Locked {
     LOG.trace("Suppressor lock")
     LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor++
@@ -64,27 +64,27 @@ public sealed class VimListenerSuppressor {
 
   // Please try not to use lock/unlock without scoping
   // Prefer try-with-resources
-  public fun unlock() {
+  fun unlock() {
     LOG.trace("Suppressor unlock")
     LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor--
   }
 
-  public fun reset() {
+  fun reset() {
     StrictMode.assert(caretListenerSuppressor == 0, "Listener is not zero")
     caretListenerSuppressor = 0
   }
 
-  public val isNotLocked: Boolean
+  val isNotLocked: Boolean
     get() = caretListenerSuppressor == 0
 
-  public inner class Locked : Closeable {
+  inner class Locked : Closeable {
     override fun close(): Unit = unlock()
   }
 
-  public companion object {
+  companion object {
     private val LOG = vimLogger<VimListenerSuppressor>()
   }
 }
 
-public object SelectionVimListenerSuppressor : VimListenerSuppressor()
+object SelectionVimListenerSuppressor : VimListenerSuppressor()

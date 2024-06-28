@@ -7,9 +7,9 @@
  */
 package com.maddyhome.idea.vim.api
 
-public interface VimDigraphGroup {
-  public fun getDigraph(ch1: Char, ch2: Char): Char
-  public fun displayAsciiInfo(editor: VimEditor)
-  public fun parseCommandLine(editor: VimEditor, args: String): Boolean
-  public fun showDigraphs(editor: VimEditor)
+interface VimDigraphGroup {
+  fun getDigraph(ch1: Char, ch2: Char): Char
+  fun displayAsciiInfo(editor: VimEditor)
+  fun parseCommandLine(editor: VimEditor, args: String): Boolean
+  fun showDigraphs(editor: VimEditor)
 }

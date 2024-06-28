@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
-public data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executable>>>) : Executable {
+data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executable>>>) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 

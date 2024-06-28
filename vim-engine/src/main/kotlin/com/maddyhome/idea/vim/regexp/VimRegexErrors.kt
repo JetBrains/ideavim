@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.regexp
 /**
  * Error codes related to Vim regular expressions
  */
-public enum class VimRegexErrors {
+enum class VimRegexErrors {
   /**
    * Invalid search string
    */

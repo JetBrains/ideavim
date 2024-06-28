@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.un
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-public object NotOperatorHandler : UnaryOperatorHandler() {
+object NotOperatorHandler : UnaryOperatorHandler() {
 
   override fun performOperation(value: VimDataType): VimDataType {
     return (!value.asBoolean()).asVimInt()

@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 
 @CommandOrMotion(keys = ["g$", "g<End>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
+class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

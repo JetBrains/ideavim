@@ -29,7 +29,7 @@ M                       To Middle line of window, on the first non-blank
                         character |linewise|.  See also 'startofline' option.
  */
 @CommandOrMotion(keys = ["M"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
+class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override val motionType: MotionType = MotionType.LINE_WISE

@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
  * see :h lockvar
  */
 @ExCommand(command = "lockv[ar]")
-public class LockVarCommand(public val range: Range, public val argument: String) : Command.SingleExecution(range, argument) {
+class LockVarCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments
@@ -38,7 +38,7 @@ public class LockVarCommand(public val range: Range, public val argument: String
  * see :h unlockvar
  */
 @ExCommand(command = "unlo[ckvar]")
-public class UnlockVarCommand(public val range: Range, public val argument: String) : Command.SingleExecution(range, argument) {
+class UnlockVarCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments

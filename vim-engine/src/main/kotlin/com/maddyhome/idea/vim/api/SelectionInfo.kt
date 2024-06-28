@@ -28,14 +28,14 @@ import kotlin.math.min
  * @property end            The BufferPosition marking the end of the selection or caret.
  * @property selectionType  The type of selection being represented (character-wise, line-wise, etc.).
  */
-public data class SelectionInfo(public var start: BufferPosition?, public var end: BufferPosition?, public val selectionType: SelectionType) {
+data class SelectionInfo(var start: BufferPosition?, var end: BufferPosition?, val selectionType: SelectionType) {
   /**
    * Provides the start and end BufferPositions in sorted order as a Pair. This property ensures a sequential
    * order of positions, regardless of the caret movement direction.
    */
-  public val startEndSorted: Pair<BufferPosition, BufferPosition>? get() = sortBufferPositions(start, end)
+  val startEndSorted: Pair<BufferPosition, BufferPosition>? get() = sortBufferPositions(start, end)
 
-  public fun getSelectionRange(editor: VimEditor): TextRange? {
+  fun getSelectionRange(editor: VimEditor): TextRange? {
     val (sortedStart, sortedEnd) = startEndSorted ?: return null
     return when (selectionType) {
       SelectionType.CHARACTER_WISE -> TextRange(editor.bufferPositionToOffset(sortedStart), editor.bufferPositionToOffset(sortedEnd) + 1)
@@ -57,7 +57,7 @@ public data class SelectionInfo(public var start: BufferPosition?, public var en
     }
   }
 
-  public fun isSelected(offset: Int, editor: VimEditor): Boolean {
+  fun isSelected(offset: Int, editor: VimEditor): Boolean {
     return getSelectionRange(editor)?.contains(offset) ?: false
   }
 
@@ -70,8 +70,8 @@ public data class SelectionInfo(public var start: BufferPosition?, public var en
     }
   }
 
-  public companion object {
-    public fun collectCurrentSelectionInfo(caret: VimCaret): SelectionInfo? {
+  companion object {
+    fun collectCurrentSelectionInfo(caret: VimCaret): SelectionInfo? {
       val editor = caret.editor
       val mode = editor.mode
 

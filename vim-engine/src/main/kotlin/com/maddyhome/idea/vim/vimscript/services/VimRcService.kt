@@ -16,11 +16,11 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Paths
 
-public object VimRcService {
+object VimRcService {
   private val logger = vimLogger<VimRcService>()
 
   @NonNls
-  public const val VIMRC_FILE_NAME: String = "ideavimrc"
+  const val VIMRC_FILE_NAME: String = "ideavimrc"
 
   @NonNls
   private val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
@@ -29,7 +29,7 @@ public object VimRcService {
   private val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
 
   @JvmStatic
-  public fun findIdeaVimRc(): File? {
+  fun findIdeaVimRc(): File? {
     val homeDirName = System.getProperty("user.home")
     // Check whether file exists in home dir
     if (homeDirName != null) {
@@ -89,7 +89,7 @@ public object VimRcService {
 
   """.trimMargin()
 
-  public fun findOrCreateIdeaVimRc(): File? {
+  fun findOrCreateIdeaVimRc(): File? {
     val found = findIdeaVimRc()
     if (found != null) return found
 
@@ -130,7 +130,7 @@ public object VimRcService {
   }
 
   @JvmStatic
-  public fun executeIdeaVimRc(editor: VimEditor) {
+  fun executeIdeaVimRc(editor: VimEditor) {
     val ideaVimRc = findIdeaVimRc()
     if (ideaVimRc != null) {
       logger.info("Execute ideavimrc file: " + ideaVimRc.absolutePath)
@@ -140,7 +140,7 @@ public object VimRcService {
     }
   }
 
-  public fun isIdeaVimRcFile(file: File): Boolean {
+  fun isIdeaVimRcFile(file: File): Boolean {
     val ideaVimRc = findIdeaVimRc() ?: return false
     return ideaVimRc == file
   }

@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<C-[>", "<C-C>", "<Esc>"], modes = [Mode.INSERT])
-public class InsertExitModeAction : VimActionHandler.SingleExecution() {
+class InsertExitModeAction : VimActionHandler.SingleExecution() {
   // Note that hitting Escape can insert text when exiting insert mode after visual block mode.
   // If the editor is read-only, we'll get a "This view is read-only" tooltip. However, we should only enter insert
   // mode if both editor and document are writable.

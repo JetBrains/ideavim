@@ -31,7 +31,7 @@ private const val ESCAPED_QUOTE = "\\\""
 private const val UNESCAPED_QUOTE = "\""
 
 @ExCommand(command = "delm[arks]")
-public data class DeleteMarksCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class DeleteMarksCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
-public class ModeInputConsumer: KeyConsumer {
+class ModeInputConsumer: KeyConsumer {
   private companion object {
     private val logger = vimLogger<ModeInputConsumer>()
   }

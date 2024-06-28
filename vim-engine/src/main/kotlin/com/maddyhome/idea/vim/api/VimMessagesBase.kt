@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.api
 
-public abstract class VimMessagesBase : VimMessages
+abstract class VimMessagesBase : VimMessages

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 
-public data class LambdaExpression(val args: List<String>, val expr: Expression) : Expression() {
+data class LambdaExpression(val args: List<String>, val expr: Expression) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimFuncref {
     val function = FunctionDeclaration(null, getFunctionName(), args, listOf(), buildBody(), false, setOf(FunctionFlag.CLOSURE), true)

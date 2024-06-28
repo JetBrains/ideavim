@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 
 @ExCommand(command = "unm[ap],nun[map],vu[nmap],xu[nmap],sunm[ap],ou[nmap],unm[ap],iu[nmap],lu[nmap],cu[nmap]")
-public data class UnMapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
+data class UnMapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -38,7 +38,7 @@ public data class UnMapCommand(val range: Range, val argument: String, val cmd: 
     return true
   }
 
-  public companion object {
+  companion object {
     private val COMMAND_INFOS = arrayOf(
       CommandInfo("unm", "ap", MappingMode.NVO, false),
       CommandInfo("nun", "map", MappingMode.N, false),

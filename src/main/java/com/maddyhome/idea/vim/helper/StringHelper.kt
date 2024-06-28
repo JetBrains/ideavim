@@ -13,11 +13,11 @@ import java.util.*
 import java.util.stream.Collectors
 import javax.swing.KeyStroke
 
-public object StringHelper {
+object StringHelper {
   @JvmStatic
   @Deprecated("Use injector.parser.parseKeys(string)")
   @ApiStatus.ScheduledForRemoval
-  public fun parseKeys(vararg string: String): List<KeyStroke> {
+  fun parseKeys(vararg string: String): List<KeyStroke> {
     return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).stream() }
       .collect(Collectors.toList())
   }

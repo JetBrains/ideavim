@@ -21,15 +21,15 @@ internal val Mode.hasVisualSelection
     else -> false
   }
 
-public val Mode.inNormalMode: Boolean
+val Mode.inNormalMode: Boolean
   get() = this is Mode.NORMAL
 
 @get:JvmName("inInsertMode")
-public val Editor.inInsertMode: Boolean
+val Editor.inInsertMode: Boolean
   get() = this.vim.mode == Mode.INSERT || this.vim.mode == Mode.REPLACE
 
 @get:JvmName("inVisualMode")
-public val Editor.inVisualMode: Boolean
+val Editor.inVisualMode: Boolean
   get() = this.vim.inVisualMode
 
 @get:JvmName("inExMode")

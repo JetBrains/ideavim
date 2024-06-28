@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.state.mode.Mode
 
 @CommandOrMotion(keys = ["o"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
-public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
+class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
@@ -35,7 +35,7 @@ public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecutio
 }
 
 @CommandOrMotion(keys = ["O"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
-public class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
+class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(

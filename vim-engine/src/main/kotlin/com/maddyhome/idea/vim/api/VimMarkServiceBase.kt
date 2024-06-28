@@ -38,8 +38,8 @@ import java.lang.Integer.max
 import java.lang.Integer.min
 import java.util.*
 
-public abstract class VimMarkServiceBase : VimMarkService {
-  public companion object {
+abstract class VimMarkServiceBase : VimMarkService {
+  companion object {
     private val logger = vimLogger<VimMarkServiceBase>()
   }
 
@@ -49,10 +49,10 @@ public abstract class VimMarkServiceBase : VimMarkService {
   // marks are stored for primary caret only
   protected val filepathToLocalMarks: HashMap<String, LocalMarks<Char, Mark>> = HashMap()
 
-  public class LocalMarks<K, V> : HashMap<K, V>() {
-    public var myTimestamp: Date = Date()
+  class LocalMarks<K, V> : HashMap<K, V>() {
+    var myTimestamp: Date = Date()
 
-    public fun setTimestamp(timestamp: Date) {
+    fun setTimestamp(timestamp: Date) {
       this.myTimestamp = timestamp
     }
 
@@ -69,7 +69,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
    * @return The map of marks. The keys are `Character`s of the mark names, the values are
    * `Mark`s.
    */
-  public fun getLocalMarks(filePath: String): LocalMarks<Char, Mark> {
+  fun getLocalMarks(filePath: String): LocalMarks<Char, Mark> {
     return filepathToLocalMarks.getOrPut(filePath) { LocalMarks() }
   }
 
@@ -572,21 +572,21 @@ public abstract class VimMarkServiceBase : VimMarkService {
   protected fun Char.normalizeMarkChar(): Char = if (this == '`') '\'' else this
 }
 
-public class LocalMarkStorage(public var caret: ImmutableVimCaret) {
+class LocalMarkStorage(var caret: ImmutableVimCaret) {
   private val marks = HashMap<Char, Mark>()
 
-  public fun getMarks(): Map<Char, Mark> {
+  fun getMarks(): Map<Char, Mark> {
     return marks.toMap()
   }
 
-  public fun getMark(char: Char): Mark? {
+  fun getMark(char: Char): Mark? {
     if (caret.isPrimary) {
       return injector.markService.getMark(caret, char)
     }
     return marks[char]
   }
 
-  public fun setMark(mark: Mark): Boolean {
+  fun setMark(mark: Mark): Boolean {
     // todo check if set is valid for secondary caret
     if (caret.isPrimary) {
       return injector.markService.setMark(caret, mark)
@@ -596,7 +596,7 @@ public class LocalMarkStorage(public var caret: ImmutableVimCaret) {
     return true
   }
 
-  public fun removeMark(char: Char) {
+  fun removeMark(char: Char) {
     if (caret.isPrimary) {
       return injector.markService.removeLocalMark(caret, char)
     } else {
@@ -604,7 +604,7 @@ public class LocalMarkStorage(public var caret: ImmutableVimCaret) {
     }
   }
 
-  public fun clear(caret: ImmutableVimCaret) {
+  fun clear(caret: ImmutableVimCaret) {
     if (caret.isPrimary) {
       injector.markService.resetAllMarksForCaret(caret)
     } else {

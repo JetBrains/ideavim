@@ -13,12 +13,12 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.InsertSequence
 
-public interface VimUndoRedo {
-  public fun undo(editor: VimEditor, context: ExecutionContext): Boolean
-  public fun redo(editor: VimEditor, context: ExecutionContext): Boolean
+interface VimUndoRedo {
+  fun undo(editor: VimEditor, context: ExecutionContext): Boolean
+  fun redo(editor: VimEditor, context: ExecutionContext): Boolean
 
-  public fun startInsertSequence(caret: VimCaret, startOffset: Int, startNanoTime: Long)
-  public fun endInsertSequence(caret: VimCaret, endOffset: Int, endNanoTime: Long)
-  public fun abandonCurrentInsertSequence(caret: VimCaret)
-  public fun getInsertSequence(caret: VimCaret, nanoTime: Long): InsertSequence?
+  fun startInsertSequence(caret: VimCaret, startOffset: Int, startNanoTime: Long)
+  fun endInsertSequence(caret: VimCaret, endOffset: Int, endNanoTime: Long)
+  fun abandonCurrentInsertSequence(caret: VimCaret)
+  fun getInsertSequence(caret: VimCaret, nanoTime: Long): InsertSequence?
 }

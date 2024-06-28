@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import java.lang.Long.toHexString
 
-public abstract class VimFileBase : VimFile {
+abstract class VimFileBase : VimFile {
   override fun displayHexInfo(editor: VimEditor) {
     val offset = editor.currentCaret().offset
     val ch = editor.text()[offset]

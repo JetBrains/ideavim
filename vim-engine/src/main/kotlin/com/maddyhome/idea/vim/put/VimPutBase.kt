@@ -40,7 +40,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-public abstract class VimPutBase : VimPut {
+abstract class VimPutBase : VimPut {
   @RWLockLabel.SelfSynchronized
   override fun putText(
     editor: VimEditor,
@@ -565,8 +565,8 @@ public abstract class VimPutBase : VimPut {
     }
   }
 
-  public companion object {
-    public val logger: VimLogger by lazy { vimLogger<VimPutBase>() }
+  companion object {
+    val logger: VimLogger by lazy { vimLogger<VimPutBase>() }
   }
 }
 

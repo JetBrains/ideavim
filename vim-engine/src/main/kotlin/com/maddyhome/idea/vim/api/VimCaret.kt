@@ -34,40 +34,40 @@ import javax.swing.KeyStroke
  * TODO: Switch names: ImmutableVimCaret -> VimCaret & VimCaret -> MutableVimCaret
  *       to be consistent with VimEditor
  */
-public interface ImmutableVimCaret {
-  public val editor: VimEditor
-  public val offset: Int
-  public val isValid: Boolean
-  public val isPrimary: Boolean
+interface ImmutableVimCaret {
+  val editor: VimEditor
+  val offset: Int
+  val isValid: Boolean
+  val isPrimary: Boolean
 
-  public val selectionStart: Int
-  public val selectionEnd: Int
-  public val vimSelectionStart: Int
+  val selectionStart: Int
+  val selectionEnd: Int
+  val vimSelectionStart: Int
 
-  public val vimLastColumn: Int
+  val vimLastColumn: Int
 
-  public fun getBufferPosition(): BufferPosition
+  fun getBufferPosition(): BufferPosition
 
   // TODO: [visual] Try to remove this. Visual position is an IntelliJ concept and Vim doesn't have a direct equivalent
-  public fun getVisualPosition(): VimVisualPosition
+  fun getVisualPosition(): VimVisualPosition
 
-  public fun getLine(): Int
+  fun getLine(): Int
 
   /**
    * Return the buffer line of the caret as a 1-based public value, as used by VimScript
    */
-  public val vimLine: Int
-  public val visualLineStart: Int
-  public fun hasSelection(): Boolean
+  val vimLine: Int
+  val visualLineStart: Int
+  fun hasSelection(): Boolean
 
-  public var lastSelectionInfo: SelectionInfo
-  public val registerStorage: CaretRegisterStorage
-  public val markStorage: LocalMarkStorage
+  var lastSelectionInfo: SelectionInfo
+  val registerStorage: CaretRegisterStorage
+  val markStorage: LocalMarkStorage
 }
 
-public interface VimCaret : ImmutableVimCaret {
+interface VimCaret : ImmutableVimCaret {
   override var vimLastColumn: Int
-  public fun resetLastColumn()
+  fun resetLastColumn()
 
   /*
 This variable should not exist. This is actually `< mark in visual selection. It should be refactored as we'll get
@@ -75,12 +75,12 @@ per-caret marks.
 */
   override var vimSelectionStart: Int
 
-  public fun vimSelectionStartClear()
+  fun vimSelectionStartClear()
 
-  public fun setSelection(start: Int, end: Int)
-  public fun removeSelection()
+  fun setSelection(start: Int, end: Int)
+  fun removeSelection()
 
-  public fun moveToOffset(offset: Int): VimCaret {
+  fun moveToOffset(offset: Int): VimCaret {
     if (offset < 0 || offset > editor.text().length || !isValid) return this
     if (editor.inBlockSelection) {
       StrictMode.assert(this == editor.primaryCaret(), "Block selection can only be moved with primary caret!")
@@ -117,29 +117,29 @@ per-caret marks.
     return caretAfterMove
   }
 
-  public fun moveToOffsetNative(offset: Int)
+  fun moveToOffsetNative(offset: Int)
 
   /**
    * We return here an instance of the caret because the caret implementation may be immutable
    */
-  public fun moveToInlayAwareOffset(newOffset: Int): VimCaret
-  public fun moveToBufferPosition(position: BufferPosition)
+  fun moveToInlayAwareOffset(newOffset: Int): VimCaret
+  fun moveToBufferPosition(position: BufferPosition)
 
   // TODO: [visual] Try to remove this. Visual position is an IntelliJ concept and Vim doesn't have a direct equivalent
-  public fun moveToVisualPosition(position: VimVisualPosition)
+  fun moveToVisualPosition(position: VimVisualPosition)
 
   /**
    * Same as setter for [vimLastColumn] but returns the new version of the caret.
    * As the common strategies for caret processing are not yet created, there is no need to adapt
    *   this method around IdeaVim right now
    */
-  public fun setVimLastColumnAndGetCaret(col: Int): VimCaret
+  fun setVimLastColumnAndGetCaret(col: Int): VimCaret
 
-  public var vimInsertStart: LiveRange
-  public var vimLastVisualOperatorRange: VisualChange?
+  var vimInsertStart: LiveRange
+  var vimLastVisualOperatorRange: VisualChange?
 }
 
-public fun VimCaret.moveToMotion(motion: Motion): VimCaret {
+fun VimCaret.moveToMotion(motion: Motion): VimCaret {
   return if (motion is Motion.AbsoluteOffset) {
     this.moveToOffset(motion.offset)
   } else {
@@ -148,20 +148,20 @@ public fun VimCaret.moveToMotion(motion: Motion): VimCaret {
   }
 }
 
-public interface CaretRegisterStorage {
-  public val caret: ImmutableVimCaret
+interface CaretRegisterStorage {
+  val caret: ImmutableVimCaret
 
   /**
    * Stores text to caret's recordable (named/numbered/unnamed) register
    */
-  public fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
+  fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
 
   /**
    * Gets text from caret's recordable register
    * If the register is not recordable - global text state will be returned
    */
-  public fun getRegister(r: Char): Register?
+  fun getRegister(r: Char): Register?
 
-  public fun setKeys(register: Char, keys: List<KeyStroke>)
-  public fun saveRegister(r: Char, register: Register)
+  fun setKeys(register: Char, keys: List<KeyStroke>)
+  fun saveRegister(r: Char, register: Register)
 }

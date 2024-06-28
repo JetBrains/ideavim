@@ -25,7 +25,7 @@ import java.util.*
  * @author vlan
  */
 @CommandOrMotion(keys = ["gq"], modes = [Mode.VISUAL])
-public class ReformatCodeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+class ReformatCodeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)

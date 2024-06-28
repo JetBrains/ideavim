@@ -13,8 +13,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-public abstract class Expression {
+abstract class Expression {
 
-  public lateinit var originalString: String
-  public abstract fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
+  lateinit var originalString: String
+  abstract fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
 }

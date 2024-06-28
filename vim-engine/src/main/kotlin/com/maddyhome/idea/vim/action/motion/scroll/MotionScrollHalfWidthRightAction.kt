@@ -34,7 +34,7 @@ zH                      Move the view on the text half a screenwidth to the
 [count] is used but undocumented.
  */
 @CommandOrMotion(keys = ["zH"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionScrollHalfWidthRightAction : VimActionHandler.SingleExecution() {
+class MotionScrollHalfWidthRightAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)

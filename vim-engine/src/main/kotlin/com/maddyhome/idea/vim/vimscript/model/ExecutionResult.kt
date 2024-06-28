@@ -10,12 +10,12 @@ package com.maddyhome.idea.vim.vimscript.model
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-public sealed class ExecutionResult {
+sealed class ExecutionResult {
 
-  public object Success : ExecutionResult()
-  public object Error : ExecutionResult()
+  object Success : ExecutionResult()
+  object Error : ExecutionResult()
 
-  public object Break : ExecutionResult()
-  public object Continue : ExecutionResult()
-  public class Return(public val value: VimDataType) : ExecutionResult()
+  object Break : ExecutionResult()
+  object Continue : ExecutionResult()
+  class Return(val value: VimDataType) : ExecutionResult()
 }

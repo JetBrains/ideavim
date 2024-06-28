@@ -85,7 +85,7 @@ import kotlin.math.min
 /**
  * Provides all the insert/replace related functionality
  */
-public class ChangeGroup : VimChangeGroupBase() {
+class ChangeGroup : VimChangeGroupBase() {
   private val insertListeners = ContainerUtil.createLockFreeCopyOnWriteList<VimInsertListener>()
   private val listener: EditorMouseListener = object : EditorMouseListener {
     override fun mouseClicked(event: EditorMouseEvent) {
@@ -96,7 +96,7 @@ public class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
-  public fun editorCreated(editor: Editor?, disposable: Disposable) {
+  fun editorCreated(editor: Editor?, disposable: Disposable) {
     EventFacade.getInstance().addEditorMouseListener(editor!!, listener, disposable)
   }
 
@@ -790,11 +790,11 @@ public class ChangeGroup : VimChangeGroupBase() {
     return number
   }
 
-  public fun addInsertListener(listener: VimInsertListener) {
+  fun addInsertListener(listener: VimInsertListener) {
     insertListeners.add(listener)
   }
 
-  public fun removeInsertListener(listener: VimInsertListener) {
+  fun removeInsertListener(listener: VimInsertListener) {
     insertListeners.remove(listener)
   }
 

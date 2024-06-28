@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import java.util.*
 
-public data class VimString(val value: String) : VimDataType() {
+data class VimString(val value: String) : VimDataType() {
 
   // todo refactoring
   override fun asDouble(): Double {
@@ -84,7 +84,7 @@ public data class VimString(val value: String) : VimDataType() {
     this.isLocked = false
   }
 
-  public companion object {
-    public val EMPTY: VimString = VimString("")
+  companion object {
+    val EMPTY: VimString = VimString("")
   }
 }

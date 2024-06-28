@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
 // todo refactor us senpai :(
-public data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
+data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
@@ -92,7 +92,7 @@ public data class ForLoop(val variable: Variable, val iterable: Expression, val 
   }
 }
 
-public data class ForLoopWithList(val variables: List<String>, val iterable: Expression, val body: List<Executable>) :
+data class ForLoopWithList(val variables: List<String>, val iterable: Expression, val body: List<Executable>) :
   Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange

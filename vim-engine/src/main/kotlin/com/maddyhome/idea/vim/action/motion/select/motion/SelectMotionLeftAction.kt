@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
  */
 
 @CommandOrMotion(keys = ["<Left>"], modes = [Mode.SELECT])
-public class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
+class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

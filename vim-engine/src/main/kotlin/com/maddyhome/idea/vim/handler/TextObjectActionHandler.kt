@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.state.mode.selectionType
  *
  * This handler gets executed for each caret.
  */
-public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
+abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
 
   final override val type: Command.Type = Command.Type.MOTION
 
@@ -43,9 +43,9 @@ public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
    * See `:h ip` for example, the last line.
    * This "visual type" is noted in lines like "When used in Visual mode it is made linewise."
    */
-  public abstract val visualType: TextObjectVisualType
+  abstract val visualType: TextObjectVisualType
 
-  public abstract fun getRange(
+  abstract fun getRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,

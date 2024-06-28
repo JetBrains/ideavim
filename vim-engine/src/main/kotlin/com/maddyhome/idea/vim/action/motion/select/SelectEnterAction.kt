@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  */
 
 @CommandOrMotion(keys = ["<Enter>"], modes = [Mode.SELECT])
-public class SelectEnterAction : VimActionHandler.SingleExecution() {
+class SelectEnterAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT
 

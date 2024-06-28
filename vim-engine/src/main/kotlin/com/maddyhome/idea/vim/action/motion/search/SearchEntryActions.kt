@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import java.util.*
 
 @CommandOrMotion(keys = ["/"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class SearchEntryFwdAction : VimActionHandler.SingleExecution() {
+class SearchEntryFwdAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
 
@@ -32,7 +32,7 @@ public class SearchEntryFwdAction : VimActionHandler.SingleExecution() {
 }
 
 @CommandOrMotion(keys = ["?"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class SearchEntryRevAction : VimActionHandler.SingleExecution() {
+class SearchEntryRevAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
 

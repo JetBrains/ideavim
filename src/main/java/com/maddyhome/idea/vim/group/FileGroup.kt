@@ -47,7 +47,7 @@ import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import java.io.File
 import java.util.*
 
-public class FileGroup public constructor() : VimFileBase() {
+class FileGroup : VimFileBase() {
   override fun openFile(filename: String, context: ExecutionContext): Boolean {
     if (logger.isDebugEnabled) {
       logger.debug("openFile($filename)")
@@ -82,7 +82,7 @@ public class FileGroup public constructor() : VimFileBase() {
     }
   }
 
-  public fun findFile(filename: String, project: Project): VirtualFile? {
+  fun findFile(filename: String, project: Project): VirtualFile? {
     var found: VirtualFile?
     // Vim supports both ~/ and ~\ (tested on Mac and Windows). On Windows, it supports forward- and back-slashes, but
     // it only supports forward slash on Unix (tested on Mac)
@@ -242,7 +242,7 @@ public class FileGroup public constructor() : VimFileBase() {
   /**
    * Returns the previous tab.
    */
-  public fun getPreviousTab(context: DataContext): VirtualFile? {
+  fun getPreviousTab(context: DataContext): VirtualFile? {
     val project = PlatformDataKeys.PROJECT.getData(context) ?: return null
     val vf = getInstance(project).lastTab
     if (vf != null && vf.isValid) {
@@ -251,7 +251,7 @@ public class FileGroup public constructor() : VimFileBase() {
     return null
   }
 
-  public fun selectEditor(project: Project, file: VirtualFile): Editor? {
+  fun selectEditor(project: Project, file: VirtualFile): Editor? {
     val fMgr = FileEditorManager.getInstance(project)
     val feditors = fMgr.openFile(file, true)
     if (feditors.size > 0) {
@@ -418,7 +418,7 @@ public class FileGroup public constructor() : VimFileBase() {
     return project.name + "-" + project.locationHash
   }
 
-  public companion object {
+  companion object {
     private fun findByNameInProject(filename: String, project: Project): VirtualFile? {
       val projectScope = ProjectScope.getProjectScope(project)
       val names = FilenameIndex.getVirtualFilesByName(filename, projectScope)
@@ -435,7 +435,7 @@ public class FileGroup public constructor() : VimFileBase() {
     /**
      * Respond to editor tab selection and remember the last used tab
      */
-    public fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
+    fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
       if (event.oldFile != null) {
         getInstance(event.manager.project).lastTab = event.oldFile
       }

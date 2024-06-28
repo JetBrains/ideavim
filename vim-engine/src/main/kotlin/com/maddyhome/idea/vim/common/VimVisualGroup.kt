@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.state.mode.Mode
 
-public fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: Mode): Pair<Int, Int> {
+fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineEnd = editor.getLineEndForOffset(nativeEnd)
   val adj =
@@ -31,7 +31,7 @@ public fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: 
  *
  * Adds caret adjustment or extends to line start / end in case of linewise selection
  */
-public fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, Int> {
+fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineStart = editor.getLineStartForOffset(nativeStart)
   // Extend to \n char of line to fill full line with selection
@@ -39,11 +39,11 @@ public fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<
   return lineStart to lineEnd
 }
 
-public fun <T : Comparable<T>> sort(a: T, b: T): Pair<T, T> = if (a > b) b to a else a to b
+fun <T : Comparable<T>> sort(a: T, b: T): Pair<T, T> = if (a > b) b to a else a to b
 
 private fun isExclusiveSelection() = injector.globalOptions().selection.contains("exclusive")
 
-public fun blockToNativeSelection(
+fun blockToNativeSelection(
   editor: VimEditor,
   start: Int,
   end: Int,

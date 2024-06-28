@@ -30,7 +30,7 @@ import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import kotlin.math.max
 
-public class VimModeWidget(public val project: Project) : CustomStatusBarWidget, VimStatusBarWidget {
+class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarWidget {
   private companion object {
     private const val INSERT = "INSERT"
     private const val NORMAL = "NORMAL"
@@ -71,12 +71,12 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
     return label
   }
 
-  public fun updateWidget() {
+  fun updateWidget() {
     val mode = getFocusedEditor(project)?.vim?.mode
     updateWidget(mode)
   }
 
-  public fun updateWidget(mode: Mode?) {
+  fun updateWidget(mode: Mode?) {
     updateLabel(mode)
     updateWidgetInStatusBar(ModeWidgetFactory.ID, project)
   }
@@ -140,7 +140,7 @@ public class VimModeWidget(public val project: Project) : CustomStatusBarWidget,
   }
 }
 
-public fun updateModeWidget() {
+fun updateModeWidget() {
   val factory = StatusBarWidgetFactory.EP_NAME.findExtension(ModeWidgetFactory::class.java) ?: return
   for (project in ProjectManager.getInstance().openProjects) {
     val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
@@ -148,7 +148,7 @@ public fun updateModeWidget() {
   }
 }
 
-public fun repaintModeWidget() {
+fun repaintModeWidget() {
   for (project in ProjectManager.getInstance().openProjects) {
     val widgets = WindowManager.getInstance()?.getStatusBar(project)?.allWidgets ?: continue
 

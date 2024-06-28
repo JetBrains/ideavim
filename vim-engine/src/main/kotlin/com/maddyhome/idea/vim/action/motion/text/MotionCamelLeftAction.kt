@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 
 @CommandOrMotion(keys = ["[b"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionCamelLeftAction : MotionActionHandler.ForEachCaret() {
+class MotionCamelLeftAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -37,7 +37,7 @@ public class MotionCamelLeftAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["[w"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionCamelRightAction : MotionActionHandler.ForEachCaret() {
+class MotionCamelRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(

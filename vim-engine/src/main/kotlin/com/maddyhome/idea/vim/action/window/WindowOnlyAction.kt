@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author rasendubi
  */
 @CommandOrMotion(keys = ["<C-W>o", "<C-W><C-O>"], modes = [Mode.NORMAL])
-public class WindowOnlyAction : VimActionHandler.SingleExecution() {
+class WindowOnlyAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

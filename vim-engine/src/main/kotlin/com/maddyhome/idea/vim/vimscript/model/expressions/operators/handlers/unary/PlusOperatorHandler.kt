@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
-public object PlusOperatorHandler : UnaryOperatorHandler() {
+object PlusOperatorHandler : UnaryOperatorHandler() {
 
   override fun performOperation(value: VimDataType): VimDataType {
     return if (value is VimFloat) {

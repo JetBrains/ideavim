@@ -8,6 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimCommandLineCaret {
-  public var offset: Int
+interface VimCommandLineCaret {
+  var offset: Int
 }

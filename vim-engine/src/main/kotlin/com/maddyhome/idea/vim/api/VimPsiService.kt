@@ -10,11 +10,11 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
 
-public interface VimPsiService {
+interface VimPsiService {
   /**
    * @return triple of comment range, comment prefix, comment suffix or null if there is no comment at the given position
    */
-  public fun getCommentAtPos(editor: VimEditor, pos: Int): Pair<TextRange, Pair<String, String>?>?
+  fun getCommentAtPos(editor: VimEditor, pos: Int): Pair<TextRange, Pair<String, String>?>?
 
   /**
    * @param isInner A flag indicating whether the start and end quote characters should be considered part of the string:
@@ -23,7 +23,7 @@ public interface VimPsiService {
    *
    * NOTE: Regardless of the [isInner] value, a TextRange will be returned if the caret is positioned on a quote character.
    */
-  public fun getDoubleQuotedString(editor: VimEditor, pos: Int, isInner: Boolean): TextRange?
+  fun getDoubleQuotedString(editor: VimEditor, pos: Int, isInner: Boolean): TextRange?
 
   /**
    * @param isInner A flag indicating whether the start and end quote characters should be considered part of the string:
@@ -32,5 +32,5 @@ public interface VimPsiService {
    *
    * NOTE: Regardless of the [isInner] value, a TextRange will be returned if the caret is positioned on a quote character.
    */
-  public fun getSingleQuotedString(editor: VimEditor, pos: Int, isInner: Boolean): TextRange?
+  fun getSingleQuotedString(editor: VimEditor, pos: Int, isInner: Boolean): TextRange?
 }

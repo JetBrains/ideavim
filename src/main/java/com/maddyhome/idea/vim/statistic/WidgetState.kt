@@ -18,7 +18,7 @@ import com.intellij.openapi.wm.WindowManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory
 
-public class WidgetState : ApplicationUsagesCollector() {
+class WidgetState : ApplicationUsagesCollector() {
   override fun getGroup(): EventLogGroup = GROUP
 
   override fun getMetrics(): Set<MetricEvent> {
@@ -54,7 +54,7 @@ public class WidgetState : ApplicationUsagesCollector() {
     }
   }
 
-  public companion object {
+  companion object {
     private val GROUP = EventLogGroup("vim.widget", 1, "FUS")
 
     private val IS_MODE_WIDGET_SHOWN = EventFields.Boolean("is-mode-widget-shown")

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["~"], modes = [Mode.NORMAL])
-public class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
+class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override fun execute(

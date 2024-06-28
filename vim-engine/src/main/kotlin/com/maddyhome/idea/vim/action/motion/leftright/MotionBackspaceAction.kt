@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 @CommandOrMotion(keys = ["<BS>", "<C-H>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
+class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -37,7 +37,7 @@ public class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<Space>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionSpaceAction : MotionActionHandler.ForEachCaret() {
+class MotionSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

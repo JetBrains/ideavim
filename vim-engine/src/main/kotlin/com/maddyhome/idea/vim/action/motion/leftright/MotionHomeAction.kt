@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 
 @CommandOrMotion(keys = ["<Home>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
-public class MotionHomeAction : NonShiftedSpecialKeyHandler() {
+class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun motion(

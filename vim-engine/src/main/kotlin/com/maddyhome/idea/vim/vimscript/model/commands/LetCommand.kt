@@ -44,7 +44,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
  * see "h :let"
  */
 @ExCommand(command = "let")
-public data class LetCommand(
+data class LetCommand(
   val range: Range,
   val variable: Expression,
   val operator: AssignmentOperator,

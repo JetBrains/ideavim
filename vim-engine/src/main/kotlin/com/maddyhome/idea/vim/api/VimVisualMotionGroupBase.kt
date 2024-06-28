@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.state.mode.selectionType
 
-public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
+abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override val exclusiveSelection: Boolean
     get() = injector.globalOptions().selection.contains("exclusive")
   override val selectionAdj: Int

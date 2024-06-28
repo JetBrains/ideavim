@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 @CommandOrMotion(keys = ["h"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionLeftAction : MotionActionHandler.ForEachCaret() {
+class MotionLeftAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -39,7 +39,7 @@ public class MotionLeftAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.INSERT])
-public class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret() {
+class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(

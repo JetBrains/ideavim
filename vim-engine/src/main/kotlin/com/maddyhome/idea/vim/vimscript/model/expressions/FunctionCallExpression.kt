@@ -18,9 +18,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-public data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBracesName, val arguments: MutableList<Expression>) :
+data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBracesName, val arguments: MutableList<Expression>) :
   Expression() {
-  public constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
+  constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
     this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {

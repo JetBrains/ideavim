@@ -22,12 +22,12 @@ import kotlin.math.min
  * The [startLine] and [endLine] fields are 0-based, matching the rest of IdeaVim. These are coerced to a minimum value
  * of `0`, so the range `0,$` becomes a synonym for `1,$`.
  */
-public class LineRange(startLine: Int, endLine: Int) {
+class LineRange(startLine: Int, endLine: Int) {
   @JvmField
-  public val startLine: Int
+  val startLine: Int
 
   @JvmField
-  public val endLine: Int
+  val endLine: Int
 
   init {
     if (endLine >= startLine) {
@@ -39,12 +39,12 @@ public class LineRange(startLine: Int, endLine: Int) {
     }
   }
 
-  public val startLine1: Int = startLine + 1
-  public val endLine1: Int = endLine + 1
-  public val size: Int = endLine - startLine + 1
+  val startLine1: Int = startLine + 1
+  val endLine1: Int = endLine + 1
+  val size: Int = endLine - startLine + 1
 }
 
-public fun LineRange.toTextRange(editor: VimEditor): TextRange {
+fun LineRange.toTextRange(editor: VimEditor): TextRange {
   val start = editor.getLineStartOffset(startLine.coerceAtLeast(0))
   val end = editor.getLineEndOffset(endLine, true) + 1
   return TextRange(start, min(end, editor.fileSize().toInt()))

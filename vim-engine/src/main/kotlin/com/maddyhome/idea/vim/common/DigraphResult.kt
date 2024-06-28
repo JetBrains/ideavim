@@ -9,9 +9,9 @@ package com.maddyhome.idea.vim.common
 
 import javax.swing.KeyStroke
 
-public class DigraphResult {
-  public val result: Int
-  public val stroke: KeyStroke?
+class DigraphResult {
+  val result: Int
+  val stroke: KeyStroke?
   private var promptCharacter: Char = 0.toChar()
 
   private constructor(result: Int) {
@@ -30,26 +30,26 @@ public class DigraphResult {
     this.stroke = stroke
   }
 
-  public companion object {
-    public const val RES_HANDLED: Int = 0
-    public const val RES_UNHANDLED: Int = 1
-    public const val RES_DONE: Int = 3
-    public const val RES_BAD: Int = 4
+  companion object {
+    const val RES_HANDLED: Int = 0
+    const val RES_UNHANDLED: Int = 1
+    const val RES_DONE: Int = 3
+    const val RES_BAD: Int = 4
 
     @JvmField
-    public val HANDLED_DIGRAPH: DigraphResult = DigraphResult(RES_HANDLED, '?')
+    val HANDLED_DIGRAPH: DigraphResult = DigraphResult(RES_HANDLED, '?')
 
     @JvmField
-    public val HANDLED_LITERAL: DigraphResult = DigraphResult(RES_HANDLED, '^')
+    val HANDLED_LITERAL: DigraphResult = DigraphResult(RES_HANDLED, '^')
 
     @JvmField
-    public val UNHANDLED: DigraphResult = DigraphResult(RES_UNHANDLED)
+    val UNHANDLED: DigraphResult = DigraphResult(RES_UNHANDLED)
 
     @JvmField
-    public val BAD: DigraphResult = DigraphResult(RES_BAD)
+    val BAD: DigraphResult = DigraphResult(RES_BAD)
 
     @JvmStatic
-    public fun done(stroke: KeyStroke?): DigraphResult {
+    fun done(stroke: KeyStroke?): DigraphResult {
       // for some reason vim does not let to insert char 10 as a digraph, it inserts 10 instead
       return if (stroke == null || stroke.keyCode != 10) {
         DigraphResult(stroke)
@@ -59,7 +59,7 @@ public class DigraphResult {
     }
 
     @JvmStatic
-    public fun handled(promptCharacter: Char): DigraphResult {
+    fun handled(promptCharacter: Char): DigraphResult {
       return DigraphResult(RES_HANDLED, promptCharacter)
     }
   }

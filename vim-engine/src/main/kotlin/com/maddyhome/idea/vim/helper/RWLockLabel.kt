@@ -12,13 +12,13 @@ package com.maddyhome.idea.vim.helper
  * This annotations marks if annotated function required read or write lock
  */
 @Target
-public annotation class RWLockLabel {
+annotation class RWLockLabel {
   /**
    * [Readonly] annotation means that annotated function should be called from read action
    * This annotation is only a marker and doesn't enable r/w lock automatically
    */
   @Target(AnnotationTarget.FUNCTION)
-  public annotation class Readonly
+  annotation class Readonly
 
   /**
    * [Writable] annotation means that annotated function should be called from write action
@@ -26,19 +26,19 @@ public annotation class RWLockLabel {
    */
   @Suppress("unused")
   @Target(AnnotationTarget.FUNCTION)
-  public annotation class Writable
+  annotation class Writable
 
   /**
    * [SelfSynchronized] annotation means that annotated function handles read/write lock by itself
    * This annotation is only a marker and doesn't enable r/w lock automatically
    */
   @Target(AnnotationTarget.FUNCTION)
-  public annotation class SelfSynchronized
+  annotation class SelfSynchronized
 
   /**
    * [NoLockRequired] annotation means that annotated function doesn't require any lock
    * This annotation is only a marker and doesn't enable r/w lock automatically
    */
   @Target(AnnotationTarget.FUNCTION)
-  public annotation class NoLockRequired
+  annotation class NoLockRequired
 }

@@ -499,12 +499,12 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 }
 
-public val Editor.vim: VimEditor
+val Editor.vim: VimEditor
   get() = IjVimEditor(this)
-public val VimEditor.ij: Editor
+val VimEditor.ij: Editor
   get() = (this as IjVimEditor).editor
 
-public val com.intellij.openapi.util.TextRange.vim: TextRange
+val com.intellij.openapi.util.TextRange.vim: TextRange
   get() = TextRange(this.startOffset, this.endOffset)
 
 internal class InsertTimeRecorder: ModeChangeListener {

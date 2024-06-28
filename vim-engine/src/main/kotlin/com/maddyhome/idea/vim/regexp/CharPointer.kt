@@ -11,22 +11,22 @@ import java.nio.CharBuffer
 import java.util.*
 
 @Deprecated("Remove once old regex engine is removed")
-public class CharPointer {
+class CharPointer {
   private var seq: CharSequence
-  public var pointer: Int = 0
+  var pointer: Int = 0
   private var readonly: Boolean
 
-  public constructor(text: String) {
+  constructor(text: String) {
     seq = text
     readonly = true
   }
 
-  public constructor(text: CharBuffer) {
+  constructor(text: CharBuffer) {
     seq = text
     readonly = true
   }
 
-  public constructor(text: StringBuffer) {
+  constructor(text: StringBuffer) {
     seq = text
     readonly = false
   }
@@ -37,12 +37,12 @@ public class CharPointer {
     pointer = ptr.pointer + offset
   }
 
-  public fun pointer(): Int {
+  fun pointer(): Int {
     return pointer
   }
 
   @JvmOverloads
-  public fun set(ch: Char, offset: Int = 0): CharPointer {
+  fun set(ch: Char, offset: Int = 0): CharPointer {
     check(!readonly) { "readonly string" }
     val data = seq as StringBuffer
     while (pointer + offset >= data.length) {
@@ -52,14 +52,14 @@ public class CharPointer {
     return this
   }
 
-  public fun charAtInc(): Char {
+  fun charAtInc(): Char {
     val res = charAt(0)
     inc()
     return res
   }
 
   @JvmOverloads
-  public fun charAt(offset: Int = 0): Char {
+  fun charAt(offset: Int = 0): Char {
     return if (end(offset)) {
       '\u0000'
     } else {
@@ -68,36 +68,36 @@ public class CharPointer {
   }
 
   @JvmOverloads
-  public operator fun inc(cnt: Int = 1): CharPointer {
+  operator fun inc(cnt: Int = 1): CharPointer {
     pointer += cnt
     return this
   }
 
   @JvmOverloads
-  public operator fun dec(cnt: Int = 1): CharPointer {
+  operator fun dec(cnt: Int = 1): CharPointer {
     pointer -= cnt
     return this
   }
 
-  public fun assign(ptr: CharPointer): CharPointer {
+  fun assign(ptr: CharPointer): CharPointer {
     seq = ptr.seq
     pointer = ptr.pointer
     readonly = ptr.readonly
     return this
   }
 
-  public fun ref(offset: Int): CharPointer {
+  fun ref(offset: Int): CharPointer {
     return CharPointer(this, offset)
   }
 
-  public fun substring(len: Int): String {
+  fun substring(len: Int): String {
     if (end()) return ""
     val start = pointer
     val end = normalize(pointer + len)
     return CharBuffer.wrap(seq, start, end).toString()
   }
 
-  public fun strlen(): Int {
+  fun strlen(): Int {
     if (end()) return 0
     for (i in pointer until seq.length) {
       if (seq[i] == '\u0000') {
@@ -107,7 +107,7 @@ public class CharPointer {
     return seq.length - pointer
   }
 
-  public fun strncmp(str: String, len: Int): Int {
+  fun strncmp(str: String, len: Int): Int {
     var len = len
     if (end()) return -1
     val s = CharBuffer.wrap(seq, pointer, normalize(pointer + len)).toString()
@@ -117,7 +117,7 @@ public class CharPointer {
     return s.compareTo(str.substring(0, len))
   }
 
-  public fun strncmp(str: CharPointer, len: Int, ignoreCase: Boolean): Int {
+  fun strncmp(str: CharPointer, len: Int, ignoreCase: Boolean): Int {
     if (end()) return -1
     val cs1: CharSequence = CharBuffer.wrap(seq, pointer, normalize(pointer + len))
     val cs2: CharSequence = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len))
@@ -139,7 +139,7 @@ public class CharPointer {
     return 0
   }
 
-  public fun strchr(c: Char): CharPointer? {
+  fun strchr(c: Char): CharPointer? {
     if (end()) {
       return null
     }
@@ -156,7 +156,7 @@ public class CharPointer {
     return null
   }
 
-  public fun istrchr(c: Char): CharPointer? {
+  fun istrchr(c: Char): CharPointer? {
     var c = c
     if (end()) {
       return null
@@ -176,45 +176,45 @@ public class CharPointer {
     return null
   }
 
-  public val isNul: Boolean
+  val isNul: Boolean
     get() = charAt() == '\u0000'
 
   @JvmOverloads
-  public fun end(offset: Int = 0): Boolean {
+  fun end(offset: Int = 0): Boolean {
     return pointer + offset >= seq.length
   }
 
-  public fun OP(): Int {
+  fun OP(): Int {
     return charAt().code
   }
 
-  public fun OPERAND(): CharPointer {
+  fun OPERAND(): CharPointer {
     return ref(3)
   }
 
-  public fun NEXT(): Int {
+  fun NEXT(): Int {
     return (seq[pointer + 1].code and 0xff shl 8) + (seq[pointer + 2].code and 0xff)
   }
 
-  public fun OPERAND_MIN(): Int {
+  fun OPERAND_MIN(): Int {
     return (seq[pointer + 3].code shl 24) +
       (seq[pointer + 4].code shl 16) +
       (seq[pointer + 5].code shl 8) +
       seq[pointer + 6].code
   }
 
-  public fun OPERAND_MAX(): Int {
+  fun OPERAND_MAX(): Int {
     return (seq[pointer + 7].code shl 24) +
       (seq[pointer + 8].code shl 16) +
       (seq[pointer + 9].code shl 8) +
       seq[pointer + 10].code
   }
 
-  public fun OPERAND_CMP(): Char {
+  fun OPERAND_CMP(): Char {
     return seq[pointer + 7]
   }
 
-  public override fun equals(obj: Any?): Boolean {
+  override fun equals(obj: Any?): Boolean {
     if (obj is CharPointer) {
       val ptr = obj
       return ptr.seq === seq && ptr.pointer == pointer
@@ -222,15 +222,15 @@ public class CharPointer {
     return false
   }
 
-  public override fun hashCode(): Int {
+  override fun hashCode(): Int {
     return Objects.hash(seq, pointer)
   }
 
-  public fun skipWhitespaces() {
+  fun skipWhitespaces() {
     while (CharacterClasses.isWhite(charAt())) inc()
   }
 
-  public val digits: Int
+  val digits: Int
     get() {
       var res = 0
       while (Character.isDigit(charAt())) {
@@ -244,7 +244,7 @@ public class CharPointer {
     return Math.min(seq.length, pos)
   }
 
-  public override fun toString(): String {
+  override fun toString(): String {
     return substring(strlen())
   }
 }

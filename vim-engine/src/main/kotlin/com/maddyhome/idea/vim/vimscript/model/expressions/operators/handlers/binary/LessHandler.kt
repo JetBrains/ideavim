@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-public object LessHandler : BinaryOperatorWithIgnoreCaseOption(LessIgnoreCaseHandler, LessCaseSensitiveHandler)
+object LessHandler : BinaryOperatorWithIgnoreCaseOption(LessIgnoreCaseHandler, LessCaseSensitiveHandler)

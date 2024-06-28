@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.util.*
 
 @CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.CMD_LINE])
-public class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
+class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP, CommandFlags.FLAG_END_EX)
   override var motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -39,7 +39,7 @@ public class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
   }
 }
 
-public class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) : MotionActionHandler.ForEachCaret() {
+class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType
     get() = throw RuntimeException("Parent motion type should be used, as only it is accessed by other code")
 
@@ -57,7 +57,7 @@ public class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAc
   }
 }
 
-public class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
+class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: VimEditor, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {

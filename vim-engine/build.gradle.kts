@@ -98,10 +98,6 @@ tasks {
 //    version.set("0.48.2")
 //}
 
-kotlin {
-    explicitApi()
-}
-
 java {
   withSourcesJar()
   withJavadocJar()

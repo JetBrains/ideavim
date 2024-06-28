@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["!"], modes = [Mode.VISUAL])
-public class FilterVisualLinesAction : VimActionHandler.SingleExecution(), FilterCommand {
+class FilterVisualLinesAction : VimActionHandler.SingleExecution(), FilterCommand {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
@@ -43,7 +43,7 @@ public class FilterVisualLinesAction : VimActionHandler.SingleExecution(), Filte
  * the ex command line is started with the initial text `:[range]!`. The {filter} will be typed into the ex entry field.
  */
 @CommandOrMotion(keys = ["!"], modes = [Mode.NORMAL])
-public class FilterMotionAction : VimActionHandler.SingleExecution(), FilterCommand, DuplicableOperatorAction {
+class FilterMotionAction : VimActionHandler.SingleExecution(), FilterCommand, DuplicableOperatorAction {
 
   override val type: Command.Type = Command.Type.CHANGE
   override val argumentType: Argument.Type = Argument.Type.MOTION
@@ -68,8 +68,8 @@ public class FilterMotionAction : VimActionHandler.SingleExecution(), FilterComm
   }
 }
 
-public interface FilterCommand {
-  public fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+interface FilterCommand {
+  fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
     injector.processGroup.startExEntry(editor, context, cmd, initialCommandText = "!")
   }
 }

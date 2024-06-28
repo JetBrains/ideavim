@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-D>"], modes = [Mode.INSERT])
-public class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
+class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.INSERT
 
@@ -46,7 +46,7 @@ public class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<"], modes = [Mode.NORMAL])
-public class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
@@ -68,7 +68,7 @@ public class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), D
 }
 
 @CommandOrMotion(keys = ["<"], modes = [Mode.VISUAL])
-public class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override fun executeAction(

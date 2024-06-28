@@ -12,8 +12,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.WindowManager
 import java.util.*
 
-public interface VimStatusBarWidget {
-  public fun updateWidgetInStatusBar(widgetID: String, project: Project?) {
+interface VimStatusBarWidget {
+  fun updateWidgetInStatusBar(widgetID: String, project: Project?) {
     if (project == null) return
     val windowManager = WindowManager.getInstance()
     windowManager.getStatusBar(project)?.updateWidget(widgetID) ?: run {

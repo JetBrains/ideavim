@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimStorageService {
+interface VimStorageService {
   /**
    * Gets keyed data from a Vim window
    *
@@ -19,7 +19,7 @@ public interface VimStorageService {
    * @param editor editor/window to get the value from
    * @param key key
    */
-  public fun <T> getDataFromWindow(editor: VimEditor, key: Key<T>): T?
+  fun <T> getDataFromWindow(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Stores keyed user data in a Vim window
@@ -32,7 +32,7 @@ public interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  public fun <T> putDataToWindow(editor: VimEditor, key: Key<T>, data: T)
+  fun <T> putDataToWindow(editor: VimEditor, key: Key<T>, data: T)
 
   /**
    * Gets data from buffer
@@ -41,7 +41,7 @@ public interface VimStorageService {
    * @param editor editor/window with the buffer opened
    * @param key key
    */
-  public fun <T> getDataFromBuffer(editor: VimEditor, key: Key<T>): T?
+  fun <T> getDataFromBuffer(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Puts data to buffer
@@ -51,7 +51,7 @@ public interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  public fun <T> putDataToBuffer(editor: VimEditor, key: Key<T>, data: T)
+  fun <T> putDataToBuffer(editor: VimEditor, key: Key<T>, data: T)
 
   /**
    * Gets data from tab (group of windows)
@@ -60,7 +60,7 @@ public interface VimStorageService {
    * @param editor editor/window in the tap page
    * @param key key
    */
-  public fun <T> getDataFromTab(editor: VimEditor, key: Key<T>): T?
+  fun <T> getDataFromTab(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Puts data to tab (group of windows)
@@ -70,16 +70,16 @@ public interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  public fun <T> putDataToTab(editor: VimEditor, key: Key<T>, data: T)
+  fun <T> putDataToTab(editor: VimEditor, key: Key<T>, data: T)
 }
 
-public data class Key<T>(val name: String)
+data class Key<T>(val name: String)
 
-public fun <T> VimStorageService.getOrPutWindowData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+fun <T> VimStorageService.getOrPutWindowData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
   getDataFromWindow(editor, key) ?: provider().also { putDataToWindow(editor, key, it) }
 
-public fun <T> VimStorageService.getOrPutBufferData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+fun <T> VimStorageService.getOrPutBufferData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
   getDataFromBuffer(editor, key) ?: provider().also { putDataToBuffer(editor, key, it) }
 
-public fun <T> VimStorageService.getOrPutTabData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+fun <T> VimStorageService.getOrPutTabData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
   getDataFromTab(editor, key) ?: provider().also { putDataToTab(editor, key, it) }

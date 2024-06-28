@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<C-G>u"], modes = [Mode.INSERT])
-public class BreakUndoSequenceAction : VimActionHandler.SingleExecution() {
+class BreakUndoSequenceAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(

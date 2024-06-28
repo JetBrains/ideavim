@@ -50,13 +50,13 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
-public object VimExtensionFacade {
+object VimExtensionFacade {
 
   private val LOG = logger<VimExtensionFacade>()
 
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
-  public fun putExtensionHandlerMapping(
+  fun putExtensionHandlerMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -74,7 +74,7 @@ public object VimExtensionFacade {
       "com.maddyhome.idea.vim.VimPlugin"
     )
   )
-  public fun putExtensionHandlerMapping(
+  fun putExtensionHandlerMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -86,7 +86,7 @@ public object VimExtensionFacade {
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
-  public fun putKeyMapping(
+  fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -98,7 +98,7 @@ public object VimExtensionFacade {
 
   /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
   @JvmStatic
-  public fun putKeyMappingIfMissing(
+  fun putKeyMappingIfMissing(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
@@ -112,7 +112,7 @@ public object VimExtensionFacade {
   /**
    * Equivalent to calling 'command' to set up a user-defined command or alias
    */
-  public fun addCommand(
+  fun addCommand(
     name: String,
     handler: CommandAliasHandler,
   ) {
@@ -123,7 +123,7 @@ public object VimExtensionFacade {
    * Equivalent to calling 'command' to set up a user-defined command or alias
    */
   @JvmStatic
-  public fun addCommand(
+  fun addCommand(
     name: String,
     minimumNumberOfArguments: Int,
     maximumNumberOfArguments: Int,
@@ -141,7 +141,7 @@ public object VimExtensionFacade {
    * leaves the editor in the insert mode if it's been activated.
    */
   @JvmStatic
-  public fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
+  fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
     val keyHandler = KeyHandler.getInstance()
     keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, false, keyHandler.keyHandlerState) }
@@ -149,7 +149,7 @@ public object VimExtensionFacade {
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
   @JvmStatic
-  public fun inputKeyStroke(editor: Editor): KeyStroke {
+  fun inputKeyStroke(editor: Editor): KeyStroke {
     if (editor.vim.vimStateMachine.isDotRepeatInProgress) {
       val input = Extension.consumeKeystroke()
       LOG.trace("inputKeyStroke: dot repeat in progress. Input: $input")
@@ -181,43 +181,43 @@ public object VimExtensionFacade {
 
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
-  public fun inputString(editor: Editor, context: DataContext, prompt: String, finishOn: Char?): String {
+  fun inputString(editor: Editor, context: DataContext, prompt: String, finishOn: Char?): String {
     return injector.commandLine.inputString(editor.vim, context.vim, prompt, finishOn) ?: ""
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */
   @JvmStatic
-  public fun getRegister(register: Char): List<KeyStroke>? {
+  fun getRegister(register: Char): List<KeyStroke>? {
     val reg = VimPlugin.getRegister().getRegister(register) ?: return null
     return reg.keys
   }
 
   @JvmStatic
-  public fun getRegisterForCaret(register: Char, caret: VimCaret): List<KeyStroke>? {
+  fun getRegisterForCaret(register: Char, caret: VimCaret): List<KeyStroke>? {
     val reg = caret.registerStorage.getRegister(register) ?: return null
     return reg.keys
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
-  public fun setRegister(register: Char, keys: List<KeyStroke?>?) {
+  fun setRegister(register: Char, keys: List<KeyStroke?>?) {
     VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList())
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
-  public fun setRegisterForCaret(register: Char, caret: ImmutableVimCaret, keys: List<KeyStroke?>?) {
+  fun setRegisterForCaret(register: Char, caret: ImmutableVimCaret, keys: List<KeyStroke?>?) {
     caret.registerStorage.setKeys(register, keys?.filterNotNull() ?: emptyList())
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
-  public fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
+  fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
     VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList(), type)
   }
 
   @JvmStatic
-  public fun exportScriptFunction(
+  fun exportScriptFunction(
     scope: Scope?,
     name: String,
     args: List<String>,
@@ -253,7 +253,7 @@ public object VimExtensionFacade {
   }
 }
 
-public fun VimExtensionFacade.exportOperatorFunction(name: String, function: OperatorFunction) {
+fun VimExtensionFacade.exportOperatorFunction(name: String, function: OperatorFunction) {
   exportScriptFunction(null, name, listOf("type"), emptyList(), false, noneOfEnum()) {
     editor, context, args ->
 
@@ -274,6 +274,6 @@ public fun VimExtensionFacade.exportOperatorFunction(name: String, function: Ope
   }
 }
 
-public fun interface ScriptFunction {
-  public fun execute(editor: VimEditor, context: ExecutionContext, args: Map<String, VimDataType>): ExecutionResult
+fun interface ScriptFunction {
+  fun execute(editor: VimEditor, context: ExecutionContext, args: Map<String, VimDataType>): ExecutionResult
 }

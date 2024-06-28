@@ -32,8 +32,8 @@ import kotlin.math.min
 // todo all this methods should return Long since editor.fileSize is long
 // todo same for TextRange and motions
 // However, editor.text() returns a CharSequence, which can only be indexed by Int
-public abstract class VimSearchHelperBase : VimSearchHelper {
-  public companion object {
+abstract class VimSearchHelperBase : VimSearchHelper {
+  companion object {
     private val logger = vimLogger<VimSearchHelperBase>()
   }
 

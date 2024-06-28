@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-public class DigraphSequence: Cloneable {
+class DigraphSequence: Cloneable {
   private var digraphState = DIG_STATE_PENDING
   private var digraphChar = 0.toChar()
   private lateinit var codeChars: CharArray
@@ -24,23 +24,23 @@ public class DigraphSequence: Cloneable {
   private var codeType = 0
   private var codeMax = 0
 
-  public fun isDigraphStart(key: KeyStroke): Boolean {
+  fun isDigraphStart(key: KeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       key.keyCode == KeyEvent.VK_K && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  public fun isLiteralStart(key: KeyStroke): Boolean {
+  fun isLiteralStart(key: KeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  public fun startDigraphSequence(): DigraphResult {
+  fun startDigraphSequence(): DigraphResult {
     logger.debug("startDigraphSequence")
     digraphState = DIG_STATE_DIG_ONE
     return DigraphResult.HANDLED_DIGRAPH
   }
 
-  public fun startLiteralSequence(): DigraphResult {
+  fun startLiteralSequence(): DigraphResult {
     logger.debug("startLiteralSequence")
     digraphState = DIG_STATE_CODE_START
     codeChars = CharArray(8)
@@ -48,7 +48,7 @@ public class DigraphSequence: Cloneable {
     return DigraphResult.HANDLED_LITERAL
   }
 
-  public fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
+  fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     return when (digraphState) {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
@@ -217,7 +217,7 @@ public class DigraphSequence: Cloneable {
     return null
   }
 
-  public fun reset() {
+  fun reset() {
     digraphState = DIG_STATE_PENDING
     codeChars = CharArray(8)
   }
@@ -271,7 +271,7 @@ public class DigraphSequence: Cloneable {
     return "State = $digraphState, char = $digraphChar"
   }
 
-  public companion object {
+  companion object {
     private const val DIG_STATE_PENDING = 1
     private const val DIG_STATE_DIG_ONE = 2
     private const val DIG_STATE_DIG_TWO = 3

@@ -21,14 +21,14 @@ import com.maddyhome.idea.vim.command.OperatorArguments
  *   - [VimActionHandler.SingleExecution]
  *   - [VimActionHandler.ForEachCaret]
  */
-public sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerBase(myRunForEachCaret) {
+sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerBase(myRunForEachCaret) {
   /**
    * This handler executes an action for each caret. That means that if you have 5 carets,
    *   [execute] will be called 5 times.
    * @see [VimActionHandler.SingleExecution] for only one execution.
    */
-  public abstract class ForEachCaret : VimActionHandler(true) {
-    public abstract fun execute(
+  abstract class ForEachCaret : VimActionHandler(true) {
+    abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -42,8 +42,8 @@ public sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionH
    *   [execute] will be called 1 time.
    * @see [VimActionHandler.ForEachCaret] for per-caret execution.
    */
-  public abstract class SingleExecution : VimActionHandler(false) {
-    public abstract fun execute(
+  abstract class SingleExecution : VimActionHandler(false) {
+    abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
@@ -51,15 +51,15 @@ public sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionH
     ): Boolean
   }
 
-  public abstract class ConditionalMulticaret : VimActionHandler(false) {
-    public abstract fun runAsMulticaret(
+  abstract class ConditionalMulticaret : VimActionHandler(false) {
+    abstract fun runAsMulticaret(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    public abstract fun execute(
+    abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -67,7 +67,7 @@ public sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionH
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    public abstract fun execute(
+    abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,

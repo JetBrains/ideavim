@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimEditorGroup {
-  public fun notifyIdeaJoin(editor: VimEditor)
+interface VimEditorGroup {
+  fun notifyIdeaJoin(editor: VimEditor)
 
   /**
    * Get a collection of all editors, including those that have not yet been initialised.
@@ -21,7 +21,7 @@ public interface VimEditorGroup {
    * IDE might already have editors open, either because the plugin is initialised after the IDE starts, or because the
    * IDE has reopened editors at startup.
    */
-  public fun getEditorsRaw(): Collection<VimEditor>
+  fun getEditorsRaw(): Collection<VimEditor>
 
   /**
    * Get a collection of all initialised editors
@@ -40,7 +40,7 @@ public interface VimEditorGroup {
    *
    * Also note that it is possible for multiple editors in different projects to open the same file (document/buffer).
    */
-  public fun getEditors(): Collection<VimEditor>
+  fun getEditors(): Collection<VimEditor>
 
   /**
    * Get a collection of all initialised editors for the given buffer
@@ -54,9 +54,9 @@ public interface VimEditorGroup {
    * Implementors should take care to only return "local" editors. I.e. for IntelliJ, this function will not include
    * hidden editors that are used to handle requests from Code With Me guests.
    */
-  public fun getEditors(buffer: VimDocument): Collection<VimEditor>
+  fun getEditors(buffer: VimDocument): Collection<VimEditor>
 
   // TODO find a better place for methods below. Maybe make CaretVisualAttributesHelper abstract?
-  public fun updateCaretsVisualAttributes(editor: VimEditor)
-  public fun updateCaretsVisualPosition(editor: VimEditor)
+  fun updateCaretsVisualAttributes(editor: VimEditor)
+  fun updateCaretsVisualPosition(editor: VimEditor)
 }

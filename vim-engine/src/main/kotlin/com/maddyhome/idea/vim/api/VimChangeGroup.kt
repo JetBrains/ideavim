@@ -20,33 +20,33 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
-public interface VimChangeGroup {
-  public fun setInsertRepeat(lines: Int, column: Int, append: Boolean)
+interface VimChangeGroup {
+  fun setInsertRepeat(lines: Int, column: Int, append: Boolean)
 
-  public fun insertBeforeCursor(editor: VimEditor, context: ExecutionContext)
+  fun insertBeforeCursor(editor: VimEditor, context: ExecutionContext)
 
-  public fun insertBeforeFirstNonBlank(editor: VimEditor, context: ExecutionContext)
+  fun insertBeforeFirstNonBlank(editor: VimEditor, context: ExecutionContext)
 
-  public fun insertLineStart(editor: VimEditor, context: ExecutionContext)
+  fun insertLineStart(editor: VimEditor, context: ExecutionContext)
 
-  public fun insertAfterCursor(editor: VimEditor, context: ExecutionContext)
+  fun insertAfterCursor(editor: VimEditor, context: ExecutionContext)
 
-  public fun insertAfterLineEnd(editor: VimEditor, context: ExecutionContext)
+  fun insertAfterLineEnd(editor: VimEditor, context: ExecutionContext)
 
-  public fun insertPreviousInsert(editor: VimEditor, context: ExecutionContext, exit: Boolean, operatorArguments: OperatorArguments)
+  fun insertPreviousInsert(editor: VimEditor, context: ExecutionContext, exit: Boolean, operatorArguments: OperatorArguments)
 
-  public fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode)
+  fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode)
 
-  public fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
+  fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
 
-  public fun processEnter(editor: VimEditor, caret: VimCaret, context: ExecutionContext)
-  public fun processEnter(editor: VimEditor, context: ExecutionContext)
+  fun processEnter(editor: VimEditor, caret: VimCaret, context: ExecutionContext)
+  fun processEnter(editor: VimEditor, context: ExecutionContext)
 
-  public fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: Mode)
+  fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: Mode)
 
-  public fun processCommand(editor: VimEditor, cmd: Command)
+  fun processCommand(editor: VimEditor, cmd: Command)
 
-  public fun deleteCharacter(
+  fun deleteCharacter(
     editor: VimEditor,
     caret: VimCaret,
     count: Int,
@@ -54,11 +54,11 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  public fun processSingleCommand(editor: VimEditor)
+  fun processSingleCommand(editor: VimEditor)
 
-  public fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
-  public fun deleteJoinLines(
+  fun deleteJoinLines(
     editor: VimEditor,
     caret: VimCaret,
     count: Int,
@@ -66,13 +66,13 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  public fun processKey(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
+  fun processKey(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
-  public fun processKeyInSelectMode(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
+  fun processKeyInSelectMode(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
-  public fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
-  public fun deleteJoinRange(
+  fun deleteJoinRange(
     editor: VimEditor,
     caret: VimCaret,
     range: TextRange,
@@ -80,15 +80,15 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  public fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean
+  fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean
 
-  public fun joinViaIdeaBySelections(editor: VimEditor, context: ExecutionContext, caretsAndSelections: Map<VimCaret, VimSelection>)
+  fun joinViaIdeaBySelections(editor: VimEditor, context: ExecutionContext, caretsAndSelections: Map<VimCaret, VimSelection>)
 
-  public fun getDeleteRangeAndType(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
+  fun getDeleteRangeAndType(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
-  public fun getDeleteRangeAndType2(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
+  fun getDeleteRangeAndType2(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
-  public fun deleteRange(
+  fun deleteRange(
     editor: VimEditor,
     caret: VimCaret,
     range: TextRange,
@@ -97,9 +97,9 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
     saveToRegister: Boolean = true,
   ): Boolean
-  public fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
+  fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
 
-  public fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
   /**
    * Delete the text covered by the motion command argument and enter insert mode
@@ -110,15 +110,15 @@ public interface VimChangeGroup {
    * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
-  public fun changeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  fun changeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
-  public fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean
+  fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean
 
-  public fun blockInsert(editor: VimEditor, context: ExecutionContext, range: TextRange, append: Boolean, operatorArguments: OperatorArguments): Boolean
+  fun blockInsert(editor: VimEditor, context: ExecutionContext, range: TextRange, append: Boolean, operatorArguments: OperatorArguments): Boolean
 
-  public fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: Char): Boolean
+  fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: Char): Boolean
 
-  public fun changeRange(
+  fun changeRange(
     editor: VimEditor,
     caret: VimCaret,
     range: TextRange,
@@ -127,17 +127,17 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  public fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: Char, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: Char, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
-  public fun reformatCodeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  fun reformatCodeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
-  public fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection)
+  fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection)
 
-  public fun autoIndentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments)
+  fun autoIndentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments)
 
-  public fun autoIndentRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, range: TextRange)
+  fun autoIndentRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, range: TextRange)
 
-  public fun indentLines(
+  fun indentLines(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -146,13 +146,13 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   )
 
-  public fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret
+  fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret
 
-  public fun insertText(editor: VimEditor, caret: VimCaret, str: String): VimCaret
+  fun insertText(editor: VimEditor, caret: VimCaret, str: String): VimCaret
 
-  public fun indentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, dir: Int, operatorArguments: OperatorArguments)
+  fun indentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, dir: Int, operatorArguments: OperatorArguments)
 
-  public fun indentRange(
+  fun indentRange(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -162,21 +162,21 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   )
 
-  public fun changeNumberVisualMode(editor: VimEditor, caret: VimCaret, selectedRange: TextRange, count: Int, avalanche: Boolean): Boolean
+  fun changeNumberVisualMode(editor: VimEditor, caret: VimCaret, selectedRange: TextRange, count: Int, avalanche: Boolean): Boolean
 
-  public fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean
+  fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean
 
-  public fun sortRange(editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>, sortOptions: SortOption): Boolean
+  fun sortRange(editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>, sortOptions: SortOption): Boolean
 
-  public fun reset()
+  fun reset()
 
-  public fun saveStrokes(newStrokes: String?)
+  fun saveStrokes(newStrokes: String?)
 
   @TestOnly
-  public fun resetRepeat()
-  public fun notifyListeners(editor: VimEditor)
-  public fun runEnterAction(editor: VimEditor, context: ExecutionContext)
-  public fun runEnterAboveAction(editor: VimEditor, context: ExecutionContext)
+  fun resetRepeat()
+  fun notifyListeners(editor: VimEditor)
+  fun runEnterAction(editor: VimEditor, context: ExecutionContext)
+  fun runEnterAboveAction(editor: VimEditor, context: ExecutionContext)
 
   /**
    * This repeats the previous insert count times
@@ -185,7 +185,7 @@ public interface VimChangeGroup {
    * @param context The data context
    * @param count   The number of times to repeat the previous insert
    */
-  public fun repeatInsert(
+  fun repeatInsert(
     editor: VimEditor,
     context: ExecutionContext,
     count: Int,
@@ -193,6 +193,6 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   )
 
-  public fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)
-  public fun replaceText(editor: VimEditor, caret: VimCaret, start: Int, end: Int, str: String)
+  fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)
+  fun replaceText(editor: VimEditor, caret: VimCaret, start: Int, end: Int, str: String)
 }

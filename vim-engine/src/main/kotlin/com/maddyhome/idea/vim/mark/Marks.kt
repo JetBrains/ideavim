@@ -12,16 +12,16 @@ import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimEditor
 import org.jetbrains.annotations.NonNls
 
-public interface Mark {
-  public val key: Char
-  public val line: Int // 0-based
-  public val col: Int // 0-based
-  public val filepath: String
-  public val protocol: String
+interface Mark {
+  val key: Char
+  val line: Int // 0-based
+  val col: Int // 0-based
+  val filepath: String
+  val protocol: String
 
-  public fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(line, col))
+  fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(line, col))
 
-  public object KeySorter : Comparator<Mark> {
+  object KeySorter : Comparator<Mark> {
     @NonNls
     private const val ORDER = "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"[]^.<>"
 
@@ -31,16 +31,16 @@ public interface Mark {
   }
 }
 
-public data class VimMark(
+data class VimMark(
   override val key: Char,
   override var line: Int,
   override val col: Int,
   override val filepath: String,
   override val protocol: String,
 ) : Mark {
-  public companion object {
+  companion object {
     @JvmStatic
-    public fun create(key: Char?, line: Int?, col: Int?, filename: String?, protocol: String?): VimMark? {
+    fun create(key: Char?, line: Int?, col: Int?, filename: String?, protocol: String?): VimMark? {
       return VimMark(
         key ?: return null,
         line ?: return null,

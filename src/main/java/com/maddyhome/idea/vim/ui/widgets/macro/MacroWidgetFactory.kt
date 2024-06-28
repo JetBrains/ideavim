@@ -43,8 +43,8 @@ internal class MacroWidgetFactory : StatusBarWidgetFactory {
   }
 }
 
-public class VimMacroWidget : StatusBarWidget, VimStatusBarWidget {
-  public var content: String = ""
+class VimMacroWidget : StatusBarWidget, VimStatusBarWidget {
+  var content: String = ""
 
   override fun ID(): String {
     return ID
@@ -69,7 +69,7 @@ public class VimMacroWidget : StatusBarWidget, VimStatusBarWidget {
   }
 }
 
-public fun updateMacroWidget() {
+fun updateMacroWidget() {
   val factory = StatusBarWidgetFactory.EP_NAME.findExtension(MacroWidgetFactory::class.java) ?: return
   for (project in ProjectManager.getInstance().openProjects) {
     val statusBarWidgetsManager = project.service<StatusBarWidgetsManager>()
@@ -79,7 +79,7 @@ public fun updateMacroWidget() {
 
 // TODO: At the moment recording macro & RegisterGroup is bound to application, so macro will be recorded even if we
 // move between projects. BUT it's not a good idea. Maybe RegisterGroup should have it's own project scope instances
-public class MacroWidgetListener : MacroRecordingListener, VimWidgetListener({ updateMacroWidget() }) {
+class MacroWidgetListener : MacroRecordingListener, VimWidgetListener({ updateMacroWidget() }) {
   override fun recordingStarted() {
     for (project in ProjectManager.getInstance().openProjects) {
       val macroWidget = getWidget(project) ?: continue
@@ -103,4 +103,4 @@ public class MacroWidgetListener : MacroRecordingListener, VimWidgetListener({ u
   }
 }
 
-public val macroWidgetOptionListener: VimWidgetListener = VimWidgetListener { updateMacroWidget() }
+val macroWidgetOptionListener: VimWidgetListener = VimWidgetListener { updateMacroWidget() }

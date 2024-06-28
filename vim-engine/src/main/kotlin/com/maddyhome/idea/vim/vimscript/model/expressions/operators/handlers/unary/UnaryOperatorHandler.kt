@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.un
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-public abstract class UnaryOperatorHandler {
+abstract class UnaryOperatorHandler {
 
-  public abstract fun performOperation(value: VimDataType): VimDataType
+  abstract fun performOperation(value: VimDataType): VimDataType
 }

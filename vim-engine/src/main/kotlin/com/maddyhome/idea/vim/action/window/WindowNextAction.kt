@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author rasendubi
  */
 @CommandOrMotion(keys = ["<C-W>w", "<C-W><C-W>"], modes = [Mode.NORMAL])
-public class WindowNextAction : VimActionHandler.SingleExecution() {
+class WindowNextAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
@@ -39,7 +39,7 @@ public class WindowNextAction : VimActionHandler.SingleExecution() {
 }
 
 @CommandOrMotion(keys = ["<C-W>W"], modes = [Mode.NORMAL])
-public class WindowPrevAction : VimActionHandler.SingleExecution() {
+class WindowPrevAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

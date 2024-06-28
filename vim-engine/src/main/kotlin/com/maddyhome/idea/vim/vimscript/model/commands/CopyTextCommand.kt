@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :copy"
  */
 @ExCommand(command = "t,co[py]")
-public data class CopyTextCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class CopyTextCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

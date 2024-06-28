@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.state.mode.mode
  * @author vlan
  */
 @CommandOrMotion(keys = ["gv"], modes = [Mode.VISUAL])
-public class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
+class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   // FIXME: 2019-03-05 Make it multicaret

@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["ZQ", "ZZ"], modes = [Mode.NORMAL])
-public class FileSaveCloseAction : VimActionHandler.SingleExecution() {
+class FileSaveCloseAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
   override fun execute(

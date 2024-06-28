@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
-public abstract class VimMacroBase : VimMacro {
+abstract class VimMacroBase : VimMacro {
   override var lastRegister: Char = 0.toChar()
   private var macroDepth = 0
 
@@ -71,7 +71,7 @@ public abstract class VimMacroBase : VimMacro {
     return lastRegister.code != 0 && playbackRegister(editor, context, lastRegister, count)
   }
 
-  public companion object {
-    public val logger: VimLogger = vimLogger<VimMacroBase>()
+  companion object {
+    val logger: VimLogger = vimLogger<VimMacroBase>()
   }
 }

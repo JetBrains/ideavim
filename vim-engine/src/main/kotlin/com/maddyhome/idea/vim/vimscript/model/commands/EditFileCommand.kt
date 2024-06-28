@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :edit"
  */
 @ExCommand(command = "e[dit],bro[wse]")
-public data class EditFileCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class EditFileCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val arg = argument

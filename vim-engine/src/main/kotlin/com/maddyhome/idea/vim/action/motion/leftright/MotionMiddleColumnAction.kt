@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 @CommandOrMotion(keys = ["gm"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionMiddleColumnAction : MotionActionHandler.ForEachCaret() {
+class MotionMiddleColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

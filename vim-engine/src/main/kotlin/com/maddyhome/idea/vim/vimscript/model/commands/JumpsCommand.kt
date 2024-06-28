@@ -24,7 +24,7 @@ import kotlin.math.absoluteValue
  * see "h :jumps"
  */
 @ExCommand(command = "ju[mps]")
-public data class JumpsCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class JumpsCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val jumps = injector.jumpService.getJumps(editor)

@@ -11,8 +11,8 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.LiveRange
 
-public interface VimDocument {
-  public fun addChangeListener(listener: ChangesListener)
-  public fun removeChangeListener(listener: ChangesListener)
-  public fun getOffsetGuard(offset: Int): LiveRange?
+interface VimDocument {
+  fun addChangeListener(listener: ChangesListener)
+  fun removeChangeListener(listener: ChangesListener)
+  fun getOffsetGuard(offset: Int): LiveRange?
 }

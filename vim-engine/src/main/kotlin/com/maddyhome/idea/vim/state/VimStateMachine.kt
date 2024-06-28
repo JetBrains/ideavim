@@ -19,11 +19,11 @@ import java.util.*
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
-public interface VimStateMachine {
-  public val mode: Mode
-  public var isDotRepeatInProgress: Boolean
-  public var isRegisterPending: Boolean
-  public val isReplaceCharacter: Boolean
+interface VimStateMachine {
+  val mode: Mode
+  var isDotRepeatInProgress: Boolean
+  var isRegisterPending: Boolean
+  val isReplaceCharacter: Boolean
 
   /**
    * The currently executing command
@@ -35,22 +35,22 @@ public interface VimStateMachine {
    *
    * This field is reset after the command has been executed.
    */
-  public var executingCommand: Command?
-  public val executingCommandFlags: EnumSet<CommandFlags>
+  var executingCommand: Command?
+  val executingCommandFlags: EnumSet<CommandFlags>
 
-  public fun resetRegisterPending()
+  fun resetRegisterPending()
 
   /**
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
    * mode.
    */
-  public fun toggleInsertOverwrite()
+  fun toggleInsertOverwrite()
 
-  public companion object {
+  companion object {
     private val globalState = VimStateMachineImpl()
 
     // TODO do we really need this method? Can't we use editor.vimStateMachine?
-    public fun getInstance(editor: Any?): VimStateMachine {
+    fun getInstance(editor: Any?): VimStateMachine {
       return if (editor == null || injector.globalOptions().ideaglobalmode) {
         globalState
       } else {

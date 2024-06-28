@@ -20,25 +20,25 @@ import java.util.*
  * This represents a command argument.
  * TODO please make it a sealed class and not a giant collection of fields with default values, it's not safe
  */
-public class Argument private constructor(
-  public val character: Char = 0.toChar(),
-  public val motion: Command = EMPTY_COMMAND,
-  public val offsets: Map<ImmutableVimCaret, VimSelection> = emptyMap(),
-  public val string: String = "",
-  public val type: Type,
+class Argument private constructor(
+  val character: Char = 0.toChar(),
+  val motion: Command = EMPTY_COMMAND,
+  val offsets: Map<ImmutableVimCaret, VimSelection> = emptyMap(),
+  val string: String = "",
+  val type: Type,
 ) {
-  public constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
-  public constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
-  public constructor(label: Char, strArg: String) : this(character = label, string = strArg, type = Type.EX_STRING)
-  public constructor(offsets: Map<ImmutableVimCaret, VimSelection>) : this(offsets = offsets, type = Type.OFFSETS)
+  constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
+  constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
+  constructor(label: Char, strArg: String) : this(character = label, string = strArg, type = Type.EX_STRING)
+  constructor(offsets: Map<ImmutableVimCaret, VimSelection>) : this(offsets = offsets, type = Type.OFFSETS)
 
-  public enum class Type {
+  enum class Type {
     MOTION, CHARACTER, DIGRAPH, EX_STRING, OFFSETS
   }
 
-  public companion object {
+  companion object {
     @JvmField
-    public val EMPTY_COMMAND: Command = Command(
+    val EMPTY_COMMAND: Command = Command(
       0,
       object : MotionActionHandler.SingleExecution() {
         override fun getOffset(

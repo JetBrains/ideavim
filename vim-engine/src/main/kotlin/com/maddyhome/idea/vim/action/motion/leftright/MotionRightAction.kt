@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 
 @CommandOrMotion(keys = ["l"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionRightAction : MotionActionHandler.ForEachCaret() {
+class MotionRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -42,7 +42,7 @@ public class MotionRightAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.INSERT])
-public class MotionRightInsertAction : MotionActionHandler.ForEachCaret() {
+class MotionRightInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(

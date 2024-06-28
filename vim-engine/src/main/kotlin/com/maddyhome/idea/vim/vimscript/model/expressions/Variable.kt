@@ -14,14 +14,14 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-public data class Variable(val scope: Scope?, val name: CurlyBracesName) : Expression() {
-  public constructor(scope: Scope?, name: String) : this(scope, CurlyBracesName(listOf(SimpleExpression(name))))
+data class Variable(val scope: Scope?, val name: CurlyBracesName) : Expression() {
+  constructor(scope: Scope?, name: String) : this(scope, CurlyBracesName(listOf(SimpleExpression(name))))
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     return injector.variableService.getNonNullVariableValue(this, editor, context, vimContext)
   }
 
-  public fun toString(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): String {
+  fun toString(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): String {
     return (scope?.toString() ?: "") + name.evaluate(editor, context, vimContext)
   }
 }

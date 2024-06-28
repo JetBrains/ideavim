@@ -18,18 +18,18 @@ import org.jetbrains.annotations.TestOnly
 /**
  * Handles the set of range values entered as part of an Ex command.
  */
-public class Range {
+class Range {
   // This property should be private, but is used in tests
   @TestOnly
-  public val addresses: MutableList<Address> = mutableListOf()
+  val addresses: MutableList<Address> = mutableListOf()
 
   /** Adds a range to the list */
-  public fun addAddresses(range: Array<Address>) {
+  fun addAddresses(range: Array<Address>) {
     addresses.addAll(range)
   }
 
   /** Gets the number of ranges in the list */
-  public fun size(): Int = addresses.size
+  fun size(): Int = addresses.size
 
   /**
    * The default range for a command, if not specified.
@@ -37,7 +37,7 @@ public class Range {
    * Most commands default to the current line (`.`). If the command expects a count, the default range would be `1`,
    * which would be a one-based count.
    */
-  public var defaultRange: String = "."
+  var defaultRange: String = "."
 
   /**
    * If a command expects a line, Vim uses the last line of any range passed to the command
@@ -46,7 +46,7 @@ public class Range {
    * @param caret   The caret to use for current line, initial search line, etc. if required
    * @return The line number represented by the range
    */
-  public fun getLine(editor: VimEditor, caret: VimCaret): Int {
+  fun getLine(editor: VimEditor, caret: VimCaret): Int {
     return getLineRange(editor, caret).endLine
   }
 
@@ -60,7 +60,7 @@ public class Range {
    * @param caret   The caret to use for current line, initial search line, etc. if required
    * @return The last line specified in the range, to be treated as a count (one-based)
    */
-  public fun getCount(editor: VimEditor, caret: VimCaret): Int {
+  fun getCount(editor: VimEditor, caret: VimCaret): Int {
     return processRange(editor, caret).endLine1
   }
 
@@ -71,7 +71,7 @@ public class Range {
    * @param caret   The caret to use for current line, initial search line, etc. if required
    * @return The line range (zero-based)
    */
-  public fun getLineRange(editor: VimEditor, caret: VimCaret): LineRange {
+  fun getLineRange(editor: VimEditor, caret: VimCaret): LineRange {
     return processRange(editor, caret)
   }
 

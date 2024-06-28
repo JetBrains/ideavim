@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  */
 
 @CommandOrMotion(keys = ["gh"], modes = [Mode.NORMAL])
-public class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
+class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

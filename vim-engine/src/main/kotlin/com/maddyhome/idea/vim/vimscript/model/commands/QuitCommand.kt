@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :quit" / "h :close" / "h :quit"
  */
 @ExCommand(command = "q[uit],clo[se],hi[de]")
-public data class QuitCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class QuitCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     injector.file.closeFile(editor, context)

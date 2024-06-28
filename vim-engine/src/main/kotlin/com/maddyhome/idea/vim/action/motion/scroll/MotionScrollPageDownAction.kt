@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-F>", "<PageDown>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
+class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -35,7 +35,7 @@ public class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
 }
 
 @CommandOrMotion(keys = ["<PageDown>"], modes = [Mode.INSERT])
-public class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution() {
+class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

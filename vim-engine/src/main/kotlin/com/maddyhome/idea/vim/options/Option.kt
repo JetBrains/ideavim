@@ -42,16 +42,17 @@ import java.util.*
  * @param isHidden   True for feature-toggle options that will be reviewed in future releases.
  *                      Such options won't be printed in the output to `:set`
  */
-public abstract class Option<T : VimDataType>(public val name: String,
-                                              public val declaredScope: OptionDeclaredScope,
-                                              public val abbrev: String,
-                                              defaultValue: T,
-                                              public val unsetValue: T,
-                                              public val isLocalNoGlobal: Boolean = false,
-                                              public val isHidden: Boolean = false) {
+abstract class Option<T : VimDataType>(
+  val name: String,
+  val declaredScope: OptionDeclaredScope,
+  val abbrev: String,
+  defaultValue: T,
+  val unsetValue: T,
+  val isLocalNoGlobal: Boolean = false,
+  val isHidden: Boolean = false) {
   private var defaultValueField = defaultValue
 
-  public open val defaultValue: T
+  open val defaultValue: T
     get() = defaultValueField
 
   internal fun overrideDefaultValue(newDefaultValue: T) {
@@ -59,8 +60,8 @@ public abstract class Option<T : VimDataType>(public val name: String,
   }
 
   // todo 1.9 should return Result with exceptions
-  public abstract fun checkIfValueValid(value: VimDataType, token: String)
-  public abstract fun parseValue(value: String, token: String): VimDataType
+  abstract fun checkIfValueValid(value: VimDataType, token: String)
+  abstract fun parseValue(value: String, token: String): VimDataType
 }
 
 /**
@@ -81,17 +82,17 @@ public abstract class Option<T : VimDataType>(public val name: String,
  * or [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW]. The default value is an empty string.
  * @param boundedValues The collection of bounded values for the option.
  */
-public open class StringOption(
+open class StringOption(
   name: String,
   declaredScope: OptionDeclaredScope,
   abbrev: String,
   defaultValue: VimString,
   unsetValue: VimString = VimString.EMPTY,
-  public val boundedValues: Collection<String>? = null,
+  val boundedValues: Collection<String>? = null,
   isLocalNoGlobal: Boolean = false
 ) : Option<VimString>(name, declaredScope, abbrev, defaultValue, unsetValue, isLocalNoGlobal = isLocalNoGlobal) {
 
-  public constructor(
+  constructor(
     name: String,
     declaredScope: OptionDeclaredScope,
     abbrev: String,
@@ -117,13 +118,13 @@ public open class StringOption(
   override fun parseValue(value: String, token: String): VimString =
     VimString(value).also { checkIfValueValid(it, token) }
 
-  public fun appendValue(currentValue: VimString, value: VimString): VimString =
+  fun appendValue(currentValue: VimString, value: VimString): VimString =
     VimString(currentValue.value + value.value)
 
-  public fun prependValue(currentValue: VimString, value: VimString): VimString =
+  fun prependValue(currentValue: VimString, value: VimString): VimString =
     VimString(value.value + currentValue.value)
 
-  public fun removeValue(currentValue: VimString, value: VimString): VimString =
+  fun removeValue(currentValue: VimString, value: VimString): VimString =
     VimString(currentValue.value.replaceFirst(value.value, ""))
 }
 
@@ -139,15 +140,15 @@ public open class StringOption(
  * not supported by [StringListOption]. Verify the behaviour of modifying sublists if/when flags are required.
  * See `:help set-args` and `:help add-option-flags`.
  */
-public open class StringListOption(
+open class StringListOption(
   name: String,
   declaredScope: OptionDeclaredScope,
   abbrev: String,
   defaultValue: VimString,
-  public val boundedValues: Collection<String>? = null,
+  val boundedValues: Collection<String>? = null,
 ) : Option<VimString>(name, declaredScope, abbrev, defaultValue, VimString.EMPTY) {
 
-  public constructor(
+  constructor(
     name: String,
     declaredScope: OptionDeclaredScope,
     abbrev: String,
@@ -172,7 +173,7 @@ public open class StringListOption(
   override fun parseValue(value: String, token: String): VimString =
     VimString(value).also { checkIfValueValid(it, token) }
 
-  public fun appendValue(currentValue: VimString, value: VimString): VimString {
+  fun appendValue(currentValue: VimString, value: VimString): VimString {
     val valuesToAppend = split(value.value)
     val elements = split(currentValue.value).toMutableList()
     if (Collections.indexOfSubList(elements, valuesToAppend) != -1) {
@@ -181,7 +182,7 @@ public open class StringListOption(
     return VimString(joinValues(currentValue.value, value.value))
   }
 
-  public fun prependValue(currentValue: VimString, value: VimString): VimString {
+  fun prependValue(currentValue: VimString, value: VimString): VimString {
     val valuesToPrepend = split(value.value)
     val elements = split(currentValue.value).toMutableList()
     if (Collections.indexOfSubList(elements, valuesToPrepend) != -1) {
@@ -190,7 +191,7 @@ public open class StringListOption(
     return VimString(joinValues(value.value, currentValue.value))
   }
 
-  public fun removeValue(currentValue: VimString, value: VimString): VimString {
+  fun removeValue(currentValue: VimString, value: VimString): VimString {
     val valuesToRemove = split(value.value)
     val elements = split(currentValue.value).toMutableList()
     if (Collections.indexOfSubList(elements, valuesToRemove) != -1) {
@@ -199,7 +200,7 @@ public open class StringListOption(
     return VimString(elements.joinToString(separator = ","))
   }
 
-  public open fun split(value: String): List<String> = value.split(",")
+  open fun split(value: String): List<String> = value.split(",")
 
   private fun joinValues(first: String, second: String): String {
     val separator = if (first.isNotEmpty()) "," else ""
@@ -222,7 +223,7 @@ public open class StringListOption(
  * @param unsetValue The unset value of the option if the [declaredScope] is [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER]
  * or [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW]. The default value is `-1`.
  */
-public open class NumberOption(
+open class NumberOption(
   name: String,
   declaredScope: OptionDeclaredScope,
   abbrev: String,
@@ -231,7 +232,7 @@ public open class NumberOption(
 ) :
   Option<VimInt>(name, declaredScope, abbrev, defaultValue, unsetValue) {
 
-  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int, unsetValue: Int = -1) : this(
+  constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int, unsetValue: Int = -1) : this(
     name,
     declaredScope,
     abbrev,
@@ -246,9 +247,9 @@ public open class NumberOption(
   override fun parseValue(value: String, token: String): VimInt =
     VimInt(parseNumber(value) ?: throw exExceptionMessage("E521", token)).also { checkIfValueValid(it, token) }
 
-  public fun addValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value + value2.value)
-  public fun multiplyValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value * value2.value)
-  public fun subtractValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value - value2.value)
+  fun addValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value + value2.value)
+  fun multiplyValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value * value2.value)
+  fun subtractValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value - value2.value)
 }
 
 /**
@@ -265,14 +266,14 @@ public open class NumberOption(
  * @param abbrev  An abbreviated name for the option, recognised by `:set`
  * @param defaultValue The option's default value of the option
  */
-public open class UnsignedNumberOption(
+open class UnsignedNumberOption(
   name: String,
   declaredScope: OptionDeclaredScope,
   abbrev: String,
   defaultValue: VimInt,
 ) : NumberOption(name, declaredScope, abbrev, defaultValue) {
 
-  public constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int) : this(
+  constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int) : this(
     name,
     declaredScope,
     abbrev,
@@ -303,7 +304,7 @@ public open class UnsignedNumberOption(
  * @param isHidden   True for feature-toggle options that will be reviewed in future releases.
  *                   Such options won't be printed in the output to `:set`
  */
-public class ToggleOption(
+class ToggleOption(
   name: String,
   declaredScope: OptionDeclaredScope,
   abbrev: String,
@@ -321,7 +322,7 @@ public class ToggleOption(
     isHidden = isHidden
   ) {
 
-  public constructor(
+  constructor(
     name: String,
     declaredScope: OptionDeclaredScope,
     abbrev: String,

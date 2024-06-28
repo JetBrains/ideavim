@@ -28,12 +28,12 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import java.util.*
 
 @CommandOrMotion(keys = ["<End>"], modes = [Mode.INSERT])
-public class MotionLastColumnInsertAction : MotionLastColumnAction() {
+class MotionLastColumnInsertAction : MotionLastColumnAction() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 }
 
 @CommandOrMotion(keys = ["$"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
+open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun getOffset(

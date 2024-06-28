@@ -12,10 +12,10 @@ package com.maddyhome.idea.vim.api
  * This would be ideal if we could provide a typed solution, but sofar this is just a holder
  */
 
-public interface ExecutionContext {
-  public val context: Any
+interface ExecutionContext {
+  val context: Any
 }
 
-public interface ExecutionContextManager {
-  public fun getEditorExecutionContext(editor: VimEditor): ExecutionContext
+interface ExecutionContextManager {
+  fun getEditorExecutionContext(editor: VimEditor): ExecutionContext
 }

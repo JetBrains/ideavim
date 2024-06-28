@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
-public data class ReturnStatement(val expression: Expression) : Executable {
+data class ReturnStatement(val expression: Expression) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 

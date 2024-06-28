@@ -19,15 +19,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["<Del>"], modes = [Mode.NORMAL])
-public class DeleteCharacterAction : DeleteCharacter({ 1 })
+class DeleteCharacterAction : DeleteCharacter({ 1 })
 
 @CommandOrMotion(keys = ["X"], modes = [Mode.NORMAL])
-public class DeleteCharacterLeftAction : DeleteCharacter({ -it })
+class DeleteCharacterLeftAction : DeleteCharacter({ -it })
 
 @CommandOrMotion(keys = ["x"], modes = [Mode.NORMAL])
-public class DeleteCharacterRightAction : DeleteCharacter({ it })
+class DeleteCharacterRightAction : DeleteCharacter({ it })
 
-public abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
+abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(

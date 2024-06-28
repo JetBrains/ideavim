@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.regexp
 
-public class VimRegexException(override val message: String) : RuntimeException(message)
+class VimRegexException(override val message: String) : RuntimeException(message)

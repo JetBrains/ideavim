@@ -15,7 +15,7 @@ import java.util.*
  *
  * COMPATIBILITY-LAYER: Do not move this class to a different package
  */
-public enum class MappingMode {
+enum class MappingMode {
   /**
    * Indicates this key mapping applies to Normal mode
    */
@@ -48,30 +48,30 @@ public enum class MappingMode {
 
   ;
 
-  public companion object {
+  companion object {
     @JvmField
-    public val N: EnumSet<MappingMode> = EnumSet.of(NORMAL)
-    public val X: EnumSet<MappingMode> = EnumSet.of(VISUAL)
-    public val O: EnumSet<MappingMode> = EnumSet.of(OP_PENDING)
-    public val I: EnumSet<MappingMode> = EnumSet.of(INSERT)
-    public val C: EnumSet<MappingMode> = EnumSet.of(CMD_LINE)
-    public val S: EnumSet<MappingMode> = EnumSet.of(SELECT)
-    public val V: EnumSet<MappingMode> = EnumSet.of(VISUAL, SELECT)
-    public val NO: EnumSet<MappingMode> = EnumSet.of(NORMAL, OP_PENDING)
+    val N: EnumSet<MappingMode> = EnumSet.of(NORMAL)
+    val X: EnumSet<MappingMode> = EnumSet.of(VISUAL)
+    val O: EnumSet<MappingMode> = EnumSet.of(OP_PENDING)
+    val I: EnumSet<MappingMode> = EnumSet.of(INSERT)
+    val C: EnumSet<MappingMode> = EnumSet.of(CMD_LINE)
+    val S: EnumSet<MappingMode> = EnumSet.of(SELECT)
+    val V: EnumSet<MappingMode> = EnumSet.of(VISUAL, SELECT)
+    val NO: EnumSet<MappingMode> = EnumSet.of(NORMAL, OP_PENDING)
 
     @JvmField
-    public val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
-    public val NX: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL)
-    public val IC: EnumSet<MappingMode> = EnumSet.of(INSERT, CMD_LINE)
-    public val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
+    val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
+    val NX: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL)
+    val IC: EnumSet<MappingMode> = EnumSet.of(INSERT, CMD_LINE)
+    val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
 
     @JvmField
-    public val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
+    val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
 
     @JvmField
-    public val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
-    public val INV: EnumSet<MappingMode> = EnumSet.of(INSERT, NORMAL, VISUAL, SELECT)
-    public val ALL: EnumSet<MappingMode> = EnumSet.allOf(MappingMode::class.java)
+    val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
+    val INV: EnumSet<MappingMode> = EnumSet.of(INSERT, NORMAL, VISUAL, SELECT)
+    val ALL: EnumSet<MappingMode> = EnumSet.allOf(MappingMode::class.java)
 
     // This method is used only for single modes, not groups of them (V is not supported)
     internal fun parseModeChar(char: Char): MappingMode {

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 
 @CommandOrMotion(keys = ["<Down>", "<kDown>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING])
-public class MotionArrowDownAction : NonShiftedSpecialKeyHandler() {
+class MotionArrowDownAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
 

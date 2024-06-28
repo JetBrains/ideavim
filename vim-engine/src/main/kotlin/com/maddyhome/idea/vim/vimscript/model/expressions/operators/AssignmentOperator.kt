@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bin
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.MultiplicationHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.SubtractionHandler
 
-public enum class AssignmentOperator(public val value: String) {
+enum class AssignmentOperator(val value: String) {
   ASSIGNMENT("="),
   ADDITION("+="),
   SUBTRACTION("-="),
@@ -27,13 +27,13 @@ public enum class AssignmentOperator(public val value: String) {
   CONCATENATION(".="),
   ;
 
-  public companion object {
-    public fun getByValue(value: String): AssignmentOperator {
+  companion object {
+    fun getByValue(value: String): AssignmentOperator {
       return entries.first { it.value == value }
     }
   }
 
-  public fun getNewValue(left: VimDataType?, right: VimDataType): VimDataType {
+  fun getNewValue(left: VimDataType?, right: VimDataType): VimDataType {
     return when (this) {
       ASSIGNMENT -> right
       ADDITION -> {

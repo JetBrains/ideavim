@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.state.mode.selectionType
 
-public fun VimEditor.exitVisualMode() {
+fun VimEditor.exitVisualMode() {
   val selectionType = this.mode.selectionType ?: CHARACTER_WISE
   SelectionVimListenerSuppressor.lock().use {
     if (inBlockSelection) {

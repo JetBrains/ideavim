@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :file"
  */
 @ExCommand(command = "f[ile]")
-public data class FileCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class FileCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

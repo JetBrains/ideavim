@@ -12,11 +12,11 @@ import com.maddyhome.idea.vim.helper.indexOfOrNull
 import com.maddyhome.idea.vim.helper.lastIndexOfOrNull
 
 // TODO do we really need a tree structure here?
-public class ExCommandTree {
+class ExCommandTree {
   private val abbrevToCommand = mutableMapOf<String, String>()
   private val commandToInstance = mutableMapOf<String, LazyExCommandInstance>()
 
-  public fun addCommand(commandsPattern: String, lazyInstance: LazyExCommandInstance) {
+  fun addCommand(commandsPattern: String, lazyInstance: LazyExCommandInstance) {
     val subCommands = parseCommandPattern(commandsPattern)
     for ((requiredPart, optionalPart) in subCommands) {
       val fullCommand = requiredPart + optionalPart
@@ -28,7 +28,7 @@ public class ExCommandTree {
     }
   }
 
-  public fun getCommand(command: String): LazyExCommandInstance? {
+  fun getCommand(command: String): LazyExCommandInstance? {
     return abbrevToCommand[command]?.let { commandToInstance[it] }
   }
 

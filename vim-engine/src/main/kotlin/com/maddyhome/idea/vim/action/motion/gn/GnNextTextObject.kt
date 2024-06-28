@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
  */
 
 @CommandOrMotion(keys = ["gn"], modes = [Mode.OP_PENDING])
-public class GnNextTextObject : TextObjectActionHandler() {
+class GnNextTextObject : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 

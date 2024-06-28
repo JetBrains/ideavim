@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
 @CommandOrMotion(keys = ["g_"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionLastNonSpaceAction : MotionActionHandler.ForEachCaret() {
+class MotionLastNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-public data class OptionExpression(val scope: Scope?, val optionName: String) : Expression() {
+data class OptionExpression(val scope: Scope?, val optionName: String) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", originalString)

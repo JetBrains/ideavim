@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
  * @author vlan
  */
 @CommandOrMotion(keys = ["y"], modes = [Mode.VISUAL])
-public class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
+class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.COPY
 
   override fun executeForAllCarets(

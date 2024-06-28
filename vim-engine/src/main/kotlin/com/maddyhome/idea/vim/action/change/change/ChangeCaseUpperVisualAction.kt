@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.helper.CharacterHelper
  * @author vlan
  */
 @CommandOrMotion(keys = ["U"], modes = [Mode.VISUAL])
-public class ChangeCaseUpperVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+class ChangeCaseUpperVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override fun executeAction(

@@ -144,7 +144,7 @@ private object AttributesCache {
 @TestOnly
 internal fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
 
-public class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener {
+class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener {
   override fun isReplaceCharChanged(editor: VimEditor) {
     updateCaretsVisual(editor)
   }
@@ -163,7 +163,7 @@ public class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeLi
     }
   }
 
-  public fun updateAllEditorsCaretsVisual() {
+  fun updateAllEditorsCaretsVisual() {
     injector.editorGroup.getEditors().forEach { editor ->
       val ijEditor = (editor as IjVimEditor).editor
       ijEditor.updateCaretsVisualAttributes()

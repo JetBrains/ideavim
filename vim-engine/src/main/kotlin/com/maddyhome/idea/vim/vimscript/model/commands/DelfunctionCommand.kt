@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
  * see "h :delfunction"
  */
 @ExCommand(command = "delf[unction]")
-public data class DelfunctionCommand(
+data class DelfunctionCommand(
   val range: Range,
   val scope: Scope?,
   val name: String,

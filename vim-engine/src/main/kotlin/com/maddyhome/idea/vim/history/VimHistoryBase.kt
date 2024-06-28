@@ -12,8 +12,8 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
-public open class VimHistoryBase : VimHistory {
-  public val histories: MutableMap<String, HistoryBlock> = HashMap()
+open class VimHistoryBase : VimHistory {
+  val histories: MutableMap<String, HistoryBlock> = HashMap()
 
   override fun addEntry(key: String, text: String) {
     logger.debug { "Add entry '$text' to $key" }
@@ -63,7 +63,7 @@ public open class VimHistoryBase : VimHistory {
     return histories.getOrPut(key) { HistoryBlock() }
   }
 
-  public companion object {
-    public val logger: VimLogger = vimLogger<VimHistoryBase>()
+  companion object {
+    val logger: VimLogger = vimLogger<VimHistoryBase>()
   }
 }

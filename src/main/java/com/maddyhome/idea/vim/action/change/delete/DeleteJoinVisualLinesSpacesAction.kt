@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.newapi.ijOptions
  * @author vlan
  */
 @CommandOrMotion(keys = ["J"], modes = [Mode.VISUAL])
-public class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExecution() {
+class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun executeForAllCarets(

@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
  *
  * Handler is called once for all carets
  */
-public abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret() {
+abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret() {
   final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     error("This method should not be executed")
   }
@@ -73,7 +73,7 @@ public abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMul
    * This method is called when `keymodel` doesn't contain `startsel`,
    * or contains one of `continue*` values but in different mode.
    */
-  public abstract fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret)
+  abstract fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret)
 }
 
 /**
@@ -83,7 +83,7 @@ public abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMul
  *
  * Handler is called once for all carets
  */
-public abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: Boolean) : VimActionHandler.ConditionalMulticaret() {
+abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: Boolean) : VimActionHandler.ConditionalMulticaret() {
 
   override fun runAsMulticaret(
     editor: VimEditor,
@@ -152,13 +152,13 @@ public abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMultic
   /**
    * This method is called when `keymodel` contains `startsel`, or one of `continue*` values in corresponding mode
    */
-  public abstract fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command)
+  abstract fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command)
 
   /**
    * This method is called when `keymodel` doesn't contain `startsel`,
    * or contains one of `continue*` values but in different mode.
    */
-  public abstract fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command)
+  abstract fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command)
 }
 
 /**
@@ -169,7 +169,7 @@ public abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMultic
  *
  * Handler is called for each caret
  */
-public abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
+abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
   final override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -191,7 +191,7 @@ public abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachC
   /**
    * Calculate new offset for current [caret]
    */
-  public abstract fun motion(
+  abstract fun motion(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,

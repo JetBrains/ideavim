@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<C-^>", "<C-S-6>", "<C-6>"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
-public class FilePreviousAction : VimActionHandler.SingleExecution() {
+class FilePreviousAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

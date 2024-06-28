@@ -26,7 +26,7 @@ import java.util.*
  */
 // todo make it multicaret
 @ExCommand(command = "sor[t]")
-public data class SortCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class SortCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   @Throws(ExException::class)
@@ -128,7 +128,7 @@ public data class SortCommand(val range: Range, val argument: String) : Command.
   }
 }
 
-public data class SortOption(
+data class SortOption(
   val ignoreCase: Boolean,
   val numeric: Boolean,
   val reverse: Boolean,

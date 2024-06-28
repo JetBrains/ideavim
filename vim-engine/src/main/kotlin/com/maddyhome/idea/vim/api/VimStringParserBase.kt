@@ -16,7 +16,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-public abstract class VimStringParserBase : VimStringParser {
+abstract class VimStringParserBase : VimStringParser {
   override val plugKeyStroke: KeyStroke
     get() = parseKeys("<Plug>")[0]
 

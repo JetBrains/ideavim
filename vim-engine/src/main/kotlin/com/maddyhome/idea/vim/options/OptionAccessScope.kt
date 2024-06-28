@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
  *
  * Maps closely to `:set`, `:setlocal` and `:setglobal`.
  */
-public sealed class OptionAccessScope {
+sealed class OptionAccessScope {
 
   /**
    * Explicitly get or set the global value of an option
@@ -28,7 +28,7 @@ public sealed class OptionAccessScope {
    * @param editor  The editor to access global option values from. This can only be `null` for global and global-local
    * options.
    */
-  public class GLOBAL(public val editor: VimEditor?) : OptionAccessScope()
+  class GLOBAL(val editor: VimEditor?) : OptionAccessScope()
 
   /**
    * Explicitly get or set the local value of the option, relative to the given editor
@@ -38,7 +38,7 @@ public sealed class OptionAccessScope {
    * local value of the option, which might be a sentinel value representing "unset". For numbers and booleans (which
    * are represented as numbers), this will be -1. For strings, this will be an empty string.
    */
-  public class LOCAL(public val editor: VimEditor) : OptionAccessScope()
+  class LOCAL(val editor: VimEditor) : OptionAccessScope()
 
   /**
    * Get or set the effective value of the option for the given editor
@@ -51,5 +51,5 @@ public sealed class OptionAccessScope {
    * Note that for local-to-window options, the "global" option is a per-window copy of the option. See
    * [OptionDeclaredScope.LOCAL_TO_WINDOW] for more details.
    */
-  public class EFFECTIVE(public val editor: VimEditor) : OptionAccessScope()
+  class EFFECTIVE(val editor: VimEditor) : OptionAccessScope()
 }

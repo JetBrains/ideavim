@@ -13,14 +13,14 @@ import com.maddyhome.idea.vim.common.TextRange
 /**
  * The resulting match of a capture group
  */
-public class VimMatchGroup(
+class VimMatchGroup(
   /**
    * The range of indices in the editor text of where the match was found
    */
-  public val range: TextRange,
+  val range: TextRange,
 
   /**
    * The string value of the match found
    */
-  public val value: String
+  val value: String
 )

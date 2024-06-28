@@ -35,11 +35,11 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
  * Base class for motion handlers.
  * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
-public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
+sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   /**
    * By default, we unfold collapsed regions after caret movement inside the fold
    */
-  public open val keepFold: Boolean = false
+  open val keepFold: Boolean = false
 
   /**
    * Base class for motion handlers.
@@ -47,7 +47,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    *   called 5 times.
    * @see [MotionActionHandler.SingleExecution] for only one execution
    */
-  public abstract class ForEachCaret : MotionActionHandler() {
+  abstract class ForEachCaret : MotionActionHandler() {
 
     /**
      * This method should return new offset for [caret]
@@ -55,7 +55,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      *   called 5 times.
      * The method executes only once it there is block selection.
      */
-    public abstract fun getOffset(
+    abstract fun getOffset(
       editor: VimEditor,
       caret: ImmutableVimCaret,
       context: ExecutionContext,
@@ -70,13 +70,13 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    *   [getOffset] will be called 1 time.
    * @see [MotionActionHandler.ForEachCaret] for per-caret execution
    */
-  public abstract class SingleExecution : MotionActionHandler() {
+  abstract class SingleExecution : MotionActionHandler() {
     /**
      * This method should return new offset for primary caret
      * It executes once for all carets. That means that if you have 5 carets, [getOffset] will be
      *   called 1 time.
      */
-    public abstract fun getOffset(
+    abstract fun getOffset(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
@@ -88,8 +88,8 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    * Support for commands that can be executed either once or for each caret depending on some circumstances
    * TODO this class should not exist at all, changes to command execution are required
    */
-  public abstract class AmbiguousExecution : MotionActionHandler() {
-    public abstract fun getMotionActionHandler(argument: Argument?): MotionActionHandler
+  abstract class AmbiguousExecution : MotionActionHandler() {
+    abstract fun getMotionActionHandler(argument: Argument?): MotionActionHandler
 
     final override fun process(cmd: Command) {
       super.process(cmd)
@@ -105,11 +105,11 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     }
   }
 
-  public abstract val motionType: MotionType
+  abstract val motionType: MotionType
 
   final override val type: Command.Type = Command.Type.MOTION
 
-  public fun getHandlerOffset(
+  fun getHandlerOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,
@@ -286,7 +286,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     }
   }
 
-  public companion object {
-    public val logger: VimLogger = vimLogger<MotionActionHandler>()
+  companion object {
+    val logger: VimLogger = vimLogger<MotionActionHandler>()
   }
 }

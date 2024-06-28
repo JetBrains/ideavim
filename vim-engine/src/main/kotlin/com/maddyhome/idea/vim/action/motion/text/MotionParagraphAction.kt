@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-public sealed class MotionParagraphAction(public val direction: Direction) : MotionActionHandler.ForEachCaret() {
+sealed class MotionParagraphAction(val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -42,10 +42,10 @@ public sealed class MotionParagraphAction(public val direction: Direction) : Mot
 }
 
 @CommandOrMotion(keys = ["}"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionParagraphNextAction : MotionParagraphAction(Direction.FORWARDS)
+class MotionParagraphNextAction : MotionParagraphAction(Direction.FORWARDS)
 
 @CommandOrMotion(keys = ["{"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionParagraphPreviousAction : MotionParagraphAction(Direction.BACKWARDS)
+class MotionParagraphPreviousAction : MotionParagraphAction(Direction.BACKWARDS)
 
 private fun moveCaretToNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
   val res = injector.searchHelper.findNextParagraph(editor, caret, count, false) ?: return Motion.Error

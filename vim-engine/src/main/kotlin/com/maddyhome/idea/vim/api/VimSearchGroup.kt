@@ -14,19 +14,19 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
-public interface VimSearchGroup {
+interface VimSearchGroup {
 
   /**
    * Last used pattern to perform a search.
    */
-  public var lastSearchPattern: String?
+  var lastSearchPattern: String?
 
   /**
    * Last used pattern to perform a substitution.
    */
-  public var lastSubstitutePattern: String?
+  var lastSubstitutePattern: String?
 
-  public fun searchBackward(editor: VimEditor, offset: Int, count: Int): TextRange?
+  fun searchBackward(editor: VimEditor, offset: Int, count: Int): TextRange?
 
   /**
    * Find the range of the next occurrence of the last used search pattern
@@ -42,7 +42,7 @@ public interface VimSearchGroup {
    * @param forwards  Search forwards or backwards
    * @return          The TextRange of the next occurrence or null if not found
    */
-  public fun getNextSearchRange(editor: VimEditor, count: Int, forwards: Boolean): TextRange?
+  fun getNextSearchRange(editor: VimEditor, count: Int, forwards: Boolean): TextRange?
 
   /**
    * Process the pattern being used as a search range
@@ -62,7 +62,7 @@ public interface VimSearchGroup {
    * @param direction     The direction to search in
    * @return              The offset of the match or -1 if not found
    */
-  public fun processSearchRange(
+  fun processSearchRange(
     editor: VimEditor,
     pattern: String,
     patternOffset: Int,
@@ -81,7 +81,7 @@ public interface VimSearchGroup {
    * @param count   Find the nth occurrence
    * @return        The offset of the next match, or -1 if not found
    */
-  public fun searchNext(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
+  fun searchNext(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
 
   /**
    * Find the previous occurrence of the last used pattern.
@@ -94,7 +94,7 @@ public interface VimSearchGroup {
    * @param count   Find the nth occurrence
    * @return        The offset of the next match, or -1 if not found
    */
-  public fun searchPrevious(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
+  fun searchPrevious(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
 
   /**
    * Process the search command, searching for the pattern from the given document offset
@@ -123,7 +123,7 @@ public interface VimSearchGroup {
    * @return            Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based on
    *                    the search offset. The value will be `null` if no result is found.
    */
-  public fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, count1: Int, dir: Direction): Pair<Int, MotionType>?
+  fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, count1: Int, dir: Direction): Pair<Int, MotionType>?
 
   /**
    * Search for the word under the given caret
@@ -140,14 +140,14 @@ public interface VimSearchGroup {
    * @param dir     Which direction to search
    * @return        The offset of the result or the start of the word under the caret if not found. Returns -1 on error
    */
-  public fun searchWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int, whole: Boolean, dir: Direction): Int
+  fun searchWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int, whole: Boolean, dir: Direction): Int
 
   /**
    * If [command] contains a pattern, this function finds the end of it that is marked with [delimiter].
    *
    * This is useful for commands like `:%s/123/321/s` to detect the end of `123` pattern. `/` will be a [delimiter].
    */
-  public fun findEndOfPattern(
+  fun findEndOfPattern(
     command: String,
     delimiter: Char,
     startIndex: Int = 0
@@ -172,7 +172,7 @@ public interface VimSearchGroup {
    * @param exarg   The argument to the substitute command, such as `/{pattern}/{string}/[flags]`
    * @return        True if the substitution succeeds, false on error. Will succeed even if nothing is modified
    */
-  public fun processSubstituteCommand(
+  fun processSubstituteCommand(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -182,15 +182,15 @@ public interface VimSearchGroup {
     parent: VimLContext,
   ): Boolean
 
-  public fun findDecimalNumber(line: String): Int?
+  fun findDecimalNumber(line: String): Int?
 
   /**
    * Clears all search highlights.
    */
-  public fun clearSearchHighlight()
+  fun clearSearchHighlight()
 
   /**
    * Gets the direction lastly used in a search.
    */
-  public fun getLastSearchDirection(): Direction
+  fun getLastSearchDirection(): Direction
 }

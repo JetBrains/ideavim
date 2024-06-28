@@ -23,11 +23,11 @@ import java.io.InputStream
  * The primary functionality of this interface is to transform the JSON data into a collection of
  * {@code LazyVimCommand} instances.
  */
-public interface CommandProvider {
-  public val commandListFileName: String
+interface CommandProvider {
+  val commandListFileName: String
 
   @OptIn(ExperimentalSerializationApi::class)
-  public fun getCommands(): Collection<LazyVimCommand> {
+  fun getCommands(): Collection<LazyVimCommand> {
     val classLoader = this.javaClass.classLoader
     val commands: List<CommandBean> = Json.decodeFromStream(getFile())
     return commands
@@ -46,4 +46,4 @@ public interface CommandProvider {
 }
 
 @Serializable
-public data class CommandBean(val keys: String, val `class`: String, val modes: String)
+data class CommandBean(val keys: String, val `class`: String, val modes: String)

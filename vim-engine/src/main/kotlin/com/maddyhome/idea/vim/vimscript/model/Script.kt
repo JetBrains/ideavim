@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
-public data class Script(val units: List<Executable> = ArrayList()) : Executable {
+data class Script(val units: List<Executable> = ArrayList()) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 

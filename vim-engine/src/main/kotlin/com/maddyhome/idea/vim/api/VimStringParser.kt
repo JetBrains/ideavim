@@ -11,16 +11,16 @@ package com.maddyhome.idea.vim.api
 import org.jetbrains.annotations.NonNls
 import javax.swing.KeyStroke
 
-public interface VimStringParser {
+interface VimStringParser {
   /**
    * Fake key for `<Plug>` mappings
    */
-  public val plugKeyStroke: KeyStroke
+  val plugKeyStroke: KeyStroke
 
   /**
    * Fake key for `<Action>` mappings
    */
-  public val actionKeyStroke: KeyStroke
+  val actionKeyStroke: KeyStroke
 
   /**
    * Parses Vim key notation strings.
@@ -28,24 +28,24 @@ public interface VimStringParser {
    *
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    */
-  public fun parseKeys(@NonNls string: String): List<KeyStroke>
+  fun parseKeys(@NonNls string: String): List<KeyStroke>
 
   /**
    * Transforms string of regular and control characters (e.g. "ihello") to list of keystrokes
    */
-  public fun stringToKeys(@NonNls string: String): List<KeyStroke>
+  fun stringToKeys(@NonNls string: String): List<KeyStroke>
 
   /**
    * Transforms a keystroke to a string in Vim key notation.
    * @see <a href="http://vimdoc.sourceforge.net/htmldoc/intro.html#key-notation">Vim key notation</a>
    */
-  public fun toKeyNotation(keyStroke: KeyStroke): String
+  fun toKeyNotation(keyStroke: KeyStroke): String
 
   /**
    * Transforms list of keystrokes to a string in Vim key notation.
    * @see <a href="http://vimdoc.sourceforge.net/htmldoc/intro.html#key-notation">Vim key notation</a>
    */
-  public fun toKeyNotation(keyStrokes: List<KeyStroke>): String
+  fun toKeyNotation(keyStrokes: List<KeyStroke>): String
 
   /**
    * Transforms list of keystrokes to a pastable to editor string
@@ -53,19 +53,19 @@ public interface VimStringParser {
    * e.g. "`<C-I>hello<Esc>`" -> "  hello" (<C-I> is a tab character)
    */
   // todo better name
-  public fun toPrintableString(keys: List<KeyStroke>): String
+  fun toPrintableString(keys: List<KeyStroke>): String
 
   /**
    * This method is used to parse content of double-quoted strings in VimScript.
    * @see <a href="http://vimdoc.sourceforge.net/htmldoc/eval.html#expr-string">:help string</a>
    */
-  public fun parseVimScriptString(string: String): String
+  fun parseVimScriptString(string: String): String
 }
 
-public fun key(string: String): KeyStroke {
+fun key(string: String): KeyStroke {
   return keys(string).single()
 }
 
-public fun keys(string: String): List<KeyStroke> {
+fun keys(string: String): List<KeyStroke> {
   return injector.parser.parseKeys(string)
 }

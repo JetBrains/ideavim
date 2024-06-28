@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
 
-public class CommandConsumer : KeyConsumer {
+class CommandConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CommandConsumer>()
   }

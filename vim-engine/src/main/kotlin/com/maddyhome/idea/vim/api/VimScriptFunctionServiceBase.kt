@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.LazyVimscriptFunction
 import com.maddyhome.idea.vim.vimscript.model.functions.VimscriptFunctionProvider
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-public abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
+abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   private val logger = vimLogger<VimScriptFunctionServiceBase>()
 
   protected abstract val functionProviders: List<VimscriptFunctionProvider>

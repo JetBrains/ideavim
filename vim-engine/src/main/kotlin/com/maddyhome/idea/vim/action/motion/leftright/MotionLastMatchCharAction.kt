@@ -20,12 +20,12 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 @CommandOrMotion(keys = [";"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionLastMatchCharAction : MotionLastMatchCharActionBase(MotionType.INCLUSIVE, reverse = false)
+class MotionLastMatchCharAction : MotionLastMatchCharActionBase(MotionType.INCLUSIVE, reverse = false)
 
 @CommandOrMotion(keys = [","], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionLastMatchCharReverseAction : MotionLastMatchCharActionBase(MotionType.EXCLUSIVE, reverse = true)
+class MotionLastMatchCharReverseAction : MotionLastMatchCharActionBase(MotionType.EXCLUSIVE, reverse = true)
 
-public sealed class MotionLastMatchCharActionBase(defaultMotionType: MotionType, private val reverse: Boolean) :
+sealed class MotionLastMatchCharActionBase(defaultMotionType: MotionType, private val reverse: Boolean) :
   MotionActionHandler.ForEachCaret() {
 
   // injector.motion.lastFTCmd not up-to-date during construction, need to set during getOffset
@@ -47,7 +47,7 @@ public sealed class MotionLastMatchCharActionBase(defaultMotionType: MotionType,
     return if (repeatLastMatchChar < 0) Motion.Error else Motion.AbsoluteOffset(repeatLastMatchChar)
   }
 
-  public fun MotionType.reverse(): MotionType {
+  fun MotionType.reverse(): MotionType {
     return when (this) {
       MotionType.INCLUSIVE -> MotionType.EXCLUSIVE
       MotionType.EXCLUSIVE -> MotionType.INCLUSIVE

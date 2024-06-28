@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 
 @CommandOrMotion(keys = ["c"], modes = [Mode.NORMAL])
-public class ChangeMotionAction : ChangeInInsertSequenceAction(), DuplicableOperatorAction {
+class ChangeMotionAction : ChangeInInsertSequenceAction(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION

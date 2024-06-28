@@ -33,7 +33,7 @@ L                       To line [count] from bottom of window (default: Last
                         scroll.  E.g. "yL" yanks from the cursor to the last
                         visible line.
  */
-public abstract class MotionLastScreenLineActionBase(private val operatorPending: Boolean) :
+abstract class MotionLastScreenLineActionBase(private val operatorPending: Boolean) :
   MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
@@ -52,7 +52,7 @@ public abstract class MotionLastScreenLineActionBase(private val operatorPending
 }
 
 @CommandOrMotion(keys = ["L"], modes = [Mode.NORMAL, Mode.VISUAL])
-public class MotionLastScreenLineAction : MotionLastScreenLineActionBase(false)
+class MotionLastScreenLineAction : MotionLastScreenLineActionBase(false)
 
 @CommandOrMotion(keys = ["L"], modes = [Mode.OP_PENDING])
-public class MotionOpPendingLastScreenLineAction : MotionLastScreenLineActionBase(true)
+class MotionOpPendingLastScreenLineAction : MotionLastScreenLineActionBase(true)

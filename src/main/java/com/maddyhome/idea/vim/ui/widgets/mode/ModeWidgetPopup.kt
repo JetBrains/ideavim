@@ -44,18 +44,18 @@ import javax.swing.JPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-public class ModeWidgetPopup : AnAction() {
-  public override fun actionPerformed(e: AnActionEvent) {
+class ModeWidgetPopup : AnAction() {
+  override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
     val popup = createPopup() ?: return
     popup.showCenteredInCurrentWindow(project)
   }
 
-  public companion object {
+  companion object {
     @Volatile
     private var currentPopup: JBPopup? = null
 
-    public fun createPopup(): JBPopup? {
+    fun createPopup(): JBPopup? {
       synchronized(this) {
         if (currentPopup?.isDisposed == false) return null
         val mainPanel = JPanel(BorderLayout())
@@ -350,7 +350,7 @@ public class ModeWidgetPopup : AnAction() {
   }
 }
 
-public enum class ModeWidgetTheme(private var value: String) {
+enum class ModeWidgetTheme(private var value: String) {
   TERM("Term"),
   COLORLESS("Colorless");
 
@@ -358,11 +358,11 @@ public enum class ModeWidgetTheme(private var value: String) {
     return value
   }
 
-  public companion object {
-    public fun parseString(string: String): ModeWidgetTheme? {
+  companion object {
+    fun parseString(string: String): ModeWidgetTheme? {
       return entries.firstOrNull { it.value == string }
     }
 
-    public fun getDefaultTheme(): ModeWidgetTheme = TERM
+    fun getDefaultTheme(): ModeWidgetTheme = TERM
   }
 }

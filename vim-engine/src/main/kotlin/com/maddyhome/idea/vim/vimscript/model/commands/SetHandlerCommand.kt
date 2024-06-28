@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 @ExCommand(command = "sethandler")
-public data class SetHandlerCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class SetHandlerCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -55,9 +55,9 @@ public data class SetHandlerCommand(val range: Range, val argument: String) : Co
     return true
   }
 
-  public companion object {
+  companion object {
     // todo you should make me internal
-    public fun updateOwner(owner: ShortcutOwnerInfo.PerMode?, newData: String): ShortcutOwnerInfo.PerMode? {
+    fun updateOwner(owner: ShortcutOwnerInfo.PerMode?, newData: String): ShortcutOwnerInfo.PerMode? {
       if (owner == null) return null
       val split = newData.split(":", limit = 2)
       if (split.size != 2) return null

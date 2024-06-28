@@ -13,14 +13,14 @@ import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-public class Register {
-  public var name: Char
-  public val type: SelectionType
-  public val keys: MutableList<KeyStroke>
-  public val transferableData: MutableList<out Any>
-  public val rawText: String?
+class Register {
+  var name: Char
+  val type: SelectionType
+  val keys: MutableList<KeyStroke>
+  val transferableData: MutableList<out Any>
+  val rawText: String?
 
-  public constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) {
+  constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) {
     this.name = name
     this.type = type
     this.keys = keys
@@ -28,7 +28,7 @@ public class Register {
     this.rawText = text
   }
 
-  public constructor(
+  constructor(
     name: Char,
     type: SelectionType,
     text: String,
@@ -41,7 +41,7 @@ public class Register {
     this.rawText = text
   }
 
-  public constructor(
+  constructor(
     name: Char,
     type: SelectionType,
     text: String,
@@ -55,7 +55,7 @@ public class Register {
     this.rawText = rawText
   }
 
-  public val text: String?
+  val text: String?
     get() {
       val builder = StringBuilder()
       for (key in keys) {
@@ -71,16 +71,16 @@ public class Register {
   /**
    * Append the supplied text to any existing text.
    */
-  public fun addTextAndResetTransferableData(text: String) {
+  fun addTextAndResetTransferableData(text: String) {
     addKeys(injector.parser.stringToKeys(text))
     transferableData.clear()
   }
 
-  public fun addKeys(keys: List<KeyStroke>) {
+  fun addKeys(keys: List<KeyStroke>) {
     this.keys.addAll(keys)
   }
 
-  public object KeySorter : Comparator<Register> {
+  object KeySorter : Comparator<Register> {
     @NonNls
     private const val ORDER = "\"0123456789abcdefghijklmnopqrstuvwxyz-*+.:%#/="
 

@@ -10,4 +10,4 @@ package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.command.Argument
 
-public var argumentCaptured: Argument? = null
+var argumentCaptured: Argument? = null

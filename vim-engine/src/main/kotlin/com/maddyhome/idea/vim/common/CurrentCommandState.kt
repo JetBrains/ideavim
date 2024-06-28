@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.common
 
-public enum class CurrentCommandState {
+enum class CurrentCommandState {
   NEW_COMMAND,
   READY,
   BAD_COMMAND,

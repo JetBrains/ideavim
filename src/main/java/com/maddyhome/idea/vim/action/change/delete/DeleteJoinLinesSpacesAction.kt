@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.newapi.ijOptions
 
 @CommandOrMotion(keys = ["J"], modes = [Mode.NORMAL])
-public class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
+class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(

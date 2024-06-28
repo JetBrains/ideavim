@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["w"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
+class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -39,7 +39,7 @@ public class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<C-Right>", "<C-kRight>"], modes = [Mode.INSERT])
-public class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret() {
+class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 

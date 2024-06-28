@@ -8,6 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-public object EngineExCommandProvider : ExCommandProvider {
+object EngineExCommandProvider : ExCommandProvider {
   override val exCommandsFileName: String = "engine_ex_commands.json"
 }

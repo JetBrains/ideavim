@@ -26,9 +26,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 @Suppress("SpellCheckingInspection")
-public object IjOptions {
+object IjOptions {
 
-  public fun initialise() {
+  fun initialise() {
     // Calling this method allows for deterministic initialisation of IjOptions, specifically initialising the
     // properties and registering the IJ specific options. Once added, they can be safely accessed by name, e.g. by the
     // implementation of `:set` while executing ~/.ideavimrc
@@ -39,8 +39,8 @@ public object IjOptions {
   }
 
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
-  public val breakindent: ToggleOption = addOption(ToggleOption("breakindent", LOCAL_TO_WINDOW, "bri", false))
-  public val colorcolumn: StringListOption = addOption(object : StringListOption("colorcolumn", LOCAL_TO_WINDOW, "cc", "") {
+  val breakindent: ToggleOption = addOption(ToggleOption("breakindent", LOCAL_TO_WINDOW, "bri", false))
+  val colorcolumn: StringListOption = addOption(object : StringListOption("colorcolumn", LOCAL_TO_WINDOW, "cc", "") {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       if (value != VimString.EMPTY) {
@@ -55,19 +55,19 @@ public object IjOptions {
       }
     }
   })
-  public val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
-  public val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
-  public val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
-  public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
-  public val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))
-  public val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
+  val cursorline: ToggleOption = addOption(ToggleOption("cursorline", LOCAL_TO_WINDOW, "cul", false))
+  val list: ToggleOption = addOption(ToggleOption("list", LOCAL_TO_WINDOW, "list", false))
+  val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
+  val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", LOCAL_TO_WINDOW, "rnu", false))
+  val textwidth: NumberOption = addOption(UnsignedNumberOption("textwidth", LOCAL_TO_BUFFER, "tw", 0))
+  val wrap: ToggleOption = addOption(ToggleOption("wrap", LOCAL_TO_WINDOW, "wrap", true))
 
   // These options are not explicitly listed as local-noglobal in Vim's help, but are set when a new buffer is edited,
   // based on the value of 'fileformats' or 'fileencodings'. To prevent unexpected file conversion, we treat them as
   // local-noglobal. See `:help local-noglobal`, `:help 'fileformats'` and `:help 'fileencodings'`
-  public val bomb: ToggleOption =
+  val bomb: ToggleOption =
     addOption(ToggleOption("bomb", LOCAL_TO_BUFFER, "bomb", false, isLocalNoGlobal = true))
-  public val fileencoding: StringOption = addOption(
+  val fileencoding: StringOption = addOption(
     StringOption(
       "fileencoding",
       LOCAL_TO_BUFFER,
@@ -76,7 +76,7 @@ public object IjOptions {
       isLocalNoGlobal = true
     )
   )
-  public val fileformat: StringOption = addOption(
+  val fileformat: StringOption = addOption(
     StringOption(
       "fileformat",
       LOCAL_TO_BUFFER,
@@ -88,15 +88,15 @@ public object IjOptions {
   )
 
   // IntelliJ specific functionality - custom options
-  public val ide: StringOption = addOption(
+  val ide: StringOption = addOption(
     StringOption("ide", GLOBAL, "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
   )
-  public val ideacopypreprocess: ToggleOption = addOption(
+  val ideacopypreprocess: ToggleOption = addOption(
     ToggleOption("ideacopypreprocess", GLOBAL_OR_LOCAL_TO_BUFFER, "ideacopypreprocess", false)
   )
-  public val ideajoin: ToggleOption = addOption(ToggleOption("ideajoin", GLOBAL_OR_LOCAL_TO_BUFFER, "ideajoin", false))
-  public val ideamarks: ToggleOption = addOption(ToggleOption("ideamarks", GLOBAL, "ideamarks", true))
-  public val idearefactormode: StringOption = addOption(
+  val ideajoin: ToggleOption = addOption(ToggleOption("ideajoin", GLOBAL_OR_LOCAL_TO_BUFFER, "ideajoin", false))
+  val ideamarks: ToggleOption = addOption(ToggleOption("ideamarks", GLOBAL, "ideamarks", true))
+  val idearefactormode: StringOption = addOption(
     StringOption(
       "idearefactormode",
       GLOBAL_OR_LOCAL_TO_BUFFER,
@@ -105,7 +105,7 @@ public object IjOptions {
       IjOptionConstants.ideaRefactorModeValues
     )
   )
-  public val ideastatusicon: StringOption = addOption(
+  val ideastatusicon: StringOption = addOption(
     StringOption(
       "ideastatusicon",
       GLOBAL,
@@ -114,7 +114,7 @@ public object IjOptions {
       IjOptionConstants.ideaStatusIconValues
     )
   )
-  public val ideavimsupport: StringListOption = addOption(
+  val ideavimsupport: StringListOption = addOption(
     StringListOption(
       "ideavimsupport",
       GLOBAL,
@@ -123,25 +123,26 @@ public object IjOptions {
       IjOptionConstants.ideavimsupportValues
     )
   )
-  @JvmField public val ideawrite: StringOption = addOption(
+  @JvmField
+  val ideawrite: StringOption = addOption(
     StringOption("ideawrite", GLOBAL, "ideawrite", "all", IjOptionConstants.ideaWriteValues)
   )
-  public val lookupkeys: StringListOption = addOption(
+  val lookupkeys: StringListOption = addOption(
     StringListOption(
       "lookupkeys",
       GLOBAL,
       "lookupkeys",
       "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>")
   )
-  public val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", GLOBAL, "tai", false))
-  public val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", GLOBAL, "visualdelay", 100))
+  val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", GLOBAL, "tai", false))
+  val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", GLOBAL, "visualdelay", 100))
 
   // Temporary feature flags during development, not really intended for external use
-  public val closenotebooks: ToggleOption = addOption(ToggleOption("closenotebooks", GLOBAL, "closenotebooks", true, isHidden = true))
-  public val commandOrMotionAnnotation: ToggleOption = addOption(ToggleOption("commandormotionannotation", GLOBAL, "commandormotionannotation", true, isHidden = true))
-  public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isHidden = true))
-  public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true, isHidden = true))
-  public val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", GLOBAL, "vimscriptfunctionannotation", true, isHidden = true))
+  val closenotebooks: ToggleOption = addOption(ToggleOption("closenotebooks", GLOBAL, "closenotebooks", true, isHidden = true))
+  val commandOrMotionAnnotation: ToggleOption = addOption(ToggleOption("commandormotionannotation", GLOBAL, "commandormotionannotation", true, isHidden = true))
+  val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isHidden = true))
+  val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true, isHidden = true))
+  val vimscriptFunctionAnnotation: ToggleOption = addOption(ToggleOption("vimscriptfunctionannotation", GLOBAL, "vimscriptfunctionannotation", true, isHidden = true))
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>

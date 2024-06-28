@@ -21,7 +21,7 @@ import org.jetbrains.annotations.TestOnly
  * COMPATIBILITY-LAYER: Renamed from VimVariableService
  * Please see: https://jb.gg/zo8n0r
  */
-public interface VariableService {
+interface VariableService {
   /**
    * Stores variable.
    *
@@ -33,20 +33,20 @@ public interface VariableService {
    * @param vimContext vim context
    * @throws ExException("The 'v:' scope is not implemented yet :(")
    */
-  public fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+  fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
 
   /**
    * Get global scope variable value.
    * @param name variable name
    * @param value variable value
    */
-  public fun storeGlobalVariable(name: String, value: VimDataType)
+  fun storeGlobalVariable(name: String, value: VimDataType)
 
   /**
    * Get global scope variable value.
    * @param name variable name
    */
-  public fun getGlobalVariableValue(name: String): VimDataType?
+  fun getGlobalVariableValue(name: String): VimDataType?
 
   /**
    * Gets variable value
@@ -58,7 +58,7 @@ public interface VariableService {
    * @param vimContext vim context
    * @throws ExException("The 'v:' scope is not implemented yet :(")
    */
-  public fun getNullableVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType?
+  fun getNullableVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType?
 
   /**
    * Gets variable value.
@@ -71,7 +71,7 @@ public interface VariableService {
    * @throws ExException("The 'v:' scope is not implemented yet :(")
    * @throws ExException("E121: Undefined variable: ${scope}:${name}")
    */
-  public fun getNonNullVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
+  fun getNonNullVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
 
   /**
    * Checks if the variable locked.
@@ -84,7 +84,7 @@ public interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    */
-  public fun isVariableLocked(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): Boolean
+  fun isVariableLocked(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): Boolean
 
   /**
    * Locks variable.
@@ -96,7 +96,7 @@ public interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    */
-  public fun lockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+  fun lockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
 
   /**
    * Unlocks variable.
@@ -108,18 +108,18 @@ public interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    */
-  public fun unlockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+  fun unlockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
 
-  public fun getGlobalVariables(): Map<String, VimDataType>
+  fun getGlobalVariables(): Map<String, VimDataType>
 
   /**
    * Clears all global variables
    */
   @TestOnly
-  public fun clear()
+  fun clear()
 
   @Internal
-  public fun getVimVariable(name: String): VimDataType?
+  fun getVimVariable(name: String): VimDataType?
   @Internal
-  public fun storeVimVariable(name: String, value: VimDataType)
+  fun storeVimVariable(name: String, value: VimDataType)
 }

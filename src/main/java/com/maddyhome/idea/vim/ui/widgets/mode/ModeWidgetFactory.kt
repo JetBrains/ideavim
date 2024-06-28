@@ -17,9 +17,9 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ui.widgets.VimWidgetListener
 
-public class ModeWidgetFactory : StatusBarWidgetFactory {
-  public companion object {
-    public const val ID: String = "IdeaVimMode"
+class ModeWidgetFactory : StatusBarWidgetFactory {
+  companion object {
+    const val ID: String = "IdeaVimMode"
   }
 
   override fun getId(): String {
@@ -42,4 +42,4 @@ public class ModeWidgetFactory : StatusBarWidgetFactory {
   }
 }
 
-public val modeWidgetOptionListener: VimWidgetListener = VimWidgetListener { updateModeWidget() }
+val modeWidgetOptionListener: VimWidgetListener = VimWidgetListener { updateModeWidget() }

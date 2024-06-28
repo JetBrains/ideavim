@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.state.mode.inBlockSelection
  * @author vlan
  */
 @CommandOrMotion(keys = ["o"], modes = [Mode.VISUAL])
-public class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
+class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -40,7 +40,7 @@ public class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
  * @author vlan
  */
 @CommandOrMotion(keys = ["O"], modes = [Mode.VISUAL])
-public class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
+class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

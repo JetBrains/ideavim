@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :comclear"
  */
 @ExCommand(command = "comc[lear]")
-public data class CmdClearCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class CmdClearCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

@@ -11,12 +11,12 @@ package com.maddyhome.idea.vim.history
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 
-public class HistoryBlock {
+class HistoryBlock {
   private val entries: MutableList<HistoryEntry> = ArrayList()
 
   private var counter = 0
 
-  public fun addEntry(text: String) {
+  fun addEntry(text: String) {
     for (i in entries.indices) {
       val entry = entries[i]
       if (text == entry.entry) {
@@ -30,11 +30,11 @@ public class HistoryBlock {
     }
   }
 
-  public fun getEntries(): List<HistoryEntry> {
+  fun getEntries(): List<HistoryEntry> {
     return entries
   }
 
-  public companion object {
+  companion object {
     private fun maxLength() = injector.globalOptions().history
   }
 }

@@ -8,6 +8,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-public enum class SearchOptions {
+enum class SearchOptions {
   BACKWARDS, WANT_ENDPOS, WRAP, SHOW_MESSAGES, WHOLE_FILE, IGNORE_SMARTCASE
 }

@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.regexp.parser.VimRegexParserResult
 import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import java.util.EnumSet
+import java.util.*
 
 /**
  * Represents a compiled Vim pattern. Provides methods to
@@ -45,7 +45,7 @@ import java.util.EnumSet
  * @see :help /pattern
  *
  */
-public class VimRegex(pattern: String) {
+class VimRegex(pattern: String) {
   /**
    * TODO: in my opinion only the find() and findAll() methods are necessary.
    *
@@ -97,7 +97,7 @@ public class VimRegex(pattern: String) {
    *
    * @return True if any match was found, false otherwise
    */
-  public fun containsMatchIn(
+  fun containsMatchIn(
     editor: VimEditor,
     options: EnumSet<VimRegexOptions> = noneOfEnum()
   ): Boolean {
@@ -129,7 +129,7 @@ public class VimRegex(pattern: String) {
    *
    * @return The first match found in the editor after startIndex
    */
-  public fun findNext(
+  fun findNext(
     editor: VimEditor,
     startIndex: Int = 0,
     options: EnumSet<VimRegexOptions> = noneOfEnum()
@@ -192,7 +192,7 @@ public class VimRegex(pattern: String) {
    *
    * @return The first match found in the editor before startIndex
    */
-  public fun findPrevious(
+  fun findPrevious(
     editor: VimEditor,
     startIndex: Int = 0,
     options: EnumSet<VimRegexOptions> = noneOfEnum()
@@ -267,7 +267,7 @@ public class VimRegex(pattern: String) {
    *
    * @return All the matches found in the editor
    */
-  public fun findAll(
+  fun findAll(
     editor: VimEditor,
     startIndex: Int = 0,
     maxIndex: Int = editor.text().length,
@@ -317,7 +317,7 @@ public class VimRegex(pattern: String) {
    * @param line       The number of the line where to look for the match in
    * @param column     The column of that line where to start looking for a match
    */
-  public fun findInLine(
+  fun findInLine(
     editor: VimEditor,
     line: Int,
     column: Int = 0,
@@ -348,7 +348,7 @@ public class VimRegex(pattern: String) {
    * @param column               The column of that line where to start looking for a match
    * @param takeLiterally        Whether to always take the string literally, meaning no character has a special meaning
    */
-  public fun substitute(
+  fun substitute(
     editor: VimEditor,
     substituteString: String,
     lastSubstituteString: String,
@@ -457,7 +457,7 @@ public class VimRegex(pattern: String) {
    *
    * @return The match, either successful or not, found at the specified index
    */
-  public fun matchAt(
+  fun matchAt(
     editor: VimEditor,
     index: Int,
     options: EnumSet<VimRegexOptions> = noneOfEnum()
@@ -480,7 +480,7 @@ public class VimRegex(pattern: String) {
    *
    * @return The match, either successful or not, when matching against the entire editor
    */
-  public fun matchEntire(
+  fun matchEntire(
     editor: VimEditor,
     options: EnumSet<VimRegexOptions> = noneOfEnum()
   ): VimMatchResult {
@@ -508,7 +508,7 @@ public class VimRegex(pattern: String) {
    *
    * @return True if the entire editor matches, false otherwise
    */
-  public fun matches(
+  fun matches(
     editor: VimEditor,
     options: EnumSet<VimRegexOptions> = noneOfEnum()
   ): Boolean {
@@ -519,7 +519,7 @@ public class VimRegex(pattern: String) {
     }
   }
 
-  public fun matches(
+  fun matches(
     text: String,
     options: EnumSet<VimRegexOptions> = noneOfEnum()
   ): Boolean {
@@ -534,7 +534,7 @@ public class VimRegex(pattern: String) {
    *
    * @return True if there is a successful match starting at the specified index, false otherwise
    */
-  public fun matchesAt(
+  fun matchesAt(
     editor: VimEditor,
     index: Int,
     options: EnumSet<VimRegexOptions> = noneOfEnum()

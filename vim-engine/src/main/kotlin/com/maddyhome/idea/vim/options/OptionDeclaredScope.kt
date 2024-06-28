@@ -35,7 +35,7 @@ package com.maddyhome.idea.vim.options
  * options from. Also, Vim always has an opening window, such as `:e {file}` from the ex command line. This isn't true
  * for an IDE, which might open a window or buffer from a Project view, a search palette, ctrl+click on an element, etc.
  */
-public enum class OptionDeclaredScope {
+enum class OptionDeclaredScope {
   /**
    * Option is global and applies to all buffers and windows
    *
@@ -127,6 +127,6 @@ public enum class OptionDeclaredScope {
    */
   GLOBAL_OR_LOCAL_TO_WINDOW;
 
-  public fun isGlobalLocal(): Boolean =
+  fun isGlobalLocal(): Boolean =
     this == GLOBAL_OR_LOCAL_TO_BUFFER || this == GLOBAL_OR_LOCAL_TO_WINDOW
 }

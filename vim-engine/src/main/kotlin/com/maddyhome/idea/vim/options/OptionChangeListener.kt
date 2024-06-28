@@ -20,8 +20,8 @@ import com.maddyhome.idea.vim.api.VimEditor
  *
  * This function will always be called before [EffectiveOptionValueChangeListener.onEffectiveValueChanged].
  */
-public fun interface GlobalOptionChangeListener {
-  public fun onGlobalOptionChanged()
+fun interface GlobalOptionChangeListener {
+  fun onGlobalOptionChanged()
 }
 
 /**
@@ -36,6 +36,6 @@ public fun interface GlobalOptionChangeListener {
  * If its global value is changed, all editors where the value is unset will be notified (this includes the current
  * buffer or window's editor(s)).
  */
-public fun interface EffectiveOptionValueChangeListener {
-  public fun onEffectiveValueChanged(editor: VimEditor)
+fun interface EffectiveOptionValueChangeListener {
+  fun onEffectiveValueChanged(editor: VimEditor)
 }

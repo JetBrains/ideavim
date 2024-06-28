@@ -21,24 +21,24 @@ import com.maddyhome.idea.vim.state.mode.mode
 import com.maddyhome.idea.vim.state.mode.returnTo
 import java.util.*
 
-public inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
+inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 
-public val TextRange.endOffsetInclusive: Int
+val TextRange.endOffsetInclusive: Int
   get() = if (this.endOffset > 0 && this.endOffset > this.startOffset) this.endOffset - 1 else this.endOffset
 
-public val VimEditor.inRepeatMode: Boolean
+val VimEditor.inRepeatMode: Boolean
   get() = this.vimStateMachine.isDotRepeatInProgress
 
-public val VimEditor.vimStateMachine: VimStateMachine
+val VimEditor.vimStateMachine: VimStateMachine
   get() = VimStateMachine.getInstance(this)
 
-public val VimEditor.usesVirtualSpace: Boolean
+val VimEditor.usesVirtualSpace: Boolean
   get() = injector.options(this).virtualedit.contains(OptionConstants.virtualedit_onemore)
 
-public val VimEditor.isEndAllowed: Boolean
+val VimEditor.isEndAllowed: Boolean
   get() = this.isEndAllowed(this.mode)
 
-public fun VimEditor.isEndAllowed(mode: Mode): Boolean {
+fun VimEditor.isEndAllowed(mode: Mode): Boolean {
   return when (mode) {
     is Mode.INSERT, is Mode.VISUAL, is Mode.SELECT -> true
     is Mode.NORMAL, is Mode.CMD_LINE, Mode.REPLACE, is Mode.OP_PENDING -> {
@@ -48,16 +48,16 @@ public fun VimEditor.isEndAllowed(mode: Mode): Boolean {
   }
 }
 
-public inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
+inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
   0 -> noneOfEnum()
   1 -> EnumSet.of(value[0])
   else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
 }
 
-public fun VimEditor.setSelectMode(submode: SelectionType) {
+fun VimEditor.setSelectMode(submode: SelectionType) {
   mode = Mode.SELECT(submode, this.mode.returnTo)
 }
 
-public fun VimEditor.pushVisualMode(submode: SelectionType) {
+fun VimEditor.pushVisualMode(submode: SelectionType) {
   mode = Mode.VISUAL(submode, this.mode.returnTo)
 }

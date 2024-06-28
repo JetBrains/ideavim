@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author smartbomb
  */
 @ExCommand(command = "action")
-public data class ActionCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+data class ActionCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
 
   override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,

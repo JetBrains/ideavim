@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
-public class VimApplicationStub : VimApplicationBase() {
+class VimApplicationStub : VimApplicationBase() {
   init {
     vimLogger<ExecutionContextManagerStub>().warn("VimApplicationStub is used. Please replace it with your own implementation of VimApplication.")
   }

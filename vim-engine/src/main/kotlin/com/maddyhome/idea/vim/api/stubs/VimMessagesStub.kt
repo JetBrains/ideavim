@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMessagesBase
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
-public class VimMessagesStub : VimMessagesBase() {
+class VimMessagesStub : VimMessagesBase() {
   init {
     vimLogger<ExecutionContextManagerStub>().warn("VimMessagesStub is used. Please replace it with your own implementation of VimMessages.")
   }

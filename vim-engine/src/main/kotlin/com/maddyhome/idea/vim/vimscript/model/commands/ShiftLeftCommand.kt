@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :<"
  */
 @ExCommand("<")
-public data class ShiftLeftCommand(val range: Range, val argument: String, val length: Int) : Command.ForEachCaret(range, argument) {
+data class ShiftLeftCommand(val range: Range, val argument: String, val length: Int) : Command.ForEachCaret(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun processCommand(

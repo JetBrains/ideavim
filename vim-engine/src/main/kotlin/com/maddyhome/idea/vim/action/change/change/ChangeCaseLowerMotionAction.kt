@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.CharacterHelper
 
 @CommandOrMotion(keys = ["gu"], modes = [Mode.NORMAL])
-public class ChangeCaseLowerMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+class ChangeCaseLowerMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION

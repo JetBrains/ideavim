@@ -39,7 +39,7 @@ import java.util.*
  * @param isMove  True if the caret should be moved after evaluating this address. In the text representation, a
  *                semicolon follows this address.
  */
-public sealed class Address(public val offset: Int, public val isMove: Boolean) {
+sealed class Address(val offset: Int, val isMove: Boolean) {
 
   /**
    * Gets the one-based line number specified by this address.
@@ -53,7 +53,7 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
    * @param caret    The caret to use for the current line or initial search line, if required
    * @return The one-based line number or -1 if unable to get the line number
    */
-  public fun getLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
+  fun getLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
     val line = calculateLine1(editor, caret)
     return applyOffset(line)
   }
@@ -92,7 +92,7 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
     return result
   }
 
-  public companion object {
+  companion object {
     /**
      * Factory method used to create an appropriate range based on the range text
      *
@@ -101,7 +101,7 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
      * @param move   True if the cursor should be moved to the line that the address evaluates to
      * @return The ranges appropriate to the text
      */
-    public fun createRangeAddresses(str: String, offset: Int, move: Boolean): Array<Address>? {
+    fun createRangeAddresses(str: String, offset: Int, move: Boolean): Array<Address>? {
       // Current line
       if (str.isEmpty() || str == ".") {
         return arrayOf(CurrentLineAddress(offset, move))
@@ -139,7 +139,7 @@ public sealed class Address(public val offset: Int, public val isMove: Boolean) 
  * @param move    True if the address should move the caret to the line that the address evaluates to
  */
 @TestOnly
-public class LineAddress(private val line1: Int, offset: Int, move: Boolean) : Address(offset, move) {
+class LineAddress(private val line1: Int, offset: Int, move: Boolean) : Address(offset, move) {
   override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int = line1
 
   override fun equals(other: Any?): Boolean {
@@ -180,7 +180,7 @@ private class LastLineAddress(offset: Int, move: Boolean) : Address(offset, move
  * Represents the line specified by a mark
  */
 @TestOnly // Should be private. Constructor is visible for test purposes only
-public class MarkAddress(private val mark: Char, offset: Int, move: Boolean) : Address(offset, move) {
+class MarkAddress(private val mark: Char, offset: Int, move: Boolean) : Address(offset, move) {
   override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
     val mark = injector.markService.getMark(caret, mark)
       ?: throw exExceptionMessage("E20") // E20: Mark not set

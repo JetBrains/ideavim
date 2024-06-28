@@ -10,6 +10,6 @@ package com.maddyhome.idea.vim.listener
 
 import com.intellij.openapi.editor.Editor
 
-public interface VimInsertListener {
-  public fun insertModeStarted(editor: Editor)
+interface VimInsertListener {
+  fun insertModeStarted(editor: Editor)
 }

@@ -26,27 +26,27 @@ import com.maddyhome.idea.vim.state.VimStateMachine
  *
  * Also read about how modes work in Vim: https://github.com/JetBrains/ideavim/wiki/how-many-modes-does-vim-have
  */
-public sealed interface Mode {
-  public data class NORMAL(public val returnTo: ReturnTo? = null) : Mode, ReturnableFromCmd
-  public data class OP_PENDING(public val returnTo: ReturnTo? = null, public val forcedVisual: SelectionType? = null) :
+sealed interface Mode {
+  data class NORMAL(val returnTo: ReturnTo? = null) : Mode, ReturnableFromCmd
+  data class OP_PENDING(val returnTo: ReturnTo? = null, val forcedVisual: SelectionType? = null) :
     Mode, ReturnableFromCmd
-  public data class VISUAL(public val selectionType: SelectionType, public val returnTo: ReturnTo? = null) : Mode,
+  data class VISUAL(val selectionType: SelectionType, val returnTo: ReturnTo? = null) : Mode,
     ReturnableFromCmd
-  public data class SELECT(public val selectionType: SelectionType, public val returnTo: ReturnTo? = null) : Mode
-  public object INSERT : Mode
-  public object REPLACE : Mode
-  public data class CMD_LINE(public val returnTo: ReturnableFromCmd) : Mode
+  data class SELECT(val selectionType: SelectionType, val returnTo: ReturnTo? = null) : Mode
+  object INSERT : Mode
+  object REPLACE : Mode
+  data class CMD_LINE(val returnTo: ReturnableFromCmd) : Mode
 }
 
-public sealed interface ReturnTo {
-  public object INSERT : ReturnTo
-  public object REPLACE : ReturnTo
+sealed interface ReturnTo {
+  object INSERT : ReturnTo
+  object REPLACE : ReturnTo
 }
 
 // Marks modes that can we return from CMD_LINE mode
-public sealed interface ReturnableFromCmd
+sealed interface ReturnableFromCmd
 
-public enum class SelectionType {
+enum class SelectionType {
   LINE_WISE,
   CHARACTER_WISE,
   BLOCK_WISE,

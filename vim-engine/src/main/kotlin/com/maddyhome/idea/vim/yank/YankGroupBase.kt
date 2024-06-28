@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
 
-public open class YankGroupBase : VimYankGroup {
+open class YankGroupBase : VimYankGroup {
   private val yankListeners: MutableList<VimYankListener> = ArrayList()
 
   private fun yankRange(

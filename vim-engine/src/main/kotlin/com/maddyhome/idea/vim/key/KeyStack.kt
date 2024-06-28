@@ -21,18 +21,18 @@ import javax.swing.KeyStroke
  *   solves an issus of passing a keystroke to modal entry.
  *   However, some more advanced solution may be necessary in the future.
  */
-public class KeyStack {
+class KeyStack {
   private val stack = ArrayDeque<Frame>()
 
-  public fun hasStroke(): Boolean {
+  fun hasStroke(): Boolean {
     return stack.isNotEmpty() && stack.first().hasStroke()
   }
 
-  public fun isEmpty(): Boolean {
+  fun isEmpty(): Boolean {
     return stack.none { it.hasStroke() }
   }
 
-  public fun feedSomeStroke(): KeyStroke? {
+  fun feedSomeStroke(): KeyStroke? {
     stack.forEach {
       if (it.hasStroke()) {
         return it.feed()
@@ -41,30 +41,30 @@ public class KeyStack {
     return null
   }
 
-  public fun feedStroke(): KeyStroke {
+  fun feedStroke(): KeyStroke {
     val frame = stack.first()
     val key = frame.feed()
     return key
   }
 
-  public fun addKeys(keyStrokes: List<KeyStroke>) {
+  fun addKeys(keyStrokes: List<KeyStroke>) {
     LOG.trace { "Got new keys to key stack: $keyStrokes" }
     stack.addFirst(Frame(keyStrokes))
   }
 
-  public fun removeFirst() {
+  fun removeFirst() {
     if (stack.isNotEmpty()) {
       stack.removeFirst()
     }
   }
 
-  public fun resetFirst() {
+  fun resetFirst() {
     if (stack.isNotEmpty()) {
       stack.first().resetPointer()
     }
   }
 
-  public fun dump(): String {
+  fun dump(): String {
     return buildString {
       this.appendLine("KeyStack:")
       this.appendLine("Stack size: ${stack.size}")

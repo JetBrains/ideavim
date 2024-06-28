@@ -11,14 +11,14 @@ package com.maddyhome.idea.vim.macro
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
-public interface VimMacro {
-  public val isExecutingMacro: Boolean
-  public var lastRegister: Char
+interface VimMacro {
+  val isExecutingMacro: Boolean
+  var lastRegister: Char
 
   /**
    * Keys are taken from KeyHandler.mappingStack
    */
-  public fun playbackKeys(
+  fun playbackKeys(
     editor: VimEditor,
     context: ExecutionContext,
     total: Int,
@@ -33,7 +33,7 @@ public interface VimMacro {
    * @param count   The number of times to execute the macro
    * @return true if able to play the macro, false if invalid or empty register
    */
-  public fun playbackRegister(editor: VimEditor, context: ExecutionContext, reg: Char, count: Int): Boolean
+  fun playbackRegister(editor: VimEditor, context: ExecutionContext, reg: Char, count: Int): Boolean
 
   /**
    * This plays back the last register that was executed, if any.
@@ -43,7 +43,7 @@ public interface VimMacro {
    * @param count   The number of times to execute the macro
    * @return true if able to play the macro, false in no previous playback
    */
-  public fun playbackLastRegister(
+  fun playbackLastRegister(
     editor: VimEditor,
     context: ExecutionContext,
     count: Int,

@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["gt"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class NextTabAction : VimActionHandler.SingleExecution() {
+class NextTabAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: VimEditor,
     context: ExecutionContext,

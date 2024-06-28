@@ -29,7 +29,7 @@ import java.util.*
  * @author vlan
  */
 @CommandOrMotion(keys = ["r"], modes = [Mode.VISUAL])
-public class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
+class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH

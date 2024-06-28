@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // todo make it for each caret
 @ExCommand(command = "norm[al]")
-public data class NormalCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class NormalCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,

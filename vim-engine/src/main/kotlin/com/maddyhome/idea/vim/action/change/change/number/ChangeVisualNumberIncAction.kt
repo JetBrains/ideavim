@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 
-public sealed class IncNumber(public val inc: Int, private val avalanche: Boolean) : VisualOperatorActionHandler.ForEachCaret() {
+sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override fun executeAction(
@@ -34,13 +34,13 @@ public sealed class IncNumber(public val inc: Int, private val avalanche: Boolea
 }
 
 @CommandOrMotion(keys = ["<C-A>"], modes = [Mode.VISUAL])
-public class ChangeVisualNumberIncAction : IncNumber(1, false)
+class ChangeVisualNumberIncAction : IncNumber(1, false)
 
 @CommandOrMotion(keys = ["<C-X>"], modes = [Mode.VISUAL])
-public class ChangeVisualNumberDecAction : IncNumber(-1, false)
+class ChangeVisualNumberDecAction : IncNumber(-1, false)
 
 @CommandOrMotion(keys = ["g<C-A>"], modes = [Mode.VISUAL])
-public class ChangeVisualNumberAvalancheIncAction : IncNumber(1, true)
+class ChangeVisualNumberAvalancheIncAction : IncNumber(1, true)
 
 @CommandOrMotion(keys = ["g<C-X>"], modes = [Mode.VISUAL])
-public class ChangeVisualNumberAvalancheDecAction : IncNumber(-1, true)
+class ChangeVisualNumberAvalancheDecAction : IncNumber(-1, true)

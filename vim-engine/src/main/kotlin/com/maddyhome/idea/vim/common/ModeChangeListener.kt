@@ -11,6 +11,6 @@ package com.maddyhome.idea.vim.common
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.state.mode.Mode
 
-public interface ModeChangeListener {
-  public fun modeChanged(editor: VimEditor, oldMode: Mode)
+interface ModeChangeListener {
+  fun modeChanged(editor: VimEditor, oldMode: Mode)
 }

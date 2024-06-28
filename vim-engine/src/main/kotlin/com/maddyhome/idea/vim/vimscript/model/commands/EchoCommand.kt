@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
  * see "h :echo"
  */
 @ExCommand(command = "ec[ho]")
-public data class EchoCommand(val range: Range, val args: List<Expression>) : Command.SingleExecution(range) {
+data class EchoCommand(val range: Range, val args: List<Expression>) : Command.SingleExecution(range) {
 
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 

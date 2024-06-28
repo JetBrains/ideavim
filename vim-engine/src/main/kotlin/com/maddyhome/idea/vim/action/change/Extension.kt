@@ -11,8 +11,8 @@ package com.maddyhome.idea.vim.action.change
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import javax.swing.KeyStroke
 
-public object Extension {
-  public var lastExtensionHandler: ExtensionHandler? = null
+object Extension {
+  var lastExtensionHandler: ExtensionHandler? = null
 
   private val keyStrokes = mutableListOf<KeyStroke>()
   private val strings = mutableListOf<String>()
@@ -20,10 +20,10 @@ public object Extension {
   private var keystrokePointer = 0
   private var stringPointer = 0
 
-  public fun addKeystroke(key: KeyStroke): Boolean = keyStrokes.add(key)
-  public fun addString(key: String): Boolean = strings.add(key)
+  fun addKeystroke(key: KeyStroke): Boolean = keyStrokes.add(key)
+  fun addString(key: String): Boolean = strings.add(key)
 
-  public fun consumeKeystroke(): KeyStroke? {
+  fun consumeKeystroke(): KeyStroke? {
     if (keystrokePointer in keyStrokes.indices) {
       keystrokePointer += 1
       return keyStrokes[keystrokePointer - 1]
@@ -31,7 +31,7 @@ public object Extension {
     return null
   }
 
-  public fun consumeString(): String? {
+  fun consumeString(): String? {
     if (stringPointer in strings.indices) {
       stringPointer += 1
       return strings[stringPointer - 1]
@@ -39,12 +39,12 @@ public object Extension {
     return null
   }
 
-  public fun reset() {
+  fun reset() {
     keystrokePointer = 0
     stringPointer = 0
   }
 
-  public fun clean() {
+  fun clean() {
     keyStrokes.clear()
     strings.clear()
     keystrokePointer = 0

@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.mark.Jump
 
-public abstract class VimJumpServiceBase : VimJumpService {
+abstract class VimJumpServiceBase : VimJumpService {
   protected val projectToJumps: MutableMap<String, MutableList<Jump>> = mutableMapOf()
   protected val projectToJumpSpot: MutableMap<String, Int> = mutableMapOf()
 
@@ -76,7 +76,7 @@ public abstract class VimJumpServiceBase : VimJumpService {
     projectToJumpSpot.clear()
   }
 
-  public companion object {
-    public const val SAVE_JUMP_COUNT: Int = 100
+  companion object {
+    const val SAVE_JUMP_COUNT: Int = 100
   }
 }

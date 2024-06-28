@@ -16,8 +16,8 @@ internal class IjLiveRange(val marker: RangeMarker) : LiveRange {
     get() = marker.startOffset
 }
 
-public val RangeMarker.vim: LiveRange
+val RangeMarker.vim: LiveRange
   get() = IjLiveRange(this)
 
-public val LiveRange.ij: RangeMarker
+val LiveRange.ij: RangeMarker
   get() = (this as IjLiveRange).marker

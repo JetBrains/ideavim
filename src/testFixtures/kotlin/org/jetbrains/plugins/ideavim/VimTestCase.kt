@@ -320,7 +320,7 @@ abstract class VimTestCase {
     return fixture.editor
   }
 
-  public fun configureByTextX(fileName: String, content: String): Editor {
+  fun configureByTextX(fileName: String, content: String): Editor {
     fixture.configureByText(fileName, content)
     setDefaultIntelliJSettings(fixture.editor)
     NeovimTesting.setupEditor(fixture.editor, testInfo)

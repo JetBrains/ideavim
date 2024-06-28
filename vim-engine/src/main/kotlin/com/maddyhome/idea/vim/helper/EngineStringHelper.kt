@@ -12,8 +12,8 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-public object EngineStringHelper {
-  public fun toPrintableCharacters(keys: List<KeyStroke>): String {
+object EngineStringHelper {
+  fun toPrintableCharacters(keys: List<KeyStroke>): String {
     if (keys.isEmpty()) {
       return ""
     }
@@ -34,7 +34,7 @@ public object EngineStringHelper {
    * @return A printable String of the character represented by the KeyStroke
    */
   @JvmStatic
-  public fun toPrintableCharacter(key: KeyStroke): String {
+  fun toPrintableCharacter(key: KeyStroke): String {
     // TODO: Look at 'isprint', 'display' and 'encoding' settings
     var c = key.keyChar
     if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers == 0) {
@@ -63,7 +63,7 @@ public object EngineStringHelper {
 }
 
 // https://stackoverflow.com/a/14652763/3124227
-public fun String.removeAsciiColorCodes(): String {
+fun String.removeAsciiColorCodes(): String {
   return this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
 }
 

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :print"
  */
 @ExCommand(command = "p[rint],P[rint]")
-public data class PrintCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class PrintCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

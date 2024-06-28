@@ -124,8 +124,8 @@ import com.maddyhome.idea.vim.state.mode.returnTo
  * and IntelliJ visual lines will be clearly marked in the parameter or variable name, e.g. `visualLine`.
  * ([VimVisualPosition] should be phased out if possible, as it is an IntelliJ concept, not a Vim concept.)
  */
-public interface VimEditor {
-  public var mode: Mode
+interface VimEditor {
+  var mode: Mode
     get() = vimStateMachine.mode
     set(value) {
       if (vimStateMachine.mode == value) return
@@ -135,7 +135,7 @@ public interface VimEditor {
       injector.listenersNotifier.notifyModeChanged(this, oldValue)
     }
 
-  public  var isReplaceCharacter: Boolean
+  var isReplaceCharacter: Boolean
     get() = vimStateMachine.isReplaceCharacter
     set(value) {
       if (value != vimStateMachine.isReplaceCharacter) {
@@ -144,10 +144,10 @@ public interface VimEditor {
       }
     }
 
-  public val lfMakesNewLine: Boolean
-  public var vimChangeActionSwitchMode: Mode?
+  val lfMakesNewLine: Boolean
+  var vimChangeActionSwitchMode: Mode?
 
-  public fun fileSize(): Long
+  fun fileSize(): Long
 
   /**
    * Return the text of the document
@@ -155,7 +155,7 @@ public interface VimEditor {
    * This function should expect to be called multiple times, and therefore should not allocate and copy the entire text
    * of the document. For example, the search helpers call this function repeatedly.
    */
-  public fun text(): CharSequence
+  fun text(): CharSequence
 
   /**
    * Vim has always at least one line. When we need to understand that there are no lines, it has a flag "ML_EMPTY"
@@ -168,17 +168,17 @@ public interface VimEditor {
    *   that this variable doesn't present the line count, so I may be wrong and line count can return zero.
    * I've explored this question by looking at the implementation of ctrl-g command in normal mode.
    */
-  public fun lineCount(): Int {
+  fun lineCount(): Int {
     return nativeLineCount().coerceAtLeast(1)
   }
 
-  public fun nativeLineCount(): Int
+  fun nativeLineCount(): Int
 
-  public fun getLineRange(line: Int): Pair<Int, Int>
-  public fun carets(): List<VimCaret>
-  public fun sortedCarets(): List<VimCaret> = carets().sortedByOffset()
-  public fun nativeCarets(): List<VimCaret>
-  public fun sortedNativeCarets(): List<VimCaret> = nativeCarets().sortedByOffset()
+  fun getLineRange(line: Int): Pair<Int, Int>
+  fun carets(): List<VimCaret>
+  fun sortedCarets(): List<VimCaret> = carets().sortedByOffset()
+  fun nativeCarets(): List<VimCaret>
+  fun sortedNativeCarets(): List<VimCaret> = nativeCarets().sortedByOffset()
 
   private fun List<VimCaret>.sortedByOffset(): List<VimCaret> {
     return this.sortedWith(compareBy { it.offset }).reversed()
@@ -189,9 +189,9 @@ public interface VimEditor {
    * TODO review
    */
 
-  public fun forEachCaret(action: (VimCaret) -> Unit)
-  public fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean = false)
-  public fun isInForEachCaretScope(): Boolean
+  fun forEachCaret(action: (VimCaret) -> Unit)
+  fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean = false)
+  fun isInForEachCaretScope(): Boolean
 
   // --------------------------------------------------------------------
 
@@ -199,101 +199,101 @@ public interface VimEditor {
    * Do we really need this?
    * TODO
    */
-  public fun primaryCaret(): VimCaret
-  public fun currentCaret(): VimCaret
+  fun primaryCaret(): VimCaret
+  fun currentCaret(): VimCaret
 
-  public fun isWritable(): Boolean
-  public fun isDocumentWritable(): Boolean
-  public fun isOneLineMode(): Boolean
+  fun isWritable(): Boolean
+  fun isDocumentWritable(): Boolean
+  fun isOneLineMode(): Boolean
 
   /**
    * public function for refactoring, get rid of it
    */
-  public fun search(
+  fun search(
     pair: Pair<Int, Int>,
     editor: VimEditor,
     shiftType: LineDeleteShift,
   ): Pair<Pair<Int, Int>, LineDeleteShift>?
 
-  public fun offsetToBufferPosition(offset: Int): BufferPosition
-  public fun bufferPositionToOffset(position: BufferPosition): Int
+  fun offsetToBufferPosition(offset: Int): BufferPosition
+  fun bufferPositionToOffset(position: BufferPosition): Int
 
   // TODO: [visual] Try to remove these. Visual position is an IntelliJ concept and doesn't have a Vim equivalent
-  public fun offsetToVisualPosition(offset: Int): VimVisualPosition
-  public fun visualPositionToOffset(position: VimVisualPosition): Int
+  fun offsetToVisualPosition(offset: Int): VimVisualPosition
+  fun visualPositionToOffset(position: VimVisualPosition): Int
 
-  public fun visualPositionToBufferPosition(position: VimVisualPosition): BufferPosition
-  public fun bufferPositionToVisualPosition(position: BufferPosition): VimVisualPosition
+  fun visualPositionToBufferPosition(position: VimVisualPosition): BufferPosition
+  fun bufferPositionToVisualPosition(position: BufferPosition): VimVisualPosition
 
-  public fun bufferLineToVisualLine(line: Int): Int {
+  fun bufferLineToVisualLine(line: Int): Int {
     return bufferPositionToVisualPosition(BufferPosition(line, 0)).line
   }
 
-  public fun getVirtualFile(): VirtualFile?
-  public fun deleteString(range: TextRange)
+  fun getVirtualFile(): VirtualFile?
+  fun deleteString(range: TextRange)
 
-  public fun getLineText(line: Int): String {
+  fun getLineText(line: Int): String {
     val start: Int = getLineStartOffset(line)
     val end: Int = getLineEndOffset(line, true)
     return getText(start, end)
   }
 
-  public fun getSelectionModel(): VimSelectionModel
-  public fun getScrollingModel(): VimScrollingModel
+  fun getSelectionModel(): VimSelectionModel
+  fun getScrollingModel(): VimScrollingModel
 
-  public fun removeCaret(caret: VimCaret)
-  public fun removeSecondaryCarets()
-  public fun vimSetSystemBlockSelectionSilently(start: BufferPosition, end: BufferPosition)
+  fun removeCaret(caret: VimCaret)
+  fun removeSecondaryCarets()
+  fun vimSetSystemBlockSelectionSilently(start: BufferPosition, end: BufferPosition)
 
-  public fun getLineStartOffset(line: Int): Int
-  public fun getLineEndOffset(line: Int): Int
+  fun getLineStartOffset(line: Int): Int
+  fun getLineEndOffset(line: Int): Int
 
-  public fun addCaretListener(listener: VimCaretListener)
-  public fun removeCaretListener(listener: VimCaretListener)
+  fun addCaretListener(listener: VimCaretListener)
+  fun removeCaretListener(listener: VimCaretListener)
 
-  public fun isDisposed(): Boolean
+  fun isDisposed(): Boolean
 
-  public fun removeSelection()
+  fun removeSelection()
 
-  public fun getPath(): String?
-  public fun extractProtocol(): String?
+  fun getPath(): String?
+  fun extractProtocol(): String?
 
   // Can be used as a key to store something for specific project
-  public val projectId: String
+  val projectId: String
 
-  public fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments)
-  public fun exitSelectModeNative(adjustCaret: Boolean)
+  fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments)
+  fun exitSelectModeNative(adjustCaret: Boolean)
 
-  public var vimLastSelectionType: SelectionType?
+  var vimLastSelectionType: SelectionType?
 
-  public fun isTemplateActive(): Boolean
+  fun isTemplateActive(): Boolean
 
-  public fun startGuardedBlockChecking()
-  public fun stopGuardedBlockChecking()
+  fun startGuardedBlockChecking()
+  fun stopGuardedBlockChecking()
 
-  public fun hasUnsavedChanges(): Boolean
+  fun hasUnsavedChanges(): Boolean
 
-  public fun getLastVisualLineColumnNumber(line: Int): Int
+  fun getLastVisualLineColumnNumber(line: Int): Int
 
-  public fun createLiveMarker(start: Int, end: Int): LiveRange
-  public var insertMode: Boolean
+  fun createLiveMarker(start: Int, end: Int): LiveRange
+  var insertMode: Boolean
 
-  public val document: VimDocument
+  val document: VimDocument
 
-  public fun charAt(offset: Int): Char {
+  fun charAt(offset: Int): Char {
     return text()[offset]
   }
 
-  public fun createIndentBySize(size: Int): String
-  public fun getFoldRegionAtOffset(offset: Int): VimFoldRegion?
+  fun createIndentBySize(size: Int): String
+  fun getFoldRegionAtOffset(offset: Int): VimFoldRegion?
 
   /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret
    *   instance and need to search for a new version.
    */
-  public fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T?
+  fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T?
 
-  public fun resetOpPending() {
+  fun resetOpPending() {
     if (this.mode is Mode.OP_PENDING) {
       val returnTo = this.mode.returnTo
       mode = when (returnTo) {
@@ -305,22 +305,22 @@ public interface VimEditor {
   }
 }
 
-public interface MutableVimEditor : VimEditor {
-  public fun addLine(atPosition: Int): Int?
-  public fun insertText(caret: VimCaret, atPosition: Int, text: CharSequence)
-  public fun replaceString(start: Int, end: Int, newString: String)
+interface MutableVimEditor : VimEditor {
+  fun addLine(atPosition: Int): Int?
+  fun insertText(caret: VimCaret, atPosition: Int, text: CharSequence)
+  fun replaceString(start: Int, end: Int, newString: String)
 }
 
-public abstract class LinearEditor : VimEditor {
-  public abstract fun getLine(offset: Int): Int
-  public abstract fun getText(left: Int, right: Int): CharSequence
+abstract class LinearEditor : VimEditor {
+  abstract fun getLine(offset: Int): Int
+  abstract fun getText(left: Int, right: Int): CharSequence
 }
 
-public abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
-  public abstract fun deleteRange(leftOffset: Int, rightOffset: Int)
+abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
+  abstract fun deleteRange(leftOffset: Int, rightOffset: Int)
 }
 
-public enum class LineDeleteShift {
+enum class LineDeleteShift {
   NL_ON_START,
   NL_ON_END,
   NO_NL,
@@ -332,21 +332,21 @@ public enum class LineDeleteShift {
  * See `:help definitions` for terminology. Equivalent to IntelliJ's `LogicalPosition` which should not be confused for
  * Vim's "logical lines", which don't have an IntelliJ equivalent.
  */
-public class BufferPosition(
-  public val line: Int,
-  public val column: Int,
-  public val leansForward: Boolean = false,
+class BufferPosition(
+  val line: Int,
+  val column: Int,
+  val leansForward: Boolean = false,
 ) : Comparable<BufferPosition> {
-  public override fun compareTo(other: BufferPosition): Int {
+  override fun compareTo(other: BufferPosition): Int {
     return if (line != other.line) line - other.line else column - other.column
   }
 }
 
 // TODO: [visual] Try to remove this. It's an IntelliJ concept and doesn't have a Vim equivalent
-public data class VimVisualPosition(val line: Int, public val column: Int, public val leansRight: Boolean = false)
+data class VimVisualPosition(val line: Int, val column: Int, val leansRight: Boolean = false)
 
-public interface VimFoldRegion {
-  public var isExpanded: Boolean
-  public val startOffset: Int
-  public val endOffset: Int
+interface VimFoldRegion {
+  var isExpanded: Boolean
+  val startOffset: Int
+  val endOffset: Int
 }

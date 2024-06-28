@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 @ExCommand(command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],no[map],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]")
-public data class MapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
+data class MapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
@@ -131,7 +131,7 @@ public data class MapCommand(val range: Range, val argument: String, val cmd: St
     val secondArgument: String,
   )
 
-  public companion object {
+  companion object {
     private const val CTRL_V = '\u0016'
     private val COMMAND_INFOS = arrayOf(
       // TODO: Support smap, map!, lmap

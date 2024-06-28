@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["i`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
+class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -40,7 +40,7 @@ public class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["i\""], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
+class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -58,7 +58,7 @@ public class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["i'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
+class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -76,7 +76,7 @@ public class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
+class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -94,7 +94,7 @@ public class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a\""], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
+class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -112,7 +112,7 @@ public class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["a'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
+class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
-public class SelectRegisterConsumer : KeyConsumer {
+class SelectRegisterConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<SelectRegisterConsumer>()
   }

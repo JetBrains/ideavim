@@ -26,12 +26,12 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["g)"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionSentenceNextEndAction : MotionSentenceEndAction(Direction.FORWARDS)
+class MotionSentenceNextEndAction : MotionSentenceEndAction(Direction.FORWARDS)
 
 @CommandOrMotion(keys = ["g("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionSentencePreviousEndAction : MotionSentenceEndAction(Direction.BACKWARDS)
+class MotionSentencePreviousEndAction : MotionSentenceEndAction(Direction.BACKWARDS)
 
-public sealed class MotionSentenceEndAction(public val direction: Direction) : MotionActionHandler.ForEachCaret() {
+sealed class MotionSentenceEndAction(val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

@@ -35,11 +35,11 @@ import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import javax.swing.KeyStroke
 
-public abstract class VimRegisterGroupBase : VimRegisterGroup {
+abstract class VimRegisterGroupBase : VimRegisterGroup {
   override val isRecording: Boolean
     get() = recordRegister != null
 
-  public override var recordRegister: Char? = null
+  override var recordRegister: Char? = null
     set(value) {
       field = value
       if (value != null) {
@@ -96,7 +96,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     lastRegisterChar = defaultRegisterChar
   }
 
-  public fun initClipboardOptionListener() {
+  fun initClipboardOptionListener() {
     injector.optionGroup.addGlobalOptionChangeListener(Options.clipboard, onClipboardChanged)
     onClipboardChanged()
   }
@@ -169,7 +169,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     return false
   }
 
-  public fun storeTextInternal(
+  fun storeTextInternal(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     range: TextRange,
@@ -528,8 +528,8 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     recordRegister = null
   }
 
-  public companion object {
-    public val logger: VimLogger = vimLogger<VimRegisterGroupBase>()
+  companion object {
+    val logger: VimLogger = vimLogger<VimRegisterGroupBase>()
   }
 
   override fun getCurrentRegisterForMulticaret(): Char {

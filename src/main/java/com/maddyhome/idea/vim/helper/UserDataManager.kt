@@ -45,7 +45,7 @@ import kotlin.reflect.KProperty
 /**
  * Caret's offset when entering visual mode
  */
-public var Caret.vimSelectionStart: Int
+var Caret.vimSelectionStart: Int
   get() {
     val selectionStart = _vimSelectionStart
     if (selectionStart == null) {

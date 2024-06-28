@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 
 // TODO: We need a nicer way to handle output, especially wrt testing, appending + clearing
-public class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
+class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
   private var isActiveInTestMode = false
 
   override val isActive: Boolean
@@ -60,9 +60,9 @@ public class ExOutputModel private constructor(private val myEditor: Editor) : V
     }
   }
 
-  public companion object {
+  companion object {
     @JvmStatic
-    public fun getInstance(editor: Editor): ExOutputModel {
+    fun getInstance(editor: Editor): ExOutputModel {
       var model = editor.vimExOutput
       if (model == null) {
         model = ExOutputModel(editor)

@@ -26,12 +26,12 @@ import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.min
 
-public abstract class VimKeyGroupBase : VimKeyGroup {
+abstract class VimKeyGroupBase : VimKeyGroup {
   @JvmField
-  public val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
-  public val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
-  public val keyRoots: MutableMap<MappingMode, CommandPartNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
-  public val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
+  val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
+  val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
+  val keyRoots: MutableMap<MappingMode, CommandPartNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
+  val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
 
   override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>) {
     modes.map { getKeyMapping(it) }.forEach { it.delete(keys) }

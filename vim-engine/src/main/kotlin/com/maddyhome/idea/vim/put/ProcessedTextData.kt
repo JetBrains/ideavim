@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.put
 
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
-public data class ProcessedTextData(
+data class ProcessedTextData(
   val text: String,
   val typeInRegister: SelectionType,
   val transferableData: List<Any>,

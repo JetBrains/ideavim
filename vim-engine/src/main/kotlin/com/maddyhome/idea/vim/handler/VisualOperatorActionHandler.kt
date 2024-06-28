@@ -41,14 +41,14 @@ import com.maddyhome.idea.vim.state.mode.selectionType
  *  - [VisualOperatorActionHandler.SingleExecution]
  *  - [VisualOperatorActionHandler.ForEachCaret]
  */
-public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
+sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   /**
    * Base class for visual operation handlers.
    * This handler executes an action for each caret. That means that if you have 5 carets,
    *   [executeAction] will be called 5 times.
    * @see [VisualOperatorActionHandler.SingleExecution] for only one execution.
    */
-  public abstract class ForEachCaret : VisualOperatorActionHandler() {
+  abstract class ForEachCaret : VisualOperatorActionHandler() {
 
     /**
      * Execute an action for current [caret].
@@ -58,7 +58,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
      * This method is executed once for each caret except case with block selection. If there is block selection,
      *   the method will be executed only once with [Caret#primaryCaret].
      */
-    public abstract fun executeAction(
+    abstract fun executeAction(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -72,7 +72,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
      * [caretsAndSelections] contains a map of all current carets and corresponding selections.
      *   If there is block selection, only one caret is in [caretsAndSelections].
      */
-    public open fun beforeExecution(
+    open fun beforeExecution(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
@@ -83,7 +83,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
      * This method executes after [executeAction] and only once for all carets.
      * [res] has true if ALL executions of [executeAction] returned true.
      */
-    public open fun afterExecution(editor: VimEditor, context: ExecutionContext, cmd: Command, res: Boolean) {}
+    open fun afterExecution(editor: VimEditor, context: ExecutionContext, cmd: Command, res: Boolean) {}
   }
 
   /**
@@ -92,7 +92,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
    *   [executeForAllCarets] will be called 1 time.
    * @see [VisualOperatorActionHandler.ForEachCaret] for per-caret execution
    */
-  public abstract class SingleExecution : VisualOperatorActionHandler() {
+  abstract class SingleExecution : VisualOperatorActionHandler() {
     /**
      * Execute an action
      * [caretsAndSelections] contains a map of all current carets and corresponding selections.
@@ -100,7 +100,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
      *
      * This method is executed once for all carets.
      */
-    public abstract fun executeForAllCarets(
+    abstract fun executeForAllCarets(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,

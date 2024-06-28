@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimSelectionModel {
-  public val selectionStart: Int
-  public val selectionEnd: Int
+interface VimSelectionModel {
+  val selectionStart: Int
+  val selectionEnd: Int
 
-  public fun hasSelection(): Boolean
+  fun hasSelection(): Boolean
 }

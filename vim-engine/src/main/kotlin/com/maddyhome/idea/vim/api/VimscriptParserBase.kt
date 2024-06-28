@@ -27,7 +27,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 
-public abstract class VimscriptParserBase: com.maddyhome.idea.vim.api.VimscriptParser {
+abstract class VimscriptParserBase: com.maddyhome.idea.vim.api.VimscriptParser {
   private companion object {
     private const val MAX_NUMBER_OF_TRIES = 5
   }
@@ -37,7 +37,7 @@ public abstract class VimscriptParserBase: com.maddyhome.idea.vim.api.VimscriptP
   private var tries = 0
   private var deletionInfo: DeletionInfo = DeletionInfo()
   protected open val commandProviders: List<ExCommandProvider> = listOf(EngineExCommandProvider)
-  public override val exCommands: ExCommandTree by lazy {
+  override val exCommands: ExCommandTree by lazy {
     val commandTree = ExCommandTree()
     commandProviders.forEach { provider -> provider.getCommands().forEach { commandTree.addCommand(it.key, it.value) } }
     commandTree

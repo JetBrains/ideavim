@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.
 /**
  * any command with no parser rule. we assume that it is an alias
  */
-public data class UnknownCommand(val range: Range, val name: String, val argument: String) :
+data class UnknownCommand(val range: Range, val name: String, val argument: String) :
   Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 

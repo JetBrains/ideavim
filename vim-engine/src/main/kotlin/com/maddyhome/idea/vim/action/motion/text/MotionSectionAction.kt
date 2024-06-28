@@ -26,18 +26,18 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["[]"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionSectionBackwardEndAction : MotionSectionAction('}', Direction.BACKWARDS)
+class MotionSectionBackwardEndAction : MotionSectionAction('}', Direction.BACKWARDS)
 
 @CommandOrMotion(keys = ["[["], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionSectionBackwardStartAction : MotionSectionAction('{', Direction.BACKWARDS)
+class MotionSectionBackwardStartAction : MotionSectionAction('{', Direction.BACKWARDS)
 
 @CommandOrMotion(keys = ["]["], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionSectionForwardEndAction : MotionSectionAction('}', Direction.FORWARDS)
+class MotionSectionForwardEndAction : MotionSectionAction('}', Direction.FORWARDS)
 
 @CommandOrMotion(keys = ["]]"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionSectionForwardStartAction : MotionSectionAction('{', Direction.FORWARDS)
+class MotionSectionForwardStartAction : MotionSectionAction('{', Direction.FORWARDS)
 
-public sealed class MotionSectionAction(private val charType: Char, public val direction: Direction) : MotionActionHandler.ForEachCaret() {
+sealed class MotionSectionAction(private val charType: Char, val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

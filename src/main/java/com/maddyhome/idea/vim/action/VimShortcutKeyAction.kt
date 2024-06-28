@@ -60,7 +60,7 @@ import javax.swing.KeyStroke
  * This class is used in Which-Key plugin, so don't make it internal. Generally, we should provide a proper
  *   way to get ideavim keys for this plugin. See VIM-3085
  */
-public class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   private val traceTime: Boolean
     get() {
       // Make sure the injector is initialized

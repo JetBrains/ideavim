@@ -102,7 +102,7 @@ annotation class OptionTest(vararg val value: VimOption)
  *   - Without bounded list:
  *     - Not supported, please specify possible values using [limitedValues]
  */
-public annotation class VimOption(
+annotation class VimOption(
   val name: String,
   val limitedValues: Array<String> = [],
   val doesntAffectTest: Boolean = false,

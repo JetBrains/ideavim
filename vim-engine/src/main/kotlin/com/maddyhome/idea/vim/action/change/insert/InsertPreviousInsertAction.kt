@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["<C-A>"], modes = [Mode.INSERT])
-public class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
+class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
@@ -33,7 +33,7 @@ public class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecut
 }
 
 @CommandOrMotion(keys = ["<C-@>", "<C-S-2>", "<C-2>"], modes = [Mode.INSERT])
-public class InsertPreviousInsertExitAction : ChangeEditorActionHandler.SingleExecution() {
+class InsertPreviousInsertExitAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(

@@ -21,7 +21,7 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-public class DigraphConsumer : KeyConsumer {
+class DigraphConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<DigraphConsumer>()
   }

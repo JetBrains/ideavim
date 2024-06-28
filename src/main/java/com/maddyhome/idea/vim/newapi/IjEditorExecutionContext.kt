@@ -24,8 +24,8 @@ internal val runFromVimKey = Key.create<Boolean>("RunFromVim")
 internal val DataContext.actionStartedFromVim: Boolean
   get() = (this as? UserDataHolder)?.getUserData(runFromVimKey) ?: false
 
-public val DataContext.vim: ExecutionContext
+val DataContext.vim: ExecutionContext
   get() = IjEditorExecutionContext(this)
 
-public val ExecutionContext.ij: DataContext
+val ExecutionContext.ij: DataContext
   get() = (this as IjEditorExecutionContext).context

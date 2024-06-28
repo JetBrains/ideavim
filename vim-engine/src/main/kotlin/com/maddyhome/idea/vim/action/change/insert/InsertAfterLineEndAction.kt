@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["A"], modes = [Mode.NORMAL])
-public class InsertAfterLineEndAction : ChangeEditorActionHandler.SingleExecution() {
+class InsertAfterLineEndAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(

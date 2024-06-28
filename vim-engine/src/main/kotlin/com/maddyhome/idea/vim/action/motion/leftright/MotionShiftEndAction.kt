@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 @CommandOrMotion(keys = ["<S-End>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
-public class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
+class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

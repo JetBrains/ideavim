@@ -51,7 +51,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
 
-public object CommandVisitor : VimscriptBaseVisitor<Command>() {
+object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   private val logger = vimLogger<CommandVisitor>()
   private val expressionVisitor: ExpressionVisitor = ExpressionVisitor

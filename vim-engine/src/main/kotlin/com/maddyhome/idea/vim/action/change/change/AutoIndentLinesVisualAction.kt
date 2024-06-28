@@ -25,7 +25,7 @@ import java.util.*
  * @author vlan
  */
 @CommandOrMotion(keys = ["="], modes = [Mode.VISUAL])
-public class AutoIndentLinesVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+class AutoIndentLinesVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)

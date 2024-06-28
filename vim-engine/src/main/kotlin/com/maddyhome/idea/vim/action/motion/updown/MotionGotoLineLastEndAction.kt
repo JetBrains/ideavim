@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-End>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
@@ -53,7 +53,7 @@ public class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<C-End>"], modes = [Mode.INSERT])
-public class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)

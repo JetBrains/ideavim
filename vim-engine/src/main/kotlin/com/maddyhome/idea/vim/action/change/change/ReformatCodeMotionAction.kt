@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["gq"], modes = [Mode.NORMAL])
-public class ReformatCodeMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+class ReformatCodeMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION

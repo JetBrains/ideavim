@@ -17,22 +17,22 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.state.mode.Mode
 
-public data class KeyHandlerState(
-  public val mappingState: MappingState,
-  public val digraphSequence: DigraphSequence,
-  public val editorCommandBuilder: CommandBuilder,
-  public var commandLineCommandBuilder: CommandBuilder?,
+data class KeyHandlerState(
+  val mappingState: MappingState,
+  val digraphSequence: DigraphSequence,
+  val editorCommandBuilder: CommandBuilder,
+  var commandLineCommandBuilder: CommandBuilder?,
 ): Cloneable {
-  public constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)), null)
+  constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)), null)
 
-  public companion object {
+  companion object {
     private val logger = vimLogger<KeyHandlerState>()
   }
 
-  public val commandBuilder: CommandBuilder
+  val commandBuilder: CommandBuilder
     get() = commandLineCommandBuilder ?: editorCommandBuilder
 
-  public fun enterCommandLine() {
+  fun enterCommandLine() {
     // Create a new command builder for the command line, so we can handle nested commands inside the command line.
     // The command that starts the command line is added to the new command builder and immediately executed, opening
     // the command line UI.
@@ -46,17 +46,17 @@ public data class KeyHandlerState(
     commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.CMD_LINE), editorCommandBuilder.count)
   }
 
-  public fun leaveCommandLine() {
+  fun leaveCommandLine() {
     commandLineCommandBuilder = null
   }
 
-  public fun partialReset(mode: Mode) {
+  fun partialReset(mode: Mode) {
     logger.trace("entered partialReset. mode: $mode")
     mappingState.resetMappingSequence()
     commandBuilder.resetInProgressCommandPart(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
   }
 
-  public fun reset(mode: Mode) {
+  fun reset(mode: Mode) {
     logger.trace("entered reset. mode: $mode")
     digraphSequence.reset()
     mappingState.resetMappingSequence()

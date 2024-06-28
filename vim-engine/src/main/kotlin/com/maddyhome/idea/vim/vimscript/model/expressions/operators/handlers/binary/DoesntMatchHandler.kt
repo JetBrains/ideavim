@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-public object DoesntMatchHandler : BinaryOperatorWithIgnoreCaseOption(DoesntMatchIgnoreCaseHandler, DoesntMatchCaseSensitiveHandler)
+object DoesntMatchHandler : BinaryOperatorWithIgnoreCaseOption(DoesntMatchIgnoreCaseHandler, DoesntMatchCaseSensitiveHandler)

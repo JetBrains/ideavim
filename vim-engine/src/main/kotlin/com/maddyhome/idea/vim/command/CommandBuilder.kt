@@ -21,14 +21,14 @@ import com.maddyhome.idea.vim.key.RootNode
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
-public class CommandBuilder(
+class CommandBuilder(
   private var currentCommandPartNode: CommandPartNode<LazyVimCommand>,
   initialUncommittedRawCount: Int = 0,
 ) : Cloneable {
   private var commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
-  public var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
+  var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
 
   /**
    * The current uncommitted count for the currently in-progress command part
@@ -46,7 +46,7 @@ public class CommandBuilder(
    * The [aggregatedUncommittedCount] property can be used to get the current total count across all command parts,
    * although this value is also not guaranteed to be final.
    */
-  public var count: Int = initialUncommittedRawCount
+  var count: Int = initialUncommittedRawCount
     private set
 
   /**
@@ -61,34 +61,34 @@ public class CommandBuilder(
    * [Command.rawCount] after a call to [buildCommand]. This value is expected to be used for `'incsearch'`
    * highlighting.
    */
-  public val aggregatedUncommittedCount: Int
+  val aggregatedUncommittedCount: Int
     get() = (commandParts.map { it.count }.reduceOrNull { acc, i -> acc * i } ?: 1) * count.coerceAtLeast(1)
 
-  public val keys: Iterable<KeyStroke> get() = keyList
-  public val register: Char?
+  val keys: Iterable<KeyStroke> get() = keyList
+  val register: Char?
     get() = commandParts.lastOrNull()?.register
 
   // The argument type for the current command part's action. Kept separate to handle digraphs and characters. We first
   // try to accept a digraph. If we get it, set expected argument type to character and handle the converted key. If we
   // fail to convert to a digraph, set expected argument type to character and try to handle the key again.
-  public var expectedArgumentType: Argument.Type? = null
+  var expectedArgumentType: Argument.Type? = null
     private set
 
   private var prevExpectedArgumentType: Argument.Type? = null
 
-  public val isReady: Boolean get() = commandState == CurrentCommandState.READY
-  public val isBad: Boolean get() = commandState == CurrentCommandState.BAD_COMMAND
-  public val isEmpty: Boolean get() = commandParts.isEmpty()
-  public val isAtDefaultState: Boolean get() = isEmpty && count == 0 && expectedArgumentType == null
+  val isReady: Boolean get() = commandState == CurrentCommandState.READY
+  val isBad: Boolean get() = commandState == CurrentCommandState.BAD_COMMAND
+  val isEmpty: Boolean get() = commandParts.isEmpty()
+  val isAtDefaultState: Boolean get() = isEmpty && count == 0 && expectedArgumentType == null
 
-  public val isExpectingCount: Boolean
+  val isExpectingCount: Boolean
     get() {
       return commandState == CurrentCommandState.NEW_COMMAND &&
         expectedArgumentType != Argument.Type.CHARACTER &&
         expectedArgumentType != Argument.Type.DIGRAPH
     }
 
-  public fun pushCommandPart(action: EditorActionHandlerBase) {
+  fun pushCommandPart(action: EditorActionHandlerBase) {
     logger.trace { "pushCommandPart is executed. action = $action" }
     commandParts.add(Command(count, action, action.type, action.flags))
     prevExpectedArgumentType = expectedArgumentType
@@ -96,7 +96,7 @@ public class CommandBuilder(
     count = 0
   }
 
-  public fun pushCommandPart(register: Char) {
+  fun pushCommandPart(register: Char) {
     logger.trace { "pushCommandPart is executed. register = $register" }
     // We will never execute this command, but we need to push something to correctly handle counts on either side of a
     // select register command part. e.g. 2"a2d2w or even crazier 2"a2"a2"a2"a2"a2d2w
@@ -105,14 +105,14 @@ public class CommandBuilder(
     count = 0
   }
 
-  public fun popCommandPart(): Command {
+  fun popCommandPart(): Command {
     logger.trace { "popCommandPart is executed" }
     val command = commandParts.removeLast()
     expectedArgumentType = if (commandParts.size > 0) commandParts.last().action.argumentType else null
     return command
   }
 
-  public fun fallbackToCharacterArgument() {
+  fun fallbackToCharacterArgument() {
     logger.trace { "fallbackToCharacterArgument is executed" }
     // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
     // in which case try to handle input as a character argument.
@@ -120,12 +120,12 @@ public class CommandBuilder(
     expectedArgumentType = Argument.Type.CHARACTER
   }
 
-  public fun addKey(key: KeyStroke) {
+  fun addKey(key: KeyStroke) {
     logger.trace { "added key to command builder" }
     keyList.add(key)
   }
 
-  public fun addCountCharacter(key: KeyStroke) {
+  fun addCountCharacter(key: KeyStroke) {
     count = (count * 10) + (key.keyChar - '0')
     // If count overflows and flips negative, reset to 999999999L. In Vim, count is a long, which is *usually* 32 bits,
     // so will flip at 2147483648. We store count as an Int, which is also 32 bit.
@@ -136,21 +136,21 @@ public class CommandBuilder(
     addKey(key)
   }
 
-  public fun deleteCountCharacter() {
+  fun deleteCountCharacter() {
     count /= 10
     keyList.removeAt(keyList.size - 1)
   }
 
-  public fun setCurrentCommandPartNode(newNode: CommandPartNode<LazyVimCommand>) {
+  fun setCurrentCommandPartNode(newNode: CommandPartNode<LazyVimCommand>) {
     logger.trace { "setCurrentCommandPartNode is executed" }
     currentCommandPartNode = newNode
   }
 
-  public fun getChildNode(key: KeyStroke): Node<LazyVimCommand>? {
+  fun getChildNode(key: KeyStroke): Node<LazyVimCommand>? {
     return currentCommandPartNode[key]
   }
 
-  public fun isAwaitingCharOrDigraphArgument(): Boolean {
+  fun isAwaitingCharOrDigraphArgument(): Boolean {
     if (commandParts.size == 0) return false
     val argumentType = commandParts.last().action.argumentType
     val awaiting = argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
@@ -158,7 +158,7 @@ public class CommandBuilder(
     return awaiting
   }
 
-  public fun isBuildingMultiKeyCommand(): Boolean {
+  fun isBuildingMultiKeyCommand(): Boolean {
     // Don't apply mapping if we're in the middle of building a multi-key command.
     // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
     //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
@@ -169,28 +169,28 @@ public class CommandBuilder(
     return isMultikey
   }
 
-  public fun isPuttingLiteral(): Boolean {
+  fun isPuttingLiteral(): Boolean {
     return !commandParts.isEmpty() && commandParts.last().action.id == "VimInsertCompletedLiteralAction"
   }
 
-  public fun isDone(): Boolean {
+  fun isDone(): Boolean {
     return commandParts.isEmpty()
   }
 
-  public fun completeCommandPart(argument: Argument) {
+  fun completeCommandPart(argument: Argument) {
     logger.trace { "completeCommandPart is executed" }
     commandParts.last().argument = argument
     commandState = CurrentCommandState.READY
   }
 
-  public fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
+  fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
     logger.trace { "entered isDuplicateOperatorKeyStroke" }
     val action = commandParts.last().action as? DuplicableOperatorAction
     logger.trace { "action = $action" }
     return action?.duplicateWith == key.keyChar
   }
 
-  public fun hasCurrentCommandPartArgument(): Boolean {
+  fun hasCurrentCommandPartArgument(): Boolean {
     return commandParts.firstOrNull()?.argument != null
   }
 
@@ -200,10 +200,10 @@ public class CommandBuilder(
    * If there isn't a current command part, this will return 0. Not to be confused with [count], which is the count for
    * the _next_ command part.
    */
-  public val currentCommandPartCount1: Int
+  val currentCommandPartCount1: Int
     get() = commandParts.firstOrNull()?.count ?: 0
 
-  public fun buildCommand(): Command {
+  fun buildCommand(): Command {
     if (commandParts.last().action.id == "VimInsertCompletedDigraphAction" || commandParts.last().action.id == "VimResetModeAction") {
       expectedArgumentType = prevExpectedArgumentType
       prevExpectedArgumentType = null
@@ -228,7 +228,7 @@ public class CommandBuilder(
     return command
   }
 
-  public fun resetAll(commandPartNode: CommandPartNode<LazyVimCommand>) {
+  fun resetAll(commandPartNode: CommandPartNode<LazyVimCommand>) {
     logger.trace { "resetAll is executed" }
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
@@ -238,18 +238,18 @@ public class CommandBuilder(
     prevExpectedArgumentType = null
   }
 
-  public fun resetCount() {
+  fun resetCount() {
     count = 0
   }
 
-  public fun resetInProgressCommandPart(commandPartNode: CommandPartNode<LazyVimCommand>) {
+  fun resetInProgressCommandPart(commandPartNode: CommandPartNode<LazyVimCommand>) {
     logger.trace { "resetInProgressCommandPart is executed" }
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }
 
   @TestOnly
-  public fun getCurrentTrie(): CommandPartNode<LazyVimCommand> = currentCommandPartNode
+  fun getCurrentTrie(): CommandPartNode<LazyVimCommand> = currentCommandPartNode
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
@@ -294,7 +294,7 @@ public class CommandBuilder(
       "command part node - $currentCommandPartNode"
   }
 
-  public companion object {
+  companion object {
     private val logger = vimLogger<CommandBuilder>()
   }
 }

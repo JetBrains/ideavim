@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
 @CommandOrMotion(keys = ["j"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public open class MotionDownAction : MotionActionHandler.ForEachCaret() {
+open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
 
@@ -38,7 +38,7 @@ public open class MotionDownAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["<C-N>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionDownCtrlNAction : MotionDownAction() {
+class MotionDownCtrlNAction : MotionDownAction() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -60,7 +60,7 @@ public class MotionDownCtrlNAction : MotionDownAction() {
 }
 
 @CommandOrMotion(keys = ["gj", "g<Down>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
+class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(

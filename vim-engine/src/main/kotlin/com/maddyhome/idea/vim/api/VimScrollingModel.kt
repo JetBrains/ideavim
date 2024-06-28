@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimScrollingModel {
-  public fun accumulateViewportChanges()
-  public fun flushViewportChanges()
+interface VimScrollingModel {
+  fun accumulateViewportChanges()
+  fun flushViewportChanges()
 }

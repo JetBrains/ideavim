@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-public class RegisterConsumer : KeyConsumer {
+class RegisterConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CharArgumentConsumer>()
   }

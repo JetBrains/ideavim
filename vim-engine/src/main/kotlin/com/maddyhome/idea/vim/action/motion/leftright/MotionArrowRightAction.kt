@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 
 @CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionArrowRightAction : NonShiftedSpecialKeyHandler() {
+class MotionArrowRightAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun motion(

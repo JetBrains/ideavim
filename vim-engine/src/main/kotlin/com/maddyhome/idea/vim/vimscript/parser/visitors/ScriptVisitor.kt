@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 
-public object ScriptVisitor : VimscriptBaseVisitor<Script>() {
+object ScriptVisitor : VimscriptBaseVisitor<Script>() {
 
   override fun visitScript(ctx: VimscriptParser.ScriptContext): Script {
     val script = if (ctx.children != null) {

@@ -31,18 +31,18 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 @Suppress("unused", "SpellCheckingInspection")
-public object Options {
+object Options {
   private val options = MultikeyMap()
 
-  public fun initialise() {
+  fun initialise() {
     // Do nothing!
     // Calling this method allows for deterministic initialisation of the Options singleton, specifically initialising
     // the properties and registering the IJ specific options. Once added, they can be safely accessed by name, e.g. by
     // the implementation of `:set` while executing ~/.ideavimrc
   }
 
-  public fun getOption(key: String): Option<VimDataType>? = options.get(key)
-  public fun getAllOptions(): Set<Option<VimDataType>> = options.values.toSet()
+  fun getOption(key: String): Option<VimDataType>? = options.get(key)
+  fun getAllOptions(): Set<Option<VimDataType>> = options.values.toSet()
 
   /**
    * Add an option
@@ -50,7 +50,7 @@ public object Options {
    * Note that the generic type is `Option<out VimDataType>` so that it will handle derived types that have a more
    * derived type parameter. E.g. `NumberOption`, which derives from `Option<VimInt>`.
    */
-  public fun <T : Option<out VimDataType>> addOption(option: T): T {
+  fun <T : Option<out VimDataType>> addOption(option: T): T {
     return option.also {
       // This suppresses a variance problem. We need to be generic with an upper bound of `Option<out VimDataType` so
       // that we can both accept and then return a derived type which is generic by a type derived from `VimDataType`.
@@ -60,7 +60,7 @@ public object Options {
     }
   }
 
-  public fun removeOption(optionName: String): Unit = options.remove(optionName)
+  fun removeOption(optionName: String): Unit = options.remove(optionName)
 
   /**
    * Override the default value of an option
@@ -68,7 +68,7 @@ public object Options {
    * Use with care! This function is intended for an implementation to provide additional values, such as `'clipboard'`
    * supporting 'ideaput' to use IntelliJ's paste handlers.
    */
-  public fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {
+  fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {
     option.overrideDefaultValue(newDefaultValue)
   }
 
@@ -102,13 +102,15 @@ public object Options {
    */
 
   // Simple options, sorted by name
-  public val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
-  public val gdefault: ToggleOption = addOption(ToggleOption("gdefault", GLOBAL, "gd", false))
-  public val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", GLOBAL, "hi", 50))
-  @JvmField public val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
-  @JvmField public val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
-  public val incsearch: ToggleOption = addOption(ToggleOption("incsearch", GLOBAL, "is", false))
-  public val keymodel: StringListOption = addOption(
+  val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
+  val gdefault: ToggleOption = addOption(ToggleOption("gdefault", GLOBAL, "gd", false))
+  val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", GLOBAL, "hi", 50))
+  @JvmField
+  val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
+  @JvmField
+  val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
+  val incsearch: ToggleOption = addOption(ToggleOption("incsearch", GLOBAL, "is", false))
+  val keymodel: StringListOption = addOption(
     StringListOption(
       "keymodel",
       GLOBAL,
@@ -124,14 +126,14 @@ public object Options {
       )
     )
   )
-  public val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
-  public val more: ToggleOption = addOption(ToggleOption("more", GLOBAL, "more", true))
-  public val nrformats: StringListOption = addOption(
+  val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
+  val more: ToggleOption = addOption(ToggleOption("more", GLOBAL, "more", true))
+  val nrformats: StringListOption = addOption(
     StringListOption("nrformats", LOCAL_TO_BUFFER, "nf", "hex", setOf("octal", "hex", "alpha"))
   )
-  public val scroll: NumberOption = addOption(NumberOption("scroll", LOCAL_TO_WINDOW, "scr", 0))
-  public val scrolloff: NumberOption = addOption(NumberOption("scrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "so", 0))
-  public val selection: StringOption = addOption(
+  val scroll: NumberOption = addOption(NumberOption("scroll", LOCAL_TO_WINDOW, "scr", 0))
+  val scrolloff: NumberOption = addOption(NumberOption("scrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "so", 0))
+  val selection: StringOption = addOption(
     StringOption(
       "selection",
       GLOBAL,
@@ -140,7 +142,7 @@ public object Options {
       setOf("old", "inclusive", "exclusive")
     )
   )
-  public val selectmode: StringListOption = addOption(
+  val selectmode: StringListOption = addOption(
     StringListOption(
       "selectmode", GLOBAL, "slm", "",
       setOf(
@@ -151,7 +153,7 @@ public object Options {
       )
     )
   )
-  public val shell: StringOption = addOption(
+  val shell: StringOption = addOption(
     StringOption(
       "shell",
       GLOBAL,
@@ -159,7 +161,7 @@ public object Options {
       if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"
     )
   )
-  public val shellxescape: StringOption = addOption(
+  val shellxescape: StringOption = addOption(
     StringOption(
       "shellxescape",
       GLOBAL,
@@ -167,23 +169,24 @@ public object Options {
       if (injector.systemInfoService.isWindows) "\"&|<>()@^" else ""
     )
   )
-  public val showcmd: ToggleOption = addOption(ToggleOption("showcmd", GLOBAL, "sc", true))
-  public val showmode: ToggleOption = addOption(ToggleOption("showmode", GLOBAL, "smd", true))
-  public val sidescroll: NumberOption = addOption(UnsignedNumberOption("sidescroll", GLOBAL, "ss", 0))
-  public val sidescrolloff: NumberOption = addOption(
+  val showcmd: ToggleOption = addOption(ToggleOption("showcmd", GLOBAL, "sc", true))
+  val showmode: ToggleOption = addOption(ToggleOption("showmode", GLOBAL, "smd", true))
+  val sidescroll: NumberOption = addOption(UnsignedNumberOption("sidescroll", GLOBAL, "ss", 0))
+  val sidescrolloff: NumberOption = addOption(
     NumberOption("sidescrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "siso", 0)
   )
-  @JvmField public val smartcase: ToggleOption = addOption(ToggleOption("smartcase", GLOBAL, "scs", false))
-  public val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
-  public val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
-  public val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", GLOBAL, "tm", 1000))
-  public val undolevels: NumberOption = addOption(
+  @JvmField
+  val smartcase: ToggleOption = addOption(ToggleOption("smartcase", GLOBAL, "scs", false))
+  val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
+  val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
+  val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", GLOBAL, "tm", 1000))
+  val undolevels: NumberOption = addOption(
     // -1 means no undo. Vim uses -123456 as "unset". See `:help undolevels`
     // TODO: This option doesn't appear to be used anywhere...
     NumberOption("undolevels", GLOBAL_OR_LOCAL_TO_BUFFER, "ul", 1000, -123456)
   )
-  public val viminfo: StringListOption = addOption(StringListOption("viminfo", GLOBAL, "vi", "'100,<50,s10,h"))
-  public val virtualedit: StringListOption = addOption(
+  val viminfo: StringListOption = addOption(StringListOption("viminfo", GLOBAL, "vi", "'100,<50,s10,h"))
+  val virtualedit: StringListOption = addOption(
     StringListOption(
       "virtualedit",
       GLOBAL_OR_LOCAL_TO_WINDOW,
@@ -192,8 +195,8 @@ public object Options {
       setOf("onemore", "block", "insert", "all")
     )
   )
-  public val visualbell: ToggleOption = addOption(ToggleOption("visualbell", GLOBAL, "vb", false))
-  public val whichwrap: StringListOption = addOption(
+  val visualbell: ToggleOption = addOption(ToggleOption("visualbell", GLOBAL, "vb", false))
+  val whichwrap: StringListOption = addOption(
     StringListOption(
       "whichwrap",
       GLOBAL,
@@ -202,11 +205,11 @@ public object Options {
       setOf("b", "s", "h", "l", "<", ">", "~", "[", "]")
     )
   )
-  public val wrapscan: ToggleOption = addOption(ToggleOption("wrapscan", GLOBAL, "ws", true))
+  val wrapscan: ToggleOption = addOption(ToggleOption("wrapscan", GLOBAL, "ws", true))
 
 
   // More complex options, with additional validation, etc.
-  public val guicursor: StringListOption = addOption(object : StringListOption(
+  val guicursor: StringListOption = addOption(object : StringListOption(
     "guicursor", GLOBAL, "gcr",
     "n-v-c:block-Cursor/lCursor," +
       "ve:ver35-Cursor," +
@@ -221,7 +224,7 @@ public object Options {
     }
   })
 
-  public val iskeyword: StringListOption =
+  val iskeyword: StringListOption =
     addOption(object : StringListOption("iskeyword", LOCAL_TO_BUFFER, "isk", "@,48-57,_") {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
@@ -239,7 +242,7 @@ public object Options {
     })
 
 
-  public val matchpairs: StringListOption =
+  val matchpairs: StringListOption =
     addOption(object : StringListOption("matchpairs", LOCAL_TO_BUFFER, "mps", "(:),{:},[:]") {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
@@ -251,7 +254,7 @@ public object Options {
       }
     })
 
-  public val operatorfunc: StringOption = addOption(object : StringOption("operatorfunc", GLOBAL, "opfunc", VimString.EMPTY) {
+  val operatorfunc: StringOption = addOption(object : StringOption("operatorfunc", GLOBAL, "opfunc", VimString.EMPTY) {
     override fun parseValue(value: String, token: String): VimString {
       // TODO: Support script local functions
       // If this value is a function name, it should be a global function. It's possible to use a local function by
@@ -269,7 +272,7 @@ public object Options {
     }
   })
 
-  public val scrolljump: NumberOption = addOption(object : NumberOption("scrolljump", GLOBAL, "sj", 1) {
+  val scrolljump: NumberOption = addOption(object : NumberOption("scrolljump", GLOBAL, "sj", 1) {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       if ((value as VimInt).value < -100) {
@@ -278,7 +281,7 @@ public object Options {
     }
   })
 
-  public val shellcmdflag: StringOption = addOption(object : StringOption("shellcmdflag", GLOBAL, "shcf", "") {
+  val shellcmdflag: StringOption = addOption(object : StringOption("shellcmdflag", GLOBAL, "shcf", "") {
     override val defaultValue: VimString
       get() {
         // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
@@ -293,7 +296,7 @@ public object Options {
       }
   })
 
-  public val shellxquote: StringOption = addOption(object : StringOption("shellxquote", GLOBAL, "sxq", "") {
+  val shellxquote: StringOption = addOption(object : StringOption("shellxquote", GLOBAL, "sxq", "") {
     override val defaultValue: VimString
       get() {
         // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
@@ -310,16 +313,16 @@ public object Options {
 
   // Note that IntelliJ overrides clipboard's default value to include the `ideaput` option.
   // TODO: Technically, we should validate values, but that requires handling exclude, which is irrelevant to us
-  public val clipboard: StringListOption = addOption(
+  val clipboard: StringListOption = addOption(
     StringListOption("clipboard", GLOBAL, "cb", "autoselect,exclude:cons\\|linux")
   )
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
-  public val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", GLOBAL, "ideaglobalmode", false))
+  val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", GLOBAL, "ideaglobalmode", false))
 
   // Temporary feature flags for work-in-progress behaviour, diagnostic switches, etc. Hidden from the output of `:set all`
-  public val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))
-  public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false, isHidden = true))
+  val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))
+  val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false, isHidden = true))
 }
 
 private class MultikeyMap(vararg entries: Option<VimDataType>) {

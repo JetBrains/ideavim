@@ -26,10 +26,10 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.selectionType
 
-public val VimEditor.isIdeaRefactorModeKeep: Boolean
+val VimEditor.isIdeaRefactorModeKeep: Boolean
   get() = injector.ijOptions(this).idearefactormode.contains(IjOptionConstants.idearefactormode_keep)
 
-public val VimEditor.isIdeaRefactorModeSelect: Boolean
+val VimEditor.isIdeaRefactorModeSelect: Boolean
   get() = injector.ijOptions(this).idearefactormode.contains(IjOptionConstants.idearefactormode_select)
 
 internal object IdeaRefactorModeHelper {

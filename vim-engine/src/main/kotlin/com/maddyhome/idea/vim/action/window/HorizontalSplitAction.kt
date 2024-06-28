@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author rasendubi
  */
 @CommandOrMotion(keys = ["<C-W>s", "<C-W>S", "<C-W><C-S>"], modes = [Mode.NORMAL])
-public class HorizontalSplitAction : VimActionHandler.SingleExecution() {
+class HorizontalSplitAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {

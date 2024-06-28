@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["<Esc>", "<C-[>", "<C-C>"], modes = [Mode.CMD_LINE])
-public class LeaveCommandLineAction : VimActionHandler.SingleExecution() {
+class LeaveCommandLineAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_END_EX)
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

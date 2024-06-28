@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.put.PutData
 /**
  * @author vlan
  */
-public sealed class PutVisualTextBaseAction(
+sealed class PutVisualTextBaseAction(
   private val insertTextBeforeCaret: Boolean,
   private val indent: Boolean,
   private val caretAfterInsertedText: Boolean,
@@ -69,19 +69,19 @@ public sealed class PutVisualTextBaseAction(
 }
 
 @CommandOrMotion(keys = ["P"], modes = [Mode.VISUAL])
-public class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false, modifyRegister = false)
+class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false, modifyRegister = false)
 
 @CommandOrMotion(keys = ["p"], modes = [Mode.VISUAL])
-public class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
+class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
 
 @CommandOrMotion(keys = ["]P", "[P"], modes = [Mode.VISUAL])
-public class PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
+class PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
 
 @CommandOrMotion(keys = ["[p", "]p"], modes = [Mode.VISUAL])
-public class PutVisualTextAfterCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
+class PutVisualTextAfterCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
 
 @CommandOrMotion(keys = ["gP"], modes = [Mode.VISUAL])
-public class PutVisualTextBeforeCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
+class PutVisualTextBeforeCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
 
 @CommandOrMotion(keys = ["gp"], modes = [Mode.VISUAL])
-public class PutVisualTextAfterCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)
+class PutVisualTextAfterCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)

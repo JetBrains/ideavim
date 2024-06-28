@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import kotlin.reflect.KClass
 
-public class LazyExCommandInstance(private val className: String, private val classLoader: ClassLoader) {
-  public fun getKClass(): KClass<out Command> {
+class LazyExCommandInstance(private val className: String, private val classLoader: ClassLoader) {
+  fun getKClass(): KClass<out Command> {
     @Suppress("UNCHECKED_CAST")
     return classLoader.loadClass(className).kotlin as KClass<out Command>
   }

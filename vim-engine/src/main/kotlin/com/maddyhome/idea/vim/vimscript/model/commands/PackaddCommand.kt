@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // Currently support only matchit
 @ExCommand(command = "pa[ckadd]")
-public class PackaddCommand(public val range: Range, public val argument: String) : Command.SingleExecution(range, argument) {
+class PackaddCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

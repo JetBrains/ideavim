@@ -1313,28 +1313,28 @@ private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAcce
 }
 
 
-public class IjOptionConstants {
+class IjOptionConstants {
   @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate", "ConstPropertyName")
-  public companion object {
+  companion object {
 
-    public const val idearefactormode_keep: String = "keep"
-    public const val idearefactormode_select: String = "select"
-    public const val idearefactormode_visual: String = "visual"
+    const val idearefactormode_keep: String = "keep"
+    const val idearefactormode_select: String = "select"
+    const val idearefactormode_visual: String = "visual"
 
-    public const val ideastatusicon_enabled: String = "enabled"
-    public const val ideastatusicon_gray: String = "gray"
-    public const val ideastatusicon_disabled: String = "disabled"
+    const val ideastatusicon_enabled: String = "enabled"
+    const val ideastatusicon_gray: String = "gray"
+    const val ideastatusicon_disabled: String = "disabled"
 
-    public const val ideavimsupport_dialog: String = "dialog"
-    public const val ideavimsupport_singleline: String = "singleline"
-    public const val ideavimsupport_dialoglegacy: String = "dialoglegacy"
+    const val ideavimsupport_dialog: String = "dialog"
+    const val ideavimsupport_singleline: String = "singleline"
+    const val ideavimsupport_dialoglegacy: String = "dialoglegacy"
 
-    public const val ideawrite_all: String = "all"
-    public const val ideawrite_file: String = "file"
+    const val ideawrite_all: String = "all"
+    const val ideawrite_file: String = "file"
 
-    public val ideaStatusIconValues: Set<String> = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
-    public val ideaRefactorModeValues: Set<String> = setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)
-    public val ideaWriteValues: Set<String> = setOf(ideawrite_all, ideawrite_file)
-    public val ideavimsupportValues: Set<String> = setOf(ideavimsupport_dialog, ideavimsupport_singleline, ideavimsupport_dialoglegacy)
+    val ideaStatusIconValues: Set<String> = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
+    val ideaRefactorModeValues: Set<String> = setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)
+    val ideaWriteValues: Set<String> = setOf(ideawrite_all, ideawrite_file)
+    val ideavimsupportValues: Set<String> = setOf(ideavimsupport_dialog, ideavimsupport_singleline, ideavimsupport_dialoglegacy)
   }
 }

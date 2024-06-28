@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :history"
  */
 @ExCommand(command = "his[tory]")
-public data class HistoryCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class HistoryCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     logger.debug("execute")
@@ -119,7 +119,7 @@ public data class HistoryCommand(val range: Range, val argument: String) : Comma
     }
   }
 
-  public companion object {
+  companion object {
     private val logger = vimLogger<HistoryCommand>()
   }
 }

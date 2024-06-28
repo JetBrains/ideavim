@@ -11,9 +11,9 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
-public interface VimVisualMotionGroup {
-  public val exclusiveSelection: Boolean
-  public val selectionAdj: Int
+interface VimVisualMotionGroup {
+  val exclusiveSelection: Boolean
+  val selectionAdj: Int
 
   /**
    * This function toggles visual mode.
@@ -22,8 +22,8 @@ public interface VimVisualMotionGroup {
    * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
    * If visual mode is enabled with the same [selectionType], disable it
    */
-  public fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: ReturnTo? = null): Boolean
-  public fun enterSelectMode(editor: VimEditor, subMode: SelectionType): Boolean
+  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: ReturnTo? = null): Boolean
+  fun enterSelectMode(editor: VimEditor, subMode: SelectionType): Boolean
 
   /**
    * Enters visual mode based on current editor state.
@@ -39,6 +39,6 @@ public interface VimVisualMotionGroup {
    * - DOES NOT move caret
    * - DOES NOT check if carets actually have any selection
    */
-  public fun enterVisualMode(editor: VimEditor, subMode: SelectionType? = null): Boolean
-  public fun autodetectVisualSubmode(editor: VimEditor): SelectionType
+  fun enterVisualMode(editor: VimEditor, subMode: SelectionType? = null): Boolean
+  fun autodetectVisualSubmode(editor: VimEditor): SelectionType
 }

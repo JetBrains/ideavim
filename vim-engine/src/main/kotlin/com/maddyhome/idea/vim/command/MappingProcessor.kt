@@ -25,11 +25,11 @@ import com.maddyhome.idea.vim.key.MappingInfoLayer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
-public object MappingProcessor: KeyConsumer {
+object MappingProcessor: KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()
 
-  public override fun consumeKey(
+  override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,

@@ -13,7 +13,7 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.intellij.vim.processors.VimscriptFunctionProcessor
 
-public class VimscriptFunctionProcessorProvider : SymbolProcessorProvider {
+class VimscriptFunctionProcessorProvider : SymbolProcessorProvider {
   override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
     return VimscriptFunctionProcessor(environment)
   }

@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimTemplateManager {
-  public fun getTemplateState(editor: VimEditor): VimTemplateState?
+interface VimTemplateManager {
+  fun getTemplateState(editor: VimEditor): VimTemplateState?
 }
 
-public interface VimTemplateState
+interface VimTemplateState

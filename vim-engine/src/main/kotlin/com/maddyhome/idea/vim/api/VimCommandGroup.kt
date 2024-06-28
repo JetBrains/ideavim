@@ -12,17 +12,17 @@ import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.GoalCommand
 import org.jetbrains.annotations.NonNls
 
-public interface VimCommandGroup {
-  public fun isAlias(command: String): Boolean
-  public fun hasAlias(name: String): Boolean
-  public fun getAliasCommand(command: String, count: Int): GoalCommand
-  public fun setAlias(name: String, commandAlias: CommandAlias)
-  public fun removeAlias(name: String)
-  public fun listAliases(): Set<Map.Entry<String, CommandAlias>>
-  public fun resetAliases()
+interface VimCommandGroup {
+  fun isAlias(command: String): Boolean
+  fun hasAlias(name: String): Boolean
+  fun getAliasCommand(command: String, count: Int): GoalCommand
+  fun setAlias(name: String, commandAlias: CommandAlias)
+  fun removeAlias(name: String)
+  fun listAliases(): Set<Map.Entry<String, CommandAlias>>
+  fun resetAliases()
 
-  public companion object {
+  companion object {
     @NonNls
-    public val BLACKLISTED_ALIASES: Array<String> = arrayOf("X", "Next", "Print")
+    val BLACKLISTED_ALIASES: Array<String> = arrayOf("X", "Next", "Print")
   }
 }

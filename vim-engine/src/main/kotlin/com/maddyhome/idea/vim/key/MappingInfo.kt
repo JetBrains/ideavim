@@ -37,10 +37,10 @@ import kotlin.math.min
 /**
  * @author vlan
  */
-public sealed class MappingInfo(
-  public val fromKeys: List<KeyStroke>,
-  public val isRecursive: Boolean,
-  public val owner: MappingOwner,
+sealed class MappingInfo(
+  val fromKeys: List<KeyStroke>,
+  val isRecursive: Boolean,
+  val owner: MappingOwner,
 ) : Comparable<MappingInfo>, MappingInfoLayer {
 
   @VimNlsSafe
@@ -74,8 +74,8 @@ public sealed class MappingInfo(
   }
 }
 
-public class ToKeysMappingInfo(
-  public val toKeys: List<KeyStroke>,
+class ToKeysMappingInfo(
+  val toKeys: List<KeyStroke>,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
@@ -105,12 +105,12 @@ public class ToKeysMappingInfo(
     return "Mapping[$fromKeys -> $toKeys]"
   }
 
-  public companion object {
+  companion object {
     private val LOG = vimLogger<ToKeysMappingInfo>()
   }
 }
 
-public class ToExpressionMappingInfo(
+class ToExpressionMappingInfo(
   private val toExpression: Expression,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
@@ -132,12 +132,12 @@ public class ToExpressionMappingInfo(
     }
   }
 
-  public companion object {
+  companion object {
     private val LOG = vimLogger<ToExpressionMappingInfo>()
   }
 }
 
-public class ToHandlerMappingInfo(
+class ToHandlerMappingInfo(
   private val extensionHandler: ExtensionHandler,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
@@ -203,7 +203,7 @@ public class ToHandlerMappingInfo(
     }
   }
 
-  public companion object {
+  companion object {
     private val LOG = vimLogger<ToHandlerMappingInfo>()
 
     private fun myFun(
@@ -245,8 +245,8 @@ public class ToHandlerMappingInfo(
   }
 }
 
-public class ToActionMappingInfo(
-  public val action: String,
+class ToActionMappingInfo(
+  val action: String,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
@@ -258,7 +258,7 @@ public class ToActionMappingInfo(
     injector.actionExecutor.executeAction(action, context)
   }
 
-  public companion object {
+  companion object {
     private val LOG = vimLogger<ToActionMappingInfo>()
   }
 }

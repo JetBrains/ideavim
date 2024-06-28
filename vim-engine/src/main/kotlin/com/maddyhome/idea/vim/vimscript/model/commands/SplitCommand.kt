@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :split" / "h :vsplit"
  */
 @ExCommand(command = "sp[lit],vs[plit]")
-public data class SplitCommand(val range: Range, val argument: String, val splitType: SplitType) : Command.SingleExecution(range, argument) {
+data class SplitCommand(val range: Range, val argument: String, val splitType: SplitType) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -34,7 +34,7 @@ public data class SplitCommand(val range: Range, val argument: String, val split
   }
 }
 
-public enum class SplitType {
+enum class SplitType {
   VERTICAL,
   HORIZONTAL,
 }

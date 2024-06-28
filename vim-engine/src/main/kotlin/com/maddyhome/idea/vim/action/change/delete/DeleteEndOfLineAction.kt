@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["D"], modes = [Mode.NORMAL])
-public class DeleteEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
+class DeleteEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(

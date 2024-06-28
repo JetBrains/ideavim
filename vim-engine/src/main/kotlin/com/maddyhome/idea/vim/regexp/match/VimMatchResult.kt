@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.regexp.VimRegexErrors
 /**
  * The result of matching a pattern against an editor
  */
-public sealed class VimMatchResult {
+sealed class VimMatchResult {
 
   /**
    * Successful match
@@ -23,10 +23,10 @@ public sealed class VimMatchResult {
    * @param value  The string value of the match found
    * @param groups The results of sub-matches corresponding to capture groups
    */
-  public data class Success(
-    public val range: TextRange,
-    public val value: String,
-    public val groups: VimMatchGroupCollection
+  data class Success(
+    val range: TextRange,
+    val value: String,
+    val groups: VimMatchGroupCollection
   ) : VimMatchResult()
 
   /**
@@ -34,7 +34,7 @@ public sealed class VimMatchResult {
    *
    * @param errorCode Code of the error that caused matching to fail
    */
-  public data class Failure(
+  data class Failure(
     val errorCode: VimRegexErrors
   ) : VimMatchResult()
 }

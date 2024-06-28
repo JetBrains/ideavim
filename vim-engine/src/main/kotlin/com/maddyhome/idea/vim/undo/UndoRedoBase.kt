@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.undo
 
-public abstract class UndoRedoBase : VimUndoRedo
+abstract class UndoRedoBase : VimUndoRedo

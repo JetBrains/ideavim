@@ -29,7 +29,7 @@ import java.util.*
  * @author vlan
  */
 @CommandOrMotion(keys = ["D"], modes = [Mode.VISUAL])
-public class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
+class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)

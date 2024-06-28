@@ -38,21 +38,21 @@ import kotlin.math.ceil
  * see "h :set"
  */
 @ExCommand(command = "se[t]")
-public data class SetCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
+data class SetCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.EFFECTIVE(editor)
 }
 
 @ExCommand(command = "setg[lobal]")
-public data class SetglobalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
+data class SetglobalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.GLOBAL(editor)
 }
 
 @ExCommand(command = "setl[ocal]")
-public data class SetlocalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
+data class SetlocalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.LOCAL(editor)
 }
 
-public abstract class SetCommandBase(range: Range, argument: String) : Command.SingleExecution(range, argument) {
+abstract class SetCommandBase(range: Range, argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
@@ -93,7 +93,7 @@ public abstract class SetCommandBase(range: Range, argument: String) : Command.S
  * @param args      The raw text passed to the `:set` command
  * @throws ExException Thrown if any option names or operations are incorrect
  */
-public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessScope) {
+fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessScope) {
   val optionGroup = injector.optionGroup
 
   val columnFormat = args.startsWith("!")

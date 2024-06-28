@@ -8,11 +8,11 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimLookupManager {
-  public fun getActiveLookup(editor: VimEditor): IdeLookup?
+interface VimLookupManager {
+  fun getActiveLookup(editor: VimEditor): IdeLookup?
 }
 
-public interface IdeLookup {
-  public fun down(caret: ImmutableVimCaret, context: ExecutionContext)
-  public fun up(caret: ImmutableVimCaret, context: ExecutionContext)
+interface IdeLookup {
+  fun down(caret: ImmutableVimCaret, context: ExecutionContext)
+  fun up(caret: ImmutableVimCaret, context: ExecutionContext)
 }

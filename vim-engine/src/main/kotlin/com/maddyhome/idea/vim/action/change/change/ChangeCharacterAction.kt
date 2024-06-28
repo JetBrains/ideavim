@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["r"], modes = [Mode.NORMAL])
-public class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
+class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH

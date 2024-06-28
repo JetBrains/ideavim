@@ -8,16 +8,16 @@
 
 package com.maddyhome.idea.vim.api
 
-public interface VimExOutputPanelService {
-  public fun getPanel(editor: VimEditor): VimExOutputPanel
+interface VimExOutputPanelService {
+  fun getPanel(editor: VimEditor): VimExOutputPanel
 }
 
-public interface VimExOutputPanel {
-  public val isActive: Boolean
+interface VimExOutputPanel {
+  val isActive: Boolean
 
-  public val text: String?
+  val text: String?
 
-  public fun output(text: String)
-  public fun clear()
-  public fun close()
+  fun output(text: String)
+  fun clear()
+  fun close()
 }

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
-public data class AnonymousFunctionDeclaration(
+data class AnonymousFunctionDeclaration(
   val sublist: OneElementSublistExpression,
   val args: List<String>,
   val defaultArgs: List<Pair<String, Expression>>,

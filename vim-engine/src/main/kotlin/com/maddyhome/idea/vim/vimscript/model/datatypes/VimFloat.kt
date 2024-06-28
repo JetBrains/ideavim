@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-public data class VimFloat(val value: Double) : VimDataType() {
+data class VimFloat(val value: Double) : VimDataType() {
 
   override fun asDouble(): Double {
     return value

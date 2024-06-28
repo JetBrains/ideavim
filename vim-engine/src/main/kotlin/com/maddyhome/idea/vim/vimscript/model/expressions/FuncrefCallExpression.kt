@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 
-public data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
+data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
 
-  public fun evaluateWithRange(range: Range?, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  fun evaluateWithRange(range: Range?, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val value = expression.evaluate(editor, context, vimContext)
     if (value is VimFuncref) {
       value.handler.range = range

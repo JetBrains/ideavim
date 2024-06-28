@@ -7,7 +7,7 @@
  */
 package com.maddyhome.idea.vim.helper
 
-public enum class NumberType {
+enum class NumberType {
   @Suppress("unused")
   BIN, OCT, DEC, HEX, ALPHA
 }

@@ -25,7 +25,7 @@ import javax.swing.JComponent
 import javax.swing.JTable
 
 @Deprecated("Use fileSize from VimEditor")
-public val Editor.fileSize: Int
+val Editor.fileSize: Int
   get() = document.textLength
 
 /**

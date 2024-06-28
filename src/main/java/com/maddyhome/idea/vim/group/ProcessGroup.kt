@@ -31,9 +31,9 @@ import java.io.Reader
 import java.io.Writer
 
 
-public class ProcessGroup : VimProcessGroupBase() {
+class ProcessGroup : VimProcessGroupBase() {
   @Throws(ExecutionException::class, ProcessCanceledException::class)
-  public override fun executeCommand(
+  override fun executeCommand(
     editor: VimEditor,
     command: String,
     input: CharSequence?,
@@ -132,7 +132,7 @@ public class ProcessGroup : VimProcessGroupBase() {
     }
   }
 
-  public companion object {
+  companion object {
     private val logger = logger<ProcessGroup>()
   }
 }

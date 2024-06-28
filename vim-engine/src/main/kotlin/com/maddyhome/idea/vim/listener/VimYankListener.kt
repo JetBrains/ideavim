@@ -11,6 +11,6 @@ package com.maddyhome.idea.vim.listener
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 
-public interface VimYankListener {
-  public fun yankPerformed(editor: VimEditor, range: TextRange)
+interface VimYankListener {
+  fun yankPerformed(editor: VimEditor, range: TextRange)
 }

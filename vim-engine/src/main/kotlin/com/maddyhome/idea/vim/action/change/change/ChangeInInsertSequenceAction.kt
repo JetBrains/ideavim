@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-public abstract class ChangeInInsertSequenceAction : ChangeEditorActionHandler.ForEachCaret() {
+abstract class ChangeInInsertSequenceAction : ChangeEditorActionHandler.ForEachCaret() {
   final override fun execute(
     editor: VimEditor,
     caret: VimCaret,
@@ -31,7 +31,7 @@ public abstract class ChangeInInsertSequenceAction : ChangeEditorActionHandler.F
     return result
   }
 
-  public abstract fun executeInInsertSequence(
+  abstract fun executeInInsertSequence(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,

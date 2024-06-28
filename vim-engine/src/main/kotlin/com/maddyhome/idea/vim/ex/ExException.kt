@@ -8,6 +8,6 @@
 
 package com.maddyhome.idea.vim.ex
 
-public open class ExException(s: String? = null) : Exception(s) {
-  public var code: String? = null
+open class ExException(s: String? = null) : Exception(s) {
+  var code: String? = null
 }

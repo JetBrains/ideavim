@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 
 @ExCommand(command = "mapc[lear],nmapc[lear],vmapc[lear],xmapc[lear],smapc[lear],omapc[lear],mapc[lear],imapc[lear],lmapc[lear],cmapc[lear]")
-public data class MapClearCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
+data class MapClearCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -34,7 +34,7 @@ public data class MapClearCommand(val range: Range, val argument: String, val cm
     return true
   }
 
-  public companion object {
+  companion object {
     private val COMMAND_INFOS = arrayOf(
       CommandInfo("mapc", "lear", MappingMode.NVO, false),
       CommandInfo("nmapc", "lear", MappingMode.N, false),

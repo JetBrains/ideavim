@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 @CommandOrMotion(keys = ["ap"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionOuterParagraphAction : TextObjectActionHandler() {
+class MotionOuterParagraphAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -40,7 +40,7 @@ public class MotionOuterParagraphAction : TextObjectActionHandler() {
 }
 
 @CommandOrMotion(keys = ["ip"], modes = [Mode.VISUAL, Mode.OP_PENDING])
-public class MotionInnerParagraphAction : TextObjectActionHandler() {
+class MotionInnerParagraphAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

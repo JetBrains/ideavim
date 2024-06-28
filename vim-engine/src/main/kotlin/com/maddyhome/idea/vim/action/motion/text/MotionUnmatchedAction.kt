@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-public sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
+sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
@@ -41,16 +41,16 @@ public sealed class MotionUnmatchedAction(private val motionChar: Char) : Motion
 }
 
 @CommandOrMotion(keys = ["]}"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
+class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
 
 @CommandOrMotion(keys = ["[{"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
+class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
 
 @CommandOrMotion(keys = ["])"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
+class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
 
 @CommandOrMotion(keys = ["[("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
+class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
 private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int? {
   return if (editor.currentCaret().offset == 0 && count < 0 || editor.currentCaret().offset >= editor.fileSize() - 1 && count > 0) {

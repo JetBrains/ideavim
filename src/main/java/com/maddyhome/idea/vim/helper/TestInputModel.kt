@@ -12,14 +12,14 @@ import com.intellij.openapi.editor.Editor
 import javax.swing.KeyStroke
 
 // Do not remove until it's used in EasyMotion plugin in tests
-public class TestInputModel private constructor() {
+class TestInputModel private constructor() {
   private val myKeyStrokes: MutableList<KeyStroke> = Lists.newArrayList()
-  public fun setKeyStrokes(keyStrokes: List<KeyStroke>) {
+  fun setKeyStrokes(keyStrokes: List<KeyStroke>) {
     myKeyStrokes.clear()
     myKeyStrokes.addAll(keyStrokes)
   }
 
-  public fun nextKeyStroke(): KeyStroke? {
+  fun nextKeyStroke(): KeyStroke? {
     // Return key from the unfinished mapping
     /*
 MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();
@@ -34,9 +34,9 @@ if (mappingStack.hasStroke()) {
     }
   }
 
-  public companion object {
+  companion object {
     @JvmStatic
-    public fun getInstance(editor: Editor): TestInputModel {
+    fun getInstance(editor: Editor): TestInputModel {
       var model = editor.vimTestInputModel
       if (model == null) {
         model = TestInputModel()

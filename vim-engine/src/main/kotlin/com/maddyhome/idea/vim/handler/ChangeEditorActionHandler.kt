@@ -25,15 +25,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
  *   - [ChangeEditorActionHandler.SingleExecution]
  *   - [ChangeEditorActionHandler.ForEachCaret]
  */
-public sealed class ChangeEditorActionHandler(runForEachCaret: Boolean) : EditorActionHandlerBase(runForEachCaret) {
+sealed class ChangeEditorActionHandler(runForEachCaret: Boolean) : EditorActionHandlerBase(runForEachCaret) {
 
   /**
    * This handler executes an action for each caret. That means that if you have 5 carets, [execute] will be
    *   called 5 times.
    * @see [ChangeEditorActionHandler.SingleExecution] for only one execution.
    */
-  public abstract class ForEachCaret : ChangeEditorActionHandler(true) {
-    public abstract fun execute(
+  abstract class ForEachCaret : ChangeEditorActionHandler(true) {
+    abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -47,8 +47,8 @@ public sealed class ChangeEditorActionHandler(runForEachCaret: Boolean) : Editor
    *   [execute] will be called 1 time.
    * @see [ChangeEditorActionHandler.ForEachCaret] for per-caret execution
    */
-  public abstract class SingleExecution : ChangeEditorActionHandler(false) {
-    public abstract fun execute(
+  abstract class SingleExecution : ChangeEditorActionHandler(false) {
+    abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
@@ -56,15 +56,15 @@ public sealed class ChangeEditorActionHandler(runForEachCaret: Boolean) : Editor
     ): Boolean
   }
 
-  public abstract class ConditionalSingleExecution : ChangeEditorActionHandler(true) {
-    public abstract fun runAsMulticaret(
+  abstract class ConditionalSingleExecution : ChangeEditorActionHandler(true) {
+    abstract fun runAsMulticaret(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    public abstract fun execute(
+    abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -72,7 +72,7 @@ public sealed class ChangeEditorActionHandler(runForEachCaret: Boolean) : Editor
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    public abstract fun execute(
+    abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,

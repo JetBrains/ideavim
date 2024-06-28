@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 @CommandOrMotion(keys = ["<C-I>", "<Tab>"], modes = [Mode.NORMAL])
-public class MotionJumpNextAction : MotionActionHandler.ForEachCaret() {
+class MotionJumpNextAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

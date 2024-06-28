@@ -10,21 +10,21 @@ package com.maddyhome.idea.vim.api
 
 import javax.swing.KeyStroke
 
-public interface VimApplication {
-  public fun isMainThread(): Boolean
-  public fun invokeLater(action: () -> Unit, editor: VimEditor)
-  public fun invokeLater(action: () -> Unit)
-  public fun isUnitTest(): Boolean
-  public fun isInternal(): Boolean
-  public fun postKey(stroke: KeyStroke, editor: VimEditor)
+interface VimApplication {
+  fun isMainThread(): Boolean
+  fun invokeLater(action: () -> Unit, editor: VimEditor)
+  fun invokeLater(action: () -> Unit)
+  fun isUnitTest(): Boolean
+  fun isInternal(): Boolean
+  fun postKey(stroke: KeyStroke, editor: VimEditor)
 
-  public fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
-  public fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
+  fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
+  fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
 
-  public fun <T> runWriteAction(action: () -> T): T
-  public fun <T> runReadAction(action: () -> T): T
+  fun <T> runWriteAction(action: () -> T): T
+  fun <T> runReadAction(action: () -> T): T
 
-  public fun currentStackTrace(): String
-  public fun runAfterGotFocus(runnable: Runnable)
-  public fun isOctopusEnabled(): Boolean
+  fun currentStackTrace(): String
+  fun runAfterGotFocus(runnable: Runnable)
+  fun isOctopusEnabled(): Boolean
 }

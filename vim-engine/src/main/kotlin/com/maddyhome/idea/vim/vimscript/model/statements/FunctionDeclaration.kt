@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
-public data class FunctionDeclaration(
+data class FunctionDeclaration(
   val scope: Scope?,
   val name: String,
   val args: List<String>,
@@ -61,15 +61,15 @@ public data class FunctionDeclaration(
   }
 }
 
-public enum class FunctionFlag(public val abbrev: String) {
+enum class FunctionFlag(val abbrev: String) {
   RANGE("range"),
   ABORT("abort"),
   DICT("dict"),
   CLOSURE("closure"),
   ;
 
-  public companion object {
-    public fun getByName(abbrev: String): FunctionFlag? {
+  companion object {
+    fun getByName(abbrev: String): FunctionFlag? {
       return entries.firstOrNull { it.abbrev == abbrev }
     }
   }

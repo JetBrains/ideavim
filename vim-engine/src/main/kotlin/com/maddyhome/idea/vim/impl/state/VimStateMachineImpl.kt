@@ -19,7 +19,7 @@ import java.util.*
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
-public class VimStateMachineImpl : VimStateMachine {
+class VimStateMachineImpl : VimStateMachine {
   override var mode: Mode = Mode.NORMAL()
   override var isDotRepeatInProgress: Boolean = false
   override var isRegisterPending: Boolean = false
@@ -64,9 +64,9 @@ public class VimStateMachineImpl : VimStateMachine {
     }
   }
 
-  public companion object {
+  companion object {
     @Contract(pure = true)
-    public fun modeToMappingMode(mode: Mode): MappingMode {
+    fun modeToMappingMode(mode: Mode): MappingMode {
       return when (mode) {
         is Mode.NORMAL -> MappingMode.NORMAL
         Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
@@ -79,7 +79,7 @@ public class VimStateMachineImpl : VimStateMachine {
   }
 }
 
-public fun Mode.toMappingMode(): MappingMode {
+fun Mode.toMappingMode(): MappingMode {
   return when (this) {
     is Mode.NORMAL -> MappingMode.NORMAL
     Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT

@@ -13,13 +13,13 @@ import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.ExCommandTree
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
-public interface VimscriptParser {
-  public val linesWithErrors: MutableList<Int>
+interface VimscriptParser {
+  val linesWithErrors: MutableList<Int>
 
-  public val exCommands: ExCommandTree
+  val exCommands: ExCommandTree
 
-  public fun parse(script: String): Script
-  public fun parseLetCommand(text: String): Command?
-  public fun parseCommand(command: String): Command?
-  public fun parseExpression(expression: String): Expression?
+  fun parse(script: String): Script
+  fun parseLetCommand(text: String): Command?
+  fun parseCommand(command: String): Command?
+  fun parseExpression(expression: String): Expression?
 }

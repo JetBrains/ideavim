@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  */
 
 @CommandOrMotion(keys = ["<C-G>"], modes = [Mode.VISUAL, Mode.SELECT])
-public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
+class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -40,8 +40,8 @@ public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
     return true
   }
 
-  public companion object {
-    public fun toggleMode(editor: VimEditor) {
+  companion object {
+    fun toggleMode(editor: VimEditor) {
       val commandState = editor.vimStateMachine
       val myMode = commandState.mode
       if (myMode is com.maddyhome.idea.vim.state.mode.Mode.VISUAL) {

@@ -40,17 +40,17 @@ import javax.swing.KeyStroke
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
 @Suppress("GrazieInspection")
-public interface Node<T>
+interface Node<T>
 
 /** Represents a complete command */
-public data class CommandNode<T>(public val actionHolder: T) : Node<T> {
+data class CommandNode<T>(val actionHolder: T) : Node<T> {
   override fun toString(): String {
     return "COMMAND NODE (${ actionHolder.toString() })"
   }
 }
 
 /** Represents a part of the command */
-public open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
+open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
@@ -72,9 +72,9 @@ public open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
 }
 
 /** Represents a root node for the mode */
-public class RootNode<T> : CommandPartNode<T>()
+class RootNode<T> : CommandPartNode<T>()
 
-public fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
+fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
   var node: Node<T> = this
   val len = keyStrokes.size
   // Add a child for each keystroke in the shortcut for this action

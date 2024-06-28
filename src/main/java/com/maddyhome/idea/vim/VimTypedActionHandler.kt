@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  * This class is used in Which-Key plugin, so don't make it internal. Generally, we should provide a proper
  *   way to get ideavim keys for this plugin. See VIM-3085
  */
-public class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
+class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
   private val traceTime = injector.globalOptions().ideatracetime
 

@@ -18,12 +18,12 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
 
-public abstract class VimProcessGroupBase : VimProcessGroup {
+abstract class VimProcessGroupBase : VimProcessGroup {
   override var lastCommand: String? = null
   override var isCommandProcessing: Boolean = false
   override var modeBeforeCommandProcessing: Mode? = null
 
-  public override fun startExEntry(editor: VimEditor, context: ExecutionContext, command: Command, label: String, initialCommandText: String) {
+  override fun startExEntry(editor: VimEditor, context: ExecutionContext, command: Command, label: String, initialCommandText: String) {
     // Don't allow ex commands in one line editors
     if (editor.isOneLineMode()) return
 
@@ -54,7 +54,7 @@ public abstract class VimProcessGroupBase : VimProcessGroup {
     injector.commandLine.create(editor, context, ":", rangeText + initialCommandText)
   }
 
-  public override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
+  override fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
     // FIXME comment above is not true. This method is called all the time. Is there a way to make it work like in the comment above?
@@ -76,7 +76,7 @@ public abstract class VimProcessGroupBase : VimProcessGroup {
     }
   }
 
-  public override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
+  override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
     // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
     // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.
     editor.mode = editor.mode.returnTo()

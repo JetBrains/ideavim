@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.awt.Color
 
-public fun getModeBackground(mode: Mode?): Color {
+fun getModeBackground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
   if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.asBoolean() != true) {
@@ -75,7 +75,7 @@ public fun getModeBackground(mode: Mode?): Color {
   }
 }
 
-public fun getModeForeground(mode: Mode?): Color {
+fun getModeForeground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
   if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.asBoolean() != true) {

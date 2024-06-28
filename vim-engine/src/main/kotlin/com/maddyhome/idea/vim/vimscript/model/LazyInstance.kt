@@ -17,8 +17,8 @@ import java.lang.invoke.MethodType
  * useful for deferring the loading and instantiation of a class until it is actually needed, reducing
  * initial memory footprint and startup time.
  */
-public abstract class LazyInstance<T>(private val className: String, private val classLoader: ClassLoader) {
-  public open val instance: T by lazy {
+abstract class LazyInstance<T>(private val className: String, private val classLoader: ClassLoader) {
+  open val instance: T by lazy {
     val aClass = classLoader.loadClass(className)
     val lookup = MethodHandles.privateLookupIn(aClass, MethodHandles.lookup())
     val instance = lookup.findConstructor(aClass, MethodType.methodType(Void.TYPE)).invoke()

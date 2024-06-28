@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 
 @CommandOrMotion(keys = ["V"], modes = [Mode.NORMAL, Mode.VISUAL])
-public class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
+class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun runAsMulticaret(

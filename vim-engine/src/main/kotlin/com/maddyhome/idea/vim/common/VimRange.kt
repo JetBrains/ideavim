@@ -11,16 +11,16 @@ package com.maddyhome.idea.vim.common
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.VimEditor
 
-public sealed class OperatedRange {
-  public class Lines(
-    public val text: CharSequence,
-    public val lineAbove: Int,
-    public val linesOperated: Int,
-    public val shiftType: LineDeleteShift,
+sealed class OperatedRange {
+  class Lines(
+    val text: CharSequence,
+    val lineAbove: Int,
+    val linesOperated: Int,
+    val shiftType: LineDeleteShift,
   ) : OperatedRange()
 
-  public class Characters(public val text: CharSequence, public val leftOffset: Int, public val rightOffset: Int) : OperatedRange()
-  public class Block : OperatedRange() {
+  class Characters(val text: CharSequence, val leftOffset: Int, val rightOffset: Int) : OperatedRange()
+  class Block : OperatedRange() {
     init {
       TODO()
     }

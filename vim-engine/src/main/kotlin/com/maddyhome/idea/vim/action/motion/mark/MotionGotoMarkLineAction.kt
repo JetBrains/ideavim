@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 
 @CommandOrMotion(keys = ["'"], modes = [Mode.NORMAL])
-public class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
@@ -45,7 +45,7 @@ public class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
 }
 
 @CommandOrMotion(keys = ["g'"], modes = [Mode.NORMAL])
-public class MotionGotoMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

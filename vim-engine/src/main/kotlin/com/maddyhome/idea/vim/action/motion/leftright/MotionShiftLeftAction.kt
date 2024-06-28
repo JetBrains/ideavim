@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
  */
 
 @CommandOrMotion(keys = ["<S-Left>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
-public class MotionShiftLeftAction : ShiftedArrowKeyHandler(true) {
+class MotionShiftLeftAction : ShiftedArrowKeyHandler(true) {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

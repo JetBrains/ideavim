@@ -15,13 +15,13 @@ import kotlin.math.min
 /**
  * Please prefer [com.maddyhome.idea.vim.group.visual.VimSelection] for visual selection
  */
-public data class TextRange(public val startOffsets: IntArray, public val endOffsets: IntArray) {
-  public constructor(start: Int, end: Int) : this(intArrayOf(start), intArrayOf(end))
+data class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
+  constructor(start: Int, end: Int) : this(intArrayOf(start), intArrayOf(end))
 
-  public val isMultiple: Boolean
+  val isMultiple: Boolean
     get() = startOffsets.size > 1
 
-  public val maxLength: Int
+  val maxLength: Int
     get() {
       var max = 0
       for (i in 0 until size()) {
@@ -30,7 +30,7 @@ public data class TextRange(public val startOffsets: IntArray, public val endOff
       return max
     }
 
-  public val selectionCount: Int
+  val selectionCount: Int
     get() {
       var res = 0
       for (i in 0 until size()) {
@@ -39,15 +39,15 @@ public data class TextRange(public val startOffsets: IntArray, public val endOff
       return res
     }
 
-  public fun size(): Int = startOffsets.size
+  fun size(): Int = startOffsets.size
 
-  public val startOffset: Int
+  val startOffset: Int
     get() = startOffsets.first()
 
-  public val endOffset: Int
+  val endOffset: Int
     get() = endOffsets.last()
 
-  public fun normalize(): TextRange {
+  fun normalize(): TextRange {
     normalizeIndex(0)
     return this
   }
@@ -61,7 +61,7 @@ public data class TextRange(public val startOffsets: IntArray, public val endOff
   }
 
   @Contract(mutates = "this")
-  public fun normalize(fileSize: Int): Boolean {
+  fun normalize(fileSize: Int): Boolean {
     for (i in 0 until size()) {
       normalizeIndex(i)
       startOffsets[i] = max(0, min(startOffsets[i], fileSize))
@@ -73,7 +73,7 @@ public data class TextRange(public val startOffsets: IntArray, public val endOff
     return true
   }
 
-  public operator fun contains(offset: Int): Boolean {
+  operator fun contains(offset: Int): Boolean {
     return (0 until size()).any { offset in startOffsets[it] until endOffsets[it] }
   }
 

@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.vimscript.model.Script
 
 @CommandOrMotion(keys = ["&"], modes = [Mode.NORMAL])
-public class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
+class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(

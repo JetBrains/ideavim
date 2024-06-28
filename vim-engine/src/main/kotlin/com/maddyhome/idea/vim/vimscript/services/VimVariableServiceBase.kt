@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-public abstract class VimVariableServiceBase : VariableService {
+abstract class VimVariableServiceBase : VariableService {
   private var globalVariables: MutableMap<String, VimDataType> = mutableMapOf()
   private val windowVariablesKey = Key<MutableMap<String, VimDataType>>("TabVariables")
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
@@ -190,7 +190,7 @@ public abstract class VimVariableServiceBase : VariableService {
     }
   }
 
-  public override fun storeGlobalVariable(name: String, value: VimDataType) {
+  override fun storeGlobalVariable(name: String, value: VimDataType) {
     globalVariables[name] = value
   }
 

@@ -165,7 +165,7 @@ object NeovimTesting {
     assertEquals(neovimContent, editor.document.text)
   }
 
-  public fun vimMode() = neovimApi.mode.get().mode
+  fun vimMode() = neovimApi.mode.get().mode
 
   private fun assertMode(editor: Editor) {
     val ideavimState = editor.vim.vimStateMachine.mode.toVimNotation()
@@ -207,8 +207,8 @@ object NeovimTesting {
     }
   }
 
-  public fun getRegister(register: Char) = neovimApi.callFunction("getreg", listOf(register)).get().toString()
-  public fun getMark(register: String) = neovimApi.callFunction("getpos", listOf(register)).get().toString()
+  fun getRegister(register: Char) = neovimApi.callFunction("getreg", listOf(register)).get().toString()
+  fun getMark(register: String) = neovimApi.callFunction("getpos", listOf(register)).get().toString()
 }
 
 annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description: String = "")

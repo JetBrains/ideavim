@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
 @CommandOrMotion(keys = ["+", "<C-M>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
+class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
@@ -38,7 +38,7 @@ public class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() 
 
 // FIXME I should not exist (see class above)
 @CommandOrMotion(keys = ["<CR>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-public class EnterNormalAction : MotionActionHandler.ForEachCaret() {
+class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(

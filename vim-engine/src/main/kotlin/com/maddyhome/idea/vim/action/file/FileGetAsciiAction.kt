@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["ga"], modes = [Mode.NORMAL])
-public class FileGetAsciiAction : VimActionHandler.SingleExecution() {
+class FileGetAsciiAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
