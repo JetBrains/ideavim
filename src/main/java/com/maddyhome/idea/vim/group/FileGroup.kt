@@ -5,167 +5,147 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.group
 
-package com.maddyhome.idea.vim.group;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileEditor.impl.EditorsSplitters
+import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.ProjectScope
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimFileBase
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.LastTabService.Companion.getInstance
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.MessageHelper.message
+import com.maddyhome.idea.vim.helper.countWords
+import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.execute
+import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
+import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import java.io.File
+import java.util.*
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.fileEditor.*;
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.fileEditor.impl.EditorWindow;
-import com.intellij.openapi.fileEditor.impl.EditorsSplitters;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectScope;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.newapi.ExecuteExtensionKt;
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.state.VimStateMachine;
-import com.maddyhome.idea.vim.state.mode.Mode;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.countWords;
-import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
-
-public class FileGroup extends VimFileBase {
-  public boolean openFile(@NotNull String filename, @NotNull ExecutionContext context) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("openFile(" + filename + ")");
+public class FileGroup public constructor() : VimFileBase() {
+  override fun openFile(filename: String, context: ExecutionContext): Boolean {
+    if (logger.isDebugEnabled) {
+      logger.debug("openFile($filename)")
     }
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext()); // API change - don't merge
-    if (project == null) return false;
+    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
+      ?: return false // API change - don't merge
 
-    VirtualFile found = findFile(filename, project);
+    val found = findFile(filename, project)
 
     if (found != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("found file: " + found);
+      if (logger.isDebugEnabled) {
+        logger.debug("found file: $found")
       }
       // Can't open a file unless it has a known file type. The next call will return the known type.
       // If unknown, IDEA will prompt the user to pick a type.
-      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project);
+      val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
 
-      //noinspection IfStatementWithIdenticalBranches
       if (type != null) {
-        FileEditorManager fem = FileEditorManager.getInstance(project);
-        fem.openFile(found, true);
+        val fem = FileEditorManager.getInstance(project)
+        fem.openFile(found, true)
 
-        return true;
-      }
-      else {
+        return true
+      } else {
         // There was no type and user didn't pick one. Don't open the file
         // Return true here because we found the file but the user canceled by not picking a type.
-        return true;
+        return true
       }
-    }
-    else {
-      VimPlugin.showMessage(MessageHelper.message("unable.to.find.0", filename));
+    } else {
+      VimPlugin.showMessage(message("unable.to.find.0", filename))
 
-      return false;
+      return false
     }
   }
 
-  @Nullable VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
-    VirtualFile found;
+  public fun findFile(filename: String, project: Project): VirtualFile? {
+    var found: VirtualFile?
     // Vim supports both ~/ and ~\ (tested on Mac and Windows). On Windows, it supports forward- and back-slashes, but
     // it only supports forward slash on Unix (tested on Mac)
     // VFS works with both directory separators (tested on Mac and Windows)
     if (filename.startsWith("~/") || filename.startsWith("~\\")) {
-      String relativePath = filename.substring(2);
-      String dir = System.getProperty("user.home");
-      if (logger.isDebugEnabled()) {
-        logger.debug("home dir file");
-        logger.debug("looking for " + relativePath + " in " + dir);
+      val relativePath = filename.substring(2)
+      val dir = System.getProperty("user.home")
+      if (logger.isDebugEnabled) {
+        logger.debug("home dir file")
+        logger.debug("looking for $relativePath in $dir")
       }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, relativePath));
-    }
-    else {
-      found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
+      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(dir, relativePath))
+    } else {
+      found = LocalFileSystem.getInstance().findFileByIoFile(File(filename))
 
       if (found == null) {
-        found = findByNameInContentRoots(filename, project);
+        found = findByNameInContentRoots(filename, project)
         if (found == null) {
-          found = findByNameInProject(filename, project);
+          found = findByNameInProject(filename, project)
         }
       }
     }
 
-    return found;
+    return found
   }
 
-  @Nullable
-  private VirtualFile findByNameInContentRoots(@NotNull String filename, @NotNull Project project) {
-    VirtualFile found = null;
-    ProjectRootManager prm = ProjectRootManager.getInstance(project);
-    VirtualFile[] roots = prm.getContentRoots();
-    for (int i = 0; i < roots.length; i++) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("root[" + i + "] = " + roots[i].getPath());
+  private fun findByNameInContentRoots(filename: String, project: Project): VirtualFile? {
+    var found: VirtualFile? = null
+    val prm = ProjectRootManager.getInstance(project)
+    val roots = prm.contentRoots
+    for (i in roots.indices) {
+      if (logger.isDebugEnabled) {
+        logger.debug("root[" + i + "] = " + roots[i].path)
       }
-      found = roots[i].findFileByRelativePath(filename);
+      found = roots[i].findFileByRelativePath(filename)
       if (found != null) {
-        break;
+        break
       }
     }
-    return found;
-  }
-
-  @Nullable
-  private static VirtualFile findByNameInProject(@NotNull String filename, @NotNull Project project) {
-    GlobalSearchScope projectScope = ProjectScope.getProjectScope(project);
-    Collection<VirtualFile> names = FilenameIndex.getVirtualFilesByName(filename, projectScope);
-    if (!names.isEmpty()) {
-      return names.stream().findFirst().get();
-    }
-    return null;
+    return found
   }
 
   /**
    * Closes the current editor.
    */
-  @Override
-  public void closeFile(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((DataContext)context.getContext()));
+  override fun closeFile(editor: VimEditor, context: ExecutionContext) {
+    val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext))
     if (project != null) {
-      final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
-      final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final VirtualFile virtualFile = fileEditorManager.getCurrentFile();
+      val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
+      val window = fileEditorManager.currentWindow
+      val virtualFile = fileEditorManager.currentFile
 
       if (virtualFile != null && window != null) {
         // During the work on VIM-2912 I've changed the close function to this one.
         //   However, the function with manager seems to work weirdly and it causes VIM-2953
         //window.getManager().closeFile(virtualFile, true, false);
-        window.closeFile(virtualFile);
+        window.closeFile(virtualFile)
 
         // Get focus after closing tab
-        window.requestFocus(true);
-        if (!ApplicationManager.getApplication().isUnitTestMode()) {
+        window.requestFocus(true)
+        if (!ApplicationManager.getApplication().isUnitTestMode) {
           // This thing doesn't have an implementation in test mode
-          EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+          EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project)
         }
       }
     }
@@ -174,80 +154,74 @@ public class FileGroup extends VimFileBase {
   /**
    * Closes editor.
    */
-  @Override
-  public void closeFile(int number, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
-    if (project == null) return;
-    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
-    final EditorWindow window = fileEditorManager.getCurrentWindow();
-    VirtualFile[] editors = fileEditorManager.getOpenFiles();
+  override fun closeFile(number: Int, context: ExecutionContext) {
+    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return
+    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
+    val window = fileEditorManager.currentWindow
+    val editors = fileEditorManager.openFiles
     if (window != null) {
-      if (number >= 0 && number < editors.length) {
-        fileEditorManager.closeFile(editors[number], window);
+      if (number >= 0 && number < editors.size) {
+        fileEditorManager.closeFile(editors[number], window)
       }
-    } if (!ApplicationManager.getApplication().isUnitTestMode()) {
+    }
+    if (!ApplicationManager.getApplication().isUnitTestMode) {
       // This thing doesn't have an implementation in test mode
-      EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+      EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project)
     }
   }
 
   /**
    * Saves specific file in the project.
    */
-  @Override
-  public void saveFile(@NotNull ExecutionContext context) {
-    NativeAction action;
-    if (globalIjOptions(injector).getIdeawrite().contains(IjOptionConstants.ideawrite_all)) {
-      action = injector.getNativeActionManager().getSaveAll();
+  override fun saveFile(context: ExecutionContext) {
+    val action = if (injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)) {
+      injector.nativeActionManager.saveAll
+    } else {
+      injector.nativeActionManager.saveCurrent
     }
-    else {
-      action = injector.getNativeActionManager().getSaveCurrent();
-    }
-    ExecuteExtensionKt.execute(action, context);
+    action.execute(context)
   }
 
   /**
    * Saves all files in the project.
    */
-  public void saveFiles(@NotNull ExecutionContext context) {
-    ExecuteExtensionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(), context);
+  override fun saveFiles(context: ExecutionContext) {
+    injector.nativeActionManager.saveAll.execute(context)
   }
 
   /**
    * Selects then next or previous editor.
    */
-  @Override
-  public boolean selectFile(int count, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
-    if (project == null) return false;
-    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
-    VirtualFile[] editors = fem.getOpenFiles();
+  override fun selectFile(count: Int, context: ExecutionContext): Boolean {
+    var count = count
+    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return false
+    val fem = FileEditorManager.getInstance(project) // API change - don't merge
+    val editors = fem.openFiles
     if (count == 99) {
-      count = editors.length - 1;
+      count = editors.size - 1
     }
-    if (count < 0 || count >= editors.length) {
-      return false;
+    if (count < 0 || count >= editors.size) {
+      return false
     }
 
-    fem.openFile(editors[count], true);
+    fem.openFile(editors[count], true)
 
-    return true;
+    return true
   }
 
   /**
    * Selects then next or previous editor.
    */
-  public void selectNextFile(int count, @NotNull ExecutionContext context) {
-    Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
-    if (project == null) return;
-    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
-    VirtualFile[] editors = fem.getOpenFiles();
-    VirtualFile current = fem.getSelectedFiles()[0];
-    for (int i = 0; i < editors.length; i++) {
-      if (editors[i].equals(current)) {
-        int pos = (i + (count % editors.length) + editors.length) % editors.length;
+  override fun selectNextFile(count: Int, context: ExecutionContext) {
+    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return
+    val fem = FileEditorManager.getInstance(project) // API change - don't merge
+    val editors = fem.openFiles
+    val current = fem.selectedFiles[0]
+    for (i in editors.indices) {
+      if (editors[i] == current) {
+        val pos = (i + (count % editors.size) + editors.size) % editors.size
 
-        fem.openFile(editors[pos], true);
+        fem.openFile(editors[pos], true)
       }
     }
   }
@@ -255,220 +229,216 @@ public class FileGroup extends VimFileBase {
   /**
    * Selects previous editor tab.
    */
-  @Override
-  public void selectPreviousTab(@NotNull ExecutionContext context) {
-    Project project = PlatformDataKeys.PROJECT.getData(((DataContext)context.getContext()));
-    if (project == null) return;
-    VirtualFile vf = LastTabService.getInstance(project).getLastTab();
-    if (vf != null && vf.isValid()) {
-      FileEditorManager.getInstance(project).openFile(vf, true);
-    }
-    else {
-      VimPlugin.indicateError();
+  override fun selectPreviousTab(context: ExecutionContext) {
+    val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext)) ?: return
+    val vf = getInstance(project).lastTab
+    if (vf != null && vf.isValid) {
+      FileEditorManager.getInstance(project).openFile(vf, true)
+    } else {
+      VimPlugin.indicateError()
     }
   }
 
   /**
    * Returns the previous tab.
    */
-  public @Nullable VirtualFile getPreviousTab(@NotNull DataContext context) {
-    Project project = PlatformDataKeys.PROJECT.getData(context);
-    if (project == null) return null;
-    VirtualFile vf = LastTabService.getInstance(project).getLastTab();
-    if (vf != null && vf.isValid()) {
-      return vf;
+  public fun getPreviousTab(context: DataContext): VirtualFile? {
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return null
+    val vf = getInstance(project).lastTab
+    if (vf != null && vf.isValid) {
+      return vf
     }
-    return null;
+    return null
   }
 
-  @Nullable Editor selectEditor(Project project, @NotNull VirtualFile file) {
-    FileEditorManager fMgr = FileEditorManager.getInstance(project);
-    FileEditor[] feditors = fMgr.openFile(file, true);
-    if (feditors.length > 0) {
-      if (feditors[0] instanceof TextEditor) {
-        Editor editor = ((TextEditor)feditors[0]).getEditor();
-        if (!editor.isDisposed()) {
-          return editor;
+  public fun selectEditor(project: Project, file: VirtualFile): Editor? {
+    val fMgr = FileEditorManager.getInstance(project)
+    val feditors = fMgr.openFile(file, true)
+    if (feditors.size > 0) {
+      if (feditors[0] is TextEditor) {
+        val editor = (feditors[0] as TextEditor).editor
+        if (!editor.isDisposed) {
+          return editor
         }
       }
     }
 
-    return null;
+    return null
   }
 
-  @Override
-  public void displayLocationInfo(@NotNull VimEditor vimEditor) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
-    StringBuilder msg = new StringBuilder();
-    Document doc = editor.getDocument();
+  override fun displayLocationInfo(vimEditor: VimEditor) {
+    val editor = (vimEditor as IjVimEditor).editor
+    val msg = StringBuilder()
+    val doc = editor.document
 
-    if (!(VimStateMachine.Companion.getInstance(new IjVimEditor(editor)).getMode() instanceof Mode.VISUAL)) {
-      LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
-      int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lp.line);
-      int endoff = doc.getLineEndOffset(lp.line);
-      if (endoff < EditorHelperRt.getFileSize(editor) && doc.getCharsSequence().charAt(endoff) == '\n') {
-        endoff--;
+    if (getInstance(IjVimEditor(editor)).mode !is VISUAL) {
+      val lp = editor.caretModel.logicalPosition
+      val col = editor.caretModel.offset - doc.getLineStartOffset(lp.line)
+      var endoff = doc.getLineEndOffset(lp.line)
+      if (endoff < editor.fileSize && doc.charsSequence[endoff] == '\n') {
+        endoff--
       }
-      int ecol = endoff - doc.getLineStartOffset(lp.line);
-      LogicalPosition elp = editor.offsetToLogicalPosition(endoff);
+      val ecol = endoff - doc.getLineStartOffset(lp.line)
+      val elp = editor.offsetToLogicalPosition(endoff)
 
-      msg.append("Col ").append(col + 1);
+      msg.append("Col ").append(col + 1)
       if (col != lp.column) {
-        msg.append("-").append(lp.column + 1);
+        msg.append("-").append(lp.column + 1)
       }
 
-      msg.append(" of ").append(ecol + 1);
+      msg.append(" of ").append(ecol + 1)
       if (ecol != elp.column) {
-        msg.append("-").append(elp.column + 1);
+        msg.append("-").append(elp.column + 1)
       }
 
-      int lline = editor.getCaretModel().getLogicalPosition().line;
-      int total = new IjVimEditor(editor).lineCount();
+      val lline = editor.caretModel.logicalPosition.line
+      val total = IjVimEditor(editor).lineCount()
 
-      msg.append("; Line ").append(lline + 1).append(" of ").append(total);
+      msg.append("; Line ").append(lline + 1).append(" of ").append(total)
 
-      CountPosition cp = countWords(editor);
+      val cp = countWords(vimEditor)
 
-      msg.append("; Word ").append(cp.getPosition()).append(" of ").append(cp.getCount());
+      msg.append("; Word ").append(cp.position).append(" of ").append(cp.count)
 
-      int offset = editor.getCaretModel().getOffset();
-      int size = EditorHelperRt.getFileSize(editor);
+      val offset = editor.caretModel.offset
+      val size = editor.fileSize
 
-      msg.append("; Character ").append(offset + 1).append(" of ").append(size);
-    }
-    else {
-      msg.append("Selected ");
+      msg.append("; Character ").append(offset + 1).append(" of ").append(size)
+    } else {
+      msg.append("Selected ")
 
-      TextRange vr = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
-                                   editor.getSelectionModel().getBlockSelectionEnds());
-      vr.normalize();
+      val vr = TextRange(
+        editor.selectionModel.blockSelectionStarts,
+        editor.selectionModel.blockSelectionEnds
+      )
+      vr.normalize()
 
-      int lines;
-      CountPosition cp = countWords(editor);
-      int words = cp.getCount();
-      int word = 0;
-      if (vr.isMultiple()) {
-        lines = vr.size();
-        int cols = vr.getMaxLength();
+      val lines: Int
+      var cp = countWords(vimEditor)
+      val words = cp.count
+      var word = 0
+      if (vr.isMultiple) {
+        lines = vr.size()
+        val cols = vr.maxLength
 
-        msg.append(cols).append(" Cols; ");
+        msg.append(cols).append(" Cols; ")
 
-        for (int i = 0; i < vr.size(); i++) {
-          cp = countWords(editor, vr.getStartOffsets()[i], vr.getEndOffsets()[i] - 1);
-          word += cp.getCount();
+        for (i in 0 until vr.size()) {
+          cp = countWords(vimEditor, vr.startOffsets[i], (vr.endOffsets[i] - 1).toLong())
+          word += cp.count
         }
+      } else {
+        val slp = editor.offsetToLogicalPosition(vr.startOffset)
+        val elp = editor.offsetToLogicalPosition(vr.endOffset)
+
+        lines = elp.line - slp.line + 1
+
+        cp = countWords(vimEditor, vr.startOffset, (vr.endOffset - 1).toLong())
+        word = cp.count
       }
-      else {
-        LogicalPosition slp = editor.offsetToLogicalPosition(vr.getStartOffset());
-        LogicalPosition elp = editor.offsetToLogicalPosition(vr.getEndOffset());
 
-        lines = elp.line - slp.line + 1;
+      val total = IjVimEditor(editor).lineCount()
 
-        cp = countWords(editor, vr.getStartOffset(), vr.getEndOffset() - 1);
-        word = cp.getCount();
-      }
+      msg.append(lines).append(" of ").append(total).append(" Lines")
 
-      int total = new IjVimEditor(editor).lineCount();
+      msg.append("; ").append(word).append(" of ").append(words).append(" Words")
 
-      msg.append(lines).append(" of ").append(total).append(" Lines");
+      val chars = vr.selectionCount
+      val size = editor.fileSize
 
-      msg.append("; ").append(word).append(" of ").append(words).append(" Words");
-
-      int chars = vr.getSelectionCount();
-      int size = EditorHelperRt.getFileSize(editor);
-
-      msg.append("; ").append(chars).append(" of ").append(size).append(" Characters");
+      msg.append("; ").append(chars).append(" of ").append(size).append(" Characters")
     }
 
-    VimPlugin.showMessage(msg.toString());
+    VimPlugin.showMessage(msg.toString())
   }
 
-  @Override
-  public void displayFileInfo(@NotNull VimEditor vimEditor, boolean fullPath) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
-    StringBuilder msg = new StringBuilder();
-    VirtualFile vf = EditorHelper.getVirtualFile(editor);
+  override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean) {
+    val editor = (vimEditor as IjVimEditor).editor
+    val msg = StringBuilder()
+    val vf = EditorHelper.getVirtualFile(editor)
     if (vf != null) {
-      msg.append('"');
+      msg.append('"')
       if (fullPath) {
-        msg.append(vf.getPath());
-      }
-      else {
-        Project project = editor.getProject();
+        msg.append(vf.path)
+      } else {
+        val project = editor.project
         if (project != null) {
-          VirtualFile root = ProjectRootManager.getInstance(project).getFileIndex().getContentRootForFile(vf);
+          val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
           if (root != null) {
-            msg.append(vf.getPath().substring(root.getPath().length() + 1));
-          }
-          else {
-            msg.append(vf.getPath());
+            msg.append(vf.path.substring(root.path.length + 1))
+          } else {
+            msg.append(vf.path)
           }
         }
       }
-      msg.append("\" ");
-    }
-    else {
-      msg.append("\"[No File]\" ");
-    }
-
-    Document doc = editor.getDocument();
-    if (!doc.isWritable()) {
-      msg.append("[RO] ");
-    }
-    else if (FileDocumentManager.getInstance().isDocumentUnsaved(doc)) {
-      msg.append("[+] ");
+      msg.append("\" ")
+    } else {
+      msg.append("\"[No File]\" ")
     }
 
-    int lline = editor.getCaretModel().getLogicalPosition().line;
-    int total = new IjVimEditor(editor).lineCount();
-    int pct = (int)((float)lline / (float)total * 100f + 0.5);
+    val doc = editor.document
+    if (!doc.isWritable) {
+      msg.append("[RO] ")
+    } else if (FileDocumentManager.getInstance().isDocumentUnsaved(doc)) {
+      msg.append("[+] ")
+    }
 
-    msg.append("line ").append(lline + 1).append(" of ").append(total);
-    msg.append(" --").append(pct).append("%-- ");
+    val lline = editor.caretModel.logicalPosition.line
+    val total = IjVimEditor(editor).lineCount()
+    val pct = (lline.toFloat() / total.toFloat() * 100f + 0.5).toInt()
 
-    LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
-    int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lline);
+    msg.append("line ").append(lline + 1).append(" of ").append(total)
+    msg.append(" --").append(pct).append("%-- ")
 
-    msg.append("col ").append(col + 1);
+    val lp = editor.caretModel.logicalPosition
+    val col = editor.caretModel.offset - doc.getLineStartOffset(lline)
+
+    msg.append("col ").append(col + 1)
     if (col != lp.column) {
-      msg.append("-").append(lp.column + 1);
+      msg.append("-").append(lp.column + 1)
     }
 
-    VimPlugin.showMessage(msg.toString());
+    VimPlugin.showMessage(msg.toString())
   }
 
-  private static final @NotNull Logger logger = Logger.getInstance(FileGroup.class.getName());
+  override fun selectEditor(projectId: String, documentPath: String, protocol: String?): VimEditor? {
+    val fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol) ?: return null
+    val virtualFile = fileSystem.findFileByPath(documentPath) ?: return null
 
-  /**
-   * Respond to editor tab selection and remember the last used tab
-   */
-  public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
-    if (event.getOldFile() != null) {
-      LastTabService.getInstance(event.getManager().getProject()).setLastTab(event.getOldFile());
+    val project = Arrays.stream(ProjectManager.getInstance().openProjects)
+      .filter { p: Project? -> injector.file.getProjectId(p!!) == projectId }
+      .findFirst().orElseThrow()
+
+    val editor = selectEditor(project, virtualFile) ?: return null
+    return IjVimEditor(editor)
+  }
+
+  override fun getProjectId(project: Any): String {
+    require(project is Project)
+    return project.name + "-" + project.locationHash
+  }
+
+  public companion object {
+    private fun findByNameInProject(filename: String, project: Project): VirtualFile? {
+      val projectScope = ProjectScope.getProjectScope(project)
+      val names = FilenameIndex.getVirtualFilesByName(filename, projectScope)
+      if (!names.isEmpty()) {
+        return names.stream().findFirst().get()
+      }
+      return null
     }
-  }
 
-  @Nullable
-  @Override
-  public VimEditor selectEditor(@NotNull String projectId, @NotNull String documentPath, @Nullable String protocol) {
-    VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol);
-    if (fileSystem == null) return null;
-    VirtualFile virtualFile = fileSystem.findFileByPath(documentPath);
-    if (virtualFile == null) return null;
+    private val logger = Logger.getInstance(
+      FileGroup::class.java.name
+    )
 
-    Project project = Arrays.stream(ProjectManager.getInstance().getOpenProjects())
-      .filter(p -> injector.getFile().getProjectId(p).equals(projectId))
-      .findFirst().orElseThrow();
-
-    Editor editor = selectEditor(project, virtualFile);
-    if (editor == null) return null;
-    return new IjVimEditor(editor);
-  }
-
-  @NotNull
-  @Override
-  public String getProjectId(@NotNull Object project) {
-    if (!(project instanceof Project ijProject)) throw new IllegalArgumentException();
-    return ijProject.getName() + "-" + ijProject.getLocationHash();
+    /**
+     * Respond to editor tab selection and remember the last used tab
+     */
+    public fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
+      if (event.oldFile != null) {
+        getInstance(event.manager.project).lastTab = event.oldFile
+      }
+    }
   }
 }

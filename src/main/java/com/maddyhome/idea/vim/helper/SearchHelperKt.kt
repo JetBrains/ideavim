@@ -14,6 +14,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.spellchecker.SpellCheckerSeveritiesProvider
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.globalOptions
@@ -57,18 +58,12 @@ private fun containsUpperCase(pattern: String): Boolean {
 /**
  * This counts all the words in the file.
  */
-public fun countWords(editor: Editor): CountPosition {
-  val size = editor.fileSize
-
-  return countWords(editor, 0, size)
-}
-
-/**
- * This counts all the words in the file.
- */
-public fun countWords(editor: Editor, start: Int, end: Int): CountPosition {
-  val offset = editor.caretModel.offset
-  val vimEditor = IjVimEditor(editor)
+public fun countWords(
+  vimEditor: VimEditor,
+  start: Int = 0,
+  end: Long = vimEditor.fileSize(),
+): CountPosition {
+  val offset = vimEditor.currentCaret().offset
 
   var count = 1
   var position = 0
