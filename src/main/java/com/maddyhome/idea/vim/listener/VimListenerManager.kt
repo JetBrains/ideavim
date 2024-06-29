@@ -175,7 +175,7 @@ internal object VimListenerManager {
     injector.listenersNotifier.macroRecordingListeners.add(macroWidgetListener)
     injector.listenersNotifier.vimPluginListeners.add(macroWidgetListener)
 
-    injector.listenersNotifier.myEditorListeners.add(KeyHandlerStateResetter())
+    injector.listenersNotifier.myEditorListeners.add(IJEditorFocusListener())
     injector.listenersNotifier.myEditorListeners.add(ShowCmdWidgetUpdater())
   }
 
