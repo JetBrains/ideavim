@@ -491,7 +491,7 @@ sealed interface KeyProcessResult {
   }
 }
 
-class KeyHandlerStateResetter : EditorListener {
+open class KeyHandlerStateResetter : EditorListener {
   override fun focusGained(editor: VimEditor) {
     KeyHandler.getInstance().reset(editor)
   }
