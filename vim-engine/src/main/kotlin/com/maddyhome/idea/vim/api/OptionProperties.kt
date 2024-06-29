@@ -51,10 +51,6 @@ open class GlobalOptions(scope: OptionAccessScope): OptionsPropertiesBase(scope)
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
 
-  // This is an experimental option that enables global mode for the editor. However,
-  //   for the moment it has issues and there is no quality garantee if this option is enabled
-  var ideaglobalmode: Boolean by optionProperty(Options.ideaglobalmode)
-
   // Temporary flags for work-in-progress behaviour. Hidden from the output of `:set all`
   var ideastrictmode: Boolean by optionProperty(Options.ideastrictmode)
   var ideatracetime: Boolean by optionProperty(Options.ideatracetime)

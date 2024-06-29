@@ -146,21 +146,15 @@ internal fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
 
 class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener {
   override fun isReplaceCharChanged(editor: VimEditor) {
-    updateCaretsVisual(editor)
+    updateCaretsVisual()
   }
 
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
-    updateCaretsVisual(editor)
+    updateCaretsVisual()
   }
 
-  private fun updateCaretsVisual(editor: VimEditor) {
-    if (injector.globalOptions().ideaglobalmode) {
-      updateAllEditorsCaretsVisual()
-    } else {
-      val ijEditor = (editor as IjVimEditor).editor
-      ijEditor.updateCaretsVisualAttributes()
-      ijEditor.updateCaretsVisualPosition()
-    }
+  private fun updateCaretsVisual() {
+    updateAllEditorsCaretsVisual()
   }
 
   fun updateAllEditorsCaretsVisual() {

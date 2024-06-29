@@ -320,7 +320,6 @@ object Options {
   )
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
-  val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", GLOBAL, "ideaglobalmode", false))
 
   // Temporary feature flags for work-in-progress behaviour, diagnostic switches, etc. Hidden from the output of `:set all`
   val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))

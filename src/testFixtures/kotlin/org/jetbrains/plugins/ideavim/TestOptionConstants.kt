@@ -33,7 +33,6 @@ class TestOptionConstants {
     const val whichwrap = "whichwrap"
 
     // IdeaVim specific
-    const val ideaglobalmode = "ideaglobalmode"
     const val ideatracetime = "ideatracetime"
   }
 }

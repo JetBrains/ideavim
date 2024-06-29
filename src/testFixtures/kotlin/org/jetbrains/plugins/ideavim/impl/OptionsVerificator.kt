@@ -156,7 +156,6 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
     val LOG by lazy { vimLogger<OptionsVerificator>() }
     private val ignored = setOf(
       TestOptionConstants.guicursor,
-      TestOptionConstants.ideaglobalmode,
       TestOptionConstants.ideatracetime,
       TestIjOptionConstants.ideavimsupport,
       TestOptionConstants.maxmapdepth,
