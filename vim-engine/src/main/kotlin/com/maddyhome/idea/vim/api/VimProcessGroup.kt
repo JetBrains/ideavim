@@ -21,7 +21,7 @@ interface VimProcessGroup {
   // TODO remove me
   // TODO: Why ^^ ? Should that also include startExEntry?
   fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
-  fun cancelExEntry(editor: VimEditor, resetCaret: Boolean)
+  fun cancelExEntry(editor: VimEditor, refocusOwningEditor: Boolean, resetCaret: Boolean)
 
   @kotlin.jvm.Throws(java.lang.Exception::class)
   fun executeCommand(editor: VimEditor, command: String, input: CharSequence?, currentDirectoryPath: String?): String?

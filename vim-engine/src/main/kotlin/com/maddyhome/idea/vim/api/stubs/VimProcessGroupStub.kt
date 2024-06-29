@@ -40,7 +40,7 @@ class VimProcessGroupStub : VimProcessGroupBase() {
     TODO("Not yet implemented")
   }
 
-  override fun cancelExEntry(editor: VimEditor, resetCaret: Boolean) {
+  override fun cancelExEntry(editor: VimEditor, refocusOwningEditor: Boolean, resetCaret: Boolean) {
     TODO("Not yet implemented")
   }
 

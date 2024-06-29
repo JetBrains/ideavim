@@ -312,7 +312,7 @@ internal class MotionGroup : VimMotionGroupBase() {
                 KeyHandler.getInstance().reset(vimEditor)
               }
               is Mode.CMD_LINE -> {
-                injector.processGroup.cancelExEntry(vimEditor, false)
+                injector.processGroup.cancelExEntry(vimEditor, refocusOwningEditor = false, resetCaret = false)
                 ExOutputModel.tryGetInstance(editor)?.close()
               }
               else -> {}

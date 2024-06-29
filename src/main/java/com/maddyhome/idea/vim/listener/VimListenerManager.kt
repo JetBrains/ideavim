@@ -738,7 +738,7 @@ internal object VimListenerManager {
         val editor = event.editor
         val commandLine = injector.commandLine.getActiveCommandLine()
         if (commandLine != null) {
-          injector.processGroup.cancelExEntry(editor.vim, false)
+          injector.processGroup.cancelExEntry(editor.vim, refocusOwningEditor = true, resetCaret = false)
         }
 
         ExOutputModel.tryGetInstance(editor)?.close()
@@ -769,7 +769,7 @@ internal object VimListenerManager {
       ) {
         val commandLine = injector.commandLine.getActiveCommandLine()
         if (commandLine != null) {
-          injector.processGroup.cancelExEntry(event.editor.vim, false)
+          injector.processGroup.cancelExEntry(event.editor.vim, refocusOwningEditor = true, resetCaret = false)
         }
 
         ExOutputModel.getInstance(event.editor).close()
