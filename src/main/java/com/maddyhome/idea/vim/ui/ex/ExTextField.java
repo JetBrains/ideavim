@@ -293,7 +293,7 @@ public class ExTextField extends JTextField {
     clearCurrentAction();
     Editor editor = ExEntryPanel.instance.getEditor();
     if (editor != null) {
-      VimPlugin.getProcess().cancelExEntry(new IjVimEditor(editor), true);
+      VimPlugin.getProcess().cancelExEntry(new IjVimEditor(editor), true, true);
     }
   }
 

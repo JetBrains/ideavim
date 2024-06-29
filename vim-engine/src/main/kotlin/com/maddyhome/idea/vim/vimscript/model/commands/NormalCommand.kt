@@ -48,7 +48,7 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
           editor.currentCaret().moveToBufferPosition(BufferPosition(selectionStart.line, selectionStart.col))
         }
       }
-      is Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, false)
+      is Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, refocusOwningEditor = true, resetCaret = false)
       Mode.INSERT, Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, editor.mode))
       is Mode.SELECT -> editor.exitSelectModeNative(false)
       is Mode.OP_PENDING, is Mode.NORMAL -> Unit
@@ -76,7 +76,7 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
       // Exit if state leaves as insert or cmd_line
       val mode = editor.mode
       if (mode is Mode.CMD_LINE) {
-        injector.processGroup.cancelExEntry(editor, false)
+        injector.processGroup.cancelExEntry(editor, refocusOwningEditor = true, resetCaret = false)
       }
       if (mode is Mode.INSERT || mode is Mode.REPLACE) {
         editor.exitInsertMode(context, OperatorArguments(false, 1, mode))
