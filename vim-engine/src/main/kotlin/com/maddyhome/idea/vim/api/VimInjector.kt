@@ -22,6 +22,8 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
 interface VimInjector {
+  val vimState: VimStateMachine
+
   /**
    * The window used when we need a window but there are no editor windows available.
    *
@@ -85,12 +87,14 @@ interface VimInjector {
   val visualMotionGroup: VimVisualMotionGroup
 
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
+  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
   fun commandStateFor(editor: VimEditor): VimStateMachine
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
   /**
    * COMPATIBILITY-LAYER: Added new method with Any
    * Please see: https://jb.gg/zo8n0r
    */
+  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
   fun commandStateFor(editor: Any): VimStateMachine
 
   // !! in progress

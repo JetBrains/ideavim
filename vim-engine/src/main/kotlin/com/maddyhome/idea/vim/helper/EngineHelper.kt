@@ -26,10 +26,7 @@ val TextRange.endOffsetInclusive: Int
   get() = if (this.endOffset > 0 && this.endOffset > this.startOffset) this.endOffset - 1 else this.endOffset
 
 val VimEditor.inRepeatMode: Boolean
-  get() = this.vimStateMachine.isDotRepeatInProgress
-
-val VimEditor.vimStateMachine: VimStateMachine
-  get() = VimStateMachine.getInstance(this)
+  get() = injector.vimState.isDotRepeatInProgress
 
 val VimEditor.usesVirtualSpace: Boolean
   get() = injector.options(this).virtualedit.contains(OptionConstants.virtualedit_onemore)

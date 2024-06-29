@@ -206,21 +206,14 @@ internal class IjVimInjector : VimInjectorBase() {
   override val redrawService: VimRedrawService
     get() = service()
 
+  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
   override fun commandStateFor(editor: VimEditor): VimStateMachine {
-    var res = editor.ij.vimStateMachine
-    if (res == null) {
-      res = VimStateMachineImpl()
-      editor.ij.vimStateMachine = res
-    }
-    return res
+    return vimState
   }
 
+  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
   override fun commandStateFor(editor: Any): VimStateMachine {
-    return when (editor) {
-      is VimEditor -> this.commandStateFor(editor)
-      is Editor -> this.commandStateFor(IjVimEditor(editor))
-      else -> error("Unexpected type: $editor")
-    }
+    return vimState
   }
 
   override val engineEditorHelper: EngineEditorHelper
