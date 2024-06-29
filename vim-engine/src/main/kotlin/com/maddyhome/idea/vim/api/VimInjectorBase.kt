@@ -16,8 +16,10 @@ import com.maddyhome.idea.vim.api.stubs.VimProcessGroupStub
 import com.maddyhome.idea.vim.common.VimListenersNotifier
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
+import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.vimscript.services.VimVariableServiceBase
 import com.maddyhome.idea.vim.yank.VimYankGroup
@@ -28,6 +30,8 @@ abstract class VimInjectorBase : VimInjector {
     val logger: VimLogger by lazy { vimLogger<VimInjectorBase>() }
     val registerGroupStub: VimRegisterGroupBase by lazy { object : VimRegisterGroupBase() {} }
   }
+
+  override val vimState: VimStateMachine = VimStateMachineImpl()
 
   override val parser: VimStringParser = object : VimStringParserBase() {}
   override val optionGroup: VimOptionGroup by lazy { object : VimOptionGroupBase() {} }

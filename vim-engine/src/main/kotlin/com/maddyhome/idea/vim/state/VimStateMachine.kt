@@ -8,11 +8,9 @@
 
 package com.maddyhome.idea.vim.state
 
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.util.*
 
@@ -41,15 +39,9 @@ interface VimStateMachine {
   fun resetRegisterPending()
 
   companion object {
-    private val globalState = VimStateMachineImpl()
-
-    // TODO do we really need this method? Can't we use editor.vimStateMachine?
+    @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("injector.vimState", imports = ["com.maddyhome.idea.vim.api.injector"]))
     fun getInstance(editor: Any?): VimStateMachine {
-      return if (editor == null || injector.globalOptions().ideaglobalmode) {
-        globalState
-      } else {
-        injector.commandStateFor(editor)
-      }
+      return injector.vimState
     }
   }
 }

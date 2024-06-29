@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
@@ -126,20 +125,22 @@ import com.maddyhome.idea.vim.state.mode.returnTo
  */
 interface VimEditor {
   var mode: Mode
-    get() = vimStateMachine.mode
+    get() = injector.vimState.mode
     set(value) {
-      if (vimStateMachine.mode == value) return
+      val vimState = injector.vimState
+      if (vimState.mode == value) return
 
-      val oldValue = vimStateMachine.mode
-      (vimStateMachine as VimStateMachineImpl).mode = value
+      val oldValue = vimState.mode
+      (vimState as VimStateMachineImpl).mode = value
       injector.listenersNotifier.notifyModeChanged(this, oldValue)
     }
 
-  var isReplaceCharacter: Boolean
-    get() = vimStateMachine.isReplaceCharacter
+   var isReplaceCharacter: Boolean
+    get() = injector.vimState.isReplaceCharacter
     set(value) {
-      if (value != vimStateMachine.isReplaceCharacter) {
-        (vimStateMachine as VimStateMachineImpl).isReplaceCharacter = value
+      val vimState = injector.vimState
+      if (value != vimState.isReplaceCharacter) {
+        (vimState as VimStateMachineImpl).isReplaceCharacter = value
         injector.listenersNotifier.notifyIsReplaceCharChanged(this)
       }
     }
@@ -162,7 +163,7 @@ interface VimEditor {
    *   which indicated that the buffer is empty. However, the line count is still 1.
    *
    * The variable for line count is named `ml_line_count` in `memline` structure. There is a single spot where
-   *   `0` is assigned to this variable (at the end of `buf_freeall` public function), however I'm not sure that this affects
+   *   `0` is assigned to this variable (at the end of `buf_freeall` function), however I'm not sure that this affects
    *   the opened buffer.
    * Another thing that I don't understand is that I don't see where this variable is updated. There is a small chance
    *   that this variable doesn't present the line count, so I may be wrong and line count can return zero.
@@ -207,7 +208,7 @@ interface VimEditor {
   fun isOneLineMode(): Boolean
 
   /**
-   * public function for refactoring, get rid of it
+   * function for refactoring, get rid of it
    */
   fun search(
     pair: Pair<Int, Int>,
@@ -308,7 +309,7 @@ interface VimEditor {
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
    * mode.
    */
-  public fun toggleInsertOverwrite() {
+  fun toggleInsertOverwrite() {
     val oldMode = this.mode
     var newMode = oldMode
     if (oldMode == Mode.INSERT) {
