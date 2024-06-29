@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyConsumer
@@ -167,7 +166,7 @@ class KeyHandler {
 
     if (commandBuilder.isReady) {
       logger.trace("Ready command builder. Execute command.")
-      executeCommand(editor, context, editor.vimStateMachine, keyState)
+      executeCommand(editor, context, injector.vimState, keyState)
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
@@ -186,7 +185,7 @@ class KeyHandler {
     logger.trace("Command builder is set to BAD")
     keyState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     editor.resetOpPending()
-    editor.vimStateMachine.resetRegisterPending()
+    injector.vimState.resetRegisterPending()
     editor.isReplaceCharacter = false
     reset(keyState, editor.mode)
   }
@@ -298,7 +297,7 @@ class KeyHandler {
     injector.messages.clearError()
 
     editor.mode = Mode.NORMAL()
-    editor.vimStateMachine.executingCommand = null
+    injector.vimState.executingCommand = null
     keyHandlerState.digraphSequence.reset()
 
     reset(keyHandlerState, editor.mode)
@@ -322,7 +321,7 @@ class KeyHandler {
     val operatorArguments: OperatorArguments,
   ) : Runnable {
     override fun run() {
-      val editorState = VimStateMachine.getInstance(editor)
+      val editorState = injector.vimState
       keyState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
       val register = cmd.register
       if (register != null) {

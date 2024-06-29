@@ -47,6 +47,14 @@ class VimStateMachineImpl : VimStateMachine {
     }
   }
 
+  override fun reset() {
+    mode = Mode.NORMAL()
+    isDotRepeatInProgress = false
+    isRegisterPending = false
+    isReplaceCharacter = false
+    executingCommand = null
+  }
+
   companion object {
     @Contract(pure = true)
     fun modeToMappingMode(mode: Mode): MappingMode {

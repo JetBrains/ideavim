@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.vim
@@ -150,7 +150,7 @@ object VimExtensionFacade {
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
   @JvmStatic
   fun inputKeyStroke(editor: Editor): KeyStroke {
-    if (editor.vim.vimStateMachine.isDotRepeatInProgress) {
+    if (editor.vim.inRepeatMode) {
       val input = Extension.consumeKeystroke()
       LOG.trace("inputKeyStroke: dot repeat in progress. Input: $input")
       return input ?: error("Not enough keystrokes saved: ${Extension.lastExtensionHandler}")

@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.action
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -73,8 +72,6 @@ class MotionActionTest : VimTestCase() {
     """.trimIndent()
     doTest(listOf("12", "<Esc>"), content, content, Mode.NORMAL())
     assertPluginError(false)
-    val vimCommandState = fixture.editor.vimStateMachine
-    kotlin.test.assertNotNull(vimCommandState)
     assertEmpty(KeyHandler.getInstance().keyHandlerState.commandBuilder.keys.toList())
   }
 

@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -33,7 +32,7 @@ class RegisterConsumer : KeyConsumer {
     shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     logger.trace { "Entered RegisterConsumer" }
-    if (!editor.vimStateMachine.isRegisterPending) return false
+    if (!injector.vimState.isRegisterPending) return false
 
     logger.trace("Pending mode.")
     keyProcessResultBuilder.state.commandBuilder.addKey(key)
@@ -45,7 +44,7 @@ class RegisterConsumer : KeyConsumer {
 
   private fun handleSelectRegister(editor: VimEditor, chKey: Char, processBuilder: KeyProcessResult.KeyProcessResultBuilder) {
     logger.trace("Handle select register")
-    editor.vimStateMachine.resetRegisterPending()
+    injector.vimState.resetRegisterPending()
     if (injector.registerGroup.isValid(chKey)) {
       logger.trace("Valid register")
       processBuilder.state.commandBuilder.pushCommandPart(chKey)

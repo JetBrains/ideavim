@@ -34,4 +34,4 @@ val Editor.inVisualMode: Boolean
 
 @get:JvmName("inExMode")
 internal val Editor.inExMode
-  get() = this.vim.vimStateMachine.mode is Mode.CMD_LINE
+  get() = this.vim.mode is Mode.CMD_LINE

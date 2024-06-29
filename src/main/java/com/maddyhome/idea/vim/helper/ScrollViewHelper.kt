@@ -180,7 +180,7 @@ internal object ScrollViewHelper {
   }
 
   private fun getScrollJump(editor: VimEditor, height: Int): Int {
-    val flags = VimStateMachine.getInstance(editor).executingCommandFlags
+    val flags = injector.vimState.executingCommandFlags
     val scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
 
     // Default value is 1. Zero is a valid value, but we normalise to 1 - we always want to scroll at least one line
@@ -203,7 +203,7 @@ internal object ScrollViewHelper {
     val caretColumn = position.column
     val halfWidth = getApproximateScreenWidth(editor) / 2
     val scrollOffset = getNormalizedSideScrollOffset(editor)
-    val flags = VimStateMachine.getInstance(vimEditor).executingCommandFlags
+    val flags = injector.vimState.executingCommandFlags
     val allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)
     val sidescroll = injector.options(vimEditor).sidescroll
     val offsetLeft = caretColumn - (currentVisualLeftColumn + scrollOffset)

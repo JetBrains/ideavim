@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.state.mode.returnTo
 internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.vim.inSelectMode) return
 
-  val returnTo = this.vim.vimStateMachine.mode.returnTo
+  val returnTo = this.vim.mode.returnTo
   when (returnTo) {
     ReturnTo.INSERT -> {
       this.vim.mode = Mode.INSERT
@@ -64,7 +64,7 @@ internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
 internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
-  val returnTo = this.vimStateMachine.mode.returnTo
+  val returnTo = this.mode.returnTo
   when (returnTo) {
     ReturnTo.INSERT -> {
       this.mode = Mode.INSERT

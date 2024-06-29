@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.setSelectMode
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -72,7 +71,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       } else {
         editor.mode = Mode.VISUAL(
           selectionType,
-          returnTo ?: editor.vimStateMachine.mode.returnTo
+          returnTo ?: editor.mode.returnTo
         )
         editor.forEachCaret { it.vimSetSelection(it.offset) }
       }

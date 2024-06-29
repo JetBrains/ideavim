@@ -47,7 +47,6 @@ import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.AppCodeTemplates
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.ij
@@ -307,7 +306,7 @@ internal class MotionGroup : VimMotionGroupBase() {
         val editor = fileEditor.editor
         if (!editor.isDisposed) {
           editor.vim.let { vimEditor ->
-            when (vimEditor.vimStateMachine.mode) {
+            when (vimEditor.mode) {
               is Mode.VISUAL -> {
                 vimEditor.exitVisualMode()
                 KeyHandler.getInstance().reset(vimEditor)

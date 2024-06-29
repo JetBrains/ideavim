@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyConsumer
@@ -126,9 +125,8 @@ class CommandConsumer : KeyConsumer {
       processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
         logger.trace("Set waiting for the argument")
         val argumentType = action.argumentType
-        val editorState = lambdaEditor.vimStateMachine
-        startWaitingForArgument(lambdaEditor, lambdaContext, action, argumentType!!, lambdaKeyState, editorState)
-        lambdaKeyState.partialReset(editorState.mode)
+        startWaitingForArgument(lambdaEditor, lambdaContext, action, argumentType!!, lambdaKeyState, injector.vimState)
+        lambdaKeyState.partialReset(lambdaEditor.mode)
       }
     }
 

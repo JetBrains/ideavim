@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.inVisualMode
@@ -27,7 +26,7 @@ abstract class VimProcessGroupBase : VimProcessGroup {
     // Don't allow ex commands in one line editors
     if (editor.isOneLineMode()) return
 
-    val currentMode = editor.vimStateMachine.mode
+    val currentMode = editor.mode
     check(currentMode is ReturnableFromCmd) {
       "Cannot enable cmd mode from current mode $currentMode"
     }

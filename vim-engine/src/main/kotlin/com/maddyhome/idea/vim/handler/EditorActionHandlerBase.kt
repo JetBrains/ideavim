@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.state.VimStateMachine
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -114,7 +113,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     }
 
     if (currentCaret == primaryCaret) {
-      val cmd = VimStateMachine.getInstance(editor).executingCommand ?: run {
+      val cmd = injector.vimState.executingCommand ?: run {
         injector.messages.indicateError()
         return
       }
@@ -127,7 +126,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = VimStateMachine.getInstance(editor).executingCommand ?: run {
+    val cmd = injector.vimState.executingCommand ?: run {
       injector.messages.indicateError()
       return
     }

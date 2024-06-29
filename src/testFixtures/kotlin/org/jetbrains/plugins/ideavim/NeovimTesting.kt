@@ -16,7 +16,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CharacterPosition
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.ALTERNATE_BUFFER_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
@@ -168,7 +167,7 @@ object NeovimTesting {
   fun vimMode() = neovimApi.mode.get().mode
 
   private fun assertMode(editor: Editor) {
-    val ideavimState = editor.vim.vimStateMachine.mode.toVimNotation()
+    val ideavimState = editor.vim.mode.toVimNotation()
     val neovimState = vimMode()
     assertEquals(neovimState, ideavimState)
   }

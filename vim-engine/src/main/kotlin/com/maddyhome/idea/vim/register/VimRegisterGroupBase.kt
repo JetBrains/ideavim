@@ -147,8 +147,8 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     myRegisters.clear()
   }
 
-  private fun isSmallDeletionSpecialCase(editor: VimEditor): Boolean {
-    val currentCommand = VimStateMachine.getInstance(editor).executingCommand
+  private fun isSmallDeletionSpecialCase(): Boolean {
+    val currentCommand = injector.vimState.executingCommand
     if (currentCommand != null) {
       val argument = currentCommand.argument
       if (argument != null) {
@@ -253,7 +253,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
           )
 
       // Deletes go into numbered registers only if text is smaller than a line, register is used or it's a special case
-      if (!smallInlineDeletion && register == defaultRegister || isSmallDeletionSpecialCase(editor)) {
+      if (!smallInlineDeletion && register == defaultRegister || isSmallDeletionSpecialCase()) {
         // Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
         var d = '8'
         while (d >= '1') {

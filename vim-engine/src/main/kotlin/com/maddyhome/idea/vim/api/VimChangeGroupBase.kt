@@ -26,13 +26,11 @@ import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
-import com.maddyhome.idea.vim.state.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.toReturnTo
@@ -430,7 +428,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param mode    The mode - indicate insert or replace
    */
   override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
-    val state = getInstance(editor)
+    val state = injector.vimState
     for (caret in editor.nativeCarets()) {
       caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
       injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
@@ -442,7 +440,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         editor.insertMode = false
       }
       if (cmd.flags.contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
-        val commandState = getInstance(editor)
+        val commandState = injector.vimState
         repeatInsert(
           editor,
           context,
@@ -451,7 +449,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           OperatorArguments(false, 1, commandState.mode),
         )
       } else {
-        val commandState = getInstance(editor)
+        val commandState = injector.vimState
         repeatInsert(
           editor,
           context,
@@ -484,7 +482,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   override fun runEnterAction(editor: VimEditor, context: ExecutionContext) {
-    val state = getInstance(editor)
+    val state = injector.vimState
     if (!state.isDotRepeatInProgress) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       val action = injector.nativeActionManager.enterAction
@@ -502,7 +500,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   override fun runEnterAboveAction(editor: VimEditor, context: ExecutionContext) {
-    val state = getInstance(editor)
+    val state = injector.vimState
     if (!state.isDotRepeatInProgress) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       val action = injector.nativeActionManager.createLineAboveCaret
@@ -543,7 +541,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val markGroup = injector.markService
     markGroup.setMark(editor, VimMarkService.INSERT_EXIT_MARK)
     markGroup.setMark(editor, MARK_CHANGE_END)
-    if (getInstance(editor).mode is Mode.REPLACE) {
+    if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
     var cnt = if (lastInsert != null) lastInsert!!.count else 0
@@ -558,7 +556,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (context != null) {
       injector.changeGroup.repeatInsert(editor, context, if (cnt == 0) 0 else cnt - 1, true, operatorArguments)
     }
-    if (getInstance(editor).mode is Mode.INSERT) {
+    if (editor.mode is Mode.INSERT) {
       updateLastInsertedTextRegister()
     }
 
@@ -589,7 +587,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param context The data context
    */
   override fun processEnter(editor: VimEditor, context: ExecutionContext) {
-    if (editor.vimStateMachine.mode is Mode.REPLACE) {
+    if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
@@ -599,7 +597,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         break
       }
     }
-    if (editor.vimStateMachine.mode is Mode.REPLACE) {
+    if (editor.mode is Mode.REPLACE) {
       editor.insertMode = false
     }
   }

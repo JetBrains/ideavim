@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -124,7 +123,6 @@ internal object IdeaSpecifics {
         }
       ) {
         editor?.let {
-          val commandState = it.vim.vimStateMachine
           it.vim.mode = Mode.NORMAL()
           VimPlugin.getChange().insertBeforeCursor(it.vim, event.dataContext.vim)
           KeyHandler.getInstance().reset(it.vim)

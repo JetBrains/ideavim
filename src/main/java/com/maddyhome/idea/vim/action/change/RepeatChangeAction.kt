@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 
 @CommandOrMotion(keys = ["."], modes = [Mode.NORMAL])
@@ -25,7 +24,7 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val state = editor.vimStateMachine
+    val state = injector.vimState
     val lastCommand = VimRepeater.lastChangeCommand
 
     if (lastCommand == null && Extension.lastExtensionHandler == null) return false

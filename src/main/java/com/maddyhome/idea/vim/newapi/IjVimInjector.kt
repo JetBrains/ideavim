@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContextManager
@@ -79,9 +78,7 @@ import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.history.VimHistory
-import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup

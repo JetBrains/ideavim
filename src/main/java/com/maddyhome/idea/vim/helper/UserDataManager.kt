@@ -105,7 +105,6 @@ internal var Editor.vimInitialised: Boolean by userDataOr { false }
 // ------------------ Editor
 internal fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
-  editor.vimStateMachine = null
   editor.vimMorePanel = null
   editor.vimExOutput = null
   editor.vimLastHighlighters = null
@@ -120,7 +119,6 @@ internal var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
  * @see :help visualmode()
  */
 internal var Editor.vimLastSelectionType: SelectionType? by userData()
-internal var Editor.vimStateMachine: VimStateMachine? by userData()
 internal var Editor.vimEditorGroup: Boolean by userDataOr { false }
 internal var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
 internal var Editor.vimMorePanel: ExOutputPanel? by userData()
