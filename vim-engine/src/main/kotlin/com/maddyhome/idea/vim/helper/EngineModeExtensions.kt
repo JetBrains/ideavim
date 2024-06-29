@@ -33,7 +33,7 @@ fun VimEditor.exitVisualMode() {
     injector.markService.setVisualSelectionMarks(this)
     this.nativeCarets().forEach { it.vimSelectionStartClear() }
 
-    val returnTo = this.vimStateMachine.mode.returnTo
+    val returnTo = this.mode.returnTo
     when (returnTo) {
       ReturnTo.INSERT -> {
         this.mode = Mode.INSERT

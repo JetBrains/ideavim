@@ -11,9 +11,9 @@ package com.maddyhome.idea.vim.key.consumers
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -43,7 +43,7 @@ class CommandCountConsumer : KeyConsumer {
 
   private fun isCommandCountKey(chKey: Char, keyState: KeyHandlerState, editor: VimEditor): Boolean {
     // Make sure to avoid handling '0' as the start of a count.
-    val editorState = editor.vimStateMachine
+    val editorState = injector.vimState
     val commandBuilder = keyState.commandBuilder
     val notRegisterPendingCommand = editorState.mode is Mode.NORMAL && !editorState.isRegisterPending
     val visualMode = editorState.mode is Mode.VISUAL && !editorState.isRegisterPending

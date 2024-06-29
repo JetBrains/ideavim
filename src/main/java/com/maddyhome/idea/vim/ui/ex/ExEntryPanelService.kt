@@ -15,8 +15,8 @@ import com.maddyhome.idea.vim.api.VimCommandLineService
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ModalEntry
@@ -31,7 +31,7 @@ class ExEntryPanelService : VimCommandLineService {
 
   override fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String? {
     val editor = vimEditor.ij
-    if (vimEditor.vimStateMachine.isDotRepeatInProgress) {
+    if (vimEditor.inRepeatMode) {
       val input = Extension.consumeString()
       return input ?: error("Not enough strings saved: ${Extension.lastExtensionHandler}")
     }

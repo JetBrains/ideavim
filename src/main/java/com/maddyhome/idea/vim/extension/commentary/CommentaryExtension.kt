@@ -46,7 +46,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.PsiHelper
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -65,7 +64,7 @@ internal class CommentaryExtension : VimExtension {
       selectionType: SelectionType,
       resetCaret: Boolean = true,
     ): Boolean {
-      val mode = editor.vimStateMachine.mode
+      val mode = editor.mode
       if (mode !is Mode.VISUAL) {
         editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
       }

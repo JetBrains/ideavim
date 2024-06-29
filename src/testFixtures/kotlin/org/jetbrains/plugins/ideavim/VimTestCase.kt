@@ -128,6 +128,7 @@ abstract class VimTestCase {
       KeyHandler.getInstance().fullReset(editor.vim)
     }
     KeyHandler.getInstance().keyHandlerState.reset(Mode.NORMAL())
+    injector.vimState.reset()
     resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()

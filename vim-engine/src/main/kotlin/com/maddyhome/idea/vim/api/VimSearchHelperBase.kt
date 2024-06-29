@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.Range
@@ -1454,7 +1453,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       while (selectionEndWithoutNewline < sequence.length && sequence[selectionEndWithoutNewline] == '\n') {
         selectionEndWithoutNewline++
       }
-      val mode = VimStateMachine.getInstance(editor).mode
+      val mode = editor.mode
       if (mode is Mode.VISUAL) {
         if (closingTagTextRange.startOffset == selectionEndWithoutNewline &&
           openingTag.endOffset == selectionStart

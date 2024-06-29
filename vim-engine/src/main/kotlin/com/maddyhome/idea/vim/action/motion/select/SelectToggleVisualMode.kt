@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.setSelectMode
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
@@ -42,8 +41,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
   companion object {
     fun toggleMode(editor: VimEditor) {
-      val commandState = editor.vimStateMachine
-      val myMode = commandState.mode
+      val myMode = editor.mode
       if (myMode is com.maddyhome.idea.vim.state.mode.Mode.VISUAL) {
         editor.setSelectMode(myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {

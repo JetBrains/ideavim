@@ -271,7 +271,7 @@ class FileGroup : VimFileBase() {
     val msg = StringBuilder()
     val doc = editor.document
 
-    if (getInstance(IjVimEditor(editor)).mode !is VISUAL) {
+    if (injector.vimState.mode !is VISUAL) {
       val lp = editor.caretModel.logicalPosition
       val col = editor.caretModel.offset - doc.getLineStartOffset(lp.line)
       var endoff = doc.getLineEndOffset(lp.line)

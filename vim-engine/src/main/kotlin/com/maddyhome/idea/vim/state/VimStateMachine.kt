@@ -38,6 +38,8 @@ interface VimStateMachine {
 
   fun resetRegisterPending()
 
+  fun reset()
+
   companion object {
     @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("injector.vimState", imports = ["com.maddyhome.idea.vim.api.injector"]))
     fun getInstance(editor: Any?): VimStateMachine {

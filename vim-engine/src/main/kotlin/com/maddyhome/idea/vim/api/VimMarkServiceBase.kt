@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
@@ -368,7 +367,7 @@ abstract class VimMarkServiceBase : VimMarkService {
           val markLineStartOffset = editor.getLineStartOffset(mark.line)
           val markLineEndOffset = editor.getLineEndOffset(mark.line, true)
 
-          val command = editor.vimStateMachine.executingCommand
+          val command = injector.vimState.executingCommand
           // If text is being changed from the start of the mark line (a special case for mark deletion)
           val changeFromMarkLineStart =
             (command != null && command.type === Command.Type.CHANGE && delStartOffset == markLineStartOffset)

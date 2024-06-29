@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMappingLayer
@@ -42,13 +41,12 @@ object MappingProcessor: KeyConsumer {
 
     log.debug("Start processing key mappings.")
     val keyState = keyProcessResultBuilder.state
-    val commandState = editor.vimStateMachine
     val mappingState = keyState.mappingState
     val commandBuilder = keyState.commandBuilder
     if (commandBuilder.isAwaitingCharOrDigraphArgument() ||
       commandBuilder.isBuildingMultiKeyCommand() ||
       isMappingDisabledForKey(key, keyState) ||
-      commandState.isRegisterPending
+      injector.vimState.isRegisterPending
     ) {
       log.debug("Finish key processing, returning false")
       return false

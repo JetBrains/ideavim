@@ -9,13 +9,10 @@
 package com.maddyhome.idea.vim.state.mode
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.helper.vimStateMachine
-
-val VimEditor.mode: Mode
-  get() = this.vimStateMachine.mode
+import com.maddyhome.idea.vim.api.injector
 
 val VimEditor.inVisualMode: Boolean
-  get() = this.vimStateMachine.mode is Mode.VISUAL
+  get() = injector.vimState.mode is Mode.VISUAL
 
 val VimEditor.inBlockSelection: Boolean
   get() = this.mode.selectionType == SelectionType.BLOCK_WISE

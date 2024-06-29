@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // todo make it for each caret
@@ -40,7 +39,6 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
       argument = argument.substring(1)
     }
 
-    val commandState = editor.vimStateMachine
     val rangeUsed = range.size() != 0
     when (editor.mode) {
       is Mode.VISUAL -> {
@@ -51,7 +49,7 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
         }
       }
       is Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, false)
-      Mode.INSERT, Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode))
+      Mode.INSERT, Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, editor.mode))
       is Mode.SELECT -> editor.exitSelectModeNative(false)
       is Mode.OP_PENDING, is Mode.NORMAL -> Unit
     }
@@ -76,12 +74,12 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
       }
 
       // Exit if state leaves as insert or cmd_line
-      val mode = commandState.mode
+      val mode = editor.mode
       if (mode is Mode.CMD_LINE) {
         injector.processGroup.cancelExEntry(editor, false)
       }
       if (mode is Mode.INSERT || mode is Mode.REPLACE) {
-        editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode))
+        editor.exitInsertMode(context, OperatorArguments(false, 1, mode))
       }
     }
 

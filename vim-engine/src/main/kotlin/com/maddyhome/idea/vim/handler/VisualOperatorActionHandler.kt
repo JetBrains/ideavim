@@ -24,8 +24,6 @@ import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inRepeatMode
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
@@ -176,7 +174,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
   private fun VimEditor.collectSelections(): Map<VimCaret, VimSelection>? {
     return when {
-      !this.inVisualMode && this.inRepeatMode -> {
+      !this.inVisualMode && injector.vimState.isDotRepeatInProgress -> {
         if (this.vimLastSelectionType == SelectionType.BLOCK_WISE) {
           val primaryCaret = primaryCaret()
           val range = primaryCaret.vimLastVisualOperatorRange ?: return null
@@ -211,7 +209,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         )
       }
       else -> this.nativeCarets().associateWith { caret ->
-        val mode = this.vimStateMachine.mode
+        val mode = this.mode
         VimSimpleSelection.createWithNative(
           caret.vimSelectionStart,
           caret.offset,
@@ -235,7 +233,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
       editor.forEachCaret {
         val change =
-          if (editor.inVisualMode && !editor.inRepeatMode) {
+          if (editor.inVisualMode && !injector.vimState.isDotRepeatInProgress) {
             VisualOperation.getRange(editor, it, cmd.flags)
           } else {
             null

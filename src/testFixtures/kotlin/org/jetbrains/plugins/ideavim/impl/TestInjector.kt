@@ -27,6 +27,9 @@ class TestInjector(val injector: VimInjector) : VimInjector by injector {
     tracers[key] = collector
   }
 
+  override val vimState
+    get() = injector.vimState
+
   override val optionGroup: VimOptionGroup
     get() {
       val tracer = tracers[OptionsTracer] as? OptionsTraceCollector

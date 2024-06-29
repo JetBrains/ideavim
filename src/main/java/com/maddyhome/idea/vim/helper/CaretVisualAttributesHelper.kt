@@ -73,7 +73,7 @@ internal object GuicursorChangeListener : EffectiveOptionValueChangeListener {
 }
 
 private fun Editor.guicursorMode(): GuiCursorMode {
-  return GuiCursorMode.fromMode(vim.mode, vim.vimStateMachine.isReplaceCharacter)
+  return GuiCursorMode.fromMode(vim.mode, injector.vimState.isReplaceCharacter)
 }
 
 /**
