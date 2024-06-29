@@ -169,21 +169,20 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set all",
       """
         |--- Options ---
-        |noargtextobj          ideamarks           scrolljump=1      notextobj-indent
-        |nobomb                ideawrite=all       scrolloff=0         textwidth=0
-        |nobreakindent       noignorecase          selectmode=         timeout
-        |  colorcolumn=      noincsearch           shellcmdflag=-x     timeoutlen=1000
-        |nocommentary        nolist                shellxescape=@    notrackactionids
-        |nocursorline        nomatchit             shellxquote={       undolevels=1000
-        |nodigraph             maxmapdepth=20      showcmd             virtualedit=
-        |noexchange            more                showmode          novisualbell
-        |  fileformat=unix   nomultiple-cursors    sidescroll=0        visualdelay=100
-        |nogdefault          noNERDTree            sidescrolloff=0     whichwrap=b,s
-        |nohighlightedyank     nrformats=hex     nosmartcase           wrap
-        |  history=50        nonumber            nosneak               wrapscan
-        |nohlsearch            operatorfunc=       startofline
-        |noideaglobalmode    norelativenumber    nosurround
-        |noideajoin            scroll=0          notextobj-entire
+        |noargtextobj          ideamarks           scroll=0          nosurround
+        |nobomb                ideawrite=all       scrolljump=1      notextobj-entire
+        |nobreakindent       noignorecase          scrolloff=0       notextobj-indent
+        |  colorcolumn=      noincsearch           selectmode=         textwidth=0
+        |nocommentary        nolist                shellcmdflag=-x     timeout
+        |nocursorline        nomatchit             shellxescape=@      timeoutlen=1000
+        |nodigraph             maxmapdepth=20      shellxquote={     notrackactionids
+        |noexchange            more                showcmd             undolevels=1000
+        |  fileformat=unix   nomultiple-cursors    showmode            virtualedit=
+        |nogdefault          noNERDTree            sidescroll=0      novisualbell
+        |nohighlightedyank     nrformats=hex       sidescrolloff=0     visualdelay=100
+        |  history=50        nonumber            nosmartcase           whichwrap=b,s
+        |nohlsearch            operatorfunc=     nosneak               wrap
+        |noideajoin          norelativenumber      startofline         wrapscan
         |  clipboard=ideaput,autoselect,exclude:cons\|linux
         |  fileencoding=utf-8
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -254,7 +253,6 @@ class SetCommandTest : VimTestCase() {
       |nohlsearch
       |  ide=IntelliJ IDEA Community Edition
       |noideacopypreprocess
-      |noideaglobalmode
       |noideajoin
       |  ideamarks
       |  idearefactormode=select
