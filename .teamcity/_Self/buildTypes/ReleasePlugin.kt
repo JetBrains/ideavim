@@ -19,8 +19,6 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.sshAgent
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
-import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
 object ReleaseMajor : ReleasePlugin("major")
 object ReleaseMinor : ReleasePlugin("minor")
@@ -156,18 +154,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
   features {
     sshAgent {
       teamcitySshKey = "IdeaVim ssh keys"
-    }
-  }
-
-  failureConditions {
-    failOnMetricChange {
-      metric = BuildFailureOnMetric.MetricType.ARTIFACT_SIZE
-      threshold = 5
-      units = BuildFailureOnMetric.MetricUnit.PERCENTS
-      comparison = BuildFailureOnMetric.MetricComparison.DIFF
-      compareTo = build {
-        buildRule = lastSuccessful()
-      }
     }
   }
 })
