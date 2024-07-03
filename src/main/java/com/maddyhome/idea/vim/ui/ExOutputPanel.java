@@ -264,6 +264,12 @@ public class ExOutputPanel extends JPanel {
   private void positionPanel() {
     final JComponent contentComponent = myEditor.getContentComponent();
     Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, contentComponent);
+    JRootPane rootPane = SwingUtilities.getRootPane(contentComponent);
+    if (scroll == null || rootPane == null) {
+      // These might be null if we're invoked during component initialisation and before it's been added to the tree
+      return;
+    }
+
     setSize(scroll.getSize());
 
     myLineHeight = myText.getFontMetrics(myText.getFont()).getHeight();
@@ -277,8 +283,7 @@ public class ExOutputPanel extends JPanel {
     Rectangle bounds = scroll.getBounds();
     bounds.translate(0, scroll.getHeight() - height);
     bounds.height = height;
-    Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(),
-                                            SwingUtilities.getRootPane(contentComponent).getGlassPane());
+    Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(), rootPane.getGlassPane());
     bounds.setLocation(pos);
     setBounds(bounds);
 

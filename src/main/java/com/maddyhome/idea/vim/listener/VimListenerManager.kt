@@ -726,7 +726,7 @@ internal object VimListenerManager {
           injector.processGroup.cancelExEntry(editor.vim, false)
         }
 
-        ExOutputModel.getInstance(editor).clear()
+        ExOutputModel.tryGetInstance(editor)?.clear()
 
         val caretModel = editor.caretModel
         if (editor.vim.mode.selectionType != null) {

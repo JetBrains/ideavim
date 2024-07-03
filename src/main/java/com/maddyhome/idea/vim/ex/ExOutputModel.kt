@@ -66,5 +66,8 @@ public class ExOutputModel private constructor(private val myEditor: Editor) : V
       }
       return model
     }
+
+    @JvmStatic
+    public fun tryGetInstance(editor: Editor): ExOutputModel? = editor.vimExOutput
   }
 }
