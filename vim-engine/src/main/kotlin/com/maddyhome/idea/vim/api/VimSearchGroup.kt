@@ -184,6 +184,8 @@ interface VimSearchGroup {
 
   fun findDecimalNumber(line: String): Int?
 
+  fun updateSearchHighlightsAfterGlobalCommand()
+
   /**
    * Clears all search highlights.
    */

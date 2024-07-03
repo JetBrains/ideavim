@@ -363,6 +363,40 @@ end
     )
   }
 
+  @Test
+  @TestFor(issues = ["VIM-3517"])
+  fun `test global used as a creative substitute alternative`() {
+    val textBefore = """
+aaa bbb ccc aaa aaa
+bbbbbb
+bbbbbb
+aaa bbb ccc aaa aaa aaa aaa aaa
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+end
+      """.trimIndent()
+    val textAfter = """
+replacement bbb ccc replacement replacement
+bbbbbb
+bbbbbb
+replacement bbb ccc replacement replacement replacement replacement replacement
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+bbbbbb
+end
+      """.trimIndent()
+    configureByText(textBefore)
+    typeText(commandToKeys(":g/aaa"))
+    assertState(textBefore)
+    typeText(commandToKeys(":g//s//replacement/g"))
+    assertState(textAfter)
+  }
+
   private fun doTest(command: String, before: String, after: String) {
     doTest(listOf(exCommand(command)), before, after)
   }

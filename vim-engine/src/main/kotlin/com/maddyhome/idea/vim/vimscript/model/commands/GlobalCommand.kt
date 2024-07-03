@@ -114,6 +114,7 @@ data class GlobalCommand(val range: Range, val argument: String, val invert: Boo
         globalExe(editor, context, marks, globalCommandArguments.command)
       }
     }
+    injector.searchGroup.updateSearchHighlightsAfterGlobalCommand()
     return true
   }
 

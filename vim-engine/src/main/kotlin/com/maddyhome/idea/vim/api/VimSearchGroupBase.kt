@@ -112,6 +112,11 @@ abstract class VimSearchGroupBase : VimSearchGroup {
    */
   abstract fun resetIncsearchHighlights()
 
+  override fun updateSearchHighlightsAfterGlobalCommand() {
+    setShouldShowSearchHighlights()
+    updateSearchHighlights(false)
+  }
+
   /**
    * Asks the user how to deal with a substitution confirmation choice.
    * Used when the 'c' flag is present in a substitute command.
@@ -258,7 +263,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     }
     setLastUsedPattern(pattern, patSave, isNewPattern)
 
-    return VimRegex(pat.toString())
+    return VimRegex(pattern)
   }
 
   // TODO I think that this method (and the method above) should be part of the global command
