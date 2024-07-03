@@ -111,29 +111,41 @@ data class GlobalCommand(val range: Range, val argument: String, val invert: Boo
           messages.showStatusBarMessage(null, messages.message("global.command.not.found.g", globalCommandArguments.pattern.toString()))
         }
       } else {
-        globalExe(editor, context, marks, globalCommandArguments.command)
+        globalExe(editor, context, linesForGlobalCommand, marks, globalCommandArguments.command, getOriginalCommandString())
       }
     }
     injector.searchGroup.updateSearchHighlightsAfterGlobalCommand()
     return true
   }
 
+  // TODO it should be provided by VimScript parser
+  private fun getOriginalCommandString(): String {
+    return (if (invert) "v" else "g") + argument
+  }
+
   private fun VimMatchResult.Success.getLine(editor: VimEditor): Int {
     return editor.offsetToBufferPosition(range.startOffset).line
   }
 
-  private fun globalExe(editor: VimEditor, context: ExecutionContext, marks: List<VimRangeMarker>, cmd: String) {
+  private fun globalExe(editor: VimEditor, context: ExecutionContext, lines: List<Int>, marks: List<VimRangeMarker>, cmd: String, originalCommandString: String) {
     globalBusy = true
     try {
-      for (mark in marks) {
-        if (gotInt) break
-        if (!globalBusy) break
-        val startOffset = mark.startOffset
-        val isValid = mark.isValid
-        mark.dispose()
-        if (!isValid) continue
-        globalExecuteOne(editor, context, startOffset, cmd)
-        // TODO: 26.05.2021 break check
+      if (cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
+        val exOutputModel = injector.exOutputPanel.getPanel(editor)
+        exOutputModel.clear()
+        exOutputModel.output(originalCommandString + '\n' + PrintCommand.getText(editor, lines))
+      } else {
+        for (mark in marks) {
+          if (gotInt) break
+          if (!globalBusy) break
+          val startOffset = mark.startOffset
+          val isValid = mark.isValid
+          mark.dispose()
+          if (!isValid) continue
+          editor.currentCaret().moveToOffset(startOffset)
+          injector.vimscriptExecutor.execute(cmd, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
+          // TODO: 26.05.2021 break check
+        }
       }
     } catch (e: Exception) {
       throw e

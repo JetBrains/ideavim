@@ -10,7 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.history.HistoryConstants
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -284,7 +287,9 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput("I found it in a legendary land")
+    assertExOutput("""
+      g/found
+      I found it in a legendary land""".trimIndent())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -296,9 +301,25 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
     )
     assertExOutput("""
+      |g/it
       |I found it in a legendary land
       |where it was settled on some sodden sand
       """.trimMargin())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test print multiple matching line if no command with number option`() {
+    configureByText(initialText)
+    val editor = fixture.editor.vim
+    injector.options(editor).number = true
+    typeText(commandToKeys(":g/it"))
+    assertExOutput("""
+      |g/it
+      |3 I found it in a legendary land
+      |5 where it was settled on some sodden sand
+      """.trimMargin())
+    injector.options(editor).number = false
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -309,7 +330,22 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput("I found it in a legendary land")
+    assertExOutput("""
+      g/found/
+      I found it in a legendary land""".trimIndent())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test print matching lines if no command and no trailing separator with number option`() {
+    configureByText(initialText)
+    val editor = fixture.editor.vim
+    injector.options(editor).number = true
+    typeText(commandToKeys(":g/found/"))
+    assertExOutput("""
+      g/found/
+      3 I found it in a legendary land""".trimIndent())
+    injector.options(editor).number = false
   }
 
   @Test

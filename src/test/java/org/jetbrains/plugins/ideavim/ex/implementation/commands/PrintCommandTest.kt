@@ -8,7 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -69,6 +72,22 @@ class PrintCommandTest : VimTestCase() {
       |    Sed in orci mauris.
       """.trimMargin(),
     )
+  }
+
+  @Test
+  fun `test moves caret to start of last line of range skipping whitespace with number option`() {
+    configureByText(initialText)
+    val editor = fixture.editor.vim
+    injector.options(editor).number = true
+    typeText(commandToKeys("2,5p"))
+    assertExOutput("""
+      |2 
+      |3     Lorem ipsum dolor sit amet,
+      |4     consectetur adipiscing elit
+      |5     Sed in orci mauris.
+      """.trimMargin(),
+    )
+    injector.options(editor).number = false
   }
 
   @Test
