@@ -30,7 +30,7 @@ jobs:
 
       - name: Update authors
         id: update_authors
-        run: ./gradlew updateMergedPr -PprId=${{ github.event.number }}
+        run: ./gradlew --no-configuration-cache updateMergedPr -PprId=${{ github.event.number }}
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
 

@@ -40,7 +40,7 @@ jobs:
 
       - name: Update authors
         id: update_authors
-        run: ./gradlew updateAuthors --stacktrace
+        run: ./gradlew --no-configuration-cache updateAuthors --stacktrace
         env:
           SUCCESS_COMMIT: ${{ env.LAST_COMMIT }}
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}

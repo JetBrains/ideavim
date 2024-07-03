@@ -36,7 +36,7 @@ jobs:
           echo "LAST_COMMIT=$(git rev-list -n 1 tags/workflow-changelog)" >> $GITHUB_ENV
 
       - name: Update changelog
-        run: ./gradlew updateChangelog
+        run: ./gradlew --no-configuration-cache updateChangelog
         env:
           SUCCESS_COMMIT: ${{ env.LAST_COMMIT }}
 
