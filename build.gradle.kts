@@ -94,6 +94,8 @@ val publishToken: String by project
 val slackUrl: String by project
 val youtrackToken: String by project
 
+val releaseType: String? by project
+
 repositories {
   mavenCentral()
   intellijPlatform {
@@ -463,6 +465,8 @@ val fixVersionsElementType = "VersionBundleElement"
 tasks.register("releaseActions") {
   group = "other"
   doLast {
+    if (releaseType == "patch") return@doLast
+
     val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D%20and%20tag:%20%7BIdeaVim%20Released%20In%20EAP%7D%20")
     if (tickets.isNotEmpty()) {
       println("Updating statuses for tickets: $tickets")
