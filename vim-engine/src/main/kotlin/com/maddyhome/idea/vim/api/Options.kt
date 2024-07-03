@@ -131,6 +131,8 @@ object Options {
   val nrformats: StringListOption = addOption(
     StringListOption("nrformats", LOCAL_TO_BUFFER, "nf", "hex", setOf("octal", "hex", "alpha"))
   )
+  // TODO add listener/interface for number option in to vim-engine
+  val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
   val scroll: NumberOption = addOption(NumberOption("scroll", LOCAL_TO_WINDOW, "scr", 0))
   val scrolloff: NumberOption = addOption(NumberOption("scrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "so", 0))
   val selection: StringOption = addOption(

@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -51,14 +52,14 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   @Test
   fun `test 'number' and 'relativenumber' default to current intellij settings`() {
     assertFalse(fixture.editor.settings.isLineNumbersShown)
-    assertFalse(optionsIj().number)
+    assertFalse(options().number)
     assertFalse(optionsIj().relativenumber)
   }
 
   @Test
   fun `test 'number' and 'relativenumber' defaults to global intellij settings`() {
     assertFalse(EditorSettingsExternalizable.getInstance().isLineNumbersShown)
-    assertFalse(optionsIj().number)
+    assertFalse(options().number)
     assertFalse(optionsIj().relativenumber)
   }
 
@@ -198,7 +199,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
   @Test
   fun `test set global 'number' option affects IdeaVim global value only`() {
-    assertFalse(IjOptions.number.defaultValue.asBoolean())
+    assertFalse(Options.number.defaultValue.asBoolean())
     assertCommandOutput("setglobal number?", "nonumber")
 
     enterCommand("setglobal number")
@@ -209,7 +210,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
   @Test
   fun `test set global 'relativenumber' option affects IdeaVim global value only`() {
-    assertFalse(IjOptions.number.defaultValue.asBoolean())
+    assertFalse(Options.number.defaultValue.asBoolean())
     assertCommandOutput("setglobal relativenumber?", "norelativenumber")
 
     enterCommand("setglobal relativenumber")

@@ -96,12 +96,12 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOpt
     addOptionValueOverride(IjOptions.fileencoding, FileEncodingOptionMapper())
     addOptionValueOverride(IjOptions.fileformat, FileFormatOptionMapper())
     addOptionValueOverride(IjOptions.list, ListOptionMapper(IjOptions.list, this))
-    addOptionValueOverride(IjOptions.number, NumberOptionMapper(IjOptions.number, this))
     addOptionValueOverride(IjOptions.relativenumber, RelativeNumberOptionMapper(IjOptions.relativenumber, this))
     addOptionValueOverride(IjOptions.textwidth, TextWidthOptionMapper(IjOptions.textwidth))
     addOptionValueOverride(IjOptions.wrap, WrapOptionMapper(IjOptions.wrap, this))
 
     // These options are defined and implemented in vim-engine, but IntelliJ has similar features with settings we can map
+    addOptionValueOverride(Options.number, NumberOptionMapper(Options.number, this))
     addOptionValueOverride(Options.scrolljump, ScrollJumpOptionMapper(Options.scrolljump, this))
     addOptionValueOverride(Options.sidescroll, SideScrollOptionMapper(Options.sidescroll, this))
     addOptionValueOverride(Options.scrolloff, ScrollOffOptionMapper(Options.scrolloff, this))

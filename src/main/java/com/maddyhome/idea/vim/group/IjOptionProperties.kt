@@ -49,7 +49,6 @@ class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(sc
   var cursorline: Boolean by optionProperty(IjOptions.cursorline)
   var fileformat: String by optionProperty(IjOptions.fileformat)
   var list: Boolean by optionProperty(IjOptions.list)
-  var number: Boolean by optionProperty(IjOptions.number)
   var relativenumber: Boolean by optionProperty(IjOptions.relativenumber)
   var textwidth: Int by optionProperty(IjOptions.textwidth)
   var wrap: Boolean by optionProperty(IjOptions.wrap)

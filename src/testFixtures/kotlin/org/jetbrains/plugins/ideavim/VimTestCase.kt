@@ -153,7 +153,7 @@ abstract class VimTestCase {
       isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.asBoolean()
       isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
       isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
-      isLineNumbersShown = IjOptions.number.defaultValue.asBoolean()
+      isLineNumbersShown = Options.number.defaultValue.asBoolean()
       lineNumeration = if (IjOptions.relativenumber.defaultValue.asBoolean()) {
         if (isLineNumbersShown) EditorSettings.LineNumerationType.HYBRID else EditorSettings.LineNumerationType.RELATIVE
       } else {

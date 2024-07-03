@@ -49,6 +49,7 @@ import java.util.stream.Stream;
 
 import static com.intellij.openapi.editor.EditorSettings.*;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
 import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
 
 /**
@@ -329,7 +330,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
       final IjVimEditor ijVimEditor = new IjVimEditor(editor);
-      final boolean number = ijOptions(injector, ijVimEditor).getNumber();
+      final boolean number = options(injector, ijVimEditor).getNumber();
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based
