@@ -33,7 +33,6 @@ import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.jetbrains.intellij.platform.gradle.tasks.CustomRunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
 import org.kohsuke.github.GHUser
 import java.net.HttpURLConnection
@@ -70,7 +69,7 @@ plugins {
   kotlin("jvm") version "1.9.22"
   application
   id("java-test-fixtures")
-  id("org.jetbrains.intellij.platform") version "2.0.0-beta7"
+  id("org.jetbrains.intellij.platform") version "2.0.0-beta8"
   id("org.jetbrains.changelog") version "2.2.0"
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.0"
@@ -211,17 +210,17 @@ tasks {
 
   // Uncomment to run the plugin in a custom IDE, rather than the IDE specified as a compile target in dependencies
   // Note that the version must be greater than the plugin's target version, for obvious reasons
-//  val runIdeCustom by registering(CustomRunIdeTask::class) {
+//  val runIdeCustom by intellijPlatformTesting.runIde.registering {
 //    type = IntelliJPlatformType.Rider
 //    version = "2024.1.2"
 //  }
 
   // Uncomment to run the plugin in a locally installed IDE
-//  val runIdeLocal by registering(CustomRunIdeTask::class) {
+//  val runIdeLocal by intellijPlatformTesting.runIde.registering {
 //    localPath = file("/Users/{user}/Applications/WebStorm.app")
 //  }
 
-  val runIdeSplitMode by registering(CustomRunIdeTask::class) {
+  val runIdeSplitMode by intellijPlatformTesting.runIde.registering {
     splitMode = true
     splitModeTarget = SplitModeAware.SplitModeTarget.FRONTEND
 

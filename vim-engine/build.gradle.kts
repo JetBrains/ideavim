@@ -67,8 +67,8 @@ dependencies {
 }
 
 tasks {
-    val test by getting(Test::class) {
-        useJUnitPlatform()
+    test {
+      useJUnitPlatform()
     }
 
     generateGrammarSource {
