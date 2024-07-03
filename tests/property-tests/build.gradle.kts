@@ -1,6 +1,5 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
-import org.jetbrains.intellij.platform.gradle.tasks.CustomTestIdeTask
 
 plugins {
   java
@@ -48,9 +47,12 @@ tasks {
     enabled = false
   }
 
-  register<CustomTestIdeTask>("testPropertyBased") {
-    group = "verification"
-    useJUnitPlatform()
+  // The `test` task is automatically set up with IntelliJ goodness. A custom test task needs to be configured for it
+  val testPropertyBased by intellijPlatformTesting.testIde.registering {
+    task {
+      group = "verification"
+      useJUnitPlatform()
+    }
   }
 }
 
