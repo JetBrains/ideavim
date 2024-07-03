@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.action.change
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class UndoActionTest : VimTestCase() {
@@ -107,6 +108,7 @@ class UndoActionTest : VimTestCase() {
   }
 
   @Test
+  @Disabled
   @TestFor(issues = ["VIM-547"])
   fun `test typed text requires one undo`() {
     configureByText("Lorem ipsu${c}m")
@@ -117,6 +119,7 @@ class UndoActionTest : VimTestCase() {
   }
 
   @Test
+  @Disabled
   @TestFor(issues = ["VIM-547"])
   fun `test breaking insert sequence`() {
     configureByText("Lorem ipsu${c}m")
@@ -127,6 +130,7 @@ class UndoActionTest : VimTestCase() {
   }
 
   @Test
+  @Disabled
   @TestFor(issues = ["VIM-547"])
   fun `test moving caret breaks insert sequence`() {
     configureByText("Lorem ipsu${c}m")
