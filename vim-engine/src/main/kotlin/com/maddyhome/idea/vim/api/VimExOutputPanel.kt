@@ -15,7 +15,7 @@ interface VimExOutputPanelService {
 interface VimExOutputPanel {
   val isActive: Boolean
 
-  val text: String?
+  val text: String
 
   fun output(text: String)
   fun clear()

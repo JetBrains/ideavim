@@ -58,7 +58,7 @@ public class ExOutputPanel extends JPanel {
   private @Nullable LayoutManager myOldLayout = null;
   private boolean myWasOpaque = false;
 
-  private boolean myActive = false;
+  public boolean myActive = false;
 
   private static final VimLogger LOG = injector.getLogger(ExOutputPanel.class);
 
@@ -90,12 +90,16 @@ public class ExOutputPanel extends JPanel {
     updateUI();
   }
 
+  public static @Nullable ExOutputPanel getNullablePanel(@NotNull Editor editor) {
+    return UserDataManager.getVimMorePanel(editor);
+  }
+
   public static boolean isPanelActive(@NotNull Editor editor) {
-    return UserDataManager.getVimMorePanel(editor) != null;
+    return getNullablePanel(editor) != null;
   }
 
   public static @NotNull ExOutputPanel getInstance(@NotNull Editor editor) {
-    ExOutputPanel panel = UserDataManager.getVimMorePanel(editor);
+    ExOutputPanel panel = getNullablePanel(editor);
     if (panel == null) {
       panel = new ExOutputPanel(editor);
       UserDataManager.setVimMorePanel(editor, panel);
@@ -192,7 +196,7 @@ public class ExOutputPanel extends JPanel {
   /**
    * Turns on the more window for the given editor
    */
-  private void activate() {
+  public void activate() {
     JRootPane root = SwingUtilities.getRootPane(myEditor.getContentComponent());
     myOldGlass = (JComponent)root.getGlassPane();
     if (myOldGlass != null) {
