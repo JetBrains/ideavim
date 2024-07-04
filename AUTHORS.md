@@ -519,6 +519,10 @@ Contributors:
   [![icon][github]](https://github.com/alexfu)
   &nbsp;
   Alex Fu
+* [![icon][mail]](mailto:jakepeters199@hotmail.com)
+  [![icon][github]](https://github.com/LazyScaper)
+  &nbsp;
+  Jake
 
 Previous contributors:
 
