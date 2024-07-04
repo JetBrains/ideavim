@@ -10,12 +10,20 @@ package com.maddyhome.idea.vim.ex
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimExOutputPanel
+import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 
 // TODO: We need a nicer way to handle output, especially wrt testing, appending + clearing
-class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
+class ExOutputModel(private val myEditor: Editor) : VimExOutputPanel, VimOutputPanel {
   private var isActiveInTestMode = false
+
+  override val isShown: Boolean
+    get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
+      ExOutputPanel.getNullablePanel(myEditor)?.myActive ?: false
+    } else {
+      isActiveInTestMode
+    }
 
   override val isActive: Boolean
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
@@ -24,22 +32,42 @@ class ExOutputModel private constructor(private val myEditor: Editor) : VimExOut
       isActiveInTestMode
     }
 
-  override var text: String? = null
+  override fun addText(text: String, isNewLine: Boolean) {
+    if (this.text.isNotEmpty() && isNewLine) this.text += "\n$text" else this.text += text
+  }
+
+  override fun show() {
+    myEditor.vimExOutput = this
+    val exOutputPanel = ExOutputPanel.getInstance(myEditor)
+    if (!exOutputPanel.myActive) {
+      if (ApplicationManager.getApplication().isUnitTestMode) {
+        isActiveInTestMode = true
+      } else {
+        exOutputPanel.activate()
+      }
+    }
+  }
+
+  override fun update() {
+    // the current implementation updates text as soon as it is modified
+  }
+
+  override var text: String = ""
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
       ExOutputPanel.getInstance(myEditor).text
     } else {
       // ExOutputPanel always returns a non-null string
-      field ?: ""
+      field
     }
     set(value) {
       // ExOutputPanel will strip a trailing newline. We'll do it now so that tests have the same behaviour. We also
       // never pass null to ExOutputPanel, but we do store it for tests, so we know if we're active or not
-      val newValue = value?.removeSuffix("\n")
+      val newValue = value.removeSuffix("\n")
       if (!ApplicationManager.getApplication().isUnitTestMode) {
-        ExOutputPanel.getInstance(myEditor).setText(newValue ?: "")
+        ExOutputPanel.getInstance(myEditor).setText(newValue)
       } else {
         field = newValue
-        isActiveInTestMode = !newValue.isNullOrEmpty()
+        isActiveInTestMode = newValue.isNotEmpty()
       }
     }
 
@@ -48,7 +76,7 @@ class ExOutputModel private constructor(private val myEditor: Editor) : VimExOut
   }
 
   override fun clear() {
-    text = null
+    text = ""
   }
 
   override fun close() {

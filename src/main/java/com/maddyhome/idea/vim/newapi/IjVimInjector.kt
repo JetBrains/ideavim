@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.VimOutputPanelService
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimPsiService
 import com.maddyhome.idea.vim.api.VimRedrawService
@@ -189,6 +190,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val vimscriptParser: VimscriptParser
     get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
   override val commandLine: VimCommandLineService
+    get() = service()
+  override val outputPanel: VimOutputPanelService
     get() = service()
 
   override val optionGroup: VimOptionGroup

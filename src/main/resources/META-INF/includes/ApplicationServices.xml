@@ -24,6 +24,8 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryPanelService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimCommandLineService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.IjOutputPanelService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimOutputPanelService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.DigraphGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimDigraphGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
