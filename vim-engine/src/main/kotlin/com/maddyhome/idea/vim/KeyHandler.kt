@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingProcessor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.CurrentCommandState
-import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -266,6 +265,7 @@ class KeyHandler {
    */
   fun reset(editor: VimEditor) {
     logger.trace { "Reset is executed" }
+    editor.resetOpPending()
     keyHandlerState.partialReset(editor.mode)
     keyHandlerState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
   }
