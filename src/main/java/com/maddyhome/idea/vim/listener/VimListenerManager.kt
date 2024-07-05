@@ -52,7 +52,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ExceptionUtil
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.KeyHandlerStateResetter
 import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler

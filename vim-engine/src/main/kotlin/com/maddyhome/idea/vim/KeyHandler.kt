@@ -491,15 +491,4 @@ sealed interface KeyProcessResult {
   }
 }
 
-open class KeyHandlerStateResetter : EditorListener {
-  override fun focusGained(editor: VimEditor) {
-    KeyHandler.getInstance().reset(editor)
-  }
-
-  override fun focusLost(editor: VimEditor) {
-    // We do not reset the KeyHandler state here, because a command or a search prompt is not considered to be part of the
-    // editor, and resetting state would break the search functionality.
-  }
-}
-
 typealias KeyProcessing = (KeyHandlerState, VimEditor, ExecutionContext) -> Unit
