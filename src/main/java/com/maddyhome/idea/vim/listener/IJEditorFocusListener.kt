@@ -11,11 +11,12 @@ package com.maddyhome.idea.vim.listener
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorKind
-import com.maddyhome.idea.vim.KeyHandlerStateResetter
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.newapi.ij
@@ -26,7 +27,7 @@ import com.maddyhome.idea.vim.newapi.ij
  * It is different to we had previously. Now we go to INSERT mode not only when we focus on the console the first time, but every time.
  * Going to INSERT on every focus is easier to implement and more consistent (behavior is always the same, you don't have to remember if you are focusing a console the first time or not)
  */
-class IJEditorFocusListener : KeyHandlerStateResetter() {
+class IJEditorFocusListener : EditorListener {
   override fun focusGained(editor: VimEditor) {
     // We add Vim bindings to all opened editors, including editors used as UI controls rather than just project file
     // editors. This includes editors used as part of the UI, such as the VCS commit message, or used as read-only
@@ -66,6 +67,6 @@ class IJEditorFocusListener : KeyHandlerStateResetter() {
         switchToInsertMode.run()
       }
     }
-    super.focusGained(editor)
+    KeyHandler.getInstance().reset(editor)
   }
 }
