@@ -13,14 +13,17 @@ import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.ui.ExOutputPanel
+import java.lang.ref.WeakReference
 
 // TODO: We need a nicer way to handle output, especially wrt testing, appending + clearing
-class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
+class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPanel {
   private var isActiveInTestMode = false
+
+  val editor get() = myEditor.get()
 
   val isActive: Boolean
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
-      ExOutputPanel.getNullablePanel(myEditor)?.myActive ?: false
+      editor?.let { ExOutputPanel.getNullablePanel(it) }?.myActive ?: false
     } else {
       isActiveInTestMode
     }
@@ -30,11 +33,12 @@ class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
   }
 
   override fun show() {
+    if (editor == null) return
     val currentPanel = injector.outputPanel.getCurrentOutputPanel()
     if (currentPanel != null && currentPanel != this) currentPanel.close()
 
-    myEditor.vimExOutput = this
-    val exOutputPanel = ExOutputPanel.getInstance(myEditor)
+    editor!!.vimExOutput = this
+    val exOutputPanel = ExOutputPanel.getInstance(editor!!)
     if (!exOutputPanel.myActive) {
       if (ApplicationManager.getApplication().isUnitTestMode) {
         isActiveInTestMode = true
@@ -46,7 +50,7 @@ class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
 
   override var text: String = ""
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
-      ExOutputPanel.getInstance(myEditor).text
+      editor?.let { ExOutputPanel.getInstance(it).text } ?: ""
     } else {
       // ExOutputPanel always returns a non-null string
       field
@@ -56,7 +60,7 @@ class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
       // never pass null to ExOutputPanel, but we do store it for tests, so we know if we're active or not
       val newValue = value.removeSuffix("\n")
       if (!ApplicationManager.getApplication().isUnitTestMode) {
-        ExOutputPanel.getInstance(myEditor).setText(newValue)
+        editor?.let { ExOutputPanel.getInstance(it).setText(newValue) }
       } else {
         field = newValue
         isActiveInTestMode = newValue.isNotEmpty()
@@ -73,7 +77,7 @@ class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
 
   override fun close() {
     if (!ApplicationManager.getApplication().isUnitTestMode) {
-      ExOutputPanel.getInstance(myEditor).close()
+      editor?.let { ExOutputPanel.getInstance(it).close() }
     }
     else {
       isActiveInTestMode = false
@@ -85,7 +89,7 @@ class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
     fun getInstance(editor: Editor): ExOutputModel {
       var model = editor.vimExOutput
       if (model == null) {
-        model = ExOutputModel(editor)
+        model = ExOutputModel(WeakReference(editor))
         editor.vimExOutput = model
       }
       return model
