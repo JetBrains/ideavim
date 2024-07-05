@@ -58,12 +58,10 @@ class VimListenersNotifier {
   }
 
   fun notifyPluginTurnedOn() {
-    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     vimPluginListeners.forEach { it.turnedOn() }
   }
 
   fun notifyPluginTurnedOff() {
-    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     vimPluginListeners.forEach { it.turnedOff() }
   }
 
