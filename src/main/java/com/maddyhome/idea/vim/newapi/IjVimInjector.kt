@@ -27,8 +27,6 @@ import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimEnabler
-import com.maddyhome.idea.vim.api.VimExOutputPanel
-import com.maddyhome.idea.vim.api.VimExOutputPanelService
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjector
@@ -103,12 +101,6 @@ internal class IjVimInjector : VimInjectorBase() {
 
   override val actionExecutor: VimActionExecutor
     get() = service<IjActionExecutor>()
-  override val exOutputPanel: VimExOutputPanelService
-    get() = object : VimExOutputPanelService {
-      override fun getPanel(editor: VimEditor): VimExOutputPanel {
-        return ExOutputModel.getInstance(editor.ij)
-      }
-    }
   override val historyGroup: VimHistory
     get() = service<HistoryGroup>()
   override val extensionRegistrator: VimExtensionRegistrator

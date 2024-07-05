@@ -13,4 +13,5 @@ interface VimOutputPanelService {
   fun create(editor: VimEditor, context: ExecutionContext): VimOutputPanel
   fun getOrCreate(editor: VimEditor, context: ExecutionContext): VimOutputPanel
   fun getCurrentOutputPanel(): VimOutputPanel?
+  fun output(editor: VimEditor, context: ExecutionContext, text: String)
 }

@@ -113,9 +113,6 @@ interface VimInjector {
   val actionExecutor: VimActionExecutor
 
   // Can't be fully moved to vim-engine.
-  val exOutputPanel: VimExOutputPanelService
-
-  // Can't be fully moved to vim-engine.
   val clipboardManager: VimClipboardManager
 
   // Only state left in the IJ

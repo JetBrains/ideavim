@@ -49,7 +49,7 @@ data class MarksCommand(val range: Range, val argument: String) : Command.Single
         " ${mark.key}  $line  $column $text"
       }
 
-    injector.exOutputPanel.getPanel(editor).output(res)
+    injector.outputPanel.output(editor, context, res)
 
     return ExecutionResult.Success
   }

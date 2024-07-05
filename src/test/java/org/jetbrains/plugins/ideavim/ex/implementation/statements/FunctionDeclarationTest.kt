@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -55,6 +56,7 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("echo F1()"))
     assertExOutput("5550")
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
     assertExOutput("555")
 
@@ -203,10 +205,13 @@ class FunctionDeclarationTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo F1()"))
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
     assertExOutput("1")
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
     assertExOutput("2")
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
     assertExOutput("3")
 
@@ -230,9 +235,11 @@ class FunctionDeclarationTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo F1()"))
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
     assertExOutput("1")
     typeText(commandToKeys("delf! F1"))
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
     assertExOutput("2")
 
@@ -260,10 +267,12 @@ class FunctionDeclarationTest : VimTestCase() {
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: x")
 
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
     assertExOutput("10")
     assertPluginError(false)
 
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: x")
@@ -289,6 +298,7 @@ class FunctionDeclarationTest : VimTestCase() {
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: unknownVar")
 
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo x"))
     assertExOutput("10")
     assertPluginError(false)
@@ -474,7 +484,12 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("1,4call F1()"))
     assertPluginError(false)
-    assertExOutput("1:4")
+    assertExOutput("""
+      1:4
+      1:4
+      1:4
+      1:4
+    """.trimIndent())
     assertState(
       """
         -----

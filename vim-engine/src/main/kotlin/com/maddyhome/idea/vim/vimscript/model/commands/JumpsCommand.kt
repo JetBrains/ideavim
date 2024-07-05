@@ -58,8 +58,7 @@ data class JumpsCommand(val range: Range, val argument: String) : Command.Single
       text.append(">\n")
     }
 
-    injector.exOutputPanel.getPanel(editor).output(text.toString())
-
+    injector.outputPanel.output(editor, context, text.toString())
     return ExecutionResult.Success
   }
 }

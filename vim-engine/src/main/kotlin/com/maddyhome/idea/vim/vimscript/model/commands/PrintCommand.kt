@@ -29,22 +29,12 @@ data class PrintCommand(val range: Range, val argument: String) : Command.Single
     editor.removeSecondaryCarets()
     val caret = editor.currentCaret()
     val lineRange = getLineRangeWithCount(editor, caret)
-    val text = getText(editor, (lineRange.startLine .. lineRange.endLine).toList())
 
     // Move the caret to the start of the last line of the range
     val offset = injector.motion.moveCaretToLineStartSkipLeading(editor, lineRange.endLine)
     caret.moveToOffset(offset)
 
-    // Note that we append to the existing text because we can be called multiple times by the :global command
-    // TODO: We need a better way to handle output. This is not very efficient, especially if we have a lot of output
-    val exOutputModel = injector.exOutputPanel.getPanel(editor)
-    if (!exOutputModel.isActive) {
-      // When we add text, we make the panel active. So if we're appending, it should already be active. If it's not,
-      // make sure it's clear
-      exOutputModel.clear()
-    }
-    val existingText = exOutputModel.text?.let { if (it.isNotEmpty()) it.plus("\n") else it } ?: ""
-    exOutputModel.output(existingText + text)
+    injector.outputPanel.output(editor, context, getText(editor, (lineRange.startLine .. lineRange.endLine).toList()))
     return ExecutionResult.Success
   }
 

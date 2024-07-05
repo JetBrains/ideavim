@@ -38,7 +38,7 @@ data class RegistersCommand(val range: Range, val argument: String) : Command.Si
         "  $type  \"${reg.name}   ${EngineStringHelper.toPrintableCharacters(text).take(200)}"
       }
 
-    injector.exOutputPanel.getPanel(editor).output(regs)
+    injector.outputPanel.output(editor, context, regs)
 
     return ExecutionResult.Success
   }
