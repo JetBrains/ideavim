@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.ex
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimOutputPanel
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 
@@ -17,7 +18,7 @@ import com.maddyhome.idea.vim.ui.ExOutputPanel
 class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
   private var isActiveInTestMode = false
 
-  override val isShown: Boolean
+  val isActive: Boolean
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
       ExOutputPanel.getNullablePanel(myEditor)?.myActive ?: false
     } else {
@@ -29,6 +30,9 @@ class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
   }
 
   override fun show() {
+    val currentPanel = injector.outputPanel.getCurrentOutputPanel()
+    if (currentPanel != null && currentPanel != this) currentPanel.close()
+
     myEditor.vimExOutput = this
     val exOutputPanel = ExOutputPanel.getInstance(myEditor)
     if (!exOutputPanel.myActive) {

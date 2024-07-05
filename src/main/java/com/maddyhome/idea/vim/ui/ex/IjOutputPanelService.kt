@@ -19,7 +19,7 @@ class IjOutputPanelService : VimOutputPanelServiceBase() {
   private var activeOutputPanel: VimOutputPanel? = null
 
   override fun getCurrentOutputPanel(): VimOutputPanel? {
-    return activeOutputPanel?.takeIf { it.isShown }
+    return activeOutputPanel?.takeIf { (it as ExOutputModel).isActive }
   }
 
   override fun create(editor: VimEditor, context: ExecutionContext): VimOutputPanel {
