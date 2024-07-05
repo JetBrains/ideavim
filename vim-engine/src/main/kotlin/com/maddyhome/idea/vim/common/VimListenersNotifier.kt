@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.annotations.ApiStatus.Internal
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -22,42 +23,52 @@ class VimListenersNotifier {
   val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
   
   fun notifyModeChanged(editor: VimEditor, oldMode: Mode) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     modeChangeListeners.forEach { it.modeChanged(editor, oldMode) }
   }
 
   fun notifyEditorCreated(editor: VimEditor) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     myEditorListeners.forEach { it.created(editor) }
   }
 
   fun notifyEditorReleased(editor: VimEditor) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     myEditorListeners.forEach { it.released(editor) }
   }
 
   fun notifyEditorFocusGained(editor: VimEditor) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     myEditorListeners.forEach { it.focusGained(editor) }
   }
 
   fun notifyEditorFocusLost(editor: VimEditor) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     myEditorListeners.forEach { it.focusLost(editor) }
   }
 
   fun notifyMacroRecordingStarted() {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     macroRecordingListeners.forEach { it.recordingStarted() }
   }
   
   fun notifyMacroRecordingFinished() {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     macroRecordingListeners.forEach { it.recordingFinished() }
   }
 
   fun notifyPluginTurnedOn() {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     vimPluginListeners.forEach { it.turnedOn() }
   }
 
   fun notifyPluginTurnedOff() {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     vimPluginListeners.forEach { it.turnedOff() }
   }
 
   fun notifyIsReplaceCharChanged(editor: VimEditor) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     isReplaceCharListeners.forEach { it.isReplaceCharChanged(editor) }
   }
 
