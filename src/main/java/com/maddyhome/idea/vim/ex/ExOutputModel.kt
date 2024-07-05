@@ -40,10 +40,6 @@ class ExOutputModel(private val myEditor: Editor) : VimOutputPanel {
     }
   }
 
-  override fun update() {
-    // the current implementation updates text as soon as it is modified
-  }
-
   override var text: String = ""
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
       ExOutputPanel.getInstance(myEditor).text
