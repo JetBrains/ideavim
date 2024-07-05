@@ -14,16 +14,20 @@ import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.VimOutputPanelServiceBase
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.newapi.ij
+import java.lang.ref.WeakReference
 
 class IjOutputPanelService : VimOutputPanelServiceBase() {
   private var activeOutputPanel: VimOutputPanel? = null
 
   override fun getCurrentOutputPanel(): VimOutputPanel? {
-    return activeOutputPanel?.takeIf { (it as ExOutputModel).isActive }
+    return activeOutputPanel?.takeIf {
+      (it as ExOutputModel)
+      it.isActive && it.editor != null
+    }
   }
 
   override fun create(editor: VimEditor, context: ExecutionContext): VimOutputPanel {
-    val panel = ExOutputModel(editor.ij)
+    val panel = ExOutputModel(WeakReference(editor.ij))
     activeOutputPanel = panel
     return panel
   }
