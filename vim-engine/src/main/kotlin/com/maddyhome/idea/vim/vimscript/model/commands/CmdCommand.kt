@@ -52,14 +52,14 @@ data class CmdCommand(val range: Range, val argument: String) : Command.SingleEx
   }
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val result: Boolean = if (argument.trim().isEmpty()) {
-      this.listAlias(editor, "")
+      this.listAlias(editor, context, "")
     } else {
-      this.addAlias(editor)
+      this.addAlias(editor, context)
     }
     return if (result) ExecutionResult.Success else ExecutionResult.Error
   }
 
-  private fun listAlias(editor: VimEditor, filter: String): Boolean {
+  private fun listAlias(editor: VimEditor, context: ExecutionContext, filter: String): Boolean {
     val lineSeparator = "\n"
     val allAliases = injector.commandGroup.listAliases()
     val aliases = allAliases.filter {
@@ -67,11 +67,11 @@ data class CmdCommand(val range: Range, val argument: String) : Command.SingleEx
     }.map {
       "${it.key.padEnd(12)}${it.value.numberOfArguments.padEnd(11)}${it.value.printValue()}"
     }.sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator)
-    injector.exOutputPanel.getPanel(editor).output("Name        Args       Definition$lineSeparator$aliases")
+    injector.outputPanel.output(editor, context, "Name        Args       Definition$lineSeparator$aliases")
     return true
   }
 
-  private fun addAlias(editor: VimEditor): Boolean {
+  private fun addAlias(editor: VimEditor, context: ExecutionContext): Boolean {
     var argument = argument.trim()
 
     // Handle overwriting of aliases
@@ -165,7 +165,7 @@ data class CmdCommand(val range: Range, val argument: String) : Command.SingleEx
         // No message should be shown either, since there is no editor.
         return false
       }
-      return this.listAlias(editor, alias)
+      return this.listAlias(editor, context, alias)
     }
 
     // If we are not over-writing existing aliases, and an alias with the same command

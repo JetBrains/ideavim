@@ -105,8 +105,7 @@ data class HistoryCommand(val range: Range, val argument: String) : Command.Sing
       else -> ""
     }
 
-    injector.exOutputPanel.getPanel(editor).output(res)
-
+    injector.outputPanel.output(editor, context, res)
     return ExecutionResult.Success
   }
 

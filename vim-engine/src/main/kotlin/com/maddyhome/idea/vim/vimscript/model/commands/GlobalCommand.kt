@@ -131,9 +131,7 @@ data class GlobalCommand(val range: Range, val argument: String, val invert: Boo
     globalBusy = true
     try {
       if (cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
-        val exOutputModel = injector.exOutputPanel.getPanel(editor)
-        exOutputModel.clear()
-        exOutputModel.output(originalCommandString + '\n' + PrintCommand.getText(editor, lines))
+        injector.outputPanel.output(editor, context, originalCommandString + '\n' + PrintCommand.getText(editor, lines))
       } else {
         for (mark in marks) {
           if (gotInt) break

@@ -61,7 +61,7 @@ abstract class SetCommandBase(range: Range, argument: String) : Command.SingleEx
     context: ExecutionContext,
     operatorArguments: OperatorArguments
   ): ExecutionResult {
-    parseOptionLine(editor, commandArgument, getScope(editor))
+    parseOptionLine(editor, context, commandArgument, getScope(editor))
     return ExecutionResult.Success
   }
 
@@ -93,7 +93,7 @@ abstract class SetCommandBase(range: Range, argument: String) : Command.SingleEx
  * @param args      The raw text passed to the `:set` command
  * @throws ExException Thrown if any option names or operations are incorrect
  */
-fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessScope) {
+fun parseOptionLine(editor: VimEditor, context: ExecutionContext, args: String, scope: OptionAccessScope) {
   val optionGroup = injector.optionGroup
 
   val columnFormat = args.startsWith("!")
@@ -105,14 +105,14 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessScope) {
       val changedOptions = optionGroup.getAllOptions()
         .filter { !optionGroup.isDefaultValue(it, scope) && (!it.isHidden || (injector.application.isInternal() && !injector.application.isUnitTest())) }
         .map { Pair(it.name, it.name) }
-      showOptions(editor, changedOptions, scope, true, columnFormat)
+      showOptions(editor, context, changedOptions, scope, true, columnFormat)
       return
     }
     argument == "all" -> {
       val options = optionGroup.getAllOptions()
         .filter { !it.isHidden || (injector.application.isInternal() && !injector.application.isUnitTest()) }
         .map { Pair(it.name, it.name) }
-      showOptions(editor, options, scope, true, columnFormat)
+      showOptions(editor, context, options, scope, true, columnFormat)
       return
     }
     argument == "all&" -> {
@@ -196,7 +196,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionAccessScope) {
 
   // Now show all options that were individually requested
   if (toShow.size > 0) {
-    showOptions(editor, toShow, scope, false, columnFormat)
+    showOptions(editor, context, toShow, scope, false, columnFormat)
   }
 
   if (error != null) {
@@ -212,6 +212,7 @@ private fun getValidToggleOption(optionName: String, token: String) =
 
 private fun showOptions(
   editor: VimEditor,
+  context: ExecutionContext,
   nameAndToken: Collection<Pair<String, String>>,
   scope: OptionAccessScope,
   showIntro: Boolean,
@@ -275,7 +276,7 @@ private fun showOptions(
       appendLine(option)
     }
   }
-  injector.exOutputPanel.getPanel(editor).output(output)
+  injector.outputPanel.output(editor, context, output)
 
   if (unknownOption != null) {
     throw exExceptionMessage("E518", unknownOption.second)

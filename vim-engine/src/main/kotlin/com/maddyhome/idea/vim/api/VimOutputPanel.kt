@@ -13,6 +13,7 @@ interface VimOutputPanel {
   val isShown: Boolean
 
   fun addText(text: String, isNewLine: Boolean = true)
+  // TODO it can be removed
   fun update()
 
   /**

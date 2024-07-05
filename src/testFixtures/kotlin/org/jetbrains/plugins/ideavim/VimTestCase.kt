@@ -222,6 +222,7 @@ abstract class VimTestCase {
     VimPlugin.getChange().resetRepeat()
     VimPlugin.getKey().savedShortcutConflicts.clear()
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
+    injector.outputPanel.getCurrentOutputPanel()?.close()
 
     // Tear down neovim
     NeovimTesting.tearDown(testInfo)
