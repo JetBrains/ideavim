@@ -109,7 +109,7 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
     get() {
       val notNullEditor = editor ?: return false
       val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return false
-      return panel.myAtEnd
+      return panel.isAtEnd()
     }
 
   override fun onBadKey() {

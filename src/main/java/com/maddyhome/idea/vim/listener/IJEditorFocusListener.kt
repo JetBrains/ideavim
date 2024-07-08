@@ -29,6 +29,11 @@ import com.maddyhome.idea.vim.newapi.ij
  */
 class IJEditorFocusListener : EditorListener {
   override fun focusGained(editor: VimEditor) {
+    val editorInFocus = KeyHandler.getInstance().editorInFocus
+    if (editorInFocus != null && editorInFocus.ij == editor.ij) return
+
+    KeyHandler.getInstance().editorInFocus = editor
+
     // We add Vim bindings to all opened editors, including editors used as UI controls rather than just project file
     // editors. This includes editors used as part of the UI, such as the VCS commit message, or used as read-only
     // viewers for text output, such as log files in run configurations or the Git Console tab. And editors are used for

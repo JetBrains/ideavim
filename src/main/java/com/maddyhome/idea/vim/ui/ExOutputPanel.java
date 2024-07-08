@@ -52,7 +52,6 @@ public class ExOutputPanel extends JPanel {
   private final @NotNull JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private final @NotNull ComponentAdapter myAdapter;
-  public boolean myAtEnd = false;
   private int myLineHeight = 0;
 
   private @Nullable JComponent myOldGlass = null;
@@ -245,19 +244,22 @@ public class ExOutputPanel extends JPanel {
   }
 
   private void scrollOffset(int more) {
-    myAtEnd = false;
     int val = myScrollPane.getVerticalScrollBar().getValue();
     myScrollPane.getVerticalScrollBar().setValue(val + more);
     myScrollPane.getHorizontalScrollBar().setValue(0);
     if (val + more >=
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
-      myAtEnd = true;
       myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
     }
     else {
       myLabel.setText(MessageHelper.message("ex.output.panel.more"));
     }
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
+  }
+
+  public boolean isAtEnd() {
+    int val = myScrollPane.getVerticalScrollBar().getValue();
+    return val >= myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount();
   }
 
   private void positionPanel() {
@@ -315,7 +317,9 @@ public class ExOutputPanel extends JPanel {
         }
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
         ExecutionContext context = injector.getExecutionContextManager().getEditorExecutionContext(new IjVimEditor(myEditor));
-        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
+        injector.getApplication().runWriteAction(() -> { VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
+          return null;
+        });
       }
     });
   }
