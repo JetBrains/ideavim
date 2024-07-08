@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimOutputPanel;
 import com.maddyhome.idea.vim.diagnostic.VimLogger;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
@@ -51,7 +52,7 @@ public class ExOutputPanel extends JPanel {
   private final @NotNull JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private final @NotNull ComponentAdapter myAdapter;
-  private boolean myAtEnd = false;
+  public boolean myAtEnd = false;
   private int myLineHeight = 0;
 
   private @Nullable JComponent myOldGlass = null;
@@ -224,30 +225,21 @@ public class ExOutputPanel extends JPanel {
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
 
-  private void scrollLine() {
+  public void scrollLine() {
     scrollOffset(myLineHeight);
   }
 
-  private void scrollPage() {
+  public void scrollPage() {
     scrollOffset(myScrollPane.getVerticalScrollBar().getVisibleAmount());
   }
 
-  private void scrollHalfPage() {
+  public void scrollHalfPage() {
     double sa = myScrollPane.getVerticalScrollBar().getVisibleAmount() / 2.0;
     double offset = Math.ceil(sa / myLineHeight) * myLineHeight;
     scrollOffset((int)offset);
   }
 
-  private void handleEnter() {
-    if (myAtEnd) {
-      close();
-    }
-    else {
-      scrollLine();
-    }
-  }
-
-  private void badKey() {
+  public void onBadKey() {
     myLabel.setText(MessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
@@ -308,14 +300,13 @@ public class ExOutputPanel extends JPanel {
     close(null);
   }
 
-  private void close(final @Nullable KeyEvent e) {
+  public void close(final @Nullable KeyStroke key) {
     ApplicationManager.getApplication().invokeLater(() -> {
       deactivate(true);
 
       final Project project = myEditor.getProject();
 
-      if (project != null && e != null && e.getKeyChar() != '\n') {
-        final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
+      if (project != null && key != null && key.getKeyChar() != '\n') {
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
         if (LOG.isTrace()) {
@@ -341,40 +332,14 @@ public class ExOutputPanel extends JPanel {
      */
     @Override
     public void keyTyped(@NotNull KeyEvent e) {
-      if (myExOutputPanel.myAtEnd) {
-        myExOutputPanel.close(e);
-      }
-      else {
-        switch (e.getKeyChar()) {
-          case ' ':
-            myExOutputPanel.scrollPage();
-            break;
-          case 'd':
-            myExOutputPanel.scrollHalfPage();
-            break;
-          case 'q':
-          case '\u001b':
-            myExOutputPanel.close();
-            break;
-          case '\n':
-            myExOutputPanel.handleEnter();
-            break;
-          case KeyEvent.CHAR_UNDEFINED: {
-            switch (e.getKeyCode()) {
-              case KeyEvent.VK_ENTER:
-                myExOutputPanel.handleEnter();
-                break;
-              case KeyEvent.VK_ESCAPE:
-                myExOutputPanel.close();
-                break;
-              default:
-                myExOutputPanel.badKey();
-            }
-          }
-          default:
-            myExOutputPanel.badKey();
-        }
-      }
+      VimOutputPanel currentPanel = injector.getOutputPanel().getCurrentOutputPanel();
+      if (currentPanel == null) return;
+
+      int keyCode = e.getKeyCode();
+      Character keyChar = e.getKeyChar();
+      int modifiers = e.getModifiersEx();
+      KeyStroke keyStroke = (keyChar == KeyEvent.CHAR_UNDEFINED) ? KeyStroke.getKeyStroke(keyCode, modifiers) : KeyStroke.getKeyStroke(keyChar, modifiers);
+      currentPanel.handleKey(keyStroke);
     }
   }
 

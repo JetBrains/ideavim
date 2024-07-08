@@ -9,14 +9,15 @@ package com.maddyhome.idea.vim.ex
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.api.VimOutputPanel
+import com.maddyhome.idea.vim.api.VimOutputPanelBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 import java.lang.ref.WeakReference
+import javax.swing.KeyStroke
 
 // TODO: We need a nicer way to handle output, especially wrt testing, appending + clearing
-class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPanel {
+class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPanelBase() {
   private var isActiveInTestMode = false
 
   val editor get() = myEditor.get()
@@ -48,6 +49,24 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
     }
   }
 
+  override fun scrollPage() {
+    val notNullEditor = editor ?: return
+    val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
+    panel.scrollPage()
+  }
+
+  override fun scrollHalfPage() {
+    val notNullEditor = editor ?: return
+    val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
+    panel.scrollHalfPage()
+  }
+
+  override fun scrollLine() {
+    val notNullEditor = editor ?: return
+    val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
+    panel.scrollLine()
+  }
+
   override var text: String = ""
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
       editor?.let { ExOutputPanel.getInstance(it).text } ?: ""
@@ -73,6 +92,25 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
 
   fun clear() {
     text = ""
+  }
+
+  override val atEnd: Boolean
+    get() {
+      val notNullEditor = editor ?: return false
+      val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return false
+      return panel.myAtEnd
+    }
+
+  override fun onBadKey() {
+    val notNullEditor = editor ?: return
+    val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
+    panel.onBadKey()
+  }
+
+  override fun close(key: KeyStroke?) {
+    val notNullEditor = editor ?: return
+    val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
+    panel.close(key)
   }
 
   override fun close() {
