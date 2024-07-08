@@ -85,6 +85,17 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
         isActiveInTestMode = newValue.isNotEmpty()
       }
     }
+  override var label: String
+    get() {
+      val notNullEditor = editor ?: return ""
+      val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return ""
+      return panel.myLabel.text
+    }
+    set(value) {
+      val notNullEditor = editor ?: return
+      val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
+      panel.myLabel.text = value
+    }
 
   fun output(text: String) {
     this.text = text

@@ -47,7 +47,7 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 public class ExOutputPanel extends JPanel {
   private final @NotNull Editor myEditor;
 
-  private final @NotNull JLabel myLabel = new JLabel("more");
+  public final @NotNull JLabel myLabel = new JLabel("more");
   private final @NotNull JTextArea myText = new JTextArea();
   private final @NotNull JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
