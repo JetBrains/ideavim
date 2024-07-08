@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.returnTo
+import java.lang.ref.WeakReference
 import javax.swing.KeyStroke
 
 /**
@@ -49,6 +50,7 @@ import javax.swing.KeyStroke
 // 1. avoid using handleKeyRecursionCount & shouldRecord
 // 2. maybe we can live without allowKeyMappings: Boolean & mappingCompleted: Boolean
 class KeyHandler {
+  private var editorInFocusReference: WeakReference<VimEditor>? = null
   private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
   private var handleKeyRecursionCount = 0
 
@@ -57,6 +59,12 @@ class KeyHandler {
 
   val keyStack: KeyStack = KeyStack()
   val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
+
+  var editorInFocus: VimEditor?
+    get() = editorInFocusReference?.get()
+    set(value) {
+      editorInFocusReference = WeakReference(value)
+    }
 
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
