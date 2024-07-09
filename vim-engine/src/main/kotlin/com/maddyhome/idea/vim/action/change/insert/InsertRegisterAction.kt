@@ -68,9 +68,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
           val textToStore = expression.toInsertableString()
           injector.registerGroup.storeTextSpecial('=', textToStore)
         }
-        injector.application.runWriteAction {
-          insertRegister(editor, context, '=', operatorArguments)
-        }
+        insertRegister(editor, context, '=', operatorArguments)
       } catch (e: ExException) {
         injector.messages.indicateError()
         injector.messages.showStatusBarMessage(editor, e.message)
