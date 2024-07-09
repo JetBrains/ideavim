@@ -55,7 +55,7 @@ import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
 /**
  * This is used to enter ex commands such as searches and "colon" commands
  */
-public class ExEntryPanel extends JPanel implements VimCommandLine, VimModalInput {
+public class ExEntryPanel extends JPanel implements VimCommandLine {
   public static ExEntryPanel instance;
   public static ExEntryPanel instanceWithoutShortcuts;
   private boolean isReplaceMode = false;
@@ -79,15 +79,13 @@ public class ExEntryPanel extends JPanel implements VimCommandLine, VimModalInpu
     layout.setConstraints(entry, gbc);
     add(entry);
 
-    if (enableShortcuts) {
-      // This does not need to be unregistered, it's registered as a custom UI property on this
-      EventFacade.getInstance().registerCustomShortcutSet(
-        VimShortcutKeyAction.getInstance(),
-        toShortcutSet(((VimKeyGroupBase) injector.getKeyGroup()).getRequiredShortcutKeys()),
-        entry
-      );
-      new ExShortcutKeyAction(this).registerCustomShortcutSet();
-    }
+    // This does not need to be unregistered, it's registered as a custom UI property on this
+    EventFacade.getInstance().registerCustomShortcutSet(
+      VimShortcutKeyAction.getInstance(),
+      toShortcutSet(((VimKeyGroupBase) injector.getKeyGroup()).getRequiredShortcutKeys()),
+      entry
+    );
+    new ExShortcutKeyAction(this).registerCustomShortcutSet();
 
     updateUI();
   }
@@ -552,20 +550,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine, VimModalInpu
   }
 
   @NotNull
-  @Override
   public VimInputInterceptor<?> getInputInterceptor() {
     return myInputInterceptor;
-  }
-
-  @NotNull
-  @Override
-  public String getText() {
-    return getVisibleText();
-  }
-
-  @Override
-  public void handleKey(@NotNull KeyStroke key, @NotNull VimEditor editor, @NotNull ExecutionContext executionContext) {
-    getInputInterceptor().consumeKey(key, editor, executionContext);
   }
 
   @Override
@@ -573,7 +559,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine, VimModalInpu
     VimCommandLine.super.insertText(offset, string);
   }
 
-  @Override
   public void setInputInterceptor(@NotNull VimInputInterceptor<?> vimInputInterceptor) {
     myInputInterceptor = vimInputInterceptor;
   }
