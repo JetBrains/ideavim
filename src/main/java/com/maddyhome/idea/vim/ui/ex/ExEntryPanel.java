@@ -140,6 +140,14 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   /**
+   * @deprecated use {@link ExEntryPanel#activate(Editor, DataContext, String, String)}
+   */
+  @Deprecated(forRemoval = true)
+  public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
+    activate(editor, context, label, initText);
+  }
+
+  /**
    * Turns on the ex entry field for the given editor
    *
    * @param editor   The editor to use for display
@@ -390,6 +398,14 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    */
   public boolean isActive() {
     return active;
+  }
+
+  /**
+   * @deprecated Use getVisibleText()
+   */
+  @Deprecated(forRemoval = true)
+  public @NotNull String getText() {
+    return entry.getText();
   }
 
   @Override

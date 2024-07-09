@@ -9,21 +9,18 @@
 package com.maddyhome.idea.vim.command
 
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.VimStateMachine
-import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * COMPATIBILITY-LAYER: Additional class
  * Please see: https://jb.gg/zo8n0r
  */
-public class CommandState(private val machine: VimStateMachine) {
+@Deprecated("Use `injector.vimState`")
+class CommandState(private val machine: VimStateMachine) {
 
-  public val isOperatorPending: Boolean
-    get() = machine.isOperatorPending(machine.mode)
-
-  public val mode: Mode
+  val mode: Mode
     get() {
       val myMode = machine.mode
       return when (myMode) {
@@ -37,13 +34,23 @@ public class CommandState(private val machine: VimStateMachine) {
       }
     }
 
-  public val commandBuilder: CommandBuilder
-    get() = machine.commandBuilder
+  @Deprecated("Use `KeyHandler.keyHandlerState.commandBuilder", ReplaceWith(
+    "KeyHandler.getInstance().keyHandlerState.commandBuilder",
+    "com.maddyhome.idea.vim.KeyHandler"
+  )
+  )
+  val commandBuilder: CommandBuilder
+    get() = KeyHandler.getInstance().keyHandlerState.commandBuilder
 
-  public val mappingState: MappingState
-    get() = machine.mappingState
+  @Deprecated("Use `KeyHandler.keyHandlerState.mappingState", ReplaceWith(
+    "KeyHandler.getInstance().keyHandlerState.mappingState",
+    "com.maddyhome.idea.vim.KeyHandler"
+  )
+  )
+  val mappingState: MappingState
+    get() = KeyHandler.getInstance().keyHandlerState.mappingState
 
-  public enum class Mode {
+  enum class Mode {
     // Basic modes
     COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
 
@@ -51,22 +58,15 @@ public class CommandState(private val machine: VimStateMachine) {
     OP_PENDING, REPLACE /*, VISUAL_REPLACE*/, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT
   }
 
-  public enum class SubMode {
+  enum class SubMode {
     NONE, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
-  public companion object {
+  companion object {
     @JvmStatic
-    public fun getInstance(editor: Editor): CommandState {
-      return CommandState(editor.vim.vimStateMachine)
+    @Deprecated("Use `injector.vimState`")
+    fun getInstance(editor: Editor): CommandState {
+      return CommandState(injector.vimState)
     }
   }
 }
-
-internal val CommandState.SubMode.engine: SelectionType
-  get() = when (this) {
-    CommandState.SubMode.NONE -> error("Unexpected value")
-    CommandState.SubMode.VISUAL_CHARACTER -> SelectionType.CHARACTER_WISE
-    CommandState.SubMode.VISUAL_LINE -> SelectionType.LINE_WISE
-    CommandState.SubMode.VISUAL_BLOCK -> SelectionType.BLOCK_WISE
-  }
