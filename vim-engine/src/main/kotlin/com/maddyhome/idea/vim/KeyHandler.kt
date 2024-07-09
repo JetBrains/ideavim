@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
+import com.maddyhome.idea.vim.key.consumers.ModalInputConsumer
 import com.maddyhome.idea.vim.key.consumers.ModeInputConsumer
 import com.maddyhome.idea.vim.key.consumers.RegisterConsumer
 import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
@@ -51,7 +52,7 @@ import javax.swing.KeyStroke
 // 2. maybe we can live without allowKeyMappings: Boolean & mappingCompleted: Boolean
 class KeyHandler {
   private var editorInFocusReference: WeakReference<VimEditor>? = null
-  private val keyConsumers: List<KeyConsumer> = listOf(MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(ModalInputConsumer(), MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
   private var handleKeyRecursionCount = 0
 
   var keyHandlerState: KeyHandlerState = KeyHandlerState()

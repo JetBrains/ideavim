@@ -175,6 +175,7 @@ interface VimInjector {
   // !! in progress
   val variableService: VariableService
 
+  val modalInput: VimModalInputService
   val commandLine: VimCommandLineService
   val outputPanel: VimOutputPanelService
 

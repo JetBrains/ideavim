@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimCommandGroup
+import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineService
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
@@ -36,6 +37,7 @@ import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMessages
+import com.maddyhome.idea.vim.api.VimModalInputService
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOutputPanelService
@@ -83,6 +85,7 @@ import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.ui.VimRcFileState
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanelService
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.VariableService
@@ -183,6 +186,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
   override val commandLine: VimCommandLineService
     get() = service()
+  override val modalInput: VimModalInputService
+    get() = commandLine as ExEntryPanelService
   override val outputPanel: VimOutputPanelService
     get() = service()
 
