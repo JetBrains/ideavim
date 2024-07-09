@@ -9,8 +9,11 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import com.intellij.idea.TestFor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 
 class UndoActionTest : VimTestCase() {
@@ -109,6 +112,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-547"])
   fun `test typed text requires one undo`() {
+    assumeTrue(!injector.globalIjOptions().oldundo)
     configureByText("Lorem ipsu${c}m")
     typeText("a dolor sit amet,<CR>consectetur adipiscing elit<Esc>")
     assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit")
@@ -119,6 +123,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-547"])
   fun `test breaking insert sequence`() {
+    assumeTrue(!injector.globalIjOptions().oldundo)
     configureByText("Lorem ipsu${c}m")
     typeText("a dolor sit amet,<CR>consectetur <C-G>uadipiscing elit<Esc>")
     assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit")
@@ -129,6 +134,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-547"])
   fun `test moving caret breaks insert sequence`() {
+    assumeTrue(!injector.globalIjOptions().oldundo)
     configureByText("Lorem ipsu${c}m")
     typeText("a dolor sit amet,<CR>consectetur  <Left>adipiscing elit<Esc>")
     assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit ")
