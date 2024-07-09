@@ -11,9 +11,11 @@ import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.action.change.Extension
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
+import com.maddyhome.idea.vim.api.VimCommandLineCaret
 import com.maddyhome.idea.vim.api.VimCommandLineService
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimModalInput
+import com.maddyhome.idea.vim.api.VimModalInputBase
 import com.maddyhome.idea.vim.api.VimModalInputService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.TestInputModel
@@ -109,13 +111,34 @@ class ExEntryPanelService : VimCommandLineService, VimModalInputService {
   }
 
   override fun getCurrentModalInput(): VimModalInput? {
-    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive }
+    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive }?.let { WrappedAsModalInputExEntryPanel(it) }
   }
 
   override fun create(editor: VimEditor, context: ExecutionContext, label: String, inputInterceptor: VimInputInterceptor<*>): VimModalInput {
     val panel = ExEntryPanel.getInstanceWithoutShortcuts()
     panel.myInputInterceptor = inputInterceptor
     panel.activate(editor.ij, context.ij, label, "")
-    return panel
+    return WrappedAsModalInputExEntryPanel(panel)
+  }
+}
+
+internal class WrappedAsModalInputExEntryPanel(internal val exEntryPanel: ExEntryPanel) : VimModalInputBase() {
+  override var inputInterceptor: VimInputInterceptor<*>
+    get() = exEntryPanel.myInputInterceptor
+    set(value) { exEntryPanel.myInputInterceptor = value }
+  override val caret: VimCommandLineCaret = exEntryPanel.caret
+  override val label: String = exEntryPanel.label
+  override val text: String = exEntryPanel.actualText
+
+  override fun setText(string: String) {
+    exEntryPanel.setText(string)
+  }
+
+  override fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean) {
+    exEntryPanel.deactivate(refocusOwningEditor, resetCaret)
+  }
+
+  override fun focus() {
+    exEntryPanel.focus()
   }
 }

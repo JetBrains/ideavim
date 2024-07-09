@@ -120,7 +120,8 @@ internal object ExEditorKit : DefaultEditorKit() {
           val c = key.keyChar
           if (c.code > 0) {
             if (target.useHandleKeyFromEx) {
-              val entry = ((injector.commandLine.getActiveCommandLine() ?: injector.modalInput.getCurrentModalInput()) as ExEntryPanel?)?.entry ?: return
+              val panel = ((injector.commandLine.getActiveCommandLine() as? ExEntryPanel) ?: (injector.modalInput.getCurrentModalInput() as? WrappedAsModalInputExEntryPanel)?.exEntryPanel) ?: return
+              val entry = panel.entry
               val editor = entry.editor
               val keyHandler = KeyHandler.getInstance()
               keyHandler.handleKey(editor!!.vim, key, entry.context.vim, keyHandler.keyHandlerState)
