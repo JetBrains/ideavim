@@ -16,6 +16,12 @@ abstract class VimModalInputBase : VimModalInput {
     setText(newText)
   }
 
+  override fun typeText(string: String) {
+    val caretOffset = caret.offset
+    insertText(caretOffset, string)
+    caret.offset += string.length
+  }
+
   override fun handleKey(key: KeyStroke, editor: VimEditor, executionContext: ExecutionContext) {
     inputInterceptor.consumeKey(key, editor, executionContext)
   }

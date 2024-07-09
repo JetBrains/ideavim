@@ -19,6 +19,7 @@ interface VimModalInput {
 
   fun setText(string: String)
   fun insertText(offset: Int, string: String)
+  fun typeText(string: String)
 
   fun handleKey(key: KeyStroke, editor: VimEditor, executionContext: ExecutionContext)
 
