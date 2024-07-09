@@ -27,6 +27,9 @@ class TestInjector(val injector: VimInjector) : VimInjector by injector {
     tracers[key] = collector
   }
 
+  override val modalInput
+    get() = injector.modalInput
+
   override val vimState
     get() = injector.vimState
 
