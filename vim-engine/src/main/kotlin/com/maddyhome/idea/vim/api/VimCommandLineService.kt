@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.api
 interface VimCommandLineService {
   fun getActiveCommandLine(): VimCommandLine?
 
+  @Deprecated("Please use ModalInputService")
   fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String?
 
   /**
@@ -23,6 +24,7 @@ interface VimCommandLineService {
    */
   fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
 
+  @Deprecated("Please use ModalInputService.create()")
   fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
 
   fun fullReset()

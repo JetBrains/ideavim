@@ -13,19 +13,22 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineService
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimModalInput
+import com.maddyhome.idea.vim.api.VimModalInputService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
+import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ModalEntry
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class ExEntryPanelService : VimCommandLineService {
+class ExEntryPanelService : VimCommandLineService, VimModalInputService {
   override fun getActiveCommandLine(): VimCommandLine? {
-    val instance = ExEntryPanel.instance ?: ExEntryPanel.instanceWithoutShortcuts ?: return null
+    val instance = ExEntryPanel.instance ?: return null
     return if (instance.isActive) instance else null
   }
 
@@ -103,5 +106,16 @@ class ExEntryPanelService : VimCommandLineService {
 
   override fun fullReset() {
     ExEntryPanel.fullReset()
+  }
+
+  override fun getCurrentModalInput(): VimModalInput? {
+    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive }
+  }
+
+  override fun create(editor: VimEditor, context: ExecutionContext, label: String, inputInterceptor: VimInputInterceptor<*>): VimModalInput {
+    val panel = ExEntryPanel.getInstanceWithoutShortcuts()
+    panel.myInputInterceptor = inputInterceptor
+    panel.activate(editor.ij, context.ij, label, "")
+    return panel
   }
 }

@@ -23,12 +23,11 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
-import com.maddyhome.idea.vim.api.VimCommandLine;
-import com.maddyhome.idea.vim.api.VimCommandLineCaret;
-import com.maddyhome.idea.vim.api.VimKeyGroupBase;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
@@ -56,11 +55,12 @@ import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
 /**
  * This is used to enter ex commands such as searches and "colon" commands
  */
-public class ExEntryPanel extends JPanel implements VimCommandLine {
+public class ExEntryPanel extends JPanel implements VimCommandLine, VimModalInput {
   public static ExEntryPanel instance;
   public static ExEntryPanel instanceWithoutShortcuts;
   private boolean isReplaceMode = false;
   private WeakReference<Editor> weakEditor = null;
+  public VimInputInterceptor myInputInterceptor = null;
 
   private ExEntryPanel(boolean enableShortcuts) {
     label = new JLabel(" ");
@@ -549,6 +549,33 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   @Override
   public void focus() {
     IdeFocusManager.findInstance().requestFocus(entry, true);
+  }
+
+  @NotNull
+  @Override
+  public VimInputInterceptor<?> getInputInterceptor() {
+    return myInputInterceptor;
+  }
+
+  @NotNull
+  @Override
+  public String getText() {
+    return getVisibleText();
+  }
+
+  @Override
+  public void handleKey(@NotNull KeyStroke key, @NotNull VimEditor editor, @NotNull ExecutionContext executionContext) {
+    getInputInterceptor().consumeKey(key, editor, executionContext);
+  }
+
+  @Override
+  public void insertText(int offset, @NotNull String string) {
+    VimCommandLine.super.insertText(offset, string);
+  }
+
+  @Override
+  public void setInputInterceptor(@NotNull VimInputInterceptor<?> vimInputInterceptor) {
+    myInputInterceptor = vimInputInterceptor;
   }
 
   public static class LafListener implements LafManagerListener {

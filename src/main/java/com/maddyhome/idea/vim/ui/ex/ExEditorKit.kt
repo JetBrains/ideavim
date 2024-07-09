@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.ui.ex
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 import java.awt.event.ActionEvent
@@ -119,7 +120,7 @@ internal object ExEditorKit : DefaultEditorKit() {
           val c = key.keyChar
           if (c.code > 0) {
             if (target.useHandleKeyFromEx) {
-              val entry = ExEntryPanel.getInstance().entry
+              val entry = ((injector.commandLine.getActiveCommandLine() ?: injector.modalInput.getCurrentModalInput()) as ExEntryPanel?)?.entry ?: return
               val editor = entry.editor
               val keyHandler = KeyHandler.getInstance()
               keyHandler.handleKey(editor!!.vim, key, entry.context.vim, keyHandler.keyHandlerState)
