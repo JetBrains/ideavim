@@ -18,10 +18,14 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.isCloseKeyStroke
+import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptorBase
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.Script
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.INSERT])
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
@@ -38,32 +42,40 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
     val argument = cmd.argument
 
     if (argument?.character == '=') {
-      injector.application.invokeLater {
-        try {
-          val expression = readExpression(editor, context)
-          if (expression != null) {
-            if (expression.isNotEmpty()) {
-              val expressionValue =
-                injector.vimscriptParser.parseExpression(expression)?.evaluate(editor, context, Script(listOf()))
-                  ?: throw ExException("E15: Invalid expression: $expression")
-              val textToStore = expressionValue.toInsertableString()
-              injector.registerGroup.storeTextSpecial('=', textToStore)
-            }
-            insertRegister(editor, context, argument.character, operatorArguments)
-          }
-        } catch (e: ExException) {
-          injector.messages.indicateError()
-          injector.messages.showStatusBarMessage(editor, e.message)
-        }
-      }
+      injector.modalInput.create(editor, context, "=", ExpressionRegisterInputInterceptor(operatorArguments))
       return true
     } else {
       return argument != null && insertRegister(editor, context, argument.character, operatorArguments)
     }
   }
 
-  private fun readExpression(editor: VimEditor, context: ExecutionContext): String? {
-    return injector.commandLine.inputString(editor, context, "=", null)
+  private class ExpressionRegisterInputInterceptor(val operatorArguments: OperatorArguments) : VimInputInterceptorBase<String>() {
+    override fun buildInput(key: KeyStroke): String? {
+      val modalInput = injector.modalInput.getCurrentModalInput() ?: return ""
+      if (key.isCloseKeyStroke() || key.keyCode == KeyEvent.VK_ENTER) {
+        closeModalInputPrompt()
+        return modalInput.text
+      }
+      modalInput.typeText(injector.parser.toPrintableString(listOf(key)))
+      return null
+    }
+
+    override fun executeInput(input: String, editor: VimEditor, context: ExecutionContext) {
+      try {
+        if (input.isNotEmpty()) {
+          val expression = injector.vimscriptParser.parseExpression(input)?.evaluate(editor, context, Script(listOf()))
+            ?: throw ExException("E15: Invalid expression: $input")
+          val textToStore = expression.toInsertableString()
+          injector.registerGroup.storeTextSpecial('=', textToStore)
+        }
+        injector.application.runWriteAction {
+          insertRegister(editor, context, '=', operatorArguments)
+        }
+      } catch (e: ExException) {
+        injector.messages.indicateError()
+        injector.messages.showStatusBarMessage(editor, e.message)
+      }
+    }
   }
 }
 
