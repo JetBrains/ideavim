@@ -29,10 +29,10 @@ interface VimInputInterceptor<T> {
   /**
    * Attempt to build a complete input from the given keystroke.
    *
-   * @param keystroke The current keystroke to process.
+   * @param key The current keystroke to process.
    * @return The complete input of type [T] if it can be constructed, or null if more keystrokes are needed.
    */
-  fun buildInput(keystroke: KeyStroke): T?
+  fun buildInput(key: KeyStroke): T?
 
   /**
    * Execute the action associated with the complete input.
