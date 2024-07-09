@@ -91,8 +91,8 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
+import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
@@ -458,7 +458,7 @@ internal object VimListenerManager {
         event.editor.putUserData(openingEditorKey, OpeningEditor(openingEditor, owningEditorWindow, isPreview, canBeReused))
       }
 
-      VimStandalonePluginUpdateChecker.instance.pluginUsed()
+      VimStandalonePluginUpdateChecker.getInstance().pluginUsed()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {

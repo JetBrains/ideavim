@@ -27,6 +27,6 @@ internal class VimStandalonePluginUpdateChecker : StandalonePluginUpdateChecker(
 
   companion object {
     private const val PROPERTY_NAME = "ideavim.statistics.timestamp"
-    val instance: VimStandalonePluginUpdateChecker = service()
+    fun getInstance(): VimStandalonePluginUpdateChecker = service()
   }
 }
