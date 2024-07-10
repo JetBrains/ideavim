@@ -70,6 +70,6 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), FilterCommand, Du
 
 interface FilterCommand {
   fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    injector.processGroup.startExEntry(editor, context, cmd, initialCommandText = "!")
+    injector.commandLine.createCommandPrompt(editor, context, cmd, initialText = "!")
   }
 }

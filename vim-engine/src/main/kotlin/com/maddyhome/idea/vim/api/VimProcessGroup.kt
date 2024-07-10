@@ -8,11 +8,9 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.KeyProcessResult
-import com.maddyhome.idea.vim.command.Command
 import javax.swing.KeyStroke
 
 interface VimProcessGroup {
-  fun startExEntry(editor: VimEditor, context: ExecutionContext, command: Command, label: String = ":", initialCommandText: String = "")
   // TODO remove me
   // TODO: Why ^^ ? Should that also include startExEntry?
   fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean

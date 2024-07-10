@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import java.util.*
 
 @CommandOrMotion(keys = ["/"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
@@ -43,15 +42,5 @@ class SearchEntryRevAction : VimActionHandler.SingleExecution() {
 }
 
 private fun startSearchCommand(label: Char, editor: VimEditor, context: ExecutionContext) {
-  // Don't allow searching in one line editors
-  if (editor.isOneLineMode()) return
-
-  // Switch to Command-line mode. Unlike ex command entry, search does not switch to Normal first, and does not remove
-  // selection (neither does IdeaVim's ex command entry, to be honest. See startExEntry for implementation details).
-  // We maintain the current mode so that we can return to it correctly when search is done.
-  val currentMode = editor.mode
-  check(currentMode is ReturnableFromCmd) { "Cannot enable command line mode $currentMode" }
-  editor.mode = com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE(currentMode)
-
-  injector.commandLine.create(editor, context, label.toString(), "")
+  injector.commandLine.createSearchPrompt(editor, context, label.toString(), "")
 }
