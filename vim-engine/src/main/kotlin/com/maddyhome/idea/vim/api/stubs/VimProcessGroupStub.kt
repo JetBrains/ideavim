@@ -21,8 +21,6 @@ class VimProcessGroupStub : VimProcessGroupBase() {
     vimLogger<ExecutionContextManagerStub>().warn("VimProcessGroupStub is used. Please replace it with your own implementation of VimProcessGroup.")
   }
 
-  override var lastCommand: String? = null
-
   override fun startExEntry(
     editor: VimEditor,
     context: ExecutionContext,
