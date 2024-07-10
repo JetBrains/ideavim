@@ -14,8 +14,6 @@ import javax.swing.KeyStroke
 
 interface VimProcessGroup {
   val lastCommand: String?
-  var isCommandProcessing: Boolean
-  var modeBeforeCommandProcessing: Mode?
 
   fun startExEntry(editor: VimEditor, context: ExecutionContext, command: Command, label: String = ":", initialCommandText: String = "")
   // TODO remove me

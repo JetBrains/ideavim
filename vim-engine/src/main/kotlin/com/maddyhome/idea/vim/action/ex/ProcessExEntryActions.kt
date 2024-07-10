@@ -100,9 +100,6 @@ class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
     } catch (bad: Exception) {
       logger.error("Error during command execution", bad)
       injector.messages.indicateError()
-    } finally {
-      injector.processGroup.isCommandProcessing = false
-      injector.processGroup.modeBeforeCommandProcessing = null
     }
     // TODO support motions for commands
     return Motion.NoMotion
