@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.key.consumers
 
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -22,7 +21,6 @@ class ModalInputConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     val modalInput = injector.modalInput.getCurrentModalInput() ?: return false
     keyProcessResultBuilder.addExecutionStep { _, lambdaVimEditor, lambdaExecutionContext ->

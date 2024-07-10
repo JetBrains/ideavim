@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
@@ -31,7 +30,6 @@ class SelectRegisterConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     logger.trace { "Entered SelectRegisterConsumer" }
     val state = keyProcessResultBuilder.state

@@ -31,7 +31,6 @@ class CharArgumentConsumer: KeyConsumer {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     logger.trace { "Entered CharArgumentConsumer" }
     if (!isExpectingCharArgument(keyProcessResultBuilder.state.commandBuilder)) return false

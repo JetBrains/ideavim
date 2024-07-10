@@ -31,7 +31,6 @@ class DeleteCommandConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     logger.trace { "Entered DeleteCommandConsumer" }
     if (!isDeleteCommandCountKey(key, keyProcessResultBuilder.state, editor.mode)) return false
