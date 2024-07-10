@@ -27,7 +27,7 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Run tests
-        run: ./gradlew integrationsTest
+        run: ./gradlew --no-configuration-cache integrationsTest
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
