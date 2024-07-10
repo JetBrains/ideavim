@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.Command
+
 interface VimCommandLineService {
   fun getActiveCommandLine(): VimCommandLine?
 
@@ -22,9 +24,10 @@ interface VimCommandLineService {
    * @param editor   The editor to use for display
    * @param context  The data context
    * @param label    The label for the command line (i.e. :, /, or ?)
-   * @param initText The initial text for the entry
+   * @param initialText The initial text for the entry
    */
-  fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
+  fun createSearchPrompt(editor: VimEditor, context: ExecutionContext, label: String, initialText: String): VimCommandLine
+  fun createCommandPrompt(editor: VimEditor, context: ExecutionContext, command: Command, initialText: String): VimCommandLine
 
   @Deprecated("Please use ModalInputService.create()")
   fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine

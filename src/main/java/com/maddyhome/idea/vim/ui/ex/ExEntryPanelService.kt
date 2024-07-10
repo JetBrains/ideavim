@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.action.change.Extension
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
-import com.maddyhome.idea.vim.api.VimCommandLineService
+import com.maddyhome.idea.vim.api.VimCommandLineServiceBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimModalInput
 import com.maddyhome.idea.vim.api.VimModalInputBase
@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.ui.ModalEntry
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class ExEntryPanelService : VimCommandLineService, VimModalInputService {
+class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
   override fun getActiveCommandLine(): VimCommandLine? {
     val instance = ExEntryPanel.instance ?: return null
     return if (instance.isActive) instance else null
@@ -65,7 +65,7 @@ class ExEntryPanelService : VimCommandLineService, VimModalInputService {
     } else {
       var text: String? = null
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
-      val commandLine = injector.commandLine.create(vimEditor, context, prompt.ifEmpty { " " }, "")
+      val commandLine = injector.commandLine.createSearchPrompt(vimEditor, context, prompt.ifEmpty { " " }, "")
       ModalEntry.activate(editor.vim) { key: KeyStroke ->
         return@activate when {
           key.isCloseKeyStroke() -> {
@@ -129,7 +129,7 @@ class ExEntryPanelService : VimCommandLineService, VimModalInputService {
     panel.activate(editor.ij, context.ij, prompt, "")
   }
 
-  override fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {
+  override fun createPanel(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, label, initText)
     return panel

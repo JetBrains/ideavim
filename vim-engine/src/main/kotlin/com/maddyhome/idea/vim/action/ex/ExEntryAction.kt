@@ -26,7 +26,7 @@ internal class ExEntryAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     if (editor.isOneLineMode()) return false
-    injector.processGroup.startExEntry(editor, context, cmd)
+    injector.commandLine.createCommandPrompt(editor, context, cmd, initialText = "")
     return true
   }
 }
