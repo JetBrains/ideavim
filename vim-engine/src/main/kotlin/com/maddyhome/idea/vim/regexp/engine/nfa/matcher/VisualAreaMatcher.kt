@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.returnTo
 
 /**
  * Matcher used to check if index is inside the visual area.
@@ -26,16 +27,12 @@ internal class VisualAreaMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>
   ): MatcherResult {
-    val processGroup = injector.processGroup
     val newPossibleCursors = if (editor.inVisualMode) {
       possibleCursors.filter { it.hasSelection() && index >= it.selectionStart && index < it.selectionEnd }
     }
     // IdeaVim exits visual mode before command processing (e.g. substitute), so we work with lastSelectionInfo
-    else if ((processGroup.isCommandProcessing || injector.vimscriptExecutor.executingVimscript)
-      && processGroup.modeBeforeCommandProcessing is Mode.VISUAL) {
+    else {
       possibleCursors.filter { it.lastSelectionInfo.isSelected(index, editor) }
-    } else {
-      emptyList()
     }
 
     return if (newPossibleCursors.isNotEmpty()) {
