@@ -8,10 +8,12 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
 import kotlin.math.min
 
 interface VimCommandLine {
+  val editor: VimEditor
   val caret: VimCommandLineCaret
 
   val label: String
@@ -76,7 +78,16 @@ interface VimCommandLine {
 
   fun clearCurrentAction()
 
+  /**
+   * TODO remove me
+   */
   fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
+  fun close(refocusOwningEditor: Boolean, resetCaret: Boolean, isCancel: Boolean) {
+    // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
+    // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.
+    editor.mode = editor.mode.returnTo()
+    deactivate(refocusOwningEditor, resetCaret)
+  }
 
   // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name
   fun focus()

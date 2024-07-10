@@ -735,10 +735,7 @@ internal object VimListenerManager {
 
       if (event.area == EditorMouseEventArea.EDITING_AREA) {
         val editor = event.editor
-        val commandLine = injector.commandLine.getActiveCommandLine()
-        if (commandLine != null) {
-          injector.processGroup.cancelExEntry(editor.vim, refocusOwningEditor = true, resetCaret = false)
-        }
+        injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false, isCancel = true)
 
         ExOutputModel.tryGetInstance(editor)?.close()
 
@@ -766,10 +763,7 @@ internal object VimListenerManager {
         event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
         event.mouseEvent.button != MouseEvent.BUTTON3
       ) {
-        val commandLine = injector.commandLine.getActiveCommandLine()
-        if (commandLine != null) {
-          injector.processGroup.cancelExEntry(event.editor.vim, refocusOwningEditor = true, resetCaret = false)
-        }
+        injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false, isCancel = true)
 
         ExOutputModel.getInstance(event.editor).close()
       }

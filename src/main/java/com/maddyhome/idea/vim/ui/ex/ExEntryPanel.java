@@ -125,8 +125,16 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     }
   }
 
-  public @Nullable Editor getEditor() {
+  public @Nullable Editor getIjEditor() {
     return weakEditor != null ? weakEditor.get() : null;
+  }
+
+  public @NotNull VimEditor getEditor() {
+    Editor editor = getIjEditor();
+    if (editor == null) {
+      throw new RuntimeException("Editor was disposed for active command line");
+    }
+    return new IjVimEditor(editor);
   }
 
   public void setEditor(@Nullable Editor editor) {
@@ -279,7 +287,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       String text = entry.getText();
-      Font newFont = UiHelper.selectEditorFont(getEditor(), text);
+      Font newFont = UiHelper.selectEditorFont(getIjEditor(), text);
       if (newFont != entry.getFont()) {
         entry.setFont(newFont);
       }
@@ -460,8 +468,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   private void setFontForElements() {
-    label.setFont(UiHelper.selectEditorFont(getEditor(), label.getText()));
-    entry.setFont(UiHelper.selectEditorFont(getEditor(), getVisibleText()));
+    label.setFont(UiHelper.selectEditorFont(getIjEditor(), label.getText()));
+    entry.setFont(UiHelper.selectEditorFont(getIjEditor(), getVisibleText()));
   }
 
   private void positionPanel() {

@@ -16,6 +16,7 @@ import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.history.HistoryEntry;
@@ -211,7 +212,7 @@ public class ExTextField extends JTextField {
   }
 
   public @Nullable Editor getEditor() {
-    return ExEntryPanel.getInstance().getEditor();
+    return ExEntryPanel.getInstance().getIjEditor();
   }
 
   public DataContext getContext() {
@@ -291,9 +292,9 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    Editor editor = ExEntryPanel.instance.getEditor();
-    if (editor != null) {
-      VimPlugin.getProcess().cancelExEntry(new IjVimEditor(editor), true, true);
+    VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
+    if (commandLine != null) {
+      commandLine.close(true, true, true);
     }
   }
 
