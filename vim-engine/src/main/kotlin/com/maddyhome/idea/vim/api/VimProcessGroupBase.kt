@@ -14,13 +14,10 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
 
 abstract class VimProcessGroupBase : VimProcessGroup {
   override var lastCommand: String? = null
-  override var isCommandProcessing: Boolean = false
-  override var modeBeforeCommandProcessing: Mode? = null
 
   override fun startExEntry(editor: VimEditor, context: ExecutionContext, command: Command, label: String, initialCommandText: String) {
     // Don't allow ex commands in one line editors
@@ -30,9 +27,6 @@ abstract class VimProcessGroupBase : VimProcessGroup {
     check(currentMode is ReturnableFromCmd) {
       "Cannot enable cmd mode from current mode $currentMode"
     }
-
-    isCommandProcessing = true
-    modeBeforeCommandProcessing = currentMode
 
     // Make sure the Visual selection marks are up to date before we use them.
     injector.markService.setVisualSelectionMarks(editor)

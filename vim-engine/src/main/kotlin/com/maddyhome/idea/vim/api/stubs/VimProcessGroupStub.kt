@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
 class VimProcessGroupStub : VimProcessGroupBase() {
@@ -23,8 +22,6 @@ class VimProcessGroupStub : VimProcessGroupBase() {
   }
 
   override var lastCommand: String? = null
-  override var isCommandProcessing: Boolean = false
-  override var modeBeforeCommandProcessing: Mode? = null
 
   override fun startExEntry(
     editor: VimEditor,
