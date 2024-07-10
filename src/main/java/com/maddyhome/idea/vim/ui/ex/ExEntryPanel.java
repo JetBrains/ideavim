@@ -439,6 +439,10 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   @Override
   public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
+    if (finishOn != null && stroke.getKeyChar() == finishOn && inputProcessing != null) {
+      inputProcessing.invoke(getActualText());
+      close(true, true, false);
+    }
   }
 
   // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
