@@ -63,7 +63,7 @@ dependencies {
 
     compileOnly(kotlin("reflect"))
 
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 }
 
 tasks {
