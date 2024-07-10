@@ -39,7 +39,7 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
       argument.forEach { c ->
         when {
           !inBackslash && c == '!' -> {
-            val last = VimPlugin.getProcess().lastCommand
+            val last = lastCommand
             if (last.isNullOrEmpty()) {
               VimPlugin.showMessage(MessageHelper.message("e_noprev"))
               return ExecutionResult.Error
@@ -76,6 +76,7 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
         VimPlugin.getProcess().executeCommand(editor, command, null, workingDirectory)?.let {
           ExOutputModel.getInstance(editor.ij).output(it)
         }
+        lastCommand = command
         ExecutionResult.Success
       } else {
         // Filter
@@ -92,6 +93,7 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
             }
           }
         }
+        lastCommand = command
         ExecutionResult.Success
       }
     } catch (e: ProcessCanceledException) {
@@ -103,5 +105,6 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
 
   companion object {
     private val logger = Logger.getInstance(CmdFilterCommand::class.java.name)
+    private var lastCommand: String? = null
   }
 }

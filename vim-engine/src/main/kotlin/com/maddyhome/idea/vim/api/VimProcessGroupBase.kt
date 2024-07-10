@@ -17,8 +17,6 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import javax.swing.KeyStroke
 
 abstract class VimProcessGroupBase : VimProcessGroup {
-  override var lastCommand: String? = null
-
   override fun startExEntry(editor: VimEditor, context: ExecutionContext, command: Command, label: String, initialCommandText: String) {
     // Don't allow ex commands in one line editors
     if (editor.isOneLineMode()) return

@@ -95,8 +95,6 @@ class ProcessGroup : VimProcessGroupBase() {
         val progressIndicator = ProgressIndicatorProvider.getInstance().progressIndicator
         val output = handler.runProcessWithProgressIndicator(progressIndicator)
 
-        lastCommand = command
-
         if (output.isCancelled) {
           // TODO: Vim will use whatever text has already been written to stdout
           // For whatever reason, we're not getting any here, so just throw an exception
