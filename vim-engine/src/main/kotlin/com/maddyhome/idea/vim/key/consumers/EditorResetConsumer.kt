@@ -34,7 +34,6 @@ class EditorResetConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     logger.trace { "Entered EditorResetConsumer" }
     if (!isEditorReset(key, editor)) return false

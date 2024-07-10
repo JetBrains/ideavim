@@ -29,20 +29,17 @@ class ModeInputConsumer: KeyConsumer {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     logger.trace { "Entered ModeInputConsumer" }
     val isProcessed = when (editor.mode) {
       Mode.INSERT, Mode.REPLACE -> {
         logger.trace("Process insert or replace")
         val keyProcessed = injector.changeGroup.processKey(editor, key, keyProcessResultBuilder)
-        shouldRecord.value = keyProcessed && shouldRecord.value
         keyProcessed
       }
       is Mode.SELECT -> {
         logger.trace("Process select")
         val keyProcessed = injector.changeGroup.processKeyInSelectMode(editor, key, keyProcessResultBuilder)
-        shouldRecord.value = keyProcessed && shouldRecord.value
         keyProcessed
       }
       is Mode.CMD_LINE -> {

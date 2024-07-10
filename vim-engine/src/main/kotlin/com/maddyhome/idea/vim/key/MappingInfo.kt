@@ -172,7 +172,7 @@ class ToHandlerMappingInfo(
               editor,
               context,
               null,
-              KeyHandler.MutableBoolean(false),
+              false,
               keyState,
             )
           }

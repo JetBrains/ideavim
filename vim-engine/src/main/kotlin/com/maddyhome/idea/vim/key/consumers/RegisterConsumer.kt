@@ -29,7 +29,6 @@ class RegisterConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
-    shouldRecord: KeyHandler.MutableBoolean,
   ): Boolean {
     logger.trace { "Entered RegisterConsumer" }
     if (!injector.vimState.isRegisterPending) return false

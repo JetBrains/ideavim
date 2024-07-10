@@ -135,12 +135,12 @@ class KeyHandler {
 
       injector.messages.clearError()
       // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
-      val shouldRecord = MutableBoolean(handleKeyRecursionCount == 0 && injector.registerGroup.isRecording)
+      val shouldRecord = handleKeyRecursionCount == 0 && injector.registerGroup.isRecording
 
       handleKeyRecursionCount++
       try {
         val isProcessed = keyConsumers.any {
-          it.consumeKey(key, editor, allowKeyMappings, mappingCompleted, processBuilder, shouldRecord)
+          it.consumeKey(key, editor, allowKeyMappings, mappingCompleted, processBuilder)
         }
         if (isProcessed) {
           logger.trace { "Key was successfully caught by consumer" }
@@ -166,7 +166,7 @@ class KeyHandler {
     editor: VimEditor,
     context: ExecutionContext,
     key: KeyStroke?,
-    shouldRecord: MutableBoolean,
+    shouldRecord: Boolean,
     keyState: KeyHandlerState,
   ) {
     // Do we have a fully entered command at this point? If so, let's execute it.
@@ -178,7 +178,7 @@ class KeyHandler {
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
-    if (shouldRecord.value && injector.registerGroup.isRecording && key != null) {
+    if (shouldRecord && injector.registerGroup.isRecording && key != null) {
       injector.registerGroup.recordKeyStroke(key)
       modalEntryKeys.forEach { injector.registerGroup.recordKeyStroke(it) }
       modalEntryKeys.clear()
