@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.runningIJAction
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
@@ -164,6 +165,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
     }
 
     if (dataContext?.actionStartedFromVim == true) return true
+    if (runningIJAction) return true
 
     return false
   }

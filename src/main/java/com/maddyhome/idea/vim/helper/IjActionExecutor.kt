@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
@@ -17,6 +16,7 @@ import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.DataContextWrapper
 import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.intellij.openapi.actionSystem.ex.ActionUtil
@@ -24,10 +24,13 @@ import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.project.IndexNotReadyException
-import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.util.ActionCallback
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.openapi.util.await
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.SlowOperations
 import com.maddyhome.idea.vim.RegisterActions
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -39,10 +42,11 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.runFromVimKey
+import com.maddyhome.idea.vim.newapi.runningIJAction
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import javax.swing.JComponent
-import javax.swing.SwingUtilities
 
 @Service
 internal class IjActionExecutor : VimActionExecutor {
@@ -77,45 +81,54 @@ internal class IjActionExecutor : VimActionExecutor {
     val dataContext = DataContextWrapper(context.ij)
     dataContext.putUserData(runFromVimKey, true)
 
-    val actionId = ActionManager.getInstance().getId(ijAction)
-    val event = AnActionEvent(
-      null,
-      dataContext,
-      ActionPlaces.KEYBOARD_SHORTCUT,
-      ijAction.templatePresentation.clone(),
-      ActionManager.getInstance(),
-      0,
-    )
-    // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
-    //   because rider use async update method. See VIM-1819.
-    // This method executes inside of lastUpdateAndCheckDumb
-    // Another related issue: VIM-2604
-
-    // This is a hack to fix the tests and fix VIM-3332
-    // We should get rid of it in VIM-3376
-    if (actionId == "RunClass" || actionId == IdeActions.ACTION_COMMENT_LINE || actionId == IdeActions.ACTION_COMMENT_BLOCK) {
-      ijAction.beforeActionPerformedUpdate(event)
-      if (!event.presentation.isEnabled) return false
-    } else {
-      if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
-    }
-    if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
-      // Some ActionGroups should not be performed, but shown as a popup
-      val popup = JBPopupFactory.getInstance()
-        .createActionGroupPopup(event.presentation.text, ijAction, dataContext, false, null, -1)
-      val component = dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT)
-      if (component != null) {
-        val window = SwingUtilities.getWindowAncestor(component)
-        if (window != null) {
-          popup.showInCenterOf(window)
-        }
-        return true
+    val contextComponent = PlatformCoreDataKeys.CONTEXT_COMPONENT.getData(dataContext)
+      ?: editor?.ij?.component ?: run {
+        LOG.error("Can't get the context component")
+        return false
       }
-      popup.showInFocusCenter()
-      return true
-    } else {
-      performDumbAwareWithCallbacks(ijAction, event) { ijAction.actionPerformed(event) }
-      return true
+
+    val result = withRunningAction {
+      val result = withStringRegistryOption {
+        ActionManager.getInstance()
+          .tryToExecute(ijAction, null, contextComponent, ActionPlaces.KEYBOARD_SHORTCUT, true)
+      }
+      result.wait()
+    }
+    return result.isDone
+  }
+
+  private fun <T> withRunningAction(block: () -> T): T {
+    runningIJAction = true
+    try {
+      return block()
+    } finally {
+      runningIJAction = false
+    }
+  }
+
+  private fun ActionCallback.wait(): ActionCallback {
+    runBlocking {
+      try {
+        await()
+      } catch (_: RuntimeException) {
+        // Nothing
+        // The exception happens when the action is rejected
+        //  and the exception message explains the reason for rejection
+        // At the moment, we don't process this information
+      }
+    }
+    return this
+  }
+
+  @Suppress("SameParameterValue")
+  private fun <T> withStringRegistryOption(block: () -> T): T {
+    val registry = Registry.get("actionSystem.update.beforeActionPerformedUpdate")
+    val oldValue = registry.asString()
+    registry.setValue("on")
+    try {
+      return block()
+    } finally {
+      registry.setValue(oldValue)
     }
   }
 
@@ -244,5 +257,9 @@ internal class IjActionExecutor : VimActionExecutor {
 
   override fun getActionIdList(idPrefix: String): List<String> {
     return ActionManager.getInstance().getActionIdList(idPrefix)
+  }
+
+  companion object {
+    private val LOG = logger<IjActionExecutor>()
   }
 }

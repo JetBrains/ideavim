@@ -16,7 +16,6 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
@@ -51,7 +50,6 @@ class MotionActionTest : VimTestCase() {
   }
 
   @Test
-  @Disabled("VIM-3376")
   fun testEscapeInCommand() {
     val content = """
      on${c}e two

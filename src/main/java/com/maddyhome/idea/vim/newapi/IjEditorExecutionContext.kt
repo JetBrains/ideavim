@@ -19,6 +19,11 @@ internal open class IjEditorExecutionContext(override val context: DataContext) 
 internal val runFromVimKey = Key.create<Boolean>("RunFromVim")
 
 /**
+ * Sometimes we can't rely on [runFromVimKey] because the data context is created after the execution
+ */
+internal var runningIJAction: Boolean = false
+
+/**
  * Check if the action with this data context was started from Vim
  */
 internal val DataContext.actionStartedFromVim: Boolean

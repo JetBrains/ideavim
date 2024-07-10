@@ -13,7 +13,6 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
@@ -74,7 +73,6 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
-  @Disabled("VIM-3376")
   fun `test char mode backspace`() {
     this.doTest(
       listOf("gh", "<BS>"),
@@ -100,7 +98,6 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
-  @Disabled("VIM-3376")
   fun `test char mode delete`() {
     this.doTest(
       listOf("gh", "<DEL>"),
