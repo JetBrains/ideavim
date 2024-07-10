@@ -312,7 +312,8 @@ internal class MotionGroup : VimMotionGroupBase() {
                 KeyHandler.getInstance().reset(vimEditor)
               }
               is Mode.CMD_LINE -> {
-                injector.processGroup.cancelExEntry(vimEditor, refocusOwningEditor = false, resetCaret = false)
+                val commandLine = injector.commandLine.getActiveCommandLine() ?: return
+                commandLine.close(refocusOwningEditor = false, resetCaret = false, isCancel = true)
                 ExOutputModel.tryGetInstance(editor)?.close()
               }
               else -> {}

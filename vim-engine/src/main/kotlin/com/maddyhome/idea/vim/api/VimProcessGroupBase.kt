@@ -75,14 +75,6 @@ abstract class VimProcessGroupBase : VimProcessGroup {
     }
   }
 
-  override fun cancelExEntry(editor: VimEditor, refocusOwningEditor: Boolean, resetCaret: Boolean) {
-    // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
-    // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.
-    editor.mode = editor.mode.returnTo()
-    getInstance().reset(editor)
-    injector.commandLine.getActiveCommandLine()?.deactivate(refocusOwningEditor, resetCaret)
-  }
-
   private fun getRange(editor: VimEditor, cmd: Command) = when {
     editor.inVisualMode -> "'<,'>"
     cmd.rawCount == 1 -> "."
