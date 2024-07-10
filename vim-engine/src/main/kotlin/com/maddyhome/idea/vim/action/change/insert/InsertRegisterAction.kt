@@ -42,37 +42,23 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
     val argument = cmd.argument
 
     if (argument?.character == '=') {
-      injector.modalInput.create(editor, context, "=", ExpressionRegisterInputInterceptor(operatorArguments))
+      injector.commandLine.readInputAndProcess(editor, context, "=", finishOn = null) { input ->
+        try {
+          if (input.isNotEmpty()) {
+            val expression = injector.vimscriptParser.parseExpression(input)?.evaluate(editor, context, Script(listOf()))
+              ?: throw ExException("E15: Invalid expression: $input")
+            val textToStore = expression.toInsertableString()
+            injector.registerGroup.storeTextSpecial('=', textToStore)
+          }
+          insertRegister(editor, context, '=', operatorArguments)
+        } catch (e: ExException) {
+          injector.messages.indicateError()
+          injector.messages.showStatusBarMessage(editor, e.message)
+        }
+      }
       return true
     } else {
       return argument != null && insertRegister(editor, context, argument.character, operatorArguments)
-    }
-  }
-
-  private class ExpressionRegisterInputInterceptor(val operatorArguments: OperatorArguments) : VimInputInterceptorBase<String>() {
-    override fun buildInput(key: KeyStroke): String? {
-      val modalInput = injector.modalInput.getCurrentModalInput() ?: return ""
-      if (key.isCloseKeyStroke() || key.keyCode == KeyEvent.VK_ENTER) {
-        closeModalInputPrompt()
-        return modalInput.text
-      }
-      modalInput.typeText(injector.parser.toPrintableString(listOf(key)))
-      return null
-    }
-
-    override fun executeInput(input: String, editor: VimEditor, context: ExecutionContext) {
-      try {
-        if (input.isNotEmpty()) {
-          val expression = injector.vimscriptParser.parseExpression(input)?.evaluate(editor, context, Script(listOf()))
-            ?: throw ExException("E15: Invalid expression: $input")
-          val textToStore = expression.toInsertableString()
-          injector.registerGroup.storeTextSpecial('=', textToStore)
-        }
-        insertRegister(editor, context, '=', operatorArguments)
-      } catch (e: ExException) {
-        injector.messages.indicateError()
-        injector.messages.showStatusBarMessage(editor, e.message)
-      }
     }
   }
 }

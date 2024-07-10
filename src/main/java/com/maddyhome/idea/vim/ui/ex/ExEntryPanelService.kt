@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.ui.ModalEntry
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -92,6 +94,39 @@ class ExEntryPanelService : VimCommandLineService, VimModalInputService {
       }
       return text
     }
+  }
+
+  override fun readInputAndProcess(
+    editor: VimEditor,
+    context: ExecutionContext,
+    prompt: String,
+    finishOn: Char?,
+    processing: (String) -> Unit,
+  ) {
+    val currentMode = editor.mode
+    check(currentMode is ReturnableFromCmd) {
+      "Cannot enable cmd mode from current mode $currentMode"
+    }
+
+    // Make sure the Visual selection marks are up to date before we use them.
+    injector.markService.setVisualSelectionMarks(editor)
+
+    // Note that we should remove selection and reset caret offset before we switch back to Normal mode and then enter
+    // Command-line mode. However, some IdeaVim commands can handle multiple carets, including multiple carets with
+    // selection (which might or might not be a block selection). Unfortunately, because we're just entering
+    // Command-line mode, we don't know which command is going to be entered, so we can't remove selection here.
+    // Therefore, we switch to Normal and then Command-line even though we might still have a Visual selection...
+    // On the plus side, it means we still show selection while editing the command line, which Vim also does
+    // (Normal then Command-line is not strictly necessary, but done for completeness and autocmd)
+    // Caret selection is finally handled in Command.execute
+    editor.mode = Mode.NORMAL()
+    editor.mode = Mode.CMD_LINE(currentMode)
+
+    val panel = ExEntryPanel.getInstance()
+    panel as ExEntryPanel
+    panel.finishOn = finishOn
+    panel.inputProcessing = processing
+    panel.activate(editor.ij, context.ij, prompt, "")
   }
 
   override fun create(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {

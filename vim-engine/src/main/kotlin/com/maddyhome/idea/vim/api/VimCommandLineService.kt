@@ -11,8 +11,10 @@ package com.maddyhome.idea.vim.api
 interface VimCommandLineService {
   fun getActiveCommandLine(): VimCommandLine?
 
-  @Deprecated("Please use ModalInputService")
+  @Deprecated("Please use readInputAndProcess")
   fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String?
+
+  fun readInputAndProcess(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?, processing: (String) -> Unit)
 
   /**
    * Turns on the command line for the given editor

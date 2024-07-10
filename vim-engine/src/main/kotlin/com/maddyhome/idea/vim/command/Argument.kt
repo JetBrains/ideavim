@@ -25,11 +25,12 @@ class Argument private constructor(
   val motion: Command = EMPTY_COMMAND,
   val offsets: Map<ImmutableVimCaret, VimSelection> = emptyMap(),
   val string: String = "",
+  val processing: ((String) -> Unit)? = null,
   val type: Type,
 ) {
   constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
   constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
-  constructor(label: Char, strArg: String) : this(character = label, string = strArg, type = Type.EX_STRING)
+  constructor(label: Char, strArg: String, processing: ((String) -> Unit)?) : this(character = label, string = strArg, processing = processing, type = Type.EX_STRING)
   constructor(offsets: Map<ImmutableVimCaret, VimSelection>) : this(offsets = offsets, type = Type.OFFSETS)
 
   enum class Type {

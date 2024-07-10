@@ -35,6 +35,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.Command;
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand;
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +62,10 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   public static ExEntryPanel instanceWithoutShortcuts;
   private boolean isReplaceMode = false;
   private WeakReference<Editor> weakEditor = null;
+
   public VimInputInterceptor myInputInterceptor = null;
+  public Function1<String, Unit> inputProcessing = null;
+  public Character finishOn = null;
 
   private ExEntryPanel(boolean enableShortcuts) {
     label = new JLabel(" ");
@@ -263,6 +268,9 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
     // We have this in the end, because `entry.deactivate()` communicates with active panel during deactivation
     active = false;
+    finishOn = null;
+    myInputInterceptor = null;
+    inputProcessing = null;
   }
 
   private void reset() {
@@ -569,6 +577,18 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   public void setInputInterceptor(@NotNull VimInputInterceptor<?> vimInputInterceptor) {
     myInputInterceptor = vimInputInterceptor;
+  }
+
+  @Nullable
+  @Override
+  public Function1<String, Unit> getInputProcessing() {
+    return inputProcessing;
+  }
+
+  @Nullable
+  @Override
+  public Character getFinishOn() {
+    return finishOn;
   }
 
   public static class LafListener implements LafManagerListener {
