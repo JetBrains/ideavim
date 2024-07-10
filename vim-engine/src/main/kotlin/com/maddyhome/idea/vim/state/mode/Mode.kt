@@ -33,7 +33,7 @@ sealed interface Mode {
   data class VISUAL(val selectionType: SelectionType, val returnTo: ReturnTo? = null) : Mode,
     ReturnableFromCmd
   data class SELECT(val selectionType: SelectionType, val returnTo: ReturnTo? = null) : Mode
-  object INSERT : Mode
+  object INSERT : Mode, ReturnableFromCmd
   object REPLACE : Mode
   data class CMD_LINE(val returnTo: ReturnableFromCmd) : Mode
 }

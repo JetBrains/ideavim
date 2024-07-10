@@ -136,10 +136,10 @@ class CommandConsumer : KeyConsumer {
         val commandLine = injector.commandLine.getActiveCommandLine()!!
         val label = commandLine.label
         val text = commandLine.actualText
-        commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
+        val processing = commandLine.inputProcessing
+        commandLine.close(refocusOwningEditor = true, resetCaret = true, isCancel = true)
 
-        commandBuilder.completeCommandPart(Argument(label[0], text))
-        lambdaEditor.mode = lambdaEditor.mode.returnTo()
+        commandBuilder.completeCommandPart(Argument(label[0], text, processing))
       }
     }
   }

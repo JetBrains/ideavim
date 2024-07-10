@@ -34,7 +34,26 @@ class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
   override var motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getMotionActionHandler(argument: Argument?): MotionActionHandler {
+    if (argument?.processing != null) return ExecuteDefinedInputProcessingAction()
     return if (argument?.character == ':') ProcessExCommandEntryAction() else ProcessSearchEntryAction(this)
+  }
+}
+
+class ExecuteDefinedInputProcessingAction : MotionActionHandler.SingleExecution() {
+  override val motionType: MotionType = MotionType.LINE_WISE
+
+  override fun getOffset(
+    editor: VimEditor,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    if (argument == null) return Motion.Error
+    val input = argument.string
+    val processing = argument.processing!!
+
+    processing.invoke(input)
+    return Motion.NoMotion
   }
 }
 
