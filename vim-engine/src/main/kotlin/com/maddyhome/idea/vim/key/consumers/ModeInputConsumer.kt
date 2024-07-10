@@ -46,10 +46,19 @@ class ModeInputConsumer: KeyConsumer {
         keyProcessed
       }
       is Mode.CMD_LINE -> {
-        logger.trace("Process cmd line")
-        val keyProcessed = injector.processGroup.processExKey(editor, key, keyProcessResultBuilder)
-        shouldRecord.value = keyProcessed && shouldRecord.value
-        keyProcessed
+        val commandLine = injector.commandLine.getActiveCommandLine()
+        if (commandLine != null) {
+          keyProcessResultBuilder.addExecutionStep { _, _, _ ->
+            commandLine.focus()
+            commandLine.handleKey(key)
+          }
+        } else {
+          keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
+            lambdaEditor.mode = Mode.NORMAL()
+            KeyHandler.getInstance().reset(lambdaEditor)
+          }
+        }
+        true
       }
       else -> {
         false

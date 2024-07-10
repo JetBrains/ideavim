@@ -7,14 +7,7 @@
  */
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.KeyProcessResult
-import javax.swing.KeyStroke
-
 interface VimProcessGroup {
-  // TODO remove me
-  // TODO: Why ^^ ? Should that also include startExEntry?
-  fun processExKey(editor: VimEditor, stroke: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
-
   @kotlin.jvm.Throws(java.lang.Exception::class)
   fun executeCommand(editor: VimEditor, command: String, input: CharSequence?, currentDirectoryPath: String?): String?
 }
