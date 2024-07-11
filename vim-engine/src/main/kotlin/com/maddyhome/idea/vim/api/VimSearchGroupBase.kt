@@ -119,23 +119,6 @@ abstract class VimSearchGroupBase : VimSearchGroup {
   }
 
   /**
-   * Asks the user how to deal with a substitution confirmation choice.
-   * Used when the 'c' flag is present in a substitute command.
-   *
-   * @param editor      The editor where the substitution would be made.
-   * @param match       The string that would replace the old one.
-   * @param caret       The current caret.
-   * @param startOffset The index where the substitution would be made.
-   */
-  protected abstract fun confirmChoice(
-    editor: VimEditor,
-    context: ExecutionContext,
-    match: String,
-    caret: VimCaret,
-    startOffset: Int,
-  ): ReplaceConfirmationChoice
-
-  /**
    * Highlights the string that would be replaced (pending user confimation) in
    * a substitute command.
    *
