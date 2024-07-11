@@ -97,59 +97,6 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, true)
   }
 
-  override fun confirmChoice(
-    editor: VimEditor,
-    context: ExecutionContext,
-    match: String,
-    caret: VimCaret,
-    startOffset: Int,
-  ): ReplaceConfirmationChoice {
-    val result: Ref<ReplaceConfirmationChoice> = Ref.create(ReplaceConfirmationChoice.QUIT)
-    val keyStrokeProcessor: Function1<KeyStroke, Boolean> = label@{ key: KeyStroke ->
-      val choice: ReplaceConfirmationChoice
-      val c = key.keyChar
-      choice = if (key.isCloseKeyStroke() || c == 'q') {
-        ReplaceConfirmationChoice.QUIT
-      } else if (c == 'y') {
-        ReplaceConfirmationChoice.SUBSTITUTE_THIS
-      } else if (c == 'l') {
-        ReplaceConfirmationChoice.SUBSTITUTE_LAST
-      } else if (c == 'n') {
-        ReplaceConfirmationChoice.SKIP
-      } else if (c == 'a') {
-        ReplaceConfirmationChoice.SUBSTITUTE_ALL
-      } else {
-        return@label true
-      }
-      // TODO: Handle <C-E> and <C-Y>
-      result.set(choice)
-      false
-    }
-    if (ApplicationManager.getApplication().isUnitTestMode) {
-      caret.moveToOffset(startOffset)
-      val inputModel = getInstance(editor.ij)
-      var key = inputModel.nextKeyStroke()
-      while (key != null) {
-        if (!keyStrokeProcessor.invoke(key)) {
-          break
-        }
-        key = inputModel.nextKeyStroke()
-      }
-    } else {
-      // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
-      val exEntryPanel = injector.commandLine.createWithoutShortcuts(
-        editor,
-        context,
-        MessageHelper.message("replace.with.0", match),
-        "",
-      )
-      caret.moveToOffset(startOffset)
-      ModalEntry.activate(editor, keyStrokeProcessor)
-      exEntryPanel.deactivate(refocusOwningEditor = true, resetCaret = false)
-    }
-    return result.get()
-  }
-
   override fun addSubstitutionConfirmationHighlight(
     editor: VimEditor,
     startOffset: Int,
