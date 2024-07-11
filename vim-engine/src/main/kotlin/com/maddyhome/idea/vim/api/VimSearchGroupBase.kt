@@ -709,29 +709,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       lastMatchLine = line
       gotQuit = preparationResult.gotQuit
 
-      // Can we skip this if [gotQuit]?
       val replaceResult = performReplace(editor, caret, context, parent, preparationResult, line, hasExpression, substituteString, exceptions)
       line = replaceResult.line
       column = replaceResult.column
       line2 = replaceResult.endLine
     }
 
-    if (!gotQuit) {
-      if (lastMatchLine != -1) {
-        caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
-      } else {
-        injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
-      }
-    }
-
-    setLatestMatch("")
-
-    // todo throw multiple exceptions at once
-    if (exceptions.isNotEmpty()) {
-      injector.messages.indicateError()
-      injector.messages.showStatusBarMessage(null, exceptions[0].toString())
-    }
-
+    postSubstitute(editor, caret, pattern, gotQuit, lastMatchLine, exceptions)
     // TODO: Support reporting number of changes (:help 'report')
     return true
   }
@@ -840,6 +824,24 @@ abstract class VimSearchGroupBase : VimSearchGroup {
   }
 
   private data class ReplaceResult(val line: Int, val column: Int, val endLine: Int)
+
+  private fun postSubstitute(editor: VimEditor, caret: VimCaret, pattern: String, gotQuit: Boolean, lastMatchLine: Int, exceptions: List<ExException>) {
+    if (!gotQuit) {
+      if (lastMatchLine != -1) {
+        caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
+      } else {
+        injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
+      }
+    }
+
+    setLatestMatch("")
+
+    // todo throw multiple exceptions at once
+    if (exceptions.isNotEmpty()) {
+      injector.messages.indicateError()
+      injector.messages.showStatusBarMessage(null, exceptions[0].toString())
+    }
+  }
 
   private fun evaluateExpression(exprString: String, editor: VimEditor, context: ExecutionContext, parent: VimLContext, exceptions: MutableList<ExException>): String {
     val expression = injector.vimscriptParser.parseExpression(exprString)
