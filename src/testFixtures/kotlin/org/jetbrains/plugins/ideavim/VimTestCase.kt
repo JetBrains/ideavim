@@ -223,6 +223,7 @@ abstract class VimTestCase {
     VimPlugin.getKey().savedShortcutConflicts.clear()
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
     injector.outputPanel.getCurrentOutputPanel()?.close()
+    injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = false, resetCaret = false)
 
     // Tear down neovim
     NeovimTesting.tearDown(testInfo)

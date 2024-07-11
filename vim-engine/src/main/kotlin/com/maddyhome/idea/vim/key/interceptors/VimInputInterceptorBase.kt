@@ -22,7 +22,6 @@ abstract class VimInputInterceptorBase<T> : VimInputInterceptor<T> {
   ) {
     val completeInput = buildInput(key) ?: return
     executeInput(completeInput, editor, context)
-    onFinish()
   }
 
   protected open fun onFinish() {
