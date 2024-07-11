@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.state.mode.returnTo
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 import kotlin.math.min
@@ -91,24 +90,11 @@ interface VimCommandLine {
    * TODO remove me, close is safer
    */
   fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
-  fun close(refocusOwningEditor: Boolean, resetCaret: Boolean, isCancel: Boolean) {
+  fun close(refocusOwningEditor: Boolean, resetCaret: Boolean) {
     // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
     // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.
     editor.mode = editor.mode.returnTo()
     deactivate(refocusOwningEditor, resetCaret)
-  }
-
-  fun close(refocusOwningEditor: Boolean, resetCaret: Boolean) {
-    // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
-    // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.
-    val editorSnapshot = editor
-    if (editorSnapshot != null) {
-      editorSnapshot.mode = editorSnapshot.mode.returnTo()
-      KeyHandler.getInstance().reset(editorSnapshot)
-    } else {
-      logger.error("Editor was disposed while command line was still active")
-    }
-    injector.commandLine.getActiveCommandLine()?.deactivate(refocusOwningEditor, resetCaret)
   }
 
   // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name

@@ -441,7 +441,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     entry.handleKey(stroke);
     if (finishOn != null && stroke.getKeyChar() == finishOn && inputProcessing != null) {
       inputProcessing.invoke(getActualText());
-      close(true, true, false);
+      close(true, true);
     }
   }
 

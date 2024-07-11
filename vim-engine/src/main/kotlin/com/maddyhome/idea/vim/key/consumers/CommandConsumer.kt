@@ -136,7 +136,7 @@ class CommandConsumer : KeyConsumer {
         val label = commandLine.label
         val text = commandLine.actualText
         val processing = commandLine.inputProcessing
-        commandLine.close(refocusOwningEditor = true, resetCaret = true, isCancel = true)
+        commandLine.close(refocusOwningEditor = true, resetCaret = true)
 
         commandBuilder.completeCommandPart(Argument(label[0], text, processing))
       }

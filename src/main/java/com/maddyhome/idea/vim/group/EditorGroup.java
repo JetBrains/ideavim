@@ -377,7 +377,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
           // Note that IDE scale is handled by LafManager.lookAndFeelChanged
           VimCommandLine activeCommandLine = injector.getCommandLine().getActiveCommandLine();
           if (activeCommandLine != null) {
-            activeCommandLine.close(true, false, true);
+            activeCommandLine.close(true, false);
           }
           ExOutputModel exOutputModel = ExOutputModel.tryGetInstance(editor);
           if (exOutputModel != null) {
