@@ -13,6 +13,14 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 import kotlin.math.min
 
+/**
+ * This interface is not supposed to have any implementation logic.
+ * The reason why we have implementation details here is
+ * that this class extended by [ExEntryPanel] that already extends [JPanel]
+ * and can't extend a base implementation of [VimCommandLine].
+ * It will also be hard to wrap [ExEntryPanel] into some other class that extends [VimCommandLine],
+ * because [ExEntryPanel] has a listener that should use the [actualText] field, so it must implement [VimCommandLine]
+ */
 interface VimCommandLine {
   companion object {
     private val logger = vimLogger<VimCommandLine>()
