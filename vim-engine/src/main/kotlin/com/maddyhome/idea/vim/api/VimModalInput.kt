@@ -15,11 +15,6 @@ interface VimModalInput {
   var inputInterceptor: VimInputInterceptor<*>
   val caret: VimCommandLineCaret
   val label: String
-  val text: String
-
-  fun setText(string: String)
-  fun insertText(offset: Int, string: String)
-  fun typeText(string: String)
 
   fun handleKey(key: KeyStroke, editor: VimEditor, executionContext: ExecutionContext)
 
