@@ -708,17 +708,12 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
       injector.jumpService.saveJumpLocation(editor)
       val matchRange = substituteResult.first.range
-      var expression: Expression? = null
-      if (hasExpression) {
-        val exprString = substituteString.substring(2)
-        expression = injector.vimscriptParser.parseExpression(exprString)
-        if (expression == null) {
-          exceptions.add(ExException("E15: Invalid expression: $exprString"))
-          expression = SimpleExpression(VimString(""))
-        }
-      }
       var match = substituteResult.second
       lastMatchStartOffset = matchRange.startOffset
+
+      caret.moveToOffset(matchRange.startOffset)
+      setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
+      if (hasExpression) match = evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions)
 
       var didReplace = false
       if (doAll || line != editor.lineCount()) {
@@ -743,20 +738,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
           highlight.remove()
         }
         if (doReplace) {
-          setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
-          caret.moveToOffset(matchRange.startOffset)
-          if (expression != null) {
-            match = try {
-              expression.evaluate(editor, context, parent).toInsertableString()
-            } catch (e: Exception) {
-              exceptions.add(e as ExException)
-              ""
-            }
-          }
-
           val endPositionWithoutReplace = editor.offsetToBufferPosition(matchRange.endOffset)
 
-          // FIXME: if we received an instance of MutableVimEditor this method might not be necessary
           replaceString(editor, matchRange.startOffset, matchRange.endOffset, match)
           didReplace = true
 
@@ -803,6 +786,21 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
     // TODO: Support reporting number of changes (:help 'report')
     return true
+  }
+
+  private fun evaluateExpression(exprString: String, editor: VimEditor, context: ExecutionContext, parent: VimLContext, exceptions: MutableList<ExException>): String {
+    val expression = injector.vimscriptParser.parseExpression(exprString)
+    return if (expression == null) {
+      exceptions.add(ExException("E15: Invalid expression: $exprString"))
+      ""
+    } else {
+      try {
+        expression.evaluate(editor, context, parent).toInsertableString()
+      } catch (e: Exception) {
+        exceptions.add(e as ExException)
+        ""
+      }
+    }
   }
 
   private fun parseSubstituteCommand(
