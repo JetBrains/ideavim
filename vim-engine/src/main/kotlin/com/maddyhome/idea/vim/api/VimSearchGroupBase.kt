@@ -706,7 +706,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         continue
       }
       val matchRange = substituteResult.first.range
-      var match = substituteResult.second
+      val match = substituteResult.second
       lastMatchStartOffset = matchRange.startOffset
 
       injector.jumpService.saveJumpLocation(editor)
@@ -733,38 +733,10 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       }
 
       // PERFORM REPLACE START
-      caret.moveToOffset(matchRange.startOffset)
-      setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
-      if (hasExpression) match = evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions)
-
-      var didReplace = false
-
-      if (doReplace) {
-        val endPositionWithoutReplace = editor.offsetToBufferPosition(matchRange.endOffset)
-
-        replaceString(editor, matchRange.startOffset, matchRange.endOffset, match)
-        didReplace = true
-
-        val endPositionWithReplace = editor.offsetToBufferPosition(matchRange.startOffset + match.length)
-        line += max(0, endPositionWithReplace.line - endPositionWithoutReplace.line)
-        line2 += endPositionWithReplace.line - endPositionWithoutReplace.line
-      }
-
-      if (doAll && matchRange.startOffset != matchRange.endOffset) {
-        if (didReplace) {
-          // if there was a replacement, we start next search from where the new string ends
-          val endPosition = editor.offsetToBufferPosition(matchRange.startOffset + match.length)
-          line = endPosition.line
-          column = endPosition.column
-        } else {
-          // no replacement, so start next search where the match ended
-          val endPosition = editor.offsetToVisualPosition(matchRange.endOffset)
-          column = endPosition.column
-        }
-      } else {
-        column = 0
-        line++
-      }
+      val replaceResult = performReplace(editor, caret, context, parent, doReplace, line, line2, match, matchRange, hasExpression, substituteString, exceptions)
+      line = replaceResult.line
+      column = replaceResult.column
+      line2 = replaceResult.endLine
       // PERFORM REPLACE END
 
     }
@@ -791,9 +763,60 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     return true
   }
 
-  private fun performReplace() {
+  private fun performReplace(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    parent: VimLContext,
+    doReplace: Boolean,
+    line: Int,
+    endLine: Int,
+    match: String,
+    matchRange: TextRange,
+    hasExpression: Boolean,
+    substituteString: String,
+    exceptions: MutableList<ExException>,
+  ): ReplaceResult {
+    caret.moveToOffset(matchRange.startOffset)
+    setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
+    val finalMatch = if (hasExpression) evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions) else match
 
+    val newColumn: Int
+    var newLine = line
+    var newEndLine = endLine
+
+    var didReplace = false
+
+    if (doReplace) {
+      val endPositionWithoutReplace = editor.offsetToBufferPosition(matchRange.endOffset)
+
+      replaceString(editor, matchRange.startOffset, matchRange.endOffset, finalMatch)
+      didReplace = true
+
+      val endPositionWithReplace = editor.offsetToBufferPosition(matchRange.startOffset + finalMatch.length)
+      newLine += max(0, endPositionWithReplace.line - endPositionWithoutReplace.line)
+      newEndLine += endPositionWithReplace.line - endPositionWithoutReplace.line
+    }
+
+    if (doAll && matchRange.startOffset != matchRange.endOffset) {
+      if (didReplace) {
+        // if there was a replacement, we start next search from where the new string ends
+        val endPosition = editor.offsetToBufferPosition(matchRange.startOffset + finalMatch.length)
+        newLine = endPosition.line
+        newColumn = endPosition.column
+      } else {
+        // no replacement, so start next search where the match ended
+        val endPosition = editor.offsetToVisualPosition(matchRange.endOffset)
+        newColumn = endPosition.column
+      }
+    } else {
+      newColumn = 0
+      newLine++
+    }
+    return ReplaceResult(newLine, newColumn, newEndLine)
   }
+
+  private data class ReplaceResult(val line: Int, val column: Int, val endLine: Int)
 
   private fun evaluateExpression(exprString: String, editor: VimEditor, context: ExecutionContext, parent: VimLContext, exceptions: MutableList<ExException>): String {
     val expression = injector.vimscriptParser.parseExpression(exprString)
