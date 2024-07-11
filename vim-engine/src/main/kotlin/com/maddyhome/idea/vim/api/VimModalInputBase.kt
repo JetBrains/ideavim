@@ -11,17 +11,6 @@ package com.maddyhome.idea.vim.api
 import javax.swing.KeyStroke
 
 abstract class VimModalInputBase : VimModalInput {
-  override fun insertText(offset: Int, string: String) {
-    val newText = StringBuilder(text).insert(offset, string).toString()
-    setText(newText)
-  }
-
-  override fun typeText(string: String) {
-    val caretOffset = caret.offset
-    insertText(caretOffset, string)
-    caret.offset += string.length
-  }
-
   override fun handleKey(key: KeyStroke, editor: VimEditor, executionContext: ExecutionContext) {
     inputInterceptor.consumeKey(key, editor, executionContext)
   }
