@@ -699,46 +699,21 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     var column = 0
     var line = line1
     while (line <= line2 && !gotQuit) {
-      val substituteResult = regex.substitute(editor, substituteString, oldLastSubstituteString, line, column, hasExpression, options)
-      if (substituteResult == null) {
-        line++
-        column = 0
+      val preparationResult = prepareToSubstitute(editor, caret, context, regex, oldLastSubstituteString, line, line2, column, hasExpression, substituteString, options)
+      if (preparationResult is SubstitutePreparationResult.Skip) {
+        line = preparationResult.newLine
+        column = preparationResult.newColumn
         continue
       }
-      val matchRange = substituteResult.first.range
-      val match = substituteResult.second
-      lastMatchStartOffset = matchRange.startOffset
+      preparationResult as SubstitutePreparationResult.Prepared
+      lastMatchStartOffset = preparationResult.matchRange.startOffset
+      gotQuit = preparationResult.gotQuit
 
-      injector.jumpService.saveJumpLocation(editor)
-
-      var doReplace = true
-      if (doAsk) {
-        val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
-        val choice: ReplaceConfirmationChoice = confirmChoice(editor, context, match, caret, matchRange.startOffset)
-        when (choice) {
-          ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
-          ReplaceConfirmationChoice.SKIP -> doReplace = false
-          ReplaceConfirmationChoice.SUBSTITUTE_ALL -> doAsk = false
-          ReplaceConfirmationChoice.QUIT -> {
-            doReplace = false
-            gotQuit = true
-          }
-
-          ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
-            doAll = false
-            line2 = line
-          }
-        }
-        highlight.remove()
-      }
-
-      // PERFORM REPLACE START
-      val replaceResult = performReplace(editor, caret, context, parent, doReplace, line, line2, match, matchRange, hasExpression, substituteString, exceptions)
+      // Can we skip this if [gotQuit]?
+      val replaceResult = performReplace(editor, caret, context, parent, preparationResult, line, hasExpression, substituteString, exceptions)
       line = replaceResult.line
       column = replaceResult.column
       line2 = replaceResult.endLine
-      // PERFORM REPLACE END
-
     }
 
     if (!gotQuit) {
@@ -763,27 +738,77 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     return true
   }
 
+  private fun prepareToSubstitute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    regex: VimRegex,
+    oldLastSubstituteString: String,
+    line: Int,
+    endLine: Int,
+    column: Int,
+    hasExpression: Boolean,
+    substituteString: String,
+    options: EnumSet<VimRegexOptions>
+  ): SubstitutePreparationResult {
+    val substituteResult = regex.substitute(editor, substituteString, oldLastSubstituteString, line, column, hasExpression, options)
+        ?: return SubstitutePreparationResult.Skip(line + 1, 0)
+    val matchRange = substituteResult.first.range
+    val match = substituteResult.second
+
+    injector.jumpService.saveJumpLocation(editor)
+    var newEndLine = endLine
+
+    var doReplace = true
+    var gotQuit = false
+    if (doAsk) {
+      val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
+      val choice: ReplaceConfirmationChoice = confirmChoice(editor, context, match, caret, matchRange.startOffset)
+      when (choice) {
+        ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
+        ReplaceConfirmationChoice.SKIP -> doReplace = false
+        ReplaceConfirmationChoice.SUBSTITUTE_ALL -> doAsk = false
+        ReplaceConfirmationChoice.QUIT -> {
+          doReplace = false
+          gotQuit = true
+        }
+
+        ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
+          doAll = false
+          newEndLine = line
+        }
+      }
+      highlight.remove()
+    }
+    return SubstitutePreparationResult.Prepared(match, matchRange, newEndLine, doReplace, gotQuit)
+  }
+
+  private sealed interface SubstitutePreparationResult {
+    data class Skip(val newLine: Int, val newColumn: Int) : SubstitutePreparationResult
+    data class Prepared(val match: String, val matchRange: TextRange, val newEndLine: Int, val doReplace: Boolean, val gotQuit: Boolean): SubstitutePreparationResult
+  }
+
   private fun performReplace(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
     parent: VimLContext,
-    doReplace: Boolean,
+    preparationResult: SubstitutePreparationResult.Prepared,
     line: Int,
-    endLine: Int,
-    match: String,
-    matchRange: TextRange,
     hasExpression: Boolean,
     substituteString: String,
     exceptions: MutableList<ExException>,
   ): ReplaceResult {
+    val matchRange = preparationResult.matchRange
+    val doReplace = preparationResult.doReplace
+
     caret.moveToOffset(matchRange.startOffset)
     setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
-    val finalMatch = if (hasExpression) evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions) else match
+    val finalMatch = if (hasExpression) evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions) else preparationResult.match
 
     val newColumn: Int
     var newLine = line
-    var newEndLine = endLine
+    var newEndLine = preparationResult.newEndLine
 
     var didReplace = false
 
