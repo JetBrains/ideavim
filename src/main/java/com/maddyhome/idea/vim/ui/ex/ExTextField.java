@@ -294,7 +294,7 @@ public class ExTextField extends JTextField {
     clearCurrentAction();
     VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
     if (commandLine != null) {
-      commandLine.close(true, true, true);
+      commandLine.close(true, true);
     }
   }
 
