@@ -88,7 +88,7 @@ interface VimCommandLine {
   fun clearCurrentAction()
 
   /**
-   * TODO remove me
+   * TODO remove me, close is safer
    */
   fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
   fun close(refocusOwningEditor: Boolean, resetCaret: Boolean, isCancel: Boolean) {

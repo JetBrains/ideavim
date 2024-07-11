@@ -383,6 +383,10 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
           if (exOutputModel != null) {
             exOutputModel.close();
           }
+          VimModalInput modalInput = injector.getModalInput().getCurrentModalInput();
+          if (modalInput != null) {
+            modalInput.deactivate(true, false);
+          }
         }
       }
     }

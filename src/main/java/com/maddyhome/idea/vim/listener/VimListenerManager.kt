@@ -736,6 +736,7 @@ internal object VimListenerManager {
       if (event.area == EditorMouseEventArea.EDITING_AREA) {
         val editor = event.editor
         injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false, isCancel = true)
+        injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = true, resetCaret = false)
 
         ExOutputModel.tryGetInstance(editor)?.close()
 
@@ -764,6 +765,7 @@ internal object VimListenerManager {
         event.mouseEvent.button != MouseEvent.BUTTON3
       ) {
         injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false, isCancel = true)
+        injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = true, resetCaret = false)
 
         ExOutputModel.getInstance(event.editor).close()
       }
