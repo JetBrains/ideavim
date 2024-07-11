@@ -18,21 +18,22 @@ import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.history.HistoryConstants
+import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptorBase
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import org.jetbrains.annotations.TestOnly
 import java.text.NumberFormat
 import java.text.ParsePosition
 import java.util.*
+import javax.swing.KeyStroke
 import kotlin.math.max
 import kotlin.math.min
 
@@ -695,78 +696,49 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     updateSearchHighlights(true)
 
     if (!doAsk) {
-      performSubstituteInLines(editor, caret, context, parent, regex, pattern, oldLastSubstituteString, line1, line2, hasExpression, substituteString, exceptions, options)
+      performSubstituteInLines(editor, caret, context, parent, regex, pattern, oldLastSubstituteString, line1, line2, 0, hasExpression, substituteString, exceptions, options)
     } else {
-      var lastMatchLine = -1
-      var gotQuit = false
-      var line = line1
-      var column = 0
-      while (line <= line2 && !gotQuit) {
-        val preparationResult = prepareToSubstitute(editor, caret, context, regex, oldLastSubstituteString, line, line2, column, hasExpression, substituteString, options)
-        if (preparationResult is SubstitutePreparationResult.Skip) {
-          line = preparationResult.newLine
-          column = preparationResult.newColumn
-          continue
-        }
-        preparationResult as SubstitutePreparationResult.Prepared
-        lastMatchLine = line
-        gotQuit = preparationResult.gotQuit
-
-        val replaceResult = performReplace(editor, caret, context, parent, preparationResult, line, hasExpression, substituteString, exceptions)
-        line = replaceResult.line
-        column = replaceResult.column
-        line2 = replaceResult.endLine
+      val lineToNextSubstitute = getNextSubstitute(editor, regex, oldLastSubstituteString, line1, line2, 0, hasExpression, substituteString, options)
+      if (lineToNextSubstitute == null) {
+        injector.messages.indicateError()
+        injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
+        return true
       }
-      postSubstitute(editor, caret, pattern, gotQuit, lastMatchLine, exceptions)
+      val (line, nextSubstitute) = lineToNextSubstitute
+      val matchRange = nextSubstitute.first.range
+      caret.moveToOffset(matchRange.startOffset)
+      val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
+      injector.modalInput.create(
+        editor, context, injector.messages.message("replace.with.0", lineToNextSubstitute.second.second),
+        SubstituteWithAskInputInterceptor(
+          editor, caret, nextSubstitute, highlight, line, 0, parent, pattern, regex,
+          oldLastSubstituteString, line2, hasExpression, substituteString, options,
+          -1, mutableListOf(),
+        )
+      )
     }
 
     // TODO: Support reporting number of changes (:help 'report')
     return true
   }
 
-  private fun prepareToSubstitute(
+  private fun getNextSubstitute(
     editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
     regex: VimRegex,
     oldLastSubstituteString: String,
-    line: Int,
+    startLine: Int,
     endLine: Int,
     column: Int,
     hasExpression: Boolean,
     substituteString: String,
     options: EnumSet<VimRegexOptions>
-  ): SubstitutePreparationResult {
-    val substituteResult = regex.substitute(editor, substituteString, oldLastSubstituteString, line, column, hasExpression, options)
-        ?: return SubstitutePreparationResult.Skip(line + 1, 0)
-    val matchRange = substituteResult.first.range
-    val match = substituteResult.second
-
-    injector.jumpService.saveJumpLocation(editor)
-    var newEndLine = endLine
-
-    var doReplace = true
-    var gotQuit = false
-    if (doAsk) {
-      val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
-      val choice: ReplaceConfirmationChoice = confirmChoice(editor, context, match, caret, matchRange.startOffset)
-      when (choice) {
-        ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
-        ReplaceConfirmationChoice.SKIP -> doReplace = false
-        ReplaceConfirmationChoice.SUBSTITUTE_ALL -> doAsk = false
-        ReplaceConfirmationChoice.QUIT -> {
-          doReplace = false
-          gotQuit = true
-        }
-
-        ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
-          doAll = false
-          newEndLine = line
-        }
-      }
-      highlight.remove()
+  ): Pair<Int, Pair<VimMatchResult.Success, String>>? {
+    for (line in startLine..endLine) {
+      val col = if (line == startLine) column else 0
+      val result = regex.substitute(editor, substituteString, oldLastSubstituteString, line, col, hasExpression, options)
+      if (result != null) return line to result
     }
-    return SubstitutePreparationResult.Prepared(match, matchRange, newEndLine, doReplace, gotQuit)
+    return null
   }
 
   private fun prepareToSubstituteWithoutAsk(
@@ -804,12 +776,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     oldLastSubstituteString: String,
     startLine: Int,
     endLine: Int,
+    startColumn: Int,
     hasExpression: Boolean,
     substituteString: String,
     exceptions: MutableList<ExException>,
     options: EnumSet<VimRegexOptions>,
   ) {
-    var column = 0
+    var column = startColumn
     var line = startLine
     var line2 = endLine
     var lastMatchLine = -1
@@ -823,7 +796,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       preparationResult as SubstitutePreparationResult.Prepared
       lastMatchLine = line
 
-      val replaceResult = performReplace(editor, caret, context, parent, preparationResult, line, hasExpression, substituteString, exceptions)
+      val replaceResult = performReplace(editor, caret, context, parent, preparationResult.match, preparationResult.matchRange, preparationResult.doReplace, line, preparationResult.newEndLine, hasExpression, substituteString, exceptions)
       line = replaceResult.line
       column = replaceResult.column
       line2 = replaceResult.endLine
@@ -836,22 +809,22 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     caret: VimCaret,
     context: ExecutionContext,
     parent: VimLContext,
-    preparationResult: SubstitutePreparationResult.Prepared,
+    match: String,
+    matchRange: TextRange,
+    doReplace: Boolean,
     line: Int,
+    endLine: Int,
     hasExpression: Boolean,
     substituteString: String,
     exceptions: MutableList<ExException>,
   ): ReplaceResult {
-    val matchRange = preparationResult.matchRange
-    val doReplace = preparationResult.doReplace
-
     caret.moveToOffset(matchRange.startOffset)
     setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
-    val finalMatch = if (hasExpression) evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions) else preparationResult.match
+    val finalMatch = if (hasExpression) evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions) else match
 
     val newColumn: Int
     var newLine = line
-    var newEndLine = preparationResult.newEndLine
+    var newEndLine = endLine
 
     var didReplace = false
 
@@ -901,6 +874,117 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     if (exceptions.isNotEmpty()) {
       injector.messages.indicateError()
       injector.messages.showStatusBarMessage(null, exceptions[0].toString())
+    }
+  }
+
+  private inner class SubstituteWithAskInputInterceptor(
+    val editor: VimEditor,
+    val caret: VimCaret,
+    val nextSubstitute: Pair<VimMatchResult.Success, String>,
+    val highlight: SearchHighlight,
+    var line: Int,
+    var column: Int,
+    val parent: VimLContext,
+    val pattern: String,
+    val regex: VimRegex,
+    val oldLastSubstituteString: String,
+    var endLine: Int,
+    val hasExpression: Boolean,
+    val substituteString: String,
+    val options: EnumSet<VimRegexOptions>,
+    var lastMatchLine: Int,
+    val exceptions: MutableList<ExException>,
+  ): VimInputInterceptorBase<ReplaceConfirmationChoice>() {
+    private val modalInput: VimModalInput
+      get() = injector.modalInput.getCurrentModalInput()!!
+    private var gotQuit = false
+    private var doReplace = true
+
+    override fun buildInput(key: KeyStroke): ReplaceConfirmationChoice? {
+      if (key.isCloseKeyStroke()) return ReplaceConfirmationChoice.QUIT
+      return when (key.keyChar) {
+        'q' -> ReplaceConfirmationChoice.QUIT
+        'y' -> ReplaceConfirmationChoice.SUBSTITUTE_THIS
+        'l' -> ReplaceConfirmationChoice.SUBSTITUTE_LAST
+        'n' -> ReplaceConfirmationChoice.SKIP
+        'a' -> ReplaceConfirmationChoice.SUBSTITUTE_ALL
+        else -> null
+      }
+    }
+
+    override fun executeInput(input: ReplaceConfirmationChoice, editor: VimEditor, context: ExecutionContext) {
+      injector.application.runWriteCommand(editor, "substitute-with-confirmation", modalInput) {
+        highlight.remove()
+        injector.jumpService.saveJumpLocation(editor)
+        val matchRange = nextSubstitute.first.range
+        val match = nextSubstitute.second
+
+        when (input) {
+          ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
+          ReplaceConfirmationChoice.SKIP -> doReplace = false
+          ReplaceConfirmationChoice.SUBSTITUTE_ALL -> {
+            doAsk = false
+            performSubstituteInLines(editor, caret, context, parent, regex, pattern, oldLastSubstituteString, line, endLine, column, hasExpression, substituteString, exceptions, options)
+            closeModalInputPrompt()
+            return@runWriteCommand
+          }
+          ReplaceConfirmationChoice.QUIT -> {
+            doReplace = false
+            gotQuit = true
+          }
+          ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
+            doAll = false
+            endLine = line
+          }
+        }
+        lastMatchLine = line
+
+        val replaceResult = performReplace(editor, caret, context, parent, match, matchRange, doReplace, line, endLine, hasExpression, substituteString, exceptions)
+        line = replaceResult.line
+        endLine = replaceResult.endLine
+        column = replaceResult.column
+
+        goToNextIteration()
+      }
+    }
+
+    private fun goToNextIteration() {
+      if (gotQuit) {
+        afterAllSubstitutes()
+        return
+      }
+
+      val lineToNextSubstitute = getNextSubstitute(editor, regex, oldLastSubstituteString, line, endLine, column, hasExpression, substituteString, options)
+      if (lineToNextSubstitute == null) {
+        afterAllSubstitutes()
+      } else {
+        val matchRange = lineToNextSubstitute.second.first.range
+        caret.moveToOffset(matchRange.startOffset)
+        val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
+        modalInput.inputInterceptor = SubstituteWithAskInputInterceptor(
+            editor,
+            caret,
+            lineToNextSubstitute.second,
+            highlight,
+            lineToNextSubstitute.first,
+            column,
+            parent,
+            pattern,
+            regex,
+            oldLastSubstituteString,
+            endLine,
+            hasExpression,
+            substituteString,
+            options,
+            lastMatchLine,
+            exceptions,
+        )
+      }
+    }
+
+    private fun afterAllSubstitutes() {
+      postSubstitute(editor, caret, pattern, gotQuit, lastMatchLine, exceptions)
+      closeModalInputPrompt()
     }
   }
 
