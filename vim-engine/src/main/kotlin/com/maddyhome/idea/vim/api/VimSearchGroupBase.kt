@@ -716,37 +716,36 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       if (hasExpression) match = evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions)
 
       var didReplace = false
-      if (doAll || line != editor.lineCount()) {
-        var doReplace = true
-        if (doAsk) {
-          val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
-          val choice: ReplaceConfirmationChoice = confirmChoice(editor, context, match, caret, matchRange.startOffset)
-          when (choice) {
-            ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
-            ReplaceConfirmationChoice.SKIP -> doReplace = false
-            ReplaceConfirmationChoice.SUBSTITUTE_ALL -> doAsk = false
-            ReplaceConfirmationChoice.QUIT -> {
-              doReplace = false
-              gotQuit = true
-            }
 
-            ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
-              doAll = false
-              line2 = line
-            }
+      var doReplace = true
+      if (doAsk) {
+        val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
+        val choice: ReplaceConfirmationChoice = confirmChoice(editor, context, match, caret, matchRange.startOffset)
+        when (choice) {
+          ReplaceConfirmationChoice.SUBSTITUTE_THIS -> {}
+          ReplaceConfirmationChoice.SKIP -> doReplace = false
+          ReplaceConfirmationChoice.SUBSTITUTE_ALL -> doAsk = false
+          ReplaceConfirmationChoice.QUIT -> {
+            doReplace = false
+            gotQuit = true
           }
-          highlight.remove()
-        }
-        if (doReplace) {
-          val endPositionWithoutReplace = editor.offsetToBufferPosition(matchRange.endOffset)
 
-          replaceString(editor, matchRange.startOffset, matchRange.endOffset, match)
-          didReplace = true
-
-          val endPositionWithReplace = editor.offsetToBufferPosition(matchRange.startOffset + match.length)
-          line += max(0, endPositionWithReplace.line - endPositionWithoutReplace.line)
-          line2 += endPositionWithReplace.line - endPositionWithoutReplace.line
+          ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
+            doAll = false
+            line2 = line
+          }
         }
+        highlight.remove()
+      }
+      if (doReplace) {
+        val endPositionWithoutReplace = editor.offsetToBufferPosition(matchRange.endOffset)
+
+        replaceString(editor, matchRange.startOffset, matchRange.endOffset, match)
+        didReplace = true
+
+        val endPositionWithReplace = editor.offsetToBufferPosition(matchRange.startOffset + match.length)
+        line += max(0, endPositionWithReplace.line - endPositionWithoutReplace.line)
+        line2 += endPositionWithReplace.line - endPositionWithoutReplace.line
       }
 
       if (doAll && matchRange.startOffset != matchRange.endOffset) {
