@@ -705,17 +705,11 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         column = 0
         continue
       }
-
-      injector.jumpService.saveJumpLocation(editor)
       val matchRange = substituteResult.first.range
       var match = substituteResult.second
       lastMatchStartOffset = matchRange.startOffset
 
-      caret.moveToOffset(matchRange.startOffset)
-      setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
-      if (hasExpression) match = evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions)
-
-      var didReplace = false
+      injector.jumpService.saveJumpLocation(editor)
 
       var doReplace = true
       if (doAsk) {
@@ -737,6 +731,14 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         }
         highlight.remove()
       }
+
+      // PERFORM REPLACE START
+      caret.moveToOffset(matchRange.startOffset)
+      setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
+      if (hasExpression) match = evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions)
+
+      var didReplace = false
+
       if (doReplace) {
         val endPositionWithoutReplace = editor.offsetToBufferPosition(matchRange.endOffset)
 
@@ -763,6 +765,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         column = 0
         line++
       }
+      // PERFORM REPLACE END
+
     }
 
     if (!gotQuit) {
@@ -785,6 +789,10 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
     // TODO: Support reporting number of changes (:help 'report')
     return true
+  }
+
+  private fun performReplace() {
+
   }
 
   private fun evaluateExpression(exprString: String, editor: VimEditor, context: ExecutionContext, parent: VimLContext, exceptions: MutableList<ExException>): String {
