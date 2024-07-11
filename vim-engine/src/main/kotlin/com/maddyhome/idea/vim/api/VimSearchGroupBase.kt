@@ -694,7 +694,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
-    var lastMatchStartOffset = -1
+    var lastMatchLine = -1
     var gotQuit = false
     var column = 0
     var line = line1
@@ -706,7 +706,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         continue
       }
       preparationResult as SubstitutePreparationResult.Prepared
-      lastMatchStartOffset = preparationResult.matchRange.startOffset
+      lastMatchLine = line
       gotQuit = preparationResult.gotQuit
 
       // Can we skip this if [gotQuit]?
@@ -717,10 +717,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     }
 
     if (!gotQuit) {
-      if (lastMatchStartOffset != -1) {
-        caret.moveToOffset(
-          injector.motion.moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatchStartOffset).line)
-        )
+      if (lastMatchLine != -1) {
+        caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
       } else {
         injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
       }
