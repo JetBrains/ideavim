@@ -163,11 +163,6 @@ internal class WrappedAsModalInputExEntryPanel(internal val exEntryPanel: ExEntr
     set(value) { exEntryPanel.myInputInterceptor = value }
   override val caret: VimCommandLineCaret = exEntryPanel.caret
   override val label: String = exEntryPanel.label
-  override val text: String = exEntryPanel.actualText
-
-  override fun setText(string: String) {
-    exEntryPanel.setText(string)
-  }
 
   override fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean) {
     exEntryPanel.deactivate(refocusOwningEditor, resetCaret)
