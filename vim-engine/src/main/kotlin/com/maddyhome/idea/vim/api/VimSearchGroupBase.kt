@@ -694,28 +694,32 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
-    var lastMatchLine = -1
-    var gotQuit = false
-    var column = 0
-    var line = line1
-    while (line <= line2 && !gotQuit) {
-      val preparationResult = prepareToSubstitute(editor, caret, context, regex, oldLastSubstituteString, line, line2, column, hasExpression, substituteString, options)
-      if (preparationResult is SubstitutePreparationResult.Skip) {
-        line = preparationResult.newLine
-        column = preparationResult.newColumn
-        continue
-      }
-      preparationResult as SubstitutePreparationResult.Prepared
-      lastMatchLine = line
-      gotQuit = preparationResult.gotQuit
+    if (!doAsk) {
+      performSubstituteInLines(editor, caret, context, parent, regex, pattern, oldLastSubstituteString, line1, line2, hasExpression, substituteString, exceptions, options)
+    } else {
+      var lastMatchLine = -1
+      var gotQuit = false
+      var line = line1
+      var column = 0
+      while (line <= line2 && !gotQuit) {
+        val preparationResult = prepareToSubstitute(editor, caret, context, regex, oldLastSubstituteString, line, line2, column, hasExpression, substituteString, options)
+        if (preparationResult is SubstitutePreparationResult.Skip) {
+          line = preparationResult.newLine
+          column = preparationResult.newColumn
+          continue
+        }
+        preparationResult as SubstitutePreparationResult.Prepared
+        lastMatchLine = line
+        gotQuit = preparationResult.gotQuit
 
-      val replaceResult = performReplace(editor, caret, context, parent, preparationResult, line, hasExpression, substituteString, exceptions)
-      line = replaceResult.line
-      column = replaceResult.column
-      line2 = replaceResult.endLine
+        val replaceResult = performReplace(editor, caret, context, parent, preparationResult, line, hasExpression, substituteString, exceptions)
+        line = replaceResult.line
+        column = replaceResult.column
+        line2 = replaceResult.endLine
+      }
+      postSubstitute(editor, caret, pattern, gotQuit, lastMatchLine, exceptions)
     }
 
-    postSubstitute(editor, caret, pattern, gotQuit, lastMatchLine, exceptions)
     // TODO: Support reporting number of changes (:help 'report')
     return true
   }
@@ -765,9 +769,66 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     return SubstitutePreparationResult.Prepared(match, matchRange, newEndLine, doReplace, gotQuit)
   }
 
+  private fun prepareToSubstituteWithoutAsk(
+    editor: VimEditor,
+    regex: VimRegex,
+    oldLastSubstituteString: String,
+    line: Int,
+    endLine: Int,
+    column: Int,
+    hasExpression: Boolean,
+    substituteString: String,
+    options: EnumSet<VimRegexOptions>
+  ): SubstitutePreparationResult {
+    val substituteResult = regex.substitute(editor, substituteString, oldLastSubstituteString, line, column, hasExpression, options)
+      ?: return SubstitutePreparationResult.Skip(line + 1, 0)
+    val matchRange = substituteResult.first.range
+    val match = substituteResult.second
+
+    injector.jumpService.saveJumpLocation(editor)
+    return SubstitutePreparationResult.Prepared(match, matchRange, endLine, doReplace = true, gotQuit = false)
+  }
+
   private sealed interface SubstitutePreparationResult {
     data class Skip(val newLine: Int, val newColumn: Int) : SubstitutePreparationResult
     data class Prepared(val match: String, val matchRange: TextRange, val newEndLine: Int, val doReplace: Boolean, val gotQuit: Boolean): SubstitutePreparationResult
+  }
+
+  private fun performSubstituteInLines(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    parent: VimLContext,
+    regex: VimRegex,
+    pattern: String,
+    oldLastSubstituteString: String,
+    startLine: Int,
+    endLine: Int,
+    hasExpression: Boolean,
+    substituteString: String,
+    exceptions: MutableList<ExException>,
+    options: EnumSet<VimRegexOptions>,
+  ) {
+    var column = 0
+    var line = startLine
+    var line2 = endLine
+    var lastMatchLine = -1
+    while (line <= line2) {
+      val preparationResult = prepareToSubstituteWithoutAsk(editor, regex, oldLastSubstituteString, line, line2, column, hasExpression, substituteString, options)
+      if (preparationResult is SubstitutePreparationResult.Skip) {
+        line = preparationResult.newLine
+        column = preparationResult.newColumn
+        continue
+      }
+      preparationResult as SubstitutePreparationResult.Prepared
+      lastMatchLine = line
+
+      val replaceResult = performReplace(editor, caret, context, parent, preparationResult, line, hasExpression, substituteString, exceptions)
+      line = replaceResult.line
+      column = replaceResult.column
+      line2 = replaceResult.endLine
+    }
+    postSubstitute(editor, caret, pattern, gotQuit = false, lastMatchLine, exceptions)
   }
 
   private fun performReplace(
