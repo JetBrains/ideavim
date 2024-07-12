@@ -36,7 +36,8 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     return if (instance.isActive) instance else null
   }
 
-  override fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String? {
+  @Deprecated("Please use readInputAndProcess")
+  fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String? {
     val editor = vimEditor.ij
     if (vimEditor.inRepeatMode) {
       val input = Extension.consumeString()
