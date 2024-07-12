@@ -222,13 +222,13 @@ Ex commands or via `:map` command mappings:
     * Execute an action by `{action_id}`. Works from Ex command line.
     * Please don't use `:action` in mappings. Use `<Action>` instead.
 
-### Finding action ids:
+### Finding action IDs:
 
-* IJ provides `IdeaVim: track action Ids` command to show the id of the executed actions.
+* IJ provides `IdeaVim: track action IDs` command to show the id of the executed actions.
   This command can be found in "Search everywhere" (double `shift`).
 
     <details>
-        <summary><strong>"Track action Ids" Details</strong> (click to see)</summary>
+        <summary><strong>"Track action IDs" Details</strong> (click to see)</summary>
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="assets/readme/track_action_dark.gif">
             <img src="assets/readme/track_action_light.gif" alt="track action ids"/>

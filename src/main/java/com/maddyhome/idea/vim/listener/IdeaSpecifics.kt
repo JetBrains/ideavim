@@ -28,6 +28,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
@@ -58,6 +59,7 @@ internal object IdeaSpecifics {
     private var editor: Editor? = null
     private var completionPrevDocumentLength: Int? = null
     private var completionPrevDocumentOffset: Int? = null
+
     override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
       if (VimPlugin.isNotEnabled()) return
 
@@ -70,7 +72,24 @@ internal object IdeaSpecifics {
       if (!isVimAction && injector.globalIjOptions().trackactionids) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
           val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
-          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
+          val candidates = if (id == null) {
+            // Some actions are specific to the component they're registered for, and are copies of a global action,
+            // reusing the action ID and shortcuts (e.g. `NextTab` is different for editor tabs and tool window tabs).
+            // Unfortunately, ActionManager doesn't know about these "local" actions, so can't return the action ID.
+            // However, the new "local" action does copy the shortcuts of the global template action, so we can look up
+            // all actions with matching shortcuts. We might return more action IDs than expected, so this is a list of
+            // candidates, not a definite match of the action being executed, but the list should include our target
+            // action. Note that we might return duplicate IDs because the keymap might have multiple shortcuts mapped
+            // to the same action. The notifier will handle de-duplication and sorting as a presentation detail.
+            action.shortcutSet.shortcuts.flatMap { KeymapManager.getInstance().activeKeymap.getActionIdList(it) }
+          }
+          else {
+            emptyList()
+          }
+
+          // We can still get empty ID and empty candidates. Notably, for the tool window toggle buttons on the new UI.
+          // We could filter out action events with `place == ActionPlaces.TOOLWINDOW_TOOLBAR_BAR`
+          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id, candidates)
         }
       }
 
