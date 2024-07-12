@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.findBlockRange
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -46,6 +47,7 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.state.mode.returnTo
 
 /**
  * Port of vim-surround.
@@ -111,6 +113,9 @@ internal class VimSurroundExtension : VimExtension {
 //        it.moveToOffset(lineStartOffset)
       }
       // Jump back to start
+      if (editor.mode !is Mode.NORMAL) {
+        editor.mode = Mode.NORMAL()
+      }
       executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
     }
 
@@ -133,7 +138,7 @@ internal class VimSurroundExtension : VimExtension {
       }
       runWriteAction {
         // Leave visual mode
-        executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
+        editor.exitVisualMode()
         editor.ij.caretModel.moveToOffset(selectionStart)
       }
     }
@@ -279,8 +284,10 @@ internal class VimSurroundExtension : VimExtension {
 
     private fun getSurroundRange(caret: VimCaret): TextRange? {
       val editor = caret.editor
-      val ijEditor = editor.ij
-      return when (ijEditor.vim.mode) {
+      if (editor.mode is Mode.CMD_LINE) {
+        editor.mode = (editor.mode as Mode.CMD_LINE).returnTo()
+      }
+      return when (editor.mode) {
         is Mode.NORMAL -> injector.markService.getChangeMarks(caret)
         is Mode.VISUAL -> caret.run { TextRange(selectionStart, selectionEnd) }
         else -> null
@@ -323,6 +330,9 @@ private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_
 
 private fun inputTagPair(editor: Editor, context: DataContext): Pair<String, String>? {
   val tagInput = inputString(editor, context, "<", '>')
+  if (editor.vim.mode is Mode.CMD_LINE) {
+    editor.vim.mode = editor.vim.mode.returnTo()
+  }
   val matcher = tagNameAndAttributesCapturePattern.matcher(tagInput)
   return if (matcher.find()) {
     val tagName = matcher.group(1)
@@ -339,6 +349,9 @@ private fun inputFunctionName(
   withInternalSpaces: Boolean,
 ): Pair<String, String>? {
   val functionNameInput = inputString(editor, context, "function: ", null)
+  if (editor.vim.mode is Mode.CMD_LINE) {
+    editor.vim.mode = editor.vim.mode.returnTo()
+  }
   if (functionNameInput.isEmpty()) return null
   return if (withInternalSpaces) "$functionNameInput( " to " )" else "$functionNameInput(" to ")"
 }
