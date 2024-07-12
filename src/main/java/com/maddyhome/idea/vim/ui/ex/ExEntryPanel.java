@@ -63,7 +63,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   private boolean isReplaceMode = false;
   private WeakReference<Editor> weakEditor = null;
 
-  public VimInputInterceptor myInputInterceptor = null;
+  private VimInputInterceptor myInputInterceptor = null;
   public Function1<String, Unit> inputProcessing = null;
   public Character finishOn = null;
 
@@ -569,7 +569,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     IdeFocusManager.findInstance().requestFocus(entry, true);
   }
 
-  @NotNull
+  @Nullable
   public VimInputInterceptor<?> getInputInterceptor() {
     return myInputInterceptor;
   }
@@ -579,7 +579,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     VimCommandLine.super.insertText(offset, string);
   }
 
-  public void setInputInterceptor(@NotNull VimInputInterceptor<?> vimInputInterceptor) {
+  public void setInputInterceptor(@Nullable VimInputInterceptor<?> vimInputInterceptor) {
     myInputInterceptor = vimInputInterceptor;
   }
 
