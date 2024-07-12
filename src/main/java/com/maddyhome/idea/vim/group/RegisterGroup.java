@@ -14,6 +14,8 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
+import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
 import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.state.mode.SelectionType;
@@ -34,6 +36,10 @@ import java.util.List;
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 public class RegisterGroup extends VimRegisterGroupBase implements PersistentStateComponent<Element> {
+
+  static {
+    IjVimInjectorKt.initInjector();
+  }
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 

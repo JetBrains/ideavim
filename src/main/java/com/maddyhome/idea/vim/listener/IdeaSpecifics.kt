@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
@@ -226,9 +227,13 @@ internal object IdeaSpecifics {
 
 //region Find action ID
 internal class FindActionIdAction : DumbAwareToggleAction() {
-  override fun isSelected(e: AnActionEvent): Boolean = injector.globalIjOptions().trackactionids
+  override fun isSelected(e: AnActionEvent): Boolean {
+    initInjector()
+    return injector.globalIjOptions().trackactionids
+  }
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
+    initInjector()
     injector.globalIjOptions().trackactionids = !injector.globalIjOptions().trackactionids
   }
 

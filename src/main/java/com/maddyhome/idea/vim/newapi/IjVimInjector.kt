@@ -56,8 +56,9 @@ import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.VimscriptExecutor
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.api.VimscriptParser
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.isInjectorInitialized
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.CommandGroup
 import com.maddyhome.idea.vim.group.EditorGroup
@@ -89,6 +90,16 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 import com.maddyhome.idea.vim.yank.YankGroupBase
 import javax.swing.JTextArea
+
+/**
+ * Currently, injector has to be initialized in all "entry points" from the IJ platform.
+ * This means Project Activities, listeners, status bar widgets, statistic collectors, etc.
+ * This is a bad pattern and we need to find a solution where the plugin doesn't have an "uninitialized state"
+ */
+internal fun initInjector() {
+  if (isInjectorInitialized()) return
+  injector = IjVimInjector()
+}
 
 internal class IjVimInjector : VimInjectorBase() {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz))

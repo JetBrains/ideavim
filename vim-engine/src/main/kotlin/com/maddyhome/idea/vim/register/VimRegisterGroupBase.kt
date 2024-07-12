@@ -31,11 +31,11 @@ import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import javax.swing.KeyStroke
 
 abstract class VimRegisterGroupBase : VimRegisterGroup {
+
   override val isRecording: Boolean
     get() = recordRegister != null
 

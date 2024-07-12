@@ -8,11 +8,11 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import javax.swing.KeyStroke
 
 abstract class VimCaretBase : VimCaret

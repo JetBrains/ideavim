@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
 
 @State(name = "VimJumpsSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
@@ -65,6 +66,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   }
 
   override fun loadState(state: Element) {
+    initInjector()
     val projectElements = state.getChildren("project")
     for (projectElement in projectElements) {
       val jumps = mutableListOf<Jump>()
@@ -89,6 +91,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
 
 internal class JumpsListener(val project: Project) : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
+    initInjector()
     if (!injector.globalIjOptions().unifyjumps) return
     
     val jumpService = injector.jumpService

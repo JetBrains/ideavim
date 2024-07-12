@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.VimListenersNotifier
-import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
@@ -17,9 +16,11 @@ import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
+import org.jetbrains.annotations.ApiStatus
 
 interface VimInjector {
   val vimState: VimStateMachine
@@ -198,6 +199,11 @@ interface VimInjector {
 }
 
 lateinit var injector: VimInjector
+
+@ApiStatus.Internal
+fun isInjectorInitialized(): Boolean {
+  return ::injector.isInitialized
+}
 
 /**
  * Gets an API for consuming only global options

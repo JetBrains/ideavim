@@ -13,10 +13,15 @@ import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
+import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.statistic.PluginState.Util.extensionNames
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 
 internal class VimscriptState : ApplicationUsagesCollector() {
+
+  init {
+    initInjector()
+  }
 
   override fun getGroup(): EventLogGroup = GROUP
 

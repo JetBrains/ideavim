@@ -16,6 +16,7 @@ import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.api.key
+import com.maddyhome.idea.vim.newapi.initInjector
 
 /**
  * Logs the chain of handlers for esc and enter
@@ -34,6 +35,8 @@ internal class EditorHandlersChainLogger : ProjectActivity {
   private val editorHandlers = ExtensionPointName<EditorActionHandlerBean>("com.intellij.editorActionHandler")
 
   override suspend fun execute(project: Project) {
+    initInjector()
+
     if (!enableOctopus) return
 
     val escHandlers = editorHandlers.extensionList

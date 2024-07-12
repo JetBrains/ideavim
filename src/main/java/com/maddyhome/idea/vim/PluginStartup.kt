@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.initInjector
 
 /**
  * @author Alex Plate
@@ -36,6 +37,7 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
 // This is a temporal workaround for VIM-2487
 internal class PyNotebooksCloseWorkaround : ProjectManagerListener {
   override fun projectClosingBeforeSave(project: Project) {
+    initInjector()
     // TODO: Confirm context in CWM scenario
     if (injector.globalIjOptions().closenotebooks) {
       injector.editorGroup.getEditors().forEach { vimEditor ->

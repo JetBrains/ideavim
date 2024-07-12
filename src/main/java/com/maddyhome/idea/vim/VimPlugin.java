@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
+import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
@@ -67,7 +68,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
   static {
-    VimInjectorKt.setInjector(new IjVimInjector());
+    IjVimInjectorKt.initInjector();
   }
 
   private final @NotNull VimState state = new VimState();

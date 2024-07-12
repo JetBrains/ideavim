@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ex.ExTextField
@@ -61,10 +62,13 @@ import javax.swing.KeyStroke
  *   way to get ideavim keys for this plugin. See VIM-3085
  */
 class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+
+  init {
+    initInjector()
+  }
+
   private val traceTime: Boolean
     get() {
-      // Make sure the injector is initialized
-      VimPlugin.getInstance()
       return injector.globalOptions().ideatracetime
     }
 

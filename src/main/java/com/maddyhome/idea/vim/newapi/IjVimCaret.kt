@@ -45,6 +45,7 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     get() {
       var storage = this.caret.registerStorage
       if (storage == null) {
+        initInjector() // To initialize injector used in CaretRegisterStorageBase
         storage = CaretRegisterStorageBase(this)
         this.caret.registerStorage = storage
       } else if (storage.caret != this) {

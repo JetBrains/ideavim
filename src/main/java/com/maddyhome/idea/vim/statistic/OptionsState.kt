@@ -19,10 +19,15 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionConstants
 
 internal class OptionsState : ApplicationUsagesCollector() {
+
+  init {
+    initInjector()
+  }
 
   override fun getGroup(): EventLogGroup = GROUP
 
