@@ -13,9 +13,6 @@ import com.maddyhome.idea.vim.command.Command
 interface VimCommandLineService {
   fun getActiveCommandLine(): VimCommandLine?
 
-  @Deprecated("Please use readInputAndProcess")
-  fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String?
-
   fun readInputAndProcess(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?, processing: (String) -> Unit)
 
   /**
