@@ -147,7 +147,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
   }
 
   override fun getCurrentModalInput(): VimModalInput? {
-    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive }?.let { WrappedAsModalInputExEntryPanel(it) }
+    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive && it.myInputInterceptor != null }?.let { WrappedAsModalInputExEntryPanel(it) }
   }
 
   override fun create(editor: VimEditor, context: ExecutionContext, label: String, inputInterceptor: VimInputInterceptor<*>): VimModalInput {
