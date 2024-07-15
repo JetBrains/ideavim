@@ -150,7 +150,7 @@ internal class ReloadVimRc : DumbAwareAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
     injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
-    Troubleshooter.instance.removeByType("old-action-notation-in-mappings")
+    Troubleshooter.getInstance().removeByType("old-action-notation-in-mappings")
 
     // Reload the ideavimrc in the context of the current window, as though we had called `:source ~/.ideavimrc`
     executeIdeaVimRc(editor.vim)

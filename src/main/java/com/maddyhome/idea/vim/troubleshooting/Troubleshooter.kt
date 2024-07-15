@@ -44,7 +44,7 @@ internal class Troubleshooter {
   }
 
   companion object {
-    val instance = service<Troubleshooter>()
+    fun getInstance() = service<Troubleshooter>()
   }
 }
 
