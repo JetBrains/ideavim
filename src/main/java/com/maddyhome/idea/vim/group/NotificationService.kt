@@ -65,9 +65,9 @@ internal class NotificationService(private val project: Project?) {
   fun notifyAboutNewUndo() {
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
-      "IdeaVim undo now works like Vim undo",
+      "Undo in IdeaVim now works like in Vim",
       """
-        Caret movement is no more a separate undo step and full insert is undoable in one step
+        Caret movement is no longer a separate undo step, and full insert is undoable in one step.
       """.trimIndent(),
       NotificationType.INFORMATION,
     )
