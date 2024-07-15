@@ -18,6 +18,7 @@ import kotlin.reflect.KProperty
 internal class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
+  var isNewUndoNotified by StateProperty("idea-undo")
 
   fun readData(element: Element) {
     val notifications = element.getChild("notifications")

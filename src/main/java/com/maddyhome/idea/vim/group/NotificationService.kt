@@ -62,6 +62,25 @@ internal class NotificationService(private val project: Project?) {
   @Suppress("unused")
   constructor() : this(null)
 
+  fun notifyAboutNewUndo() {
+    val notification = Notification(
+      IDEAVIM_NOTIFICATION_ID,
+      "IdeaVim undo now works like Vim undo",
+      """
+        Caret movement is no more a separate undo step and full insert is undoable in one step
+      """.trimIndent(),
+      NotificationType.INFORMATION,
+    )
+
+    notification.addAction(object : DumbAwareAction("Share Feedback") {
+      override fun actionPerformed(p0: AnActionEvent) {
+        BrowserUtil.browse("https://youtrack.jetbrains.com/issue/VIM-547/Undo-splits-Insert-mode-edits-into-separate-undo-chunks")
+      }
+    })
+
+    notification.notify(project)
+  }
+
   fun notifyAboutIdeaPut() {
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
