@@ -37,7 +37,7 @@ object Compatibility : IdeaVimBuildType({
               java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
               # Outdated java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}github.zgqq.intellij-enhance' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.copilot' [latest-PY] -team-city
+              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
             """.trimIndent()
