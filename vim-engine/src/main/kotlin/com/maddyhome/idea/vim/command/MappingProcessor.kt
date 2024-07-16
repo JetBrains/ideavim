@@ -104,11 +104,11 @@ object MappingProcessor: KeyConsumer {
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
-    processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, _ -> processUnfinishedMappingSequence(lambdaEditor, lambdaKeyState) }
+    processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext -> processUnfinishedMappingSequence(lambdaEditor, lambdaContext, lambdaKeyState) }
     return true
   }
 
-  private fun processUnfinishedMappingSequence(editor: VimEditor, keyState: KeyHandlerState) {
+  private fun processUnfinishedMappingSequence(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     if (injector.options(editor).timeout) {
       log.trace("timeout is set. schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
@@ -139,7 +139,7 @@ object MappingProcessor: KeyConsumer {
               keyHandler.handleKey(
                 editor,
                 keyStroke,
-                injector.executionContextManager.getEditorExecutionContext(editor),
+                context,
                 allowKeyMappings = true,
                 mappingCompleted = lastKeyInSequence,
                 keyState,
