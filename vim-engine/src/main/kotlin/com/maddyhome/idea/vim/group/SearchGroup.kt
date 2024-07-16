@@ -267,7 +267,7 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
   var i: Int? = start
   while (i != null && (rangeToSearch == null || rangeToSearch.contains(i))) {
     if (rangeToSearch == null) {
-      val rangeToSkip = (getStringAtPos(editor, i, false) ?: injector.psiService.getCommentAtPos(editor, i)?.first)?.takeIf { !it.contains(start) }
+      val rangeToSkip = getStringAtPos(editor, i, false) ?: injector.psiService.getCommentAtPos(editor, i)?.first
       if (rangeToSkip != null) {
         val searchStart = if (direction == Direction.FORWARDS) rangeToSkip.endOffset else rangeToSkip.startOffset - 1
         i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), searchStart, escapedRestriction, direction)
@@ -405,22 +405,25 @@ fun findBlockRange(
 }
 
 private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: Char, count: Int): Pair<Int, Int>? {
-  val stringAtPos = getStringAtPos(editor, pos, true)
+  val blockAtPos = getStringAtPos(editor, pos, true) ?: injector.psiService.getCommentAtPos(editor, pos)?.first
 
   var blockStart: Int?
   var blockEnd: Int?
 
   // There are three cases of "blocks" in Vim:
-  //   1. There is a string containing a pair of [charToMatch] to [pairChar] and caret is located between them
-  if (stringAtPos != null) {
-    blockStart = findBlockLocation(editor, pos, charToMatch, pairChar, Direction.BACKWARDS, if (editor.text()[pos] == pairChar) count - 1 else count, stringAtPos)
+  //   1. There is a comment or string containing a pair of [charToMatch] to [pairChar],
+  //   and caret is located between them,
+  //   In this case match is checked only inside the same string or comment
+  if (blockAtPos != null) {
+    blockStart = findBlockLocation(editor, pos, charToMatch, pairChar, Direction.BACKWARDS, if (editor.text()[pos] == pairChar) count - 1 else count, blockAtPos)
     if (blockStart != null) {
-      blockEnd = findBlockLocation(editor, blockStart, pairChar, charToMatch, Direction.FORWARDS, 0, stringAtPos)
+      blockEnd = findBlockLocation(editor, blockStart, pairChar, charToMatch, Direction.FORWARDS, 0, blockAtPos)
       if (blockEnd != null && blockEnd >= pos) return blockStart to blockEnd
     }
   }
 
-  //   2. Code contains [charToMatch] to [pairChar] and caret is located between them
+  //   2. Code contains [charToMatch] to [pairChar], and caret is located between them,
+  //   In this case, all comments and strings are skipped and not included in count (see [findBlockLocation] implementation)
   blockStart = findBlockLocation(editor, pos, charToMatch, pairChar, Direction.BACKWARDS, if (editor.text()[pos] == pairChar) count - 1 else count)
   if (blockStart != null) {
     blockEnd = findBlockLocation(editor, blockStart, charToMatch, pairChar, Direction.FORWARDS, 0)
@@ -430,10 +433,11 @@ private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: 
   if (count > 1) return null // There are no [charToMatch] to [pairChar] around caret at all
 
   //   3. There is a pair [charToMatch] to [pairChar] somewhere after the caret
+  //   It may be found in both code or comment / string
   blockStart = editor.text().indexOfOrNull(charToMatch, pos)
   while (blockStart != null) {
-    val containingString = getStringAtPos(editor, blockStart, false)
-    if (containingString != null) {
+    val containingBlock = getStringAtPos(editor, blockStart, false) ?: injector.psiService.getCommentAtPos(editor, blockStart)
+    if (containingBlock != null) {
       blockEnd = findMatchingChar(editor, blockStart, charToMatch, pairChar, Direction.FORWARDS)
       if (blockEnd != null) return blockStart to blockEnd
       blockStart = editor.text().indexOfOrNull(charToMatch, blockStart + 1)
