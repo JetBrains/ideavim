@@ -26,7 +26,7 @@ class IjVimPsiService: VimPsiService {
     val psiFile = PsiHelper.getFile(editor.ij) ?: return null
     val psiElement = psiFile.findElementAt(pos) ?: return null
     val language = psiElement.language
-    val commenter = LanguageCommenters.INSTANCE.forLanguage(language)
+    val commenter = LanguageCommenters.INSTANCE.forLanguage(language) ?: return null
     val psiComment = PsiTreeUtil.getParentOfType(psiElement, PsiComment::class.java, false) ?: return null
     val commentText = psiComment.text
 
