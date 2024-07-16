@@ -161,4 +161,31 @@ class MotionPercentOrMatchActionJavaTest : VimJavaTestCase() {
     }
     """.trimIndent())
   }
+
+  @Test
+  @TestFor(issues = ["VIM-3530"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test block in comment`() {
+    configureByJavaText("""
+  /**
+   * Compose Multiplatform Gradle Plugin
+   * [gradle portal](https://plugins${c}.gradle.org/plugin/org.jetbrains.compose)
+   * [github](https://github.com/JetBrains/compose-multiplatform/releases)
+   * [maven runtime](https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/runtime/)
+   * [maven runtime](https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/runtime/runtime/)
+   * [maven ui-js](https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/ui/ui-js/)
+   */
+      """.trimIndent())
+    typeText("di)")
+    assertState("""
+  /**
+   * Compose Multiplatform Gradle Plugin
+   * [gradle portal]()
+   * [github](https://github.com/JetBrains/compose-multiplatform/releases)
+   * [maven runtime](https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/runtime/)
+   * [maven runtime](https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/runtime/runtime/)
+   * [maven ui-js](https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/ui/ui-js/)
+   */
+      """.trimIndent())
+  }
 }
