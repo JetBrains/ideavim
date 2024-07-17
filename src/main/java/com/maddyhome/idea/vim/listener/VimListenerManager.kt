@@ -158,6 +158,7 @@ internal object VimListenerManager {
     check(keyCheckRequests.tryEmit(Unit))
 
     val caretVisualAttributesListener = CaretVisualAttributesListener()
+    injector.listenersNotifier.myEditorListeners.add(caretVisualAttributesListener)
     injector.listenersNotifier.modeChangeListeners.add(caretVisualAttributesListener)
     injector.listenersNotifier.isReplaceCharListeners.add(caretVisualAttributesListener)
     caretVisualAttributesListener.updateAllEditorsCaretsVisual()

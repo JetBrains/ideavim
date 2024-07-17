@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.common.IsReplaceCharListener
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -144,24 +145,28 @@ private object AttributesCache {
 @TestOnly
 internal fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
 
-class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener {
+class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener, EditorListener {
   override fun isReplaceCharChanged(editor: VimEditor) {
-    updateCaretsVisual()
+    updateCaretsVisual(editor)
   }
 
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
-    updateCaretsVisual()
+    updateCaretsVisual(editor)
   }
 
-  private fun updateCaretsVisual() {
-    updateAllEditorsCaretsVisual()
+  override fun focusGained(editor: VimEditor) {
+    updateCaretsVisual(editor)
+  }
+
+  private fun updateCaretsVisual(editor: VimEditor) {
+    val ijEditor = (editor as IjVimEditor).editor
+    ijEditor.updateCaretsVisualAttributes()
+    ijEditor.updateCaretsVisualPosition()
   }
 
   fun updateAllEditorsCaretsVisual() {
     injector.editorGroup.getEditors().forEach { editor ->
-      val ijEditor = (editor as IjVimEditor).editor
-      ijEditor.updateCaretsVisualAttributes()
-      ijEditor.updateCaretsVisualPosition()
+      updateCaretsVisual(editor)
     }
   }
 }
