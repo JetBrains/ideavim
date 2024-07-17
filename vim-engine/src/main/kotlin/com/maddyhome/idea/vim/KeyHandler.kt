@@ -265,11 +265,13 @@ class KeyHandler {
    */
   fun reset(editor: VimEditor) {
     logger.trace { "Reset is executed" }
+    editor.isReplaceCharacter = false
     editor.resetOpPending()
     keyHandlerState.partialReset(editor.mode)
     keyHandlerState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
   }
 
+  // TODO we should have a single reset method
   fun reset(keyState: KeyHandlerState, mode: Mode) {
     logger.trace { "Reset is executed" }
     keyHandlerState.partialReset(mode)
