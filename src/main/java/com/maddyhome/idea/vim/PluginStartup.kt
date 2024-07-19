@@ -8,15 +8,19 @@
 
 package com.maddyhome.idea.vim
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
 import com.intellij.openapi.startup.ProjectActivity
+import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
+import com.maddyhome.idea.vim.ui.JoinEap
+import com.maddyhome.idea.vim.ui.JoinEap.EAP_LINK
 
 /**
  * @author Alex Plate
@@ -28,6 +32,10 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
   override suspend fun execute(project: Project) {
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
+
+    if (!VimPlugin.getVimState().wasEAPDisabledByUser && ApplicationManager.getApplication().isEAP && !JoinEap.eapActive()) {
+      UpdateSettings.getInstance().storedPluginHosts += EAP_LINK
+    }
 
     // This code should be executed once
     VimPlugin.getInstance().initialize()
