@@ -42,11 +42,13 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.toReturnTo
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
 import java.awt.event.KeyEvent
 import java.math.BigInteger
 import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 abstract class VimChangeGroupBase : VimChangeGroup {
@@ -1854,6 +1856,107 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
     replaceText(editor, caret, newStart, newEnd, changedText)
+  }
+
+  override fun indentRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    range: TextRange,
+    count: Int,
+    dir: Int,
+    operatorArguments: OperatorArguments,
+  ) {
+    if (logger.isDebug()) {
+      logger.debug("count=$count")
+    }
+
+    // Remember the current caret column
+    val intendedColumn = caret.vimLastColumn
+    val indentConfig = editor.indentConfig
+    val sline = editor.offsetToBufferPosition(range.startOffset).line
+    val endLogicalPosition = editor.offsetToBufferPosition(range.endOffset)
+    val eline = if (endLogicalPosition.column == 0) max((endLogicalPosition.line - 1).toDouble(), 0.0)
+      .toInt() else endLogicalPosition.line
+    if (range.isMultiple) {
+      val from = editor.offsetToBufferPosition(range.startOffset).column
+      if (dir == 1) {
+        // Right shift blockwise selection
+        val indent = indentConfig.createIndentByDepth(count)
+        for (l in sline..eline) {
+          val len = editor.lineLength(l)
+          if (len > from) {
+            val spos = BufferPosition(l, from, false)
+            insertText(editor, caret, spos, indent)
+          }
+        }
+      } else {
+        // Left shift blockwise selection
+        val chars = editor.text()
+        for (l in sline..eline) {
+          val len = editor.lineLength(l)
+          if (len > from) {
+            val spos = BufferPosition(l, from, false)
+            val epos = BufferPosition(l, from + indentConfig.getIndentSize(count) - 1, false)
+            val wsoff = editor.bufferPositionToOffset(spos)
+            val weoff = editor.bufferPositionToOffset(epos)
+            var pos: Int
+            pos = wsoff
+            while (pos <= weoff) {
+              if (charType(editor, chars[pos], false) !== CharacterHelper.CharacterType.WHITESPACE) {
+                break
+              }
+              pos++
+            }
+            if (pos > wsoff) {
+              deleteText(editor, TextRange(wsoff, pos), null, caret, operatorArguments, true)
+            }
+          }
+        }
+      }
+    } else {
+      // Shift non-blockwise selection
+      for (l in sline..eline) {
+        val soff = editor.getLineStartOffset(l)
+        val eoff = editor.getLineEndOffset(l, true)
+        val woff = injector.motion.moveCaretToLineStartSkipLeading(editor, l)
+        val col = editor.offsetToBufferPosition(woff).column
+        val limit = max(0.0, (col + dir * indentConfig.getIndentSize(count)).toDouble())
+          .toInt()
+        if (col > 0 || soff != eoff) {
+          val indent = indentConfig.createIndentBySize(limit)
+          replaceText(editor, caret, soff, woff, indent)
+        }
+      }
+    }
+    if (editor.mode != Mode.INSERT) {
+      if (!range.isMultiple) {
+        // The caret has moved, so reset the intended column before trying to get the expected offset
+        val newCaret = caret.setVimLastColumnAndGetCaret(intendedColumn)
+        val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, sline, caret)
+        newCaret.moveToOffset(offset)
+      } else {
+        caret.moveToOffset(range.startOffset)
+      }
+    }
+  }
+
+  override fun reset() {
+    strokes.clear()
+    repeatCharsCount = 0
+    if (lastStrokes != null) {
+      lastStrokes!!.clear()
+    }
+  }
+
+  override fun saveStrokes(newStrokes: String?) {
+    val chars = newStrokes!!.toCharArray()
+    strokes.add(chars)
+  }
+
+  @TestOnly
+  override fun resetRepeat() {
+    setInsertRepeat(0, 0, false)
   }
 
   companion object {
