@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.Motion
@@ -26,15 +27,19 @@ import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
+import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.toReturnTo
+import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import java.util.*
@@ -1274,6 +1279,147 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       insertBeforeCursor(editor, context)
     }
     return true
+  }
+
+  override fun reformatCodeMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val range = injector.motion.getMotionRange(
+      editor, caret, context, argument,
+      operatorArguments
+    )
+    return range != null && reformatCodeRange(editor, caret, range)
+  }
+
+  override fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection) {
+    val textRange = range.toVimTextRange(true)
+    reformatCodeRange(editor, caret, textRange)
+  }
+
+  protected abstract fun reformatCodeRange(editor: VimEditor, caret: VimCaret, range: TextRange): Boolean
+
+  override fun autoIndentMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ) {
+    val range = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
+    if (range != null) {
+      autoIndentRange(
+        editor, caret, context,
+        TextRange(range.startOffset, range.endOffsetInclusive)
+      )
+    }
+  }
+
+  override fun indentLines(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    lines: Int,
+    dir: Int,
+    operatorArguments: OperatorArguments,
+  ) {
+    val start = caret.offset
+    val end = injector.motion.moveCaretToRelativeLineEnd(editor, caret, lines - 1, true)
+    indentRange(editor, caret, context, TextRange(start, end), 1, dir, operatorArguments)
+  }
+
+  override fun indentMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    dir: Int,
+    operatorArguments: OperatorArguments,
+  ) {
+    val range = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
+    if (range != null) {
+      indentRange(editor, caret, context, range, 1, dir, operatorArguments)
+    }
+  }
+
+  /**
+   * Sort range of text with a given comparator
+   *
+   * @param editor         The editor to replace text in
+   * @param range          The range to sort
+   * @param lineComparator The comparator to use to sort
+   * @param sortOptions     The option to sort the range
+   * @return true if able to sort the text, false if not
+   */
+  override fun sortRange(
+    editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>,
+    sortOptions: SortOption,
+  ): Boolean {
+    val startLine = range.startLine
+    val endLine = range.endLine
+    val count = range.size
+    if (count < 2) {
+      return false
+    }
+    val startOffset = editor.getLineStartOffset(startLine)
+    val endOffset = editor.getLineEndOffset(endLine)
+
+    val selectedText = editor.getText(startOffset, endOffset)
+    val lines = selectedText.split("\n")
+    val modifiedLines = sortOptions.pattern?.let {
+      if (sortOptions.sortOnPattern) {
+        extractPatternFromLines(editor, lines, startLine, it)
+      } else {
+        deletePatternFromLines(editor, lines, startLine, it)
+      }
+    } ?: lines
+    val sortedLines = lines.zip(modifiedLines)
+      .sortedWith { l1, l2 -> lineComparator.compare(l1.second, l2.second) }
+      .map {it.first}
+      .toMutableList()
+
+    if (sortOptions.unique) {
+      val iterator = sortedLines.iterator()
+      var previous: String? = null
+      while (iterator.hasNext()) {
+        val current = iterator.next()
+        if (current == previous || sortOptions.ignoreCase && current.equals(previous, ignoreCase = true)) {
+          iterator.remove()
+        } else {
+          previous = current
+        }
+      }
+    }
+    if (sortedLines.isEmpty()) {
+      return false
+    }
+    replaceText(editor, caret, startOffset, endOffset, sortedLines.joinToString { "\n" })
+    return true
+  }
+
+  private fun extractPatternFromLines(editor: VimEditor, lines: List<String>, startLine: Int, pattern: String): List<String> {
+    val regex = VimRegex(pattern)
+    return lines.mapIndexed { i: Int, line: String ->
+      val result = regex.findInLine(editor, startLine + i, 0)
+      when (result) {
+        is VimMatchResult.Success -> result.value
+        is VimMatchResult.Failure -> line
+      }
+    }
+  }
+
+  private fun deletePatternFromLines(editor: VimEditor, lines: List<String>, startLine: Int, pattern: String): List<String> {
+    val regex = VimRegex(pattern)
+    return lines.mapIndexed { i: Int, line: String ->
+      val result = regex.findInLine(editor, startLine + i, 0)
+      when (result) {
+        is VimMatchResult.Success -> line.substring(result.value.length, line.length)
+        is VimMatchResult.Failure -> line
+      }
+    }
   }
 
   /**
