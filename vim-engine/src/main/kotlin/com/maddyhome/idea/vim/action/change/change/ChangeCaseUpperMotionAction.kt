@@ -11,6 +11,7 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -41,7 +42,7 @@ class ChangeCaseUpperMotionAction : ChangeEditorActionHandler.ForEachCaret(), Du
           editor,
           caret,
           context,
-          CharacterHelper.CASE_UPPER,
+          VimChangeGroup.ChangeCaseType.UPPER,
           argument,
           operatorArguments,
         )

@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
@@ -1275,6 +1276,95 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return true
   }
 
+  /**
+   * Changes the case of all the characters in the range
+   *
+   * @param editor The editor to change
+   * @param caret  The caret to be moved
+   * @param range  The range to change
+   * @param type   The case change type (TOGGLE, UPPER, LOWER)
+   * @return true if able to delete the text, false if not
+   */
+  override fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: VimChangeGroup.ChangeCaseType): Boolean {
+    val starts = range.startOffsets
+    val ends = range.endOffsets
+    for (i in ends.indices.reversed()) {
+      changeCase(editor, caret, starts[i], ends[i], type)
+    }
+    caret.moveToOffset(range.startOffset)
+    return true
+  }
+
+  /**
+   * Changes the case of all the character moved over by the motion argument.
+   *
+   * @param editor   The editor to change
+   * @param caret    The caret on which motion pretends to be performed
+   * @param context  The data context
+   * @param type     The case change type (TOGGLE, UPPER, LOWER)
+   * @param argument The motion command
+   * @return true if able to delete the text, false if not
+   */
+  override fun changeCaseMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext?,
+    type: VimChangeGroup.ChangeCaseType,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val range = injector.motion.getMotionRange(
+      editor, caret, context!!, argument,
+      operatorArguments
+    )
+    return range != null && changeCaseRange(editor, caret, range, type)
+  }
+
+  /**
+   * Toggles the case of count characters
+   *
+   * @param editor The editor to change
+   * @param caret  The caret on which the operation is performed
+   * @param count  The number of characters to change
+   * @return true if able to change count characters
+   */
+  override fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+    val allowWrap = injector.options(editor).whichwrap.contains("~")
+    var motion = injector.motion.getHorizontalMotion(editor, caret, count, true, allowWrap)
+    if (motion is Motion.Error) return false
+    changeCase(editor, caret, caret.offset, (motion as AbsoluteOffset).offset, VimChangeGroup.ChangeCaseType.TOGGLE)
+    motion = injector.motion.getHorizontalMotion(
+      editor,
+      caret,
+      count,
+      false,
+      allowWrap
+    ) // same but without allow end because we can change till end, but can't move caret there
+    if (motion is AbsoluteOffset) {
+      caret.moveToOffset(editor.normalizeOffset(motion.offset, false))
+    }
+    return true
+  }
+
+  /**
+   * This performs the actual case change.
+   *
+   * @param editor The editor to change
+   * @param start  The start offset to change
+   * @param end    The end offset to change
+   * @param type   The type of change (TOGGLE, UPPER, LOWER)
+   */
+  private fun changeCase(editor: VimEditor, caret: VimCaret, start: Int, end: Int, type: VimChangeGroup.ChangeCaseType) {
+    var (newStart, newEnd) = if (start > end) end to start else start to end
+    newEnd = editor.normalizeOffset(newEnd, true)
+    val changedText = buildString {
+      for (i in newStart until newEnd) {
+        append(changeCase(editor.text()[i], type))
+      }
+    }
+    replaceText(editor, caret, newStart, newEnd, changedText)
+  }
+
   companion object {
     private const val MAX_REPEAT_CHARS_COUNT = 10000
     private val logger = vimLogger<VimChangeGroupBase>()
@@ -1307,6 +1397,23 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     const val MAX_HEX_INTEGER: @NonNls String = "ffffffffffffffff"
     val wordMotions: Set<String> =
       setOf(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT)
+  }
+
+  /**
+   * Changes the case of the supplied character based on the supplied change type
+   *
+   * @param ch   The character to change
+   * @param type One of `CASE_TOGGLE`, `CASE_UPPER`, or `CASE_LOWER`
+   * @return The character with changed case or the original if not a letter
+   */
+  private fun changeCase(ch: Char, type: VimChangeGroup.ChangeCaseType): Char = when (type) {
+    VimChangeGroup.ChangeCaseType.TOGGLE -> when {
+      Character.isLowerCase(ch) -> Character.toUpperCase(ch)
+      Character.isUpperCase(ch) -> Character.toLowerCase(ch)
+      else -> ch
+    }
+    VimChangeGroup.ChangeCaseType.LOWER -> Character.toLowerCase(ch)
+    VimChangeGroup.ChangeCaseType.UPPER -> Character.toUpperCase(ch)
   }
 }
 

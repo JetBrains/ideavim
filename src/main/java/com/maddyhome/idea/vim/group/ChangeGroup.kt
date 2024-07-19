@@ -32,28 +32,22 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
-import com.maddyhome.idea.vim.api.anyNonWhitespace
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.IndentConfig.Companion.create
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.group.MotionGroup.Companion.getMotionRange2
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.CharacterHelper
-import com.maddyhome.idea.vim.helper.CharacterHelper.changeCase
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.NumberType
@@ -65,7 +59,6 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
 import com.maddyhome.idea.vim.listener.VimInsertListener
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -146,32 +139,6 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
-  /**
-   * Toggles the case of count characters
-   *
-   * @param editor The editor to change
-   * @param caret  The caret on which the operation is performed
-   * @param count  The number of characters to change
-   * @return true if able to change count characters
-   */
-  override fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
-    val allowWrap = injector.options(editor).whichwrap.contains("~")
-    var motion = injector.motion.getHorizontalMotion(editor, caret, count, true, allowWrap)
-    if (motion is Motion.Error) return false
-    changeCase(editor, caret, caret.offset, (motion as AbsoluteOffset).offset, CharacterHelper.CASE_TOGGLE)
-    motion = injector.motion.getHorizontalMotion(
-      editor,
-      caret,
-      count,
-      false,
-      allowWrap
-    ) // same but without allow end because we can change till end, but can't move caret there
-    if (motion is AbsoluteOffset) {
-      caret.moveToOffset(editor.normalizeOffset(motion.offset, false))
-    }
-    return true
-  }
-
   override fun blockInsert(
     editor: VimEditor,
     context: ExecutionContext,
@@ -215,81 +182,12 @@ class ChangeGroup : VimChangeGroupBase() {
     return true
   }
 
-  /**
-   * Changes the case of all the characters in the range
-   *
-   * @param editor The editor to change
-   * @param caret  The caret to be moved
-   * @param range  The range to change
-   * @param type   The case change type (TOGGLE, UPPER, LOWER)
-   * @return true if able to delete the text, false if not
-   */
-  override fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: Char): Boolean {
-    val starts = range.startOffsets
-    val ends = range.endOffsets
-    for (i in ends.indices.reversed()) {
-      changeCase(editor, caret, starts[i], ends[i], type)
-    }
-    caret.moveToOffset(range.startOffset)
-    return true
-  }
-
-  /**
-   * This performs the actual case change.
-   *
-   * @param editor The editor to change
-   * @param start  The start offset to change
-   * @param end    The end offset to change
-   * @param type   The type of change (TOGGLE, UPPER, LOWER)
-   */
-  private fun changeCase(editor: VimEditor, caret: VimCaret, start: Int, end: Int, type: Char) {
-    var start = start
-    var end = end
-    if (start > end) {
-      val t = end
-      end = start
-      start = t
-    }
-    end = editor.normalizeOffset(end, true)
-    val chars = editor.text()
-    val sb = StringBuilder()
-    for (i in start until end) {
-      sb.append(changeCase(chars[i], type))
-    }
-    replaceText(editor, caret, start, end, sb.toString())
-  }
-
   private fun restoreCursor(editor: VimEditor, caret: VimCaret, startLine: Int) {
     if (caret != editor.primaryCaret()) {
       (editor as IjVimEditor).editor.caretModel.addCaret(
         editor.editor.offsetToVisualPosition(injector.motion.moveCaretToLineStartSkipLeading(editor, startLine)), false
       )
     }
-  }
-
-  /**
-   * Changes the case of all the character moved over by the motion argument.
-   *
-   * @param editor   The editor to change
-   * @param caret    The caret on which motion pretends to be performed
-   * @param context  The data context
-   * @param type     The case change type (TOGGLE, UPPER, LOWER)
-   * @param argument The motion command
-   * @return true if able to delete the text, false if not
-   */
-  override fun changeCaseMotion(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext?,
-    type: Char,
-    argument: Argument,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val range = injector.motion.getMotionRange(
-      editor, caret, context!!, argument,
-      operatorArguments
-    )
-    return range != null && changeCaseRange(editor, caret, range, type)
   }
 
   override fun reformatCodeMotion(
