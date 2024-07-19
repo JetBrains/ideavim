@@ -273,7 +273,6 @@ internal object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
 
   override fun actionPerformed(e: AnActionEvent) {
     if (eapActive()) {
-      VimPlugin.getVimState().wasEAPDisabledByUser = true
       UpdateSettings.getInstance().storedPluginHosts -= EAP_LINK
       VimPlugin.getNotifications(e.project).notifyEapFinished()
     } else {
