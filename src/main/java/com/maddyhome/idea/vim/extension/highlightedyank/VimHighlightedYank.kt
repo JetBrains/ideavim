@@ -23,13 +23,15 @@ import com.intellij.util.Alarm
 import com.intellij.util.Alarm.ThreadToUse
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.NonNls
@@ -75,7 +77,7 @@ internal class HighlightColorResetter : LafManagerListener {
  *
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
-internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
+internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeListener {
   private val highlightHandler = HighlightHandler()
   private var initialised = false
 
@@ -84,7 +86,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
   override fun init() {
     // Note that these listeners will still be registered when IdeaVim is disabled. However, they'll never get called
     VimPlugin.getYank().addListener(this)
-    VimPlugin.getChange().addInsertListener(this)
+    injector.listenersNotifier.modeChangeListeners.add(this)
 
     // Register our own disposable to remove highlights when IdeaVim is disabled. Somehow, we need to re-register when
     // IdeaVim is re-enabled. We don't get a call back for that, but because the listeners are active until the
@@ -106,7 +108,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
   override fun dispose() {
     // Called when the extension is disabled with `:set no{extension}` or if the plugin owning the extension unloads
     VimPlugin.getYank().removeListener(this)
-    VimPlugin.getChange().removeInsertListener(this)
+    injector.listenersNotifier.modeChangeListeners.remove(this)
 
     highlightHandler.clearYankHighlighters()
     initialised = false
@@ -117,7 +119,8 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
     highlightHandler.highlightYankRange(editor.ij, range)
   }
 
-  override fun insertModeStarted(editor: Editor) {
+  override fun modeChanged(editor: VimEditor, oldMode: Mode) {
+    if (editor.mode !is Mode.INSERT) return
     ensureInitialised()
     highlightHandler.clearYankHighlighters()
   }

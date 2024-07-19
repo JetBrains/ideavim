@@ -486,7 +486,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       editor.insertMode = mode == Mode.INSERT
       editor.mode = mode
     }
-    notifyListeners(editor)
   }
 
   override fun runEnterAction(editor: VimEditor, context: ExecutionContext) {
