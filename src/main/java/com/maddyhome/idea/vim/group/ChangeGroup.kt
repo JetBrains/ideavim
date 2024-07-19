@@ -162,22 +162,7 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
-  override fun reformatCodeRange(editor: VimEditor, caret: VimCaret, range: TextRange): Boolean {
-    val starts = range.startOffsets
-    val ends = range.endOffsets
-    val firstLine = editor.offsetToBufferPosition(range.startOffset).line
-    for (i in ends.indices.reversed()) {
-      val startOffset = editor.getLineStartForOffset(starts[i])
-      val offset = ends[i] - if (startOffset == ends[i]) 0 else 1
-      val endOffset = editor.getLineEndForOffset(offset)
-      reformatCode(editor, startOffset, endOffset)
-    }
-    val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
-    caret.moveToOffset(newOffset)
-    return true
-  }
-
-  private fun reformatCode(editor: VimEditor, start: Int, end: Int) {
+  override fun reformatCode(editor: VimEditor, start: Int, end: Int) {
     val project = (editor as IjVimEditor).editor.project ?: return
     val file = PsiUtilBase.getPsiFileInEditor(editor.editor, project) ?: return
     val textRange = com.intellij.openapi.util.TextRange.create(start, end)

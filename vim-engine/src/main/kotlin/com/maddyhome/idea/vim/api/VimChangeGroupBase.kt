@@ -1008,6 +1008,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return res
   }
 
+  protected abstract fun reformatCode(editor: VimEditor, start: Int, end: Int)
+
   /**
    * Clears all the keystrokes from the current insert command
    *
@@ -1303,7 +1305,20 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     reformatCodeRange(editor, caret, textRange)
   }
 
-  protected abstract fun reformatCodeRange(editor: VimEditor, caret: VimCaret, range: TextRange): Boolean
+  private fun reformatCodeRange(editor: VimEditor, caret: VimCaret, range: TextRange): Boolean {
+    val starts = range.startOffsets
+    val ends = range.endOffsets
+    val firstLine = editor.offsetToBufferPosition(range.startOffset).line
+    for (i in ends.indices.reversed()) {
+      val startOffset = editor.getLineStartForOffset(starts[i])
+      val offset = ends[i] - if (startOffset == ends[i]) 0 else 1
+      val endOffset = editor.getLineEndForOffset(offset)
+      reformatCode(editor, startOffset, endOffset)
+    }
+    val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
+    caret.moveToOffset(newOffset)
+    return true
+  }
 
   override fun autoIndentMotion(
     editor: VimEditor,
