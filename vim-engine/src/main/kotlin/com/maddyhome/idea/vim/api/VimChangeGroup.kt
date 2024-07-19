@@ -172,7 +172,6 @@ interface VimChangeGroup {
 
   @TestOnly
   fun resetRepeat()
-  fun notifyListeners(editor: VimEditor)
   fun runEnterAction(editor: VimEditor, context: ExecutionContext)
   fun runEnterAboveAction(editor: VimEditor, context: ExecutionContext)
 

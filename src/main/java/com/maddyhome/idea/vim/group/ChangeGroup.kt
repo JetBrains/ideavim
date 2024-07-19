@@ -22,7 +22,6 @@ import com.intellij.openapi.editor.event.EditorMouseListener
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtilBase
-import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -46,7 +45,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
-import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -54,7 +52,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.TestOnly
-import java.util.function.Consumer
 import kotlin.math.max
 import kotlin.math.min
 
@@ -62,7 +59,6 @@ import kotlin.math.min
  * Provides all the insert/replace related functionality
  */
 class ChangeGroup : VimChangeGroupBase() {
-  private val insertListeners = ContainerUtil.createLockFreeCopyOnWriteList<VimInsertListener>()
   private val listener: EditorMouseListener = object : EditorMouseListener {
     override fun mouseClicked(event: EditorMouseEvent) {
       val editor = event.editor
@@ -346,18 +342,6 @@ class ChangeGroup : VimChangeGroupBase() {
   override fun saveStrokes(newStrokes: String?) {
     val chars = newStrokes!!.toCharArray()
     strokes.add(chars)
-  }
-
-  fun addInsertListener(listener: VimInsertListener) {
-    insertListeners.add(listener)
-  }
-
-  fun removeInsertListener(listener: VimInsertListener) {
-    insertListeners.remove(listener)
-  }
-
-  override fun notifyListeners(editor: VimEditor) {
-    insertListeners.forEach(Consumer { listener: VimInsertListener -> listener.insertModeStarted((editor as IjVimEditor).editor) })
   }
 
   @TestOnly
