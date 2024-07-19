@@ -20,13 +20,10 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
 
 open class YankGroupBase : VimYankGroup {
-  private val yankListeners: MutableList<VimYankListener> = ArrayList()
-
   private fun yankRange(
     editor: VimEditor,
     caretToRange: Map<ImmutableVimCaret, TextRange>,
@@ -38,7 +35,9 @@ open class YankGroupBase : VimYankGroup {
       caret.moveToOffset(offset)
     }
 
-    notifyListeners(editor, range)
+    for ((caret, caretRange) in caretToRange) {
+      injector.listenersNotifier.notifyYankPerformed(caret, caretRange)
+    }
 
     var result = true
     for ((caret, myRange) in caretToRange) {
@@ -187,11 +186,5 @@ open class YankGroupBase : VimYankGroup {
     } else {
       yankRange(editor, caretToRange, range, type, null)
     }
-  }
-
-  override fun addListener(listener: VimYankListener): Boolean = yankListeners.add(listener)
-  override fun removeListener(listener: VimYankListener): Boolean = yankListeners.remove(listener)
-  override fun notifyListeners(editor: VimEditor, textRange: TextRange): Unit = yankListeners.forEach {
-    it.yankPerformed(editor, textRange)
   }
 }

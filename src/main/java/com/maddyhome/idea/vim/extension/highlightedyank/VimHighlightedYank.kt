@@ -22,14 +22,16 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.util.Alarm
 import com.intellij.util.Alarm.ThreadToUse
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.VimYankListener
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -85,8 +87,8 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
 
   override fun init() {
     // Note that these listeners will still be registered when IdeaVim is disabled. However, they'll never get called
-    VimPlugin.getYank().addListener(this)
     injector.listenersNotifier.modeChangeListeners.add(this)
+    injector.listenersNotifier.yankListeners.add(this)
 
     // Register our own disposable to remove highlights when IdeaVim is disabled. Somehow, we need to re-register when
     // IdeaVim is re-enabled. We don't get a call back for that, but because the listeners are active until the
@@ -107,16 +109,16 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
 
   override fun dispose() {
     // Called when the extension is disabled with `:set no{extension}` or if the plugin owning the extension unloads
-    VimPlugin.getYank().removeListener(this)
     injector.listenersNotifier.modeChangeListeners.remove(this)
+    injector.listenersNotifier.yankListeners.remove(this)
 
     highlightHandler.clearYankHighlighters()
     initialised = false
   }
 
-  override fun yankPerformed(editor: VimEditor, range: TextRange) {
+  override fun yankPerformed(caret: ImmutableVimCaret, range: TextRange) {
     ensureInitialised()
-    highlightHandler.highlightYankRange(editor.ij, range)
+    highlightHandler.highlightYankRange(caret.editor.ij, range)
   }
 
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
