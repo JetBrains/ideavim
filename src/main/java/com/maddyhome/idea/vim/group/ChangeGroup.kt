@@ -146,50 +146,6 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
-  override fun getDeleteRangeAndType2(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument,
-    isChange: Boolean,
-    operatorArguments: OperatorArguments,
-  ): Pair<TextRange, SelectionType>? {
-    val range = getMotionRange2(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      (context as IjEditorExecutionContext).context,
-      argument,
-      operatorArguments
-    )
-      ?: return null
-
-    // Delete motion commands that are not linewise become linewise if all the following are true:
-    // 1) The range is across multiple lines
-    // 2) There is only whitespace before the start of the range
-    // 3) There is only whitespace after the end of the range
-    var type: SelectionType
-    type = if (argument.motion.isLinewiseMotion()) {
-      SelectionType.LINE_WISE
-    } else {
-      SelectionType.CHARACTER_WISE
-    }
-    val motion = argument.motion
-    if (!isChange && !motion.isLinewiseMotion()) {
-      val start = editor.offsetToBufferPosition(range.startOffset)
-      val end = editor.offsetToBufferPosition(range.endOffset)
-      if (start.line != end.line) {
-        val offset1 = range.startOffset
-        if (!editor.anyNonWhitespace(offset1, -1)) {
-          val offset = range.endOffset
-          if (!editor.anyNonWhitespace(offset, 1)) {
-            type = SelectionType.LINE_WISE
-          }
-        }
-      }
-    }
-    return Pair(range, type)
-  }
-
   /**
    * Toggles the case of count characters
    *
