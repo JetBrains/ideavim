@@ -86,8 +86,6 @@ interface VimChangeGroup {
 
   fun getDeleteRangeAndType(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
-  fun getDeleteRangeAndType2(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
-
   fun deleteRange(
     editor: VimEditor,
     caret: VimCaret,
