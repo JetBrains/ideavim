@@ -124,7 +124,7 @@ dependencies {
     testFramework(TestFrameworkType.JUnit5)
 
     // AceJump is an optional dependency. We use their SessionManager class to check if it's active
-    plugin("AceJump", "3.8.11")
+    plugin("AceJump", "3.8.19")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
@@ -191,7 +191,14 @@ tasks {
       // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
       // For the list of bundled versions
       apiVersion = "1.9"
-      freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
+      freeCompilerArgs = listOf(
+        "-Xjvm-default=all-compatibility",
+
+        // Needed to compile the AceJump which uses kotlin beta
+        //  Without these two option compilation fails
+        "-Xskip-prerelease-check",
+        "-Xallow-unstable-dependencies",
+      )
 //            allWarningsAsErrors = true
     }
   }
@@ -200,6 +207,10 @@ tasks {
     kotlinOptions {
       jvmTarget = javaVersion
       apiVersion = "1.9"
+
+      // Needed to compile the AceJump which uses kotlin beta
+      //  Without these two option compilation fails
+      freeCompilerArgs += listOf("-Xskip-prerelease-check", "-Xallow-unstable-dependencies")
 //            allWarningsAsErrors = true
     }
   }
