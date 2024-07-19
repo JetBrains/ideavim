@@ -144,6 +144,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Run Integrations"
       tasks = "releaseActions"
+      gradleParams = "--no-configuration-cache"
     }
 //    gradle {
 //      name = "Slack Notification"
