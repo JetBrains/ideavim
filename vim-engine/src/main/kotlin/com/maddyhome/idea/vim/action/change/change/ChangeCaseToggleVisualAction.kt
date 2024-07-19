@@ -11,6 +11,7 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
@@ -35,6 +36,6 @@ class ChangeCaseToggleVisualAction : VisualOperatorActionHandler.ForEachCaret() 
     operatorArguments: OperatorArguments,
   ): Boolean {
     return injector.changeGroup
-      .changeCaseRange(editor, caret, range.toVimTextRange(false), CharacterHelper.CASE_TOGGLE)
+      .changeCaseRange(editor, caret, range.toVimTextRange(false), VimChangeGroup.ChangeCaseType.TOGGLE)
   }
 }

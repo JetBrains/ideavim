@@ -114,7 +114,7 @@ interface VimChangeGroup {
 
   fun blockInsert(editor: VimEditor, context: ExecutionContext, range: TextRange, append: Boolean, operatorArguments: OperatorArguments): Boolean
 
-  fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: Char): Boolean
+  fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: ChangeCaseType): Boolean
 
   fun changeRange(
     editor: VimEditor,
@@ -125,7 +125,7 @@ interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: Char, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: ChangeCaseType, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
   fun reformatCodeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
@@ -193,4 +193,10 @@ interface VimChangeGroup {
 
   fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)
   fun replaceText(editor: VimEditor, caret: VimCaret, start: Int, end: Int, str: String)
+
+  enum class ChangeCaseType {
+    LOWER,
+    UPPER,
+    TOGGLE,
+  }
 }

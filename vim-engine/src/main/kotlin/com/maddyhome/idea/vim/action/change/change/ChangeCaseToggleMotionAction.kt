@@ -11,6 +11,7 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -18,7 +19,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.helper.CharacterHelper
 
 @CommandOrMotion(keys = ["g~"], modes = [Mode.NORMAL])
 class ChangeCaseToggleMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
@@ -41,7 +41,7 @@ class ChangeCaseToggleMotionAction : ChangeEditorActionHandler.ForEachCaret(), D
           editor,
           caret,
           context,
-          CharacterHelper.CASE_TOGGLE,
+          VimChangeGroup.ChangeCaseType.TOGGLE,
           argument,
           operatorArguments,
         )
