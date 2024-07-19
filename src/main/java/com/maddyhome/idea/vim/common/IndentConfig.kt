@@ -12,17 +12,17 @@ import com.intellij.application.options.CodeStyle
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings.IndentOptions
+import com.maddyhome.idea.vim.api.VimIndentConfig
 
-internal class IndentConfig private constructor(indentOptions: IndentOptions) {
+internal class IndentConfig private constructor(indentOptions: IndentOptions): VimIndentConfig {
   private val indentSize = indentOptions.INDENT_SIZE
   private val tabSize = indentOptions.TAB_SIZE
   private val isUseTabs = indentOptions.USE_TAB_CHARACTER
 
-  fun getTotalIndent(count: Int): Int = indentSize * count
+  override fun getIndentSize(depth: Int): Int = indentSize * depth
+  override fun createIndentByDepth(depth: Int): String = createIndentBySize(getIndentSize(depth))
 
-  fun createIndentByCount(count: Int): String = createIndentBySize(getTotalIndent(count))
-
-  fun createIndentBySize(size: Int): String {
+  override fun createIndentBySize(size: Int): String {
     val tabCount: Int
     val spaceCount: Int
     if (isUseTabs) {

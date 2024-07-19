@@ -147,6 +147,7 @@ interface VimEditor {
 
   val lfMakesNewLine: Boolean
   var vimChangeActionSwitchMode: Mode?
+  val indentConfig: VimIndentConfig
 
   fun fileSize(): Long
 

@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFoldRegion
+import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
@@ -38,6 +39,7 @@ import com.maddyhome.idea.vim.api.VirtualFile
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.IndentConfig
+import com.maddyhome.idea.vim.common.IndentConfig.Companion.create
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
@@ -78,6 +80,8 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     set(value) {
       editor.vimChangeActionSwitchMode = value
     }
+  override val indentConfig: VimIndentConfig
+    get() = create(editor)
 
   override fun fileSize(): Long = editor.fileSize.toLong()
 
