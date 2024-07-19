@@ -124,7 +124,7 @@ dependencies {
     testFramework(TestFrameworkType.JUnit5)
 
     // AceJump is an optional dependency. We use their SessionManager class to check if it's active
-    plugin("AceJump", "3.8.19")
+    plugin("AceJump", "3.8.11")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
