@@ -18,14 +18,14 @@ import java.awt.Point
 fun RemoteText.doubleClickOnRight(shiftX: Int, fixture: Fixture, button: MouseButton = MouseButton.LEFT_BUTTON) {
   fixture.runJs("""
     const updatedPoint = new Point(${this.point.x + shiftX}, ${this.point.y});
-    robot.click(component, updatedPoint, $button, 2)
+    robot.click(component, updatedPoint, MouseButton.$button, 2)
   """.trimIndent())
 }
 
 fun RemoteText.tripleClickOnRight(shiftX: Int, fixture: Fixture, button: MouseButton = MouseButton.LEFT_BUTTON) {
   fixture.runJs("""
     const updatedPoint = new Point(${this.point.x + shiftX}, ${this.point.y});
-    robot.click(component, updatedPoint, $button, 3)
+    robot.click(component, updatedPoint, MouseButton.$button, 3)
   """.trimIndent())
 }
 
