@@ -222,6 +222,25 @@ tasks {
 //    localPath = file("/Users/{user}/Applications/WebStorm.app")
 //  }
 
+  val runIdeForUiTests by intellijPlatformTesting.runIde.registering {
+    task {
+      jvmArgumentProviders += CommandLineArgumentProvider {
+        listOf(
+          "-Drobot-server.port=8082",
+          "-Dide.mac.message.dialogs.as.sheets=false",
+          "-Djb.privacy.policy.text=<!--999.999-->",
+          "-Djb.consents.confirmation.enabled=false",
+          "-Dide.show.tips.on.startup.default.value=false",
+          "-Doctopus.handler=" + (System.getProperty("octopus.handler") ?: true),
+        )
+      }
+    }
+
+    plugins {
+      robotServerPlugin(remoteRobotVersion)
+    }
+  }
+
   val runIdeSplitMode by intellijPlatformTesting.runIde.registering {
     splitMode = true
     splitModeTarget = SplitModeAware.SplitModeTarget.FRONTEND
@@ -229,19 +248,6 @@ tasks {
     // Frontend split mode support requires 242+
     // TODO: Remove this once IdeaVim targets 242, as the task will naturally use the target version to run
     version.set(splitModeVersion)
-  }
-
-  // Start the default IDE with both IdeaVim and the robot server plugin installed, ready to run a UI test task. The
-  // robot server plugin is automatically added as a dependency to this task, and Gradle will take care of downloading.
-  // Note that the CustomTestIdeUiTask can be used to run tests against a different IDE
-  testIdeUi {
-    systemProperty("robot-server.port", "8082")
-    systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-    systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-    systemProperty("jb.consents.confirmation.enabled", "false")
-    systemProperty("ide.show.tips.on.startup.default.value", "false")
-
-    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
   }
 
   // Add plugin open API sources to the plugin ZIP

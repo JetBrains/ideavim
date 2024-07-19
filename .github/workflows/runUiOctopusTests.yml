@@ -23,7 +23,7 @@ jobs:
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle testIdeUi -Doctopus.handler=false > build/reports/idea.log &
+          gradle runIdeForUiTests -Doctopus.handler=false > build/reports/idea.log &
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
@@ -63,7 +63,7 @@ jobs:
 #          export DISPLAY=:99.0
 #          Xvfb -ac :99 -screen 0 1920x1080x16 &
 #          mkdir -p build/reports
-#          gradle :testIdeUi #> build/reports/idea.log
+#          gradle :runIdeForUiTests #> build/reports/idea.log
 #      - name: Wait for Idea started
 #        uses: jtalk/url-health-check-action@1.5
 #        with:
