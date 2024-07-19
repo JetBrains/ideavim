@@ -136,7 +136,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun <T : VimDataType> resetToGlobalValue(option: Option<T>, scope: OptionAccessScope, editor: VimEditor) {
-    val newValue = if (scope is OptionAccessScope.LOCAL && option.declaredScope.isGlobalLocal()
+    val newValue: OptionValue<T> = if (scope is OptionAccessScope.LOCAL && option.declaredScope.isGlobalLocal()
       && (option is NumberOption || option is ToggleOption)) {
       OptionValue.Default(option.unsetValue)
     }

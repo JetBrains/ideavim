@@ -10,8 +10,8 @@ plugins {
     java
     kotlin("jvm")
 //    id("org.jlleitschuh.gradle.ktlint")
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
-    kotlin("plugin.serialization") version "1.9.22"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.23"
+    kotlin("plugin.serialization") version "2.0.0"
     `maven-publish`
     antlr
 }

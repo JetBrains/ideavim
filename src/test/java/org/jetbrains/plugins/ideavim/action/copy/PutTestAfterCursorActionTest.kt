@@ -175,8 +175,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     override fun collectTransferableData(
       file: PsiFile,
       editor: Editor,
-      startOffsets: IntArray?,
-      endOffsets: IntArray?,
+      startOffsets: IntArray,
+      endOffsets: IntArray,
     ): List<TextBlockTransferableData> {
       return emptyList()
     }
