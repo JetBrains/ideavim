@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.api.EngineEditorHelper
+import com.maddyhome.idea.vim.api.EngineEditorHelperBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimRangeMarker
 import com.maddyhome.idea.vim.api.VimVisualPosition
@@ -22,7 +23,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
 @Service
-internal class IjEditorHelper : EngineEditorHelper {
+internal class IjEditorHelper : EngineEditorHelperBase() {
   override fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int {
     return (editor as IjVimEditor).editor.amountOfInlaysBeforeVisualPosition(
       VisualPosition(
@@ -49,10 +50,6 @@ internal class IjEditorHelper : EngineEditorHelper {
 
   override fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int {
     return EditorHelper.getVisualLineAtBottomOfScreen(editor.ij)
-  }
-
-  override fun pad(editor: VimEditor, line: Int, to: Int): String {
-    return EditorHelper.pad(editor.ij, line, to)
   }
 
   override fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition {

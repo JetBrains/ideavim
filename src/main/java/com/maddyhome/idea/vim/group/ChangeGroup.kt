@@ -15,7 +15,6 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
@@ -27,25 +26,18 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.commandContinuation
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import kotlin.math.min
 
 /**
@@ -109,49 +101,6 @@ class ChangeGroup : VimChangeGroupBase() {
         editor.insertMode = false
       }
     }
-  }
-
-  override fun blockInsert(
-    editor: VimEditor,
-    context: ExecutionContext,
-    range: TextRange,
-    append: Boolean,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val lines = getLinesCountInVisualBlock(editor, range)
-    val startPosition = editor.offsetToBufferPosition(range.startOffset)
-    val mode = operatorArguments.mode
-    val visualBlockMode = mode is VISUAL && mode.selectionType === SelectionType.BLOCK_WISE
-    for (caret in editor.carets()) {
-      val line = startPosition.line
-      var column = startPosition.column
-      if (!visualBlockMode) {
-        column = 0
-      } else if (append) {
-        column += range.maxLength
-        if (caret.vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
-          column = VimMotionGroupBase.LAST_COLUMN
-        }
-      }
-      val lineLength = editor.lineLength(line)
-      if (column < VimMotionGroupBase.LAST_COLUMN && lineLength < column) {
-        val pad = EditorHelper.pad((editor as IjVimEditor).editor, line, column)
-        val offset = editor.getLineEndOffset(line)
-        insertText(editor, caret, offset, pad)
-      }
-      if (visualBlockMode || !append) {
-        (caret as IjVimCaret).caret.moveToInlayAwareLogicalPosition(LogicalPosition(line, column))
-      }
-      if (visualBlockMode) {
-        setInsertRepeat(lines, column, append)
-      }
-    }
-    if (visualBlockMode || !append) {
-      insertBeforeCursor(editor, context)
-    } else {
-      insertAfterCursor(editor, context)
-    }
-    return true
   }
 
   private fun restoreCursor(editor: VimEditor, caret: VimCaret, startLine: Int) {
