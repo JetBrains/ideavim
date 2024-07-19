@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.helper.NumberType
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
@@ -42,6 +43,7 @@ import com.maddyhome.idea.vim.state.mode.toReturnTo
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
+import java.math.BigInteger
 import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.abs
@@ -1419,6 +1421,350 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         is VimMatchResult.Success -> line.substring(result.value.length, line.length)
         is VimMatchResult.Failure -> line
       }
+    }
+  }
+
+  override fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+    val nf: List<String> = injector.options(editor).nrformats
+    val alpha = nf.contains("alpha")
+    val hex = nf.contains("hex")
+    val octal = nf.contains("octal")
+    val range = findNumberUnderCursor(editor, caret, alpha, hex, octal)
+    if (range == null) {
+      logger.debug("no number on line")
+      return false
+    }
+    val newNumber = changeNumberInRange(editor, range, count, alpha, hex, octal)
+    return if (newNumber == null) {
+      false
+    } else {
+      replaceText(editor, caret, range.first.startOffset, range.first.endOffset, newNumber)
+      caret.moveToInlayAwareOffset(range.first.startOffset + newNumber.length - 1)
+      true
+    }
+  }
+
+  private fun changeNumberInRange(
+    editor: VimEditor,
+    range: Pair<TextRange, NumberType>,
+    count: Int,
+    alpha: Boolean,
+    hex: Boolean,
+    octal: Boolean,
+  ): String? {
+    val text = editor.getText(range.first)
+    val numberType = range.second
+    if (logger.isDebug()) {
+      logger.debug("found range $range")
+      logger.debug("text=$text")
+    }
+    var number = text
+    if (text.isEmpty()) {
+      return null
+    }
+    var ch = text[0]
+    if (hex && NumberType.HEX == numberType) {
+      if (!text.lowercase(Locale.getDefault()).startsWith(HEX_START)) {
+        throw RuntimeException("Hex number should start with 0x: $text")
+      }
+      for (i in text.length - 1 downTo 2) {
+        val index = "abcdefABCDEF".indexOf(text[i])
+        if (index >= 0) {
+          lastLower = index < 6
+          break
+        }
+      }
+      var num = BigInteger(text.substring(2), 16)
+      num = num.add(BigInteger.valueOf(count.toLong()))
+      if (num.compareTo(BigInteger.ZERO) < 0) {
+        num = BigInteger(MAX_HEX_INTEGER, 16).add(BigInteger.ONE).add(num)
+      }
+      number = num.toString(16)
+      number = number.padStart(text.length - 2, '0')
+      if (!lastLower) {
+        number = number.uppercase(Locale.getDefault())
+      }
+      number = text.substring(0, 2) + number
+    } else if (octal && NumberType.OCT == numberType && text.length > 1) {
+      if (!text.startsWith("0")) throw RuntimeException("Oct number should start with 0: $text")
+      var num = BigInteger(text, 8).add(BigInteger.valueOf(count.toLong()))
+      if (num.compareTo(BigInteger.ZERO) < 0) {
+        num = BigInteger("1777777777777777777777", 8).add(BigInteger.ONE).add(num)
+      }
+      number = num.toString(8)
+      number = "0" + number.padStart(text.length - 1, '0')
+    } else if (alpha && NumberType.ALPHA == numberType) {
+      if (!Character.isLetter(ch)) throw RuntimeException("Not alpha number : $text")
+      ch += count.toChar().code
+      if (Character.isLetter(ch)) {
+        number = ch.toString()
+      }
+    } else if (NumberType.DEC == numberType) {
+      if (ch != '-' && !Character.isDigit(ch)) throw RuntimeException("Not dec number : $text")
+      var pad = ch == '0'
+      var len = text.length
+      if (ch == '-' && text[1] == '0') {
+        pad = true
+        len--
+      }
+      var num = BigInteger(text)
+      num = num.add(BigInteger.valueOf(count.toLong()))
+      number = num.toString()
+      if (!octal && pad) {
+        var neg = false
+        if (number[0] == '-') {
+          neg = true
+          number = number.substring(1)
+        }
+        number = number.padStart(len, '0')
+        if (neg) {
+          number = "-$number"
+        }
+      }
+    }
+    return number
+  }
+
+  /**
+   * Perform increment and decrement for numbers in visual mode
+   *
+   *
+   * Flag [avalanche] marks if increment (or decrement) should be performed in avalanche mode
+   * (for v_g_Ctrl-A and v_g_Ctrl-X commands)
+   *
+   * @return true
+   */
+  override fun changeNumberVisualMode(
+    editor: VimEditor,
+    caret: VimCaret,
+    selectedRange: TextRange,
+    count: Int,
+    avalanche: Boolean,
+  ): Boolean {
+
+    val nf: List<String> = injector.options(editor).nrformats
+    val alpha = nf.contains("alpha")
+    val hex = nf.contains("hex")
+    val octal = nf.contains("octal")
+    val numberRanges = findNumbersInRange(editor, selectedRange, alpha, hex, octal)
+    val newNumbers: MutableList<String?> = ArrayList()
+    for (i in numberRanges.indices) {
+      val numberRange = numberRanges[i]
+      val iCount = if (avalanche) (i + 1) * count else count
+      val newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal)
+      newNumbers.add(newNumber)
+    }
+    for (i in newNumbers.indices.reversed()) {
+      // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
+      val (first) = numberRanges[i]
+      val newNumber = newNumbers[i]
+      replaceText(editor, caret, first.startOffset, first.endOffset, newNumber!!)
+    }
+    caret.moveToInlayAwareOffset(selectedRange.startOffset)
+    return true
+  }
+
+  private fun findNumberUnderCursor(
+    editor: VimEditor,
+    caret: VimCaret,
+    alpha: Boolean,
+    hex: Boolean,
+    octal: Boolean,
+  ): Pair<TextRange, NumberType>? {
+    val lline = caret.getBufferPosition().line
+    val text = editor.getLineText(lline).lowercase(Locale.getDefault())
+    val startLineOffset = editor.getLineStartOffset(lline)
+    val posOnLine = caret.offset - startLineOffset
+
+    val numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal) ?: return null
+
+    return Pair(
+      TextRange(
+        numberTextRange.first.startOffset + startLineOffset,
+        numberTextRange.first.endOffset + startLineOffset
+      ),
+      numberTextRange.second
+    )
+  }
+
+  fun findNumbersInRange(
+    editor: VimEditor,
+    textRange: TextRange,
+    alpha: Boolean,
+    hex: Boolean,
+    octal: Boolean,
+  ): List<Pair<TextRange, NumberType>> {
+    val result: MutableList<Pair<TextRange, NumberType>> = ArrayList()
+
+
+    for (i in 0 until textRange.size()) {
+      val startOffset = textRange.startOffsets[i]
+      val end = textRange.endOffsets[i]
+      val text: String = editor.getText(startOffset, end)
+      val textChunks = text.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+      var chunkStart = 0
+      for (chunk in textChunks) {
+        val number = findNumberInText(chunk, 0, alpha, hex, octal)
+
+        if (number != null) {
+          result.add(
+            Pair(
+              TextRange(
+                number.first.startOffset + startOffset + chunkStart,
+                number.first.endOffset + startOffset + chunkStart
+              ),
+              number.second
+            )
+          )
+        }
+        chunkStart += 1 + chunk.length
+      }
+    }
+    return result
+  }
+
+  /**
+   * Search for number in given text from start position
+   *
+   * @param textInRange    - text to search in
+   * @param startPosOnLine - start offset to search
+   * @return - text range with number
+   */
+  protected fun findNumberInText(
+    textInRange: String,
+    startPosOnLine: Int,
+    alpha: Boolean,
+    hex: Boolean,
+    octal: Boolean,
+  ): Pair<TextRange, NumberType>? {
+    if (logger.isDebug()) {
+      logger.debug("text=$textInRange")
+    }
+
+    var pos = startPosOnLine
+    val lineEndOffset = textInRange.length
+
+    while (true) {
+      // Skip over current whitespace if any
+      while (pos < lineEndOffset && !isNumberChar(textInRange[pos], alpha, hex, octal, true)) {
+        pos++
+      }
+
+      if (logger.isDebug()) logger.debug("pos=$pos")
+      if (pos >= lineEndOffset) {
+        logger.debug("no number char on line")
+        return null
+      }
+
+      val isHexChar = "abcdefABCDEF".indexOf(textInRange[pos]) >= 0
+
+      if (hex) {
+        // Ox and OX handling
+        if (textInRange[pos] == '0' && pos < lineEndOffset - 1 && "xX".indexOf(textInRange[pos + 1]) >= 0) {
+          pos += 2
+        } else if ("xX".indexOf(textInRange[pos]) >= 0 && pos > 0 && textInRange[pos - 1] == '0') {
+          pos++
+        }
+
+        logger.debug("checking hex")
+        val range = findRange(textInRange, pos, false, true, false, false)
+        val start = range.first
+        val end = range.second
+
+        // Ox and OX
+        if (start >= 2 && textInRange.substring(start - 2, start).equals("0x", ignoreCase = true)) {
+          logger.debug("found hex")
+          return Pair(TextRange(start - 2, end), NumberType.HEX)
+        }
+
+        if (!isHexChar || alpha) {
+          break
+        } else {
+          pos++
+        }
+      } else {
+        break
+      }
+    }
+
+    if (octal) {
+      logger.debug("checking octal")
+      val range = findRange(textInRange, pos, false, false, true, false)
+      val start = range.first
+      val end = range.second
+
+      if (end - start == 1 && textInRange[start] == '0') {
+        return Pair(TextRange(start, end), NumberType.DEC)
+      }
+      if (textInRange[start] == '0' && end > start &&
+        !(start > 0 && isNumberChar(textInRange[start - 1], false, false, false, true))
+      ) {
+        logger.debug("found octal")
+        return Pair(TextRange(start, end), NumberType.OCT)
+      }
+    }
+
+    if (alpha) {
+      if (logger.isDebug()) logger.debug("checking alpha for " + textInRange[pos])
+      if (isNumberChar(textInRange[pos], true, false, false, false)) {
+        if (logger.isDebug()) logger.debug("found alpha at $pos")
+        return Pair(TextRange(pos, pos + 1), NumberType.ALPHA)
+      }
+    }
+
+    val range = findRange(textInRange, pos, false, false, false, true)
+    var start = range.first
+    val end = range.second
+    if (start > 0 && textInRange[start - 1] == '-') {
+      start--
+    }
+
+    return Pair(TextRange(start, end), NumberType.DEC)
+  }
+
+  /**
+   * Searches for digits block that matches parameters
+   */
+  private fun findRange(
+    text: String,
+    pos: Int,
+    alpha: Boolean,
+    hex: Boolean,
+    octal: Boolean,
+    decimal: Boolean,
+  ): Pair<Int, Int> {
+    var end = pos
+    while (end < text.length && isNumberChar(text[end], alpha, hex, octal, decimal || octal)) {
+      end++
+    }
+    var start = pos
+    while (start >= 0 && isNumberChar(text[start], alpha, hex, octal, decimal || octal)) {
+      start--
+    }
+    if (start < end &&
+      (start == -1 ||
+        0 <= start && start < text.length &&
+        !isNumberChar(text[start], alpha, hex, octal, decimal || octal))
+    ) {
+      start++
+    }
+    if (octal) {
+      for (i in start until end) {
+        if (!isNumberChar(text[i], false, false, true, false)) return Pair(0, 0)
+      }
+    }
+    return Pair(start, end)
+  }
+
+  private fun isNumberChar(ch: Char, alpha: Boolean, hex: Boolean, octal: Boolean, decimal: Boolean): Boolean {
+    return if (alpha && ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))) {
+      true
+    } else if (octal && (ch >= '0' && ch <= '7')) {
+      true
+    } else if (hex && ((ch >= '0' && ch <= '9') || "abcdefABCDEF".indexOf(ch) >= 0)) {
+      true
+    } else {
+      decimal && (ch >= '0' && ch <= '9')
     }
   }
 

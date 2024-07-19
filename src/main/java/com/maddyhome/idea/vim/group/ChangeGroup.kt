@@ -19,9 +19,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
-import com.intellij.openapi.editor.impl.TextRangeInterval
 import com.intellij.openapi.util.UserDataHolder
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.util.containers.ContainerUtil
@@ -35,42 +33,27 @@ import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
-import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.options
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.IndentConfig.Companion.create
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.NumberType
-import com.maddyhome.idea.vim.helper.endOffsetInclusive
-import com.maddyhome.idea.vim.helper.findNumberUnderCursor
-import com.maddyhome.idea.vim.helper.findNumbersInRange
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
-import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.regexp.VimRegex
-import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.TestOnly
-import java.math.BigInteger
-import java.util.*
 import java.util.function.Consumer
 import kotlin.math.max
 import kotlin.math.min
@@ -352,65 +335,6 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
-  /**
-   * Perform increment and decrement for numbers in visual mode
-   *
-   *
-   * Flag [avalanche] marks if increment (or decrement) should be performed in avalanche mode
-   * (for v_g_Ctrl-A and v_g_Ctrl-X commands)
-   *
-   * @return true
-   */
-  override fun changeNumberVisualMode(
-    editor: VimEditor,
-    caret: VimCaret,
-    selectedRange: TextRange,
-    count: Int,
-    avalanche: Boolean,
-  ): Boolean {
-
-    val nf: List<String> = injector.options(editor).nrformats
-    val alpha = nf.contains("alpha")
-    val hex = nf.contains("hex")
-    val octal = nf.contains("octal")
-    val numberRanges = findNumbersInRange((editor as IjVimEditor).editor, selectedRange, alpha, hex, octal)
-    val newNumbers: MutableList<String?> = ArrayList()
-    for (i in numberRanges.indices) {
-      val numberRange = numberRanges[i]
-      val iCount = if (avalanche) (i + 1) * count else count
-      val newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal)
-      newNumbers.add(newNumber)
-    }
-    for (i in newNumbers.indices.reversed()) {
-      // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
-      val (first) = numberRanges[i]
-      val newNumber = newNumbers[i]
-      replaceText(editor, caret, first.startOffset, first.endOffset, newNumber!!)
-    }
-    (caret as IjVimCaret).caret.moveToInlayAwareOffset(selectedRange.startOffset)
-    return true
-  }
-
-  override fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
-    val nf: List<String> = injector.options(editor).nrformats
-    val alpha = nf.contains("alpha")
-    val hex = nf.contains("hex")
-    val octal = nf.contains("octal")
-    val range = findNumberUnderCursor((editor as IjVimEditor).editor, (caret as IjVimCaret).caret, alpha, hex, octal)
-    if (range == null) {
-      logger.debug("no number on line")
-      return false
-    }
-    val newNumber = changeNumberInRange(editor, range, count, alpha, hex, octal)
-    return if (newNumber == null) {
-      false
-    } else {
-      replaceText(editor, caret, range.first.startOffset, range.first.endOffset, newNumber)
-      caret.caret.moveToInlayAwareOffset(range.first.startOffset + newNumber.length - 1)
-      true
-    }
-  }
-
   override fun reset() {
     strokes.clear()
     repeatCharsCount = 0
@@ -422,87 +346,6 @@ class ChangeGroup : VimChangeGroupBase() {
   override fun saveStrokes(newStrokes: String?) {
     val chars = newStrokes!!.toCharArray()
     strokes.add(chars)
-  }
-
-  private fun changeNumberInRange(
-    editor: VimEditor,
-    range: Pair<TextRange, NumberType>,
-    count: Int,
-    alpha: Boolean,
-    hex: Boolean,
-    octal: Boolean,
-  ): String? {
-    val text = editor.getText(range.first)
-    val numberType = range.second
-    if (logger.isDebugEnabled) {
-      logger.debug("found range $range")
-      logger.debug("text=$text")
-    }
-    var number = text
-    if (text.isEmpty()) {
-      return null
-    }
-    var ch = text[0]
-    if (hex && NumberType.HEX == numberType) {
-      if (!text.lowercase(Locale.getDefault()).startsWith(HEX_START)) {
-        throw RuntimeException("Hex number should start with 0x: $text")
-      }
-      for (i in text.length - 1 downTo 2) {
-        val index = "abcdefABCDEF".indexOf(text[i])
-        if (index >= 0) {
-          lastLower = index < 6
-          break
-        }
-      }
-      var num = BigInteger(text.substring(2), 16)
-      num = num.add(BigInteger.valueOf(count.toLong()))
-      if (num.compareTo(BigInteger.ZERO) < 0) {
-        num = BigInteger(MAX_HEX_INTEGER, 16).add(BigInteger.ONE).add(num)
-      }
-      number = num.toString(16)
-      number = number.padStart(text.length - 2, '0')
-      if (!lastLower) {
-        number = number.uppercase(Locale.getDefault())
-      }
-      number = text.substring(0, 2) + number
-    } else if (octal && NumberType.OCT == numberType && text.length > 1) {
-      if (!text.startsWith("0")) throw RuntimeException("Oct number should start with 0: $text")
-      var num = BigInteger(text, 8).add(BigInteger.valueOf(count.toLong()))
-      if (num.compareTo(BigInteger.ZERO) < 0) {
-        num = BigInteger("1777777777777777777777", 8).add(BigInteger.ONE).add(num)
-      }
-      number = num.toString(8)
-      number = "0" + number.padStart(text.length - 1, '0')
-    } else if (alpha && NumberType.ALPHA == numberType) {
-      if (!Character.isLetter(ch)) throw RuntimeException("Not alpha number : $text")
-      ch += count.toChar().code
-      if (Character.isLetter(ch)) {
-        number = ch.toString()
-      }
-    } else if (NumberType.DEC == numberType) {
-      if (ch != '-' && !Character.isDigit(ch)) throw RuntimeException("Not dec number : $text")
-      var pad = ch == '0'
-      var len = text.length
-      if (ch == '-' && text[1] == '0') {
-        pad = true
-        len--
-      }
-      var num = BigInteger(text)
-      num = num.add(BigInteger.valueOf(count.toLong()))
-      number = num.toString()
-      if (!octal && pad) {
-        var neg = false
-        if (number[0] == '-') {
-          neg = true
-          number = number.substring(1)
-        }
-        number = number.padStart(len, '0')
-        if (neg) {
-          number = "-$number"
-        }
-      }
-    }
-    return number
   }
 
   fun addInsertListener(listener: VimInsertListener) {
