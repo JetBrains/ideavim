@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.common
 
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -21,7 +23,8 @@ class VimListenersNotifier {
   val macroRecordingListeners: MutableCollection<MacroRecordingListener> = ConcurrentLinkedDeque()
   val vimPluginListeners: MutableCollection<VimPluginListener> = ConcurrentLinkedDeque()
   val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
-  
+  val yankListeners: MutableCollection<VimYankListener> = ConcurrentLinkedDeque()
+
   fun notifyModeChanged(editor: VimEditor, oldMode: Mode) {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     modeChangeListeners.forEach { it.modeChanged(editor, oldMode) }
@@ -68,6 +71,11 @@ class VimListenersNotifier {
   fun notifyIsReplaceCharChanged(editor: VimEditor) {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     isReplaceCharListeners.forEach { it.isReplaceCharChanged(editor) }
+  }
+
+  fun notifyYankPerformed(caret: ImmutableVimCaret, range: TextRange) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
+    yankListeners.forEach { it.yankPerformed(caret, range) }
   }
 
   fun reset() {
