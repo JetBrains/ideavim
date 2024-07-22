@@ -19,14 +19,14 @@ jobs:
           python-version: '3.10'
       - name: Setup FFmpeg
         run: brew install ffmpeg
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.2
+#      - name: Setup Gradle
+#        uses: gradle/gradle-build-action@v2.4.2
       - name: Build Plugin
         run: gradle :buildPlugin
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle :runIdeForUiTests -PideaType=PC > build/reports/idea.log &
+          gradle --no-configuration-cache :runIdeForUiTests -PideaType=PC > build/reports/idea.log &
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
@@ -40,7 +40,7 @@ jobs:
         run: mv tests/ui-py-tests/video build/reports
       - name: Move sandbox logs
         if: always()
-        run: mv build/idea-sandbox idea-sandbox
+        run: mv build/idea-sandbox/PC-2024.1.1/log_runIdeForUiTests idea-sandbox-log
       - name: Save report
         if: always()
         uses: actions/upload-artifact@v4
@@ -49,4 +49,4 @@ jobs:
           path: |
             build/reports
             tests/ui-py-tests/build/reports
-            idea-sandbox
+            idea-sandbox-log
