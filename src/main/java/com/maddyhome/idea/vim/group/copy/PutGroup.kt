@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.put.VimPasteProvider
 import com.maddyhome.idea.vim.put.VimPutBase
 import com.maddyhome.idea.vim.register.RegisterConstants
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.state.mode.isChar
@@ -83,7 +84,7 @@ internal class PutGroup : VimPutBase() {
     val editor = (vimEditor as IjVimEditor).editor
     val context = vimContext.context as DataContext
     val carets: MutableMap<Caret, RangeMarker> = mutableMapOf()
-    if (editor.isInsertMode) {
+    if (injector.vimState.mode is Mode.INSERT) {
       val undo = injector.undo
       val nanoTime = System.nanoTime()
       vimEditor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
