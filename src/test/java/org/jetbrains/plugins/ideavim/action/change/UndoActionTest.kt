@@ -146,7 +146,17 @@ class UndoActionTest : VimTestCase() {
   @TestFor(issues = ["VIM-547"])
   fun `test change action is included in insert sequence`() {
     configureByText("Lorem ${c}ipsum dolor sit amet")
-    typeText("celorem")
+    typeText("celorem<Esc>")
+    assertState("Lorem lore${c}m dolor sit amet")
+    typeText("u")
+    assertState("Lorem ${c}ipsum dolor sit amet")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3552"])
+  fun `test paste is not part of undo sequence`() {
+    configureByText("test")
+    typeText("yypoxxxu")
     configureByText("Lorem lorem${c} dolor sit amet")
     typeText("u")
     configureByText("Lorem ${c}ipsum dolor sit amet")
