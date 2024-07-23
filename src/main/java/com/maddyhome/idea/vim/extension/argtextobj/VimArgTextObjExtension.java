@@ -265,7 +265,7 @@ public class VimArgTextObjExtension implements VimExtension {
           }
         });
       } else {
-        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
+        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument.Motion(new Command(count,
                                                                                          textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))));
       }
     }

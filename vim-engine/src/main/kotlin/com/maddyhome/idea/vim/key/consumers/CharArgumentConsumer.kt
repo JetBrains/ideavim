@@ -62,7 +62,7 @@ class CharArgumentConsumer: KeyConsumer {
       processBuilder.addExecutionStep { _, lambdaEditor, _ ->
         // Create the character argument, add it to the current command, and signal we are ready to process the command
         logger.trace("Add character argument to the current command")
-        commandBuilder.completeCommandPart(Argument(mutableChKey))
+        commandBuilder.completeCommandPart(Argument.Character(mutableChKey))
         lambdaEditor.isReplaceCharacter = false
       }
     } else {

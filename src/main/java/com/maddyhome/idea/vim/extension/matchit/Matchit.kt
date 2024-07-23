@@ -108,7 +108,7 @@ internal class Matchit : VimExtension {
         matchitAction.isInOpPending = true
 
         keyState.commandBuilder.completeCommandPart(
-          Argument(
+          Argument.Motion(
             Command(
               count,
               matchitAction,
