@@ -23,10 +23,20 @@ import javax.swing.KeyStroke
 
 class CommandBuilder(
   private var currentCommandPartNode: CommandPartNode<LazyVimCommand>,
-  initialUncommittedRawCount: Int = 0,
+  private val commandParts: ArrayDeque<Command>,
+  private val keyList: MutableList<KeyStroke>,
+  initialUncommittedRawCount: Int,
 ) : Cloneable {
-  private var commandParts = ArrayDeque<Command>()
-  private var keyList = mutableListOf<KeyStroke>()
+
+  constructor(
+    currentCommandPartNode: CommandPartNode<LazyVimCommand>,
+    initialUncommittedRawCount: Int = 0
+  ) : this(
+    currentCommandPartNode,
+    ArrayDeque(),
+    mutableListOf(),
+    initialUncommittedRawCount
+  )
 
   var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
 
@@ -266,9 +276,7 @@ class CommandBuilder(
   }
 
   public override fun clone(): CommandBuilder {
-    val result = CommandBuilder(currentCommandPartNode, count)
-    result.commandParts = ArrayDeque(commandParts)
-    result.keyList = keyList.toMutableList()
+    val result = CommandBuilder(currentCommandPartNode, ArrayDeque(commandParts), keyList.toMutableList(), count)
     result.commandState = commandState
     result.expectedArgumentType = expectedArgumentType
     result.prevExpectedArgumentType = prevExpectedArgumentType
