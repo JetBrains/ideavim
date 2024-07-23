@@ -86,13 +86,15 @@ class CommandBuilder(
   val register: Char?
     get() = commandParts.lastOrNull { it.register != null }?.register
 
-  // The argument type for the current command part's action. Kept separate to handle digraphs and characters. We first
-  // try to accept a digraph. If we get it, set expected argument type to character and handle the converted key. If we
-  // fail to convert to a digraph, set expected argument type to character and try to handle the key again.
-  var expectedArgumentType: Argument.Type? = null
-    private set
+  /**
+   * The argument type for the current in-progress command part's action
+   *
+   * For digraph arguments, this can fall back to [Argument.Type.CHARACTER] if there isn't a digraph match.
+   */
+  val expectedArgumentType: Argument.Type?
+    get() = fallbackArgumentType ?: commandParts.lastOrNull()?.action?.argumentType
 
-  private var prevExpectedArgumentType: Argument.Type? = null
+  private var fallbackArgumentType: Argument.Type? = null
 
   val isReady: Boolean get() = commandState == CurrentCommandState.READY
   val isEmpty: Boolean get() = commandParts.isEmpty()
@@ -108,8 +110,7 @@ class CommandBuilder(
   fun pushCommandPart(action: EditorActionHandlerBase) {
     logger.trace { "pushCommandPart is executed. action = $action" }
     commandParts.add(Command(count, action, action.type, action.flags))
-    prevExpectedArgumentType = expectedArgumentType
-    expectedArgumentType = action.argumentType
+    fallbackArgumentType = null
     count = 0
   }
 
@@ -118,7 +119,7 @@ class CommandBuilder(
     // We will never execute this command, but we need to push something to correctly handle counts on either side of a
     // select register command part. e.g. 2"a2d2w or even crazier 2"a2"a2"a2"a2"a2d2w
     commandParts.add(Command(count, register))
-    expectedArgumentType = null
+    fallbackArgumentType = null
     count = 0
   }
 
@@ -127,7 +128,7 @@ class CommandBuilder(
     // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
     // in which case try to handle input as a character argument.
     assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER" }
-    expectedArgumentType = Argument.Type.CHARACTER
+    fallbackArgumentType = Argument.Type.CHARACTER
   }
 
   fun addKey(key: KeyStroke) {
@@ -161,10 +162,8 @@ class CommandBuilder(
   }
 
   fun isAwaitingCharOrDigraphArgument(): Boolean {
-    if (commandParts.size == 0) return false
-    val argumentType = commandParts.last().action.argumentType
-    val awaiting = argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
-    logger.debug { "Awaiting char of digraph: $awaiting" }
+    val awaiting = expectedArgumentType == Argument.Type.CHARACTER || expectedArgumentType == Argument.Type.DIGRAPH
+    logger.debug { "Awaiting char or digraph: $awaiting" }
     return awaiting
   }
 
@@ -215,7 +214,7 @@ class CommandBuilder(
         assert(commandParts.size == 0)
       }
     }
-    expectedArgumentType = null
+    fallbackArgumentType = null
     return command
   }
 
@@ -225,8 +224,7 @@ class CommandBuilder(
     commandState = CurrentCommandState.NEW_COMMAND
     commandParts.clear()
     keyList.clear()
-    expectedArgumentType = null
-    prevExpectedArgumentType = null
+    fallbackArgumentType = null
   }
 
   fun resetCount() {
@@ -253,7 +251,7 @@ class CommandBuilder(
     if (commandState != other.commandState) return false
     if (count != other.count) return false
     if (expectedArgumentType != other.expectedArgumentType) return false
-    if (prevExpectedArgumentType != other.prevExpectedArgumentType) return false
+    if (fallbackArgumentType != other.fallbackArgumentType) return false
 
     return true
   }
@@ -265,16 +263,14 @@ class CommandBuilder(
     result = 31 * result + commandState.hashCode()
     result = 31 * result + count
     result = 31 * result + (expectedArgumentType?.hashCode() ?: 0)
-    result = 31 * result + (prevExpectedArgumentType?.hashCode() ?: 0)
+    result = 31 * result + (fallbackArgumentType?.hashCode() ?: 0)
     return result
   }
 
   public override fun clone(): CommandBuilder {
     val result = CommandBuilder(currentCommandPartNode, ArrayDeque(commandParts), keyList.toMutableList(), count)
     result.commandState = commandState
-    result.expectedArgumentType = expectedArgumentType
-    result.prevExpectedArgumentType = prevExpectedArgumentType
-
+    result.fallbackArgumentType = fallbackArgumentType
     return result
   }
 
