@@ -65,8 +65,16 @@ class CommandBuilder(
     get() = (commandParts.map { it.count }.reduceOrNull { acc, i -> acc * i } ?: 1) * count.coerceAtLeast(1)
 
   val keys: Iterable<KeyStroke> get() = keyList
+
+  // TODO: Try to remove this. We shouldn't be looking at the unbuilt command
+  // This is used by the extension mapping handler, to select the current register before invoking the extension. We
+  // need better handling of extensions so that they integrate better with half-built commands, either by finishing or
+  // resetting the command.
+  // If we keep this, consider renaming to something like `uncommittedRegister`, to reflect that the register could
+  // still change, if more keys are processed. E.g., it's perfectly valid to select register multiple times `"a"b`.
+  // This doesn't cause any issues with existing extensions
   val register: Char?
-    get() = commandParts.lastOrNull()?.register
+    get() = commandParts.lastOrNull { it.register != null }?.register
 
   // The argument type for the current command part's action. Kept separate to handle digraphs and characters. We first
   // try to accept a digraph. If we get it, set expected argument type to character and handle the converted key. If we
