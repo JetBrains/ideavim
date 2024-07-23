@@ -60,8 +60,7 @@ class DigraphConsumer : KeyConsumer {
     when (res.result) {
       DigraphResult.RES_HANDLED -> {
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ ->
-          val commandLine = injector.commandLine.getActiveCommandLine()
-          commandLine?.setPromptCharacter(if (lambdaKeyState.commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
+          keyHandler.setPromptCharacterEx(res.promptCharacter)
           lambdaKeyState.commandBuilder.addKey(key)
         }
         return true
