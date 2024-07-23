@@ -767,6 +767,11 @@ class MotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun testDeleteToLiteral() {
+    doTest("d/<C-V>333<CR>", "ab${c}cdōef", "abōef")
+  }
+
+  @Test
   fun testDeleteBackwardsToSearchResult() {
     val before = "Lorem ipsum dolor sit amet, ${c}consectetur adipiscing elit"
     val after = "Lorem ipsum dolor ${c}consectetur adipiscing elit"
