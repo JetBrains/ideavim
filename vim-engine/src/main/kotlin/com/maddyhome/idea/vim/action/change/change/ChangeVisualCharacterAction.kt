@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.util.*
 
 /**
@@ -35,6 +36,10 @@ class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH)
+
+  override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
+    editor.isReplaceCharacter = true
+  }
 
   override fun executeAction(
     editor: VimEditor,
@@ -68,7 +73,7 @@ private fun changeCharacterRange(editor: VimEditor, caret: VimCaret, range: Text
   for (j in ends.indices.reversed()) {
     for (i in starts[j] until ends[j]) {
       if (i < chars.length && '\n' != chars[i]) {
-        injector.changeGroup.replaceText(editor, caret, i, i + 1, Character.toString(ch))
+        injector.changeGroup.replaceText(editor, caret, i, i + 1, ch.toString())
       }
     }
   }

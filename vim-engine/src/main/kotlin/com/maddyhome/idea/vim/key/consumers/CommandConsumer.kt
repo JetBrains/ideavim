@@ -129,7 +129,7 @@ class CommandConsumer : KeyConsumer {
       }
     }
 
-    processBuilder.addExecutionStep { _, lambdaEditor, _ ->
+    processBuilder.addExecutionStep { _, _, _ ->
       if (action.flags.contains(CommandFlags.FLAG_END_EX)) {
         logger.trace("Processing ex_string")
         val commandLine = injector.commandLine.getActiveCommandLine()!!
@@ -156,38 +156,14 @@ class CommandConsumer : KeyConsumer {
     editorState: VimStateMachine,
   ) {
     val commandBuilder = keyState.commandBuilder
-    when (argument) {
-      Argument.Type.MOTION -> {
-        if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
-          commandBuilder.completeCommandPart(argumentCaptured!!)
-        }
-        editor.mode = Mode.OP_PENDING(editorState.mode.returnTo)
+    if (argument == Argument.Type.MOTION) {
+      if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
+        commandBuilder.completeCommandPart(argumentCaptured!!)
       }
-
-      Argument.Type.DIGRAPH -> // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
-        // part of a command, the showcmd output is reset part way through. This means we need to special case entering
-        // digraph/literal input mode. We have an action that takes a digraph as an argument, and pushes it back through
-        // the key handler when it's complete.
-
-        // TODO
-        if (action.id == "VimInsertCompletedDigraphAction") {
-          val result = keyState.digraphSequence.startDigraphSequence()
-          KeyHandler.getInstance().setPromptCharacterEx(result.promptCharacter)
-        } else if (action.id == "VimInsertCompletedLiteralAction") {
-          val result = keyState.digraphSequence.startLiteralSequence()
-          KeyHandler.getInstance().setPromptCharacterEx(result.promptCharacter)
-        }
-
-      else -> Unit
+      editor.mode = Mode.OP_PENDING(editorState.mode.returnTo)
     }
 
-    // Another special case. Force a mode change to update the caret shape
-    // This was a typed solution
-    // if (action is ChangeCharacterAction || action is ChangeVisualCharacterAction)
-    if (action.id == "VimChangeCharacterAction" || action.id == "VimChangeVisualCharacterAction") {
-      editor.isReplaceCharacter = true
-    }
-    action.onStartWaitingForArgument(editor, context)
+    action.onStartWaitingForArgument(editor, context, keyState)
   }
 
   private fun checkArgumentCompatibility(
