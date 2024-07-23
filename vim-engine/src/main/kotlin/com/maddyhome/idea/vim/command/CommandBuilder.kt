@@ -191,7 +191,7 @@ class CommandBuilder(
   }
 
   fun hasCurrentCommandPartArgument(): Boolean {
-    return commandParts.firstOrNull()?.argument != null
+    return commandParts.lastOrNull()?.argument != null
   }
 
   fun buildCommand(): Command {
