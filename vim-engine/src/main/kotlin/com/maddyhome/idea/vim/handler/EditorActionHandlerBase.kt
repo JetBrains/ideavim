@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -60,7 +61,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    * This method will be executed only for actions with [argumentType != null]
    * when such actions start to await for their argument
    */
-  open fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext) {}
+  open fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {}
 
   /**
    * Returns various binary flags for the command.

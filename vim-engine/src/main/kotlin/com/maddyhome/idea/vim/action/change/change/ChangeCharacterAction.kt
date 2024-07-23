@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.util.*
 
 @CommandOrMotion(keys = ["r"], modes = [Mode.NORMAL])
@@ -32,6 +33,10 @@ class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH)
+
+  override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
+    editor.isReplaceCharacter = true
+  }
 
   override fun execute(
     editor: VimEditor,

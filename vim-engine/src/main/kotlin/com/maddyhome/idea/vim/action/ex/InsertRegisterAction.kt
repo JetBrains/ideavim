@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -26,7 +27,7 @@ class InsertRegisterAction: VimActionHandler.SingleExecution() {
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
-  override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext) {
+  override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     val cmdLine = injector.commandLine.getActiveCommandLine() ?: return
     cmdLine.setPromptCharacter('"')
   }
