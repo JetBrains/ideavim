@@ -42,6 +42,7 @@ class DigraphConsumer : KeyConsumer {
     val keyState = keyProcessResultBuilder.state
     val commandBuilder = keyState.commandBuilder
     val digraphSequence = keyState.digraphSequence
+
     if (commandBuilder.expectedArgumentType == Argument.Type.DIGRAPH) {
       logger.trace("Expected argument is digraph")
       if (digraphSequence.isDigraphStart(key)) {
@@ -55,17 +56,19 @@ class DigraphConsumer : KeyConsumer {
         return true
       }
     }
+
     val res = digraphSequence.processKey(key, editor)
     val keyHandler = KeyHandler.getInstance()
-    when (res.result) {
-      DigraphResult.RES_HANDLED -> {
+    when (res) {
+      is DigraphResult.Handled -> {
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ ->
           keyHandler.setPromptCharacterEx(res.promptCharacter)
           lambdaKeyState.commandBuilder.addKey(key)
         }
         return true
       }
-      DigraphResult.RES_DONE -> {
+
+      is DigraphResult.Done -> {
         val commandLine = injector.commandLine.getActiveCommandLine()
         if (commandLine != null) {
           if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
@@ -89,7 +92,8 @@ class DigraphConsumer : KeyConsumer {
         }
         return true
       }
-      DigraphResult.RES_BAD -> {
+
+      is DigraphResult.Bad -> {
         val commandLine = injector.commandLine.getActiveCommandLine()
         if (commandLine != null) {
           if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
@@ -108,7 +112,8 @@ class DigraphConsumer : KeyConsumer {
         }
         return true
       }
-      DigraphResult.RES_UNHANDLED -> {
+
+      is DigraphResult.Unhandled -> {
         // UNHANDLED means the keystroke made no sense in the context of a digraph, but isn't an error in the current
         // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
         if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
@@ -121,6 +126,5 @@ class DigraphConsumer : KeyConsumer {
         return false
       }
     }
-    return false
   }
 }
