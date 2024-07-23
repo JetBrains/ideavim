@@ -72,7 +72,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    */
   open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
-  abstract fun baseExecute(
+  protected abstract fun baseExecute(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -83,7 +83,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   /**
    * Post execute is executed only one time after the main execute method
    */
-  open fun postExecute(
+  protected open fun postExecute(
     editor: VimEditor,
     context: ExecutionContext,
     cmd: Command,
