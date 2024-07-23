@@ -77,7 +77,6 @@ class CommandBuilder(
   private var prevExpectedArgumentType: Argument.Type? = null
 
   val isReady: Boolean get() = commandState == CurrentCommandState.READY
-  val isBad: Boolean get() = commandState == CurrentCommandState.BAD_COMMAND
   val isEmpty: Boolean get() = commandParts.isEmpty()
   val isAtDefaultState: Boolean get() = isEmpty && count == 0 && expectedArgumentType == null
 
@@ -103,13 +102,6 @@ class CommandBuilder(
     commandParts.add(Command(count, register))
     expectedArgumentType = null
     count = 0
-  }
-
-  fun popCommandPart(): Command {
-    logger.trace { "popCommandPart is executed" }
-    val command = commandParts.removeLast()
-    expectedArgumentType = if (commandParts.size > 0) commandParts.last().action.argumentType else null
-    return command
   }
 
   fun fallbackToCharacterArgument() {
@@ -193,15 +185,6 @@ class CommandBuilder(
   fun hasCurrentCommandPartArgument(): Boolean {
     return commandParts.firstOrNull()?.argument != null
   }
-
-  /**
-   * Get the count given to the current command part, coerced to 1
-   *
-   * If there isn't a current command part, this will return 0. Not to be confused with [count], which is the count for
-   * the _next_ command part.
-   */
-  val currentCommandPartCount1: Int
-    get() = commandParts.firstOrNull()?.count ?: 0
 
   fun buildCommand(): Command {
     if (commandParts.last().action.id == "VimInsertCompletedDigraphAction" || commandParts.last().action.id == "VimResetModeAction") {
