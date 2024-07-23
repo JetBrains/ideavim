@@ -68,11 +68,6 @@ enum class CommandFlags {
    */
   FLAG_EXPECT_MORE,
 
-  /**
-   * Indicate that the character argument may come from a digraph
-   */
-  FLAG_ALLOW_DIGRAPH,
-
   FLAG_START_EX,
   FLAG_END_EX,
 
