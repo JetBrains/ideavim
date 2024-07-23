@@ -238,7 +238,7 @@ class ToHandlerMappingInfo(
           }
         }
         if (offsets.isNotEmpty()) {
-          keyState.commandBuilder.completeCommandPart(Argument(offsets))
+          keyState.commandBuilder.completeCommandPart(Argument.Offsets(offsets))
         }
       }
     }

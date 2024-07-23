@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 
@@ -20,7 +19,7 @@ import java.util.*
  * This represents a command argument.
  * TODO please make it a sealed class and not a giant collection of fields with default values, it's not safe
  */
-class Argument private constructor(
+sealed class Argument private constructor(
   val character: Char = 0.toChar(),
   val motion: Command = EMPTY_COMMAND,
   val offsets: Map<ImmutableVimCaret, VimSelection> = emptyMap(),
@@ -28,10 +27,10 @@ class Argument private constructor(
   val processing: ((String) -> Unit)? = null,
   val type: Type,
 ) {
-  constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
-  constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
-  constructor(label: Char, strArg: String, processing: ((String) -> Unit)?) : this(character = label, string = strArg, processing = processing, type = Type.EX_STRING)
-  constructor(offsets: Map<ImmutableVimCaret, VimSelection>) : this(offsets = offsets, type = Type.OFFSETS)
+  class Motion(motion: Command) : Argument(motion = motion, type = Type.MOTION)
+  class Character(character: Char) : Argument(character = character, type = Type.CHARACTER)
+  class ExString(label: Char, strArg: String, processing: ((String) -> Unit)?) : Argument(character = label, string = strArg, processing = processing, type = Type.EX_STRING)
+  class Offsets(offsets: Map<ImmutableVimCaret, VimSelection>) : Argument(offsets = offsets, type = Type.OFFSETS)
 
   enum class Type {
     MOTION, CHARACTER, DIGRAPH, EX_STRING, OFFSETS
@@ -47,7 +46,7 @@ class Argument private constructor(
           context: ExecutionContext,
           argument: Argument?,
           operatorArguments: OperatorArguments,
-        ) = Motion.NoMotion
+        ) = com.maddyhome.idea.vim.handler.Motion.NoMotion
 
         override val motionType: MotionType = MotionType.EXCLUSIVE
       },
