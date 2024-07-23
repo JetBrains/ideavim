@@ -117,7 +117,7 @@ class CommandConsumer : KeyConsumer {
       }
       return
     }
-    if (action.argumentType == null || stopMacroRecord(node)) {
+    if (action.argumentType == null) {
       logger.trace("Set command state to READY")
       commandBuilder.commandState = CurrentCommandState.READY
     } else {
@@ -141,10 +141,6 @@ class CommandConsumer : KeyConsumer {
         commandBuilder.completeCommandPart(Argument(label[0], text, processing))
       }
     }
-  }
-
-  private fun stopMacroRecord(node: CommandNode<LazyVimCommand>): Boolean {
-    return injector.registerGroup.isRecording && node.actionHolder.instance.id == "VimToggleRecordingAction"
   }
 
   private fun startWaitingForArgument(
