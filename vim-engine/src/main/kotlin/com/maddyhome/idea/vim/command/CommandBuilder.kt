@@ -169,10 +169,6 @@ class CommandBuilder(
     return isMultikey
   }
 
-  fun isPuttingLiteral(): Boolean {
-    return !commandParts.isEmpty() && commandParts.last().action.id == "VimInsertCompletedLiteralAction"
-  }
-
   fun isDone(): Boolean {
     return commandParts.isEmpty()
   }

@@ -170,13 +170,12 @@ class CommandConsumer : KeyConsumer {
         // the key handler when it's complete.
 
         // TODO
-//        if (action is InsertCompletedDigraphAction) {
         if (action.id == "VimInsertCompletedDigraphAction") {
-          keyState.digraphSequence.startDigraphSequence()
-          KeyHandler.getInstance().setPromptCharacterEx('?')
+          val result = keyState.digraphSequence.startDigraphSequence()
+          KeyHandler.getInstance().setPromptCharacterEx(result.promptCharacter)
         } else if (action.id == "VimInsertCompletedLiteralAction") {
-          keyState.digraphSequence.startLiteralSequence()
-          KeyHandler.getInstance().setPromptCharacterEx('^')
+          val result = keyState.digraphSequence.startLiteralSequence()
+          KeyHandler.getInstance().setPromptCharacterEx(result.promptCharacter)
         }
 
       else -> Unit

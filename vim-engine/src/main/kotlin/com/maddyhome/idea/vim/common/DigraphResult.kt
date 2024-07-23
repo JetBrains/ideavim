@@ -12,7 +12,8 @@ import javax.swing.KeyStroke
 class DigraphResult {
   val result: Int
   val stroke: KeyStroke?
-  private var promptCharacter: Char = 0.toChar()
+  var promptCharacter: Char = 0.toChar()
+    private set
 
   private constructor(result: Int) {
     this.result = result
