@@ -31,6 +31,16 @@ fun getModeBackground(mode: Mode?): Color {
           is Mode.OP_PENDING, null -> UIUtil.getPanelBackground()
         }
       }
+      ModeWidgetTheme.DRACULA -> {
+        return when (mode) {
+          Mode.INSERT -> Color.decode("#50FA7B")
+          Mode.REPLACE -> Color.decode("#FF5555")
+          is Mode.NORMAL -> Color.decode("#BD93F9")
+          is Mode.CMD_LINE -> Color.decode("#FFB86C")
+          is Mode.VISUAL, is Mode.SELECT -> Color.decode("#F1FA8C")
+          is Mode.OP_PENDING, null -> UIUtil.getPanelBackground()
+        }
+      }
       ModeWidgetTheme.COLORLESS -> {
         return UIUtil.getPanelBackground()
       }
@@ -83,6 +93,7 @@ fun getModeForeground(mode: Mode?): Color {
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     return when (theme) {
       ModeWidgetTheme.TERM -> if (isLight) Color.WHITE else Color.BLACK
+      ModeWidgetTheme.DRACULA -> Color.BLACK
       ModeWidgetTheme.COLORLESS -> UIUtil.getLabelForeground()
     }
   } else {

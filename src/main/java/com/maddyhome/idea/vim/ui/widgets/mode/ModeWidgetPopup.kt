@@ -352,7 +352,8 @@ class ModeWidgetPopup : AnAction() {
 
 enum class ModeWidgetTheme(private var value: String) {
   TERM("Term"),
-  COLORLESS("Colorless");
+  COLORLESS("Colorless"),
+  DRACULA("Dracula");
 
   override fun toString(): String {
     return value
