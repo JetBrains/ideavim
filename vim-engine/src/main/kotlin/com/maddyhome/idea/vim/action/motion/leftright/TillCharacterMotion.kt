@@ -15,15 +15,12 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 
 enum class TillCharacterMotionType {
   LAST_F,
@@ -51,9 +48,6 @@ sealed class TillCharacterMotion(
   private val finishBeforeCharacter: Boolean,
 ) : MotionActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH)
-
   override val motionType: MotionType =
     if (direction == Direction.BACKWARDS) MotionType.EXCLUSIVE else MotionType.INCLUSIVE
 
