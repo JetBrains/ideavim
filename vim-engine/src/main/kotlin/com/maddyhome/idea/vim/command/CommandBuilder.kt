@@ -201,12 +201,6 @@ class CommandBuilder(
   }
 
   fun buildCommand(): Command {
-    if (commandParts.last().action.id == "VimInsertCompletedDigraphAction" || commandParts.last().action.id == "VimResetModeAction") {
-      expectedArgumentType = prevExpectedArgumentType
-      prevExpectedArgumentType = null
-      return commandParts.removeLast()
-    }
-
     var command: Command = commandParts.removeFirst()
     while (commandParts.size > 0) {
       val next = commandParts.removeFirst()
