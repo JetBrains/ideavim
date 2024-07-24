@@ -35,9 +35,7 @@ open class YankGroupBase : VimYankGroup {
       caret.moveToOffset(offset)
     }
 
-    for ((caret, caretRange) in caretToRange) {
-      injector.listenersNotifier.notifyYankPerformed(caret, caretRange)
-    }
+    injector.listenersNotifier.notifyYankPerformed(caretToRange)
 
     var result = true
     for ((caret, myRange) in caretToRange) {

@@ -73,9 +73,9 @@ class VimListenersNotifier {
     isReplaceCharListeners.forEach { it.isReplaceCharChanged(editor) }
   }
 
-  fun notifyYankPerformed(caret: ImmutableVimCaret, range: TextRange) {
+  fun notifyYankPerformed(caretToRange: Map<ImmutableVimCaret, TextRange>) {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
-    yankListeners.forEach { it.yankPerformed(caret, range) }
+    yankListeners.forEach { it.yankPerformed(caretToRange) }
   }
 
   fun reset() {
