@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFoldRegion
+import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
@@ -594,6 +595,8 @@ class VimRegex(pattern: String) {
   private class VimEditorWrapper(private val text: String): VimEditor {
     override val lfMakesNewLine: Boolean = true
     override var vimChangeActionSwitchMode: Mode? = null
+    override val indentConfig: VimIndentConfig
+      get() = TODO("Not yet implemented")
 
     override fun fileSize(): Long {
       return text.length.toLong()
