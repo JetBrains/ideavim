@@ -1414,7 +1414,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (sortedLines.isEmpty()) {
       return false
     }
-    replaceText(editor, caret, startOffset, endOffset, sortedLines.joinToString { "\n" })
+    replaceText(editor, caret, startOffset, endOffset, sortedLines.joinToString("\n"))
     return true
   }
 

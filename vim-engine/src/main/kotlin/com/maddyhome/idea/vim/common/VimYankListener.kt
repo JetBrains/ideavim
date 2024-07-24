@@ -11,5 +11,5 @@ package com.maddyhome.idea.vim.common
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 
 interface VimYankListener {
-  fun yankPerformed(caret: ImmutableVimCaret, range: TextRange)
+  fun yankPerformed(caretToRange: Map<ImmutableVimCaret, TextRange>)
 }
