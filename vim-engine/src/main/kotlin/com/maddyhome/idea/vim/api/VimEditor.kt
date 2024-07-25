@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.returnTo
+import org.jetbrains.annotations.ApiStatus.Internal
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -125,26 +126,7 @@ import com.maddyhome.idea.vim.state.mode.returnTo
  */
 interface VimEditor {
   var mode: Mode
-    get() = injector.vimState.mode
-    set(value) {
-      val vimState = injector.vimState
-      if (vimState.mode == value) return
-
-      val oldValue = vimState.mode
-      (vimState as VimStateMachineImpl).mode = value
-      injector.listenersNotifier.notifyModeChanged(this, oldValue)
-    }
-
-   var isReplaceCharacter: Boolean
-    get() = injector.vimState.isReplaceCharacter
-    set(value) {
-      val vimState = injector.vimState
-      if (value != vimState.isReplaceCharacter) {
-        (vimState as VimStateMachineImpl).isReplaceCharacter = value
-        injector.listenersNotifier.notifyIsReplaceCharChanged(this)
-      }
-    }
-
+  var isReplaceCharacter: Boolean
   val lfMakesNewLine: Boolean
   var vimChangeActionSwitchMode: Mode?
   val indentConfig: VimIndentConfig
@@ -330,13 +312,13 @@ interface MutableVimEditor : VimEditor {
   fun replaceString(start: Int, end: Int, newString: String)
 }
 
-abstract class LinearEditor : VimEditor {
-  abstract fun getLine(offset: Int): Int
-  abstract fun getText(left: Int, right: Int): CharSequence
+interface LinearEditor : VimEditor {
+  fun getLine(offset: Int): Int
+  fun getText(left: Int, right: Int): CharSequence
 }
 
-abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
-  abstract fun deleteRange(leftOffset: Int, rightOffset: Int)
+interface MutableLinearEditor : MutableVimEditor, LinearEditor {
+  fun deleteRange(leftOffset: Int, rightOffset: Int)
 }
 
 enum class LineDeleteShift {
