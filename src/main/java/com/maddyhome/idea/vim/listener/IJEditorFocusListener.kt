@@ -16,10 +16,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.state.mode.Mode
 
 /**
  * This listener is similar to the one we introduce in vim-engine to handle focus change,
@@ -48,17 +50,27 @@ class IJEditorFocusListener : EditorListener {
     // not file based, is writable, and not a viewer, but we don't want to treat this as an interactive editor.
     // Note that we need a similar check in `VimEditor.isWritable` to allow Escape to work to exit insert mode. We need
     // to know that a read-only editor that is hosting a console view with a running process can be treated as writable.
+
+    val ijEditor = editor.ij
+
+
     val switchToInsertMode = Runnable {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
     }
-    val ijEditor = editor.ij
     if (!ijEditor.isViewer &&
       !EditorHelper.isFileEditor(ijEditor) &&
       ijEditor.document.isWritable &&
       !ijEditor.inInsertMode && ijEditor.editorKind != EditorKind.DIFF
     ) {
       switchToInsertMode.run()
+    } else if (!ijEditor.document.isWritable) {
+      val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
+      val mode = injector.vimState.mode
+      when (mode) {
+        is Mode.INSERT -> editor.exitInsertMode(context, OperatorArguments(false, 0, mode))
+        else -> {}
+      }
     }
     ApplicationManager.getApplication().invokeLater {
       if (ijEditor.isDisposed) return@invokeLater
