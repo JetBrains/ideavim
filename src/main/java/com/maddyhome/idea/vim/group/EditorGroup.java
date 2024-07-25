@@ -217,8 +217,6 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     if (editor instanceof EditorEx editorEx) {
       editorEx.addPropertyChangeListener(FontSizeChangeListener.INSTANCE);
     }
-
-    updateCaretsVisualAttributes(new IjVimEditor(editor));
   }
 
   public void editorDeinit(@NotNull Editor editor) {
