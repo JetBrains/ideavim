@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimEditorBase
 import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
@@ -54,6 +55,7 @@ import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
+import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
@@ -61,7 +63,7 @@ import org.jetbrains.annotations.ApiStatus
 import java.lang.System.identityHashCode
 
 @ApiStatus.Internal
-internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
+internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
   companion object {
     // For cases where Editor does not have a project (for some reason)
     // It's something IJ Platform related and stored here because of this reason
@@ -73,6 +75,14 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   // TBH, I don't like the names. Need to think a bit more about this
   val editor = editor.getTopLevelEditor()
   val originalEditor = editor
+
+  override fun updateMode(mode: Mode) {
+    (injector.vimState as VimStateMachineImpl).mode = mode
+  }
+
+  override fun updateIsReplaceCharacter(isReplaceCharacter: Boolean) {
+    (injector.vimState as VimStateMachineImpl).isReplaceCharacter = isReplaceCharacter
+  }
 
   override val lfMakesNewLine: Boolean = true
   override var vimChangeActionSwitchMode: Mode?
@@ -437,7 +447,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       // This is faster than simply calling Editor#logicalToVisualPosition
       return editor.offsetToVisualLine(editor.document.getLineStartOffset(line))
     }
-    return super.bufferLineToVisualLine(line)
+    return super<MutableLinearEditor>.bufferLineToVisualLine(line)
   }
 
   override var insertMode: Boolean
