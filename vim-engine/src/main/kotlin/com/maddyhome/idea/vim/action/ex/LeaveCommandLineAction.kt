@@ -13,6 +13,7 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -27,8 +28,8 @@ class LeaveCommandLineAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val argument = cmd.argument ?: return true
-    val historyType = VimHistory.Type.getTypeByLabel(argument.character.toString())
+    val argument = cmd.argument as? Argument.ExString ?: return true
+    val historyType = VimHistory.Type.getTypeByLabel(argument.label.toString())
     injector.historyGroup.addEntry(historyType, argument.string)
     return true
   }

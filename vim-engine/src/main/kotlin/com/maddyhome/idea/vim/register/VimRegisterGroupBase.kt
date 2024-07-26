@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
@@ -151,7 +152,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     val currentCommand = injector.vimState.executingCommand
     if (currentCommand != null) {
       val argument = currentCommand.argument
-      if (argument != null) {
+      if (argument is Argument.MotionAction) {
         val motionCommand = argument.motion
         val action = motionCommand.action
         return action.id == "VimMotionPercentOrMatchAction" ||

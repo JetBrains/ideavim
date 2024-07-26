@@ -38,7 +38,8 @@ class InsertRegisterAction: VimActionHandler.SingleExecution() {
 
     val caretOffset = cmdLine.caret.offset
 
-    val keyStroke = KeyStroke.getKeyStroke(cmd.argument!!.character)
+    val argument = cmd.argument as? Argument.Character ?: return false
+    val keyStroke = KeyStroke.getKeyStroke(argument.character)
     val pasteContent = if ((keyStroke.modifiers and KeyEvent.CTRL_DOWN_MASK) == 0)  {
       injector.registerGroup.getRegister(keyStroke.keyChar)?.text
     } else {

@@ -64,8 +64,8 @@ public class VimArgTextObjExtension implements VimExtension {
    */
   private static class BracketPairs {
     // NOTE: brackets must match by the position, and ordered by rank (highest to lowest).
-    @NotNull private final String openBrackets;
-    @NotNull private final String closeBrackets;
+    private final @NotNull String openBrackets;
+    private final @NotNull String closeBrackets;
 
     static class ParseException extends Exception {
       public ParseException(@NotNull String message) {
@@ -87,8 +87,7 @@ public class VimArgTextObjExtension implements VimExtension {
      * @param bracketPairs comma-separated list of colon-separated bracket pairs.
      * @throws ParseException if a syntax error is detected.
      */
-    @NotNull
-    static BracketPairs fromBracketPairList(@NotNull final String bracketPairs) throws ParseException {
+    static @NotNull BracketPairs fromBracketPairList(final @NotNull String bracketPairs) throws ParseException {
       StringBuilder openBrackets = new StringBuilder();
       StringBuilder closeBrackets = new StringBuilder();
       ParseState state = ParseState.OPEN;
@@ -128,7 +127,7 @@ public class VimArgTextObjExtension implements VimExtension {
       return new BracketPairs(openBrackets.toString(), closeBrackets.toString());
     }
 
-    BracketPairs(@NotNull final String openBrackets, @NotNull final String closeBrackets) {
+    BracketPairs(final @NotNull String openBrackets, final @NotNull String closeBrackets) {
       assert openBrackets.length() == closeBrackets.length();
       this.openBrackets = openBrackets;
       this.closeBrackets = closeBrackets;
@@ -158,10 +157,9 @@ public class VimArgTextObjExtension implements VimExtension {
     }
   }
 
-  public static final BracketPairs DEFAULT_BRACKET_PAIRS = new BracketPairs("(", ")");
+  private static final BracketPairs DEFAULT_BRACKET_PAIRS = new BracketPairs("(", ")");
 
-  @Nullable
-  private static String bracketPairsVariable() {
+  private static @Nullable String bracketPairsVariable() {
     final Object value = VimPlugin.getVariableService().getGlobalVariableValue("argtextobj_pairs");
     if (value instanceof VimString vimValue) {
       return vimValue.getValue();
@@ -192,13 +190,12 @@ public class VimArgTextObjExtension implements VimExtension {
         this.isInner = isInner;
       }
 
-      @Nullable
       @Override
-      public TextRange getRange(@NotNull VimEditor editor,
-                                @NotNull ImmutableVimCaret caret,
-                                @NotNull ExecutionContext context,
-                                int count,
-                                int rawCount) {
+      public @Nullable TextRange getRange(@NotNull VimEditor editor,
+                                          @NotNull ImmutableVimCaret caret,
+                                          @NotNull ExecutionContext context,
+                                          int count,
+                                          int rawCount) {
         BracketPairs bracketPairs = DEFAULT_BRACKET_PAIRS;
         final String bracketPairsVar = bracketPairsVariable();
         if (bracketPairsVar != null) {
@@ -236,9 +233,8 @@ public class VimArgTextObjExtension implements VimExtension {
         return new TextRange(finder.getLeftBound(), finder.getRightBound());
       }
 
-      @NotNull
       @Override
-      public TextObjectVisualType getVisualType() {
+      public @NotNull TextObjectVisualType getVisualType() {
         return TextObjectVisualType.CHARACTER_WISE;
       }
     }
@@ -265,8 +261,11 @@ public class VimArgTextObjExtension implements VimExtension {
           }
         });
       } else {
-        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument.Motion(new Command(count,
-                                                                                         textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))));
+        keyHandlerState.getCommandBuilder().completeCommandPart(
+          new Argument.MotionAction(
+            new Command(count, textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))
+          )
+        );
       }
     }
   }
@@ -276,9 +275,9 @@ public class VimArgTextObjExtension implements VimExtension {
    * position
    */
   private static class ArgBoundsFinder {
-    @NotNull private final CharSequence text;
-    @NotNull private final Document document;
-    @NotNull private final BracketPairs brackets;
+    private final @NotNull CharSequence text;
+    private final @NotNull Document document;
+    private final @NotNull BracketPairs brackets;
     private int leftBound = Integer.MAX_VALUE;
     private int rightBound = Integer.MIN_VALUE;
     private int leftBracket;
@@ -305,7 +304,7 @@ public class VimArgTextObjExtension implements VimExtension {
      * @param position starting position.
      */
     boolean findBoundsAt(int position) throws IllegalStateException {
-      if (text.length() == 0) {
+      if (text.isEmpty()) {
         error = "empty document";
         return false;
       }

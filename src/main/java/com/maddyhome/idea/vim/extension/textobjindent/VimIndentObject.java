@@ -37,7 +37,7 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
 
 /**
  * Port of vim-indent-object:
- * https://github.com/michaeljsmith/vim-indent-object
+ * <a href="https://github.com/michaeljsmith/vim-indent-object">vim-indent-object</a>
  *
  * <p>
  * vim-indent-object provides these text objects based on the cursor line's indentation:
@@ -49,7 +49,7 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
  * </ul>
  *
  * See also the reference manual for more details at:
- * https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object.txt
+ * <a href="https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object.txt">indent-object.txt</a>
  *
  * @author Shrikant Kandula (@sharat87)
  */
@@ -98,13 +98,12 @@ public class VimIndentObject implements VimExtension {
         this.includeBelow = includeBelow;
       }
 
-      @Nullable
       @Override
-      public TextRange getRange(@NotNull VimEditor editor,
-                                @NotNull ImmutableVimCaret caret,
-                                @NotNull ExecutionContext context,
-                                int count,
-                                int rawCount) {
+      public @Nullable TextRange getRange(@NotNull VimEditor editor,
+                                          @NotNull ImmutableVimCaret caret,
+                                          @NotNull ExecutionContext context,
+                                          int count,
+                                          int rawCount) {
         final CharSequence charSequence = ((IjVimEditor)editor).getEditor().getDocument().getCharsSequence();
         final int caretOffset = ((IjVimCaret)caret).getCaret().getOffset();
 
@@ -249,9 +248,8 @@ public class VimIndentObject implements VimExtension {
         return new TextRange(upperBoundaryOffset, lowerBoundaryOffset);
       }
 
-      @NotNull
       @Override
-      public TextObjectVisualType getVisualType() {
+      public @NotNull TextObjectVisualType getVisualType() {
         return TextObjectVisualType.LINE_WISE;
       }
 
@@ -285,9 +283,11 @@ public class VimIndentObject implements VimExtension {
 
         });
       } else {
-        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument.Motion(new Command(count,
-                                                                                         textObjectHandler, Command.Type.MOTION,
-                                                                                         EnumSet.noneOf(CommandFlags.class))));
+        keyHandlerState.getCommandBuilder().completeCommandPart(
+          new Argument.MotionAction(
+            new Command(count, textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))
+          )
+        );
       }
     }
   }

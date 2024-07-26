@@ -42,7 +42,7 @@ class ChangeLineAction : ChangeInInsertSequenceAction() {
       editor,
       caret,
       context,
-      Argument.Motion(command),
+      Argument.MotionAction(command),
       operatorArguments,
     )
   }

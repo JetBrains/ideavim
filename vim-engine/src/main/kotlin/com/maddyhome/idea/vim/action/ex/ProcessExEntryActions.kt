@@ -34,8 +34,9 @@ class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
   override var motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getMotionActionHandler(argument: Argument?): MotionActionHandler {
-    if (argument?.processing != null) return ExecuteDefinedInputProcessingAction()
-    return if (argument?.character == ':') ProcessExCommandEntryAction() else ProcessSearchEntryAction(this)
+    check(argument is Argument.ExString)
+    if (argument.processing != null) return ExecuteDefinedInputProcessingAction()
+    return if (argument.label == ':') ProcessExCommandEntryAction() else ProcessSearchEntryAction(this)
   }
 }
 
@@ -48,7 +49,7 @@ class ExecuteDefinedInputProcessingAction : MotionActionHandler.SingleExecution(
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    if (argument == null) return Motion.Error
+    if (argument !is Argument.ExString) return Motion.Error
     val input = argument.string
     val processing = argument.processing!!
 
@@ -62,11 +63,11 @@ class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) :
     get() = throw RuntimeException("Parent motion type should be used, as only it is accessed by other code")
 
   override fun getOffset(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
-    if (argument == null) return Motion.Error
-    val offsetAndMotion = when (argument.character) {
+    if (argument !is Argument.ExString) return Motion.Error
+    val offsetAndMotion = when (argument.label) {
       '/' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, operatorArguments.count1, Direction.FORWARDS)
       '?' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, operatorArguments.count1, Direction.BACKWARDS)
-      else -> throw ExException("Unexpected search label ${argument.character}")
+      else -> throw ExException("Unexpected search label ${argument.label}")
     }
     // Vim doesn't treat not finding something as an error, although it might report either an error or warning message
     if (offsetAndMotion == null) return Motion.NoMotion
@@ -79,7 +80,7 @@ class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: VimEditor, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
-    if (argument == null) return Motion.Error
+    if (argument !is Argument.ExString) return Motion.Error
 
     try {
       // Exit Command-line mode and return to the previous mode before executing the command (this is set to Normal in
