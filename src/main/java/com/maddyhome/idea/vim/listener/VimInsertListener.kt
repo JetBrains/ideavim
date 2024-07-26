@@ -17,7 +17,9 @@ import com.maddyhome.idea.vim.state.mode.Mode
 @Deprecated(message = "Please use ModeChangeListener", replaceWith = ReplaceWith("ModeChangeListener", imports = ["import com.maddyhome.idea.vim.common.ModeChangeListener"]))
 interface VimInsertListener : ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
-    insertModeStarted(editor.ij)
+    if (editor.mode == Mode.INSERT) {
+      insertModeStarted(editor.ij)
+    }
   }
 
   fun insertModeStarted(editor: Editor)
