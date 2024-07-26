@@ -47,11 +47,14 @@ import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.listener.AppCodeTemplates
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.returnTo
 import org.jetbrains.annotations.Range
 import kotlin.math.max
 import kotlin.math.min
@@ -320,6 +323,18 @@ internal class MotionGroup : VimMotionGroupBase() {
             }
           }
         }
+      } else {
+        val state = injector.vimState as VimStateMachineImpl
+        if (state.mode is Mode.VISUAL) {
+          val returnTo = state.mode.returnTo
+          when (returnTo) {
+            ReturnTo.INSERT -> state.mode = Mode.INSERT
+            ReturnTo.REPLACE -> state.mode = Mode.REPLACE
+            null -> state.mode = Mode.NORMAL()
+          }
+        }
+        val keyHandler = KeyHandler.getInstance()
+        KeyHandler.getInstance().reset(keyHandler.keyHandlerState, state.mode)
       }
     }
   }
