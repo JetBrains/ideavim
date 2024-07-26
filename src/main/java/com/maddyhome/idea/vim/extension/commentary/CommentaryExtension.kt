@@ -187,7 +187,7 @@ internal class CommentaryExtension : VimExtension {
       val command = Command(operatorArguments.count1, CommentaryTextObjectMotionHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java))
 
       val keyState = KeyHandler.getInstance().keyHandlerState
-      keyState.commandBuilder.completeCommandPart(Argument.Motion(command))
+      keyState.commandBuilder.completeCommandPart(Argument.MotionAction(command))
     }
   }
 

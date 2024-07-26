@@ -31,7 +31,7 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val argument = cmd.argument ?: return false
+    val argument = cmd.argument as? Argument.Character ?: return false
     val reg = argument.character
     val application = injector.application
     val res = arrayOf(false)
@@ -49,7 +49,7 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
           if (reg != '@') { // @ is not a register itself, it just tells vim to use the last register
             injector.macro.lastRegister = reg
           }
-        } catch (e: ExException) {
+        } catch (_: ExException) {
           res[0] = false
         }
       }

@@ -875,28 +875,25 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     isChange: Boolean,
     operatorArguments: OperatorArguments,
   ): Pair<TextRange, SelectionType>? {
+    check(argument is Argument.Motion) { "Unexpected argument: $argument" }
+
     val range = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments) ?: return null
+    var motionType = argument.getMotionType()
 
     // Delete motion commands that are not linewise become linewise if all the following are true:
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
-    var type: SelectionType = if (argument.motion.isLinewiseMotion()) {
-      SelectionType.LINE_WISE
-    } else {
-      SelectionType.CHARACTER_WISE
-    }
-    val motion = argument.motion
-    if (!isChange && !motion.isLinewiseMotion()) {
+    if (!isChange && motionType != SelectionType.LINE_WISE) {
       val start = editor.offsetToBufferPosition(range.startOffset)
       val end = editor.offsetToBufferPosition(range.endOffset)
-      if (start.line != end.line) {
-        if (!editor.anyNonWhitespace(range.startOffset, -1) && !editor.anyNonWhitespace(range.endOffset, 1)) {
-          type = SelectionType.LINE_WISE
-        }
+      if (start.line != end.line
+        && !editor.anyNonWhitespace(range.startOffset, -1)
+        && !editor.anyNonWhitespace(range.endOffset, 1)) {
+        motionType = SelectionType.LINE_WISE
       }
     }
-    return Pair(range, type)
+    return Pair(range, motionType)
   }
 
   /**
@@ -1145,7 +1142,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     var count0 = operatorArguments.count0
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
-    val motion = argument.motion
+    // TODO: What if the argument is MotionOffsets?
+    val motion = (argument as? Argument.MotionAction)?.motion ?: return false
     val id = motion.action.id
     var kludge = false
     val bigWord = id == VIM_MOTION_BIG_WORD_RIGHT

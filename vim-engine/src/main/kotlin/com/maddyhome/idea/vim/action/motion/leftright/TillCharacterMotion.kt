@@ -58,7 +58,7 @@ sealed class TillCharacterMotion(
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    if (argument == null) return Motion.Error
+    if (argument !is Argument.Character) return Motion.Error
     val res = if (finishBeforeCharacter) {
       injector.motion
         .moveCaretToBeforeNextCharacterOnLine(

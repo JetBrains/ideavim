@@ -52,7 +52,8 @@ class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     // The converted digraph character has been captured as an argument, push it back through key handler
-    val keyStroke = KeyStroke.getKeyStroke(cmd.argument!!.character)
+    val argument = cmd.argument as? Argument.Character ?: return false
+    val keyStroke = KeyStroke.getKeyStroke(argument.character)
     val keyHandler = KeyHandler.getInstance()
     keyHandler.handleKey(editor, keyStroke, context, keyHandler.keyHandlerState)
     return true

@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 
 // todo make it multicaret
-private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, selectionType: SelectionType): Boolean {
+private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, motionType: SelectionType): Boolean {
   val func = injector.globalOptions().operatorfunc
   if (func.isEmpty()) {
     VimPlugin.showMessage(MessageHelper.message("E774"))
@@ -57,9 +57,9 @@ private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textR
         if (value is VimFuncref) {
           handler = value.handler
         }
-      } catch (ex: ExException) {
+      } catch (_: ExException) {
         // Get the argument for function('...') or funcref('...') for the error message
-        val functionName = if (expression is FunctionCallExpression && expression.arguments.size > 0) {
+        val functionName = if (expression is FunctionCallExpression && expression.arguments.isNotEmpty()) {
           expression.arguments[0].evaluate(editor, context, scriptContext).toString()
         }
         else {
@@ -77,7 +77,7 @@ private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textR
     return false
   }
 
-  val arg = when (selectionType) {
+  val arg = when (motionType) {
     SelectionType.LINE_WISE -> "line"
     SelectionType.CHARACTER_WISE -> "char"
     SelectionType.BLOCK_WISE -> "block"
@@ -101,19 +101,13 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
   override val argumentType: Argument.Type = Argument.Type.MOTION
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val argument = cmd.argument ?: return false
+    val argument = cmd.argument as? Argument.Motion ?: return false
     if (!editor.inRepeatMode) {
       argumentCaptured = argument
     }
     val range = getMotionRange(editor, context, argument, operatorArguments)
-
     if (range != null) {
-      val selectionType = if (argument.motion.isLinewiseMotion()) {
-        SelectionType.LINE_WISE
-      } else {
-        SelectionType.CHARACTER_WISE
-      }
-      return doOperatorAction(editor, context, range, selectionType)
+      return doOperatorAction(editor, context, range, argument.getMotionType())
     }
     return false
   }
@@ -121,7 +115,7 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
   private fun getMotionRange(
     editor: VimEditor,
     context: ExecutionContext,
-    argument: Argument,
+    argument: Argument.Motion,
     operatorArguments: OperatorArguments,
   ): TextRange? {
     // Note that we're using getMotionRange2 in order to avoid normalising the linewise range into line start
@@ -136,7 +130,7 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
       operatorArguments,
     )?.normalize()?.let {
       // If we're linewise, make sure the end offset isn't just the EOL char
-      if (argument.motion.isLinewiseMotion() && it.endOffset < editor.fileSize()) {
+      if (argument.getMotionType() == SelectionType.LINE_WISE && it.endOffset < editor.fileSize()) {
         TextRange(it.startOffset, it.endOffset + 1)
       } else {
         it

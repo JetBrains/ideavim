@@ -36,7 +36,7 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingI
 
 /**
  * Port of vim-entire:
- * https://github.com/kana/vim-textobj-entire
+ * <a href="https://github.com/kana/vim-textobj-entire">vim-textobj-entire</a>
  *
  * <p>
  * vim-textobj-entire provides two text objects:
@@ -51,7 +51,7 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingI
  * </ul>
  *
  * See also the reference manual for more details at:
- * https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
+ * <a href="https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt">text-obj-entire.txt</a>
  *
  * @author Alexandre Grison (@agrison)
  */
@@ -94,13 +94,12 @@ public class VimTextObjEntireExtension implements VimExtension {
         this.ignoreLeadingAndTrailing = ignoreLeadingAndTrailing;
       }
 
-      @Nullable
       @Override
-      public TextRange getRange(@NotNull VimEditor editor,
-                                @NotNull ImmutableVimCaret caret,
-                                @NotNull ExecutionContext context,
-                                int count,
-                                int rawCount) {
+      public @Nullable TextRange getRange(@NotNull VimEditor editor,
+                                          @NotNull ImmutableVimCaret caret,
+                                          @NotNull ExecutionContext context,
+                                          int count,
+                                          int rawCount) {
         int start = 0, end = ((IjVimEditor)editor).getEditor().getDocument().getTextLength();
 
         // for the `ie` text object we don't want leading an trailing spaces
@@ -125,9 +124,8 @@ public class VimTextObjEntireExtension implements VimExtension {
         return new TextRange(start, end);
       }
 
-      @NotNull
       @Override
-      public TextObjectVisualType getVisualType() {
+      public @NotNull TextObjectVisualType getVisualType() {
         return TextObjectVisualType.CHARACTER_WISE;
       }
     }
@@ -155,9 +153,11 @@ public class VimTextObjEntireExtension implements VimExtension {
 
         });
       } else {
-        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument.Motion(new Command(count,
-                                                                                         textObjectHandler, Command.Type.MOTION,
-                                                                                         EnumSet.noneOf(CommandFlags.class))));
+        keyHandlerState.getCommandBuilder().completeCommandPart(
+          new Argument.MotionAction(
+            new Command(count, textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))
+          )
+        );
       }
     }
   }

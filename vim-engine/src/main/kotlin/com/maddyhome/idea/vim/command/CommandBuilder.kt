@@ -210,7 +210,7 @@ class CommandBuilder(
         command.register = null
         command = next
       } else {
-        command.argument = Argument.Motion(next)
+        command.argument = Argument.MotionAction(next)
         assert(commandParts.size == 0)
       }
     }

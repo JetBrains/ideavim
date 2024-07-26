@@ -80,8 +80,8 @@ open class YankGroupBase : VimYankGroup {
     argument: Argument,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val motion = argument.motion
-    val type = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
+    val motion = argument as? Argument.Motion ?: return false
+    val motionType = motion.getMotionType()
 
     val nativeCaretCount = editor.nativeCarets().size
     if (nativeCaretCount <= 0) return false
@@ -90,7 +90,12 @@ open class YankGroupBase : VimYankGroup {
     val ranges = ArrayList<Pair<Int, Int>>(nativeCaretCount)
 
     // This logic is from original vim
-    val startOffsets = if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) null else HashMap<VimCaret, Int>(nativeCaretCount)
+    val startOffsets =
+      if (argument is Argument.MotionAction && argument.motion.action is MotionDownLess1FirstNonSpaceAction) {
+        null
+      } else {
+        HashMap<VimCaret, Int>(nativeCaretCount)
+      }
 
     for (caret in editor.nativeCarets()) {
       val motionRange = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
@@ -102,7 +107,7 @@ open class YankGroupBase : VimYankGroup {
       caretToRange[caret] = TextRange(motionRange.startOffset, motionRange.endOffset)
     }
 
-    val range = getTextRange(ranges, type) ?: return false
+    val range = getTextRange(ranges, motionType) ?: return false
 
     if (range.size() == 0) return false
 
@@ -110,7 +115,7 @@ open class YankGroupBase : VimYankGroup {
       editor,
       caretToRange,
       range,
-      type,
+      motionType,
       startOffsets,
     )
   }

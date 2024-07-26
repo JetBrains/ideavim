@@ -18,14 +18,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.RWLockLabel
-import com.maddyhome.idea.vim.helper.isCloseKeyStroke
-import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptorBase
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.Script
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.INSERT])
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
@@ -39,9 +35,8 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val argument = cmd.argument
-
-    if (argument?.character == '=') {
+    val argument = cmd.argument as? Argument.Character ?: return false
+    if (argument.character == '=') {
       injector.commandLine.readInputAndProcess(editor, context, "=", finishOn = null) { input ->
         try {
           if (input.isNotEmpty()) {
@@ -58,7 +53,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
       }
       return true
     } else {
-      return argument != null && insertRegister(editor, context, argument.character, operatorArguments)
+      return insertRegister(editor, context, argument.character, operatorArguments)
     }
   }
 }

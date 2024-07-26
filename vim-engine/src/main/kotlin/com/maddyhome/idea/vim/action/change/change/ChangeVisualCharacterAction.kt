@@ -44,7 +44,7 @@ class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val argument = cmd.argument
-    return argument != null &&
+    return argument is Argument.Character &&
       changeCharacterRange(editor, caret, range.toVimTextRange(false), argument.character)
   }
 }

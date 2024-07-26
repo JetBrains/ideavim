@@ -26,7 +26,7 @@ class ToggleRecordingAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     return if (!injector.registerGroup.isRecording) {
-      val argument = cmd.argument ?: return false
+      val argument = cmd.argument as? Argument.Character ?: return false
       val reg = argument.character
       injector.registerGroup.startRecording(reg)
     } else {
