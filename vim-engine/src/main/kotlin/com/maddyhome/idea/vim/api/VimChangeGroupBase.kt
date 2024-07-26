@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.ChangesListener
-import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -2069,10 +2068,4 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     VimChangeGroup.ChangeCaseType.LOWER -> Character.toLowerCase(ch)
     VimChangeGroup.ChangeCaseType.UPPER -> Character.toUpperCase(ch)
   }
-}
-
-fun OperatedRange.toType(): SelectionType = when (this) {
-  is OperatedRange.Characters -> SelectionType.CHARACTER_WISE
-  is OperatedRange.Lines -> SelectionType.LINE_WISE
-  is OperatedRange.Block -> SelectionType.BLOCK_WISE
 }
