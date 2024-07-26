@@ -79,7 +79,7 @@ internal class VimQuickJavaDoc : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    injector.actionExecutor.executeAction(IdeActions.ACTION_QUICK_JAVADOC, context)
+    injector.actionExecutor.executeAction(editor, IdeActions.ACTION_QUICK_JAVADOC, context)
     return true
   }
 }

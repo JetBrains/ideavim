@@ -33,7 +33,7 @@ data class FindFileCommand(val range: Range, val argument: String) : Command.Sin
       return if (res) ExecutionResult.Success else ExecutionResult.Error
     }
 
-    injector.application.invokeLater { injector.actionExecutor.executeAction("GotoFile", context) }
+    injector.application.invokeLater { injector.actionExecutor.executeAction(editor, name = "GotoFile", context = context) }
 
     return ExecutionResult.Success
   }

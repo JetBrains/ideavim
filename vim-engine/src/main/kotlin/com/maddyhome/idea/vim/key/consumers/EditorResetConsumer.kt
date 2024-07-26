@@ -65,7 +65,7 @@ class EditorResetConsumer : KeyConsumer {
           val executed = arrayOf<Boolean?>(null)
           injector.actionExecutor.executeCommand(
             editor,
-            { executed[0] = injector.actionExecutor.executeEsc(context) },
+            { executed[0] = injector.actionExecutor.executeEsc(editor, context) },
             "",
             null,
           )

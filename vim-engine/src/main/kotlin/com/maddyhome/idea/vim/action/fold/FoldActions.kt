@@ -28,7 +28,7 @@ class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_COLLAPSE_ALL_REGIONS, context)
+    injector.actionExecutor.executeAction(editor, name = injector.actionExecutor.ACTION_COLLAPSE_ALL_REGIONS, context = context)
     return true
   }
 }
@@ -44,7 +44,7 @@ class VimCollapseRegion : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_COLLAPSE_REGION, context)
+    injector.actionExecutor.executeAction(editor, name = injector.actionExecutor.ACTION_COLLAPSE_REGION, context = context)
     return true
   }
 }
@@ -59,7 +59,10 @@ class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_COLLAPSE_REGION_RECURSIVELY, context)
+    injector.actionExecutor.executeAction(editor,
+      name = injector.actionExecutor.ACTION_COLLAPSE_REGION_RECURSIVELY,
+      context = context
+    )
     return true
   }
 }
@@ -75,7 +78,7 @@ class VimExpandAllRegions : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_EXPAND_ALL_REGIONS, context)
+    injector.actionExecutor.executeAction(editor, name = injector.actionExecutor.ACTION_EXPAND_ALL_REGIONS, context = context)
     return true
   }
 }
@@ -91,7 +94,7 @@ class VimExpandRegion : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_EXPAND_REGION, context)
+    injector.actionExecutor.executeAction(editor, name = injector.actionExecutor.ACTION_EXPAND_REGION, context = context)
     return true
   }
 }
@@ -107,7 +110,10 @@ class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_EXPAND_REGION_RECURSIVELY, context)
+    injector.actionExecutor.executeAction(editor,
+      name = injector.actionExecutor.ACTION_EXPAND_REGION_RECURSIVELY,
+      context = context
+    )
     return true
   }
 }

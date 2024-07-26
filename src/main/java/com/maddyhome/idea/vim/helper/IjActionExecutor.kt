@@ -174,9 +174,9 @@ internal class IjActionExecutor : VimActionExecutor {
    * @param name    The name of the action to execute
    * @param context The context to run it in
    */
-  override fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean {
+  override fun executeAction(editor: VimEditor, name: @NonNls String, context: ExecutionContext): Boolean {
     val action = getAction(name, context)
-    return action != null && executeAction(null, IjNativeAction(action), context)
+    return action != null && executeAction(editor, IjNativeAction(action), context)
   }
   
   private fun getAction(name: String, context: ExecutionContext): AnAction? {
@@ -222,8 +222,8 @@ internal class IjActionExecutor : VimActionExecutor {
     CommandProcessor.getInstance().executeCommand(editor?.ij?.project, runnable, name, groupId)
   }
 
-  override fun executeEsc(context: ExecutionContext): Boolean {
-    return executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)
+  override fun executeEsc(editor: VimEditor, context: ExecutionContext): Boolean {
+    return executeAction(editor, IdeActions.ACTION_EDITOR_ESCAPE, context)
   }
 
   override fun executeVimAction(

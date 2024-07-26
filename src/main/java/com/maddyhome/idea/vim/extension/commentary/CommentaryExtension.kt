@@ -79,11 +79,12 @@ internal class CommentaryExtension : VimExtension {
 
         val project = editor.ij.project!!
         val callback = { afterCommenting(mode, editor, resetCaret, range) }
-        actions.any { executeActionWithCallbackOnSuccess(it, project, context, callback) }
+        actions.any { executeActionWithCallbackOnSuccess(editor, it, project, context, callback) }
       }
     }
 
     private fun executeActionWithCallbackOnSuccess(
+      editor: VimEditor,
       action: String,
       project: Project,
       context: ExecutionContext,
@@ -92,7 +93,7 @@ internal class CommentaryExtension : VimExtension {
       val res = Ref.create<Boolean>(false)
       AsyncActionExecutionService.getInstance(project).withExecutionAfterAction(
         action,
-        { res.set(injector.actionExecutor.executeAction(action, context)) },
+        { res.set(injector.actionExecutor.executeAction(editor, name = action, context = context)) },
         { if (res.get()) callback() })
       return res.get()
     }

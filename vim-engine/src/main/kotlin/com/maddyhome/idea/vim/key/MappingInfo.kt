@@ -255,7 +255,7 @@ class ToActionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToAction' mapping...")
-    injector.actionExecutor.executeAction(action, context)
+    injector.actionExecutor.executeAction(editor, name = action, context = context)
   }
 
   companion object {

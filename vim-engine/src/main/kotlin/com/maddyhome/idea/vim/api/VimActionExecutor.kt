@@ -35,7 +35,7 @@ interface VimActionExecutor {
    * @param name    The name of the action to execute
    * @param context The context to run it in
    */
-  fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean
+  fun executeAction(editor: VimEditor, name: @NonNls String, context: ExecutionContext): Boolean
 
   fun executeCommand(
     editor: VimEditor?,
@@ -44,7 +44,7 @@ interface VimActionExecutor {
     groupId: Any?,
   )
 
-  fun executeEsc(context: ExecutionContext): Boolean
+  fun executeEsc(editor: VimEditor, context: ExecutionContext): Boolean
 
   fun executeVimAction(
     editor: VimEditor,

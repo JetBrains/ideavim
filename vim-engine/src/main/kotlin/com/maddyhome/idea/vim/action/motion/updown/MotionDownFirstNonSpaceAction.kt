@@ -50,7 +50,10 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   ): Motion {
     val templateState = injector.templateManager.getTemplateState(editor)
     return if (templateState != null) {
-      injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context)
+      injector.actionExecutor.executeAction(editor,
+        name = injector.actionExecutor.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE,
+        context = context
+      )
       Motion.NoMotion
     } else {
       injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, operatorArguments.count1).toMotion()
