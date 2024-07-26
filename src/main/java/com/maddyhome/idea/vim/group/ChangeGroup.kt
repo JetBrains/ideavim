@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
+import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -173,6 +174,16 @@ class ChangeGroup : VimChangeGroupBase() {
     } catch (e: Exception) {
       // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
     }
+  }
+
+  @Deprecated(message = "Please use listenersNotifier", replaceWith = ReplaceWith("injector.listenersNotifier.modeChangeListeners.add", imports = ["import com.maddyhome.idea.vim.api.injector"]))
+  fun addInsertListener(listener: VimInsertListener) {
+    injector.listenersNotifier.modeChangeListeners.add(listener)
+  }
+
+  @Deprecated(message = "Please use listenersNotifier", replaceWith = ReplaceWith("injector.listenersNotifier.modeChangeListeners.remove", imports = ["import com.maddyhome.idea.vim.api.injector"]))
+  fun removeInsertListener(listener: VimInsertListener) {
+    injector.listenersNotifier.modeChangeListeners.remove(listener)
   }
 
   private companion object {
