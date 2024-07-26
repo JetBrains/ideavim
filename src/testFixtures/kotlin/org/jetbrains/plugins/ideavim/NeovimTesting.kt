@@ -27,8 +27,8 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.toVimNotation
-import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertEquals
 
 object NeovimTesting {
   private lateinit var neovimApi: NeovimApi

@@ -48,6 +48,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.3")
 
+    // Temp workaround suggested in https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#junit5-test-framework-refers-to-junit4
+    // Can be removed when IJPL-159134 is fixed
+//    testRuntimeOnly("junit:junit:4.13.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.3")
+
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")

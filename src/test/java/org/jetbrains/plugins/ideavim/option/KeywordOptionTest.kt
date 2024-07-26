@@ -7,7 +7,6 @@
  */
 package org.jetbrains.plugins.ideavim.option
 
-import com.intellij.testFramework.UsefulTestCase.assertDoesntContain
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.newapi.vim
@@ -92,14 +91,7 @@ class KeywordOptionTest : VimTestCase() {
     setKeyword("b-a")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: iskeyword=b-a")
-    assertDoesntContain(
-      values,
-      object : ArrayList<String?>() {
-        init {
-          add("b-a")
-        }
-      },
-    )
+    assertTrue("b-a" !in values)
   }
 
   @Test
@@ -107,14 +99,7 @@ class KeywordOptionTest : VimTestCase() {
     setKeyword("ab")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: iskeyword=ab")
-    assertDoesntContain(
-      values,
-      object : ArrayList<String?>() {
-        init {
-          add("ab")
-        }
-      },
-    )
+    assertTrue("ab" !in values)
   }
 
   @Test

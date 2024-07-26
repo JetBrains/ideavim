@@ -69,7 +69,7 @@ plugins {
   kotlin("jvm") version "2.0.0"
   application
   id("java-test-fixtures")
-  id("org.jetbrains.intellij.platform") version "2.0.0-beta9"
+  id("org.jetbrains.intellij.platform") version "2.0.0-rc1"
   id("org.jetbrains.changelog") version "2.2.1"
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.0"
@@ -152,6 +152,12 @@ dependencies {
   testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
   testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.3")
   testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
+
+  // Temp workaround suggested in https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#junit5-test-framework-refers-to-junit4
+  // Can be removed when IJPL-159134 is fixed
+//  testRuntimeOnly("junit:junit:4.13.2")
+  testImplementation("org.junit.vintage:junit-vintage-engine:5.10.3")
+//  testFixturesImplementation("org.junit.vintage:junit-vintage-engine:5.10.3")
 }
 
 configurations {

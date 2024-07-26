@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
-import com.intellij.testFramework.UsefulTestCase.assertContainsElements
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ReplaceWithRegisterTest : VimTestCase() {
 
@@ -525,7 +525,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
   fun `test multiple carets`() {
   // Behaviour of pasting a full line with multiple carets is undefined in Vim and has different implementation in
   // IdeaVim depending on if ideaput is specified in 'clipboard' or not
-  assertContainsElements(optionsNoEditor().clipboard, OptionConstants.clipboard_ideaput)
+  assertTrue(OptionConstants.clipboard_ideaput in optionsNoEditor().clipboard)
 
   enableExtensions("multiple-cursors")
     val text = """

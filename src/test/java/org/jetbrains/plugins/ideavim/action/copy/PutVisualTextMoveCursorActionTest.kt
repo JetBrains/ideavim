@@ -18,7 +18,6 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
-import org.junit.Ignore
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -261,9 +260,9 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     assertState(after)
   }
 
-  @Suppress("unused")
-  @Ignore
-  fun `ingoretest put visual block visual line mode`() {
+  @Disabled
+  @Test
+  fun `test put visual block visual line mode`() {
     val before = """
             qw${c}e
             asd
@@ -315,8 +314,6 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     assertState(after)
   }
 
-  @Suppress("unused")
-  @Ignore
   @Test
   @Disabled
   fun `test put visual text multicaret`() {
