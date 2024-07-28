@@ -152,7 +152,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     val currentCommand = injector.vimState.executingCommand
     if (currentCommand != null) {
       val argument = currentCommand.argument
-      if (argument is Argument.MotionAction) {
+      if (argument is Argument.Motion) {
         val motionCommand = argument.motion
         val action = motionCommand.action
         return action.id == "VimMotionPercentOrMatchAction" ||

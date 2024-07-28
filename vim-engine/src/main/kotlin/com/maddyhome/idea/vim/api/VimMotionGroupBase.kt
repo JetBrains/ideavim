@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.findMatchingPairOnCurrentLine
+import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
@@ -313,89 +314,86 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     argument: Argument,
     operatorArguments: OperatorArguments,
   ): TextRange? {
+    if (argument !is Argument.Motion) {
+      throw RuntimeException("Unexpected argument passed to getMotionRange2: $argument")
+    }
+
     var start: Int
     var end: Int
 
-    when (argument) {
-      is Argument.Offsets -> {
-        val offsets = argument.offsets[caret] ?: return null
-        val (first, second) = offsets.getNativeStartAndEnd()
-        start = first
-        end = second
-      }
+    val cmd = argument.motion
+    // Normalize the counts between the command and the motion argument
+    val cnt = cmd.count * operatorArguments.count1
+    val raw = if (operatorArguments.count0 == 0 && cmd.rawCount == 0) 0 else cnt
+    val cmdAction = cmd.action
 
-      is Argument.MotionAction -> {
-        val cmd = argument.motion
-        // Normalize the counts between the command and the motion argument
-        val cnt = cmd.count * operatorArguments.count1
-        val raw = if (operatorArguments.count0 == 0 && cmd.rawCount == 0) 0 else cnt
-        val cmdAction = cmd.action
-        if (cmdAction is MotionActionHandler) {
-          // This is where we are now
-          start = caret.offset
+    when (cmdAction) {
+      is MotionActionHandler -> {
+        // This is where we are now
+        start = caret.offset
 
-          // Execute the motion (without moving the cursor) and get where we end
-          val motion =
-            cmdAction.getHandlerOffset(editor, caret, context, cmd.argument, operatorArguments.withCount0(raw))
+        // Execute the motion (without moving the cursor) and get where we end
+        val motion = cmdAction.getHandlerOffset(editor, caret, context, cmd.argument, operatorArguments.withCount0(raw))
+        if (Motion.Error == motion || Motion.NoMotion == motion) return null
 
-          // Invalid motion
-          if (Motion.Error == motion) return null
-          if (Motion.NoMotion == motion) return null
-          end = (motion as AbsoluteOffset).offset
+        end = (motion as AbsoluteOffset).offset
 
-          // If inclusive, add the last character to the range
-          if (cmdAction.motionType === MotionType.INCLUSIVE) {
-            if (start > end) {
-              if (start < editor.fileSize()) start++
-            } else {
-              if (end < editor.fileSize()) end++
-            }
-          }
-        } else if (cmdAction is TextObjectActionHandler) {
-          val range: TextRange = cmdAction.getRange(editor, caret, context, cnt, raw)
-            ?: return null
-          start = range.startOffset
-          end = range.endOffset
-          if (cmd.isLinewiseMotion()) end--
-        } else {
-          throw RuntimeException(
-            "Commands doesn't take " + cmdAction.javaClass.simpleName + " as an operator",
-          )
-        }
-
-        // Normalize the range
-        if (start > end) {
-          val t = start
-          start = end
-          end = t
-        }
-
-        // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
-        // of the line and move the end to the end of the line.
-        if (cmd.isLinewiseMotion()) {
-          if (caret.getBufferPosition().line != editor.lineCount() - 1) {
-            start = editor.getLineStartForOffset(start)
-            end = min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
+        // If inclusive, add the last character to the range
+        if (cmdAction.motionType === MotionType.INCLUSIVE) {
+          if (start > end) {
+            if (start < editor.fileSize()) start++
           } else {
-            start = editor.getLineStartForOffset(start)
-            end = editor.getLineEndForOffset(end)
-          }
-        }
-
-        // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.
-        val text = editor.text().subSequence(start, end).toString()
-        val lastNewLine = text.lastIndexOf('\n')
-        if (lastNewLine > 0) {
-          val id = cmd.action.id
-          if (id == "VimMotionWordRightAction" || id == "VimMotionBigWordRightAction" || id == "VimMotionCamelRightAction") {
-            if (!editor.anyNonWhitespace(end, -1)) {
-              end = start + lastNewLine
-            }
+            if (end < editor.fileSize()) end++
           }
         }
       }
 
-      else -> throw RuntimeException("Unexpected argument: $argument")
+      is TextObjectActionHandler -> {
+        val range: TextRange = cmdAction.getRange(editor, caret, context, cnt, raw) ?: return null
+        start = range.startOffset
+        end = range.endOffset
+        if (cmd.isLinewiseMotion()) end--
+      }
+
+      is ExternalActionHandler -> {
+        val range: TextRange = cmdAction.getRange(caret) ?: return null
+        start = range.startOffset
+        end = range.endOffset
+        if (cmd.isLinewiseMotion()) end--
+      }
+
+      else -> throw RuntimeException("Commands doesn't take " + cmdAction.javaClass.simpleName + " as an operator")
+    }
+
+    // Normalize the range
+    if (start > end) {
+      val t = start
+      start = end
+      end = t
+    }
+
+    // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
+    // of the line and move the end to the end of the line.
+    if (cmd.isLinewiseMotion()) {
+      if (caret.getBufferPosition().line != editor.lineCount() - 1) {
+        start = editor.getLineStartForOffset(start)
+        end = min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
+      } else {
+        start = editor.getLineStartForOffset(start)
+        end = editor.getLineEndForOffset(end)
+      }
+    }
+
+    // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.
+    val text = editor.text().subSequence(start, end).toString()
+    val lastNewLine = text.lastIndexOf('\n')
+    if (lastNewLine > 0) {
+      val id = cmd.action.id
+      if (id == "VimMotionWordRightAction" || id == "VimMotionBigWordRightAction" || id == "VimMotionCamelRightAction") {
+        if (!editor.anyNonWhitespace(end, -1)) {
+          end = start + lastNewLine
+        }
+      }
     }
 
     return TextRange(start, end)
