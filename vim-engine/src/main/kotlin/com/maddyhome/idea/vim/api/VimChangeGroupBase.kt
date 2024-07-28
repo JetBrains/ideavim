@@ -1142,8 +1142,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     var count0 = operatorArguments.count0
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
-    // TODO: What if the argument is MotionOffsets?
-    val motion = (argument as? Argument.MotionAction)?.motion ?: return false
+    val motion = (argument as? Argument.Motion)?.motion ?: return false
     val id = motion.action.id
     var kludge = false
     val bigWord = id == VIM_MOTION_BIG_WORD_RIGHT

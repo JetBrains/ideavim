@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import java.util.*
@@ -47,10 +48,13 @@ data class Command(
   var register: Char? = null
 
   fun isLinewiseMotion(): Boolean {
-    return when (action) {
-      is TextObjectActionHandler -> (action as TextObjectActionHandler).visualType == TextObjectVisualType.LINE_WISE
-      is MotionActionHandler -> (action as MotionActionHandler).motionType == MotionType.LINE_WISE
-      else -> error("Command is not a motion: $action")
+    return action.let {
+      when (it) {
+        is TextObjectActionHandler -> it.visualType == TextObjectVisualType.LINE_WISE
+        is MotionActionHandler -> it.motionType == MotionType.LINE_WISE
+        is ExternalActionHandler -> it.isLinewiseMotion
+        else -> error("Command is not a motion: $action")
+      }
     }
   }
 

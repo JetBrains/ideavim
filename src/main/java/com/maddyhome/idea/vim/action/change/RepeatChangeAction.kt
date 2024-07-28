@@ -60,7 +60,7 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
       if (cmd.rawCount > 0) {
         lastCommand.rawCount = cmd.count
         val arg = lastCommand.argument
-        if (arg is Argument.MotionAction) {
+        if (arg is Argument.Motion) {
           val mot = arg.motion
           mot.rawCount = 0
         }
