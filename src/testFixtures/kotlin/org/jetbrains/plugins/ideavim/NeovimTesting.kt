@@ -83,7 +83,6 @@ object NeovimTesting {
   }
 
   private fun neovimEnabled(test: TestInfo, editor: Editor? = null): Boolean {
-    return true
     val method = test.testMethod.get()
     val noBehaviourDiffers = !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
     val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java) &&
