@@ -111,10 +111,14 @@ dependencies {
   compileOnly("org.jetbrains:annotations:24.1.0")
 
   intellijPlatform {
+    // Snapshots don't use installers
+    // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html#target-versions-installers
+    val useInstaller = ideaVersion.contains("EAP-SNAPSHOT")
+
     // Note that it is also possible to use local("...") to compile against a locally installed IDE
     // E.g. local("/Users/{user}/Applications/IntelliJ IDEA Ultimate.app")
     // Or something like: intellijIdeaUltimate(ideaVersion)
-    create(ideaType, ideaVersion)
+    create(ideaType, ideaVersion, useInstaller)
 
     pluginVerifier()
     zipSigner()
