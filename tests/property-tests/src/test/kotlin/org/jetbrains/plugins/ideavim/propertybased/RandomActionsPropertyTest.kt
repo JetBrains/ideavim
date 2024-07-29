@@ -90,6 +90,7 @@ private class AvailableActions(private val editor: Editor) : ImperativeCommand {
     val currentNode = KeyHandler.getInstance().keyHandlerState.commandBuilder.getCurrentTrie()
 
     val possibleKeys = currentNode.keys.toList().sortedBy { injector.parser.toKeyNotation(it) }
+    println("Keys: ${possibleKeys.joinToString(", ")}")
     val keyGenerator = Generator.integers(0, possibleKeys.lastIndex)
       .suchThat { injector.parser.toKeyNotation(possibleKeys[it]) !in stinkyKeysList }
       .map { possibleKeys[it] }
