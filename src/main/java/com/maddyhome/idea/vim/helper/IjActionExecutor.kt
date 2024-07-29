@@ -76,11 +76,10 @@ internal class IjActionExecutor : VimActionExecutor {
     val dataContext = DataContextWrapper(context.ij)
     dataContext.putUserData(runFromVimKey, true)
 
-    val contextComponent = PlatformCoreDataKeys.CONTEXT_COMPONENT.getData(dataContext)
-      ?: editor?.ij?.component ?: run {
-        LOG.error("Cannot get context component")
-        return false
-      }
+    val contextComponent = PlatformCoreDataKeys.CONTEXT_COMPONENT.getData(dataContext) ?: editor?.ij?.component ?: run {
+      LOG.error("Cannot get context component")
+      return false
+    }
 
     val result = withRunningAction {
       val result = withStringRegistryOption {
