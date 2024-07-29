@@ -83,6 +83,7 @@ object NeovimTesting {
   }
 
   private fun neovimEnabled(test: TestInfo, editor: Editor? = null): Boolean {
+    return true
     val method = test.testMethod.get()
     val noBehaviourDiffers = !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
     val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java) &&
@@ -188,7 +189,7 @@ object NeovimTesting {
       val neovimRegister = getRegister(register)
       val vimPluginRegister = VimPlugin.getRegister().getRegister(register)
       val ideavimRegister = vimPluginRegister?.text ?: ""
-      assertEquals("Register '$register'", neovimRegister, ideavimRegister)
+      assertEquals(neovimRegister, ideavimRegister, "Register '$register'")
 
       if (neovimRegister.isNotEmpty()) {
         val neovimRegisterType = neovimApi.callFunction("getregtype", listOf(register)).get().toString()
@@ -201,7 +202,7 @@ object NeovimTesting {
 
         // We take only the first char because neovim returns width for block selection
         val neovimChar = neovimRegisterType.getOrNull(0)?.toString() ?: ""
-        assertEquals("Register '$register'", expectedType, neovimChar)
+        assertEquals(expectedType, neovimChar, "Register '$register'")
       }
     }
   }
