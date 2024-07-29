@@ -103,7 +103,7 @@ object NeovimTesting {
       singleCaret
   }
 
-  fun isNeovimTestingEnabled(): Boolean {
+  private fun isNeovimTestingEnabled(): Boolean {
     val property = System.getProperty("ideavim.nvim.test", "false")
     val neovimTestingEnabled = if (property.isBlank()) true else property.toBoolean()
     return neovimTestingEnabled

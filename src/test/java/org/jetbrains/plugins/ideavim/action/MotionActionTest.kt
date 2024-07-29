@@ -736,7 +736,7 @@ class MotionActionTest : VimTestCase() {
   @Test
   fun testDeleteToEndOfSearchResultInclusive() {
     val before = "Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit"
-    val after = "Lorem ${c} amet, consectetur adipiscing elit"
+    val after = "Lorem $c amet, consectetur adipiscing elit"
     doTest("d/sit/e<CR>", before, after)
   }
 
