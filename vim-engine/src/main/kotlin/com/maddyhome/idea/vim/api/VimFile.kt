@@ -13,8 +13,8 @@ interface VimFile {
   fun displayHexInfo(editor: VimEditor)
   fun displayLocationInfo(vimEditor: VimEditor)
   fun selectPreviousTab(context: ExecutionContext)
-  fun saveFile(context: ExecutionContext)
-  fun saveFiles(context: ExecutionContext)
+  fun saveFile(editor: VimEditor, context: ExecutionContext)
+  fun saveFiles(editor: VimEditor, context: ExecutionContext)
   fun closeFile(editor: VimEditor, context: ExecutionContext)
   fun closeFile(number: Int, context: ExecutionContext)
   fun selectFile(count: Int, context: ExecutionContext): Boolean

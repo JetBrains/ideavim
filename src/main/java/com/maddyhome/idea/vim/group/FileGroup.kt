@@ -173,20 +173,20 @@ class FileGroup : VimFileBase() {
   /**
    * Saves specific file in the project.
    */
-  override fun saveFile(context: ExecutionContext) {
+  override fun saveFile(editor: VimEditor, context: ExecutionContext) {
     val action = if (injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)) {
       injector.nativeActionManager.saveAll
     } else {
       injector.nativeActionManager.saveCurrent
     }
-    action.execute(context)
+    action.execute(editor, context)
   }
 
   /**
    * Saves all files in the project.
    */
-  override fun saveFiles(context: ExecutionContext) {
-    injector.nativeActionManager.saveAll.execute(context)
+  override fun saveFiles(editor: VimEditor, context: ExecutionContext) {
+    injector.nativeActionManager.saveAll.execute(editor, context)
   }
 
   /**

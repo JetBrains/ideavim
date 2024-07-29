@@ -71,7 +71,7 @@ internal class IjActionExecutor : VimActionExecutor {
    * @param ijAction  The action to execute
    * @param context The context to run it in
    */
-  override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
+  override fun executeAction(editor: VimEditor, action: NativeAction, context: ExecutionContext): Boolean {
     val ijAction = (action as IjNativeAction).action
 
     /**
@@ -82,10 +82,7 @@ internal class IjActionExecutor : VimActionExecutor {
     dataContext.putUserData(runFromVimKey, true)
 
     val contextComponent = PlatformCoreDataKeys.CONTEXT_COMPONENT.getData(dataContext)
-      ?: editor?.ij?.component ?: run {
-        LOG.error("Can't get the context component")
-        return false
-      }
+      ?: editor.ij.component
 
     val result = withRunningAction {
       val result = withStringRegistryOption {

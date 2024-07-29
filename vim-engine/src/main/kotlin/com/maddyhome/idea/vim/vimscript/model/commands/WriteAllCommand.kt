@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class WriteAllCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    injector.file.saveFiles(context)
+    injector.file.saveFiles(editor, context)
     return ExecutionResult.Success
   }
 }

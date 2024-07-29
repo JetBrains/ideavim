@@ -28,7 +28,7 @@ data class WriteNextFileCommand(val range: Range, val argument: String) : Comman
     // be the file name
     val count = getCountFromRange(editor, editor.currentCaret())
 
-    injector.file.saveFile(context)
+    injector.file.saveFile(editor, context)
     injector.jumpService.saveJumpLocation(editor)
     injector.file.selectNextFile(count, context)
 

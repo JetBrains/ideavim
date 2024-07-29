@@ -26,7 +26,7 @@ class FileSaveCloseAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.file.saveFile(context)
+    injector.file.saveFile(editor, context)
     injector.file.closeFile(editor, context)
     return true
   }

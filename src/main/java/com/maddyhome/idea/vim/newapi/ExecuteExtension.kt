@@ -11,12 +11,13 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
 
-internal fun NativeAction?.execute(context: ExecutionContext) {
+internal fun NativeAction?.execute(editor: VimEditor, context: ExecutionContext) {
   if (this == null) return
-  injector.actionExecutor.executeAction(null, this, context)
+  injector.actionExecutor.executeAction(editor, this, context)
 }
 
 internal val VisualPosition.vim: VimVisualPosition
