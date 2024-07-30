@@ -107,16 +107,7 @@ internal class Matchit : VimExtension {
         matchitAction.reverse = reverse
         matchitAction.isInOpPending = true
 
-        keyState.commandBuilder.completeCommandPart(
-          Argument.Motion(
-            Command(
-              count,
-              matchitAction,
-              Command.Type.MOTION,
-              EnumSet.noneOf(CommandFlags::class.java),
-            ),
-          ),
-        )
+        keyState.commandBuilder.completeCommandPart(Argument.Motion(matchitAction, null))
       } else {
         editor.sortedCarets().forEach { caret ->
           injector.jumpService.saveJumpLocation(editor)
@@ -400,8 +391,7 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
 
 private fun getMotionOffset(motion: Motion): Int? {
   return when (motion) {
-    is Motion.AbsoluteOffset -> motion.offset
-    is Motion.AdjustedOffset -> motion.offset
+    is Motion.AdjustedOffset, is Motion.AbsoluteOffset -> motion.offset
     is Motion.Error, is Motion.NoMotion -> null
   }
 }

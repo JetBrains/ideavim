@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.trace
@@ -26,7 +25,6 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
@@ -241,9 +239,7 @@ class ToHandlerMappingInfo(
           }
         }
         if (offsets.isNotEmpty()) {
-          keyState.commandBuilder.completeCommandPart(
-            Argument.Motion(Command(0, ExternalActionHandler(offsets), Command.Type.MOTION, noneOfEnum()))
-          )
+          keyState.commandBuilder.completeCommandPart(Argument.Motion(ExternalActionHandler(offsets)))
         }
       }
     }

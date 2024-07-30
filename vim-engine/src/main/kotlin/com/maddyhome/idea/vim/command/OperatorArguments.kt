@@ -16,6 +16,17 @@ import com.maddyhome.idea.vim.state.mode.Mode
  * The terminology is taken directly from vim.
  * If no count is provided, [count0] defaults to zero.
  */
+// TODO: This class should be removed, refactored or at the least renamed
+// However, there are plugin compatibilities to consider...
+// Reasons:
+// * The naming is confusing, as it is used for non-operator commands as well as motions for operators
+//   Also, does the class represent the arguments for an operator, or data for the in-progress motion argument for an
+//   operator (in which case, it's even more confusing for non-operator commands)
+// * The count is (and must be) the count for the whole command rather than for the operator, or for the in-progress
+//   motion. It's not clear here what it's for
+// * The mode and `isOperatorPending` properties are snapshots of the mode _before_ the command is executed, rather than
+//   the current mode. E.g., it will be OP_PENDING even when the current mode has returned to NORMAL or VISUAL. There is
+//   no indication that this is the case, or reasons why
 data class OperatorArguments(
   val isOperatorPending: Boolean,
   val count0: Int,

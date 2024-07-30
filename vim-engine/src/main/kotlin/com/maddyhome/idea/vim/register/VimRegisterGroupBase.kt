@@ -153,8 +153,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     if (currentCommand != null) {
       val argument = currentCommand.argument
       if (argument is Argument.Motion) {
-        val motionCommand = argument.motion
-        val action = motionCommand.action
+        val action = argument.motion
         return action.id == "VimMotionPercentOrMatchAction" ||
           action.id == "VimMotionSentencePreviousStartAction" ||
           action.id == "VimMotionSentenceNextStartAction" ||

@@ -29,8 +29,6 @@ import com.maddyhome.idea.vim.state.mode.Mode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing;
 
@@ -134,11 +132,11 @@ public class VimTextObjEntireExtension implements VimExtension {
     public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
       @NotNull KeyHandler keyHandler = KeyHandler.getInstance();
       @NotNull KeyHandlerState keyHandlerState = KeyHandler.getInstance().getKeyHandlerState();
-      int count = Math.max(1, keyHandlerState.getCommandBuilder().getCount());
 
       final EntireTextObjectHandler textObjectHandler = new EntireTextObjectHandler(ignoreLeadingAndTrailing);
       //noinspection DuplicatedCode
       if (!keyHandler.isOperatorPending(editor.getMode(), keyHandlerState)) {
+        int count = Math.max(1, keyHandlerState.getCommandBuilder().getCount());
         ((IjVimEditor) editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
           final TextRange range = textObjectHandler.getRange(editor, new IjVimCaret(caret), context, count, 0);
           if (range != null) {
@@ -153,11 +151,7 @@ public class VimTextObjEntireExtension implements VimExtension {
 
         });
       } else {
-        keyHandlerState.getCommandBuilder().completeCommandPart(
-          new Argument.Motion(
-            new Command(count, textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))
-          )
-        );
+        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument.Motion(textObjectHandler));
       }
     }
   }

@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.common.CurrentCommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimExtension;
@@ -33,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing;
@@ -243,11 +243,11 @@ public class VimArgTextObjExtension implements VimExtension {
     public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
       @NotNull KeyHandler keyHandler = KeyHandler.getInstance();
       @NotNull KeyHandlerState keyHandlerState = KeyHandler.getInstance().getKeyHandlerState();
-      int count = Math.max(1, keyHandlerState.getCommandBuilder().getCount());
 
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
       if (!keyHandler.isOperatorPending(editor.getMode(), keyHandlerState)) {
+        int count = Math.max(1, keyHandlerState.getCommandBuilder().getCount());
         editor.nativeCarets().forEach((VimCaret caret) -> {
           final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0);
           if (range != null) {
@@ -261,11 +261,8 @@ public class VimArgTextObjExtension implements VimExtension {
           }
         });
       } else {
-        keyHandlerState.getCommandBuilder().completeCommandPart(
-          new Argument.Motion(
-            new Command(count, textObjectHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags.class))
-          )
-        );
+        keyHandlerState.getCommandBuilder().pushCommandPart(textObjectHandler);
+        keyHandlerState.getCommandBuilder().setCommandState(CurrentCommandState.READY);
       }
     }
   }

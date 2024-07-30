@@ -37,12 +37,11 @@ class ChangeLineAction : ChangeInInsertSequenceAction() {
   ): Boolean {
     // `S` command is a synonym of `cc`
     val motion = MotionDownLess1FirstNonSpaceAction()
-    val command = Command(1, motion, motion.type, motion.flags)
     return injector.changeGroup.changeMotion(
       editor,
       caret,
       context,
-      Argument.Motion(command),
+      Argument.Motion(motion, null),
       operatorArguments,
     )
   }

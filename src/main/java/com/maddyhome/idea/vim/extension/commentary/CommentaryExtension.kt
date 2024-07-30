@@ -26,8 +26,6 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.TextObjectVisualType
@@ -52,7 +50,6 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import java.util.*
 
 internal class CommentaryExtension : VimExtension {
 
@@ -184,10 +181,8 @@ internal class CommentaryExtension : VimExtension {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val command = Command(operatorArguments.count1, CommentaryTextObjectMotionHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java))
-
       val keyState = KeyHandler.getInstance().keyHandlerState
-      keyState.commandBuilder.completeCommandPart(Argument.Motion(command))
+      keyState.commandBuilder.completeCommandPart(Argument.Motion(CommentaryTextObjectMotionHandler))
     }
   }
 

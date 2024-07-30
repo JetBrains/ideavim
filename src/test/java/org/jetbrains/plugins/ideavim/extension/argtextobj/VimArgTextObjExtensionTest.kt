@@ -142,6 +142,16 @@ Mode.INSERT,
   }
 
   @Test
+  fun testDeleteWithMultipleCounts() {
+    doTest(
+      "2d2aa",
+      "function(int <caret>arg1,    char* arg<caret>2=\"a,b,c(d,e)\", bool arg3, string arg4, int arg5)",
+      "function(<caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
   fun testSelectTwoArguments() {
     doTest(
       Lists.newArrayList("v2aa"),
