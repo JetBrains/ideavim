@@ -298,6 +298,15 @@ class MapCommandTest : VimTestCase() {
     assertState("I found it in ${c}a legendary land")
   }
 
+  @Test
+  @TestFor(issues = ["VIM-3569"])
+  fun `test bar in mapping`() {
+    configureByText("${c}I found it in a legendary land")
+    typeText(commandToKeys("nmap <leader>\\| dw"))
+    typeText("<leader>|")
+    assertState("${c}found it in a legendary land")
+  }
+
   // VIM-676 |:map|
   @TestWithoutNeovim(reason = SkipNeovimReason.VIM_SCRIPT)
   @Test

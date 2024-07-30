@@ -169,7 +169,7 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
         if (specialArgument != null) {
           specialArguments.add(specialArgument)
         } else {
-          fromKeys = injector.parser.parseKeys(part)
+          fromKeys = injector.parser.parseKeys(processBars(part))
         }
       }
     }
@@ -189,5 +189,9 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
       }
       CommandArguments(specialArguments, it, toExpr, toKeysBuilder.toString().trimStart())
     }
+  }
+
+  private fun processBars(fromString: String): String {
+    return fromString.replace("\\|", "|")
   }
 }
