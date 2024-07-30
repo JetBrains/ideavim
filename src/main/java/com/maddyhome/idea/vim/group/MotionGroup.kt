@@ -35,7 +35,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
@@ -201,15 +200,9 @@ internal class MotionGroup : VimMotionGroupBase() {
       var start: Int
       var end: Int
 
-      val cmd = argument.motion
-      // Normalize the counts between the command and the motion argument
-      val cnt = cmd.count * operatorArguments.count1
-      val raw = if (operatorArguments.count0 == 0 && cmd.rawCount == 0) 0 else cnt
-
-      when (cmd.action) {
+      val action = argument.motion
+      when (action) {
         is MotionActionHandler -> {
-          val action = cmd.action as MotionActionHandler
-
           // This is where we are now
           start = caret.offset
 
@@ -218,8 +211,8 @@ internal class MotionGroup : VimMotionGroupBase() {
             editor.vim,
             caret.vim,
             IjEditorExecutionContext(context!!),
-            cmd.argument,
-            operatorArguments.withCount0(raw),
+            argument.argument,
+            operatorArguments
           )
 
           // Invalid motion
@@ -238,25 +231,29 @@ internal class MotionGroup : VimMotionGroupBase() {
         }
 
         is TextObjectActionHandler -> {
-          val action = cmd.action as TextObjectActionHandler
-          val range =
-            action.getRange(editor.vim, caret.vim, IjEditorExecutionContext(context!!), cnt, raw) ?: return null
+          val range = action.getRange(
+            editor.vim,
+            caret.vim,
+            IjEditorExecutionContext(context!!),
+            operatorArguments.count1,
+            operatorArguments.count0
+          ) ?: return null
           start = range.startOffset
           end = range.endOffset
-          if (cmd.isLinewiseMotion()) end--
+          if (argument.isLinewiseMotion()) end--
         }
 
         is ExternalActionHandler -> {
-          val range = (cmd.action as ExternalActionHandler).getRange(caret.vim) ?: return null
+          val range = action.getRange(caret.vim) ?: return null
           start = range.startOffset
           end = range.endOffset
         }
 
-        else -> throw RuntimeException("Commands doesn't take " + cmd.action.javaClass.simpleName + " as an operator")
+        else -> throw RuntimeException("Commands doesn't take " + action.javaClass.simpleName + " as an operator")
       }
 
       // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.
-      val id = argument.motion.action.id
+      val id = argument.motion.id
       if (id == VimChangeGroupBase.VIM_MOTION_WORD_RIGHT || id == VimChangeGroupBase.VIM_MOTION_BIG_WORD_RIGHT || id == VimChangeGroupBase.VIM_MOTION_CAMEL_RIGHT) {
         val text = editor.document.charsSequence.subSequence(start, end).toString()
         val lastNewLine = text.lastIndexOf('\n')

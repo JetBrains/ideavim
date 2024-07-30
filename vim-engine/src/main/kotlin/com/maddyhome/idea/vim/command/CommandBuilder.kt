@@ -15,6 +15,9 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.ExternalActionHandler
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
@@ -182,6 +185,7 @@ class CommandBuilder(
     return commandParts.isEmpty()
   }
 
+  // TODO: We should avoid calling this for motion arguments as it bypasses count handling
   fun completeCommandPart(argument: Argument) {
     logger.trace { "completeCommandPart is executed" }
     commandParts.last().argument = argument
@@ -201,16 +205,24 @@ class CommandBuilder(
 
   fun buildCommand(): Command {
     var command: Command = commandParts.removeFirst()
-    while (commandParts.size > 0) {
+    while (commandParts.isNotEmpty()) {
       val next = commandParts.removeFirst()
-      next.rawCount = if (command.rawCount == 0 && next.rawCount == 0) 0 else command.count * next.count
-      command.rawCount = 0
+      command.rawCount = if (command.rawCount == 0 && next.rawCount == 0) 0 else command.count * next.count
+      next.rawCount = 0
       if (command.type == Command.Type.SELECT_REGISTER) {
         next.register = command.register
+        next.rawCount = command.rawCount
         command.register = null
         command = next
       } else {
-        command.argument = Argument.Motion(next)
+        command.argument = next.action.let {
+          when (it) {
+            is MotionActionHandler -> Argument.Motion(it, next.argument)
+            is TextObjectActionHandler -> Argument.Motion(it)
+            is ExternalActionHandler -> Argument.Motion(it)
+            else -> throw RuntimeException("Unexpected action type: $it")
+          }
+        }
         assert(commandParts.isEmpty())
       }
     }

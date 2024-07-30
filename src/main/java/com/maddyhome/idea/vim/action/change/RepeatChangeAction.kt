@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
@@ -59,11 +58,6 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
     } else if (!repeatHandler && lastCommand != null) {
       if (cmd.rawCount > 0) {
         lastCommand.rawCount = cmd.count
-        val arg = lastCommand.argument
-        if (arg is Argument.Motion) {
-          val mot = arg.motion
-          mot.rawCount = 0
-        }
       }
       state.executingCommand = lastCommand
 

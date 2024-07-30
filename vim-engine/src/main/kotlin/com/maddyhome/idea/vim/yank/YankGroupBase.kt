@@ -91,7 +91,7 @@ open class YankGroupBase : VimYankGroup {
 
     // This logic is from original vim
     val startOffsets =
-      if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) {
+      if (argument.motion is MotionDownLess1FirstNonSpaceAction) {
         null
       } else {
         HashMap<VimCaret, Int>(nativeCaretCount)

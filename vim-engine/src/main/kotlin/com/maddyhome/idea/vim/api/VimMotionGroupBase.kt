@@ -117,9 +117,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val text = editor.text()
     val oldOffset = caret.offset
     var current = oldOffset
-    for (i in 0 until count.absoluteValue) {
+    repeat(count.absoluteValue) {
       val newOffset = if (count > 0) Graphemes.next(text, current) else Graphemes.prev(text, current)
-      current = newOffset ?: break
+      current = newOffset ?: return@repeat
     }
 
     val offset = if (allowWrap) {
@@ -321,25 +321,20 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     var start: Int
     var end: Int
 
-    val cmd = argument.motion
-    // Normalize the counts between the command and the motion argument
-    val cnt = cmd.count * operatorArguments.count1
-    val raw = if (operatorArguments.count0 == 0 && cmd.rawCount == 0) 0 else cnt
-    val cmdAction = cmd.action
-
-    when (cmdAction) {
+    val action = argument.motion
+    when (action) {
       is MotionActionHandler -> {
         // This is where we are now
         start = caret.offset
 
         // Execute the motion (without moving the cursor) and get where we end
-        val motion = cmdAction.getHandlerOffset(editor, caret, context, cmd.argument, operatorArguments.withCount0(raw))
+        val motion = action.getHandlerOffset(editor, caret, context, argument.argument, operatorArguments)
         if (Motion.Error == motion || Motion.NoMotion == motion) return null
 
         end = (motion as AbsoluteOffset).offset
 
         // If inclusive, add the last character to the range
-        if (cmdAction.motionType === MotionType.INCLUSIVE) {
+        if (action.motionType === MotionType.INCLUSIVE) {
           if (start > end) {
             if (start < editor.fileSize()) start++
           } else {
@@ -349,20 +344,21 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       }
 
       is TextObjectActionHandler -> {
-        val range: TextRange = cmdAction.getRange(editor, caret, context, cnt, raw) ?: return null
+        val range: TextRange = action.getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0)
+          ?: return null
         start = range.startOffset
         end = range.endOffset
-        if (cmd.isLinewiseMotion()) end--
+        if (argument.isLinewiseMotion()) end--
       }
 
       is ExternalActionHandler -> {
-        val range: TextRange = cmdAction.getRange(caret) ?: return null
+        val range: TextRange = action.getRange(caret) ?: return null
         start = range.startOffset
         end = range.endOffset
-        if (cmd.isLinewiseMotion()) end--
+        if (argument.isLinewiseMotion()) end--
       }
 
-      else -> throw RuntimeException("Commands doesn't take " + cmdAction.javaClass.simpleName + " as an operator")
+      else -> throw RuntimeException("Commands doesn't take " + action.javaClass.simpleName + " as an operator")
     }
 
     // Normalize the range
@@ -374,7 +370,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
     // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
     // of the line and move the end to the end of the line.
-    if (cmd.isLinewiseMotion()) {
+    if (argument.isLinewiseMotion()) {
       if (caret.getBufferPosition().line != editor.lineCount() - 1) {
         start = editor.getLineStartForOffset(start)
         end = min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
@@ -388,7 +384,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val text = editor.text().subSequence(start, end).toString()
     val lastNewLine = text.lastIndexOf('\n')
     if (lastNewLine > 0) {
-      val id = cmd.action.id
+      val id = action.id
       if (id == "VimMotionWordRightAction" || id == "VimMotionBigWordRightAction" || id == "VimMotionCamelRightAction") {
         if (!editor.anyNonWhitespace(end, -1)) {
           end = start + lastNewLine

@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.NumberType
@@ -242,7 +243,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ) {
     val myLastStrokes = lastStrokes ?: return
     for (caret in editor.nativeCarets()) {
-      for (i in 0 until count) {
+      repeat(count) {
         for (lastStroke in myLastStrokes) {
           when (lastStroke) {
             is NativeAction -> {
@@ -329,7 +330,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val oldFragmentLength = oldFragment.length
 
       // Repeat buffer limits
-      if (repeatCharsCount > Companion.MAX_REPEAT_CHARS_COUNT) {
+      if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
         return
       }
 
@@ -350,7 +351,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (oldFragmentLength > 0) {
         val editorDelete = injector.nativeActionManager.deleteAction
         if (editorDelete != null) {
-          for (i in 0 until oldFragmentLength) {
+          repeat(oldFragmentLength) {
             strokes.add(editorDelete)
           }
         }
@@ -369,7 +370,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         val motionName = if (delta < 0) "VimMotionLeftAction" else "VimMotionRightAction"
         val action = injector.actionExecutor.findVimAction(motionName)!!
         val count = abs(delta)
-        for (i in 0 until count) {
+        repeat(count) {
           positionCaretActions.add(action)
         }
         return positionCaretActions
@@ -552,17 +553,24 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
-    var cnt = if (lastInsert != null) lastInsert!!.count else 0
-    if (lastInsert != null && lastInsert!!.flags.contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
-      cnt = 1
-    }
+    val repeatCount0 = lastInsert?.let {
+      // How many times do we want to *repeat* the insert? For a simple insert or change action, this is count-1. But if
+      // the command is an operator+motion, then the count applies to the motion, not the insert/change. I.e., `2cw`
+      // changes two words, rather than inserting the change twice. This is the only place where we need to know who the
+      // count applies to
+      if (CommandFlags.FLAG_NO_REPEAT_INSERT in it.flags || it.action.argumentType == Argument.Type.MOTION) {
+        0
+      } else {
+        it.count - 1
+      }
+    } ?: 0
     if (vimDocument != null && vimDocumentListener != null) {
       vimDocument!!.removeChangeListener(vimDocumentListener!!)
       vimDocumentListener = null
     }
     lastStrokes = ArrayList(strokes)
     if (context != null) {
-      injector.changeGroup.repeatInsert(editor, context, if (cnt == 0) 0 else cnt - 1, true, operatorArguments)
+      injector.changeGroup.repeatInsert(editor, context, repeatCount0, true, operatorArguments)
     }
     if (editor.mode is Mode.INSERT) {
       updateLastInsertedTextRegister()
@@ -808,7 +816,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       lline + count <= total
     }
     if (!allowedExecution) return false
-    for (i in 0 until executions) {
+    repeat(executions) {
       val joinLinesAction = injector.nativeActionManager.joinLines
       if (joinLinesAction != null) {
         injector.actionExecutor.executeAction(editor, joinLinesAction, context)
@@ -1142,8 +1150,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     var count0 = operatorArguments.count0
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
-    val motion = (argument as? Argument.Motion)?.motion ?: return false
-    val id = motion.action.id
+    var motionArgument = argument as? Argument.Motion ?: return false
+    val id = motionArgument.motion.id
     var kludge = false
     val bigWord = id == VIM_MOTION_BIG_WORD_RIGHT
     val chars = editor.text()
@@ -1153,7 +1161,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val charType = charType(editor, chars[offset], bigWord)
       if (charType !== CharacterHelper.CharacterType.WHITESPACE) {
         val lastWordChar = offset >= fileSize - 1 || charType(editor, chars[offset + 1], bigWord) !== charType
-        if (wordMotions.contains(id) && lastWordChar && motion.count == 1) {
+        if (wordMotions.contains(id) && lastWordChar && operatorArguments.count1 == 1) {
           val res = deleteCharacter(editor, caret, 1, true, operatorArguments)
           if (res) {
             editor.vimChangeActionSwitchMode = Mode.INSERT
@@ -1163,47 +1171,48 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         when (id) {
           VIM_MOTION_WORD_RIGHT -> {
             kludge = true
-            motion.action = injector.actionExecutor.findVimActionOrDie(VIM_MOTION_WORD_END_RIGHT)
+            motionArgument = Argument.Motion(
+              injector.actionExecutor.findVimActionOrDie(VIM_MOTION_WORD_END_RIGHT) as MotionActionHandler,
+              motionArgument.argument
+            )
           }
 
           VIM_MOTION_BIG_WORD_RIGHT -> {
             kludge = true
-            motion.action = injector.actionExecutor.findVimActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT)
+            motionArgument = Argument.Motion(
+              injector.actionExecutor.findVimActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT) as MotionActionHandler,
+              motionArgument.argument
+            )
           }
 
           VIM_MOTION_CAMEL_RIGHT -> {
             kludge = true
-            motion.action = injector.actionExecutor.findVimActionOrDie(VIM_MOTION_CAMEL_END_RIGHT)
+            motionArgument = Argument.Motion(
+              injector.actionExecutor.findVimActionOrDie(VIM_MOTION_CAMEL_END_RIGHT) as MotionActionHandler,
+              motionArgument.argument
+            )
           }
         }
       }
     }
     if (kludge) {
-      val cnt = operatorArguments.count1 * motion.count
-      val pos1 = injector.searchHelper.findNextWordEnd(editor, offset, cnt, bigWord, false)
-      val pos2 = injector.searchHelper.findNextWordEnd(editor, pos1, -cnt, bigWord, false)
+      val pos1 = injector.searchHelper.findNextWordEnd(editor, offset, operatorArguments.count1, bigWord, false)
+      val pos2 = injector.searchHelper.findNextWordEnd(editor, pos1, -operatorArguments.count1, bigWord, false)
       if (logger.isDebug()) {
         logger.debug("pos=$offset")
         logger.debug("pos1=$pos1")
         logger.debug("pos2=$pos2")
         logger.debug("count=" + operatorArguments.count1)
-        logger.debug("arg.count=" + motion.count)
       }
-      if (pos2 == offset) {
-        if (operatorArguments.count1 > 1) {
-          count0--
-        } else if (motion.count > 1) {
-          motion.rawCount = motion.count - 1
-        } else {
-          motion.flags = EnumSet.noneOf(CommandFlags::class.java)
-        }
+      if (pos2 == offset && operatorArguments.count1 > 1) {
+        count0--
       }
     }
     val (first, second) = getDeleteRangeAndType(
       editor,
       caret,
       context,
-      argument,
+      motionArgument,
       true,
       operatorArguments.withCount0(count0),
     ) ?: return false
