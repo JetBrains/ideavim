@@ -20,10 +20,13 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.ex.ActionUtil.performDumbAwareWithCallbacks
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
+import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
+import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
 import com.maddyhome.idea.vim.RegisterActions
@@ -65,6 +68,12 @@ internal class IjActionExecutor : VimActionExecutor {
    * @param context The context to run it in
    */
   override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
+    val applicationEx = ApplicationManagerEx.getApplicationEx()
+    if (ProgressIndicatorUtils.isWriteActionRunningOrPending(applicationEx)) {
+      // This is needed for VIM-3376 and it should turn into error at soeme moment
+      thisLogger().warn(RuntimeException("Actions cannot be updated when write-action is running or pending", ))
+    }
+
     val ijAction = (action as IjNativeAction).action
 
     /**
