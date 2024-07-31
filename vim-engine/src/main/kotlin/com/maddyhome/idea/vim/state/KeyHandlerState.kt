@@ -33,16 +33,28 @@ data class KeyHandlerState(
     get() = commandLineCommandBuilder ?: editorCommandBuilder
 
   fun enterCommandLine() {
-    // Create a new command builder for the command line, so we can handle nested commands inside the command line.
-    // The command that starts the command line is added to the new command builder and immediately executed, opening
-    // the command line UI.
-    // When we match the command that accepts or cancels the command line, we remove this nested command builder, and
-    // that command is added to the editor command builder, immediately completed and executed.
-    // The user might already have entered some state in the editor command builder, specifically uncommitted count.
-    // E.g., the user might have typed `3:` expecting the command line to be displayed with `:.,.+2` as initial text.
-    // We do not reset the uncommitted count in the editor command builder. The Ex actions ignore it, preferring the
-    // range in the text command. The search actions use it, and it will be combined with an operator count as expected.
-    // E.g., `2d3/foo` will delete up to the 6th occurrence of `foo`
+    // Create a new command builder for commands entered inside the command line, which allows for nested commands, such
+    // as inserting a digraph while entering a search pattern as a delete motion - `d/foo<C-K>OK`.
+    // When matching an action that opens a command line, the new builder is created before the action is added to a
+    // builder, which means it gets added to the new command line builder. Since there are no arguments required by the
+    // action, the command is completed and executed (and the command line builder reset), and the command line UI is
+    // opened.
+    // When matching an action that accepts or cancels a command line, the command line builder is removed before the
+    // action is added, so it is added to the editor's command line builder. The key handler recognises the action to
+    // accept the command line, and will add the command line contents as an argument, and then execute the command.
+    // The user might have already entered some state in the editor command builder, specifically uncommitted count.
+    // E.g., the user might have typed `3:` expecting the command line to be displayed with `:.,.+2` as initial text, or
+    // started something like `2d3/foo` to delete up to the 6th occurrence of `foo`. (In both examples, the uncommitted
+    // count is `3`.)
+    // We pass the currently uncommitted count to the new editor command builder, where it becomes the count for the new
+    // command. The `:` handler will transform it into a range, while the search handler will ignore it. In other words,
+    // the `:` handler uses the count eagerly, where it becomes part of the command line that is executed (by the editor
+    // command builder) when the command line UI is closed. But the search handler doesn't use it - it's needed by the
+    // search motion action executed by the editor command builder once the command line UI is accepted.
+    // For this reason, we do NOT clear the uncommitted count from the editor command builder. A command such as
+    // `2d3/foo` becomes a delete operator action with a search action motion argument, which itself has an Ex string
+    // argument with the search string. The command has a count of `6`. And a command such as `3:p` becomes an action to
+    // process Ex entry with an argument of `.,.+2p` and a count of 3. The count is ignored by this action.
     commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.CMD_LINE), editorCommandBuilder.count)
   }
 
