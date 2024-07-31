@@ -109,7 +109,7 @@ class CopyActionTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun testYankRegisterUsesLastEnteredRegister() {
-    typeTextInFile("\"a\"byl" + "\"ap", "hel<caret>lo world\n")
+    typeTextInFile("\"a\"byl" + "\"bp", "hel<caret>lo world\n")
     assertState("helllo world\n")
   }
 
