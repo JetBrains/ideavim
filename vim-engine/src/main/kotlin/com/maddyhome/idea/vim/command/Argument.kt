@@ -66,6 +66,8 @@ sealed class Argument {
         }
       }
     }
+
+    fun withArgument(argument: Argument) = Motion(motion, argument)
   }
 
   /**

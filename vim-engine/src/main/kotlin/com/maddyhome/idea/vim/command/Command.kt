@@ -8,9 +8,6 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import java.util.*
 
@@ -49,15 +46,6 @@ data class Command(
   val type: Type,
   val flags: EnumSet<CommandFlags>,
 ) {
-
-  constructor(rawCount: Int, register: Char) : this(
-    rawCount,
-    NonExecutableActionHandler,
-    Type.SELECT_REGISTER,
-    EnumSet.of(CommandFlags.FLAG_EXPECT_MORE),
-  ) {
-    this.register = register
-  }
 
   init {
     action.process(this)
@@ -98,10 +86,6 @@ data class Command(
     COPY,
     PASTE,
 
-    /**
-     * Represents commands that select the register.
-     */
-    SELECT_REGISTER,
     OTHER_READONLY,
     OTHER_WRITABLE,
 
@@ -123,20 +107,5 @@ data class Command(
         INSERT, DELETE, CHANGE, PASTE, OTHER_WRITABLE -> true
         else -> false
       }
-  }
-}
-
-private object NonExecutableActionHandler : EditorActionHandlerBase(false) {
-  override val type: Command.Type
-    get() = error("This action should not be executed")
-
-  override fun baseExecute(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    error("This action should not be executed")
   }
 }

@@ -109,7 +109,6 @@ class CommandConsumer : KeyConsumer {
 
     val commandBuilder = keyState.commandBuilder
     val expectedArgumentType = commandBuilder.expectedArgumentType
-    commandBuilder.pushCommandPart(action)
     if (!checkArgumentCompatibility(expectedArgumentType, action)) {
       logger.trace("Return from command node handling")
       processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, _ ->
@@ -117,6 +116,9 @@ class CommandConsumer : KeyConsumer {
       }
       return
     }
+
+    commandBuilder.pushCommandPart(action)
+
     if (action.argumentType == null) {
       logger.trace("Set command state to READY")
       commandBuilder.commandState = CurrentCommandState.READY

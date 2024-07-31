@@ -18,17 +18,18 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
-class CommandBuilder(
+class CommandBuilder private constructor(
   private var currentCommandPartNode: CommandPartNode<LazyVimCommand>,
-  private val commandParts: ArrayDeque<Command>,
+  private val counts: MutableList<Int>,
   private val keyList: MutableList<KeyStroke>,
-  initialUncommittedRawCount: Int,
 ) : Cloneable {
 
   constructor(
@@ -36,10 +37,20 @@ class CommandBuilder(
     initialUncommittedRawCount: Int = 0
   ) : this(
     currentCommandPartNode,
-    ArrayDeque(),
+    mutableListOf(initialUncommittedRawCount),
     mutableListOf(),
-    initialUncommittedRawCount
   )
+
+  private var selectedRegister: Char? = null
+  private var action: EditorActionHandlerBase? = null
+  private var argument: Argument? = null
+  private var fallbackArgumentType: Argument.Type? = null
+
+  private var currentCount: Int
+    get() = counts.last()
+    set(value) {
+      counts[counts.size - 1] = value
+    }
 
   var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
 
@@ -59,8 +70,8 @@ class CommandBuilder(
    * The [aggregatedUncommittedCount] property can be used to get the current total count across all command parts,
    * although this value is also not guaranteed to be final.
    */
-  var count: Int = initialUncommittedRawCount
-    private set
+  val count: Int
+    get() = counts.last()
 
   /**
    * The current aggregated, but uncommitted count for all command parts in the command builder, coerced to 1
@@ -75,7 +86,7 @@ class CommandBuilder(
    * highlighting.
    */
   val aggregatedUncommittedCount: Int
-    get() = (commandParts.map { it.count }.reduceOrNull { acc, i -> acc * i } ?: 1) * count.coerceAtLeast(1)
+    get() = counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
 
   val keys: Iterable<KeyStroke> get() = keyList
 
@@ -87,7 +98,7 @@ class CommandBuilder(
   // still change, if more keys are processed. E.g., it's perfectly valid to select register multiple times `"a"b`.
   // This doesn't cause any issues with existing extensions
   val register: Char?
-    get() = commandParts.lastOrNull { it.register != null }?.register
+    get() = selectedRegister
 
   /**
    * The argument type for the current in-progress command part's action
@@ -95,13 +106,15 @@ class CommandBuilder(
    * For digraph arguments, this can fall back to [Argument.Type.CHARACTER] if there isn't a digraph match.
    */
   val expectedArgumentType: Argument.Type?
-    get() = fallbackArgumentType ?: commandParts.lastOrNull()?.action?.argumentType
+    get() = fallbackArgumentType
+      ?: (argument as? Argument.Motion)?.let { return it.motion.argumentType }
+      ?: action?.argumentType
 
-  private var fallbackArgumentType: Argument.Type? = null
-
+  // TODO: Review all of these
   val isReady: Boolean get() = commandState == CurrentCommandState.READY
-  val isEmpty: Boolean get() = commandParts.isEmpty()
+  val isEmpty: Boolean get() = selectedRegister == null && counts.size == 1 && action == null && argument == null
   val isAtDefaultState: Boolean get() = isEmpty && count == 0 && expectedArgumentType == null
+  fun isDone() = isEmpty
 
   val isExpectingCount: Boolean
     get() {
@@ -112,18 +125,27 @@ class CommandBuilder(
 
   fun pushCommandPart(action: EditorActionHandlerBase) {
     logger.trace { "pushCommandPart is executed. action = $action" }
-    commandParts.add(Command(count, action, action.type, action.flags))
+    if (this.action == null) {
+      this.action = action
+    }
+    else {
+      StrictMode.assert(argument == null, "Command builder already has an action and a fully populated argument")
+      argument = when (action) {
+        is MotionActionHandler -> Argument.Motion(action, null)
+        is TextObjectActionHandler -> Argument.Motion(action)
+        is ExternalActionHandler -> Argument.Motion(action)
+        else -> throw RuntimeException("Unexpected action type: $action")
+      }
+    }
+    counts.add(0)
     fallbackArgumentType = null
-    count = 0
   }
 
   fun pushCommandPart(register: Char) {
     logger.trace { "pushCommandPart is executed. register = $register" }
-    // We will never execute this command, but we need to push something to correctly handle counts on either side of a
-    // select register command part. e.g. 2"a2d2w or even crazier 2"a2"a2"a2"a2"a2d2w
-    commandParts.add(Command(count, register))
+    selectedRegister = register
     fallbackArgumentType = null
-    count = 0
+    counts.add(0)
   }
 
   fun fallbackToCharacterArgument() {
@@ -140,18 +162,18 @@ class CommandBuilder(
   }
 
   fun addCountCharacter(key: KeyStroke) {
-    count = (count * 10) + (key.keyChar - '0')
+    currentCount = (currentCount * 10) + (key.keyChar - '0')
     // If count overflows and flips negative, reset to 999999999L. In Vim, count is a long, which is *usually* 32 bits,
     // so will flip at 2147483648. We store count as an Int, which is also 32 bit.
     // See https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/normal.c#L631
-    if (count < 0) {
-      count = 999999999
+    if (currentCount < 0) {
+      currentCount = 999999999
     }
     addKey(key)
   }
 
   fun deleteCountCharacter() {
-    count /= 10
+    currentCount /= 10
     keyList.removeAt(keyList.size - 1)
   }
 
@@ -181,52 +203,29 @@ class CommandBuilder(
     return isMultikey
   }
 
-  fun isDone(): Boolean {
-    return commandParts.isEmpty()
-  }
-
-  // TODO: We should avoid calling this for motion arguments as it bypasses count handling
   fun completeCommandPart(argument: Argument) {
     logger.trace { "completeCommandPart is executed" }
-    commandParts.last().argument = argument
+    this.argument = (this.argument as? Argument.Motion)?.withArgument(argument) ?: argument
     commandState = CurrentCommandState.READY
   }
 
   fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
     logger.trace { "entered isDuplicateOperatorKeyStroke" }
-    val action = commandParts.last().action as? DuplicableOperatorAction
+    val action = (argument as? Argument.Motion)?.motion as? DuplicableOperatorAction
+      ?: action as? DuplicableOperatorAction
     logger.trace { "action = $action" }
     return action?.duplicateWith == key.keyChar
   }
 
-  fun hasCurrentCommandPartArgument(): Boolean {
-    return commandParts.lastOrNull()?.argument != null
-  }
+  fun hasCurrentCommandPartArgument() = argument != null
 
   fun buildCommand(): Command {
-    var command: Command = commandParts.removeFirst()
-    while (commandParts.isNotEmpty()) {
-      val next = commandParts.removeFirst()
-      command.rawCount = if (command.rawCount == 0 && next.rawCount == 0) 0 else command.count * next.count
-      next.rawCount = 0
-      if (command.type == Command.Type.SELECT_REGISTER) {
-        next.register = command.register
-        next.rawCount = command.rawCount
-        command.register = null
-        command = next
-      } else {
-        command.argument = next.action.let {
-          when (it) {
-            is MotionActionHandler -> Argument.Motion(it, next.argument)
-            is TextObjectActionHandler -> Argument.Motion(it)
-            is ExternalActionHandler -> Argument.Motion(it)
-            else -> throw RuntimeException("Unexpected action type: $it")
-          }
-        }
-        assert(commandParts.isEmpty())
-      }
+    val rawCount = if (counts.all { it == 0 }) 0 else counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
+    val command = Command(rawCount, action!!, action!!.type, action?.flags ?: noneOfEnum()).apply {
+      register = selectedRegister
+      this.argument = this@CommandBuilder.argument
     }
-    fallbackArgumentType = null
+    resetAll(currentCommandPartNode)
     return command
   }
 
@@ -234,23 +233,32 @@ class CommandBuilder(
     logger.trace { "resetAll is executed" }
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
-    commandParts.clear()
+    counts.clear()
+    counts.add(0)
+    selectedRegister = null
+    action = null
+    argument = null
     keyList.clear()
     fallbackArgumentType = null
   }
 
+  // TODO: Get rid of this
+  // It's used by the Matchit extension to incorrectly reset the command builder. Extensions need a way to properly
+  // handle the command builder. I.e., they should act like expression mappings, which return keys to evaluate, or an
+  // empty string to leave state as it is - either way, it's an explicit choice. Currently, extensions mostly ignore it
   fun resetCount() {
-    count = 0
+    counts[counts.size - 1] = 0
   }
 
   fun resetInProgressCommandPart(commandPartNode: CommandPartNode<LazyVimCommand>) {
     logger.trace { "resetInProgressCommandPart is executed" }
-    count = 0
+    counts[counts.size - 1] = 0
     setCurrentCommandPartNode(commandPartNode)
   }
 
   @TestOnly
   fun getCurrentTrie(): CommandPartNode<LazyVimCommand> = currentCommandPartNode
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
@@ -258,10 +266,12 @@ class CommandBuilder(
     other as CommandBuilder
 
     if (currentCommandPartNode != other.currentCommandPartNode) return false
-    if (commandParts != other.commandParts) return false
+    if (counts != other.counts) return false
+    if (selectedRegister != other.selectedRegister) return false
+    if (action != other.action) return false
+    if (argument != other.argument) return false
     if (keyList != other.keyList) return false
     if (commandState != other.commandState) return false
-    if (count != other.count) return false
     if (expectedArgumentType != other.expectedArgumentType) return false
     if (fallbackArgumentType != other.fallbackArgumentType) return false
 
@@ -270,24 +280,38 @@ class CommandBuilder(
 
   override fun hashCode(): Int {
     var result = currentCommandPartNode.hashCode()
-    result = 31 * result + commandParts.hashCode()
+    result = 31 * result + counts.hashCode()
+    result = 31 * result + selectedRegister.hashCode()
+    result = 31 * result + action.hashCode()
+    result = 31 * result + argument.hashCode()
     result = 31 * result + keyList.hashCode()
     result = 31 * result + commandState.hashCode()
-    result = 31 * result + count
-    result = 31 * result + (expectedArgumentType?.hashCode() ?: 0)
-    result = 31 * result + (fallbackArgumentType?.hashCode() ?: 0)
+    result = 31 * result + expectedArgumentType.hashCode()
+    result = 31 * result + fallbackArgumentType.hashCode()
     return result
   }
 
   public override fun clone(): CommandBuilder {
-    val result = CommandBuilder(currentCommandPartNode, ArrayDeque(commandParts), keyList.toMutableList(), count)
+    val result = CommandBuilder(
+      currentCommandPartNode,
+      counts.toMutableList(),
+      keyList.toMutableList()
+    )
+    result.selectedRegister = selectedRegister
+    result.action = action
+    result.argument = argument
     result.commandState = commandState
     result.fallbackArgumentType = fallbackArgumentType
     return result
   }
 
   override fun toString(): String {
-    return "Command state = $commandState, key list = ${ injector.parser.toKeyNotation(keyList) }, command parts = ${ commandParts }, count = $count\n" +
+    return "Command state = $commandState, " +
+      "key list = ${ injector.parser.toKeyNotation(keyList) }, " +
+      "selected register = $selectedRegister, " +
+      "counts = $counts, " +
+      "action = $action, " +
+      "argument = $argument, " +
       "command part node - $currentCommandPartNode"
   }
 
