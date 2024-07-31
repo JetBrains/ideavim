@@ -93,7 +93,6 @@ internal class Matchit : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val keyHandler = KeyHandler.getInstance()
       val keyState = keyHandler.keyHandlerState
-      val count = keyState.commandBuilder.count
 
       // Reset the command count so it doesn't transfer onto subsequent commands.
       keyState.commandBuilder.resetCount()
@@ -111,7 +110,7 @@ internal class Matchit : VimExtension {
       } else {
         editor.sortedCarets().forEach { caret ->
           injector.jumpService.saveJumpLocation(editor)
-          caret.moveToOffset(getMatchitOffset(editor.ij, caret.ij, count, isInOpPending, reverse))
+          caret.moveToOffset(getMatchitOffset(editor.ij, caret.ij, operatorArguments.count0, isInOpPending, reverse))
         }
       }
     }
@@ -345,7 +344,7 @@ private object FileTypePatterns {
 
 private val DEFAULT_PAIRS = setOf('(', ')', '[', ']', '{', '}')
 
-private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPending: Boolean, reverse: Boolean): Int {
+private fun getMatchitOffset(editor: Editor, caret: Caret, count0: Int, isInOpPending: Boolean, reverse: Boolean): Int {
   val virtualFile = EditorHelper.getVirtualFile(editor)
   var caretOffset = caret.offset
 
@@ -358,9 +357,9 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
   val currentChar = editor.document.charsSequence[caretOffset]
   var motionOffset: Int? = null
 
-  if (count > 0) {
+  if (count0 > 0) {
     // Matchit doesn't affect the percent motion, so we fall back to the default behavior.
-    motionOffset = VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count)
+    motionOffset = VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count0)
   } else {
     // Check the simplest case first.
     if (DEFAULT_PAIRS.contains(currentChar)) {

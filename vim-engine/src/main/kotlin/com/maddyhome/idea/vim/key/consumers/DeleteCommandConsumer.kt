@@ -8,10 +8,8 @@
 
 package com.maddyhome.idea.vim.key.consumers
 
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
@@ -40,12 +38,19 @@ class DeleteCommandConsumer : KeyConsumer {
 
   private fun isDeleteCommandCountKey(key: KeyStroke, keyState: KeyHandlerState, mode: Mode): Boolean {
     // See `:help N<Del>`
-    val commandBuilder = keyState.commandBuilder
-    val isDeleteCommandKeyCount =
-      (mode is Mode.NORMAL || mode is Mode.VISUAL || mode is Mode.OP_PENDING) &&
-        commandBuilder.isExpectingCount && commandBuilder.count > 0 && key.keyCode == KeyEvent.VK_DELETE
+    if (key.keyCode != KeyEvent.VK_DELETE) {
+      logger.debug("Not a delete key")
+      return false
+    }
 
-    logger.debug { "This is a delete command key count: $isDeleteCommandKeyCount" }
-    return isDeleteCommandKeyCount
+    val commandBuilder = keyState.commandBuilder
+    if ((mode is Mode.NORMAL || mode is Mode.VISUAL || mode is Mode.OP_PENDING)
+      && commandBuilder.isExpectingCount && commandBuilder.hasCountCharacter()) {
+      logger.debug("Deleting a count character")
+      return true
+    }
+
+    logger.debug("Not a delete key")
+    return false
   }
 }

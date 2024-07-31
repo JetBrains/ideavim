@@ -136,9 +136,9 @@ public class VimTextObjEntireExtension implements VimExtension {
       final EntireTextObjectHandler textObjectHandler = new EntireTextObjectHandler(ignoreLeadingAndTrailing);
       //noinspection DuplicatedCode
       if (!keyHandler.isOperatorPending(editor.getMode(), keyHandlerState)) {
-        int count = Math.max(1, keyHandlerState.getCommandBuilder().getCount());
+        int count0 = operatorArguments.getCount0();
         ((IjVimEditor) editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, new IjVimCaret(caret), context, count, 0);
+          final TextRange range = textObjectHandler.getRange(editor, new IjVimCaret(caret), context, Math.max(1, count0), count0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (editor.getMode() instanceof Mode.VISUAL) {

@@ -247,9 +247,9 @@ public class VimArgTextObjExtension implements VimExtension {
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
       if (!keyHandler.isOperatorPending(editor.getMode(), keyHandlerState)) {
-        int count = Math.max(1, keyHandlerState.getCommandBuilder().getCount());
+        int count0 = operatorArguments.getCount0();
         editor.nativeCarets().forEach((VimCaret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0);
+          final TextRange range = textObjectHandler.getRange(editor, caret, context, Math.max(1, count0), count0);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (editor.getMode() instanceof Mode.VISUAL) {

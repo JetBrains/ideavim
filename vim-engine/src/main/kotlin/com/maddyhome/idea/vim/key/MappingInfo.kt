@@ -181,7 +181,11 @@ class ToHandlerMappingInfo(
       }
     }
 
-    val operatorArguments = OperatorArguments(keyHandler.isOperatorPending(editor.mode, keyState), keyState.commandBuilder.count, editor.mode)
+    val operatorArguments = OperatorArguments(
+      keyHandler.isOperatorPending(editor.mode, keyState),
+      keyState.commandBuilder.calculateCount0Snapshot(),
+      editor.mode
+    )
     val register = keyState.commandBuilder.register
     if (register != null) {
       injector.registerGroup.selectRegister(register)
