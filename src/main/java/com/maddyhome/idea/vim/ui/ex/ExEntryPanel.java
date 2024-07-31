@@ -341,12 +341,12 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
           }
         }
 
-        // Get the current count from the command builder. This value is coerced to at least 1, so will always be valid.
-        // The aggregated value includes any counts for operator and register selections, and the uncommitted count for
-        // the search command (`/` or `?`). E.g., `2"a3"b4"c5d6/` would return 720.
-        // If we're showing highlights for an ex command like `:s`, there won't be a command, but the value is already
-        // coerced to at least 1.
-        int count1 = KeyHandler.getInstance().getKeyHandlerState().getEditorCommandBuilder().getAggregatedUncommittedCount();
+        // Get a snapshot of the count for the in progress command, and coerce it to 1. This value will include all
+        // count components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720.
+        // If we're showing highlights for an Ex command like `:s`, the command builder will be empty, but we'll still
+        // get a valid value.
+        int count1 = Math.max(1, KeyHandler.getInstance().getKeyHandlerState().getEditorCommandBuilder()
+          .calculateCount0Snapshot());
 
         if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
           final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
@@ -528,9 +528,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
 
-  @NotNull
   @Override
-  public VimCommandLineCaret getCaret() {
+  public @NotNull VimCommandLineCaret getCaret() {
     return (VimCommandLineCaret) entry.getCaret();
   }
 
@@ -548,9 +547,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     entry.clearCurrentAction();
   }
 
-  @Nullable
   @Override
-  public Integer getPromptCharacterOffset() {
+  public @Nullable Integer getPromptCharacterOffset() {
     int offset = entry.currentActionPromptCharacterOffset;
     return offset == -1 ? null : offset;
   }
@@ -570,8 +568,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     IdeFocusManager.findInstance().requestFocus(entry, true);
   }
 
-  @Nullable
-  public VimInputInterceptor<?> getInputInterceptor() {
+  public @Nullable VimInputInterceptor<?> getInputInterceptor() {
     return myInputInterceptor;
   }
 
@@ -584,15 +581,13 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     myInputInterceptor = vimInputInterceptor;
   }
 
-  @Nullable
   @Override
-  public Function1<String, Unit> getInputProcessing() {
+  public @Nullable Function1<String, Unit> getInputProcessing() {
     return inputProcessing;
   }
 
-  @Nullable
   @Override
-  public Character getFinishOn() {
+  public @Nullable Character getFinishOn() {
     return finishOn;
   }
 

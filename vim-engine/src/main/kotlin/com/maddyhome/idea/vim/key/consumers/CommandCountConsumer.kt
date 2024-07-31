@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.key.consumers
 
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -34,27 +33,27 @@ class CommandCountConsumer : KeyConsumer {
   ): Boolean {
     logger.trace { "Entered CommandCountConsumer" }
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
-    if (!isCommandCountKey(chKey, keyProcessResultBuilder.state, editor)) return false
+    if (!isCommandCountKey(chKey, keyProcessResultBuilder.state)) return false
 
     keyProcessResultBuilder.state.commandBuilder.addCountCharacter(key)
     return true
   }
 
-  private fun isCommandCountKey(chKey: Char, keyState: KeyHandlerState, editor: VimEditor): Boolean {
-    // Make sure to avoid handling '0' as the start of a count.
+  private fun isCommandCountKey(chKey: Char, keyState: KeyHandlerState): Boolean {
     val editorState = injector.vimState
     val commandBuilder = keyState.commandBuilder
-    val notRegisterPendingCommand = editorState.mode is Mode.NORMAL && !editorState.isRegisterPending
-    val visualMode = editorState.mode is Mode.VISUAL && !editorState.isRegisterPending
-    val opPendingMode = editorState.mode is Mode.OP_PENDING
 
-    if (notRegisterPendingCommand || visualMode || opPendingMode) {
-      if (commandBuilder.isExpectingCount && Character.isDigit(chKey) && (commandBuilder.count > 0 || chKey != '0')) {
-        logger.debug("This is a command key count")
-        return true
-      }
+    // Make sure to avoid handling '0' as the start of a count.
+    if (Character.isDigit(chKey) && (chKey != '0' || commandBuilder.hasCountCharacter())
+      && (editorState.mode is Mode.NORMAL || editorState.mode is Mode.VISUAL || editorState.mode is Mode.OP_PENDING)
+      && commandBuilder.isExpectingCount
+      && !editorState.isRegisterPending
+      ) {
+      logger.debug("This is a command count key")
+      return true
     }
-    logger.debug("This is NOT a command key count")
+
+    logger.debug("This is NOT a command count key")
     return false
   }
 }

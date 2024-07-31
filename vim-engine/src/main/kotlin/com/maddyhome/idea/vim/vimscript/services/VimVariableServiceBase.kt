@@ -171,20 +171,14 @@ abstract class VimVariableServiceBase : VariableService {
     return getBufferVariables(editor)[name]
   }
 
+  @Suppress("SpellCheckingInspection")
   protected open fun getVimVariable(name: String, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType? {
+    // Note that the v:count variables might be incorrect in scenarios other than mappings, when there is a command in
+    // progress. However, I've only seen it used inside mappings, so don't know
     return when (name) {
-      "count" -> {
-        val count = KeyHandler.getInstance().keyHandlerState.commandBuilder.count
-        VimInt(count)
-      }
-      "count1" -> {
-        val count1 = KeyHandler.getInstance().keyHandlerState.commandBuilder.count.coerceAtLeast(1)
-        VimInt(count1)
-      }
-      "searchforward" -> {
-        val searchForward = if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0
-        VimInt(searchForward)
-      }
+      "count" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot())
+      "count1" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1))
+      "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
       else -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }

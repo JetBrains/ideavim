@@ -55,38 +55,26 @@ class CommandBuilder private constructor(
   var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
 
   /**
-   * The current uncommitted count for the currently in-progress command part
+   * Returns the current total count, as the product of all entered count components. The value is not coerced.
    *
-   * TODO: Investigate usages. This value cannot be trusted
-   * TODO: Rename to uncommittedRawCount
+   * This value is not reliable! Please use [Command.rawCount] or [Command.count] instead of this function.
    *
-   * This value is not coerced, and can be 0.
+   * This value is a snapshot of the count for a currently in-progress command, and should not be used for anything
+   * other than reporting on the state of the command. This value is likely to change as the user continues entering the
+   * command. There are very few expected uses of this value. Examples include calculating `'incsearch'` highlighting
+   * for an in-progress search command, or the `v:count` and `v:count1` variables used during an expression mapping.
    *
-   * There are very few reasons for using this value. It is incomplete (the user could type another digit), and there
-   * can be other committed command parts, such as operator and multiple register selections, each of which will can a
-   * count (e.g., `2"a3"b4"c5d6` waiting for a motion). The count is only final after [buildCommand], and then only via
-   * [Command.count] or [Command.rawCount].
+   * The returned value is the product of all count components. In other words, given a command that is an
+   * operator+motion, both the operator and motion can have a count, such as `2d3w`, which means delete the next six
+   * words. Furthermore, Vim allows a count when selecting register, and it is valid to select register multiple times.
+   * E.g., `2"a3"b4"c5d6w` will delete the next 720 words and save the text to the register `c`.
    *
-   * The [aggregatedUncommittedCount] property can be used to get the current total count across all command parts,
-   * although this value is also not guaranteed to be final.
+   * The returned value is not coerced. If no count components are specified, the returned value is 0. If any components
+   * are specified, the value will naturally be greater than 0.
    */
-  val count: Int
-    get() = counts.last()
-
-  /**
-   * The current aggregated, but uncommitted count for all command parts in the command builder, coerced to 1
-   *
-   * This value multiplies together the count for command parts currently committed, such as operator and multiple
-   * register selections, as well as the current uncommitted count for the next command part. E.g., `2"a3"b4"c5d6` will
-   * multiply each count together to get what would be the final count. All counts are coerced to at least 1 before
-   * multiplying, which means the result will also be at least 1.
-   *
-   * Note that there are very few uses for this value. The final value should be retrieved from [Command.count] or
-   * [Command.rawCount] after a call to [buildCommand]. This value is expected to be used for `'incsearch'`
-   * highlighting.
-   */
-  val aggregatedUncommittedCount: Int
-    get() = counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
+  fun calculateCount0Snapshot(): Int {
+    return if (counts.all { it == 0 }) 0 else counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
+  }
 
   val keys: Iterable<KeyStroke> get() = keyList
 
@@ -113,7 +101,7 @@ class CommandBuilder private constructor(
   // TODO: Review all of these
   val isReady: Boolean get() = commandState == CurrentCommandState.READY
   val isEmpty: Boolean get() = selectedRegister == null && counts.size == 1 && action == null && argument == null
-  val isAtDefaultState: Boolean get() = isEmpty && count == 0 && expectedArgumentType == null
+  val isAtDefaultState: Boolean get() = isEmpty && counts.size == 1 && expectedArgumentType == null
   fun isDone() = isEmpty
 
   val isExpectingCount: Boolean
@@ -177,6 +165,8 @@ class CommandBuilder private constructor(
     keyList.removeAt(keyList.size - 1)
   }
 
+  fun hasCountCharacter() = currentCount > 0
+
   fun setCurrentCommandPartNode(newNode: CommandPartNode<LazyVimCommand>) {
     logger.trace { "setCurrentCommandPartNode is executed" }
     currentCommandPartNode = newNode
@@ -220,7 +210,7 @@ class CommandBuilder private constructor(
   fun hasCurrentCommandPartArgument() = argument != null
 
   fun buildCommand(): Command {
-    val rawCount = if (counts.all { it == 0 }) 0 else counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
+    val rawCount = calculateCount0Snapshot()
     val command = Command(selectedRegister, rawCount, action!!, argument, action!!.type, action?.flags ?: noneOfEnum())
     resetAll(currentCommandPartNode)
     return command

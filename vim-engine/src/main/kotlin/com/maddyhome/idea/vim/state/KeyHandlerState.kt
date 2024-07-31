@@ -46,16 +46,19 @@ data class KeyHandlerState(
     // E.g., the user might have typed `3:` expecting the command line to be displayed with `:.,.+2` as initial text, or
     // started something like `2d3/foo` to delete up to the 6th occurrence of `foo`. (In both examples, the uncommitted
     // count is `3`.)
-    // We pass the currently uncommitted count to the new editor command builder, where it becomes the count for the new
-    // command. The `:` handler will transform it into a range, while the search handler will ignore it. In other words,
-    // the `:` handler uses the count eagerly, where it becomes part of the command line that is executed (by the editor
-    // command builder) when the command line UI is closed. But the search handler doesn't use it - it's needed by the
-    // search motion action executed by the editor command builder once the command line UI is accepted.
-    // For this reason, we do NOT clear the uncommitted count from the editor command builder. A command such as
-    // `2d3/foo` becomes a delete operator action with a search action motion argument, which itself has an Ex string
+    // We pass the current, in progress count for the editor command builder to the new command line builder, where it
+    // becomes the count for the new action. The `:` handler will transform it into a range, while the search handler
+    // will ignore it.
+    // In other words, the `:` handler uses the count eagerly, where it becomes part of the command line that is
+    // executed (by the editor command builder) when the command line UI is closed. But the search handler doesn't use
+    // it - it's needed by the search motion action executed by the editor command builder once the command line UI is
+    // accepted. For this reason, we do NOT clear the uncommitted count from the editor command builder. A command such
+    // as `2d3/foo` becomes a delete operator action with a search action motion argument, which itself has an Ex string
     // argument with the search string. The command has a count of `6`. And a command such as `3:p` becomes an action to
     // process Ex entry with an argument of `.,.+2p` and a count of 3. The count is ignored by this action.
-    commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.CMD_LINE), editorCommandBuilder.count)
+    // Note that we use the calculated count. In Vim, `2"a3"b:` transforms to `:.,.+5`, which is the same behaviour
+    commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.CMD_LINE),
+      editorCommandBuilder.calculateCount0Snapshot())
   }
 
   fun leaveCommandLine() {
