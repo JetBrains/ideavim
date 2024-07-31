@@ -42,7 +42,7 @@ import java.util.*
  */
 data class Command(
   val register: Char?,
-  var rawCount: Int,
+  val rawCount: Int,
   val action: EditorActionHandlerBase,
   val argument: Argument?,
   val type: Type,

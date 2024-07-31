@@ -25,7 +25,7 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val state = injector.vimState
-    val lastCommand = VimRepeater.lastChangeCommand
+    var lastCommand = VimRepeater.lastChangeCommand
 
     if (lastCommand == null && Extension.lastExtensionHandler == null) return false
 
@@ -57,7 +57,7 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
       )
     } else if (!repeatHandler && lastCommand != null) {
       if (cmd.rawCount > 0) {
-        lastCommand.rawCount = cmd.count
+        lastCommand = lastCommand.copy(rawCount = cmd.rawCount)
       }
       state.executingCommand = lastCommand
 
