@@ -30,10 +30,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 data class OperatorArguments(
   val isOperatorPending: Boolean,
   val count0: Int,
-
   val mode: Mode,
 ) {
   val count1: Int = count0.coerceAtLeast(1)
-
-  fun withCount0(count0: Int): OperatorArguments = this.copy(count0 = count0)
 }
