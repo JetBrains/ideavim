@@ -1214,7 +1214,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       context,
       motionArgument,
       true,
-      operatorArguments.withCount0(count0),
+      operatorArguments.copy(count0 = count0),
     ) ?: return false
     return changeRange(
       editor,
