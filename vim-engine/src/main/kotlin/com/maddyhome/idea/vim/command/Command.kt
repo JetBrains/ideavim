@@ -41,8 +41,10 @@ import java.util.*
  * @see OperatorArguments
  */
 data class Command(
+  val register: Char?,
   var rawCount: Int,
   val action: EditorActionHandlerBase,
+  val argument: Argument?,
   val type: Type,
   val flags: EnumSet<CommandFlags>,
 ) {
@@ -53,9 +55,6 @@ data class Command(
 
   val count: Int
     get() = rawCount.coerceAtLeast(1)
-
-  var argument: Argument? = null
-  var register: Char? = null
 
   override fun toString() = "Action = ${action.id}"
 

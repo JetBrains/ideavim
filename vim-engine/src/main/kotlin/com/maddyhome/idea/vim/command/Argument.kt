@@ -100,6 +100,7 @@ sealed class Argument {
     // TODO: Can we get rid of this?
     @JvmField
     val EMPTY_COMMAND: Command = Command(
+      null,
       0,
       object : MotionActionHandler.SingleExecution() {
         override fun getOffset(
@@ -111,6 +112,7 @@ sealed class Argument {
 
         override val motionType: MotionType = MotionType.EXCLUSIVE
       },
+      null,
       Command.Type.MOTION,
       EnumSet.noneOf(CommandFlags::class.java),
     )

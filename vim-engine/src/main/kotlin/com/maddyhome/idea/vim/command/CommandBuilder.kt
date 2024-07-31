@@ -221,10 +221,7 @@ class CommandBuilder private constructor(
 
   fun buildCommand(): Command {
     val rawCount = if (counts.all { it == 0 }) 0 else counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
-    val command = Command(rawCount, action!!, action!!.type, action?.flags ?: noneOfEnum()).apply {
-      register = selectedRegister
-      this.argument = this@CommandBuilder.argument
-    }
+    val command = Command(selectedRegister, rawCount, action!!, argument, action!!.type, action?.flags ?: noneOfEnum())
     resetAll(currentCommandPartNode)
     return command
   }
