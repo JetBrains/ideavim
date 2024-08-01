@@ -369,6 +369,8 @@ is the full list of synonyms.
 - Fancy constants for [undolevels](https://vimhelp.org/options.txt.html#%27undolevels%27):
   > The local value is set to -123456 when the global value is to be used.
 
+- Vi (not Vim) is a POSIX standard, and [has a spec](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/vi.html)! Vim is mostly POSIX compliant when Vi compatibility is selected with the `'compatible'` option, but there are still some differences that can be changed with `'copoptions'`. The spec is interesting because it documents the behaviour of different commands in a stricter style than the user documentation, describing the current line and column after the command, for example. [More details can be found by reading `:help posix`](https://vimhelp.org/vi_diff.txt.html#posix).
+
 License
 -------
 
