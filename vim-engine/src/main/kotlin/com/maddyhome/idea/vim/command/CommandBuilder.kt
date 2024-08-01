@@ -107,6 +107,7 @@ class CommandBuilder private constructor(
   val isExpectingCount: Boolean
     get() {
       return commandState == CurrentCommandState.NEW_COMMAND &&
+        !isRegisterPending &&
         expectedArgumentType != Argument.Type.CHARACTER &&
         expectedArgumentType != Argument.Type.DIGRAPH
     }
@@ -129,9 +130,18 @@ class CommandBuilder private constructor(
     fallbackArgumentType = null
   }
 
-  fun pushCommandPart(register: Char) {
-    logger.trace { "pushCommandPart is executed. register = $register" }
+  fun startWaitingForRegister(key: KeyStroke) {
+    isRegisterPending = true
+    addKey(key)
+  }
+
+  var isRegisterPending: Boolean = false
+    private set
+
+  fun selectRegister(register: Char) {
+    logger.trace { "Selected register '$register'" }
     selectedRegister = register
+    isRegisterPending = false
     fallbackArgumentType = null
     counts.add(0)
   }
@@ -222,6 +232,7 @@ class CommandBuilder private constructor(
     commandState = CurrentCommandState.NEW_COMMAND
     counts.clear()
     counts.add(0)
+    isRegisterPending = false
     selectedRegister = null
     action = null
     argument = null

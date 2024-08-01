@@ -20,7 +20,6 @@ import java.util.*
 interface VimStateMachine {
   val mode: Mode
   var isDotRepeatInProgress: Boolean
-  var isRegisterPending: Boolean
   val isReplaceCharacter: Boolean
 
   /**
@@ -35,8 +34,6 @@ interface VimStateMachine {
    */
   var executingCommand: Command?
   val executingCommandFlags: EnumSet<CommandFlags>
-
-  fun resetRegisterPending()
 
   fun reset()
 
