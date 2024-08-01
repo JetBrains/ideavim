@@ -22,7 +22,6 @@ import java.util.*
 class VimStateMachineImpl : VimStateMachine {
   override var mode: Mode = Mode.NORMAL()
   override var isDotRepeatInProgress: Boolean = false
-  override var isRegisterPending: Boolean = false
   override var isReplaceCharacter: Boolean = false
 
   /**
@@ -41,16 +40,9 @@ class VimStateMachineImpl : VimStateMachine {
     get() = executingCommand?.flags ?: noneOfEnum()
 
 
-  override fun resetRegisterPending() {
-    if (isRegisterPending) {
-      isRegisterPending = false
-    }
-  }
-
   override fun reset() {
     mode = Mode.NORMAL()
     isDotRepeatInProgress = false
-    isRegisterPending = false
     isReplaceCharacter = false
     executingCommand = null
   }

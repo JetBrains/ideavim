@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.key.consumers
 
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -36,9 +35,8 @@ class SelectRegisterConsumer : KeyConsumer {
     if (!isSelectRegister(key, state)) return false
 
     logger.trace("Select register")
-    state.commandBuilder.addKey(key)
     keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
-      injector.vimState.isRegisterPending = true
+      state.commandBuilder.startWaitingForRegister(key)
     }
     return true
   }
@@ -48,10 +46,6 @@ class SelectRegisterConsumer : KeyConsumer {
     if (vimState.mode !is Mode.NORMAL && vimState.mode !is Mode.VISUAL) {
       return false
     }
-    return if (vimState.isRegisterPending) {
-      true
-    } else {
-      key.keyChar == '"' && !KeyHandler.getInstance().isOperatorPending(vimState.mode, keyState) && keyState.commandBuilder.expectedArgumentType == null
-    }
+    return keyState.commandBuilder.isRegisterPending || key.keyChar == '"'
   }
 }

@@ -200,7 +200,6 @@ class KeyHandler {
     logger.trace("Command builder is set to BAD")
     keyState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     editor.resetOpPending()
-    injector.vimState.resetRegisterPending()
     editor.isReplaceCharacter = false
     reset(keyState, editor.mode)
   }

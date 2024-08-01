@@ -42,12 +42,12 @@ object MappingProcessor: KeyConsumer {
     val keyState = keyProcessResultBuilder.state
     val mappingState = keyState.mappingState
     val commandBuilder = keyState.commandBuilder
-    if (commandBuilder.isAwaitingCharOrDigraphArgument() ||
-      commandBuilder.isBuildingMultiKeyCommand() ||
-      isMappingDisabledForKey(key, keyState) ||
-      injector.vimState.isRegisterPending
+    if (commandBuilder.isAwaitingCharOrDigraphArgument()
+      || commandBuilder.isBuildingMultiKeyCommand()
+      || commandBuilder.isRegisterPending
+      || isMappingDisabledForKey(key, keyState)
     ) {
-      log.debug("Finish key processing, returning false")
+      log.debug("Mapping not applicable. Finish key processing, returning false")
       return false
     }
     mappingState.stopMappingTimer()

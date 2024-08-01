@@ -44,11 +44,9 @@ class CommandCountConsumer : KeyConsumer {
     val commandBuilder = keyState.commandBuilder
 
     // Make sure to avoid handling '0' as the start of a count.
-    if (Character.isDigit(chKey) && (chKey != '0' || commandBuilder.hasCountCharacter())
+    if (Character.isDigit(chKey) && !(chKey == '0' && !commandBuilder.hasCountCharacter())
       && (editorState.mode is Mode.NORMAL || editorState.mode is Mode.VISUAL || editorState.mode is Mode.OP_PENDING)
-      && commandBuilder.isExpectingCount
-      && !editorState.isRegisterPending
-      ) {
+      && commandBuilder.isExpectingCount) {
       logger.debug("This is a command count key")
       return true
     }
