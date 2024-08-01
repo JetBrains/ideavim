@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.key.consumers
 
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
-import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -22,10 +21,7 @@ import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.key.CommandNode
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyConsumer
-import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -44,59 +40,24 @@ class CommandConsumer : KeyConsumer {
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    logger.trace { "Entered CommandConsumer" }
+    logger.trace("Entered CommandConsumer")
     val commandBuilder = keyProcessResultBuilder.state.commandBuilder
-    // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
-    // return the node matching this keystroke
-    logger.trace("Getting the node for the current mode")
-    logger.trace("command builder - $commandBuilder")
-    val node: Node<LazyVimCommand>? = mapOpCommand(key, commandBuilder.getChildNode(key), editor.mode, keyProcessResultBuilder.state)
-    logger.trace("node: $node")
 
-    when (node) {
-      is CommandNode<LazyVimCommand> -> {
-        logger.trace("Node is a command node")
-        handleCommandNode(node, keyProcessResultBuilder)
-        keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ -> lambdaKeyState.commandBuilder.addKey(key) }
-        return true
-      }
+    logger.trace { "command builder - $commandBuilder" }
 
-      is CommandPartNode<LazyVimCommand> -> {
-        logger.trace("Node is a command part node")
-        commandBuilder.setCurrentCommandPartNode(node)
-        commandBuilder.addKey(key)
-        return true
-      }
+    // Map duplicate operator keystrokes. E.g., given `dd`, there is no `d` motion, so the second keystroke is mapped to
+    // `_`. Same with `cc` and `yy`, etc.
+    val keystroke =
+      if (editor.mode is Mode.OP_PENDING) commandBuilder.convertDuplicateOperatorKeyStrokeToMotion(key) else key
+    logger.trace { "Original keystroke: $key, substituted keystroke: $keystroke" }
 
-      else -> {
-        return false
-      }
-    }
+    return commandBuilder.processKey(keystroke) { handleAction(it, keyProcessResultBuilder) }
   }
 
-  /**
-   * See the description for [com.maddyhome.idea.vim.command.DuplicableOperatorAction]
-   */
-  private fun mapOpCommand(
-    key: KeyStroke,
-    node: Node<LazyVimCommand>?,
-    mode: Mode,
-    keyState: KeyHandlerState,
-  ): Node<LazyVimCommand>? {
-    logger.trace("entered mapOpCommand. key = ${ injector.parser.toKeyNotation(key) }, node = $node, mode = $mode")
-    return if (KeyHandler.getInstance().isDuplicateOperatorKeyStroke(key, mode, keyState)) {
-      logger.trace("it is a duplicate operator key stroke")
-      keyState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
-    } else {
-      node
-    }
-  }
-
-  private fun handleCommandNode(node: CommandNode<LazyVimCommand>, processBuilder: KeyProcessResult.KeyProcessResultBuilder) {
-    logger.trace("Handle command node")
-    // The user entered a valid command. Create the command and add it to the stack.
-    val action = node.actionHolder.instance
+  private fun handleAction(action: EditorActionHandlerBase, processBuilder: KeyProcessResult.KeyProcessResultBuilder) {
     val keyState = processBuilder.state
+
+    logger.trace { "Handle command action: ${action.id}" }
 
     if (action.flags.contains(CommandFlags.FLAG_START_EX)) {
       keyState.enterCommandLine()

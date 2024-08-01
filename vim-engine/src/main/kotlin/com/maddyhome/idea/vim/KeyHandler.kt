@@ -209,10 +209,7 @@ class KeyHandler {
     injector.messages.indicateError()
   }
 
-  fun isDuplicateOperatorKeyStroke(key: KeyStroke, mode: Mode, keyState: KeyHandlerState): Boolean {
-    return isOperatorPending(mode, keyState) && keyState.commandBuilder.isDuplicateOperatorKeyStroke(key)
-  }
-
+  // TODO: Get rid of this. We can't be OP_PENDING if the command builder is empty
   fun isOperatorPending(mode: Mode, keyState: KeyHandlerState): Boolean {
     return mode is Mode.OP_PENDING && !keyState.commandBuilder.isEmpty
   }
