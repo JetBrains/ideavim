@@ -20,8 +20,8 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
-import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
@@ -53,6 +53,7 @@ class CommandBuilder private constructor(
     }
 
   var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
+  val keys: Iterable<KeyStroke> get() = keyList
 
   /**
    * Returns the current total count, as the product of all entered count components. The value is not coerced.
@@ -76,8 +77,6 @@ class CommandBuilder private constructor(
     return if (counts.all { it == 0 }) 0 else counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
   }
 
-  val keys: Iterable<KeyStroke> get() = keyList
-
   // TODO: Try to remove this. We shouldn't be looking at the unbuilt command
   // This is used by the extension mapping handler, to select the current register before invoking the extension. We
   // need better handling of extensions so that they integrate better with half-built commands, either by finishing or
@@ -97,6 +96,14 @@ class CommandBuilder private constructor(
     get() = fallbackArgumentType
       ?: (argument as? Argument.Motion)?.let { return it.motion.argumentType }
       ?: action?.argumentType
+
+  fun fallbackToCharacterArgument() {
+    logger.trace("fallbackToCharacterArgument is executed")
+    // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
+    // in which case try to handle input as a character argument.
+    assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER" }
+    fallbackArgumentType = Argument.Type.CHARACTER
+  }
 
   // TODO: Review all of these
   val isReady: Boolean get() = commandState == CurrentCommandState.READY
@@ -146,16 +153,8 @@ class CommandBuilder private constructor(
     counts.add(0)
   }
 
-  fun fallbackToCharacterArgument() {
-    logger.trace { "fallbackToCharacterArgument is executed" }
-    // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
-    // in which case try to handle input as a character argument.
-    assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER" }
-    fallbackArgumentType = Argument.Type.CHARACTER
-  }
-
   fun addKey(key: KeyStroke) {
-    logger.trace { "added key to command builder" }
+    logger.trace("added key to command builder")
     keyList.add(key)
   }
 
@@ -177,15 +176,6 @@ class CommandBuilder private constructor(
 
   fun hasCountCharacter() = currentCount > 0
 
-  fun setCurrentCommandPartNode(newNode: CommandPartNode<LazyVimCommand>) {
-    logger.trace { "setCurrentCommandPartNode is executed" }
-    currentCommandPartNode = newNode
-  }
-
-  fun getChildNode(key: KeyStroke): Node<LazyVimCommand>? {
-    return currentCommandPartNode[key]
-  }
-
   fun isAwaitingCharOrDigraphArgument(): Boolean {
     val awaiting = expectedArgumentType == Argument.Type.CHARACTER || expectedArgumentType == Argument.Type.DIGRAPH
     logger.debug { "Awaiting char or digraph: $awaiting" }
@@ -204,17 +194,65 @@ class CommandBuilder private constructor(
   }
 
   fun completeCommandPart(argument: Argument) {
-    logger.trace { "completeCommandPart is executed" }
+    logger.trace("completeCommandPart is executed")
     this.argument = (this.argument as? Argument.Motion)?.withArgument(argument) ?: argument
     commandState = CurrentCommandState.READY
   }
 
-  fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
-    logger.trace { "entered isDuplicateOperatorKeyStroke" }
-    val action = (argument as? Argument.Motion)?.motion as? DuplicableOperatorAction
-      ?: action as? DuplicableOperatorAction
-    logger.trace { "action = $action" }
-    return action?.duplicateWith == key.keyChar
+  /**
+   * Map a keystroke that duplicates an operator into the `_` "current line" motion
+   *
+   * Some commands like `dd` or `yy` or `cc` are treated as special cases by Vim. There is no `d`, `y` or `c` motion,
+   * so for convenience, Vim maps the repeated operator keystroke as meaning "operate on the current line", and replaces
+   * the second keystroke with the `_` motion. I.e. `dd` becomes `d_`, `yy` becomes `y_`, `cc` becomes `c_`, etc.
+   *
+   * @see DuplicableOperatorAction
+   */
+  fun convertDuplicateOperatorKeyStrokeToMotion(key: KeyStroke): KeyStroke {
+    logger.trace("convertDuplicateOperatorKeyStrokeToMotion is executed. key = $key")
+
+    // Simple check to ensure that we're in OP_PENDING. If we don't have an action, we don't have an operator. If we
+    // have an argument, we can't be in OP_PENDING
+    if (action != null && argument == null) {
+      (action as? DuplicableOperatorAction)?.let {
+        logger.trace { "action = $action" }
+        if (it.duplicateWith == key.keyChar) {
+          return KeyStroke.getKeyStroke('_')
+        }
+      }
+    }
+    return key
+  }
+
+  /**
+   * Process a keystroke, matching an action if available
+   *
+   * If the given keystroke matches an action, the [processor] is invoked with the action instance. Typically, the
+   * caller will end up passing the action back to [pushCommandPart], but there are more housekeeping steps that stop us
+   * encapsulating it completely.
+   *
+   * If the given keystroke does not yet match an action, the internal state is updated to track the current command
+   * part node.
+   */
+  fun processKey(key: KeyStroke, processor: (EditorActionHandlerBase) -> Unit): Boolean {
+    val node = currentCommandPartNode[key]
+    when (node) {
+      is CommandNode -> {
+        logger.trace { "Found full command node - $node ($key)" }
+        addKey(key)
+        processor(node.actionHolder.instance)
+        return true
+      }
+      is CommandPartNode -> {
+        logger.trace { "Found command part node - $node ($key)" }
+        currentCommandPartNode = node
+        addKey(key)
+        return true
+      }
+    }
+
+    logger.trace { "No command/command part node found for key: $key" }
+    return false
   }
 
   fun hasCurrentCommandPartArgument() = argument != null
@@ -227,7 +265,7 @@ class CommandBuilder private constructor(
   }
 
   fun resetAll(commandPartNode: CommandPartNode<LazyVimCommand>) {
-    logger.trace { "resetAll is executed" }
+    logger.trace("resetAll is executed")
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
     counts.clear()
@@ -249,9 +287,9 @@ class CommandBuilder private constructor(
   }
 
   fun resetInProgressCommandPart(commandPartNode: CommandPartNode<LazyVimCommand>) {
-    logger.trace { "resetInProgressCommandPart is executed" }
+    logger.trace("resetInProgressCommandPart is executed")
     counts[counts.size - 1] = 0
-    setCurrentCommandPartNode(commandPartNode)
+    currentCommandPartNode = commandPartNode
   }
 
   @TestOnly
