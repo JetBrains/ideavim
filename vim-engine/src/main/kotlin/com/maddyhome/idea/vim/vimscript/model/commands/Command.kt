@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -23,12 +22,12 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import java.util.*
 
 sealed class Command(private val commandRange: Range, val commandArgument: String) : Executable {
   override lateinit var vimContext: VimLContext
@@ -91,13 +90,7 @@ sealed class Command(private val commandRange: Range, val commandArgument: Strin
       return ExecutionResult.Error
     }
 
-    val keyHandler = KeyHandler.getInstance()
-    val keyState = keyHandler.keyHandlerState
-    val operatorArguments = OperatorArguments(
-      keyHandler.isOperatorPending(editor.mode, keyState),
-      0,
-      editor.mode,
-    )
+    val operatorArguments = OperatorArguments(editor.mode is Mode.OP_PENDING, 0, editor.mode)
 
     val runCommand = { runCommand(editor, context, operatorArguments) }
     return when (argFlags.access) {
