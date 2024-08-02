@@ -148,12 +148,10 @@ class ToHandlerMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToHandler' mapping info...")
-    val keyHandler = KeyHandler.getInstance()
 
     // Cache isOperatorPending in case the extension changes the mode while moving the caret
     // See CommonExtensionTest
-    // TODO: Is this legal? Should we assert in this case?
-    val shouldCalculateOffsets: Boolean = keyHandler.isOperatorPending(editor.mode, keyState)
+    val shouldCalculateOffsets: Boolean = editor.mode is Mode.OP_PENDING
 
     val startOffsets: Map<ImmutableVimCaret, Int> = editor.carets().associateWith { it.offset }
 
@@ -182,7 +180,7 @@ class ToHandlerMappingInfo(
     }
 
     val operatorArguments = OperatorArguments(
-      keyHandler.isOperatorPending(editor.mode, keyState),
+      editor.mode is Mode.OP_PENDING,
       keyState.commandBuilder.calculateCount0Snapshot(),
       editor.mode
     )

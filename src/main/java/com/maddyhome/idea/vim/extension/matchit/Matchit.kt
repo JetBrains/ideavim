@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
 import java.util.*
 import java.util.regex.Pattern
 
@@ -99,9 +100,7 @@ internal class Matchit : VimExtension {
 
       // Normally we want to jump to the start of the matching pair. But when moving forward in operator
       // pending mode, we want to include the entire match. isInOpPending makes that distinction.
-      val isInOpPending = keyHandler.isOperatorPending(editor.mode, keyState)
-
-      if (isInOpPending) {
+      if (editor.mode is Mode.OP_PENDING) {
         val matchitAction = MatchitAction()
         matchitAction.reverse = reverse
         matchitAction.isInOpPending = true
@@ -110,7 +109,14 @@ internal class Matchit : VimExtension {
       } else {
         editor.sortedCarets().forEach { caret ->
           injector.jumpService.saveJumpLocation(editor)
-          caret.moveToOffset(getMatchitOffset(editor.ij, caret.ij, operatorArguments.count0, isInOpPending, reverse))
+          caret.moveToOffset(
+            getMatchitOffset(
+              editor.ij,
+              caret.ij,
+              operatorArguments.count0,
+              isInOpPending = false,
+              reverse
+            ))
         }
       }
     }

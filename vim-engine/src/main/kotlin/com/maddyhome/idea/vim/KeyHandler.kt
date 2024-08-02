@@ -209,11 +209,6 @@ class KeyHandler {
     injector.messages.indicateError()
   }
 
-  // TODO: Get rid of this. We can't be OP_PENDING if the command builder is empty
-  fun isOperatorPending(mode: Mode, keyState: KeyHandlerState): Boolean {
-    return mode is Mode.OP_PENDING && !keyState.commandBuilder.isEmpty
-  }
-
   private fun executeCommand(
     editor: VimEditor,
     context: ExecutionContext,
