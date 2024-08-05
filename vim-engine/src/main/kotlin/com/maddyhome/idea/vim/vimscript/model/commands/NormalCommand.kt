@@ -49,7 +49,7 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
         }
       }
       is Mode.CMD_LINE -> injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
-      Mode.INSERT, Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, editor.mode))
+      Mode.INSERT, Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(1, editor.mode))
       is Mode.SELECT -> editor.exitSelectModeNative(false)
       is Mode.OP_PENDING, is Mode.NORMAL -> Unit
     }
@@ -79,7 +79,7 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
         injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
       }
       if (mode is Mode.INSERT || mode is Mode.REPLACE) {
-        editor.exitInsertMode(context, OperatorArguments(false, 1, mode))
+        editor.exitInsertMode(context, OperatorArguments(1, mode))
       }
     }
 
