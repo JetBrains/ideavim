@@ -217,11 +217,7 @@ class KeyHandler {
   ) {
     logger.trace("Command execution")
     val command = keyState.commandBuilder.buildCommand()
-    val operatorArguments = OperatorArguments(
-      editor.mode is Mode.OP_PENDING,
-      command.rawCount,
-      editorState.mode,
-    )
+    val operatorArguments = OperatorArguments(command.rawCount, editorState.mode)
 
     // If we were in "operator pending" mode, reset back to normal mode.
     // But opening command line should not reset operator pending mode (e.g. `d/foo`

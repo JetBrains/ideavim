@@ -456,7 +456,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           context,
           1,
           false,
-          OperatorArguments(false, 1, commandState.mode),
+          OperatorArguments(1, commandState.mode),
         )
       } else {
         val commandState = injector.vimState
@@ -465,7 +465,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           context,
           cmd.count,
           false,
-          OperatorArguments(false, cmd.count, commandState.mode),
+          OperatorArguments(cmd.count, commandState.mode),
         )
       }
       if (mode == Mode.REPLACE) {

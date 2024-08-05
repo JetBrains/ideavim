@@ -170,7 +170,7 @@ private fun doReplace(editor: Editor, context: DataContext, caret: ImmutableVimC
       vimEditor,
       context.vim,
       putData,
-      operatorArguments = OperatorArguments(editor.vim.mode is Mode.OP_PENDING, 0, editor.vim.mode),
+      operatorArguments = OperatorArguments(0, editor.vim.mode),
       saveToRegister = false
     )
   }

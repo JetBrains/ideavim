@@ -70,7 +70,7 @@ class IJEditorFocusListener : EditorListener {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       val mode = injector.vimState.mode
       when (mode) {
-        is Mode.INSERT -> editor.exitInsertMode(context, OperatorArguments(false, 0, mode))
+        is Mode.INSERT -> editor.exitInsertMode(context, OperatorArguments(0, mode))
         else -> {}
       }
     }

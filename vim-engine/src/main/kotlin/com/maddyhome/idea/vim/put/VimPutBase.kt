@@ -56,7 +56,7 @@ abstract class VimPutBase : VimPut {
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
     if (updateVisualMarks) {
-      wrapInsertedTextWithVisualMarks(editor.currentCaret(), data, processedText)
+      wrapInsertedTextWithVisualMarks(editor.currentCaret(), data)
     }
 
     return true
@@ -77,15 +77,11 @@ abstract class VimPutBase : VimPut {
     }
   }
 
-  private fun wasTextInsertedLineWise(text: ProcessedTextData): Boolean {
-    return text.typeInRegister == SelectionType.LINE_WISE
-  }
-
   /**
    * see ":h gv":
    * After using "p" or "P" in Visual mode the text that was put will be selected
    */
-  private fun wrapInsertedTextWithVisualMarks(caret: VimCaret, data: PutData, text: ProcessedTextData) {
+  private fun wrapInsertedTextWithVisualMarks(caret: VimCaret, data: PutData) {
     val textLength: Int = data.textData?.rawText?.length ?: return
     val caretsAndSelections = data.visualSelection?.caretsAndSelections ?: return
     val selection = caretsAndSelections[caret] ?: caretsAndSelections.entries.firstOrNull()?.value ?: return
@@ -297,7 +293,7 @@ abstract class VimPutBase : VimPut {
     var updated = caret
     if (currentLine + lineCount >= editor.nativeLineCount()) {
       val limit = currentLine + lineCount - editor.nativeLineCount()
-      for (i in 0 until limit) {
+      repeat(limit) {
         updated = updated.moveToOffset(editor.fileSize().toInt())
         updated = injector.changeGroup.insertText(editor, updated, "\n")
       }
@@ -526,14 +522,14 @@ abstract class VimPutBase : VimPut {
         editor,
         caret,
         data,
-        OperatorArguments(false, 0, editor.mode),
+        OperatorArguments(0, editor.mode),
         modifyRegister,
       ) ?: return false
     }
     val processedText = processText(currentCaret, data) ?: return false
     currentCaret = putForCaret(editor, currentCaret, data, additionalData, context, processedText)
     if (updateVisualMarks) {
-      wrapInsertedTextWithVisualMarks(currentCaret, data, processedText)
+      wrapInsertedTextWithVisualMarks(currentCaret, data)
     }
     return true
   }

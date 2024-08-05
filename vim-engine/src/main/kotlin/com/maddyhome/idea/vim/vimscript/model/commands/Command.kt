@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.StrictMode
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.vimscript.model.Executable
@@ -90,7 +89,7 @@ sealed class Command(private val commandRange: Range, val commandArgument: Strin
       return ExecutionResult.Error
     }
 
-    val operatorArguments = OperatorArguments(editor.mode is Mode.OP_PENDING, 0, editor.mode)
+    val operatorArguments = OperatorArguments(0, editor.mode)
 
     val runCommand = { runCommand(editor, context, operatorArguments) }
     return when (argFlags.access) {
@@ -330,7 +329,7 @@ sealed class Command(private val commandRange: Range, val commandArgument: Strin
     try {
       validate(editor)
     }
-    catch (t: Throwable) {
+    catch (_: Throwable) {
       return null
     }
     return getLineRange(editor)
