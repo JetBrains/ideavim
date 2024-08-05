@@ -8,9 +8,7 @@
 
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.find.EditorSearchSession;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.client.ClientAppSession;
 import com.intellij.openapi.client.ClientKind;
 import com.intellij.openapi.client.ClientSessionsManager;
@@ -23,12 +21,10 @@ import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt;
-import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.newapi.IjVimDocument;
@@ -242,9 +238,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     VimPlugin.getNotifications(project).notifyAboutIdeaJoin(editor);
   }
 
-  @Nullable
   @Override
-  public Element getState() {
+  public @Nullable Element getState() {
     Element element = new Element("editor");
     saveData(element);
     return element;
@@ -320,18 +315,16 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
       .collect(Collectors.toList());
   }
 
-  @NotNull
   @Override
-  public Collection<VimEditor> getEditors() {
+  public @NotNull Collection<VimEditor> getEditors() {
     return getLocalEditors()
       .filter(UserDataManager::getVimInitialised)
       .map(IjVimEditor::new)
       .collect(Collectors.toList());
   }
 
-  @NotNull
   @Override
-  public Collection<VimEditor> getEditors(@NotNull VimDocument buffer) {
+  public @NotNull Collection<VimEditor> getEditors(@NotNull VimDocument buffer) {
     final Document document = ((IjVimDocument)buffer).getDocument();
     return getLocalEditors()
       .filter(editor -> UserDataManager.getVimInitialised(editor) && editor.getDocument().equals(document))
@@ -351,7 +344,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     // events such as document change (to update search highlights), and these can come from CWM guests, and we'd get
     // the remote editors.
     // This invocation will always get local editors, regardless of the current context.
-    List<ClientAppSession> appSessions = ClientSessionsManager.getAppSessions(ClientKind.ALL);
+    List<ClientAppSession> appSessions = ClientSessionsManager.getAppSessions(ClientKind.LOCAL);
     if (!appSessions.isEmpty()) {
       ClientAppSession localSession = appSessions.get(0);
       return localSession.getService(ClientEditorManager.class).editors();
