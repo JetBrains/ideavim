@@ -59,8 +59,8 @@ dependencies {
 
     compileOnly("org.jetbrains:annotations:24.1.0")
 
-    runtimeOnly("org.antlr:antlr4-runtime:4.13.1")
-    antlr("org.antlr:antlr4:4.13.1")
+    runtimeOnly("org.antlr:antlr4-runtime:4.13.2")
+    antlr("org.antlr:antlr4:4.13.2")
 
     ksp(project(":annotation-processors"))
     compileOnly(project(":annotation-processors"))
