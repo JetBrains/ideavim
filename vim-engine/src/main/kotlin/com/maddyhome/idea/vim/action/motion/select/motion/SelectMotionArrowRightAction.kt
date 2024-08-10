@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
@@ -28,7 +29,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
  */
 
 @CommandOrMotion(keys = ["<Right>"], modes = [Mode.SELECT])
-class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
+class SelectMotionArrowRightAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -58,6 +59,6 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
   }
 
   private companion object {
-    private val logger = injector.getLogger(SelectMotionRightAction::class.java)
+    private val logger = vimLogger<SelectMotionArrowRightAction>()
   }
 }

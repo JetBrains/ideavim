@@ -19,10 +19,21 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 
-@CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
+private fun doMotion(
+  editor: VimEditor,
+  caret: ImmutableVimCaret,
+  count1: Int,
+  whichwrapKey: String,
+  allowPastEnd: Boolean,
+): Motion {
+  val allowWrap = injector.options(editor).whichwrap.contains(whichwrapKey)
+  return injector.motion.getHorizontalMotion(editor, caret, count1, allowPastEnd, allowWrap)
+}
+
+abstract class MotionNonShiftedArrowLeftBaseAction() : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun motion(
@@ -32,8 +43,38 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val allowWrap = injector.options(editor).whichwrap.contains("<")
-    val allowEnd = operatorArguments.isOperatorPending // d<Left> deletes \n with wrap enabled
-    return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
+    return doMotion(editor, caret, -operatorArguments.count1, "<", allowPastEnd)
+  }
+
+  protected open val allowPastEnd: Boolean = false
+}
+
+// Note that Select mode is handled in [SelectMotionArrowLeftAction]
+@CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.NORMAL, Mode.VISUAL])
+class MotionArrowLeftAction : MotionNonShiftedArrowLeftBaseAction()
+
+@CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.OP_PENDING])
+class MotionArrowLeftOpPendingAction : MotionNonShiftedArrowLeftBaseAction() {
+  // When the motion is used with an operator, the EOL character is counted.
+  // This allows e.g., `d<Left>` to delete the end of line character on the previous line when wrap is active
+  // ('whichwrap' contains "<")
+  // See `:help whichwrap`. This says a delete or change operator, but it appears to apply to all operators
+  override val allowPastEnd = true
+}
+
+// Just needs to be a plain motion handler - it's not shifted, and the non-shifted actions don't apply in Insert mode
+@CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.INSERT])
+class MotionArrowLeftInsertModeAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
+  override fun getOffset(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    // Insert mode is always allowed past the end of the line
+    return doMotion(editor, caret, -operatorArguments.count1, "[", allowPastEnd = true)
   }
 }
