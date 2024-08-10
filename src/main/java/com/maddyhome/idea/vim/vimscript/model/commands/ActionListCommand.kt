@@ -45,7 +45,9 @@ internal data class ActionListCommand(val range: Range, val argument: String) : 
       .filter { line -> searchPattern.all { it in line.lowercase(Locale.getDefault()) } }
       .joinToString(lineSeparator)
 
-    ExOutputModel.getInstance(editor.ij).output(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
+    val outputPanel = injector.outputPanel.getOrCreate(editor, context)
+    outputPanel.addText(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
+    outputPanel.show()
     return ExecutionResult.Success
   }
 }

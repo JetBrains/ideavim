@@ -374,9 +374,9 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
           if (activeCommandLine != null) {
             activeCommandLine.close(true, false);
           }
-          ExOutputModel exOutputModel = ExOutputModel.tryGetInstance(editor);
-          if (exOutputModel != null) {
-            exOutputModel.close();
+          VimOutputPanel outputPanel = injector.getOutputPanel().getCurrentOutputPanel();
+          if (outputPanel != null) {
+            outputPanel.close();
           }
           VimModalInput modalInput = injector.getModalInput().getCurrentModalInput();
           if (modalInput != null) {

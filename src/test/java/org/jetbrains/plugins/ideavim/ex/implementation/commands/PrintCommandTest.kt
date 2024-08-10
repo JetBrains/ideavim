@@ -32,7 +32,7 @@ class PrintCommandTest : VimTestCase() {
     // We should be waiting for a keypress now, such as <Enter> or <Esc> to close the output panel. But that's handled
     // by a separate key event loop which doesn't operate in tests.
     // Simulate closing the output panel in the same way as if we'd entered the right key
-    ExOutputModel.getInstance(fixture.editor).close()
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("p"))
     assertExOutput("    Lorem Ipsum")
   }

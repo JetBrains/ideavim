@@ -317,7 +317,7 @@ internal class MotionGroup : VimMotionGroupBase() {
               is Mode.CMD_LINE -> {
                 val commandLine = injector.commandLine.getActiveCommandLine() ?: return
                 commandLine.close(refocusOwningEditor = false, resetCaret = false)
-                ExOutputModel.tryGetInstance(editor)?.close()
+                injector.outputPanel.getCurrentOutputPanel()?.close()
               }
               else -> {}
             }

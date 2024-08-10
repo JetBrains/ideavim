@@ -739,7 +739,7 @@ internal object VimListenerManager {
         injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
         injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = true, resetCaret = false)
 
-        ExOutputModel.tryGetInstance(editor)?.close()
+        injector.outputPanel.getCurrentOutputPanel()?.close()
 
         val caretModel = editor.caretModel
         if (editor.vim.mode.selectionType != null) {
@@ -768,7 +768,7 @@ internal object VimListenerManager {
         injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
         injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = true, resetCaret = false)
 
-        ExOutputModel.getInstance(event.editor).close()
+        injector.outputPanel.getCurrentOutputPanel()?.close()
       }
     }
   }
