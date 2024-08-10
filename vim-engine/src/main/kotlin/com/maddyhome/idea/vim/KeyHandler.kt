@@ -55,8 +55,15 @@ class KeyHandler {
   private val keyConsumers: List<KeyConsumer> = listOf(ModalInputConsumer(), MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
   private var handleKeyRecursionCount = 0
 
-  var keyHandlerState: KeyHandlerState = KeyHandlerState()
-    private set
+  // KeyHandlerState requires injector.keyGroup to be initialized and that's why we don't create it immediately and have this here
+  // TODO figure out a better solution
+  private val defaultKeyHandlerState by lazy { KeyHandlerState() }
+  private var mutableKeyHandlerState: KeyHandlerState? = null
+  var keyHandlerState: KeyHandlerState
+    get() = mutableKeyHandlerState ?: defaultKeyHandlerState
+    private set(value) {
+      mutableKeyHandlerState = value
+    }
 
   val keyStack: KeyStack = KeyStack()
   val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
