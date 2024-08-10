@@ -19,21 +19,26 @@ import com.maddyhome.idea.vim.state.mode.Mode
  * Problems with this class:
  * * The name is misleading, as it is used when executing motions that do not have an operator, as well as when
  *   executing the operator itself. Or even when executing actions that are neither operators nor motions
- * * [mode] is not necessarily the same as [VimEditor.mode], but it's not clear how or why
+ * * [mode] is the mode _before_ the command is completed, which is not guaranteed to be the same as the mode once the
+ *   command completes
  * * The count is (and must be) the count for the whole command, rather than the operator, or for the in-progress
  *   motion. This is not it's not clear in this class
  *
- * @param isOperatorPending `true` if the editor is in [Mode.OP_PENDING] at the time of creating this class.
+ * @param isOperatorPending Deprecated. The value is used to indicate that a command is operator+motion and changes the
+ * behaviour of the motion (the EOL character is counted in this scenario - see `:help whichwrap`). It is better to
+ * register a separate action for [Mode.OP_PENDING] rather than expect a runtime flag for something that can be handled
+ * statically.
  * @param count0 The raw count of the entire command. E.g., if the command is `2d3w`, then this count will be `6`, even
- *        if when this class is passed to the `d` operator action (the count applies to the motion).
+ * if when this class is passed to the `d` operator action (the count applies to the motion).
  * @param mode The current mode of the editor. This is not guaranteed to match [VimEditor.mode], but it is unclear why.
  */
 data class OperatorArguments
 @Deprecated(
   "Use overload without isOperatorPending. Value can be calculated from mode",
-  replaceWith = ReplaceWith("OperatorArguments(count0, mode)")
+  replaceWith = ReplaceWith("OperatorArguments(count0, mode)"),
 ) constructor(
-  val isOperatorPending: Boolean,
+  // This is used by EasyMotion
+  @Deprecated("It is better to register a separate OP_PENDING action than switch on a runtime flag") val isOperatorPending: Boolean,
   val count0: Int,
   val mode: Mode,
 ) {

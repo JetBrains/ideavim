@@ -23,8 +23,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 
-@CommandOrMotion(keys = ["l"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-class MotionRightAction : MotionActionHandler.ForEachCaret() {
+abstract class MotionRightBaseAction() : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -35,24 +34,20 @@ class MotionRightAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allowWrap = injector.options(editor).whichwrap.contains("l")
-    val allowEnd = editor.usesVirtualSpace || editor.isEndAllowed ||
-      operatorArguments.isOperatorPending // because of `dl` removing the last character
-    return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = allowEnd, allowWrap)
+    return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd(editor), allowWrap)
   }
+
+  protected open fun allowPastEnd(editor: VimEditor)  = editor.usesVirtualSpace || editor.isEndAllowed
 }
 
-@CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.INSERT])
-class MotionRightInsertAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+@CommandOrMotion(keys = ["l"], modes = [Mode.NORMAL, Mode.VISUAL])
+class MotionRightAction : MotionRightBaseAction()
 
-  override fun getOffset(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    val allowWrap = injector.options(editor).whichwrap.contains("]")
-    return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = true, allowWrap)
-  }
+@CommandOrMotion(keys = ["l"], modes = [Mode.OP_PENDING])
+class MotionRightOpPendingAction : MotionRightBaseAction() {
+  // When the motion is used with an operator, the EOL character is counted.
+  // This allows e.g., `dl` to delete the last character in a line. Note that we can't use editor.isEndAllowed to give
+  // us this because the current mode when we execute the operator/motion is no longer OP_PENDING.
+  // See `:help whichwrap`. This says a delete or change operator, but it appears to apply to all operators
+  override fun allowPastEnd(editor: VimEditor) = true
 }

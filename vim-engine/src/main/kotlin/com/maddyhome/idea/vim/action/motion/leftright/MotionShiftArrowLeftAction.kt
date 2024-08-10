@@ -18,23 +18,19 @@ import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 
-/**
- * @author Alex Plate
- */
-
 @CommandOrMotion(keys = ["<S-Left>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
-class MotionShiftLeftAction : ShiftedArrowKeyHandler(true) {
+class MotionShiftArrowLeftAction : ShiftedArrowKeyHandler(true) {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    val vertical = injector.motion.getHorizontalMotion(editor, caret, -cmd.count, true)
-    caret.moveToMotion(vertical)
+    val motion = injector.motion.getHorizontalMotion(editor, caret, -cmd.count, true)
+    caret.moveToMotion(motion)
   }
 
   override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
     val caret = editor.currentCaret()
-    val newOffset = injector.motion.findOffsetOfNextWord(editor, caret.offset, -cmd.count, false)
-    caret.moveToMotion(newOffset)
+    val motion = injector.motion.findOffsetOfNextWord(editor, caret.offset, -cmd.count, false)
+    caret.moveToMotion(motion)
   }
 }

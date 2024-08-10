@@ -17,7 +17,12 @@
     {
         "keys": "$",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction",
-        "modes": "NXO"
+        "modes": "NX"
+    },
+    {
+        "keys": "$",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnOpPendingAction",
+        "modes": "O"
     },
     {
         "keys": "%",
@@ -742,16 +747,21 @@
     {
         "keys": "<Left>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction",
-        "modes": "NXO"
+        "modes": "NX"
     },
     {
         "keys": "<Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftInsertModeAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftInsertModeAction",
         "modes": "I"
     },
     {
         "keys": "<Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftOpPendingAction",
+        "modes": "O"
+    },
+    {
+        "keys": "<Left>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionArrowLeftAction",
         "modes": "S"
     },
     {
@@ -792,16 +802,21 @@
     {
         "keys": "<Right>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction",
-        "modes": "NXO"
+        "modes": "NX"
     },
     {
         "keys": "<Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightInsertAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightInsertModeAction",
         "modes": "I"
     },
     {
         "keys": "<Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightOpPendingAction",
+        "modes": "O"
+    },
+    {
+        "keys": "<Right>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionArrowRightAction",
         "modes": "S"
     },
     {
@@ -831,7 +846,7 @@
     },
     {
         "keys": "<S-Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftArrowLeftAction",
         "modes": "INXS"
     },
     {
@@ -841,7 +856,7 @@
     },
     {
         "keys": "<S-Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftArrowRightAction",
         "modes": "INXS"
     },
     {
@@ -887,22 +902,32 @@
     {
         "keys": "<kLeft>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction",
-        "modes": "NXO"
+        "modes": "NX"
     },
     {
         "keys": "<kLeft>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftInsertModeAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftInsertModeAction",
         "modes": "I"
+    },
+    {
+        "keys": "<kLeft>",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftOpPendingAction",
+        "modes": "O"
     },
     {
         "keys": "<kRight>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction",
-        "modes": "NXO"
+        "modes": "NX"
     },
     {
         "keys": "<kRight>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightInsertAction",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightInsertModeAction",
         "modes": "I"
+    },
+    {
+        "keys": "<kRight>",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightOpPendingAction",
+        "modes": "O"
     },
     {
         "keys": "<kUp>",
@@ -1667,7 +1692,12 @@
     {
         "keys": "h",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction",
-        "modes": "NXO"
+        "modes": "NX"
+    },
+    {
+        "keys": "h",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftOpPendingModeAction",
+        "modes": "O"
     },
     {
         "keys": "i",
@@ -1777,7 +1807,12 @@
     {
         "keys": "l",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction",
-        "modes": "NXO"
+        "modes": "NX"
+    },
+    {
+        "keys": "l",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightOpPendingAction",
+        "modes": "O"
     },
     {
         "keys": "m",
