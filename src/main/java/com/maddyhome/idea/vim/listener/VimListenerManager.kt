@@ -741,7 +741,7 @@ internal object VimListenerManager {
           injector.processGroup.cancelExEntry(editor.vim, refocusOwningEditor = true, resetCaret = false)
         }
 
-        ExOutputModel.tryGetInstance(editor)?.close()
+        injector.outputPanel.getCurrentOutputPanel()?.close()
 
         val caretModel = editor.caretModel
         if (editor.vim.mode.selectionType != null) {
@@ -772,7 +772,7 @@ internal object VimListenerManager {
           injector.processGroup.cancelExEntry(event.editor.vim, refocusOwningEditor = true, resetCaret = false)
         }
 
-        ExOutputModel.getInstance(event.editor).close()
+        injector.outputPanel.getCurrentOutputPanel()?.close()
       }
     }
   }

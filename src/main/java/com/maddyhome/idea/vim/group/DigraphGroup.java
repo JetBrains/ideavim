@@ -11,10 +11,13 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase;
 import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimOutputPanel;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.annotations.NotNull;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 public class DigraphGroup extends VimDigraphGroupBase {
 
@@ -71,7 +74,9 @@ public class DigraphGroup extends VimDigraphGroupBase {
       }
     }
 
-    ExOutputModel.getInstance(((IjVimEditor) editor).getEditor()).output(res.toString());
+    VimOutputPanel output = injector.getOutputPanel().getOrCreate(editor, injector.getExecutionContextManager().getEditorExecutionContext(editor));
+    output.addText(res.toString(), true );
+    output.show();
   }
 
   private static final Logger logger = Logger.getInstance(DigraphGroup.class.getName());

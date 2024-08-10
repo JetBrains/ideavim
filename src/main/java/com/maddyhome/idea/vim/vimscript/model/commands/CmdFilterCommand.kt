@@ -15,6 +15,7 @@ import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
@@ -74,7 +75,9 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
       if (range.size() == 0) {
         // Show command output in a window
         VimPlugin.getProcess().executeCommand(editor, command, null, workingDirectory)?.let {
-          ExOutputModel.getInstance(editor.ij).output(it)
+          val outputPanel = injector.outputPanel.getOrCreate(editor, context)
+          outputPanel.addText(it)
+          outputPanel.show()
         }
         ExecutionResult.Success
       } else {

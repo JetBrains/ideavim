@@ -26,10 +26,7 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.action.change.LazyVimCommand;
-import com.maddyhome.idea.vim.api.NativeAction;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.api.VimKeyGroupBase;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.key.*;
@@ -79,25 +76,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(),
                                                           ((IjVimEditor)editor).getEditor().getComponent());
   }
-
-  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull Editor editor) {
-    List<Pair<EnumSet<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes);
-    final StringBuilder builder = new StringBuilder();
-    for (Pair<EnumSet<MappingMode>, MappingInfo> row : rows) {
-      MappingInfo mappingInfo = row.getSecond();
-      builder.append(StringsKt.padEnd(getModesStringCode(row.getFirst()), 2, ' '));
-      builder.append(" ");
-      builder.append(StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()), 11, ' '));
-      builder.append(" ");
-      builder.append(mappingInfo.isRecursive() ? " " : "*");
-      builder.append(" ");
-      builder.append(mappingInfo.getPresentableString());
-      builder.append("\n");
-    }
-    ExOutputModel.getInstance(editor).output(builder.toString());
-    return true;
-  }
-
 
   @Override
   public void updateShortcutKeysRegistration() {
@@ -358,6 +336,22 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   @Override
   public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull VimEditor editor) {
-    return showKeyMappings(modes, ((IjVimEditor) editor).getEditor());
+    List<Pair<EnumSet<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes);
+    final StringBuilder builder = new StringBuilder();
+    for (Pair<EnumSet<MappingMode>, MappingInfo> row : rows) {
+      MappingInfo mappingInfo = row.getSecond();
+      builder.append(StringsKt.padEnd(getModesStringCode(row.getFirst()), 2, ' '));
+      builder.append(" ");
+      builder.append(StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()), 11, ' '));
+      builder.append(" ");
+      builder.append(mappingInfo.isRecursive() ? " " : "*");
+      builder.append(" ");
+      builder.append(mappingInfo.getPresentableString());
+      builder.append("\n");
+    }
+    VimOutputPanel outputPanel = injector.getOutputPanel().getOrCreate(editor, injector.getExecutionContextManager().getEditorExecutionContext(editor));
+    outputPanel.addText(builder.toString(), true);
+    outputPanel.show();
+    return true;
   }
 }

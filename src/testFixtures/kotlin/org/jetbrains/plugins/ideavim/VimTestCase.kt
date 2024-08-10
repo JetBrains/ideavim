@@ -660,7 +660,7 @@ abstract class VimTestCase {
   }
 
   fun assertExOutput(expected: String, clear: Boolean = true) {
-    val actual = ExOutputModel.getInstance(fixture.editor).text
+    val actual = injector.outputPanel.getCurrentOutputPanel()?.text
     assertNotNull(actual, "No Ex output")
     assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", testInfo, fixture.editor)
