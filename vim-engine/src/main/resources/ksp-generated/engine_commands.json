@@ -117,7 +117,12 @@
     {
         "keys": "<BS>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction",
-        "modes": "NXO"
+        "modes": "NX"
+    },
+    {
+        "keys": "<BS>",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceOpPendingModeAction",
+        "modes": "O"
     },
     {
         "keys": "<BS>",
@@ -252,7 +257,12 @@
     {
         "keys": "<C-H>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction",
-        "modes": "NXO"
+        "modes": "NX"
+    },
+    {
+        "keys": "<C-H>",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceOpPendingModeAction",
+        "modes": "O"
     },
     {
         "keys": "<C-Home>",
@@ -872,7 +882,12 @@
     {
         "keys": "<Space>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceAction",
-        "modes": "NXO"
+        "modes": "NX"
+    },
+    {
+        "keys": "<Space>",
+        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceOpPendingModeAction",
+        "modes": "O"
     },
     {
         "keys": "<Tab>",

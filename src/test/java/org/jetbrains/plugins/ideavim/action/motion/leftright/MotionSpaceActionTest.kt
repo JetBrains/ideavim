@@ -85,4 +85,35 @@ class MotionSpaceActionTest : VimTestCase() {
       enterCommand("set whichwrap=s")
     }
   }
+
+  @Suppress("SpellCheckingInspection")
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test space motion with operator`() {
+    doTest(
+      "d<Space>",
+      """
+        lorem ${c}ipsum dolor sit amet
+      """.trimIndent(),
+      """
+        lorem ${c}psum dolor sit amet
+      """.trimIndent(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test space motion with operator at end of line`() {
+    doTest(
+      "d<Space>",
+      """
+        lorem ipsum dolor sit ame${c}t
+        lorem ipsum dolor sit amet
+      """.trimIndent(),
+      """
+        lorem ipsum dolor sit am${c}e
+        lorem ipsum dolor sit amet
+      """.trimIndent(),
+    )
+  }
 }

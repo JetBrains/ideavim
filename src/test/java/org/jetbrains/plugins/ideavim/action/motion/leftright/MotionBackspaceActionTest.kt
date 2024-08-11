@@ -85,4 +85,33 @@ class MotionBackspaceActionTest : VimTestCase() {
       enterCommand("set whichwrap=b")
     }
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test backspace motion with operator`() {
+    doTest(
+      "d<BS>",
+      """
+        lorem ${c}ipsum dolor sit amet
+      """.trimIndent(),
+      """
+        lorem${c}ipsum dolor sit amet
+      """.trimIndent(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test backspace motion with operator at start of line`() {
+    doTest(
+      "d<BS>",
+      """
+        lorem ipsum dolor sit amet
+        ${c}lorem ipsum dolor sit amet
+      """.trimIndent(),
+      """
+        lorem ipsum dolor sit amet${c}lorem ipsum dolor sit amet
+      """.trimIndent(),
+    )
+  }
 }
