@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.listener
 
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorKind
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -31,8 +32,8 @@ import com.maddyhome.idea.vim.state.mode.Mode
  */
 class IJEditorFocusListener : EditorListener {
   override fun focusGained(editor: VimEditor) {
-    val editorInFocus = KeyHandler.getInstance().editorInFocus
-    if (editorInFocus != null && editorInFocus.ij == editor.ij) return
+    val oldEditor = KeyHandler.getInstance().editorInFocus
+    if (oldEditor != null && oldEditor.ij == editor.ij) return
 
     KeyHandler.getInstance().editorInFocus = editor
 
@@ -63,13 +64,9 @@ class IJEditorFocusListener : EditorListener {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
     }
-    if (!ijEditor.isViewer &&
-      !EditorHelper.isFileEditor(ijEditor) &&
-      ijEditor.document.isWritable &&
-      !ijEditor.inInsertMode && ijEditor.editorKind != EditorKind.DIFF
-    ) {
+    if (isTerminal(ijEditor) && !ijEditor.inInsertMode) {
       switchToInsertMode.run()
-    } else if (!ijEditor.document.isWritable) {
+    } else if (ijEditor.isInsertMode && ((oldEditor != null && isTerminal(oldEditor.ij)) || !ijEditor.document.isWritable)) {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       val mode = injector.vimState.mode
       when (mode) {
@@ -85,5 +82,13 @@ class IJEditorFocusListener : EditorListener {
       }
     }
     KeyHandler.getInstance().reset(editor)
+  }
+
+  // By "terminal" we refer to some editor that should switch to INSERT mode on focus
+  private fun isTerminal(ijEditor: Editor): Boolean {
+    return !ijEditor.isViewer &&
+      !EditorHelper.isFileEditor(ijEditor) &&
+      ijEditor.document.isWritable &&
+      ijEditor.editorKind != EditorKind.DIFF
   }
 }
