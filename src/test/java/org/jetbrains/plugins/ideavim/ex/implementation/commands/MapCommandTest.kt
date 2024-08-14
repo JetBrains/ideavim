@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -267,7 +268,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c"))
     typeText(injector.parser.parseKeys("ia"))
-    assertState("b \\| cfoo\n")
+    assertState("b | cfoo\n")
   }
 
   // VIM-666 |:imap|
@@ -277,7 +278,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c    |"))
     typeText(injector.parser.parseKeys("ia"))
-    assertState("b \\| c    foo\n")
+    assertState("b | c    foo\n")
   }
 
   // VIM-670 |:map|
@@ -753,5 +754,24 @@ class MapCommandTest : VimTestCase() {
     assertEquals(ExceptionHandler.exceptionMessage, exception.cause!!.cause!!.message)
 
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
+  }
+
+  @TestFor(issues = ["VIM-3601"])
+  @Test
+  fun `mapping to something with bars`() {
+    configureByText(
+      """
+     Lorem Ipsum
+
+     Lorem ipsum dolor sit amet,
+     ${c}consectetur adipiscing elit
+     Sed in orci mauris.
+     Cras id tellus in ex imperdiet egestas. 
+    """.trimIndent()
+    )
+    typeText(commandToKeys("map k :echo 4<CR> \\| :echo 42<CR>"))
+    assertNull(injector.outputPanel.getCurrentOutputPanel())
+    typeText("k")
+    assertEquals("4\n42", injector.outputPanel.getCurrentOutputPanel()!!.text)
   }
 }

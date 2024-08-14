@@ -160,7 +160,9 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
     val specialArguments = HashSet<SpecialArgument>()
     val toKeysBuilder = StringBuilder()
     var fromKeys: List<KeyStroke>? = null
-    input.split(" ").dropLastWhile { it.isEmpty() }.forEach { part ->
+
+    val preprocessedInput = processBars(input)
+    preprocessedInput.split(" ").dropLastWhile { it.isEmpty() }.forEach { part ->
       if (fromKeys != null) {
         toKeysBuilder.append(" ")
         toKeysBuilder.append(part)
@@ -173,8 +175,8 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
         }
       }
     }
-    for (i in input.length - 1 downTo 0) {
-      val c = input[i]
+    for (i in preprocessedInput.length - 1 downTo 0) {
+      val c = preprocessedInput[i]
       if (c == ' ') {
         toKeysBuilder.append(c)
       } else {
