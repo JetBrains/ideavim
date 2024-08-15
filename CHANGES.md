@@ -27,8 +27,9 @@ usual beta standards.
 
 Since version 2.9.0, the changelog can be found on YouTrack
 
-To Be Released: https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20
-Latest Fixes: https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20updated%20
+* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
+* [Latest Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20updated%20)
+* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
 
 ## 2.9.0, 2024-02-20
 
