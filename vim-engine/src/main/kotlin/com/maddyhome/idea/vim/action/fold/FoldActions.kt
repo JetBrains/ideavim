@@ -33,6 +33,22 @@ class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["za"], modes = [Mode.NORMAL, Mode.VISUAL])
+class VimExpandCollapseToggleRegion : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    injector.actionExecutor.executeAction(editor, name = injector.actionExecutor.ACTION_EXPAND_COLLAPSE_TOGGLE, context = context)
+    return true
+  }
+}
+
 @CommandOrMotion(keys = ["zc"], modes = [Mode.NORMAL, Mode.VISUAL])
 class VimCollapseRegion : VimActionHandler.SingleExecution() {
 

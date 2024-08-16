@@ -16,6 +16,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class ChangeActionJavaTest : VimJavaTestCase() {
   // VIM-511 |.|
@@ -118,6 +119,28 @@ and some text after""",
 $c
 and some text after""",
     )
+  }
+
+  // VIM-566
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun testInsertAfterToggleFold() {
+    configureByJavaText(
+      """
+          $c/**
+           * I should be fold
+           * a little more text
+           * and final fold
+           */
+          and some text after
+      """.trimIndent(),
+    )
+    CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
+    assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
+    typeText(injector.parser.parseKeys("za"))
+    assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, false)
+    typeText(injector.parser.parseKeys("za"))
+    assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
   }
 
   // VIM-287 |zc| |o|

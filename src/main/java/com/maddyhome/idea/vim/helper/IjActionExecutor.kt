@@ -60,6 +60,8 @@ internal class IjActionExecutor : VimActionExecutor {
     get() = IdeActions.ACTION_EXPAND_REGION
   override val ACTION_EXPAND_REGION_RECURSIVELY: String
     get() = IdeActions.ACTION_EXPAND_REGION_RECURSIVELY
+  override val ACTION_EXPAND_COLLAPSE_TOGGLE: String
+    get() = "ExpandCollapseToggleAction"
 
   /**
    * Execute an action
