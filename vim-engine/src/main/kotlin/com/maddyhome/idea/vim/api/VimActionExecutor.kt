@@ -20,6 +20,7 @@ interface VimActionExecutor {
   val ACTION_EXPAND_ALL_REGIONS: String
   val ACTION_EXPAND_REGION: String
   val ACTION_EXPAND_REGION_RECURSIVELY: String
+  val ACTION_EXPAND_COLLAPSE_TOGGLE: String
 
   /**
    * Execute an action
