@@ -1,7 +1,7 @@
 # Support Guide
 
 This document is created to help our support team.
-It's not intended to be read by the users as it brings to value to them.
+It's not intended to be read by the users as it brings no value to them.
 
 ## Support channels
 
