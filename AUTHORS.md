@@ -523,6 +523,10 @@ Contributors:
   [![icon][github]](https://github.com/LazyScaper)
   &nbsp;
   Jake
+* [![icon][mail]](mailto:the1xdeveloper@gmail.com)
+  [![icon][github]](https://github.com/The1xDeveloper)
+  &nbsp;
+  The1xDeveloper
 
 Previous contributors:
 
