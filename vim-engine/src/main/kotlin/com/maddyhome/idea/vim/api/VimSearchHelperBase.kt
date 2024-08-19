@@ -100,7 +100,19 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     bigWord: Boolean,
     spaceWords: Boolean,
   ): Int {
-    return doFindNext(editor, searchFrom, count, bigWord, spaceWords, ::findNextWordOne)
+    return findNextWord(editor.text(), editor.fileSize().toInt(), editor, searchFrom, count, bigWord, spaceWords)
+  }
+
+  override fun findNextWord(
+    text: CharSequence,
+    textLength: Int,
+    editor: VimEditor,
+    searchFrom: Int,
+    count: Int,
+    bigWord: Boolean,
+    spaceWords: Boolean,
+  ): Int {
+    return doFindNext(text, textLength, editor, searchFrom, count, bigWord, spaceWords, ::findNextWordOne)
   }
 
   override fun findNextWordEnd(
@@ -110,7 +122,19 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     bigWord: Boolean,
     spaceWords: Boolean,
   ): Int {
-    return doFindNext(editor, searchFrom, count, bigWord, spaceWords, ::findNextWordEndOne)
+    return findNextWordEnd(editor.text(), editor.fileSize().toInt(), editor, searchFrom, count, bigWord, spaceWords)
+  }
+
+  override fun findNextWordEnd(
+    text: CharSequence,
+    textLength: Int,
+    editor: VimEditor,
+    searchFrom: Int,
+    count: Int,
+    bigWord: Boolean,
+    spaceWords: Boolean,
+  ): Int {
+    return doFindNext(text, textLength, editor, searchFrom, count, bigWord, spaceWords, ::findNextWordEndOne)
   }
 
   override fun findPattern(
@@ -260,21 +284,22 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   }
 
   private fun doFindNext(
+    text: CharSequence,
+    textLength: Int,
     editor: VimEditor,
     searchFrom: Int,
     countDirection: Int,
     bigWord: Boolean,
     spaceWords: Boolean,
-    action: (VimEditor, pos: Int, size: Int, step: Int, bigWord: Boolean, spaceWords: Boolean) -> Int,
+    action: (text: CharSequence, editor: VimEditor, pos: Int, size: Int, step: Int, bigWord: Boolean, spaceWords: Boolean) -> Int,
   ): Int {
     var count = countDirection
     val step = if (count >= 0) 1 else -1
     count = abs(count)
-    val size = editor.fileSize().toInt()  // editor.text() returns CharSequence, which only supports Int indexing
     var pos = searchFrom
     for (i in 0 until count) {
-      pos = action(editor, pos, size, step, bigWord, spaceWords)
-      if (pos == searchFrom || pos == 0 || pos == size - 1) {
+      pos = action(text, editor, pos, textLength, step, bigWord, spaceWords)
+      if (pos == searchFrom || pos == 0 || pos == textLength - 1) {
         break
       }
     }
@@ -282,6 +307,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   }
 
   private fun findNextWordOne(
+    chars: CharSequence,
     editor: VimEditor,
     pos: Int,
     size: Int,
@@ -289,7 +315,6 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     bigWord: Boolean,
     spaceWords: Boolean,
   ): Int {
-    val chars = editor.text()
     var found = false
     var _pos = if (pos < size) pos else min(size, (chars.length - 1))
     // For back searches, skip any current whitespace so we start at the end of a word
@@ -341,6 +366,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   }
 
   private fun findNextWordEndOne(
+    chars: CharSequence,
     editor: VimEditor,
     pos: Int,
     size: Int,
@@ -348,7 +374,6 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     bigWord: Boolean,
     spaceWords: Boolean,
   ): Int {
-    val chars = editor.text()
     var pos = pos
     var found = false
     // For forward searches, skip any current whitespace so we start at the start of a word
