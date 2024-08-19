@@ -32,10 +32,6 @@ internal object ExKeyBindings {
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.CompleteEntry),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.CompleteEntry),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.beginLineAction),
-      KeyBinding(KeyStroke.getKeyStroke(0x02.toChar().code, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.beginLineAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0), DefaultEditorKit.beginLineAction),
-
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.endLineAction),
       KeyBinding(KeyStroke.getKeyStroke(0x05.toChar().code, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.endLineAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0), DefaultEditorKit.endLineAction),
