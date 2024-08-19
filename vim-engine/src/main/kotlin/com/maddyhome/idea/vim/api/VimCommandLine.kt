@@ -61,7 +61,7 @@ interface VimCommandLine {
   val visibleText: String
   var promptCharacterOffset: Int?
 
-  fun setText(string: String)
+  fun setText(string: String, updateLastEntry: Boolean = true)
   fun insertText(offset: Int, string: String) {
     val newText = if (isReplaceMode) {
       val endOffset = min(offset + string.length, actualText.length)
@@ -94,6 +94,8 @@ interface VimCommandLine {
     caret.offset = offset
   }
   fun clearPromptCharacter() {
+    if (promptCharacterOffset == null) return
+
     setText(actualText)
     caret.offset = min(caret.offset, visibleText.length)
     promptCharacterOffset = null
@@ -137,7 +139,7 @@ interface VimCommandLine {
         }
 
         if (txt.startsWith(lastEntry)) {
-          setText(txt)
+          setText(txt, updateLastEntry = false)
           caret.offset = txt.length
           histIndex = i
 
@@ -157,7 +159,7 @@ interface VimCommandLine {
         txt = entry.entry
       }
 
-      setText(txt)
+      setText(txt, updateLastEntry = false)
       caret.offset = txt.length
     }
   }

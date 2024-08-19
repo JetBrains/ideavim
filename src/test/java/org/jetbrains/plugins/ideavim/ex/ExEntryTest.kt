@@ -294,20 +294,20 @@ class ExEntryTest : VimTestCase() {
 //        assertExText("set incsearch")
 
     typeExInput(":<S-Up>")
+    assertExText("set digraph")
+    typeText("<Up>")
     assertExText("set incsearch")
     typeText("<Up>")
     assertExText("digraph")
-    typeText("<Up>")
-    assertExText("set digraph")
 
     deactivateExEntry()
 
     typeExInput(":<PageUp>")
-    assertExText("set incsearch")
-    typeText("<PageUp>")
     assertExText("digraph")
     typeText("<PageUp>")
     assertExText("set digraph")
+    typeText("<PageUp>")
+    assertExText("set incsearch")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CMD)
@@ -325,20 +325,20 @@ class ExEntryTest : VimTestCase() {
     deactivateExEntry()
 
     typeExInput(":set<S-Up>")
+    assertExText("set digraph")
+    typeText("<S-Up>")
     assertExText("set incsearch")
     typeText("<S-Up>")
     assertExText("digraph")
-    typeText("<S-Up>")
-    assertExText("set digraph")
 
     deactivateExEntry()
 
     typeExInput(":set<PageUp>")
-    assertExText("set incsearch")
-    typeText("<PageUp>")
     assertExText("digraph")
     typeText("<PageUp>")
     assertExText("set digraph")
+    typeText("<PageUp>")
+    assertExText("set incsearch")
   }
 
   @Test
@@ -357,20 +357,20 @@ class ExEntryTest : VimTestCase() {
     deactivateExEntry()
 
     typeExInput("/<S-Up>")
+    assertExText("something cool")
+    typeText("<S-Up>")
     assertExText("so cool")
     typeText("<S-Up>")
     assertExText("not cool")
-    typeText("<S-Up>")
-    assertExText("something cool")
 
     deactivateExEntry()
 
     typeExInput("/<PageUp>")
-    assertExText("so cool")
-    typeText("<PageUp>")
     assertExText("not cool")
     typeText("<PageUp>")
     assertExText("something cool")
+    typeText("<PageUp>")
+    assertExText("so cool")
   }
 
   @VimBehaviorDiffers(description = "Vim reorders history even when cancelling entry")
@@ -394,20 +394,20 @@ class ExEntryTest : VimTestCase() {
 //        assertEquals("set incsearch", exEntryPanel.text)
 
     typeExInput("/so<S-Up>")
+    assertExText("something cool")
+    typeText("<S-Up>")
     assertExText("so cool")
     typeText("<S-Up>")
     assertExText("not cool")
-    typeText("<S-Up>")
-    assertExText("something cool")
 
     deactivateExEntry()
 
     typeExInput("/so<PageUp>")
-    assertExText("so cool")
-    typeText("<PageUp>")
     assertExText("not cool")
     typeText("<PageUp>")
     assertExText("something cool")
+    typeText("<PageUp>")
+    assertExText("so cool")
   }
 
   @Test
