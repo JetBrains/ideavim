@@ -13,19 +13,30 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
 open class VimHistoryBase : VimHistory {
-  val histories: MutableMap<String, HistoryBlock> = HashMap()
+  val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
 
+  @Deprecated("Please use fun addEntry(type: Type, text: String)")
   override fun addEntry(key: String, text: String) {
-    logger.debug { "Add entry '$text' to $key" }
+    val type = getTypeForString(key)
+    addEntry(type, text)
 
-    val block = blocks(key)
+  }
+
+  override fun addEntry(type: VimHistory.Type, text: String) {
+    val block = blocks(type)
     block.addEntry(text)
   }
 
+  @Deprecated("Please use fun getEntries(type: Type, text: String)")
   override fun getEntries(key: String, first: Int, last: Int): List<HistoryEntry> {
+    val type = getTypeForString(key)
+    return getEntries(type, first, last)
+  }
+
+  override fun getEntries(type: VimHistory.Type, first: Int, last: Int): List<HistoryEntry> {
     var myFirst = first
     var myLast = last
-    val block = blocks(key)
+    val block = blocks(type)
 
     val entries = block.getEntries()
     val res = ArrayList<HistoryEntry>()
@@ -59,8 +70,18 @@ open class VimHistoryBase : VimHistory {
     return res
   }
 
-  private fun blocks(key: String): HistoryBlock {
-    return histories.getOrPut(key) { HistoryBlock() }
+  private fun blocks(type: VimHistory.Type): HistoryBlock {
+    return histories.getOrPut(type) { HistoryBlock() }
+  }
+
+  protected fun getTypeForString(key: String): VimHistory.Type {
+    return when (key) {
+      HistoryConstants.SEARCH -> VimHistory.Type.Search
+      HistoryConstants.COMMAND -> VimHistory.Type.Command
+      HistoryConstants.EXPRESSION -> VimHistory.Type.Expression
+      HistoryConstants.INPUT -> VimHistory.Type.Input
+      else -> VimHistory.Type.Custom(key)
+    }
   }
 
   companion object {

@@ -595,6 +595,27 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     return finishOn;
   }
 
+  @Override
+  public int getHistIndex() {
+    return entry.histIndex;
+  }
+
+  @Override
+  public void setHistIndex(int i) {
+    entry.histIndex = i;
+  }
+
+  @NotNull
+  @Override
+  public String getLastEntry() {
+    return entry.lastEntry;
+  }
+
+  @Override
+  public void setLastEntry(@NotNull String s) {
+    entry.lastEntry = s;
+  }
+
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {

@@ -542,9 +542,9 @@ public class ExTextField extends JTextField {
 
   private DataContext context;
   private final CommandLineCaret caret;
-  private String lastEntry;
+  String lastEntry;
   private List<HistoryEntry> history;
-  private int histIndex = 0;
+  int histIndex = 0;
   private @Nullable MultiStepAction currentAction;
   int currentActionPromptCharacterOffset = -1;
 

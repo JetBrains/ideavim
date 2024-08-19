@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.history
 
+@Deprecated("Please use VimHistory.Type")
 object HistoryConstants {
   @JvmField
   val SEARCH: String = "search"

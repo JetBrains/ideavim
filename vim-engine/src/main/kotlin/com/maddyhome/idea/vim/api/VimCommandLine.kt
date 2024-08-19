@@ -8,8 +8,10 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.history.HistoryEntry
+import com.maddyhome.idea.vim.history.VimHistory
+import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
 import kotlin.math.min
 
@@ -34,6 +36,18 @@ interface VimCommandLine {
 
   val label: String
   val isReplaceMode: Boolean
+
+  var histIndex: Int
+  var lastEntry: String
+  val historyType: VimHistory.Type
+    get() {
+      return when (label) {
+        ":" -> VimHistory.Type.Command
+        "/", "?" -> VimHistory.Type.Search
+        "=" -> VimHistory.Type.Expression
+        else -> VimHistory.Type.Custom(label)
+      }
+    }
 
   fun toggleReplaceMode()
 
@@ -107,4 +121,51 @@ interface VimCommandLine {
 
   // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name
   fun focus()
+
+  fun selectHistory(isUp: Boolean, filter: Boolean) {
+    val history = injector.historyGroup.getEntries(historyType, 0, 0)
+
+    val dir = if (isUp) -1 else 1
+    if (histIndex + dir < 0 || histIndex + dir > history.size) {
+      injector.messages.indicateError()
+
+      return
+    }
+
+    if (filter) {
+      var i: Int = histIndex + dir
+      while (i >= 0 && i <= history.size) {
+        var txt: String
+        if (i == history.size) {
+          txt = lastEntry
+        } else {
+          val entry: HistoryEntry = history[i]
+          txt = entry.entry
+        }
+
+        if (txt.startsWith(lastEntry)) {
+          setText(txt)
+          caret.offset = txt.length
+          histIndex = i
+
+          return
+        }
+        i += dir
+      }
+
+      injector.messages.indicateError()
+    } else {
+      histIndex += dir
+      val txt: String
+      if (histIndex == history.size) {
+        txt = lastEntry
+      } else {
+        val entry: HistoryEntry = history[histIndex]
+        txt = entry.entry
+      }
+
+      setText(txt)
+      caret.offset = txt.length
+    }
+  }
 }
