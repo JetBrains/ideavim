@@ -19,7 +19,6 @@ exclude:
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/JavaText.kt
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/LoremText.kt
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/SimpleText.kt
-      - src/main/java/com/maddyhome/idea/vim/package-info.java
       - vim-engine/src/main/java/com/maddyhome/idea/vim/regexp/parser/generated
       - vim-engine/src/main/java/com/maddyhome/idea/vim/parser/generated
       - src/main/java/com/maddyhome/idea/vim/group/SearchGroup.java

@@ -62,7 +62,7 @@ for a few days or send it to a friend for testing.
 If you are looking for:
 
 - Vim commands (`w`, `<C-O>`, `p`, etc.):
-    - Any particular command: `package-info.java`.
+    - Any particular command: `engine_commands.json` + `intellij_commands.json` (this files are generated during compilation, please run `gradle build` to generate them manually).
     - How commands are executed in common: `EditorActionHandlerBase`.
     - Key mapping: `KeyHandler.handleKey()`.
 
