@@ -73,6 +73,19 @@ interface VimMotionGroup {
    */
   fun findOffsetOfNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Motion
 
+  /**
+   * Find the offset of the start of the next/previous word/WORD in some text outside the editor (e.g., command line)
+   *
+   * @param text        The text to search in
+   * @param textLength  The text length (there is no guarantee that calling [text.length] will be a constant time operation)
+   * @param searchFrom  The buffer offset to start searching from
+   * @param count       The number of words to skip
+   * @param bigWord     If true then find WORD, if false then find word
+   * @param editor      The editor that provides local to buffer option values
+   * @return a [Motion] representing the offset to move to, or [Motion.Error] if not found
+   */
+  fun findOffsetOfNextWord(text: CharSequence, textLength: Int = text.length, searchFrom: Int, count: Int, bigWord: Boolean, editor: VimEditor): Motion
+
   // Next/previous matching character - f/F and t/T motions
   val lastFTCmd: TillCharacterMotionType
   val lastFTChar: Char

@@ -96,8 +96,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
    * @return position
    */
   override fun findOffsetOfNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Motion {
-    val size = editor.fileSize().toInt()
-    if ((searchFrom == 0 && count < 0) || (searchFrom >= size - 1 && count > 0)) {
+    return findOffsetOfNextWord(editor.text(), editor.fileSize().toInt(), searchFrom, count, bigWord, editor)
+  }
+
+  override fun findOffsetOfNextWord(text: CharSequence, textLength: Int, searchFrom: Int, count: Int, bigWord: Boolean, editor: VimEditor): Motion {
+    if ((searchFrom == 0 && count < 0) || (searchFrom >= textLength - 1 && count > 0)) {
       return Motion.Error
     }
     return (injector.searchHelper.findNextWord(editor, searchFrom, count, bigWord, false)).toMotionOrError()
