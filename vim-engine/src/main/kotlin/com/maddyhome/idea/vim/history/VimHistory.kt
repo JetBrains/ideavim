@@ -23,5 +23,16 @@ interface VimHistory {
     data object Expression : Type()
     data object Input : Type()
     data class Custom(val id: String) : Type()
+
+    companion object {
+      fun getTypeByLabel(label: String): Type {
+        return when (label) {
+          ":" -> Command
+          "/", "?" -> Search
+          "=" -> Expression
+          else -> Custom(label)
+        }
+      }
+    }
   }
 }
