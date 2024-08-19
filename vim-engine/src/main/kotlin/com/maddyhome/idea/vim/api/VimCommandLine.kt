@@ -40,14 +40,7 @@ interface VimCommandLine {
   var histIndex: Int
   var lastEntry: String
   val historyType: VimHistory.Type
-    get() {
-      return when (label) {
-        ":" -> VimHistory.Type.Command
-        "/", "?" -> VimHistory.Type.Search
-        "=" -> VimHistory.Type.Expression
-        else -> VimHistory.Type.Custom(label)
-      }
-    }
+    get() = VimHistory.Type.getTypeByLabel(label)
 
   fun toggleReplaceMode()
 
