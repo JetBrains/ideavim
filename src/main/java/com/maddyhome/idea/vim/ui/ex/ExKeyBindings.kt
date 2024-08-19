@@ -47,7 +47,6 @@ internal object ExKeyBindings {
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), ExEditorKit.ToggleInsertReplace),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), DefaultEditorKit.backwardAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.previousWordAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.previousWordAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), DefaultEditorKit.forwardAction),
