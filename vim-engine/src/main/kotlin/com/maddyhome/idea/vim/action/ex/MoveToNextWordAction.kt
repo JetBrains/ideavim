@@ -18,15 +18,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["<C-Left>", "<S-Left>"], modes = [Mode.CMD_LINE])
-class MoveToPreviousWordAction : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["<C-Right>", "<S-Right>"], modes = [Mode.CMD_LINE])
+class MoveToNextWordAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
 
     val text = commandLine.actualText
-    val motion = injector.motion.findOffsetOfNextWord(text, text.length, commandLine.caret.offset, -1, true, editor)
+    val motion = injector.motion.findOffsetOfNextWord(text, text.length, commandLine.caret.offset, 1, true, editor)
     when (motion) {
       is Motion.AbsoluteOffset -> {
         commandLine.caret.offset = motion.offset
