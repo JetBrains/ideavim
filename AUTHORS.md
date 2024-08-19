@@ -527,6 +527,10 @@ Contributors:
   [![icon][github]](https://github.com/The1xDeveloper)
   &nbsp;
   The1xDeveloper
+* [![icon][mail]](mailto:shaunewilliams@gmail.com)
+  [![icon][github]](https://github.com/shaunlebron)
+  &nbsp;
+  shaun
 
 Previous contributors:
 
