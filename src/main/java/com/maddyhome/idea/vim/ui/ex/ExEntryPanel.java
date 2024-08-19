@@ -60,7 +60,7 @@ import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
 public class ExEntryPanel extends JPanel implements VimCommandLine {
   public static ExEntryPanel instance;
   public static ExEntryPanel instanceWithoutShortcuts;
-  private boolean isReplaceMode = false;
+  public boolean isReplaceMode = false;
   private WeakReference<Editor> weakEditor = null;
 
   private VimInputInterceptor myInputInterceptor = null;
@@ -402,7 +402,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   @Override
   public void toggleReplaceMode() {
-    isReplaceMode = !isReplaceMode;
+    entry.toggleInsertReplace();
   }
 
   /**
