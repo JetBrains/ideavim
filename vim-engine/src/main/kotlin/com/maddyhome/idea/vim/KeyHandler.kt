@@ -290,6 +290,7 @@ class KeyHandler {
   // TODO we should have a single reset method
   fun reset(keyState: KeyHandlerState, mode: Mode) {
     logger.trace { "Reset is executed" }
+    injector.commandLine.getActiveCommandLine()?.clearCurrentAction()
     keyHandlerState.partialReset(mode)
     keyState.commandBuilder.resetAll(getKeyRoot(mode.toMappingMode()))
   }
