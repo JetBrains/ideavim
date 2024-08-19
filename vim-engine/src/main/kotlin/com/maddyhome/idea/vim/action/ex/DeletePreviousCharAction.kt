@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["<BS>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(keys = ["<BS>", "<C-H>"], modes = [Mode.CMD_LINE])
 class DeletePreviousCharAction : VimActionHandler.SingleExecution()  {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
