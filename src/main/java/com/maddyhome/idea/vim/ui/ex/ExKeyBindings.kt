@@ -32,9 +32,6 @@ internal object ExKeyBindings {
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.CompleteEntry),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.CompleteEntry),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevCharAction),
-      KeyBinding(KeyStroke.getKeyStroke(0x08.toChar().code, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevCharAction),
-
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevWordAction),
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.DeleteToCursor),
