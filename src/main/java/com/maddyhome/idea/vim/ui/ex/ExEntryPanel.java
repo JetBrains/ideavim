@@ -535,10 +535,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   @Override
-  public void setText(@NotNull String string) {
+  public void setText(@NotNull String string, boolean updateLastEntry) {
     // It's a feature of Swing that caret is moved when we set new text. However, our API is Swing independent and we do not expect this
     int offset = getCaret().getOffset();
     entry.updateText(string);
+    if (updateLastEntry) entry.saveLastEntry();
     getCaret().setOffset(Math.min(offset, getVisibleText().length()));
   }
 

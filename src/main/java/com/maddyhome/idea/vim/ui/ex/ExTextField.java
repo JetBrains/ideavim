@@ -190,7 +190,6 @@ public class ExTextField extends JTextField {
 
   void updateText(String string) {
     super.setText(string);
-    saveLastEntry();
     setFontToJField(string);
   }
 
