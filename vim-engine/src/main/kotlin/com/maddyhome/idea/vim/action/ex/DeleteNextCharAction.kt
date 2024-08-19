@@ -26,7 +26,7 @@ class DeleteNextCharAction : VimActionHandler.SingleExecution()  {
     val caretOffset = commandLine.caret.offset
 
     val oldText = commandLine.actualText
-    if (oldText.isEmpty()) return false
+    if (oldText.isEmpty()) return true
 
     val newText = if (caretOffset == oldText.length) {
       oldText.substring(0, oldText.lastIndex)
