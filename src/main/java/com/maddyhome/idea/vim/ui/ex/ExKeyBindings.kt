@@ -40,7 +40,6 @@ internal object ExKeyBindings {
       KeyBinding(KeyStroke.getKeyStroke(0x05.toChar().code, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.endLineAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0), DefaultEditorKit.endLineAction),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DefaultEditorKit.deletePrevCharAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevCharAction),
       KeyBinding(KeyStroke.getKeyStroke(0x08.toChar().code, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevCharAction),
 
