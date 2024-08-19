@@ -49,7 +49,6 @@ internal object ExKeyBindings {
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.previousWordAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.previousWordAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), DefaultEditorKit.forwardAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.nextWordAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.nextWordAction),
 
