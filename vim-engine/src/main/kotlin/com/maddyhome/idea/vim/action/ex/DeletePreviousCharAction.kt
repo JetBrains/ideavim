@@ -24,7 +24,7 @@ class DeletePreviousCharAction : VimActionHandler.SingleExecution()  {
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
     val caretOffset = commandLine.caret.offset
-    if (caretOffset == 0) return false
+    if (caretOffset == 0) return true
 
     commandLine.caret.offset -= 1
     commandLine.setText(commandLine.actualText.substring(0, caretOffset - 1) + commandLine.actualText.substring(caretOffset))
