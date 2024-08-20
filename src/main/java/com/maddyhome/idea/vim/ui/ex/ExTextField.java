@@ -16,11 +16,9 @@ import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
-import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.history.HistoryEntry;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper;
@@ -67,9 +65,6 @@ public class ExTextField extends JTextField {
         // If we're in the middle of an action (e.g. entering a register to paste, or inserting a digraph), cancel it if
         // the mouse is clicked anywhere. Vim's behavior is to use the mouse click as an event, which can lead to
         // something like : !%!C, which I don't believe is documented, or useful
-        if (currentAction != null) {
-          clearCurrentAction();
-        }
         super.mouseClicked(e);
       }
     });
@@ -240,20 +235,15 @@ public class ExTextField extends JTextField {
     // This gets called for ALL events, before the IDE starts to process key events for the action system. We can add a
     // dispatcher that checks that the plugin is enabled, checks that the component with the focus is ExTextField,
     // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
-    if (currentAction != null) {
-      currentAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, String.valueOf(c), modifiers));
-    }
-    else {
-      KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
-        (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
-        (new Date()).getTime(), modifiers, keyCode, c);
+    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
+                                        (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
+                                  (new Date()).getTime(), modifiers, keyCode, c);
 
-      useHandleKeyFromEx = false;
-      try {
-        super.processKeyEvent(event);
-      }finally {
-        useHandleKeyFromEx = true;
-      }
+    useHandleKeyFromEx = false;
+    try {
+      super.processKeyEvent(event);
+    } finally {
+      useHandleKeyFromEx = true;
     }
   }
 
@@ -279,12 +269,7 @@ public class ExTextField extends JTextField {
    * Cancels current action, if there is one. If not, cancels entry.
    */
   void escape() {
-    if (currentAction != null) {
-      clearCurrentAction();
-    }
-    else {
-      cancel();
-    }
+    cancel();
   }
 
   /**
@@ -299,17 +284,8 @@ public class ExTextField extends JTextField {
   }
 
   public void clearCurrentAction() {
-    if (currentAction != null) {
-      currentAction.reset();
-    }
-    currentAction = null;
     VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
     if (commandLine != null) commandLine.clearPromptCharacter();
-  }
-
-  @Nullable
-  Action getCurrentAction() {
-    return currentAction;
   }
 
   private void setInsertMode() {
@@ -545,7 +521,6 @@ public class ExTextField extends JTextField {
   String lastEntry;
   private List<HistoryEntry> history;
   int histIndex = 0;
-  private @Nullable MultiStepAction currentAction;
   int currentActionPromptCharacterOffset = -1;
 
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());
