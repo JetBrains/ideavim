@@ -15,10 +15,14 @@ import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 abstract class VimCommandLineServiceBase : VimCommandLineService {
+  override fun isCommandLineSupported(editor: VimEditor): Boolean {
+    return !editor.isOneLineMode()
+  }
+
   abstract fun createPanel(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
 
   private fun createCommandLinePrompt(editor: VimEditor, context: ExecutionContext, removeSelections: Boolean, label: String, initialText: String): VimCommandLine {
-    if (editor.isOneLineMode()) throw ExException("Command line is not allowed in one line editors")
+    if (!isCommandLineSupported(editor)) throw ExException("Command line is not allowed in one line editors")
 
     val currentMode = editor.mode
     check(currentMode is ReturnableFromCmd) {

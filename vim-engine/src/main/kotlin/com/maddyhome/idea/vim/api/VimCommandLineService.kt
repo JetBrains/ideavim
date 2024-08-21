@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.Command
 
 interface VimCommandLineService {
+  fun isCommandLineSupported(editor: VimEditor): Boolean
+
   fun getActiveCommandLine(): VimCommandLine?
 
   fun readInputAndProcess(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?, processing: (String) -> Unit)
