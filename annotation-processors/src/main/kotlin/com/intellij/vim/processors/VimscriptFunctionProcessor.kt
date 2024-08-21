@@ -37,7 +37,8 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
     Files.createDirectories(generatedDirPath)
 
     val filePath = generatedDirPath.resolve(environment.options["vimscript_functions_file"]!!)
-    val fileContent = json.encodeToString(nameToClass)
+    val sortedNameToClass = nameToClass.toList().sortedWith(compareBy({ it.first }, { it.second })).toMap()
+    val fileContent = json.encodeToString(sortedNameToClass)
     filePath.writeText(fileContent)
 
     return emptyList()

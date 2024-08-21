@@ -62,12 +62,16 @@ for a few days or send it to a friend for testing.
 If you are looking for:
 
 - Vim commands (`w`, `<C-O>`, `p`, etc.):
-    - Any particular command: `engine_commands.json` + `intellij_commands.json` (this files are generated during compilation, please run `gradle build` to generate them manually).
+    - Any particular command:
+      - [Commands common for Fleet and IdeaVim](vim-engine/src/main/resources/ksp-generated/engine_commands.json)
+      - [IdeaVim only commands](src/main/resources/ksp-generated/intellij_commands.json)
     - How commands are executed in common: `EditorActionHandlerBase`.
     - Key mapping: `KeyHandler.handleKey()`.
 
 - Ex commands (`:set`, `:s`, `:nohlsearch`):
-    - Any particular ex command: package `com.maddyhome.idea.vim.ex.handler`.
+    - Any particular command:
+        - [Commands common for Fleet and IdeaVim](vim-engine/src/main/resources/ksp-generated/engine_ex_commands.json)
+        - [IdeaVim only commands](src/main/resources/ksp-generated/intellij_ex_commands.json)
     - Vim script grammar: `Vimscript.g4`.
     - Vim script parsing: package `com.maddyhome.idea.vim.vimscript.parser`.
     - Vim script executor: `Executor`.
