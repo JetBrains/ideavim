@@ -37,7 +37,8 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
     Files.createDirectories(generatedDirPath)
 
     val filePath = generatedDirPath.resolve(environment.options["ex_commands_file"]!!)
-    val fileContent = json.encodeToString(commandToClass)
+    val sortedCommandToClass = commandToClass.toList().sortedWith(compareBy({ it.first }, { it.second })).toMap()
+    val fileContent = json.encodeToString(sortedCommandToClass)
     filePath.writeText(fileContent)
 
     return emptyList()

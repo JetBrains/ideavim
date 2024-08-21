@@ -37,7 +37,8 @@ class CommandOrMotionProcessor(private val environment: SymbolProcessorEnvironme
     Files.createDirectories(generatedDirPath)
 
     val filePath = generatedDirPath.resolve(environment.options["commands_file"]!!)
-    val fileContent = json.encodeToString(commands)
+    val sortedCommands = commands.sortedWith(compareBy({ it.keys }, { it.`class` }))
+    val fileContent = json.encodeToString(sortedCommands)
     filePath.writeText(fileContent)
 
     return emptyList()
