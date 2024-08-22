@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.history.HistoryEntry
 import com.maddyhome.idea.vim.history.VimHistory
@@ -111,6 +112,7 @@ interface VimCommandLine {
     // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
     // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.
     editor.mode = editor.mode.returnTo()
+    KeyHandler.getInstance().keyHandlerState.leaveCommandLine()
     deactivate(refocusOwningEditor, resetCaret)
   }
 
