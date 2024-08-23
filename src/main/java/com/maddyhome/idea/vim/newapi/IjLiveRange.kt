@@ -14,6 +14,9 @@ import com.maddyhome.idea.vim.common.LiveRange
 internal class IjLiveRange(val marker: RangeMarker) : LiveRange {
   override val startOffset: Int
     get() = marker.startOffset
+
+  override val endOffset: Int
+    get() = marker.endOffset
 }
 
 val RangeMarker.vim: LiveRange

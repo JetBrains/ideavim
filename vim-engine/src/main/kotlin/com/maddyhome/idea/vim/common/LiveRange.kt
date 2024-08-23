@@ -10,4 +10,5 @@ package com.maddyhome.idea.vim.common
 
 interface LiveRange {
   val startOffset: Int
+  val endOffset: Int
 }
