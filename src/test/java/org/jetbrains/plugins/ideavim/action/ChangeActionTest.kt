@@ -7,6 +7,7 @@
  */
 package org.jetbrains.plugins.ideavim.action
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
@@ -1067,5 +1068,15 @@ foobaz
       """.trimIndent(),
       Mode.NORMAL(),
     )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-2074"])
+  fun `backspace with replace mode`() {
+    configureByText("${c}Hello world")
+    typeText("R1111")
+    assertState("1111o world")
+    typeText("<BS><BS><BS>")
+    assertState("1ello world")
   }
 }

@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.api.VirtualFile
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.VimEditorReplaceMask
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.regexp.engine.VimRegexEngine
@@ -606,6 +607,7 @@ class VimRegex(pattern: String) {
     override var vimChangeActionSwitchMode: Mode? = null
     override val indentConfig: VimIndentConfig
       get() = TODO("Not yet implemented")
+    override var replaceMask: VimEditorReplaceMask? = null
 
     override fun fileSize(): Long {
       return text.length.toLong()
