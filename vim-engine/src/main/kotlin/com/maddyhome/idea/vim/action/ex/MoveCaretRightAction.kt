@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<Right>"], modes = [Mode.CMD_LINE])
@@ -25,8 +26,8 @@ class MoveCaretRightAction : VimActionHandler.SingleExecution()  {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
     val caret = commandLine.caret
 
-    if (caret.offset == commandLine.actualText.length) return true
-    caret.offset += 1
+    val nextOffset = Graphemes.next(commandLine.actualText, caret.offset) ?: return true
+    caret.offset = nextOffset
 
     return true
   }
