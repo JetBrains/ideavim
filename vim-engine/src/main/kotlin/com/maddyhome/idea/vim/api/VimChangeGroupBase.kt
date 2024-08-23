@@ -1963,23 +1963,21 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
   }
 
-  override fun blockInsert(
+  override fun initBlockInsert(
     editor: VimEditor,
     context: ExecutionContext,
     range: TextRange,
     append: Boolean,
-    operatorArguments: OperatorArguments,
   ): Boolean {
     val lines = getLinesCountInVisualBlock(editor, range)
     val startPosition = editor.offsetToBufferPosition(range.startOffset)
-    val mode = operatorArguments.mode
-    val visualBlockMode = mode is Mode.VISUAL && mode.selectionType === SelectionType.BLOCK_WISE
+    // Note that when called, we're likely to have moved from Visual (block) to Normal, which means all secondary carets
+    // will have been removed. Even if not, this would move them all to the same location, which would remove them and
+    // leave only the primary caret.
     for (caret in editor.carets()) {
       val line = startPosition.line
       var column = startPosition.column
-      if (!visualBlockMode) {
-        column = 0
-      } else if (append) {
+      if (append) {
         column += range.maxLength
         if (caret.vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
           column = VimMotionGroupBase.LAST_COLUMN
@@ -1991,18 +1989,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         val offset = editor.getLineEndOffset(line)
         insertText(editor, caret, offset, pad)
       }
-      if (visualBlockMode || !append) {
-        caret.moveToInlayAwareOffset(editor.bufferPositionToOffset(BufferPosition(line, column)))
-      }
-      if (visualBlockMode) {
-        setInsertRepeat(lines, column, append)
-      }
+      caret.moveToInlayAwareOffset(editor.bufferPositionToOffset(BufferPosition(line, column)))
+      setInsertRepeat(lines, column, append)
     }
-    if (visualBlockMode || !append) {
-      insertBeforeCursor(editor, context)
-    } else {
-      insertAfterCursor(editor, context)
-    }
+    insertBeforeCursor(editor, context)
     return true
   }
 
