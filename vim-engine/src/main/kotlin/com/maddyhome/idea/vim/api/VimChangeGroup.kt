@@ -52,7 +52,7 @@ interface VimChangeGroup {
    */
   fun initBlockInsert(editor: VimEditor, context: ExecutionContext, range: TextRange, append: Boolean): Boolean
 
-  fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
+  fun processEscape(editor: VimEditor, context: ExecutionContext?)
 
   fun processEnter(editor: VimEditor, caret: VimCaret, context: ExecutionContext)
   fun processEnter(editor: VimEditor, context: ExecutionContext)
@@ -102,7 +102,6 @@ interface VimChangeGroup {
     range: TextRange,
     type: SelectionType?,
     isChange: Boolean,
-    operatorArguments: OperatorArguments,
     saveToRegister: Boolean = true,
   ): Boolean
   fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
@@ -130,7 +129,6 @@ interface VimChangeGroup {
     range: TextRange,
     type: SelectionType,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments,
   ): Boolean
 
   fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: ChangeCaseType, argument: Argument, operatorArguments: OperatorArguments): Boolean
@@ -195,7 +193,6 @@ interface VimChangeGroup {
     context: ExecutionContext,
     count: Int,
     started: Boolean,
-    operatorArguments: OperatorArguments,
   )
 
   fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)

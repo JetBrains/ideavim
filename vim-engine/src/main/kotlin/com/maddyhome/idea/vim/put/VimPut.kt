@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.put
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.RWLockLabel
 
@@ -34,7 +33,6 @@ interface VimPut {
     editor: VimEditor,
     context: ExecutionContext,
     data: PutData,
-    operatorArguments: OperatorArguments,
     updateVisualMarks: Boolean = false,
     modifyRegister: Boolean = true,
   ): Boolean

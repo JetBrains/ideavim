@@ -56,7 +56,6 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
       lineRange,
       SelectionType.LINE_WISE,
       context,
-      operatorArguments,
     )
   }
 }

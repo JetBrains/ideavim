@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
@@ -755,7 +754,7 @@ class VimRegex(pattern: String) {
 
     override val projectId: String = "no project, I am just a piece of text wrapped into an Enditor for Regexp to work"
 
-    override fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments) {}
+    override fun exitInsertMode(context: ExecutionContext) {}
 
     override fun exitSelectModeNative(adjustCaret: Boolean) {}
 
@@ -793,4 +792,3 @@ class VimRegex(pattern: String) {
     }
   }
 }
-

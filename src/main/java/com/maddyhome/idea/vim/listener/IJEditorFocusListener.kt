@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -70,7 +69,7 @@ class IJEditorFocusListener : EditorListener {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       val mode = injector.vimState.mode
       when (mode) {
-        is Mode.INSERT -> editor.exitInsertMode(context, OperatorArguments(0, mode))
+        is Mode.INSERT -> editor.exitInsertMode(context)
         else -> {}
       }
     }

@@ -245,7 +245,9 @@ interface VimEditor {
   // Can be used as a key to store something for specific project
   val projectId: String
 
-  fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments)
+  @Deprecated("Use overload without OperatorArguments", replaceWith = ReplaceWith("exitInsertMode(context)"))
+  fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments) { exitInsertMode(context) }
+  fun exitInsertMode(context: ExecutionContext)
   fun exitSelectModeNative(adjustCaret: Boolean)
 
   var vimLastSelectionType: SelectionType?
