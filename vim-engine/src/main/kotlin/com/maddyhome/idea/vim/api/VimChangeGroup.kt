@@ -74,13 +74,7 @@ interface VimChangeGroup {
 
   fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
-  fun deleteJoinLines(
-    editor: VimEditor,
-    caret: VimCaret,
-    count: Int,
-    spaces: Boolean,
-    operatorArguments: OperatorArguments,
-  ): Boolean
+  fun deleteJoinLines(editor: VimEditor, caret: VimCaret, count: Int, spaces: Boolean): Boolean
 
   fun processKey(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
