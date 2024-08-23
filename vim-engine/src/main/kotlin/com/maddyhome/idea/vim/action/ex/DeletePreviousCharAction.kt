@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<BS>", "<C-H>"], modes = [Mode.CMD_LINE])
@@ -33,8 +34,9 @@ class DeletePreviousCharAction : VimActionHandler.SingleExecution()  {
     val caretOffset = commandLine.caret.offset
     if (caretOffset == 0) return true
 
-    commandLine.caret.offset -= 1
-    val newText = oldText.substring(0, caretOffset - 1) + oldText.substring(caretOffset)
+    val prevOffset = Graphemes.prev(oldText, caretOffset) ?: 0
+    commandLine.caret.offset = prevOffset
+    val newText = oldText.substring(0, prevOffset) + oldText.substring(caretOffset)
     commandLine.setText(newText)
 
     return true
