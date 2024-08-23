@@ -36,7 +36,7 @@ class VisualBlockAppendAction : VisualOperatorActionHandler.SingleExecution() {
     if (editor.isOneLineMode()) return false
     val range = caretsAndSelections.values.stream().findFirst().orElse(null) ?: return false
     return if (range.type == SelectionType.BLOCK_WISE) {
-      injector.changeGroup.blockInsert(editor, context, range.toVimTextRange(false), true, operatorArguments)
+      injector.changeGroup.initBlockInsert(editor, context, range.toVimTextRange(false), true)
     } else {
       injector.changeGroup.insertAfterLineEnd(editor, context)
       true

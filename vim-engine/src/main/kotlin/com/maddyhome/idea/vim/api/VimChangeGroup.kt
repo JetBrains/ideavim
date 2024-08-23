@@ -37,6 +37,21 @@ interface VimChangeGroup {
 
   fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode)
 
+  /**
+   * Enter Insert mode for block selection.
+   *
+   * Given a [TextRange] representing a block selection, position the primary caret either at the start column of the
+   * selection for insert, or the end of the first line for append. Then set the insert repeat counts for the extent of
+   * the block selection and start Insert mode.
+   *
+   * @param editor The Vim editor instance.
+   * @param context The execution context.
+   * @param range The range of text representing the block selection.
+   * @param append Whether to insert before the range, or append after it.
+   * @return True if the block was successfully inserted, false otherwise.
+   */
+  fun initBlockInsert(editor: VimEditor, context: ExecutionContext, range: TextRange, append: Boolean): Boolean
+
   fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
 
   fun processEnter(editor: VimEditor, caret: VimCaret, context: ExecutionContext)
@@ -112,8 +127,6 @@ interface VimChangeGroup {
   fun changeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
   fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean
-
-  fun blockInsert(editor: VimEditor, context: ExecutionContext, range: TextRange, append: Boolean, operatorArguments: OperatorArguments): Boolean
 
   fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: ChangeCaseType): Boolean
 
