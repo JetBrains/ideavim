@@ -40,7 +40,7 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecuti
   ): Boolean {
     injector.editorGroup.notifyIdeaJoin(editor)
 
-    return injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, false, operatorArguments)
+    return injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, false)
   }
 
   override fun execute(

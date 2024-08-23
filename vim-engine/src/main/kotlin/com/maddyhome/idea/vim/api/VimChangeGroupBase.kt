@@ -111,7 +111,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         TextRange(caret.offset, endOffset.offset),
         SelectionType.CHARACTER_WISE,
         caret,
-        operatorArguments,
       )
       val pos = caret.offset
       val norm = editor.normalizeOffset(caret.getBufferPosition().line, pos, isChange)
@@ -162,7 +161,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     range: TextRange,
     type: SelectionType?,
     caret: VimCaret,
-    operatorArguments: OperatorArguments,
     saveToRegister: Boolean = true,
   ): Boolean {
     var updatedRange = range
@@ -178,8 +176,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
 
-    val mode = operatorArguments.mode
-    val isInsertMode = mode == Mode.INSERT || mode == Mode.REPLACE
+    val isInsertMode = editor.mode == Mode.INSERT || editor.mode == Mode.REPLACE
     val shouldYank = type != null && !isInsertMode && saveToRegister
     if (shouldYank && !caret.registerStorage.storeText(editor, updatedRange, type, isDelete = true)) {
       return false
@@ -685,7 +682,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val rangeToDelete = TextRange(startOffset, offset)
       editor.nativeCarets().filter { it != caret && rangeToDelete.contains(it.offset) }
         .forEach { editor.removeCaret(it) }
-      val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret, operatorArguments)
+      val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret)
       if (editor.usesVirtualSpace) {
         caret.moveToOffset(startOffset)
       } else {
@@ -712,7 +709,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     caret: VimCaret,
     count: Int,
     spaces: Boolean,
-    operatorArguments: OperatorArguments,
   ): Boolean {
     var myCount = count
     if (myCount < 2) myCount = 2
@@ -721,7 +717,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return if (lline + myCount > total) {
       false
     } else {
-      deleteJoinNLines(editor, caret, lline, myCount, spaces, operatorArguments)
+      deleteJoinNLines(editor, caret, lline, myCount, spaces)
     }
   }
 
@@ -794,7 +790,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       logger.debug("offset=$offset")
     }
     if (offset != -1) {
-      val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret, operatorArguments)
+      val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret)
       if (res && caret.offset >= editor.fileSize() && caret.offset != 0) {
         caret.moveToOffset(
           injector.motion.moveCaretToRelativeLineStartSkipLeading(
@@ -847,7 +843,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val endLine = editor.offsetToBufferPosition(range.endOffset).line
     var count = endLine - startLine + 1
     if (count < 2) count = 2
-    return deleteJoinNLines(editor, caret, startLine, count, spaces, operatorArguments)
+    return deleteJoinNLines(editor, caret, startLine, count, spaces)
   }
 
   override fun joinViaIdeaBySelections(
@@ -928,7 +924,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val intendedColumn = caret.vimLastColumn
 
     val removeLastNewLine = removeLastNewLine(editor, range, type)
-    val res = deleteText(editor, range, type, caret, operatorArguments, saveToRegister)
+    val res = deleteText(editor, range, type, caret, saveToRegister)
     var processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
@@ -1047,7 +1043,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     startLine: Int,
     count: Int,
     spaces: Boolean,
-    operatorArguments: OperatorArguments,
   ): Boolean {
     // Don't move the caret until we've successfully deleted text. If we're on the last line, we don't want to move the
     // caret and then be unable to delete
@@ -1064,7 +1059,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         return i > 1
       }
       // Note that caret isn't moved here; it's only used for register + mark storage
-      deleteText(editor, TextRange(startOffset, endOffset), null, caret, operatorArguments)
+      deleteText(editor, TextRange(startOffset, endOffset), null, caret)
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, startOffset, " ")
       }
@@ -1932,7 +1927,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
               pos++
             }
             if (pos > wsoff) {
-              deleteText(editor, TextRange(wsoff, pos), null, caret, operatorArguments, true)
+              deleteText(editor, TextRange(wsoff, pos), null, caret, true)
             }
           }
         }
