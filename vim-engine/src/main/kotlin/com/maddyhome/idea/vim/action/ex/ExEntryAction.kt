@@ -26,7 +26,7 @@ class ExEntryAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     if (editor.isOneLineMode()) return false
-    injector.commandLine.createCommandPrompt(editor, context, cmd, initialText = "")
+    injector.commandLine.createCommandPrompt(editor, context, cmd.rawCount, initialText = "")
     return true
   }
 }
