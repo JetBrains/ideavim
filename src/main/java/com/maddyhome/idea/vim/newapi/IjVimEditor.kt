@@ -44,6 +44,8 @@ import com.maddyhome.idea.vim.common.IndentConfig.Companion.create
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.VimEditorReplaceMask
+import com.maddyhome.idea.vim.common.forgetAllReplaceMasks
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StrictMode
@@ -53,6 +55,7 @@ import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.replaceMask
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
@@ -75,6 +78,11 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
   // TBH, I don't like the names. Need to think a bit more about this
   val editor = editor.getTopLevelEditor()
   val originalEditor = editor
+  override var replaceMask: VimEditorReplaceMask?
+    get() = editor.replaceMask
+    set(value) {
+      editor.replaceMask = value
+    }
 
   override fun updateMode(mode: Mode) {
     (injector.vimState as VimStateMachineImpl).mode = mode
@@ -454,6 +462,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     get() = (editor as? EditorEx)?.isInsertMode ?: false
     set(value) {
       (editor as? EditorEx)?.isInsertMode = value
+      forgetAllReplaceMasks()
     }
 
   override val document: VimDocument

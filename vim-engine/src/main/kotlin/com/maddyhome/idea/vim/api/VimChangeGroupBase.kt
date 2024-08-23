@@ -731,12 +731,14 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     logger.debug { "processKey($key)" }
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
+      editor.replaceMask?.recordChangeAtCaret(editor)
       processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext -> type(lambdaEditor, lambdaContext, key.keyChar) }
       return true
     }
 
     // Shift-space
     if (key.keyCode == 32 && key.modifiers and KeyEvent.SHIFT_DOWN_MASK != 0) {
+      editor.replaceMask?.recordChangeAtCaret(editor)
       processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext -> type(lambdaEditor, lambdaContext, ' ') }
       return true
     }

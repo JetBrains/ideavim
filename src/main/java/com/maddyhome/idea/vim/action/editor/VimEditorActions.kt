@@ -22,11 +22,6 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["<C-H>", "<BS>"], modes = [Mode.INSERT])
-internal class VimEditorBackSpace : IdeActionHandler(IdeActions.ACTION_EDITOR_BACKSPACE) {
-  override val type: Command.Type = Command.Type.DELETE
-}
-
 @CommandOrMotion(keys = ["<Del>"], modes = [Mode.INSERT])
 internal class VimEditorDelete : IdeActionHandler(IdeActions.ACTION_EDITOR_DELETE) {
   override val type: Command.Type = Command.Type.DELETE

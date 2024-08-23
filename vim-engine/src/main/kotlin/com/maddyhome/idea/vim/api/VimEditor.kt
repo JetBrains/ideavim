@@ -11,12 +11,11 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
+import com.maddyhome.idea.vim.common.VimEditorReplaceMask
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.returnTo
-import org.jetbrains.annotations.ApiStatus.Internal
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -130,6 +129,7 @@ interface VimEditor {
   val lfMakesNewLine: Boolean
   var vimChangeActionSwitchMode: Mode?
   val indentConfig: VimIndentConfig
+  var replaceMask: VimEditorReplaceMask?
 
   fun fileSize(): Long
 

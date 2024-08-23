@@ -104,6 +104,11 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
+  override fun processBackspace(editor: VimEditor, context: ExecutionContext) {
+    injector.actionExecutor.executeAction(editor, name = IdeActions.ACTION_EDITOR_BACKSPACE, context = context)
+    injector.scroll.scrollCaretIntoView(editor)
+  }
+
   private fun restoreCursor(editor: VimEditor, caret: VimCaret, startLine: Int) {
     if (caret != editor.primaryCaret()) {
       (editor as IjVimEditor).editor.caretModel.addCaret(
