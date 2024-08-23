@@ -166,40 +166,41 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     saveToRegister: Boolean = true,
   ): Boolean {
     var updatedRange = range
+
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(editor.fileSize().toInt())) {
-      updatedRange = if (range.startOffset == range.endOffset && range.startOffset == editor.fileSize()
-          .toInt() && range.startOffset != 0
-      ) {
+      updatedRange = if (range.startOffset == range.endOffset
+        && range.startOffset == editor.fileSize().toInt()
+        && range.startOffset != 0) {
         TextRange(range.startOffset - 1, range.endOffset)
       } else {
         return false
       }
     }
+
     val mode = operatorArguments.mode
-    if (type == null ||
-      (mode == Mode.INSERT || mode == Mode.REPLACE) ||
-      !saveToRegister ||
-      caret.registerStorage.storeText(editor, updatedRange, type, true)
-    ) {
-      val startOffsets = updatedRange.startOffsets
-      val endOffsets = updatedRange.endOffsets
-      for (i in updatedRange.size() - 1 downTo 0) {
-        val (newRange, _) = editor.search(
-          startOffsets[i] to endOffsets[i],
-          editor,
-          LineDeleteShift.NL_ON_END
-        ) ?: continue
-        editor.deleteString(TextRange(newRange.first, newRange.second))
-      }
-      if (type != null) {
-        val start = updatedRange.startOffset
-        injector.markService.setMark(caret, MARK_CHANGE_POS, start)
-        injector.markService.setChangeMarks(caret, TextRange(start, start + 1))
-      }
-      return true
+    val isInsertMode = mode == Mode.INSERT || mode == Mode.REPLACE
+    val shouldYank = type != null && !isInsertMode && saveToRegister
+    if (shouldYank && !caret.registerStorage.storeText(editor, updatedRange, type, isDelete = true)) {
+      return false
     }
-    return false
+
+    val startOffsets = updatedRange.startOffsets
+    val endOffsets = updatedRange.endOffsets
+    for (i in updatedRange.size() - 1 downTo 0) {
+      val (newRange, _) = editor.search(
+        startOffsets[i] to endOffsets[i],
+        editor,
+        LineDeleteShift.NL_ON_END
+      ) ?: continue
+      editor.deleteString(TextRange(newRange.first, newRange.second))
+    }
+    if (type != null) {
+      val start = updatedRange.startOffset
+      injector.markService.setMark(caret, MARK_CHANGE_POS, start)
+      injector.markService.setChangeMarks(caret, TextRange(start, start + 1))
+    }
+    return true
   }
 
   /**
