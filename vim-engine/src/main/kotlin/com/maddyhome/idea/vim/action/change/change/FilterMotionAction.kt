@@ -31,7 +31,7 @@ class FilterVisualLinesAction : VimActionHandler.SingleExecution(), FilterComman
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     // Start ex entry with the initial text set to the calculated range and `!`
-    startFilterCommand(editor, context, cmd)
+    startFilterCommand(editor, context, cmd.rawCount)
     return true
   }
 }
@@ -63,13 +63,13 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), FilterCommand, Du
 
     // Start ex entry with the initial text set to the calculated range and `!`
     val count = if (start.line < end.line) end.line - start.line + 1 else 1
-    startFilterCommand(editor, context, Argument.EMPTY_COMMAND.copy(rawCount = count))
+    startFilterCommand(editor, context, count)
     return true
   }
 }
 
 interface FilterCommand {
-  fun startFilterCommand(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    injector.commandLine.createCommandPrompt(editor, context, cmd, initialText = "!")
+  fun startFilterCommand(editor: VimEditor, context: ExecutionContext, count0: Int) {
+    injector.commandLine.createCommandPrompt(editor, context, count0, initialText = "!")
   }
 }

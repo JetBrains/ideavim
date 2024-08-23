@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
@@ -50,15 +49,15 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
     return createCommandLinePrompt(editor, context, removeSelections = false, label, initialText)
   }
 
-  override fun createCommandPrompt(editor: VimEditor, context: ExecutionContext, command: Command, initialText: String): VimCommandLine {
-    val rangeText = getRange(editor, command)
+  override fun createCommandPrompt(editor: VimEditor, context: ExecutionContext, count0: Int, initialText: String): VimCommandLine {
+    val rangeText = getRange(editor, count0)
     return createCommandLinePrompt(editor, context, removeSelections = true, label = ":", rangeText + initialText)
   }
 
-  protected fun getRange(editor: VimEditor, cmd: Command) = when {
+  protected fun getRange(editor: VimEditor, count0: Int) = when {
     editor.inVisualMode -> "'<,'>"
-    cmd.rawCount == 1 -> "."
-    cmd.rawCount > 1 -> ".,.+" + (cmd.count - 1)
+    count0 == 1 -> "."
+    count0 > 1 -> ".,.+" + (count0 - 1)
     else -> ""
   }
 }

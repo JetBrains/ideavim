@@ -8,14 +8,11 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import java.util.*
 
 /**
  * Represents an argument to a command's action
@@ -94,27 +91,5 @@ sealed class Argument {
      * converted into a character, and a character argument is added to the operator action.
      */
     DIGRAPH
-  }
-
-  companion object {
-    // TODO: Can we get rid of this?
-    @JvmField
-    val EMPTY_COMMAND: Command = Command(
-      null,
-      0,
-      object : MotionActionHandler.SingleExecution() {
-        override fun getOffset(
-          editor: VimEditor,
-          context: ExecutionContext,
-          argument: Argument?,
-          operatorArguments: OperatorArguments,
-        ) = com.maddyhome.idea.vim.handler.Motion.NoMotion
-
-        override val motionType: MotionType = MotionType.EXCLUSIVE
-      },
-      null,
-      Command.Type.MOTION,
-      EnumSet.noneOf(CommandFlags::class.java),
-    )
   }
 }
