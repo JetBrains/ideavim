@@ -237,7 +237,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     editor: VimEditor,
     context: ExecutionContext,
     count: Int,
-    operatorArguments: OperatorArguments,
   ) {
     val myLastStrokes = lastStrokes ?: return
     for (caret in editor.nativeCarets()) {
@@ -250,7 +249,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
             }
 
             is EditorActionHandlerBase -> {
-              injector.actionExecutor.executeVimAction(editor, lastStroke, context, operatorArguments)
+              injector.actionExecutor.executeVimAction(editor, lastStroke, context, OperatorArguments(0, editor.mode))
               strokes.add(lastStroke)
             }
 
@@ -279,7 +278,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     context: ExecutionContext,
     count: Int,
     started: Boolean,
-    operatorArguments: OperatorArguments,
   ) {
     for (caret in editor.nativeCarets()) {
       if (repeatLines > 0) {
@@ -300,17 +298,17 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           val updatedCount = if (started) (if (i == 0) count else count + 1) else count
           if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
             caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, bufferLine + i, true))
-            repeatInsertText(editor, context, updatedCount, operatorArguments)
+            repeatInsertText(editor, context, updatedCount)
           } else if (editor.getVisualLineLength(visualLine + i) >= repeatColumn) {
             val visualPosition = VimVisualPosition(visualLine + i, repeatColumn, false)
             val inlaysCount = injector.engineEditorHelper.amountOfInlaysBeforeVisualPosition(editor, visualPosition)
             caret.moveToVisualPosition(VimVisualPosition(visualLine + i, repeatColumn + inlaysCount, false))
-            repeatInsertText(editor, context, updatedCount, operatorArguments)
+            repeatInsertText(editor, context, updatedCount)
           }
         }
         caret.moveToOffset(position)
       } else {
-        repeatInsertText(editor, context, count, operatorArguments)
+        repeatInsertText(editor, context, count)
         val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
         caret.moveToMotion(position)
       }
@@ -447,25 +445,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (mode == Mode.REPLACE) {
         editor.insertMode = false
       }
-      if (cmd.flags.contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
-        val commandState = injector.vimState
-        repeatInsert(
-          editor,
-          context,
-          1,
-          false,
-          OperatorArguments(1, commandState.mode),
-        )
-      } else {
-        val commandState = injector.vimState
-        repeatInsert(
-          editor,
-          context,
-          cmd.count,
-          false,
-          OperatorArguments(cmd.count, commandState.mode),
-        )
-      }
+      val count = if (cmd.flags.contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) 1 else cmd.count
+      repeatInsert(editor, context, count, false)
       if (mode == Mode.REPLACE) {
         editor.insertMode = true
       }
@@ -530,9 +511,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     exit: Boolean,
     operatorArguments: OperatorArguments,
   ) {
-    repeatInsertText(editor, context, 1, operatorArguments)
+    repeatInsertText(editor, context, 1)
     if (exit) {
-      editor.exitInsertMode(context, operatorArguments)
+      editor.exitInsertMode(context)
     }
   }
 
@@ -542,7 +523,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    *
    * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsertMode in file ModeExtensions.kt
    */
-  override fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments) {
+  override fun processEscape(editor: VimEditor, context: ExecutionContext?) {
     // Get the offset for marks before we exit insert mode - switching from insert to overtype subtracts one from the
     // column offset.
     val markGroup = injector.markService
@@ -568,7 +549,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     lastStrokes = ArrayList(strokes)
     if (context != null) {
-      injector.changeGroup.repeatInsert(editor, context, repeatCount0, true, operatorArguments)
+      injector.changeGroup.repeatInsert(editor, context, repeatCount0, true)
     }
     if (editor.mode is Mode.INSERT) {
       updateLastInsertedTextRegister()
@@ -918,7 +899,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     range: TextRange,
     type: SelectionType?,
     isChange: Boolean,
-    operatorArguments: OperatorArguments,
     saveToRegister: Boolean,
   ): Boolean {
     val intendedColumn = caret.vimLastColumn
@@ -1218,7 +1198,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       first,
       second,
       context,
-      operatorArguments,
     )
   }
 
@@ -1243,7 +1222,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param caret             The caret to be moved after range deletion
    * @param range             The range to change
    * @param type              The type of the range
-   * @param operatorArguments
    * @return true if able to delete the range, false if not
    */
   override fun changeRange(
@@ -1252,7 +1230,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     range: TextRange,
     type: SelectionType,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments,
   ): Boolean {
     var col = 0
     var lines = 0
@@ -1265,7 +1242,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val after = range.endOffset >= editor.fileSize()
     val lp = editor.offsetToBufferPosition(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
-    val res = deleteRange(editor, caret, range, type, true, operatorArguments)
+    val res = deleteRange(editor, caret, range, type, true)
     val updatedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (res) {
       if (type === SelectionType.LINE_WISE) {

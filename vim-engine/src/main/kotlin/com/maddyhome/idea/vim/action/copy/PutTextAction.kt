@@ -46,7 +46,7 @@ sealed class PutTextBaseAction(
       result
     } else {
       val putData = getPutDataForCaret(sortedCarets.single(), count)
-      injector.put.putText(editor, context, putData, operatorArguments)
+      injector.put.putText(editor, context, putData)
     }
   }
 

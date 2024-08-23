@@ -40,7 +40,6 @@ class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
       range.toVimTextRange(false),
       selectionType,
       false,
-      operatorArguments,
     )
   }
 }

@@ -36,9 +36,7 @@ data class DeleteLinesCommand(val range: Range, val argument: String) : Command.
     if (!injector.registerGroup.selectRegister(register)) return ExecutionResult.Error
 
     val textRange = getLineRangeWithCount(editor, caret).toTextRange(editor)
-    return if (injector.changeGroup
-      .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false, operatorArguments)
-    ) {
+    return if (injector.changeGroup.deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error

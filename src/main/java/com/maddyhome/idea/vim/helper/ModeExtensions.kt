@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -94,6 +93,6 @@ internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   }
 }
 
-internal fun Editor.exitInsertMode(context: DataContext, operatorArguments: OperatorArguments) {
-  VimPlugin.getChange().processEscape(IjVimEditor(this), IjEditorExecutionContext(context), operatorArguments)
+internal fun Editor.exitInsertMode(context: DataContext) {
+  VimPlugin.getChange().processEscape(IjVimEditor(this), IjEditorExecutionContext(context))
 }

@@ -38,9 +38,7 @@ import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.IndentConfig
-import com.maddyhome.idea.vim.common.IndentConfig.Companion.create
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
@@ -99,7 +97,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
       editor.vimChangeActionSwitchMode = value
     }
   override val indentConfig: VimIndentConfig
-    get() = create(editor)
+    get() = IndentConfig.create(editor)
 
   override fun fileSize(): Long = editor.fileSize.toLong()
 
@@ -389,8 +387,8 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight))
   }
 
-  override fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments) {
-    editor.exitInsertMode(context.ij, operatorArguments)
+  override fun exitInsertMode(context: ExecutionContext) {
+    editor.exitInsertMode(context.ij)
   }
 
   override fun exitSelectModeNative(adjustCaret: Boolean) {

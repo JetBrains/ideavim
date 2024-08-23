@@ -56,6 +56,6 @@ data class PutLinesCommand(val range: Range, val argument: String) : Command.Sin
       caretAfterInsertedText = false,
       putToLine = line,
     )
-    return if (injector.put.putText(editor, context, putData, operatorArguments = operatorArguments)) ExecutionResult.Success else ExecutionResult.Error
+    return if (injector.put.putText(editor, context, putData)) ExecutionResult.Success else ExecutionResult.Error
   }
 }
