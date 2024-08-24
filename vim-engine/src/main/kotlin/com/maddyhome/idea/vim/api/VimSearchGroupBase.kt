@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
+import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler
 import org.jetbrains.annotations.TestOnly
 import java.text.NumberFormat
 import java.text.ParsePosition
@@ -137,24 +138,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
    *
    * @param match The match to save.
    */
-  protected abstract fun setLatestMatch(
-    match: String,
-  )
-
-  /**
-   * Replaces a string in the editor.
-   *
-   * @param editor      The editor where the replacement is to take place.
-   * @param startOffset The offset where the string that is to be replaced starts (inclusive).
-   * @param endOffset   The offset where the string that is to be replaced ends (exclusive).
-   * @param newString   The new string that will replace the old one.
-   */
-  protected abstract fun replaceString(
-    editor: VimEditor,
-    startOffset: Int,
-    endOffset: Int,
-    newString: String,
-  )
+  protected open fun setLatestMatch(match: String) {
+    SubmatchFunctionHandler.getInstance().latestMatch = match
+  }
 
   /**
    * Resets the variable that determines whether search highlights should be shown.
@@ -814,7 +800,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     if (doReplace) {
       val endPositionWithoutReplace = editor.offsetToBufferPosition(matchRange.endOffset)
 
-      replaceString(editor, matchRange.startOffset, matchRange.endOffset, finalMatch)
+      injector.application.runWriteAction {
+        (editor as MutableVimEditor).replaceString(matchRange.startOffset, matchRange.endOffset, finalMatch)
+      }
       didReplace = true
 
       val endPositionWithReplace = editor.offsetToBufferPosition(matchRange.startOffset + finalMatch.length)
