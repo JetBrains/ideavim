@@ -104,21 +104,6 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     return IjSearchHighlight(ijEditor, highlighter)
   }
 
-  override fun setLatestMatch(match: String) {
-    SubmatchFunctionHandler.getInstance().latestMatch = match
-  }
-
-  override fun replaceString(
-    editor: VimEditor,
-    startOffset: Int,
-    endOffset: Int,
-    newString: String,
-  ) {
-    ApplicationManager.getApplication().runWriteAction {
-      (editor as IjVimEditor).editor.document.replaceString(startOffset, endOffset, newString)
-    }
-  }
-
   @TestOnly
   override fun resetState() {
     super.resetState()

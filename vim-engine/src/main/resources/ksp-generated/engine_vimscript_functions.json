@@ -10,6 +10,7 @@
     "len": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.LenFunctionHandler",
     "sin": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SinFunctionHandler",
     "split": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SplitFunctionHandler",
+    "submatch": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler",
     "tolower": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.TolowerFunctionHandler",
     "toupper": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ToupperFunctionHandler"
 }
