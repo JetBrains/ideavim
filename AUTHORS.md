@@ -531,6 +531,10 @@ Contributors:
   [![icon][github]](https://github.com/shaunlebron)
   &nbsp;
   shaun
+* [![icon][mail]](mailto:i.i.babko@gmail.com)
+  [![icon][github]](https://github.com/igorbabko)
+  &nbsp;
+  Igor Babko
 
 Previous contributors:
 
