@@ -5,16 +5,6 @@
         "modes": "N"
     },
     {
-        "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorBackSpace",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-H>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorBackSpace",
-        "modes": "I"
-    },
-    {
         "keys": "<C-I>",
         "class": "com.maddyhome.idea.vim.action.editor.VimEditorTab",
         "modes": "I"

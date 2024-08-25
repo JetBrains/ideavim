@@ -101,6 +101,11 @@
     },
     {
         "keys": "<BS>",
+        "class": "com.maddyhome.idea.vim.action.change.insert.InsertBackspaceAction",
+        "modes": "I"
+    },
+    {
+        "keys": "<BS>",
         "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousCharAction",
         "modes": "C"
     },
@@ -227,6 +232,11 @@
     {
         "keys": "<C-G>u",
         "class": "com.maddyhome.idea.vim.action.change.BreakUndoSequenceAction",
+        "modes": "I"
+    },
+    {
+        "keys": "<C-H>",
+        "class": "com.maddyhome.idea.vim.action.change.insert.InsertBackspaceAction",
         "modes": "I"
     },
     {
@@ -1933,6 +1943,11 @@
         "keys": "z^",
         "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction",
         "modes": "NXO"
+    },
+    {
+        "keys": "za",
+        "class": "com.maddyhome.idea.vim.action.fold.VimExpandCollapseToggleRegion",
+        "modes": "NX"
     },
     {
         "keys": "zb",
