@@ -218,13 +218,17 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler?) : VimKeyHandle
 internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<Esc>"
 
+  private val ideaVimSupportDialog
+    get() = injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
+  
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
-    val ideaVimSupportDialog =
-      injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
-
     return editor.isPrimaryEditor() ||
-      EditorHelper.isFileEditor(editor) && !editor.vim.mode.inNormalMode ||
-      ideaVimSupportDialog && !editor.vim.mode.inNormalMode
+      EditorHelper.isFileEditor(editor) && vimStateNeedsToHandleEscape(editor) ||
+      ideaVimSupportDialog && vimStateNeedsToHandleEscape(editor)
+  }
+  
+  private fun vimStateNeedsToHandleEscape(editor: Editor): Boolean {
+    return !editor.vim.mode.inNormalMode || KeyHandler.getInstance().keyHandlerState.mappingState.hasKeys
   }
 }
 

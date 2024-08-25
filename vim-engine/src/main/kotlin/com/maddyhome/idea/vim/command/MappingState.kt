@@ -37,6 +37,9 @@ class MappingState: Cloneable {
 
   val keys: Iterable<KeyStroke>
     get() = keyList
+  
+  val hasKeys
+    get() = keyList.isNotEmpty()
 
   private var timer = VimTimer(injector.globalOptions().timeoutlen)
   private var keyList = mutableListOf<KeyStroke>()
