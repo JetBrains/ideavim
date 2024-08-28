@@ -105,7 +105,7 @@ internal class Matchit : VimExtension {
         matchitAction.reverse = reverse
         matchitAction.isInOpPending = true
 
-        keyState.commandBuilder.completeCommandPart(Argument.Motion(matchitAction, null))
+        keyState.commandBuilder.addAction(matchitAction)
       } else {
         editor.sortedCarets().forEach { caret ->
           injector.jumpService.saveJumpLocation(editor)

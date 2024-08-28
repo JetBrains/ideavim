@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.trace
@@ -237,7 +236,7 @@ class ToHandlerMappingInfo(
           }
         }
         if (offsets.isNotEmpty()) {
-          keyState.commandBuilder.completeCommandPart(Argument.Motion(ExternalActionHandler(offsets)))
+          keyState.commandBuilder.addAction(ExternalActionHandler(offsets))
         }
       }
     }

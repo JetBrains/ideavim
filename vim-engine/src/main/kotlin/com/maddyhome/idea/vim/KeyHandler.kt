@@ -328,6 +328,7 @@ class KeyHandler {
   ) : Runnable {
     override fun run() {
       val editorState = injector.vimState
+      // TODO: This seems an unexpected place to reset command builder state
       keyState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
       val register = cmd.register
       if (register != null) {
@@ -348,21 +349,17 @@ class KeyHandler {
       // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
       // mode commands. An exception is if this command should leave us in the temporary mode such as
       // "select register"
-      val myMode = editorState.mode
-      val returnTo = myMode.returnTo
-      if (myMode is Mode.NORMAL && returnTo != null && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
-        when (returnTo) {
-          ReturnTo.INSERT -> {
-            editor.mode = Mode.INSERT
-          }
-
-          ReturnTo.REPLACE -> {
-            editor.mode = Mode.REPLACE
-          }
+      if (editorState.mode is Mode.NORMAL && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
+        when (editorState.mode.returnTo) {
+          ReturnTo.INSERT -> editor.mode = Mode.INSERT
+          ReturnTo.REPLACE -> editor.mode = Mode.REPLACE
+          null -> {}
         }
       }
-      if (keyState.commandBuilder.isDone()) {
-        getInstance().reset(keyState, editorState.mode)
+
+      // TODO: Surely the command builder is always empty at this point?
+      if (keyState.commandBuilder.isEmpty) {
+        instance.reset(keyState, editorState.mode)
       }
     }
   }

@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.common.CurrentCommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimExtension;
@@ -260,8 +259,7 @@ public class VimArgTextObjExtension implements VimExtension {
           }
         });
       } else {
-        keyHandlerState.getCommandBuilder().pushCommandPart(textObjectHandler);
-        keyHandlerState.getCommandBuilder().setCommandState(CurrentCommandState.READY);
+        keyHandlerState.getCommandBuilder().addAction(textObjectHandler);
       }
     }
   }

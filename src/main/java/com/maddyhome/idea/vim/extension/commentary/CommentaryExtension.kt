@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.TextObjectVisualType
@@ -182,7 +181,7 @@ internal class CommentaryExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val keyState = KeyHandler.getInstance().keyHandlerState
-      keyState.commandBuilder.completeCommandPart(Argument.Motion(CommentaryTextObjectMotionHandler))
+      keyState.commandBuilder.addAction(CommentaryTextObjectMotionHandler)
     }
   }
 

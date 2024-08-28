@@ -57,7 +57,7 @@ class EditorResetConsumer : KeyConsumer {
     if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
       editor.isReplaceCharacter = false
     }
-    if (commandBuilder.isAtDefaultState) {
+    if (commandBuilder.isEmpty) {
       val register = injector.registerGroup
       if (register.currentRegister == register.defaultRegister) {
         var indicateError = true
