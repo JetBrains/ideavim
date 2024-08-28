@@ -58,7 +58,21 @@ class CommandBuilder private constructor(
   // TODO: Encapsulate this
   var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
 
+  /** Provide the typed keys for `'showcmd'` */
   val keys: Iterable<KeyStroke> get() = keyList
+
+  /** Returns true if the command builder is clean and ready to start building */
+  val isEmpty
+    get() = commandState == CurrentCommandState.NEW_COMMAND
+      && selectedRegister == null
+      && counts.size == 1
+      && action == null
+      && argument == null
+      && fallbackArgumentType == null
+
+  /** Returns true if the command is ready to be built and executed */
+  val isReady
+    get() = commandState == CurrentCommandState.READY
 
   /**
    * Returns the current total count, as the product of all entered count components. The value is not coerced.
@@ -131,18 +145,11 @@ class CommandBuilder private constructor(
     fallbackArgumentType = Argument.Type.CHARACTER
   }
 
-  /** Returns true if the command builder is clean and ready to start building */
-  val isEmpty
-    get() = commandState == CurrentCommandState.NEW_COMMAND
-      && selectedRegister == null
-      && counts.size == 1
-      && action == null
-      && argument == null
-      && fallbackArgumentType == null
-
-  /** Returns true if the command is ready to be built and executed */
-  val isReady
-    get() = commandState == CurrentCommandState.READY
+  fun isAwaitingCharOrDigraphArgument(): Boolean {
+    val awaiting = expectedArgumentType == Argument.Type.CHARACTER || expectedArgumentType == Argument.Type.DIGRAPH
+    logger.debug { "Awaiting char or digraph: $awaiting" }
+    return awaiting
+  }
 
   val isExpectingCount: Boolean
     get() {
@@ -151,6 +158,57 @@ class CommandBuilder private constructor(
         expectedArgumentType != Argument.Type.CHARACTER &&
         expectedArgumentType != Argument.Type.DIGRAPH
     }
+
+  /**
+   * Returns true if the user has typed some count characters
+   *
+   * Used to know if `0` should be mapped or not. Vim allows "0" to be mapped, but not while entering a count. Also used
+   * to know if there are count characters available to delete.
+   */
+  fun hasCountCharacters() = currentCount > 0
+
+  fun addCountCharacter(key: KeyStroke) {
+    currentCount = (currentCount * 10) + (key.keyChar - '0')
+    // If count overflows and flips negative, reset to 999999999L. In Vim, count is a long, which is *usually* 32 bits,
+    // so will flip at 2147483648. We store count as an Int, which is also 32 bit.
+    // See https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/normal.c#L631
+    if (currentCount < 0) {
+      currentCount = 999999999
+    }
+    addKey(key)
+  }
+
+  fun deleteCountCharacter() {
+    currentCount /= 10
+    keyList.removeAt(keyList.size - 1)
+  }
+
+  var isRegisterPending: Boolean = false
+    private set
+
+  fun startWaitingForRegister(key: KeyStroke) {
+    isRegisterPending = true
+    addKey(key)
+  }
+
+  fun selectRegister(register: Char) {
+    logger.trace { "Selected register '$register'" }
+    selectedRegister = register
+    isRegisterPending = false
+    fallbackArgumentType = null
+    counts.add(0)
+  }
+
+  /**
+   * Adds a keystroke to the command builder
+   *
+   * Only public use is when entering a digraph/literal, where each key isn't handled by [CommandBuilder], but should
+   * be added to the `'showcmd'` output.
+   */
+  fun addKey(key: KeyStroke) {
+    logger.trace { "added key to command builder: $key" }
+    keyList.add(key)
+  }
 
   fun addAction(action: EditorActionHandlerBase) {
     logger.trace { "addAction is executed. action = $action" }
@@ -178,62 +236,6 @@ class CommandBuilder private constructor(
     }
   }
 
-  fun startWaitingForRegister(key: KeyStroke) {
-    isRegisterPending = true
-    addKey(key)
-  }
-
-  var isRegisterPending: Boolean = false
-    private set
-
-  fun selectRegister(register: Char) {
-    logger.trace { "Selected register '$register'" }
-    selectedRegister = register
-    isRegisterPending = false
-    fallbackArgumentType = null
-    counts.add(0)
-  }
-
-  fun addKey(key: KeyStroke) {
-    logger.trace("added key to command builder")
-    keyList.add(key)
-  }
-
-  fun addCountCharacter(key: KeyStroke) {
-    currentCount = (currentCount * 10) + (key.keyChar - '0')
-    // If count overflows and flips negative, reset to 999999999L. In Vim, count is a long, which is *usually* 32 bits,
-    // so will flip at 2147483648. We store count as an Int, which is also 32 bit.
-    // See https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/normal.c#L631
-    if (currentCount < 0) {
-      currentCount = 999999999
-    }
-    addKey(key)
-  }
-
-  fun deleteCountCharacter() {
-    currentCount /= 10
-    keyList.removeAt(keyList.size - 1)
-  }
-
-  fun hasCountCharacter() = currentCount > 0
-
-  fun isAwaitingCharOrDigraphArgument(): Boolean {
-    val awaiting = expectedArgumentType == Argument.Type.CHARACTER || expectedArgumentType == Argument.Type.DIGRAPH
-    logger.debug { "Awaiting char or digraph: $awaiting" }
-    return awaiting
-  }
-
-  fun isBuildingMultiKeyCommand(): Boolean {
-    // Don't apply mapping if we're in the middle of building a multi-key command.
-    // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
-    //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
-    // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
-    // get a match. This means we'll still process the rest of the keys of the prefix.
-    val isMultikey = currentCommandPartNode !is RootNode
-    logger.debug { "Building multikey command: $isMultikey" }
-    return isMultikey
-  }
-
   fun addArgument(argument: Argument) {
     logger.trace("addArgument is executed")
 
@@ -245,31 +247,6 @@ class CommandBuilder private constructor(
       logger.trace("Argument is simple type, or motion with own argument. No further argument required. Setting command state to READY")
       commandState = CurrentCommandState.READY
     }
-  }
-
-  /**
-   * Map a keystroke that duplicates an operator into the `_` "current line" motion
-   *
-   * Some commands like `dd` or `yy` or `cc` are treated as special cases by Vim. There is no `d`, `y` or `c` motion,
-   * so for convenience, Vim maps the repeated operator keystroke as meaning "operate on the current line", and replaces
-   * the second keystroke with the `_` motion. I.e. `dd` becomes `d_`, `yy` becomes `y_`, `cc` becomes `c_`, etc.
-   *
-   * @see DuplicableOperatorAction
-   */
-  fun convertDuplicateOperatorKeyStrokeToMotion(key: KeyStroke): KeyStroke {
-    logger.trace("convertDuplicateOperatorKeyStrokeToMotion is executed. key = $key")
-
-    // Simple check to ensure that we're in OP_PENDING. If we don't have an action, we don't have an operator. If we
-    // have an argument, we can't be in OP_PENDING
-    if (action != null && argument == null) {
-      (action as? DuplicableOperatorAction)?.let {
-        logger.trace { "action = $action" }
-        if (it.duplicateWith == key.keyChar) {
-          return KeyStroke.getKeyStroke('_')
-        }
-      }
-    }
-    return key
   }
 
   /**
@@ -301,6 +278,42 @@ class CommandBuilder private constructor(
 
     logger.trace { "No command/command part node found for key: $key" }
     return false
+  }
+
+  /**
+   * Map a keystroke that duplicates an operator into the `_` "current line" motion
+   *
+   * Some commands like `dd` or `yy` or `cc` are treated as special cases by Vim. There is no `d`, `y` or `c` motion,
+   * so for convenience, Vim maps the repeated operator keystroke as meaning "operate on the current line", and replaces
+   * the second keystroke with the `_` motion. I.e. `dd` becomes `d_`, `yy` becomes `y_`, `cc` becomes `c_`, etc.
+   *
+   * @see DuplicableOperatorAction
+   */
+  fun convertDuplicateOperatorKeyStrokeToMotion(key: KeyStroke): KeyStroke {
+    logger.trace("convertDuplicateOperatorKeyStrokeToMotion is executed. key = $key")
+
+    // Simple check to ensure that we're in OP_PENDING. If we don't have an action, we don't have an operator. If we
+    // have an argument, we can't be in OP_PENDING
+    if (action != null && argument == null) {
+      (action as? DuplicableOperatorAction)?.let {
+        logger.trace { "action = $action" }
+        if (it.duplicateWith == key.keyChar) {
+          return KeyStroke.getKeyStroke('_')
+        }
+      }
+    }
+    return key
+  }
+
+  fun isBuildingMultiKeyCommand(): Boolean {
+    // Don't apply mapping if we're in the middle of building a multi-key command.
+    // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
+    //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
+    // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
+    // get a match. This means we'll still process the rest of the keys of the prefix.
+    val isMultikey = currentCommandPartNode !is RootNode
+    logger.debug { "Building multikey command: $isMultikey" }
+    return isMultikey
   }
 
   fun buildCommand(): Command {
