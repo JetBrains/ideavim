@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -78,12 +77,8 @@ class CommandConsumer : KeyConsumer {
       return
     }
 
-    commandBuilder.pushCommandPart(action)
-
-    if (action.argumentType == null) {
-      logger.trace("Set command state to READY")
-      commandBuilder.commandState = CurrentCommandState.READY
-    } else {
+    commandBuilder.addAction(action)
+    if (commandBuilder.isAwaitingArgument) {
       processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
         logger.trace("Set waiting for the argument")
         val argumentType = action.argumentType
@@ -101,7 +96,7 @@ class CommandConsumer : KeyConsumer {
         val processing = commandLine.inputProcessing
         commandLine.close(refocusOwningEditor = true, resetCaret = true)
 
-        commandBuilder.completeCommandPart(Argument.ExString(label[0], text, processing))
+        commandBuilder.addArgument(Argument.ExString(label[0], text, processing))
       }
     }
   }
@@ -117,7 +112,7 @@ class CommandConsumer : KeyConsumer {
     val commandBuilder = keyState.commandBuilder
     if (argument == Argument.Type.MOTION) {
       if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
-        commandBuilder.completeCommandPart(argumentCaptured!!)
+        commandBuilder.addArgument(argumentCaptured!!)
       }
       editor.mode = Mode.OP_PENDING(editorState.mode.returnTo)
     }

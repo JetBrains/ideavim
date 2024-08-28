@@ -46,13 +46,18 @@ class CommandBuilder private constructor(
   private var argument: Argument? = null
   private var fallbackArgumentType: Argument.Type? = null
 
+  private val motionArgument
+    get() = argument as? Argument.Motion
+
   private var currentCount: Int
     get() = counts.last()
     set(value) {
       counts[counts.size - 1] = value
     }
 
+  // TODO: Encapsulate this
   var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
+
   val keys: Iterable<KeyStroke> get() = keyList
 
   /**
@@ -87,6 +92,17 @@ class CommandBuilder private constructor(
   val register: Char?
     get() = selectedRegister
 
+  // TODO: Try to remove this too. Also used by extension handling
+  fun hasCurrentCommandPartArgument() = motionArgument != null || argument != null
+
+  // TODO: And remove this too. More extension special case code
+  // It's used by the Matchit extension to incorrectly reset the command builder. Extensions need a way to properly
+  // handle the command builder. I.e., they should act like expression mappings, which return keys to evaluate, or an
+  // empty string to leave state as it is - either way, it's an explicit choice. Currently, extensions mostly ignore it
+  fun resetCount() {
+    counts[counts.size - 1] = 0
+  }
+
   /**
    * The argument type for the current in-progress command part's action
    *
@@ -94,8 +110,18 @@ class CommandBuilder private constructor(
    */
   val expectedArgumentType: Argument.Type?
     get() = fallbackArgumentType
-      ?: (argument as? Argument.Motion)?.let { return it.motion.argumentType }
+      ?: motionArgument?.let { return it.motion.argumentType }
       ?: action?.argumentType
+
+  /**
+   * Returns true if the command builder is waiting for an argument
+   *
+   * The command builder might be waiting for the argument to a simple motion action such as `f`, waiting for a
+   * character to move to, or it might be waiting for the argument to a motion that is itself an argument to an operator
+   * argument. For example, the character argument to `f` in `df{character}`.
+   */
+  val isAwaitingArgument: Boolean
+    get() = expectedArgumentType != null && (motionArgument?.let { it.argument == null } ?: (argument == null))
 
   fun fallbackToCharacterArgument() {
     logger.trace("fallbackToCharacterArgument is executed")
@@ -105,11 +131,18 @@ class CommandBuilder private constructor(
     fallbackArgumentType = Argument.Type.CHARACTER
   }
 
-  // TODO: Review all of these
-  val isReady: Boolean get() = commandState == CurrentCommandState.READY
-  val isEmpty: Boolean get() = selectedRegister == null && counts.size == 1 && action == null && argument == null
-  val isAtDefaultState: Boolean get() = isEmpty && counts.size == 1 && expectedArgumentType == null
-  fun isDone() = isEmpty
+  /** Returns true if the command builder is clean and ready to start building */
+  val isEmpty
+    get() = commandState == CurrentCommandState.NEW_COMMAND
+      && selectedRegister == null
+      && counts.size == 1
+      && action == null
+      && argument == null
+      && fallbackArgumentType == null
+
+  /** Returns true if the command is ready to be built and executed */
+  val isReady
+    get() = commandState == CurrentCommandState.READY
 
   val isExpectingCount: Boolean
     get() {
@@ -119,8 +152,9 @@ class CommandBuilder private constructor(
         expectedArgumentType != Argument.Type.DIGRAPH
     }
 
-  fun pushCommandPart(action: EditorActionHandlerBase) {
-    logger.trace { "pushCommandPart is executed. action = $action" }
+  fun addAction(action: EditorActionHandlerBase) {
+    logger.trace { "addAction is executed. action = $action" }
+
     if (this.action == null) {
       this.action = action
     }
@@ -133,8 +167,15 @@ class CommandBuilder private constructor(
         else -> throw RuntimeException("Unexpected action type: $action")
       }
     }
+
+    // Push a new count component, so we get an extra count for e.g. an operator's motion
     counts.add(0)
     fallbackArgumentType = null
+
+    if (!isAwaitingArgument) {
+      logger.trace("Action does not require an argument. Setting command state to READY")
+      commandState = CurrentCommandState.READY
+    }
   }
 
   fun startWaitingForRegister(key: KeyStroke) {
@@ -193,10 +234,17 @@ class CommandBuilder private constructor(
     return isMultikey
   }
 
-  fun completeCommandPart(argument: Argument) {
-    logger.trace("completeCommandPart is executed")
-    this.argument = (this.argument as? Argument.Motion)?.withArgument(argument) ?: argument
-    commandState = CurrentCommandState.READY
+  fun addArgument(argument: Argument) {
+    logger.trace("addArgument is executed")
+
+    // If the command's action is an operator, the argument will be a motion, which might be waiting for its argument.
+    // If so, update the motion argument to include the given argument
+    this.argument = motionArgument?.withArgument(argument) ?: argument
+
+    if (!isAwaitingArgument) {
+      logger.trace("Argument is simple type, or motion with own argument. No further argument required. Setting command state to READY")
+      commandState = CurrentCommandState.READY
+    }
   }
 
   /**
@@ -228,7 +276,7 @@ class CommandBuilder private constructor(
    * Process a keystroke, matching an action if available
    *
    * If the given keystroke matches an action, the [processor] is invoked with the action instance. Typically, the
-   * caller will end up passing the action back to [pushCommandPart], but there are more housekeeping steps that stop us
+   * caller will end up passing the action back to [addAction], but there are more housekeeping steps that stop us
    * encapsulating it completely.
    *
    * If the given keystroke does not yet match an action, the internal state is updated to track the current command
@@ -255,8 +303,6 @@ class CommandBuilder private constructor(
     return false
   }
 
-  fun hasCurrentCommandPartArgument() = argument != null
-
   fun buildCommand(): Command {
     val rawCount = calculateCount0Snapshot()
     val command = Command(selectedRegister, rawCount, action!!, argument, action!!.type, action?.flags ?: noneOfEnum())
@@ -278,14 +324,8 @@ class CommandBuilder private constructor(
     fallbackArgumentType = null
   }
 
-  // TODO: Get rid of this
-  // It's used by the Matchit extension to incorrectly reset the command builder. Extensions need a way to properly
-  // handle the command builder. I.e., they should act like expression mappings, which return keys to evaluate, or an
-  // empty string to leave state as it is - either way, it's an explicit choice. Currently, extensions mostly ignore it
-  fun resetCount() {
-    counts[counts.size - 1] = 0
-  }
-
+  // TODO: Why do we need this to be public?
+  // Who needs to reset the current command part node without resetting the whole command builder?
   fun resetInProgressCommandPart(commandPartNode: CommandPartNode<LazyVimCommand>) {
     logger.trace("resetInProgressCommandPart is executed")
     counts[counts.size - 1] = 0

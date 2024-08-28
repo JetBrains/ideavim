@@ -150,7 +150,7 @@ public class VimTextObjEntireExtension implements VimExtension {
 
         });
       } else {
-        keyHandlerState.getCommandBuilder().completeCommandPart(new Argument.Motion(textObjectHandler));
+        keyHandlerState.getCommandBuilder().addAction(textObjectHandler);
       }
     }
   }
