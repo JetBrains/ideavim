@@ -74,7 +74,7 @@ object MappingProcessor: KeyConsumer {
     // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
     // entering a count.
     // See `:help :map-modes`
-    val isMappingDisabled = key.keyChar == '0' && keyState.commandBuilder.hasCountCharacter()
+    val isMappingDisabled = key.keyChar == '0' && keyState.commandBuilder.hasCountCharacters()
     log.debug { "Mapping disabled for key: $isMappingDisabled" }
     return isMappingDisabled
   }
