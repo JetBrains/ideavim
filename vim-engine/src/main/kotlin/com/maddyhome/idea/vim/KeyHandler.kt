@@ -22,9 +22,9 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.impl.state.toMappingMode
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
+import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
@@ -282,7 +282,7 @@ class KeyHandler {
     keyState.commandBuilder.resetAll(getKeyRoot(mode.toMappingMode()))
   }
 
-  private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> {
+  private fun getKeyRoot(mappingMode: MappingMode): RootNode<LazyVimCommand> {
     return injector.keyGroup.getKeyRoot(mappingMode)
   }
 

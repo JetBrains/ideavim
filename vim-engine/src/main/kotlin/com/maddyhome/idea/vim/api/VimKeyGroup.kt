@@ -10,17 +10,17 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import javax.swing.KeyStroke
 
 interface VimKeyGroup {
-  fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand>
+  fun getKeyRoot(mappingMode: MappingMode): RootNode<LazyVimCommand>
   fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
   fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
   fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>

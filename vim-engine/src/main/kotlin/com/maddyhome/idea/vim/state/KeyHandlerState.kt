@@ -68,7 +68,7 @@ data class KeyHandlerState(
   fun partialReset(mode: Mode) {
     logger.trace("entered partialReset. mode: $mode")
     mappingState.resetMappingSequence()
-    commandBuilder.resetInProgressCommandPart(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
+    commandBuilder.resetCommandTrieRootNode(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
   }
 
   fun reset(mode: Mode) {
