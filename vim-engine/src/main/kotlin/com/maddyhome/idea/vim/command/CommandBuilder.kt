@@ -32,14 +32,8 @@ class CommandBuilder private constructor(
   private val keyList: MutableList<KeyStroke>,
 ) : Cloneable {
 
-  constructor(
-    currentCommandPartNode: CommandPartNode<LazyVimCommand>,
-    initialUncommittedRawCount: Int = 0
-  ) : this(
-    currentCommandPartNode,
-    mutableListOf(initialUncommittedRawCount),
-    mutableListOf(),
-  )
+  constructor(rootNode: RootNode<LazyVimCommand>, initialUncommittedRawCount: Int = 0)
+    : this(rootNode, mutableListOf(initialUncommittedRawCount), mutableListOf())
 
   private var selectedRegister: Char? = null
   private var action: EditorActionHandlerBase? = null
@@ -263,13 +257,13 @@ class CommandBuilder private constructor(
     val node = currentCommandPartNode[key]
     when (node) {
       is CommandNode -> {
-        logger.trace { "Found full command node - $node ($key)" }
+        logger.trace { "Found full command node ($key) - ${node.debugString}" }
         addKey(key)
         processor(node.actionHolder.instance)
         return true
       }
       is CommandPartNode -> {
-        logger.trace { "Found command part node - $node ($key)" }
+        logger.trace { "Found command part node ($key) - ${node.debugString}" }
         currentCommandPartNode = node
         addKey(key)
         return true
@@ -290,7 +284,7 @@ class CommandBuilder private constructor(
    * @see DuplicableOperatorAction
    */
   fun convertDuplicateOperatorKeyStrokeToMotion(key: KeyStroke): KeyStroke {
-    logger.trace("convertDuplicateOperatorKeyStrokeToMotion is executed. key = $key")
+    logger.trace { "convertDuplicateOperatorKeyStrokeToMotion is executed. key = $key" }
 
     // Simple check to ensure that we're in OP_PENDING. If we don't have an action, we don't have an operator. If we
     // have an argument, we can't be in OP_PENDING
@@ -319,13 +313,13 @@ class CommandBuilder private constructor(
   fun buildCommand(): Command {
     val rawCount = calculateCount0Snapshot()
     val command = Command(selectedRegister, rawCount, action!!, argument, action!!.type, action?.flags ?: noneOfEnum())
-    resetAll(currentCommandPartNode)
+    resetAll(currentCommandPartNode.root as RootNode<LazyVimCommand>)
     return command
   }
 
-  fun resetAll(commandPartNode: CommandPartNode<LazyVimCommand>) {
+  fun resetAll(rootNode: RootNode<LazyVimCommand>) {
     logger.trace("resetAll is executed")
-    resetInProgressCommandPart(commandPartNode)
+    currentCommandPartNode = rootNode
     commandState = CurrentCommandState.NEW_COMMAND
     counts.clear()
     counts.add(0)
@@ -337,12 +331,16 @@ class CommandBuilder private constructor(
     fallbackArgumentType = null
   }
 
-  // TODO: Why do we need this to be public?
-  // Who needs to reset the current command part node without resetting the whole command builder?
-  fun resetInProgressCommandPart(commandPartNode: CommandPartNode<LazyVimCommand>) {
-    logger.trace("resetInProgressCommandPart is executed")
-    counts[counts.size - 1] = 0
-    currentCommandPartNode = commandPartNode
+  /**
+   * Change the command trie root node used to find commands for the current mode
+   *
+   * Typically, we reset the command trie root node after a command is executed, using the root node of the current
+   * mode - this is handled by [resetAll]. This function allows us to change the root node without executing a command
+   * or fully resetting the command builder, such as when switching to Op-pending while entering an operator+motion.
+   */
+  fun resetCommandTrieRootNode(rootNode: RootNode<LazyVimCommand>) {
+    logger.trace("resetCommandTrieRootNode is executed")
+    currentCommandPartNode = rootNode
   }
 
   @TestOnly

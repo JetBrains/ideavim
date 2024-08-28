@@ -40,17 +40,36 @@ import javax.swing.KeyStroke
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
 @Suppress("GrazieInspection")
-interface Node<T>
+interface Node<T> {
+  val debugString: String
+  val parent: Node<T>?
+
+  val root: Node<T>
+    get() = parent?.root ?: this
+}
 
 /** Represents a complete command */
-data class CommandNode<T>(val actionHolder: T) : Node<T> {
-  override fun toString(): String {
-    return "COMMAND NODE (${ actionHolder.toString() })"
-  }
+data class CommandNode<T>(override val parent: Node<T>, val actionHolder: T, private val name: String) : Node<T> {
+  override val debugString: String
+    get() = toString()
+
+  override fun toString() = "COMMAND NODE ($name - ${actionHolder.toString()})"
 }
 
 /** Represents a part of the command */
-open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
+open class CommandPartNode<T>(
+  override val parent: Node<T>?,
+  internal val name: String,
+  internal val depth: Int) : Node<T> {
+
+  val children = mutableMapOf<KeyStroke, Node<T>>()
+
+  operator fun set(stroke: KeyStroke, node: Node<T>) {
+    children[stroke] = node
+  }
+
+  operator fun get(stroke: KeyStroke): Node<T>? = children[stroke]
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
@@ -58,21 +77,32 @@ open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>() {
     return true
   }
 
-  override fun hashCode(): Int {
-    return super.hashCode()
-  }
+  override fun hashCode() = super.hashCode()
 
-  override fun toString(): String {
-    return """
-      COMMAND PART NODE(
-      ${entries.joinToString(separator = "\n") { "    " + injector.parser.toKeyNotation(it.key) + " - " + it.value }}
-      )
-      """.trimIndent()
-  }
+  override fun toString() = "COMMAND PART NODE ($name - ${children.size} children)"
+
+  override val debugString
+    get() = buildString {
+      append("COMMAND PART NODE(")
+      appendLine(name)
+      children.entries.forEach {
+        repeat(depth + 1) { append(" ") }
+        append(injector.parser.toKeyNotation(it.key))
+        append(" - ")
+        appendLine(it.value.debugString)
+      }
+      repeat(depth) { append(" ") }
+      append(")")
+    }
 }
 
 /** Represents a root node for the mode */
-class RootNode<T> : CommandPartNode<T>()
+class RootNode<T>(name: String) : CommandPartNode<T>(null, name, 0) {
+  override val debugString: String
+    get() = "ROOT NODE ($name)\n" + super.debugString
+
+  override fun toString() = "ROOT NODE ($name - ${children.size} children)"
+}
 
 fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
   var node: Node<T> = this
@@ -90,7 +120,16 @@ private fun <T> addNode(base: CommandPartNode<T>, actionHolder: T, key: KeyStrok
   val existing = base[key]
   if (existing != null) return existing
 
-  val newNode: Node<T> = if (isLastInSequence) CommandNode(actionHolder) else CommandPartNode()
+  val childName = injector.parser.toKeyNotation(key)
+  val name = when (base) {
+    is RootNode -> base.name + "_" + childName
+    else -> base.name + childName
+  }
+  val newNode: Node<T> = if (isLastInSequence) {
+    CommandNode(base, actionHolder, name)
+  } else {
+    CommandPartNode(base, name, base.depth + 1)
+  }
   base[key] = newNode
   return newNode
 }

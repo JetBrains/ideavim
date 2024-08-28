@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfo
@@ -30,7 +29,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   @JvmField
   val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
   val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
-  val keyRoots: MutableMap<MappingMode, CommandPartNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
+  val keyRoots: MutableMap<MappingMode, RootNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
   val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
 
   override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>) {
@@ -63,7 +62,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  override fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<LazyVimCommand> = keyRoots.getOrPut(mappingMode) { RootNode() }
+  override fun getKeyRoot(mappingMode: MappingMode): RootNode<LazyVimCommand> = keyRoots.getOrPut(mappingMode) { RootNode(mappingMode.name.get(0).lowercase()) }
 
   override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
 

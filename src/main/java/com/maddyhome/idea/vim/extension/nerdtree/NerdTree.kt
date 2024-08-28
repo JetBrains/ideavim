@@ -555,12 +555,13 @@ private fun registerCommand(default: String, action: NerdAction) {
 }
 
 
-private val actionsRoot: RootNode<NerdAction> = RootNode()
+private val actionsRoot: RootNode<NerdAction> = RootNode("NERDTree")
 private var currentNode: CommandPartNode<NerdAction> = actionsRoot
+
 private fun collectShortcuts(node: Node<NerdAction>): Set<KeyStroke> {
   return if (node is CommandPartNode<NerdAction>) {
-    val res = node.keys.toMutableSet()
-    res += node.values.map { collectShortcuts(it) }.flatten()
+    val res = node.children.keys.toMutableSet()
+    res += node.children.values.map { collectShortcuts(it) }.flatten()
     res
   } else {
     emptySet()
