@@ -8,6 +8,10 @@
 
 package com.maddyhome.idea.vim
 
+import com.intellij.ide.BrowserUtil
+import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.intellij.ide.plugins.PluginStateListener
+import com.intellij.ide.plugins.PluginStateManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
@@ -40,6 +44,16 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
 
     // This code should be executed once
     VimPlugin.getInstance().initialize()
+
+    // Uninstall survey. Should be registered once for all projects
+    PluginStateManager.addStateListener(object : PluginStateListener {
+      override fun install(p0: IdeaPluginDescriptor) {/*Nothing*/
+      }
+
+      override fun uninstall(descriptor: IdeaPluginDescriptor) {
+        BrowserUtil.open("https://surveys.jetbrains.com/s3/ideavim-uninstall-feedback")
+      }
+    })
   }
 }
 
