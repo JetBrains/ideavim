@@ -11,5 +11,4 @@ package com.maddyhome.idea.vim.common
 enum class CurrentCommandState {
   NEW_COMMAND,
   READY,
-  BAD_COMMAND,
 }

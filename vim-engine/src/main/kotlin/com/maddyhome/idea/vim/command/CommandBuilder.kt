@@ -35,6 +35,7 @@ class CommandBuilder private constructor(
   constructor(rootNode: RootNode<LazyVimCommand>, initialUncommittedRawCount: Int = 0)
     : this(rootNode, mutableListOf(initialUncommittedRawCount), mutableListOf())
 
+  private var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
   private var selectedRegister: Char? = null
   private var action: EditorActionHandlerBase? = null
   private var argument: Argument? = null
@@ -48,9 +49,6 @@ class CommandBuilder private constructor(
     set(value) {
       counts[counts.size - 1] = value
     }
-
-  // TODO: Encapsulate this
-  var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
 
   /** Provide the typed keys for `'showcmd'` */
   val keys: Iterable<KeyStroke> get() = keyList
@@ -204,6 +202,12 @@ class CommandBuilder private constructor(
     keyList.add(key)
   }
 
+  /**
+   * Add an action to the command
+   *
+   * This can be an action such as delete the current character - `x`, a motion like `w`, an operator like `d` or a
+   * motion that will be used as the argument of an operator - the `w` in `dw`.
+   */
   fun addAction(action: EditorActionHandlerBase) {
     logger.trace { "addAction is executed. action = $action" }
 
@@ -230,12 +234,22 @@ class CommandBuilder private constructor(
     }
   }
 
+  /**
+   * Add an argument to the command
+   *
+   * This might be a simple character argument, such as `x` in `fx`, or an ex-string argument to a search motion, like
+   * `d/foo`. If the command is an operator+motion, the motion is both an action and an argument. While it is simpler
+   * to use [addAction], it will still work if the motion action can also be wrapped in an [Argument.Motion] and passed
+   * to [addArgument].
+   */
   fun addArgument(argument: Argument) {
     logger.trace("addArgument is executed")
 
     // If the command's action is an operator, the argument will be a motion, which might be waiting for its argument.
     // If so, update the motion argument to include the given argument
     this.argument = motionArgument?.withArgument(argument) ?: argument
+
+    fallbackArgumentType = null
 
     if (!isAwaitingArgument) {
       logger.trace("Argument is simple type, or motion with own argument. No further argument required. Setting command state to READY")
@@ -310,6 +324,11 @@ class CommandBuilder private constructor(
     return isMultikey
   }
 
+  /**
+   * Build the command with the current counts, register, actions and arguments
+   *
+   * The command builder is reset after the command is built.
+   */
   fun buildCommand(): Command {
     val rawCount = calculateCount0Snapshot()
     val command = Command(selectedRegister, rawCount, action!!, argument, action!!.type, action?.flags ?: noneOfEnum())
