@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingProcessor
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -197,10 +196,9 @@ class KeyHandler {
   }
 
   private fun onUnknownKey(editor: VimEditor, keyState: KeyHandlerState) {
-    logger.trace("Command builder is set to BAD")
-    keyState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     editor.resetOpPending()
     editor.isReplaceCharacter = false
+    // Note that this will also reset the CommandBuilder to NEW_COMMAND
     reset(keyState, editor.mode)
   }
 
@@ -328,8 +326,7 @@ class KeyHandler {
   ) : Runnable {
     override fun run() {
       val editorState = injector.vimState
-      // TODO: This seems an unexpected place to reset command builder state
-      keyState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
+
       val register = cmd.register
       if (register != null) {
         injector.registerGroup.selectRegister(register)
@@ -357,10 +354,7 @@ class KeyHandler {
         }
       }
 
-      // TODO: Surely the command builder is always empty at this point?
-      if (keyState.commandBuilder.isEmpty) {
-        instance.reset(keyState, editorState.mode)
-      }
+      instance.reset(keyState, editorState.mode)
     }
   }
 
