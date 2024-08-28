@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,9 +15,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.vimLine
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -102,12 +99,12 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
   if (name.isEmpty()) return null
 
   // Current caret line
-  if (name[0] == '.') return editor.ij.vimLine.asVimInt() to currentCol(editor)
+  if (name[0] == '.') return editor.currentCaret().vimLine.asVimInt() to currentCol(editor)
 
   // Visual start
   if (name == "v") {
     if (!editor.inVisualMode) {
-      return editor.ij.vimLine.asVimInt() to currentCol(editor)
+      return editor.currentCaret().vimLine.asVimInt() to currentCol(editor)
     }
 
     val vimStart = editor.currentCaret().vimSelectionStart
@@ -130,7 +127,7 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
   // First visual line
   if (name.length >= 2 && name[0] == 'w' && name[1] == '0') {
     if (!dollarForLine) return null
-    val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(editor.ij)
+    val actualVisualTop = injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor)
     val actualLogicalTop = editor.visualLineToBufferLine(actualVisualTop)
     return (actualLogicalTop + 1).asVimInt() to currentCol(editor)
   }
@@ -138,7 +135,7 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
   // Last visual line
   if (name.length >= 2 && name[0] == 'w' && name[1] == '$') {
     if (!dollarForLine) return null
-    val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(editor.ij)
+    val actualVisualBottom = injector.engineEditorHelper.getVisualLineAtBottomOfScreen(editor)
     val actualLogicalBottom = editor.visualLineToBufferLine(actualVisualBottom)
     return (actualLogicalBottom + 1).asVimInt() to currentCol(editor)
   }
