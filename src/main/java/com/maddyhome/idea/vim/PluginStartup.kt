@@ -51,7 +51,9 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
       }
 
       override fun uninstall(descriptor: IdeaPluginDescriptor) {
-        BrowserUtil.open("https://surveys.jetbrains.com/s3/ideavim-uninstall-feedback")
+        if (descriptor.pluginId == VimPlugin.getPluginId()) {
+          BrowserUtil.open("https://surveys.jetbrains.com/s3/ideavim-uninstall-feedback")
+        }
       }
     })
   }
