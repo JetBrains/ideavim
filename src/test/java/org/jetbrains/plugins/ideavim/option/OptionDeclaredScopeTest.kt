@@ -18,6 +18,7 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -60,7 +61,7 @@ class OptionDeclaredScopeTest : VimTestCaseBase() {
 
     // Create the original editor last, so that fixture.editor will point to this file
     // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
-    originalEditor = configureByText("\n")  // aaa.txt
+    originalEditor = configureByText("\n").ij  // aaa.txt
 
     manager.currentWindow.let {
       // Split the original editor into a new window, then reset the focus back to the originalEditor's EditorWindow

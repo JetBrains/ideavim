@@ -11,6 +11,7 @@ import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -184,7 +185,7 @@ class CopyActionTest : VimTestCaseBase() {
      
       """.trimIndent(),
     )
-    kotlin.test.assertEquals(0, editor.caretModel.offset)
+    kotlin.test.assertEquals(0, editor.ij.caretModel.offset)
   }
 
   // VIM-632 |CTRL-V| |v_y| |p|

@@ -33,6 +33,7 @@ dependencies {
   testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
   testImplementation(testFixtures(project(":"))) // The root project
   testImplementation("org.junit.vintage:junit-vintage-engine:5.10.3")
+  testImplementation(project(":vim-engine", "testArtifacts"))
 
   intellijPlatform {
     create(ideaType, ideaVersion)

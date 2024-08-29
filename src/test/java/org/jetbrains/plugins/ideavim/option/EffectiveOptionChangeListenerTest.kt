@@ -70,7 +70,7 @@ class EffectiveOptionChangeListenerTest : VimTestCaseBase() {
 
     // Create the original editor last, so that fixture.editor will point to this file
     // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
-    originalEditor = configureByText("\n")  // aaa.txt
+    originalEditor = configureByText("\n").ij  // aaa.txt
 
     // Split the current window. Since no options have been set, it will have default values
     splitWindow = openSplitWindow(originalEditor) // aaa.txt

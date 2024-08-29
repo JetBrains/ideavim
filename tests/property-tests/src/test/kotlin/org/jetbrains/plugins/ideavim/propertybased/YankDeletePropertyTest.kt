@@ -12,6 +12,7 @@ import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -24,7 +25,7 @@ class YankDeletePropertyTest : VimPropertyTestBase() {
   fun testYankDelete() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByText(loremText)
+        val editor = configureByText(loremText).ij
         try {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(YankDeleteActions(editor)))

@@ -30,8 +30,7 @@ class PutTextBeforeCursorActionTest : VimTestCaseBase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    injector.registerGroup.storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    injector.registerGroup.storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("V" + "P"))
     typeText(injector.parser.parseKeys("V" + "P"))
     val after = """

@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
@@ -36,7 +37,7 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
   fun testRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByText(text)
+        val editor = configureByText(text).ij
         KeyHandler.getInstance().fullReset(editor.vim)
         try {
           moveCaretToRandomPlace(env, editor)
@@ -52,7 +53,7 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
   fun testRandomActionsOnLoremIpsum() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByText(loremText)
+        val editor = configureByText(loremText).ij
         KeyHandler.getInstance().fullReset(editor.vim)
         try {
           moveCaretToRandomPlace(env, editor)
@@ -68,7 +69,7 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
   fun testRandomActionsOnJavaCode() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByJavaText(javaText)
+        val editor = configureByJavaText(javaText).ij
         KeyHandler.getInstance().fullReset(editor.vim)
         try {
           moveCaretToRandomPlace(env, editor)

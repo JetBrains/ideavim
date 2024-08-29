@@ -12,6 +12,7 @@ import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -29,7 +30,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
   fun testPlayingWithNumbers() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByText(numbers)
+        val editor = configureByText(numbers).ij
         try {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, this)))
@@ -51,7 +52,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val number = env.generateValue(testNumberGenerator, "Generate %s number")
-        val editor = configureByText(number)
+        val editor = configureByText(number).ij
         try {
           moveCaretToRandomPlace(env, editor)
 
