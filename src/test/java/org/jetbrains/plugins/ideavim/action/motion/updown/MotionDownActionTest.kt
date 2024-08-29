@@ -14,14 +14,14 @@ import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class MotionDownActionTest : VimTestCase() {
+class MotionDownActionTest : VimTestCaseBase() {
   @Test
   fun `test motion down in visual block mode`() {
     val keys = "<C-V>2kjjj"

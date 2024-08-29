@@ -14,7 +14,7 @@ import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Test
 
-class RegisterActionsTest : VimTestCase() {
+class RegisterActionsTest : VimTestCaseBase() {
   @OptionTest(
     VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
     VimOption(TestOptionConstants.whichwrap, doesntAffectTest = true),

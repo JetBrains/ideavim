@@ -19,10 +19,10 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class CaretVisualAttributesHelperTest : VimTestCase() {
+class CaretVisualAttributesHelperTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test default normal mode caret is block`() {

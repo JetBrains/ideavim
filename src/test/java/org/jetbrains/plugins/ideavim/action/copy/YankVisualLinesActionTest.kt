@@ -11,13 +11,13 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class YankVisualLinesActionTest : VimTestCase() {
+class YankVisualLinesActionTest : VimTestCaseBase() {
   @Test
   fun `test from visual mode`() {
     val text = """

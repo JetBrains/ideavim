@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 
 @TraceOptions(TestOptionConstants.clipboard)
-class VimExchangeWithClipboardTest : VimTestCase() {
+class VimExchangeWithClipboardTest : VimTestCaseBase() {
   @Throws(Exception::class)
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

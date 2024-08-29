@@ -8,13 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Michal Placek
  */
-class BufferCloseCommandTest : VimTestCase() {
+class BufferCloseCommandTest : VimTestCaseBase() {
   @Test
   fun `test close file by bd command`() {
     val psiFile1 = fixture.configureByText("A_Discovery1", "Lorem ipsum dolor sit amet,")

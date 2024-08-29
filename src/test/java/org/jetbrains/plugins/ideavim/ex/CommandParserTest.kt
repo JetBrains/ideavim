@@ -24,13 +24,13 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class CommandParserTest : VimTestCase() {
+class CommandParserTest : VimTestCaseBase() {
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Caret different position")
   @Test

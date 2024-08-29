@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.statements
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class FunctionDeclarationTest : VimTestCase() {
+class FunctionDeclarationTest : VimTestCaseBase() {
 
   @Test
   fun `test user defined function`() {

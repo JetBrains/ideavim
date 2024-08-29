@@ -10,11 +10,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class DictionaryFunctionTest : VimTestCase() {
+class DictionaryFunctionTest : VimTestCaseBase() {
 
   @Test
   fun `test self in dictionary function with assignment via function function`() {

@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.services
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class VimVariableServiceTest : VimTestCase() {
+class VimVariableServiceTest : VimTestCaseBase() {
   @Test
   fun `test v count variable without count specified`() {
     configureByText("\n")

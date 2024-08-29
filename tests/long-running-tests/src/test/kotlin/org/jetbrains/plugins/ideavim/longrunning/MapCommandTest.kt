@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.longrunning
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MapCommandTest : VimTestCase() {
+class MapCommandTest : VimTestCaseBase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test double recursion`() {

@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionRightMatchCharActionTest : VimTestCase() {
+class MotionRightMatchCharActionTest : VimTestCaseBase() {
   @Test
   fun `test move and repeat`() {
     doTest(

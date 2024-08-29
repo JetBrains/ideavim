@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Disabled
@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull
 
-class MultipleCaretsTest : VimTestCase() {
+class MultipleCaretsTest : VimTestCaseBase() {
   @Test
   fun testGotoToNthCharacter() {
     val before = "qwe rty a${c}sd\n fgh zx${c}c ${c}vbn"

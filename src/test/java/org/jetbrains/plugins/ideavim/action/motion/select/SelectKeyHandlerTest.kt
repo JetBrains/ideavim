@@ -12,14 +12,14 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class SelectKeyHandlerTest : VimTestCase() {
+class SelectKeyHandlerTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
   fun `test type in select mode`() {

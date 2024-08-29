@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test
  *   e h    --||------------------
  *   d      b ||  7  |  8  |  9  |
  */
-class PutVisualTextActionTest : VimTestCase() {
+class PutVisualTextActionTest : VimTestCaseBase() {
 
   // ----- Case 1: Copied | Characterwise | --- pasted | Characterwise | ---| small p |--------------------
 

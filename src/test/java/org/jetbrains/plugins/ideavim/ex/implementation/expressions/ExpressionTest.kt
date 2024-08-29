@@ -10,11 +10,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.expressions.Register
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
 
-class ExpressionTest : VimTestCase() {
+class ExpressionTest : VimTestCaseBase() {
 
   @Test
   fun `test multiline register content`() {

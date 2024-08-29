@@ -15,13 +15,13 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
 @TraceOptions(TestOptionConstants.virtualedit)
-class DeleteVisualLinesEndActionTest : VimTestCase() {
+class DeleteVisualLinesEndActionTest : VimTestCaseBase() {
   @OptionTest(VimOption(TestOptionConstants.virtualedit))
   fun `test simple deletion`() {
     val keys = listOf("v", "D")

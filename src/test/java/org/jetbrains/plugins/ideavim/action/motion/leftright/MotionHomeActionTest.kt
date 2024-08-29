@@ -16,14 +16,14 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import kotlin.test.assertTrue
 
 @TraceOptions(TestOptionConstants.keymodel)
-class MotionHomeActionTest : VimTestCase() {
+class MotionHomeActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test motion home`() {

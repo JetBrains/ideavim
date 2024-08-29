@@ -16,10 +16,10 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class VisualSwapEndsBlockActionTest : VimTestCase() {
+class VisualSwapEndsBlockActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   @Test
   fun `test simple block selection SE`() {

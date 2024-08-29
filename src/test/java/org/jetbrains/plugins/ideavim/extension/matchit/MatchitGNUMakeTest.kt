@@ -8,12 +8,12 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class MatchitGNUMakeTest : VimTestCase() {
+class MatchitGNUMakeTest : VimTestCaseBase() {
   @Throws(Exception::class)
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

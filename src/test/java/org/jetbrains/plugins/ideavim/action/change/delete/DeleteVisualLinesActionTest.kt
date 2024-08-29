@@ -11,10 +11,10 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class DeleteVisualLinesActionTest : VimTestCase() {
+class DeleteVisualLinesActionTest : VimTestCaseBase() {
   @Test
   fun `test remove line in char visual mode`() {
     doTest(

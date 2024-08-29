@@ -24,7 +24,7 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +34,7 @@ import javax.swing.SwingConstants
 import kotlin.test.assertEquals
 
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-class TextWidthOptionMapperTest : VimTestCase() {
+class TextWidthOptionMapperTest : VimTestCaseBase() {
 
   // IntelliJ can have a margin set, but not act on it. We want to maintain this, not least because the right margin
   // visual guide is shown by default

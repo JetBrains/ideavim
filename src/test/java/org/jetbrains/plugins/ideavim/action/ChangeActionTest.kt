@@ -15,14 +15,14 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
  * @author vlan
  */
-class ChangeActionTest : VimTestCase() {
+class ChangeActionTest : VimTestCaseBase() {
   // VIM-620 |i_CTRL-O|
   @Test
   fun testInsertSingleCommandAndInserting() {

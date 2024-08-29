@@ -9,13 +9,13 @@
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class ChangeVisualNumberAvalancheDecActionTest : VimTestCase() {
+class ChangeVisualNumberAvalancheDecActionTest : VimTestCaseBase() {
   @Test
   fun `test dec visual avalanche`() {
     doTest(

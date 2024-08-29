@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class CallCommandTest : VimTestCase() {
+class CallCommandTest : VimTestCaseBase() {
   @Test
   fun `test call command`() {
     val function = """

@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -18,7 +18,7 @@ zz                      Like "z.", but leave the cursor in the same column.
                         Careful: If caps-lock is on, this command becomes
                         "ZZ": write buffer and exit!
  */
-class ScrollMiddleScreenLineActionTest : VimTestCase() {
+class ScrollMiddleScreenLineActionTest : VimTestCaseBase() {
   @Test
   fun `test scrolls current line to middle of screen`() {
     configureByPages(5)

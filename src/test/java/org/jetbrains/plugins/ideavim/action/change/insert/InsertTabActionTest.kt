@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class InsertTabActionTest : VimTestCase() {
+class InsertTabActionTest : VimTestCaseBase() {
   @Test
   fun `test insert tab`() {
     setupChecks {

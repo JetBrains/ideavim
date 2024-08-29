@@ -15,13 +15,13 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
 import org.jetbrains.plugins.ideavim.TestIjOptionConstants
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
 @TraceOptions(TestIjOptionConstants.ideamarks)
-class MotionMarkActionTest : VimTestCase() {
+class MotionMarkActionTest : VimTestCaseBase() {
   @OptionTest(VimOption(TestIjOptionConstants.ideamarks, limitedValues = ["true"]))
   fun `test simple add mark`() {
     val keys = injector.parser.parseKeys("mA")

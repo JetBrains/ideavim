@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.text
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionNthCharacterActionTest : VimTestCase() {
+class MotionNthCharacterActionTest : VimTestCaseBase() {
   @Test
   fun `test goto without count`() {
     doTest(

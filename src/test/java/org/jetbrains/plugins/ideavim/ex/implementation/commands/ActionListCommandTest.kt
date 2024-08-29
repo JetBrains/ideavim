@@ -10,13 +10,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.util.ArrayUtil
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertNotNull
 
 @Suppress("SpellCheckingInspection")
-class ActionListCommandTest : VimTestCase() {
+class ActionListCommandTest : VimTestCaseBase() {
   @Test
   fun testListAllActions() {
     configureByText("\n")

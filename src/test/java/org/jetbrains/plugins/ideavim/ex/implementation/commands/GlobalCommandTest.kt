@@ -16,10 +16,10 @@ import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class GlobalCommandTest : VimTestCase() {
+class GlobalCommandTest : VimTestCaseBase() {
   companion object {
     private val initialText = """
                 A Discovery

@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ClearJumpsCommandTest : VimTestCase() {
+class ClearJumpsCommandTest : VimTestCaseBase() {
   @Test
   fun `test clear jumps`() {
     configureByText(

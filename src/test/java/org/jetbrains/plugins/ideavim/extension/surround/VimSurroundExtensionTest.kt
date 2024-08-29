@@ -13,7 +13,7 @@ package org.jetbrains.plugins.ideavim.extension.surround
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.TestInfo
 /**
  * @author dhleong
  */
-class VimSurroundExtensionTest : VimTestCase() {
+class VimSurroundExtensionTest : VimTestCaseBase() {
   @Throws(Exception::class)
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

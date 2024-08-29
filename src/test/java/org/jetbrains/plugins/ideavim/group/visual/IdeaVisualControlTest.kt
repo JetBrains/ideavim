@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
@@ -35,7 +35,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
 import kotlin.test.assertNull
 
 @TraceOptions(TestOptionConstants.selectmode)
-class IdeaVisualControlTest : VimTestCase() {
+class IdeaVisualControlTest : VimTestCaseBase() {
   @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection no selection`() {

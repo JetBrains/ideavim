@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class YankLineActionTest : VimTestCase() {
+class YankLineActionTest : VimTestCaseBase() {
   @Test
   fun `test yank to number register`() {
     val before = """

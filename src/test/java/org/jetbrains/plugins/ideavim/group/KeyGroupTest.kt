@@ -14,10 +14,10 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class KeyGroupTest : VimTestCase() {
+class KeyGroupTest : VimTestCaseBase() {
   private val owner = MappingOwner.Plugin.get("KeyGroupTest")
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)

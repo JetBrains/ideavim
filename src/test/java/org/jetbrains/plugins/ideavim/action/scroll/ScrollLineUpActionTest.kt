@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -20,7 +20,7 @@ CTRL-Y                  Scroll window [count] lines upwards in the buffer.
                         Note: When using the MS-Windows key bindings CTRL-Y is
                         remapped to redo.
  */
-class ScrollLineUpActionTest : VimTestCase() {
+class ScrollLineUpActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll single line up`() {

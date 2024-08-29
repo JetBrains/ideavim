@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class FileGetLocationInfoActionTest : VimTestCase() {
+class FileGetLocationInfoActionTest : VimTestCaseBase() {
   @VimBehaviorDiffers(originalVimAfter = "Col 1 of 11; Line 1 of 6; Word 1 of 32; Byte 1 of 166")
   @Test
   fun `test get file info`() {

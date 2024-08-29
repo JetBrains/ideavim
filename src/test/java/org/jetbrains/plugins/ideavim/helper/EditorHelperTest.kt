@@ -11,12 +11,12 @@ package org.jetbrains.plugins.ideavim.helper
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 
-class EditorHelperTest : VimTestCase() {
+class EditorHelperTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test scroll column to left of screen`() {

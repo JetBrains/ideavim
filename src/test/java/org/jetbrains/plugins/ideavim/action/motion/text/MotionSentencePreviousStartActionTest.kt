@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionSentencePreviousStartActionTest : VimTestCase() {
+class MotionSentencePreviousStartActionTest : VimTestCaseBase() {
   @Test
   fun `test with two empty lines`() {
     doTest(

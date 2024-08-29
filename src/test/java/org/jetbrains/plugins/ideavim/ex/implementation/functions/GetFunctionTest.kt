@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class GetFunctionTest : VimTestCase() {
+class GetFunctionTest : VimTestCaseBase() {
   @Test
   fun `test get with dictionary`() {
     configureByText("\n")

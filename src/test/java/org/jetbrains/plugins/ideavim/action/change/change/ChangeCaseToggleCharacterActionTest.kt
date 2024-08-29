@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.change
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ChangeCaseToggleCharacterActionTest : VimTestCase() {
+class ChangeCaseToggleCharacterActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @Test
   fun `test whichwrap in the same line`() {

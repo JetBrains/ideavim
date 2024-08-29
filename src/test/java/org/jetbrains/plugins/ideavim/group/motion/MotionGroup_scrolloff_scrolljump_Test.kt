@@ -14,7 +14,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
@@ -22,7 +22,7 @@ import org.jetbrains.plugins.ideavim.impl.VimOption
 // These tests are sanity tests for scrolloff and scrolljump, with actions that move the cursor. Other actions that are
 // affected by scrolloff or scrolljump should include that in the action specific tests
 @TraceOptions(TestOptionConstants.scrolloff)
-class MotionGroup_scrolloff_Test : VimTestCase() {
+class MotionGroup_scrolloff_Test : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(VimOption(TestOptionConstants.scrolloff, limitedValues = ["0"]))
   fun `test move up shows no context with scrolloff=0`() {
@@ -352,7 +352,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
 }
 
 @TraceOptions(TestOptionConstants.scrolljump)
-class MotionGroup_scrolljump_Test : VimTestCase() {
+class MotionGroup_scrolljump_Test : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(VimOption(TestOptionConstants.scrolljump, limitedValues = ["0"]))
   fun `test move up scrolls single line with scrolljump=0`() {
@@ -435,7 +435,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
 }
 
 @TraceOptions(TestOptionConstants.scrolljump, TestOptionConstants.scrolloff)
-class MotionGroup_scrolloff_scrolljump_Test : VimTestCase() {
+class MotionGroup_scrolloff_scrolljump_Test : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(
     VimOption(TestOptionConstants.scrolljump, limitedValues = ["10"]),

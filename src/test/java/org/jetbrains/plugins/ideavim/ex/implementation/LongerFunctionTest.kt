@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.ex.implementation
 
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class LongerFunctionTest : VimTestCase() {
+class LongerFunctionTest : VimTestCaseBase() {
   val script = """
       function! IsUppercase(char)
         return a:char >=# 'A' && a:char <=# 'Z'

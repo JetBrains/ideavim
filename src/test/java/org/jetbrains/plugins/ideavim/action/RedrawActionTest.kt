@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.action
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class RedrawActionTest : VimTestCase() {
+class RedrawActionTest : VimTestCaseBase() {
   @Test
   fun `test redraw action clears status line`() {
     configureByText("lorem ipsum")

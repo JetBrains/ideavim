@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 class InsertSingleCommandActionTest : SingleCommandActionTest() {
@@ -22,7 +22,7 @@ class ReplaceSingleCommandActionTest : SingleCommandActionTest() {
   override val mode: Mode = Mode.REPLACE
 }
 
-abstract class SingleCommandActionTest : VimTestCase() {
+abstract class SingleCommandActionTest : VimTestCaseBase() {
 
   abstract val command: String
   abstract val mode: Mode

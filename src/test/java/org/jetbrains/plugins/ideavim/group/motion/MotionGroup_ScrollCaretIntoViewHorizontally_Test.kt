@@ -11,12 +11,12 @@ package org.jetbrains.plugins.ideavim.group.motion
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 
 @Suppress("ClassName")
-class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
+class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCaseBase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   @Test
   fun `test moving right scrolls half screen to right by default`() {

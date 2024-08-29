@@ -9,11 +9,11 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 // |x|
-class DeleteCharacterRightActionTest : VimTestCase() {
+class DeleteCharacterRightActionTest : VimTestCaseBase() {
   @Test
   fun `test delete single character`() {
     val keys = injector.parser.parseKeys("x")

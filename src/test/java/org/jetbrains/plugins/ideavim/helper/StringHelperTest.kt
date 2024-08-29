@@ -8,13 +8,13 @@
 package org.jetbrains.plugins.ideavim.helper
 
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent
 import javax.swing.KeyStroke
 import kotlin.test.assertEquals
 
-class StringHelperTest : VimTestCase() {
+class StringHelperTest : VimTestCaseBase() {
   @Test
   fun testFalseSpecialKey() {
     val expectedKeys = injector.parser.parseKeys("move '<-2").toMutableList()

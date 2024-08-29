@@ -12,10 +12,10 @@ package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ChangeVisualLinesEndActionTest : VimTestCase() {
+class ChangeVisualLinesEndActionTest : VimTestCaseBase() {
   @Test
   fun `test change last line`() {
     val keys = "VC"

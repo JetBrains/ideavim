@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.idea.TestFor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ActionsTest : VimTestCase() {
+class ActionsTest : VimTestCaseBase() {
   @Test
   @TestFor(issues = ["VIM-3203"])
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)

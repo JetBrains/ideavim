@@ -9,11 +9,11 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection")
-class CopyCommandTest : VimTestCase() {
+class CopyCommandTest : VimTestCaseBase() {
   @Test
   fun `test duplicate line below`() {
     configureByText("""

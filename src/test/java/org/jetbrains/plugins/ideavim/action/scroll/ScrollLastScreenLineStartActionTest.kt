@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -17,7 +17,7 @@ z-                      Redraw, line [count] at bottom of window (default
                         cursor line).  Put cursor at first non-blank in the
                         line.
  */
-class ScrollLastScreenLineStartActionTest : VimTestCase() {
+class ScrollLastScreenLineStartActionTest : VimTestCaseBase() {
   @Test
   fun `test scroll current line to bottom of screen`() {
     configureByPages(5)

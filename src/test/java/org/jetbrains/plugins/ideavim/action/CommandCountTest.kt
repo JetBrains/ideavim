@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class CommandCountTest : VimTestCase() {
+class CommandCountTest : VimTestCaseBase() {
   @Test
   fun `test count operator motion`() {
     configureByText("${c}1234567890")

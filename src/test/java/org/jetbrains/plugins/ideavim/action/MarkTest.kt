@@ -14,12 +14,12 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
 @Suppress("SpellCheckingInspection")
-class MarkTest : VimTestCase() {
+class MarkTest : VimTestCaseBase() {
   // |m|
   @Test
   fun testLocalMark() {

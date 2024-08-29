@@ -10,11 +10,11 @@ package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class SearchEntryFwdActionTest : VimTestCase() {
+class SearchEntryFwdActionTest : VimTestCaseBase() {
   @Test
   fun `test search clears status line`() {
     configureByText("lorem ipsum")

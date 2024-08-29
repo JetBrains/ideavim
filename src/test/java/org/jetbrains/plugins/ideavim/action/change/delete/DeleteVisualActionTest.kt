@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test
 /**
  * @author Alex Plate
  */
-class DeleteVisualActionTest : VimTestCase() {
+class DeleteVisualActionTest : VimTestCaseBase() {
   @Test
   fun `test delete block SE direction`() {
     val keys = listOf("<C-V>e2j", "d")

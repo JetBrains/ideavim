@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionInnerWordActionTest : VimTestCase() {
+class MotionInnerWordActionTest : VimTestCaseBase() {
   @Test
   fun `test empty text`() {
     doTest(

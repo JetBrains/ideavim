@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.statements
 import com.maddyhome.idea.vim.vimscript.model.statements.ThrowStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.TryStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -22,7 +22,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class TryCatchTests : VimTestCase() {
+class TryCatchTests : VimTestCaseBase() {
 
   companion object {
     @JvmStatic

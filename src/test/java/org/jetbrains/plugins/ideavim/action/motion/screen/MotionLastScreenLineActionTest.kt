@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionLastScreenLineActionTest : VimTestCase() {
+class MotionLastScreenLineActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move caret to last line of screen`() {

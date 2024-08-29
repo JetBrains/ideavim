@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ChangeNumberIncActionTest : VimTestCase() {
+class ChangeNumberIncActionTest : VimTestCaseBase() {
   @VimBehaviorDiffers(originalVimAfter = "11X0")
   @Test
   fun `test inc fancy number`() {

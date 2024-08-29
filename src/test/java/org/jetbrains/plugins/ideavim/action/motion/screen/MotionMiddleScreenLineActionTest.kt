@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionMiddleScreenLineActionTest : VimTestCase() {
+class MotionMiddleScreenLineActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
   fun `test move caret to middle line of full screen with odd number of lines`() {

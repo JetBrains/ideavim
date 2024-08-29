@@ -12,11 +12,11 @@ import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 
-class UndoActionTest : VimTestCase() {
+class UndoActionTest : VimTestCaseBase() {
   @Test
   fun `test simple undo`() {
     val keys = listOf("dw", "u")

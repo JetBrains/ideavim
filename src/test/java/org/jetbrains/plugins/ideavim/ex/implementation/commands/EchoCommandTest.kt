@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class EchoCommandTest : VimTestCase() {
+class EchoCommandTest : VimTestCaseBase() {
 
   @Test
   fun `test echo with a string`() {

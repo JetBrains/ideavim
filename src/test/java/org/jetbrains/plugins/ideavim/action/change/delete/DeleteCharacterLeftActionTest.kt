@@ -8,11 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 // |X|
-class DeleteCharacterLeftActionTest : VimTestCase() {
+class DeleteCharacterLeftActionTest : VimTestCaseBase() {
   @Test
   fun `test delete single character`() {
     val keys = "X"

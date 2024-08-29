@@ -11,12 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 @Suppress("SpellCheckingInspection")
-class YankLinesCommandTest : VimTestCase() {
+class YankLinesCommandTest : VimTestCaseBase() {
   @Test
   fun `test yank current line with default range`() {
     configureByText(

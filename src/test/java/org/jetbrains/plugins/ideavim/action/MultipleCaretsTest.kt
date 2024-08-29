@@ -16,14 +16,14 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
 /**
  * @author Vasily Alferov
  */
-class MultipleCaretsTest : VimTestCase() {
+class MultipleCaretsTest : VimTestCaseBase() {
   // com.maddyhome.idea.vim.action.visual.leftright
   @Test
   fun testMotionLeftAction() {

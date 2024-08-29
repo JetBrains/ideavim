@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class BasicStringFunctions : VimTestCase() {
+class BasicStringFunctions : VimTestCaseBase() {
 
   @Test
   fun `test toupper`() {

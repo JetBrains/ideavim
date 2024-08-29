@@ -10,13 +10,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author John Weigel
  */
-class BufferListCommandTest : VimTestCase() {
+class BufferListCommandTest : VimTestCaseBase() {
   companion object {
     const val DEFAULT_LS_OUTPUT = "   1 %a   \"/src/aaa.txt\"                 line: 1"
   }

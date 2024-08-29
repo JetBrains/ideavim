@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
+class SelectEnableBlockModeActionHandlerTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
   fun `test entering select mode`() {

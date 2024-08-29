@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
@@ -24,7 +24,7 @@ import kotlin.test.assertTrue
  * @author vlan
  */
 @Suppress("SpellCheckingInspection")
-class CopyActionTest : VimTestCase() {
+class CopyActionTest : VimTestCaseBase() {
   // |y| |p| |count|
   @Test
   fun testYankPutCharacters() {

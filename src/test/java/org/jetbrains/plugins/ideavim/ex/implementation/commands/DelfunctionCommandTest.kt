@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class DelfunctionCommandTest : VimTestCase() {
+class DelfunctionCommandTest : VimTestCaseBase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   @Test

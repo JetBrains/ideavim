@@ -13,13 +13,13 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 
-class GuiCursorOptionTest : VimTestCase() {
+class GuiCursorOptionTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

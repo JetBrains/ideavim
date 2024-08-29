@@ -23,12 +23,12 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
 import java.awt.datatransfer.Transferable
 
-class PutTestAfterCursorActionTest : VimTestCase() {
+class PutTestAfterCursorActionTest : VimTestCaseBase() {
   @Test
   fun `test platform handlers are called`() {
     injector.globalOptions().clipboard.prependValue(OptionConstants.clipboard_ideaput)

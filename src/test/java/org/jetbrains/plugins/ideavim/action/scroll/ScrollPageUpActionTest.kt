@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -24,7 +24,7 @@ CTRL-B                  Scroll window [count] pages Backwards (upwards) in the
 <S-Up>          move window one page up        *i_<S-Up>*
 <PageUp>        move window one page up        *i_<PageUp>*
  */
-class ScrollPageUpActionTest : VimTestCase() {
+class ScrollPageUpActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll single page up with S-Up`() {

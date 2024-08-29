@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class GlobalOptionChangeListenerTest: VimTestCase() {
+class GlobalOptionChangeListenerTest: VimTestCaseBase() {
   private val optionName = "test"
   private val defaultValue = "defaultValue"
 

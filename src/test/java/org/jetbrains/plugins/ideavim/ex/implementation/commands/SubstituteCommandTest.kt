@@ -12,7 +12,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Disabled
  * @author Alex Plate
  */
 @TraceOptions(TestOptionConstants.smartcase, TestOptionConstants.ignorecase)
-class SubstituteCommandTest : VimTestCase() {
+class SubstituteCommandTest : VimTestCaseBase() {
   @OptionTest(
     VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),

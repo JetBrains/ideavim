@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionOuterSentenceActionTest : VimTestCase() {
+class MotionOuterSentenceActionTest : VimTestCaseBase() {
   @VimBehaviorDiffers(
     originalVimAfter = """
         Lorem ipsum dolor sit amet,

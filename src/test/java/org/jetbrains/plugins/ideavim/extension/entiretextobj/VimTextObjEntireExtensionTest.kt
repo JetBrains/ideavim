@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -23,7 +23,7 @@ import java.util.*
  * @author Alexandre Grison (@agrison)
  */
 @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-class VimTextObjEntireExtensionTest : VimTestCase() {
+class VimTextObjEntireExtensionTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

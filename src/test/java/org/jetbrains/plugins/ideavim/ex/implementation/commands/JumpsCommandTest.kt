@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class JumpsCommandTest : VimTestCase() {
+class JumpsCommandTest : VimTestCaseBase() {
   @Test
   fun `test shows empty list`() {
     configureByText("")

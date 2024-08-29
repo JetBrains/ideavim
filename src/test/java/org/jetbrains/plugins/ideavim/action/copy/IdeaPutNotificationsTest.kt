@@ -18,14 +18,14 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.TestOptionConstants
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.rangeOf
 
 @TraceOptions(TestOptionConstants.clipboard)
-class IdeaPutNotificationsTest : VimTestCase() {
+class IdeaPutNotificationsTest : VimTestCaseBase() {
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"

@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class OptionTest : VimTestCase() {
+class OptionTest : VimTestCaseBase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   @Test

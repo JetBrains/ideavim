@@ -8,11 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection")
-class MoveCommandTest : VimTestCase() {
+class MoveCommandTest : VimTestCaseBase() {
 
   @Test
   fun `test selection marks after moving line up`() {

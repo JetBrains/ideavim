@@ -18,7 +18,7 @@ import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.math.absoluteValue
 import kotlin.math.sign
@@ -69,13 +69,13 @@ class IncrementDecrementTest : VimPropertyTestBase() {
   }
 }
 
-private class IncrementDecrementActions(private val editor: Editor, val test: VimTestCase) : ImperativeCommand {
+private class IncrementDecrementActions(private val editor: Editor, val test: VimTestCaseBase) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
     val generator = Generator.sampledFrom("<C-A>", "<C-X>")
     val key = env.generateValue(generator, null)
     val action = injector.parser.parseKeys(key).single()
     env.logMessage("Use command: ${injector.parser.toKeyNotation(action)}.")
-    VimTestCase.typeText(listOf(action), editor, editor.project)
+    VimTestCaseBase.typeText(listOf(action), editor, editor.project)
     NeovimTesting.typeCommand(key, test.testInfo, editor)
 
     IdeEventQueue.getInstance().flushQueue()

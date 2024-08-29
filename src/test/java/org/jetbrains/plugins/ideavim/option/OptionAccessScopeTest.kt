@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,7 +29,7 @@ import kotlin.test.assertEquals
 private const val OPTION_NAME = "test"
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class OptionAccessScopeTest: VimTestCase() {
+class OptionAccessScopeTest: VimTestCaseBase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

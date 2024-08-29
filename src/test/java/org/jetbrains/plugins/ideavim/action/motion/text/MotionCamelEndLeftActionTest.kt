@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionCamelEndLeftActionTest : VimTestCase() {
+class MotionCamelEndLeftActionTest : VimTestCaseBase() {
   @Test
   fun `test go with a single uppercase word`() {
     doTest("]b", "TES${c}T", "TES${c}T", Mode.NORMAL())

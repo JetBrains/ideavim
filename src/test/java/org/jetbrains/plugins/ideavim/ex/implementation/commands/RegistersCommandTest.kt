@@ -12,12 +12,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.junit.jupiter.api.Test
 
-class RegistersCommandTest : VimTestCase() {
+class RegistersCommandTest : VimTestCaseBase() {
   @TestWithoutPrimaryClipboard
   fun `test list empty registers`() {
     configureByText("")

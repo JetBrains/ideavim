@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.ui.ShowCmd
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ShowCmdTest : VimTestCase() {
+class ShowCmdTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

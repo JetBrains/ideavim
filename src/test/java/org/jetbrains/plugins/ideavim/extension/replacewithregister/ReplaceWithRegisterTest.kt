@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ReplaceWithRegisterTest : VimTestCase() {
+class ReplaceWithRegisterTest : VimTestCaseBase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

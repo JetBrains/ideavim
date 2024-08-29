@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionSectionForwardEndActionTest : VimTestCase() {
+class MotionSectionForwardEndActionTest : VimTestCaseBase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   @Test
   fun `test remove full text`() {

@@ -11,11 +11,11 @@ package org.jetbrains.plugins.ideavim.group.motion
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 @Suppress("ClassName")
-class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
+class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCaseBase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   @Test
   fun `test moving up causes scrolling up`() {

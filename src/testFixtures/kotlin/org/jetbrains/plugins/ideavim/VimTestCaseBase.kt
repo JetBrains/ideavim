@@ -110,7 +110,7 @@ import kotlin.test.assertTrue
  */
 @RunInEdt(writeIntent = true)
 @ApiStatus.Internal
-abstract class VimTestCase {
+abstract class VimTestCaseBase {
   protected lateinit var fixture: CodeInsightTestFixture
 
   lateinit var testInfo: TestInfo

@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import org.jetbrains.plugins.ideavim.TestIjOptionConstants
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
@@ -26,7 +26,7 @@ import kotlin.test.assertTrue
  * @author Alex Plate
  */
 @TraceOptions(TestIjOptionConstants.ideajoin)
-class JoinNotificationTest : VimTestCase() {
+class JoinNotificationTest : VimTestCaseBase() {
   @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["false"]))
   fun `test notification shown for no ideajoin`() {
     val notification = newNotifications {
