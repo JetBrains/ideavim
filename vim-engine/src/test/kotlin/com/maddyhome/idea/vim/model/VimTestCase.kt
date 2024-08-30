@@ -23,7 +23,7 @@ import javax.swing.KeyStroke
 import kotlin.test.assertNull
 import kotlin.test.assertContains
 
-interface VimTestCase {
+interface VimTestCase : SharedTestCase {
   val editor: VimEditor
 
   fun <T> assertEmpty(collection: Collection<T>) {
