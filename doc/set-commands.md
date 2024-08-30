@@ -8,7 +8,7 @@ Every effort is made to make these options compatible with Vim behaviour.
 However, some differences are inevitable.
 
 ```
-'clipboard'     'cb'    Defines clipboard behaviour
+'clipboard'     'cb'    Defines clipboard behavior
         A comma-separated list of words to control clipboard behaviour:
            unnamed      The clipboard register '*' is used instead of the
                         unnamed register
