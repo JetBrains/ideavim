@@ -114,6 +114,7 @@ abstract class VimTestCaseBase : VimTestCase {
   protected lateinit var fixture: CodeInsightTestFixture
   override val editor: VimEditor
     get() = fixture.editor.vim
+  override val c: String = VimTestCaseBase.c
 
   lateinit var testInfo: TestInfo
 
@@ -479,6 +480,11 @@ abstract class VimTestCaseBase : VimTestCase {
   override fun assertState(textAfter: String) {
     fixture.checkResult(textAfter)
     NeovimTesting.assertState(fixture.editor, testInfo)
+  }
+
+  override fun assertState(textAfter: String, modeAfter: Mode) {
+    assertState(textAfter)
+    assertState(modeAfter)
   }
 
   fun mode(): String? {

@@ -88,7 +88,7 @@ class VimExchangeWithClipboardTest : VimTestCaseBase() {
   // |X|
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
-    originalVimAfter = "The ${c}brown catch over the lazy dog",
+    originalVimAfter = "The <caret>brown catch over the lazy dog",
     shouldBeFixed = true,
   )
   fun `test visual exchange words from inside`() {
@@ -103,7 +103,7 @@ class VimExchangeWithClipboardTest : VimTestCaseBase() {
   // |X|
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
-    originalVimAfter = "The brown ${c}catch over the lazy dog",
+    originalVimAfter = "The brown <caret>catch over the lazy dog",
     shouldBeFixed = true,
   )
   fun `test visual exchange words from outside`() {
@@ -121,7 +121,7 @@ class VimExchangeWithClipboardTest : VimTestCaseBase() {
     originalVimAfter =
     """The quick
        catch over
-       ${c}brown fox
+       <caret>brown fox
        the lazy dog
        """,
     shouldBeFixed = true,
@@ -149,7 +149,7 @@ class VimExchangeWithClipboardTest : VimTestCaseBase() {
     originalVimAfter =
     """The quick
        catch over
-       ${c}brown fox
+       <caret>brown fox
        the lazy dog
        """,
     shouldBeFixed = true,
@@ -203,7 +203,7 @@ class VimExchangeWithClipboardTest : VimTestCaseBase() {
     """
          catch over
          the lazy dog
-         ${c}The quick
+         <caret>The quick
          brown fox
       """,
     shouldBeFixed = true,

@@ -96,7 +96,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCaseBase() {
              rocks and lavender and tufted grass,
             re it was settled on some sodden sand
             d by the torrent of a mountain pass.
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @Test

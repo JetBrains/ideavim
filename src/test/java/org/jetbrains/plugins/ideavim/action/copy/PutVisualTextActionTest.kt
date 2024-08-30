@@ -674,7 +674,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -707,10 +707,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -743,10 +743,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -779,10 +779,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -815,10 +815,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -907,7 +907,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -940,10 +940,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -976,10 +976,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1012,10 +1012,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1048,10 +1048,10 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1131,7 +1131,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
     """,
@@ -1188,7 +1188,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
             |found|
@@ -1240,7 +1240,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
             al|l roc|ks and lavender and tufted grass,
@@ -1250,7 +1250,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
     """,
@@ -1301,7 +1301,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
             al|l roc|ks and lavender and tufted grass,
@@ -1311,7 +1311,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
     """,
@@ -1485,7 +1485,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
             hard by the torrent of a mountain pass.
     """,
   )
@@ -1495,7 +1495,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
     val before = """
             A Discovery
 
-            I $c|found| it in a legendary land
+            I <caret>|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -1509,7 +1509,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
 
             hard by the torrent of a mountain pass.
     """.trimIndent()
@@ -1549,7 +1549,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
             A Discovery
             hard by the torrent of a mountain pass.
             """,
@@ -1590,7 +1590,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
             ha the torrent of a mountain pass.
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1627,7 +1627,7 @@ class PutVisualTextActionTest : VimTestCaseBase() {
             I
             a
             w
-            ${c}A Discovery
+            <caret>A Discovery
             hard by the torrent of a mountain pass.
     """,
   )

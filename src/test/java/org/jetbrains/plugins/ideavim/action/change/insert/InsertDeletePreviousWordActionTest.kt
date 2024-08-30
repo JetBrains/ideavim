@@ -82,7 +82,7 @@ Mode.INSERT,
                if (it) {
                   legendary
                }
-            ${c}
+            <caret>
   """,
   )
   @Test

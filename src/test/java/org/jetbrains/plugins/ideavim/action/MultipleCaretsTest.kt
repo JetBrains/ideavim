@@ -1843,7 +1843,7 @@ $c five six se${c}ven eight
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = "${c}\n${c}\nabcde\n${c}\n${c}\nabcde\n")
+  @VimBehaviorDiffers(originalVimAfter = "<caret>\n<caret>\nabcde\n<caret>\n<caret>\nabcde\n")
   @Test
   fun testInsertNewLineAboveActionWithMultipleCaretsInLine() {
     typeTextInFile(

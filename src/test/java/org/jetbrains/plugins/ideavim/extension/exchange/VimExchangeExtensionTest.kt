@@ -83,7 +83,7 @@ class VimExchangeExtensionTest : VimTestCaseBase() {
 
   // |X|
   @VimBehaviorDiffers(
-    originalVimAfter = "The ${c}brown catch over the lazy dog",
+    originalVimAfter = "The <caret>brown catch over the lazy dog",
     shouldBeFixed = true,
   )
   @Test
@@ -98,7 +98,7 @@ class VimExchangeExtensionTest : VimTestCaseBase() {
 
   // |X|
   @VimBehaviorDiffers(
-    originalVimAfter = "The brown ${c}catch over the lazy dog",
+    originalVimAfter = "The brown <caret>catch over the lazy dog",
     shouldBeFixed = true,
   )
   @Test
@@ -116,7 +116,7 @@ class VimExchangeExtensionTest : VimTestCaseBase() {
     originalVimAfter =
     """The quick
        catch over
-       ${c}brown fox
+       <caret>brown fox
        the lazy dog
        """,
     shouldBeFixed = true,
@@ -144,7 +144,7 @@ class VimExchangeExtensionTest : VimTestCaseBase() {
     originalVimAfter =
     """The quick
        catch over
-       ${c}brown fox
+       <caret>brown fox
        the lazy dog
        """,
     shouldBeFixed = true,
@@ -198,7 +198,7 @@ class VimExchangeExtensionTest : VimTestCaseBase() {
     """
          catch over
          the lazy dog
-         ${c}The quick
+         <caret>The quick
          brown fox
       """,
     shouldBeFixed = true,

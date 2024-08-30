@@ -93,7 +93,7 @@ class IdeaVisualControlTest : VimTestCaseBase() {
     originalVimAfter = """
             Lorem Ipsum
 
-            I ${s}found i${c}t$se in a legendary land
+            I ${s}found i<caret>t$se in a legendary land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.

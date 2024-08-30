@@ -298,7 +298,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCaseBase() {
     originalVimAfter = """
                 A Discovery
 
-                ${s}${c}I${se} found it in a legendary land
+                ${s}<caret>I${se} found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -334,7 +334,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCaseBase() {
                 A Discovery
 
                 ${s}I found it in a legendary land
-                ${c}a${se}ll rocks and lavender and tufted grass,
+                <caret>a${se}ll rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """,

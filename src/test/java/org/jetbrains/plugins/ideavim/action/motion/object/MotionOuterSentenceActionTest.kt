@@ -19,7 +19,7 @@ class MotionOuterSentenceActionTest : VimTestCaseBase() {
         Lorem ipsum dolor sit amet,
         consectetur adipiscing elit
         Sed in orci mauris.
-        $c
+        <caret>
     """,
   )
   @Test
@@ -47,7 +47,7 @@ class MotionOuterSentenceActionTest : VimTestCaseBase() {
         Lorem ipsum dolor sit amet,
         consectetur adipiscing elit
         Sed in orci mauris.
-        $c
+        <caret>
     """,
   )
   @Test

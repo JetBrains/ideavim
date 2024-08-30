@@ -14,7 +14,7 @@ import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 class MotionSectionForwardEndActionTest : VimTestCaseBase() {
-  @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+  @VimBehaviorDiffers(originalVimAfter = "<caret>", description = "Full text is deleted")
   @Test
   fun `test remove full text`() {
     doTest(
@@ -30,7 +30,7 @@ class MotionSectionForwardEndActionTest : VimTestCaseBase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+  @VimBehaviorDiffers(originalVimAfter = "<caret>", description = "Full text is deleted")
   @Test
   fun `test remove full text with new line at the end`() {
     doTest(

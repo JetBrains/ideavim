@@ -24,6 +24,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertContains
 
 interface VimTestCase : SharedTestCase {
+  val c: String
   val editor: VimEditor
 
   fun <T> assertEmpty(collection: Collection<T>) {
@@ -46,6 +47,7 @@ interface VimTestCase : SharedTestCase {
 
   fun configureByText(fileType: FileType, content: String): VimEditor
 
+  // TODO rename, it does not 'type'
   fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
 
   fun typeText(keys: List<KeyStroke?>): VimEditor {
@@ -63,6 +65,7 @@ interface VimTestCase : SharedTestCase {
   }
 
   fun assertState(textAfter: String)
+  fun assertState(textAfter: String, modeAfter: Mode)
 
   fun assertRegister(char: Char, expected: String?) {
     val actual = injector.registerGroup.getRegister(char)?.keys?.let(injector.parser::toKeyNotation)

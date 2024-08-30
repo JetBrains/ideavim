@@ -36,7 +36,7 @@ class CopyCommandTest : VimTestCaseBase() {
     originalVimAfter = """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
-      Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
+      Nunc tincidunt viverra ligula non <caret>scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
     """,
@@ -68,7 +68,7 @@ class CopyCommandTest : VimTestCaseBase() {
   @VimBehaviorDiffers(
     originalVimAfter = """
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
-      ${c}accumsan vitae, facilisis ac nulla.
+      <caret>accumsan vitae, facilisis ac nulla.
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
@@ -105,7 +105,7 @@ class CopyCommandTest : VimTestCaseBase() {
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
-      ${c}accumsan vitae, facilisis ac nulla.
+      <caret>accumsan vitae, facilisis ac nulla.
     """,
     description = "Caret placement is incorrect",
     shouldBeFixed = true
@@ -138,7 +138,7 @@ class CopyCommandTest : VimTestCaseBase() {
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
-      ${c}accumsan vitae, facilisis ac nulla.
+      <caret>accumsan vitae, facilisis ac nulla.
     """,
     description = "Caret placement is incorrect",
     shouldBeFixed = true
@@ -172,7 +172,7 @@ class CopyCommandTest : VimTestCaseBase() {
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
-      ${c}accumsan vitae, facilisis ac nulla.
+      <caret>accumsan vitae, facilisis ac nulla.
     """,
     description = "Caret placement is wrong",
     shouldBeFixed = true

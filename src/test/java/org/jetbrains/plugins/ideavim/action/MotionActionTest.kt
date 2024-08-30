@@ -382,7 +382,7 @@ class MotionActionTest : VimTestCaseBase() {
   // VIM-1287 |d| |v_i{|
   @Test
   @VimBehaviorDiffers(
-    originalVimAfter = "{\"{foo, ${c}bar\", baz}}",
+    originalVimAfter = "{\"{foo, <caret>bar\", baz}}",
     description = "We have PSI and can resolve this case correctly. I'm not sure if it should be fixed"
   )
   fun testBadlyNestedBlockInsideString() {

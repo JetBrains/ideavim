@@ -176,7 +176,7 @@ class ReplaceWithRegisterTest : VimTestCaseBase() {
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
-  @VimBehaviorDiffers("one on${c}e on${c}e four")
+  @VimBehaviorDiffers("one on<caret>e on<caret>e four")
   @Test
   fun `test replace with multiple carets`() {
     val text = "one ${c}two ${c}three four"
@@ -373,9 +373,9 @@ class ReplaceWithRegisterTest : VimTestCaseBase() {
   @VimBehaviorDiffers(
     """
             Lorem ipsum dolor sit amet,
-            ${c}Lorem ipsum dolor sit amet,
+            <caret>Lorem ipsum dolor sit amet,
             Sed in orci mauris.
-            ${c}Sed in orci mauris.
+            <caret>Sed in orci mauris.
   """,
   )
   @Test

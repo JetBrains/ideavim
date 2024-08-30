@@ -173,7 +173,7 @@ class MatchitGeneralTest : VimTestCaseBase() {
     originalVimAfter = """
         if x == 0
           puts "Zero"
-        $c
+        <caret>
           puts "Positive"
         end
   """,

@@ -69,7 +69,7 @@ class ChangeVisualLinesEndActionTest : VimTestCaseBase() {
             Lorem ipsum dolor sit amet,
             consectetur adipiscing elit
             Sed in orci mauris.
-            ${c}
+            <caret>
   """,
   )
   @Test

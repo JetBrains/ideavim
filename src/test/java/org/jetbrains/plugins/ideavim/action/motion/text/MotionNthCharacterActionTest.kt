@@ -166,7 +166,7 @@ class MotionNthCharacterActionTest : VimTestCaseBase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.$c
+            hard by the torrent of a mountain pass.<caret>
   """,
   )
   @Test
@@ -201,7 +201,7 @@ class MotionNthCharacterActionTest : VimTestCaseBase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-            $c
+            <caret>
   """,
   )
   @Test

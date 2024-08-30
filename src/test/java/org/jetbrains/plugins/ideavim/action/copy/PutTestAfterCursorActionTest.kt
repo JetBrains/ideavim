@@ -73,7 +73,7 @@ class PutTestAfterCursorActionTest : VimTestCaseBase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @Test
@@ -106,7 +106,7 @@ class PutTestAfterCursorActionTest : VimTestCaseBase() {
   @VimBehaviorDiffers(
     originalVimAfter = """
             A Discovery
-            ${c}I found it in a legendary land
+            <caret>I found it in a legendary land
             GUARD
             I found it in a legendary land
             all rocks and lavender and tufted grass,

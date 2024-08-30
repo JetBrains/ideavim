@@ -248,7 +248,7 @@ class RepeatChangeActionTest : VimTestCaseBase() {
                 XXXXXnd it in a legendary land
                 XXXXXocks and lavender and tufted grass,
                 XXXXX it was settled on some sodden sand
-                hard ${c}XXXXXe torrent of a mountain pass.
+                hard <caret>XXXXXe torrent of a mountain pass.
 
     """,
   )

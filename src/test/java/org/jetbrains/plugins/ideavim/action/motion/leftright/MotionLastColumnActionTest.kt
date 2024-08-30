@@ -112,9 +112,9 @@ class MotionLastColumnActionTest : VimTestCaseBase() {
     originalVimAfter = """
             A Discovery
 
-            I ${s}found it in a legendary lan${c}d${se}
-            al${s}l rocks and lavender and tufted grass${c},${se}[ additional symbols]
-            wh${s}ere it was settled on some sodden san${c}d${se}
+            I ${s}found it in a legendary lan<caret>d${se}
+            al${s}l rocks and lavender and tufted grass<caret>,${se}[ additional symbols]
+            wh${s}ere it was settled on some sodden san<caret>d${se}
             hard by the torrent of a mountain pass.
     """,
   )
