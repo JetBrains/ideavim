@@ -6,7 +6,9 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.model
+package com.maddyhome.idea.vim
+
+import com.maddyhome.idea.vim.model.SharedTestCase
 
 /**
  * List of all shared test classes.
@@ -16,5 +18,7 @@ package com.maddyhome.idea.vim.model
  * This class doesn't run any tests; it only declares them.
  * Compilation errors resulting from this class will help IDE developers understand whether they have implemented all the vim-engine tests.
  */
-abstract class SharedTestCaseList {
+interface SharedTestCaseList {
+  val insertDeleteActionTest: SharedTestCase
+  val deleteVisualLinesActionTest: SharedTestCase
 }
