@@ -192,6 +192,13 @@ private object VimActionsPopup {
         null,
       ),
     )
+    actionGroup.add(
+      HelpLink(
+        "Take Survey ↗",
+        "https://surveys.jetbrains.com/s3/ideavim-usage-survey",
+        AllIcons.Actions.IntentionBulb,
+      ),
+    )
     actionGroup.addSeparator(MessageHelper.message("action.eap.choice.active.text"))
 
     actionGroup.add(JoinEap)
