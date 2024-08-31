@@ -535,6 +535,10 @@ Contributors:
   [![icon][github]](https://github.com/igorbabko)
   &nbsp;
   Igor Babko
+* [![icon][mail]](mailto:533601+felixwiemuth@users.noreply.github.com)
+  [![icon][github]](https://github.com/felixwiemuth)
+  &nbsp;
+  Felix Wiemuth
 
 Previous contributors:
 
