@@ -98,8 +98,8 @@ fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) 
  */
 fun VimCaret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
-  setVisualSelection(start, end, this)
-  if (moveCaretToSelectionEnd && !editor.inBlockSelection) moveToInlayAwareOffset(end)
+  val caret = if (moveCaretToSelectionEnd && !editor.inBlockSelection) moveToInlayAwareOffset(end) else this
+  setVisualSelection(start, end, caret)
 }
 
 /**
