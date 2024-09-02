@@ -8,11 +8,16 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.EngineStringHelper
+import java.lang.Integer.toHexString
 import java.util.*
 import javax.swing.KeyStroke
+import kotlin.math.ceil
 
-abstract class VimDigraphGroupBase() : VimDigraphGroup {
+private val logger = vimLogger<VimDigraphGroup>()
+
+open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun getDigraph(ch1: Char, ch2: Char): Char {
     var key = String(charArrayOf(ch1, ch2))
@@ -84,6 +89,62 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
     return true
   }
 
+  override fun showDigraphs(editor: VimEditor) {
+    val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 10) 80 else it }
+    val colWidth = 12
+    val colCount = width / colWidth
+    val height = ceil(digraphs.size.toDouble() / colCount.toDouble()).toInt()
+
+    if (logger.isDebug()) {
+      logger.debug("width=$width")
+      logger.debug("colCount=$colCount")
+      logger.debug("height=$height")
+    }
+
+    val output = buildString {
+
+      var count = 0
+      keys.forEach { (char, digraph) ->
+        append(digraph)
+        append(' ')
+        if (char.code < 32) {
+          append('^')
+          append(char + '@'.code)
+        }
+        else if (char.code >= 128 && char.code <= 159) {
+          append('~')
+          append(char - 128 + '@'.code)
+        }
+        else {
+          append(char)
+          append(' ')
+        }
+        append(' ')
+        if (char.code < 0x1000) {
+          append('0')
+        }
+        if (char.code < 0x100) {
+          append('0')
+        }
+        if (char.code < 0x10) {
+          append('0')
+        }
+        append(toHexString(char.code))
+        append("  ")
+
+        count++
+        if (count == colCount) {
+          appendLine()
+          count = 0
+        }
+      }
+    }
+
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    injector.outputPanel.output(editor, context, output)
+  }
+
+  @Suppress("GrazieInspection", "SpellCheckingInspection")
   private val defaultDigraphs = charArrayOf( /*
     'N', 'U', // 0   ^@
     'S', 'H', // 1   ^A
@@ -1682,6 +1743,7 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
     'f', 't', '\ufb05', // LATIN SMALL LIGATURE FT
     's', 't', '\ufb06',
   )
+
   protected val digraphs: HashMap<String, Char> = HashMap<String, Char>(defaultDigraphs.size)
   protected val keys: TreeMap<Char, String> = TreeMap<Char, String>()
 
