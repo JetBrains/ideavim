@@ -26,10 +26,13 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.addCommand
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
@@ -63,6 +66,8 @@ internal class IdeaVimSneakExtension : VimExtension {
 
     mapToFunctionAndProvideKeys(";", SneakRepeatHandler(highlightHandler, RepeatDirection.IDENTICAL), MappingMode.NXO)
     mapToFunctionAndProvideKeys(",", SneakRepeatHandler(highlightHandler, RepeatDirection.REVERSE), MappingMode.NXO)
+
+    addCommand("SneakReset", SneakReset());
   }
 
   private class SneakHandler(
@@ -110,6 +115,13 @@ internal class IdeaVimSneakExtension : VimExtension {
       } else {
         VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys(direction.symb), editor.ij)
       }
+    }
+  }
+
+  private class SneakReset: CommandAliasHandler {
+    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
+      Util.lastSDirection = null
+      Util.lastSymbols = ""
     }
   }
 
