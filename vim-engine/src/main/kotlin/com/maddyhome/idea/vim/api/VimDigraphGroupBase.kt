@@ -108,7 +108,23 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         append(' ')
 
         val printable = EngineStringHelper.toPrintableCharacter(char)
-        append(printable)
+        val adjustment = when {
+          printable.length == 1 && isRightToLeft(char) -> {
+            append('\u2067')  // RIGHT_TO_LEFT_ISOLATE - set RTL and isolate following content from the surrounding text
+            append(printable)
+            append('\u2069')  // POP_DIRECTIONAL_ISOLATE - close the isolation range and return to LTR
+            2
+          }
+          printable.length == 1 && isCombiningCharacter(char) -> {
+            append(' ') // Give the combining character something to combine with
+            append(printable)
+            1
+          }
+          else -> {
+            append(printable)
+            0
+          }
+        }
 
         // Add an extra space if we've only used one text cell
         // Ideally here, we'd check the EAST_ASIAN_WIDTH Unicode property of the printed character. If it's full width,
@@ -132,7 +148,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
             append(' ')
           }
           else {
-            repeat(columnWidth - ((length - start) % columnWidth)) {
+            repeat(columnWidth - ((length - start - adjustment) % columnWidth)) {
               append(' ')
             }
           }
@@ -142,6 +158,22 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
     injector.outputPanel.output(editor, context, output)
+  }
+
+  private fun isRightToLeft(c: Char): Boolean {
+    val directionality = Character.getDirectionality(c)
+    return directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT
+      || directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC
+      || directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING
+      || directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE
+  }
+
+  private fun isCombiningCharacter(char: Char): Boolean {
+    val type = Character.getType(char).toByte()
+    return type == Character.NON_SPACING_MARK
+      || type == Character.COMBINING_SPACING_MARK
+      || type == Character.ENCLOSING_MARK
+      || type == Character.FORMAT
   }
 
   @Suppress("GrazieInspection", "SpellCheckingInspection")
