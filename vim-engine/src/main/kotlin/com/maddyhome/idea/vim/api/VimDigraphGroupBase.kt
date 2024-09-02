@@ -102,7 +102,6 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     }
 
     val output = buildString {
-
       var count = 0
       keys.forEach { (char, digraph) ->
         append(digraph)
@@ -130,15 +129,17 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
           append('0')
         }
         append(toHexString(char.code))
-        append("  ")
 
         count++
         if (count == colCount) {
           appendLine()
           count = 0
         }
+        else {
+          append("  ")
+        }
       }
-    }
+    }.trimEnd() // TODO: Try to get rid of this
 
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
     injector.outputPanel.output(editor, context, output)
