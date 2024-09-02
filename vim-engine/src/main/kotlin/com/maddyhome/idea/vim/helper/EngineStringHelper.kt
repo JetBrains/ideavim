@@ -42,6 +42,10 @@ object EngineStringHelper {
     } else if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
       c = (key.keyCode - 'A'.code + 1).toChar()
     }
+    return toPrintableCharacter(c)
+  }
+
+  fun toPrintableCharacter(c: Char): String {
     if (c.code <= 31) {
       return "^" + (c.code + 'A'.code - 1).toChar()
     } else if (c.code == 127) {
@@ -56,7 +60,10 @@ object EngineStringHelper {
 //    } else if (c == 255) {
 //      return "~" + (char)(c - (('A' - 1) * 3));
     } else if (CharacterHelper.isInvisibleControlCharacter(c) || CharacterHelper.isZeroWidthCharacter(c)) {
-      return String.format("<%04x>", c.code)
+      if (c.code > 0xff) {
+        return String.format("<%04x>", c.code)
+      }
+      return String.format("<%02x>", c.code)
     }
     return c.toString()
   }

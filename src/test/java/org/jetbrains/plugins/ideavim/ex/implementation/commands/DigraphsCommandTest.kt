@@ -40,15 +40,15 @@ class DigraphsCommandTest : VimTestCase() {
         |CN ^X 0018  EM ^Y 0019  SB ^Z 001a  EC ^[ 001b  FS ^\ 001c  GS ^] 001d
         |RS ^^ 001e  US ^_ 001f  SP    0020  Nb #  0023  DO ${'$'}  0024  At @  0040
         |<( [  005b  // \  005c  )> ]  005d  '> ^  005e  '! `  0060  (! {  007b
-        |!! |  007c  !) }  007d  '? ~  007e  DT   007f  PA ~@ 0080  HO ~A 0081
-        |BH ~B 0082  NH ~C 0083  IN ~D 0084  NL ~E 0085  SA ~F 0086  ES ~G 0087
-        |HS ~H 0088  HJ ~I 0089  VS ~J 008a  PD ~K 008b  PU ~L 008c  RI ~M 008d
-        |S2 ~N 008e  S3 ~O 008f  DC ~P 0090  P1 ~Q 0091  P2 ~R 0092  TS ~S 0093
-        |CC ~T 0094  MW ~U 0095  SG ~V 0096  EG ~W 0097  SS ~X 0098  GC ~Y 0099
-        |SC ~Z 009a  CI ~[ 009b  ST ~\ 009c  OC ~] 009d  PM ~^ 009e  AC ~_ 009f
+        |!! |  007c  !) }  007d  '? ~  007e  DT ^? 007f  PA <80> 0080  HO <81> 0081
+        |BH <82> 0082  NH <83> 0083  IN <84> 0084  NL <85> 0085  SA <86> 0086  ES <87> 0087
+        |HS <88> 0088  HJ <89> 0089  VS <8a> 008a  PD <8b> 008b  PU <8c> 008c  RI <8d> 008d
+        |S2 <8e> 008e  S3 <8f> 008f  DC <90> 0090  P1 <91> 0091  P2 <92> 0092  TS <93> 0093
+        |CC <94> 0094  MW <95> 0095  SG <96> 0096  EG <97> 0097  SS <98> 0098  GC <99> 0099
+        |SC <9a> 009a  CI <9b> 009b  ST <9c> 009c  OC <9d> 009d  PM <9e> 009e  AC <9f> 009f
         |NS    00a0  !I ¡  00a1  Ct ¢  00a2  Pd £  00a3  Cu ¤  00a4  Ye ¥  00a5
         |BB ¦  00a6  SE §  00a7  ': ¨  00a8  Co ©  00a9  -a ª  00aa  << «  00ab
-        |NO ¬  00ac  -- ­  00ad  Rg ®  00ae  'm ¯  00af  DG °  00b0  +- ±  00b1
+        |NO ¬  00ac  -- <ad> 00ad  Rg ®  00ae  'm ¯  00af  DG °  00b0  +- ±  00b1
         |2S ²  00b2  3S ³  00b3  '' ´  00b4  My µ  00b5  PI ¶  00b6  .M ·  00b7
         |', ¸  00b8  1S ¹  00b9  -o º  00ba  >> »  00bb  14 ¼  00bc  12 ½  00bd
         |34 ¾  00be  ?I ¿  00bf  A! À  00c0  A' Á  00c1  A> Â  00c2  A? Ã  00c3
@@ -249,13 +249,13 @@ class DigraphsCommandTest : VimTestCase() {
         |aN ㄤ  3124  eN ㄥ  3125  er ㄦ  3126  i4 ㄧ  3127  u4 ㄨ  3128  iu ㄩ  3129
         |v4 ㄪ  312a  nG ㄫ  312b  gn ㄬ  312c  1c ㈠  3220  2c ㈡  3221  3c ㈢  3222
         |4c ㈣  3223  5c ㈤  3224  6c ㈥  3225  7c ㈦  3226  8c ㈧  3227  9c ㈨  3228
-        |/c   e001  UA   e002  UB   e003  "3   e004  "1   e005  "!   e006
-        |"'   e007  ">   e008  "?   e009  "-   e00a  "(   e00b  ".   e00c
-        |":   e00d  "0   e00e  ""   e00f  "<   e010  ",   e011  ";   e012
-        |"_   e013  "=   e014  "/   e015  "i   e016  "d   e017  "p   e018
-        |;;   e019  ,,   e01a  b3   e01b  Ci   e01c  f(   e01d  ed   e01e
-        |am   e01f  pm   e020  Fl   e023  GF   e024  >V   e025  !*   e026
-        |?*   e027  J<   e028  ff ﬀ  fb00  fi ﬁ  fb01  fl ﬂ  fb02  ft ﬅ  fb05
+        |/c <e001> e001  UA <e002> e002  UB <e003> e003  "3 <e004> e004  "1 <e005> e005  "! <e006> e006
+        |"' <e007> e007  "> <e008> e008  "? <e009> e009  "- <e00a> e00a  "( <e00b> e00b  ". <e00c> e00c
+        |": <e00d> e00d  "0 <e00e> e00e  "" <e00f> e00f  "< <e010> e010  ", <e011> e011  "; <e012> e012
+        |"_ <e013> e013  "= <e014> e014  "/ <e015> e015  "i <e016> e016  "d <e017> e017  "p <e018> e018
+        |;; <e019> e019  ,, <e01a> e01a  b3 <e01b> e01b  Ci <e01c> e01c  f( <e01d> e01d  ed <e01e> e01e
+        |am <e01f> e01f  pm <e020> e020  Fl <e023> e023  GF <e024> e024  >V <e025> e025  !* <e026> e026
+        |?* <e027> e027  J< <e028> e028  ff ﬀ  fb00  fi ﬁ  fb01  fl ﬂ  fb02  ft ﬅ  fb05
         |st ﬆ  fb06
       """.trimMargin())
   }

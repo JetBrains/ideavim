@@ -91,13 +91,13 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun showDigraphs(editor: VimEditor) {
     val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 10) 80 else it }
-    val colWidth = 12
-    val colCount = width / colWidth
-    val height = ceil(digraphs.size.toDouble() / colCount.toDouble()).toInt()
+    val columnWidth = 12
+    val columnCount = width / columnWidth
+    val height = ceil(digraphs.size.toDouble() / columnCount.toDouble()).toInt()
 
     if (logger.isDebug()) {
       logger.debug("width=$width")
-      logger.debug("colCount=$colCount")
+      logger.debug("colCount=$columnCount")
       logger.debug("height=$height")
     }
 
@@ -106,32 +106,25 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       keys.forEach { (char, digraph) ->
         append(digraph)
         append(' ')
-        if (char.code < 32) {
-          append('^')
-          append(char + '@'.code)
-        }
-        else if (char.code >= 128 && char.code <= 159) {
-          append('~')
-          append(char - 128 + '@'.code)
-        }
-        else {
-          append(char)
+
+        val l = this.length
+        append(EngineStringHelper.toPrintableCharacter(char))
+
+        // Add an extra space if we've only used one text cell. Subtract 3 for the characters + a space
+        // Ideally here, we'd check the EAST_ASIAN_WIDTH Unicode property of the printed character. If it's full width,
+        // it's taken two "cells". I'm not sure this would work for all characters, e.g. Ⅵ seems to be 1.5 "cells" wide.
+        // Perhaps we could set the output panel's tab size to 13, and use tab stops to make things line up?
+        if (length - l == 1) {
           append(' ')
         }
+
+        // Print the code: ' %3d'
         append(' ')
-        if (char.code < 0x1000) {
-          append('0')
-        }
-        if (char.code < 0x100) {
-          append('0')
-        }
-        if (char.code < 0x10) {
-          append('0')
-        }
-        append(toHexString(char.code))
+//        append(char.toString().padStart(3))
+        append(toHexString(char.code).padStart(4, '0'))
 
         count++
-        if (count == colCount) {
+        if (count == columnCount) {
           appendLine()
           count = 0
         }
