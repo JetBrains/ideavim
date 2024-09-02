@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.EngineStringHelper
-import java.lang.Integer.toHexString
 import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.ceil
@@ -91,7 +90,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun showDigraphs(editor: VimEditor) {
     val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 10) 80 else it }
-    val columnWidth = 12
+    val columnWidth = 13
     val columnCount = width / columnWidth
     val height = ceil(digraphs.size.toDouble() / columnCount.toDouble()).toInt()
 
@@ -102,34 +101,41 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     }
 
     val output = buildString {
-      var count = 0
+      var column = 0
       keys.forEach { (char, digraph) ->
+        val start = length
         append(digraph)
         append(' ')
 
-        val l = this.length
-        append(EngineStringHelper.toPrintableCharacter(char))
+        val printable = EngineStringHelper.toPrintableCharacter(char)
+        append(printable)
 
-        // Add an extra space if we've only used one text cell. Subtract 3 for the characters + a space
+        // Add an extra space if we've only used one text cell
         // Ideally here, we'd check the EAST_ASIAN_WIDTH Unicode property of the printed character. If it's full width,
         // it's taken two "cells". I'm not sure this would work for all characters, e.g. Ⅵ seems to be 1.5 "cells" wide.
         // Perhaps we could set the output panel's tab size to 13, and use tab stops to make things line up?
-        if (length - l == 1) {
+        if (printable.length == 1) {
           append(' ')
         }
 
         // Print the code: ' %3d'
         append(' ')
-//        append(char.toString().padStart(3))
-        append(toHexString(char.code).padStart(4, '0'))
+        append(char.code.toString().padStart(3))
 
-        count++
-        if (count == columnCount) {
+        column++
+        if (column == columnCount) {
           appendLine()
-          count = 0
+          column = 0
         }
         else {
-          append("  ")
+          if (length - start > columnWidth) {
+            append(' ')
+          }
+          else {
+            repeat(columnWidth - ((length - start) % columnWidth)) {
+              append(' ')
+            }
+          }
         }
       }
     }.trimEnd() // TODO: Try to get rid of this
