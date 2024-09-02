@@ -24,10 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.SystemInfo;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.api.VimKeyGroup;
-import com.maddyhome.idea.vim.api.VimOptionGroup;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
@@ -36,7 +33,6 @@ import com.maddyhome.idea.vim.group.copy.PutGroup;
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
-import com.maddyhome.idea.vim.newapi.IjVimInjector;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
@@ -141,8 +137,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return (MacroGroup)VimInjectorKt.getInjector().getMacro();
   }
 
-  public static @NotNull DigraphGroup getDigraph() {
-    return (DigraphGroup)VimInjectorKt.getInjector().getDigraphGroup();
+  public static @NotNull VimDigraphGroup getDigraph() {
+    return VimInjectorKt.getInjector().getDigraphGroup();
   }
 
   public static @NotNull HistoryGroup getHistory() {
