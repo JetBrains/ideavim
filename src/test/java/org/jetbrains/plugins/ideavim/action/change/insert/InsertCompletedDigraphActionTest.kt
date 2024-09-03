@@ -14,7 +14,12 @@ import org.junit.jupiter.api.Test
 class InsertCompletedDigraphActionTest : VimTestCase() {
   @Test
   fun `test insert digraph`() {
-    doTest("i<C-K>OK<Esc>", "", "✓")
+    doTest(listOf("i", "<C-K>OK", "<Esc>"), "", "✓")
+  }
+
+  @Test
+  fun `test insert digraph with reversed characters`() {
+    doTest(listOf("i", "<C-K>KO", "<Esc>"), "", "✓")
   }
 
   @Test

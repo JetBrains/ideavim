@@ -21,10 +21,13 @@ private val logger = vimLogger<VimDigraphGroup>()
 open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun getDigraph(ch1: Char, ch2: Char): Char {
-    var digraph = String(charArrayOf(ch1, ch2))
+    val chars = charArrayOf(ch1, ch2)
+    var digraph = String(chars)
     var ch: Char? = digraphToCharacter[digraph]
     if (ch == null) {
-      digraph = String(charArrayOf(ch2, ch1))
+      chars[0] = ch2
+      chars[1] = ch1
+      digraph = String(chars)
       ch = digraphToCharacter[digraph]
     }
     return ch ?: ch2
@@ -70,12 +73,12 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     var i = 0
     while (i < defaultDigraphs.size) {
       if (defaultDigraphs[i] != '\u0000' && defaultDigraphs[i + 1] != '\u0000') {
-        val ch: Char = defaultDigraphs[i + 2]
-        val key = String(charArrayOf(defaultDigraphs[i], defaultDigraphs[i + 1]))
+        val character: Char = defaultDigraphs[i + 2]
+        val digraph = String(defaultDigraphs, i, 2)
         // todo use BiMap instead?
-        digraphToCharacter[key] = ch
-        if (!characterToDigraph.contains(ch)) {
-          characterToDigraph[ch] = key
+        digraphToCharacter[digraph] = character
+        if (!characterToDigraph.contains(character)) {
+          characterToDigraph[character] = digraph
         }
       }
       i += 3
@@ -113,7 +116,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       // We cannot guarantee ordering with the dictionaries, so let's use the defaultDigraphs list
       for (i in 0 until defaultDigraphs.size step 3) {
         val char = defaultDigraphs[i + 2]
-        val digraph = String(charArrayOf(defaultDigraphs[i], defaultDigraphs[i + 1]))
+        val digraph = String(defaultDigraphs, i, 2)
 
         val start = length
         append(digraph)
