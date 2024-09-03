@@ -20,7 +20,7 @@ private val logger = vimLogger<VimDigraphGroup>()
 
 open class VimDigraphGroupBase() : VimDigraphGroup {
 
-  override fun getDigraph(ch1: Char, ch2: Char): Char {
+  override fun getCharacterForDigraph(ch1: Char, ch2: Char): Char {
     val chars = charArrayOf(ch1, ch2)
     var digraph = String(chars)
     var ch: Char? = digraphToCharacter[digraph]

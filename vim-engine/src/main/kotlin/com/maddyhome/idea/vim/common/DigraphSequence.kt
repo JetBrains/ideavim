@@ -63,7 +63,7 @@ class DigraphSequence: Cloneable {
         logger.debug("DIG_STATE_BACK_SPACE")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = injector.digraphGroup.getDigraph(digraphChar, key.keyChar)
+          val ch = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
           digraphChar = 0.toChar()
           return done(KeyStroke.getKeyStroke(ch))
         }
@@ -83,7 +83,7 @@ class DigraphSequence: Cloneable {
         logger.debug("DIG_STATE_DIG_TWO")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = injector.digraphGroup.getDigraph(digraphChar, key.keyChar)
+          val ch = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
           return done(KeyStroke.getKeyStroke(ch))
         }
         DigraphResult.Bad
