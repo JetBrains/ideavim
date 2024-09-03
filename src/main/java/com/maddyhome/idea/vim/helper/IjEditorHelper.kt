@@ -13,7 +13,6 @@ import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.ex.util.EditorUtil
-import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.EngineEditorHelperBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimRangeMarker
@@ -40,6 +39,10 @@ internal class IjEditorHelper : EngineEditorHelperBase() {
 
   override fun getApproximateScreenWidth(editor: VimEditor): Int {
     return EditorHelper.getApproximateScreenWidth(editor.ij)
+  }
+
+  override fun getApproximateOutputPanelWidth(editor: VimEditor): Int {
+    return EditorHelper.getApproximateOutputPanelWidth(editor.ij)
   }
 
   override fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: Exception) {
