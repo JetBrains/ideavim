@@ -110,7 +110,9 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       logger.debug("height=$height")
     }
 
-    val output = buildString {
+    val digraphCount = defaultDigraphs.size / 3
+    val capacity = (digraphCount * columnWidth) + (digraphCount / columnCount)  // Text + newlines
+    val output = buildString(capacity) {
       var column = 0
 
       // We cannot guarantee ordering with the dictionaries, so let's use the defaultDigraphs list
