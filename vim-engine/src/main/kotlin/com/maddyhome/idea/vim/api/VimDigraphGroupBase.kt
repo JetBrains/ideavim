@@ -114,19 +114,25 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     val capacity = (digraphCount * columnWidth) + (digraphCount / columnCount)  // Text + newlines
     val output = buildString(capacity) {
       var column = 0
+      var columnLength = 0
 
       // We cannot guarantee ordering with the dictionaries, so let's use the defaultDigraphs list
       for (i in 0 until defaultDigraphs.size step 3) {
-        val char = defaultDigraphs[i + 2]
-        val digraph = String(defaultDigraphs, i, 2)
+        if (column != 0) {
+          repeat(columnWidth - (columnLength % columnWidth)) {
+            append(' ')
+          }
+        }
+        columnLength = length
 
-        val start = length
-        append(digraph)
+        append(defaultDigraphs[i])
+        append(defaultDigraphs[i + 1])
         append(' ')
 
         // VIM highlights the printable character with HLF_8, which it also uses for special keys in `:map`
+        val char = defaultDigraphs[i + 2]
         val printable = EngineStringHelper.toPrintableCharacter(char)
-        val adjustment = when {
+        val invisibleCharAdjustment = when {
           // Weird Vim-ism. `NU` (NULL) is set to 10, but displays as `^@`
           char == '\u000a' && i == 0 -> {
             append(EngineStringHelper.toPrintableCharacter('\u0000'))
@@ -161,23 +167,15 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         append(' ')
         append(char.code.toString().padStart(3))
 
+        columnLength = length - columnLength - invisibleCharAdjustment
+
         column++
         if (column == columnCount) {
           appendLine()
           column = 0
         }
-        else {
-          if (length - start > columnWidth) {
-            append(' ')
-          }
-          else {
-            repeat(columnWidth - ((length - start - adjustment) % columnWidth)) {
-              append(' ')
-            }
-          }
-        }
       }
-    }.trimEnd() // TODO: Try to get rid of this
+    }
 
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
     injector.outputPanel.output(editor, context, output)
