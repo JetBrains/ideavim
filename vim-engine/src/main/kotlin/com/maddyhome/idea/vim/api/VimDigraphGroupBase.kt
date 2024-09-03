@@ -6,6 +6,8 @@
  * https://opensource.org/licenses/MIT.
  */
 
+@file:Suppress("LanguageDetectionInspection")
+
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
