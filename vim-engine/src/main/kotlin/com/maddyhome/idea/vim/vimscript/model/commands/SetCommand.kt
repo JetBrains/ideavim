@@ -195,7 +195,7 @@ fun parseOptionLine(editor: VimEditor, context: ExecutionContext, args: String, 
   }
 
   // Now show all options that were individually requested
-  if (toShow.size > 0) {
+  if (toShow.isNotEmpty()) {
     showOptions(editor, context, toShow, scope, false, columnFormat)
   }
 
@@ -240,9 +240,7 @@ private fun showOptions(
     if (columnFormat || optionAsString.length >= colWidth) extra.add(optionAsString) else cells.add(optionAsString)
   }
 
-  // Note that this is the approximate width of the associated editor, not the ex output panel!
-  // It excludes gutter width, for example
-  val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 20) 80 else it }
+  val width = injector.engineEditorHelper.getApproximateOutputPanelWidth(editor).let { if (it < 20) 80 else it }
   val colCount = width / colWidth
   val height = ceil(cells.size.toDouble() / colCount.toDouble()).toInt()
 
@@ -260,18 +258,14 @@ private fun showOptions(
       for (c in 0 until colCount) {
         val index = c * height + h
         if (index < cells.size) {
-          val padLength = lengthAtStartOfLine + (c * colWidth) - length
-          for (i in 1..padLength) {
-            append(' ')
-          }
-
+          repeat(lengthAtStartOfLine + (c * colWidth) - length) { append(' ') }
           append(cells[index])
         }
       }
       appendLine()
     }
 
-    // Add any lines that are too long to fit into columns. The panel will soft wrap text
+    // Add any lines that are too long to fit into columns. The panel will soft-wrap text
     for (option in extra) {
       appendLine(option)
     }

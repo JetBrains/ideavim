@@ -158,6 +158,19 @@ public class EditorHelper {
   }
 
   /**
+   * Gets the number of characters that can be fit inside the output panel for an editor.
+   * <p>
+   * This will be greater than the approximate screen width as it also includes any gutter components in the editor.
+   * </p>
+   *
+   * @param editor The editor
+   * @return The approximate number of columns that can fit in the output panel
+   */
+  public static int getApproximateOutputPanelWidth(final @NotNull Editor editor) {
+    return (int)(editor.getComponent().getWidth() / getPlainSpaceWidthFloat(editor));
+  }
+
+  /**
    * Gets the width of the space character in the editor's plain font as a float.
    * <p>
    * Font width can be fractional, but {@link EditorUtil#getPlainSpaceWidth(Editor)} returns it as an int, which can
@@ -273,7 +286,7 @@ public class EditorHelper {
 
     // Scroll the given visual line to the caret location, but do not scroll down passed the end of file, or the current
     // virtual space at the bottom of the screen
-    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+    final @NotNull VimEditor editor1 = new IjVimEditor(editor);
     final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
     final int yBottomLineOffset = max(getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine), visibleArea.y);
     scrollVertically(editor, min(yVisualLine - caretScreenOffset - inlayOffset, yBottomLineOffset));
@@ -325,7 +338,7 @@ public class EditorHelper {
     final int lineHeight = editor.getLineHeight();
 
     final int offset = y - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
-    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+    final @NotNull VimEditor editor1 = new IjVimEditor(editor);
     final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
     final int offsetForLastLineAtBottom = getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine);
 
@@ -379,7 +392,7 @@ public class EditorHelper {
     return 0;
   }
 
-  private static int getHorizontalScrollbarHeight(@NotNull final Editor editor) {
+  private static int getHorizontalScrollbarHeight(final @NotNull Editor editor) {
     // Horizontal scrollbars on macOS are either transparent AND auto-hide, so we don't need to worry about obscured
     // text, or always visible, opaque and outside the content area, so we don't need to adjust for them
     // Transparent scrollbars on Windows and Linux are overlays on the editor content area, and always visible. That
@@ -462,7 +475,7 @@ public class EditorHelper {
    */
   public static Pair<Boolean, Integer> scrollFullPageDown(final @NotNull Editor editor, int pages) {
     final Rectangle visibleArea = getVisibleArea(editor);
-    @NotNull final VimEditor editor2 = new IjVimEditor(editor);
+    final @NotNull VimEditor editor2 = new IjVimEditor(editor);
     final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor2) - 1;
 
     int y = visibleArea.y + visibleArea.height;
@@ -480,7 +493,7 @@ public class EditorHelper {
           caretVisualLine = lastVisualLine;
         }
         else {
-          @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+          final @NotNull VimEditor editor1 = new IjVimEditor(editor);
           caretVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
           completed = false;
         }
@@ -515,7 +528,7 @@ public class EditorHelper {
   public static Pair<Boolean, Integer> scrollFullPageUp(final @NotNull Editor editor, int pages) {
     final Rectangle visibleArea = getVisibleArea(editor);
     final int lineHeight = editor.getLineHeight();
-    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+    final @NotNull VimEditor editor1 = new IjVimEditor(editor);
     final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
 
     int y = visibleArea.y;

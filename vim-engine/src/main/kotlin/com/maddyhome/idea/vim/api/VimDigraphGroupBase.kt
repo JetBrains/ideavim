@@ -126,7 +126,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
   }
 
   override fun showDigraphs(editor: VimEditor, showHeaders: Boolean) {
-    val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 10) 80 else it }
+    val width = injector.engineEditorHelper.getApproximateOutputPanelWidth(editor).let { if (it < 10) 80 else it }
 
     // Vim's columns are 13 characters wide, but for some reason, they suddenly switch to 12. It makes no obvious sense,
     // and it's a quirk too far to copy.

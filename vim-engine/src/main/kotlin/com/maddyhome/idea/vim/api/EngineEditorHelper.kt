@@ -18,7 +18,23 @@ interface EngineEditorHelper {
   fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
   fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
   fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
+
+  /**
+   * Return the approximate width, in columns, of the editor surface
+   *
+   * This is used for calculating the usable editor width, for editor features such as horizontal scrolling.
+   */
   fun getApproximateScreenWidth(editor: VimEditor): Int
+
+  /**
+   * Return the approximate width, in columns, of the output panel for a given editor
+   *
+   * This value is the approximate number of columns that can be displayed in the output panel for an editor. It will be
+   * greater than the value returned by [getApproximateScreenWidth], which is the number of editor columns in what Vim
+   * calls a "screen". That value does not include the space taken up by the editor gutter and other components, and if
+   * used for the output panel will leave a gap on the right-hand side of the panel.
+   */
+  fun getApproximateOutputPanelWidth(editor: VimEditor): Int
   fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
   fun pad(editor: VimEditor, line: Int, to: Int): String
   fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
@@ -238,9 +254,7 @@ fun VimEditor.getText(range: TextRange): String {
       val end = range.endOffsets[i]
       val line = getText(start, end)
       if (line.isEmpty()) {
-        for (j in 0 until max) {
-          res.append(' ')
-        }
+        repeat(max) { res.append(' ') }
       } else {
         res.append(line)
       }
