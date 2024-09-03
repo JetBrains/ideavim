@@ -11,5 +11,5 @@ interface VimDigraphGroup {
   fun getCharacterForDigraph(ch1: Char, ch2: Char): Char
   fun displayAsciiInfo(editor: VimEditor)
   fun parseCommandLine(editor: VimEditor, args: String): Boolean
-  fun showDigraphs(editor: VimEditor)
+  fun showDigraphs(editor: VimEditor, showHeaders: Boolean)
 }

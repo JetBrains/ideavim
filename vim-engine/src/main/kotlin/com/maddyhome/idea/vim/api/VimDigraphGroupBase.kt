@@ -12,8 +12,10 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.EngineStringHelper
+import com.maddyhome.idea.vim.helper.Msg
 import java.util.*
 import javax.swing.KeyStroke
+import kotlin.Char
 import kotlin.math.ceil
 
 private val logger = vimLogger<VimDigraphGroup>()
@@ -88,14 +90,22 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun parseCommandLine(editor: VimEditor, args: String): Boolean {
     if (args.isEmpty()) {
-      showDigraphs(editor)
+      showDigraphs(editor, false)
       return true
     }
+    else if (args == "!") {
+      showDigraphs(editor, true)
+      return true
+    }
+
     // todo command is not fully supported
-    return true
+    // TODO: Command only supports adding new digraphs - :digraphs {char1}{char2} {number}
+
+    injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_invarg, args))
+    return false
   }
 
-  override fun showDigraphs(editor: VimEditor) {
+  override fun showDigraphs(editor: VimEditor, showHeaders: Boolean) {
     val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 10) 80 else it }
 
     // Vim's columns are 13 characters wide, but for some reason, they suddenly switch to 12. It makes no obvious sense,
@@ -111,17 +121,31 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     }
 
     val digraphCount = defaultDigraphs.size / 3
-    val capacity = (digraphCount * columnWidth) + (digraphCount / columnCount)  // Text + newlines
+    val capacity = (digraphCount * columnWidth) + (digraphCount / columnCount) + 300 // Text + newlines + headers
     val output = buildString(capacity) {
       var column = 0
       var columnLength = 0
+      var previousUnicodeBlock: Character.UnicodeBlock? = null
 
-      // We cannot guarantee ordering with the dictionaries, so let's use the defaultDigraphs list
+      // We cannot guarantee ordering with the dictionaries, so let's use the defaultDigraphs list.
+      // We output in codepoint order, but there are duplicate digraphs for some codepoints and we want control of order
       for (i in 0 until defaultDigraphs.size step 3) {
-        if (column != 0) {
-          repeat(columnWidth - (columnLength % columnWidth)) {
-            append(' ')
+        val char = defaultDigraphs[i + 2]
+
+        // Show headers if requested. Vim shows headers for some Unicode blocks, but not all. And its block boundaries
+        // aren't necessarily correct
+        val block = getVimCompatibleUnicodeBlock(char)
+        if (showHeaders && block != previousUnicodeBlock && digraphHeaderNames.containsKey(block)) {
+          if (column != 0) {
+            appendLine()
           }
+          appendLine(digraphHeaderNames[block])
+          previousUnicodeBlock = block
+          column = 0
+        }
+
+        if (column != 0) {
+          repeat(columnWidth - (columnLength % columnWidth)) { append(' ') }
         }
         columnLength = length
 
@@ -130,7 +154,6 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         append(' ')
 
         // VIM highlights the printable character with HLF_8, which it also uses for special keys in `:map`
-        val char = defaultDigraphs[i + 2]
         val printable = EngineStringHelper.toPrintableCharacter(char)
         val invisibleCharAdjustment = when {
           // Weird Vim-ism. `NU` (NULL) is set to 10, but displays as `^@`
@@ -195,6 +218,16 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       || type == Character.COMBINING_SPACING_MARK
       || type == Character.ENCLOSING_MARK
       || type == Character.FORMAT
+  }
+
+  private fun getVimCompatibleUnicodeBlock(char: Char): Character.UnicodeBlock {
+    // Vim's block boundaries don't agree with Java's. Fudge things so they match
+    val block = Character.UnicodeBlock.of(char)
+    return when {
+      block == Character.UnicodeBlock.LATIN_1_SUPPLEMENT && char.code < 0xa1 -> Character.UnicodeBlock.BASIC_LATIN
+      block == Character.UnicodeBlock.NUMBER_FORMS && char.code < 0x2160 -> Character.UnicodeBlock.LETTERLIKE_SYMBOLS
+      else -> block
+    }
   }
 
   // Based on the digraphs listed in `:help digraph-table` and `:help digraph-table-mbyte`, which unfortunately doesn't
@@ -1604,6 +1637,41 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
    * Note that when a character has multiple digraphs (e.g. `!I` and `~!`), only the first is kept!
    */
   private val characterToDigraph: MutableMap<Char, String> = TreeMap<Char, String>()
+
+  /**
+   * A map of Unicode block to Vim digraph header name/display text
+   *
+   * This map only contains a name for the Unicode blocks that Vim outputs. If no display text exists for a Unicode
+   * block, then it's not displayed as a separate header
+   */
+  private val digraphHeaderNames = mapOf(
+    Character.UnicodeBlock.LATIN_1_SUPPLEMENT to "Latin supplement",
+    Character.UnicodeBlock.GREEK to "Greek and Coptic",
+    Character.UnicodeBlock.CYRILLIC to "Cyrillic",
+    Character.UnicodeBlock.HEBREW to "Hebrew",
+    Character.UnicodeBlock.ARABIC to "Arabic",
+    Character.UnicodeBlock.LATIN_EXTENDED_ADDITIONAL to "Latin extended",
+    Character.UnicodeBlock.GREEK_EXTENDED to "Greek extended",
+    Character.UnicodeBlock.GENERAL_PUNCTUATION to "Punctuation",
+    Character.UnicodeBlock.SUPERSCRIPTS_AND_SUBSCRIPTS to "Super- and subscripts",
+    Character.UnicodeBlock.CURRENCY_SYMBOLS to "Currency",
+    Character.UnicodeBlock.LETTERLIKE_SYMBOLS to "Other",
+    Character.UnicodeBlock.NUMBER_FORMS to "Roman numbers",
+    Character.UnicodeBlock.ARROWS to "Arrows",
+    Character.UnicodeBlock.MATHEMATICAL_OPERATORS to "Mathematical operators",
+    Character.UnicodeBlock.MISCELLANEOUS_TECHNICAL to "Technical",
+    Character.UnicodeBlock.CONTROL_PICTURES to "Other",
+    Character.UnicodeBlock.BOX_DRAWING to "Box drawing",
+    Character.UnicodeBlock.BLOCK_ELEMENTS to "Block elements",
+    Character.UnicodeBlock.GEOMETRIC_SHAPES to "Geometric shapes",
+    Character.UnicodeBlock.MISCELLANEOUS_SYMBOLS to "Symbols",
+    Character.UnicodeBlock.DINGBATS to "Dingbats",
+    Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION to "CJK symbols and punctuation",
+    Character.UnicodeBlock.HIRAGANA to "Hiragana",
+    Character.UnicodeBlock.KATAKANA to "Katakana",
+    Character.UnicodeBlock.BOPOMOFO to "Bopomofo",
+    Character.UnicodeBlock.ENCLOSED_CJK_LETTERS_AND_MONTHS to "Other",
+  )
 
   init {
     loadDigraphs()
