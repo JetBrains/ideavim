@@ -40,8 +40,36 @@ class DigraphTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
+      enterCommand("set digraph")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @Test
+  fun `test digraph with custom digraph`() {
+    doTest(
+      "i (<BS>0",
+      """
+            Lorem Ipsum
+
+            I found it$c in a legendary land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      """
+            Lorem Ipsum
+
+            I found it ⓪$c in a legendary land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+      Mode.INSERT,
+    ) {
+      enterCommand("digraph (0 9450")
       enterCommand("set digraph")
     }
   }
@@ -67,7 +95,7 @@ Mode.INSERT,
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -94,7 +122,7 @@ Mode.INSERT,
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
@@ -121,7 +149,7 @@ Mode.INSERT,
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     ) {
       enterCommand("set digraph")
     }
