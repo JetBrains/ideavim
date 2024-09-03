@@ -26,4 +26,33 @@ class InsertCompletedDigraphActionTest : VimTestCase() {
   fun `test insert same character with different digraphs`() {
     doTest(listOf("i", "<C-K>Ct", "<C-K>c|", "<Esc>"), "", "¢¢")
   }
+
+  @Test
+  fun `test insert custom digraph`() {
+    doTest(listOf("i", "<C-K>(0", "<Esc>"), "", "⓪") {
+      enterCommand("digraph (0 9450")
+    }
+  }
+
+  @Test
+  fun `test insert custom digraph with reversed characters`() {
+    doTest(listOf("i", "<C-K>0(", "<Esc>"), "", "⓪") {
+      enterCommand("digraph (0 9450")
+    }
+  }
+
+  @Test
+  fun `test insert custom digraph overriding existing custom digraph`() {
+    doTest(listOf("i", "<C-K>(0", "<Esc>"), "", "✓") {
+      enterCommand("digraph (0 9450")
+      enterCommand("digraph (0 10003")
+    }
+  }
+
+  @Test
+  fun `test insert custom digraph overriding existing default digraph`() {
+    doTest(listOf("i", "<C-K>OK", "<Esc>"), "", "⓪") {
+      enterCommand("digraph OK 9450")
+    }
+  }
 }

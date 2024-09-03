@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.VimDigraphGroupBase
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -223,6 +224,7 @@ abstract class VimTestCase {
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
     injector.outputPanel.getCurrentOutputPanel()?.close()
     injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = false, resetCaret = false)
+    (injector.digraphGroup as VimDigraphGroupBase).clearCustomDigraphs()
 
     // Tear down neovim
     NeovimTesting.tearDown(testInfo)

@@ -69,4 +69,12 @@ class AsciiCommandTest : VimTestCase() {
     enterCommand("ascii")
     assertEquals("<¢>  162,  Hex a2,  Oct 242, Digr Ct", VimPlugin.getMessage())
   }
+
+  @Test
+  fun `test shows custom digraph`() {
+    configureByText("⓪")
+    enterCommand("digraph (0 9450")
+    enterCommand("ascii")
+    assertEquals("<⓪> 9450, Hex 24ea, Oct 22352, Digr (0", VimPlugin.getMessage())
+  }
 }

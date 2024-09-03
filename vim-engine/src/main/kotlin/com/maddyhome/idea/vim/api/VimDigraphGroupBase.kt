@@ -11,8 +11,9 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.EngineStringHelper
-import com.maddyhome.idea.vim.helper.Msg
+import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
 import kotlin.Char
@@ -23,16 +24,22 @@ private val logger = vimLogger<VimDigraphGroup>()
 open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun getCharacterForDigraph(ch1: Char, ch2: Char): Char {
-    val chars = charArrayOf(ch1, ch2)
-    var digraph = String(chars)
-    var ch: Char? = digraphToCharacter[digraph]
-    if (ch == null) {
-      chars[0] = ch2
-      chars[1] = ch1
-      digraph = String(chars)
-      ch = digraphToCharacter[digraph]
+    fun getCharacter(ch1: Char, ch2: Char, digraphs: Map<String, Char>): Char? {
+      val chars = charArrayOf(ch1, ch2)
+      var digraph = String(chars)
+      val ch = digraphs[digraph]
+      if (ch == null) {
+        chars[0] = ch2
+        chars[1] = ch1
+        digraph = String(chars)
+        return digraphs[digraph]
+      }
+      return ch
     }
-    return ch ?: ch2
+
+    return getCharacter(ch1, ch2, customDigraphToCharacter)
+      ?: getCharacter(ch1, ch2, digraphToCharacter)
+      ?: ch2
   }
 
   override fun displayAsciiInfo(editor: VimEditor) {
@@ -41,7 +48,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     if (charsSequence.isEmpty() || offset >= charsSequence.length) return
     val ch = charsSequence[offset]
 
-    val digraph = characterToDigraph[ch]
+    val digraph = customCharacterToDigraph[ch] ?: characterToDigraph[ch]
     val digraphText = if (digraph == null) "" else ", Digr $digraph"
 
     if (ch.code < 0x100) {
@@ -77,7 +84,6 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       if (defaultDigraphs[i] != '\u0000' && defaultDigraphs[i + 1] != '\u0000') {
         val character: Char = defaultDigraphs[i + 2]
         val digraph = String(defaultDigraphs, i, 2)
-        // todo use BiMap instead?
         digraphToCharacter[digraph] = character
         if (!characterToDigraph.contains(character)) {
           characterToDigraph[character] = digraph
@@ -85,7 +91,6 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       }
       i += 3
     }
-    // TODO - load custom digraphs from .ideavimrc
   }
 
   override fun parseCommandLine(editor: VimEditor, args: String): Boolean {
@@ -98,11 +103,26 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       return true
     }
 
-    // todo command is not fully supported
-    // TODO: Command only supports adding new digraphs - :digraphs {char1}{char2} {number}
+    val tokenizer = StringTokenizer(args)
+    while (tokenizer.hasMoreTokens()) {
+      val digraph = tokenizer.nextToken()
+      if (digraph.length == 1) {
+        throw exExceptionMessage("E1214", digraph)  // E1214: Digraph must be just two characters: {0}
+      }
 
-    injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_invarg, args))
-    return false
+      if (!(tokenizer.hasMoreTokens())) {
+        throw exExceptionMessage("E39") // E39: Number expected
+      }
+
+      val codepoint = tokenizer.nextToken().toIntOrNull()
+      if (codepoint == null) {
+        throw exExceptionMessage("E39") // E39: Number expected
+      }
+
+      addCustomDigraph(digraph.substring(0, 2), Char(codepoint))
+    }
+
+    return true
   }
 
   override fun showDigraphs(editor: VimEditor, showHeaders: Boolean) {
@@ -120,7 +140,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       logger.debug("height=$height")
     }
 
-    val digraphCount = defaultDigraphs.size / 3
+    val digraphCount = (defaultDigraphs.size / 3) + customDigraphToCharacter.size
     val capacity = (digraphCount * columnWidth) + (digraphCount / columnCount) + 300 // Text + newlines + headers
     val output = buildString(capacity) {
       var column = 0
@@ -147,52 +167,32 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         if (column != 0) {
           repeat(columnWidth - (columnLength % columnWidth)) { append(' ') }
         }
-        columnLength = length
 
-        append(defaultDigraphs[i])
-        append(defaultDigraphs[i + 1])
-        append(' ')
-
-        // VIM highlights the printable character with HLF_8, which it also uses for special keys in `:map`
-        val printable = EngineStringHelper.toPrintableCharacter(char)
-        val invisibleCharAdjustment = when {
-          // Weird Vim-ism. `NU` (NULL) is set to 10, but displays as `^@`
-          char == '\u000a' && i == 0 -> {
-            append(EngineStringHelper.toPrintableCharacter('\u0000'))
-            0
-          }
-          printable.length == 1 && isRightToLeft(char) -> {
-            append('\u2067')  // RIGHT_TO_LEFT_ISOLATE - set RTL and isolate following content from the surrounding text
-            append(printable)
-            append('\u2069')  // POP_DIRECTIONAL_ISOLATE - close the isolation range and return to LTR
-            2
-          }
-          printable.length == 1 && isCombiningCharacter(char) -> {
-            append(' ') // Give the combining character something to combine with
-            append(printable)
-            1
-          }
-          else -> {
-            append(printable)
-            0
-          }
-        }
-
-        // Add an extra space if we've only used one text cell.
-        // Ideally here, we'd check the EAST_ASIAN_WIDTH Unicode property of the printed character. If it's full width,
-        // it's taken two "cells". I'm not sure this would work for all characters, e.g. Ⅵ seems to be 1.5 "cells" wide.
-        // Perhaps we could set the output panel's tab size to 13, and use tab stops to make things line up?
-        if (printable.length == 1) {
-          append(' ')
-        }
-
-        // Print the code: ' %3d'
-        append(' ')
-        append(char.code.toString().padStart(3))
-
-        columnLength = length - columnLength - invisibleCharAdjustment
-
+        columnLength = appendDigraph(defaultDigraphs[i], defaultDigraphs[i + 1], char)
         column++
+
+        if (column == columnCount) {
+          appendLine()
+          column = 0
+        }
+      }
+
+      if (showHeaders && customDigraphToCharacter.isNotEmpty()) {
+        if (column != 0) {
+          appendLine()
+        }
+        appendLine("Custom")
+        column = 0
+      }
+
+      customDigraphToCharacter.forEach { (digraph, char) ->
+        if (column != 0) {
+          repeat(columnWidth - (columnLength % columnWidth)) { append(' ') }
+        }
+
+        columnLength = appendDigraph(digraph[0], digraph[1], char)
+        column++
+
         if (column == columnCount) {
           appendLine()
           column = 0
@@ -202,6 +202,53 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
     injector.outputPanel.output(editor, context, output)
+  }
+
+  private fun StringBuilder.appendDigraph(ch1: Char, ch2: Char, char: Char): Int {
+    val start = this.length
+
+    append(ch1)
+    append(ch2)
+    append(' ')
+
+    // VIM highlights the printable character with HLF_8, which it also uses for special keys in `:map`
+    val printable = EngineStringHelper.toPrintableCharacter(char)
+    val invisibleCharAdjustment = when {
+      // Vim null handling weirdness... `NU` is NULL, and represented as NL ('\u000a`), but the char should be `^@`
+      ch1 == 'N' && ch2 == 'U' -> {
+        append(EngineStringHelper.toPrintableCharacter('\u0000'))
+        0
+      }
+      printable.length == 1 && isRightToLeft(char) -> {
+        append('\u2067')  // RIGHT_TO_LEFT_ISOLATE - set RTL and isolate following content from the surrounding text
+        append(printable)
+        append('\u2069')  // POP_DIRECTIONAL_ISOLATE - close the isolation range and return to LTR
+        2
+      }
+      printable.length == 1 && isCombiningCharacter(char) -> {
+        append(' ') // Give the combining character something to combine with
+        append(printable)
+        1
+      }
+      else -> {
+        append(printable)
+        0
+      }
+    }
+
+    // Add an extra space if we've only used one text cell.
+    // Ideally here, we'd check the EAST_ASIAN_WIDTH Unicode property of the printed character. If it's full width,
+    // it's taken two "cells". I'm not sure this would work for all characters, e.g. Ⅵ seems to be 1.5 "cells" wide.
+    // Perhaps we could set the output panel's tab size to 13, and use tab stops to make things line up?
+    if (printable.length == 1) {
+      append(' ')
+    }
+
+    // Print the code: ' %3d'
+    append(' ')
+    append(char.code.toString().padStart(3))
+
+    return length - start - invisibleCharAdjustment
   }
 
   private fun isRightToLeft(c: Char): Boolean {
@@ -228,6 +275,18 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       block == Character.UnicodeBlock.NUMBER_FORMS && char.code < 0x2160 -> Character.UnicodeBlock.LETTERLIKE_SYMBOLS
       else -> block
     }
+  }
+
+  private fun addCustomDigraph(digraph: String, char: Char) {
+    customDigraphToCharacter[digraph] = char
+    customCharacterToDigraph[char] = digraph
+  }
+
+  // Surprisingly, Vim doesn't have a command line for removing custom digraphs
+  @TestOnly
+  fun clearCustomDigraphs() {
+    customDigraphToCharacter.clear()
+    customCharacterToDigraph.clear()
   }
 
   // Based on the digraphs listed in `:help digraph-table` and `:help digraph-table-mbyte`, which unfortunately doesn't
@@ -1637,6 +1696,18 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
    * Note that when a character has multiple digraphs (e.g. `!I` and `~!`), only the first is kept!
    */
   private val characterToDigraph: MutableMap<Char, String> = TreeMap<Char, String>()
+
+  /**
+   * A map of custom digraphs to chars
+   *
+   * This property uses [LinkedHashMap] so that iteration order matches insertion order
+   */
+  private val customDigraphToCharacter: MutableMap<String, Char> = LinkedHashMap<String, Char>()
+
+  /**
+   * A map of custom digraph characters to digraph
+   */
+  private val customCharacterToDigraph: MutableMap<Char, String> = HashMap<Char, String>()
 
   /**
    * A map of Unicode block to Vim digraph header name/display text
