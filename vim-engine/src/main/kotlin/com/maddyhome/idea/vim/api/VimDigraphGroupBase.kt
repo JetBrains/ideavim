@@ -21,11 +21,11 @@ private val logger = vimLogger<VimDigraphGroup>()
 open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun getDigraph(ch1: Char, ch2: Char): Char {
-    var key = String(charArrayOf(ch1, ch2))
-    var ch: Char? = digraphs[key]
+    var digraph = String(charArrayOf(ch1, ch2))
+    var ch: Char? = digraphToCharacter[digraph]
     if (ch == null) {
-      key = String(charArrayOf(ch2, ch1))
-      ch = digraphs[key]
+      digraph = String(charArrayOf(ch2, ch1))
+      ch = digraphToCharacter[digraph]
     }
     return ch ?: ch2
   }
@@ -36,7 +36,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     if (charsSequence.isEmpty() || offset >= charsSequence.length) return
     val ch = charsSequence[offset]
 
-    val digraph = keys[ch]
+    val digraph = characterToDigraph[ch]
     val digraphText = if (digraph == null) "" else ", Digr $digraph"
 
     if (ch.code < 0x100) {
@@ -73,8 +73,10 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         val ch: Char = defaultDigraphs[i + 2]
         val key = String(charArrayOf(defaultDigraphs[i], defaultDigraphs[i + 1]))
         // todo use BiMap instead?
-        digraphs[key] = ch
-        keys[ch] = key
+        digraphToCharacter[key] = ch
+        if (!characterToDigraph.contains(ch)) {
+          characterToDigraph[ch] = key
+        }
       }
       i += 3
     }
@@ -92,9 +94,12 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun showDigraphs(editor: VimEditor) {
     val width = injector.engineEditorHelper.getApproximateScreenWidth(editor).let { if (it < 10) 80 else it }
+
+    // Vim's columns are 13 characters wide, but for some reason, they suddenly switch to 12. It makes no obvious sense,
+    // and it's a quirk too far to copy.
     val columnWidth = 13
     val columnCount = width / columnWidth
-    val height = ceil(digraphs.size.toDouble() / columnCount.toDouble()).toInt()
+    val height = ceil(digraphToCharacter.size.toDouble() / columnCount.toDouble()).toInt()
 
     if (logger.isDebug()) {
       logger.debug("width=$width")
@@ -104,13 +109,24 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
     val output = buildString {
       var column = 0
-      keys.forEach { (char, digraph) ->
+
+      // We cannot guarantee ordering with the dictionaries, so let's use the defaultDigraphs list
+      for (i in 0 until defaultDigraphs.size step 3) {
+        val char = defaultDigraphs[i + 2]
+        val digraph = String(charArrayOf(defaultDigraphs[i], defaultDigraphs[i + 1]))
+
         val start = length
         append(digraph)
         append(' ')
 
+        // VIM highlights the printable character with HLF_8, which it also uses for special keys in `:map`
         val printable = EngineStringHelper.toPrintableCharacter(char)
         val adjustment = when {
+          // Weird Vim-ism. `NU` (NULL) is set to 10, but displays as `^@`
+          char == '\u000a' && i == 0 -> {
+            append(EngineStringHelper.toPrintableCharacter('\u0000'))
+            0
+          }
           printable.length == 1 && isRightToLeft(char) -> {
             append('\u2067')  // RIGHT_TO_LEFT_ISOLATE - set RTL and isolate following content from the surrounding text
             append(printable)
@@ -128,7 +144,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
           }
         }
 
-        // Add an extra space if we've only used one text cell
+        // Add an extra space if we've only used one text cell.
         // Ideally here, we'd check the EAST_ASIAN_WIDTH Unicode property of the printed character. If it's full width,
         // it's taken two "cells". I'm not sure this would work for all characters, e.g. Ⅵ seems to be 1.5 "cells" wide.
         // Perhaps we could set the output panel's tab size to 13, and use tab stops to make things line up?
@@ -178,9 +194,34 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       || type == Character.FORMAT
   }
 
+  // Based on the digraphs listed in `:help digraph-table` and `:help digraph-table-mbyte`, which unfortunately doesn't
+  // list all digraphs. The output of the `:digraphs` command (`redir @">|silent digraphs|redir END|enew|put`) is used
+  // to fill in the missing entries. (Compare against the output in the tests)
+  // This awk script will convert these tables into the format we need:
+  // awk '{
+  //  char1 = substr($2, 1, 1);
+  //  char2 = substr($2, 2, 1);
+  //  name = substr($0, index($0, $5))
+  //  sub(/[ \t]+$/, "" name)
+  //
+  //  gsub(/'\''/, "\\'\''", char1)
+  //  gsub(/'\''/, "\\'\''", char2)
+  //
+  //  codepoint = $3;
+  //  gsub("0x", "", codepoint);
+  //  unicode = tolower(sprintf("\\u%04s", codepoint))
+  //
+  //  printf "'\''%s'\'', '\''%s'\'', '\''%s'\'', // %4d %s %s\n", char1, char2, unicode, $4, $1, name;
+  //}' $input_file
+  //
+  // NOTE:
+  // * This script fails for `SP` - the space character will have to be updated manually
+  // * The `NU` digraph is set to `\u000a`. This matches Vim behaviour, which ignores a digraph with a code of 0
+  //   See `:help i_CTRL-V_digit` for more details (Vim uses `\u000a` internally to represent null)
   @Suppress("GrazieInspection", "SpellCheckingInspection")
   private val defaultDigraphs = charArrayOf(
-    'N', 'U', '\u0000', //    0 ^@ NULL (NUL)
+    // See `:help digraph-table`
+    'N', 'U', '\u000a', //   10 ^@ NULL (NUL)
     'S', 'H', '\u0001', //    1 ^A START OF HEADING (SOH)
     'S', 'X', '\u0002', //    2 ^B START OF TEXT (STX)
     'E', 'X', '\u0003', //    3 ^C END OF TEXT (ETX)
@@ -202,7 +243,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'D', '3', '\u0013', //   19 ^S DEVICE CONTROL THREE (DC3)
     'D', '4', '\u0014', //   20 ^T DEVICE CONTROL FOUR (DC4)
     'N', 'K', '\u0015', //   21 ^U NEGATIVE ACKNOWLEDGE (NAK)
-    'S', 'Y', '\u0016', //   22 ^V SYNCRONOUS IDLE (SYN)
+    'S', 'Y', '\u0016', //   22 ^V SYNCHRONOUS IDLE (SYN)
     'E', 'B', '\u0017', //   23 ^W END OF TRANSMISSION BLOCK (ETB)
     'C', 'N', '\u0018', //   24 ^X CANCEL (CAN)
     'E', 'M', '\u0019', //   25 ^Y END OF MEDIUM (EM)
@@ -260,100 +301,154 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'A', 'C', '\u009f', //  159 ~_ APPLICATION PROGRAM COMMAND (APC)
     'N', 'S', '\u00a0', //  160 | NO-BREAK SPACE
     '!', 'I', '\u00a1', //  161 ¡ INVERTED EXCLAMATION MARK
+    '~', '!', '\u00a1', //  161 ¡ INVERTED EXCLAMATION MARK (Vim 5.x compatible)
     'C', 't', '\u00a2', //  162 ¢ CENT SIGN
+    'c', '|', '\u00a2', //  162 ¢ CENT SIGN (Vim 5.x compatible)
     'P', 'd', '\u00a3', //  163 £ POUND SIGN
+    '$', '$', '\u00a3', //  163 £ POUND SIGN (Vim 5.x compatible)
     'C', 'u', '\u00a4', //  164 ¤ CURRENCY SIGN
+    'o', 'x', '\u00a4', //  164 ¤ CURRENCY SIGN (Vim 5.x compatible)
     'Y', 'e', '\u00a5', //  165 ¥ YEN SIGN
+    'Y', '-', '\u00a5', //  165 ¥ YEN SIGN (Vim 5.x compatible)
     'B', 'B', '\u00a6', //  166 ¦ BROKEN BAR
+    '|', '|', '\u00a6', //  166 ¦ BROKEN BAR (Vim 5.x compatible)
     'S', 'E', '\u00a7', //  167 § SECTION SIGN
     '\'', ':', '\u00a8', //  168 ¨ DIAERESIS
     'C', 'o', '\u00a9', //  169 © COPYRIGHT SIGN
+    'c', 'O', '\u00a9', //  169 © COPYRIGHT SIGN (Vim 5.x compatible)
     '-', 'a', '\u00aa', //  170 ª FEMININE ORDINAL INDICATOR
     '<', '<', '\u00ab', //  171 « LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
     'N', 'O', '\u00ac', //  172 ¬ NOT SIGN
+    '-', ',', '\u00ac', //  172 ¬ NOT SIGN (Vim 5.x compatible)
     '-', '-', '\u00ad', //  173 ­ SOFT HYPHEN
     'R', 'g', '\u00ae', //  174 ® REGISTERED SIGN
     '\'', 'm', '\u00af', //  175 ¯ MACRON
+    '-', '=', '\u00af', //  175 ¯ MACRON (Vim 5.x compatible)
     'D', 'G', '\u00b0', //  176 ° DEGREE SIGN
+    '~', 'o', '\u00b0', //  176 ° DEGREE SIGN (Vim 5.x compatible)
     '+', '-', '\u00b1', //  177 ± PLUS-MINUS SIGN
     '2', 'S', '\u00b2', //  178 ² SUPERSCRIPT TWO
+    '2', '2', '\u00b2', //  178 ² SUPERSCRIPT TWO (Vim 5.x compatible)
     '3', 'S', '\u00b3', //  179 ³ SUPERSCRIPT THREE
+    '3', '3', '\u00b3', //  179 ³ SUPERSCRIPT THREE (Vim 5.x compatible)
     '\'', '\'', '\u00b4', //  180 ´ ACUTE ACCENT
     'M', 'y', '\u00b5', //  181 µ MICRO SIGN
     'P', 'I', '\u00b6', //  182 ¶ PILCROW SIGN
+    'p', 'p', '\u00b6', //  182 ¶ PILCROW SIGN (Vim 5.x compatible)
     '.', 'M', '\u00b7', //  183 · MIDDLE DOT
+    '~', '.', '\u00b7', //  183 · MIDDLE DOT (Vim 5.x compatible)
     '\'', ',', '\u00b8', //  184 ¸ CEDILLA
     '1', 'S', '\u00b9', //  185 ¹ SUPERSCRIPT ONE
+    '1', '1', '\u00b9', //  185 ¹ SUPERSCRIPT ONE (Vim 5.x compatible)
     '-', 'o', '\u00ba', //  186 º MASCULINE ORDINAL INDICATOR
     '>', '>', '\u00bb', //  187 » RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
     '1', '4', '\u00bc', //  188 ¼ VULGAR FRACTION ONE QUARTER
     '1', '2', '\u00bd', //  189 ½ VULGAR FRACTION ONE HALF
     '3', '4', '\u00be', //  190 ¾ VULGAR FRACTION THREE QUARTERS
     '?', 'I', '\u00bf', //  191 ¿ INVERTED QUESTION MARK
+    '~', '?', '\u00bf', //  191 ¿ INVERTED QUESTION MARK (Vim 5.x compatible)
     'A', '!', '\u00c0', //  192 À LATIN CAPITAL LETTER A WITH GRAVE
+    'A', '`', '\u00c0', //  192 À LATIN CAPITAL LETTER A WITH GRAVE (Vim 5.x compatible)
     'A', '\'', '\u00c1', //  193 Á LATIN CAPITAL LETTER A WITH ACUTE
     'A', '>', '\u00c2', //  194 Â LATIN CAPITAL LETTER A WITH CIRCUMFLEX
+    'A', '^', '\u00c2', //  194 Â LATIN CAPITAL LETTER A WITH CIRCUMFLEX (Vim 5.x compatible)
     'A', '?', '\u00c3', //  195 Ã LATIN CAPITAL LETTER A WITH TILDE
+    'A', '~', '\u00c3', //  195 Ã LATIN CAPITAL LETTER A WITH TILDE (Vim 5.x compatible)
     'A', ':', '\u00c4', //  196 Ä LATIN CAPITAL LETTER A WITH DIAERESIS
+    'A', '"', '\u00c4', //  196 Ä LATIN CAPITAL LETTER A WITH DIAERESIS (Vim 5.x compatible)
     'A', 'A', '\u00c5', //  197 Å LATIN CAPITAL LETTER A WITH RING ABOVE
+    'A', '@', '\u00c5', //  197 Å LATIN CAPITAL LETTER A WITH RING ABOVE (Vim 5.x compatible)
     'A', 'E', '\u00c6', //  198 Æ LATIN CAPITAL LETTER AE
     'C', ',', '\u00c7', //  199 Ç LATIN CAPITAL LETTER C WITH CEDILLA
     'E', '!', '\u00c8', //  200 È LATIN CAPITAL LETTER E WITH GRAVE
+    'E', '`', '\u00c8', //  200 È LATIN CAPITAL LETTER E WITH GRAVE (Vim 5.x compatible)
     'E', '\'', '\u00c9', //  201 É LATIN CAPITAL LETTER E WITH ACUTE
     'E', '>', '\u00ca', //  202 Ê LATIN CAPITAL LETTER E WITH CIRCUMFLEX
+    'E', '^', '\u00ca', //  202 Ê LATIN CAPITAL LETTER E WITH CIRCUMFLEX (Vim 5.x compatible)
     'E', ':', '\u00cb', //  203 Ë LATIN CAPITAL LETTER E WITH DIAERESIS
+    'E', '"', '\u00cb', //  203 Ë LATIN CAPITAL LETTER E WITH DIAERESIS (Vim 5.x compatible)
     'I', '!', '\u00cc', //  204 Ì LATIN CAPITAL LETTER I WITH GRAVE
+    'I', '`', '\u00cc', //  204 Ì LATIN CAPITAL LETTER I WITH GRAVE (Vim 5.x compatible)
     'I', '\'', '\u00cd', //  205 Í LATIN CAPITAL LETTER I WITH ACUTE
     'I', '>', '\u00ce', //  206 Î LATIN CAPITAL LETTER I WITH CIRCUMFLEX
+    'I', '^', '\u00ce', //  206 Î LATIN CAPITAL LETTER I WITH CIRCUMFLEX (Vim 5.x compatible)
     'I', ':', '\u00cf', //  207 Ï LATIN CAPITAL LETTER I WITH DIAERESIS
+    'I', '"', '\u00cf', //  207 Ï LATIN CAPITAL LETTER I WITH DIAERESIS (Vim 5.x compatible)
     'D', '-', '\u00d0', //  208 Ð LATIN CAPITAL LETTER ETH (Icelandic)
     'N', '?', '\u00d1', //  209 Ñ LATIN CAPITAL LETTER N WITH TILDE
+    'N', '~', '\u00d1', //  209 Ñ LATIN CAPITAL LETTER N WITH TILDE (Vim 5.x compatible)
     'O', '!', '\u00d2', //  210 Ò LATIN CAPITAL LETTER O WITH GRAVE
+    'O', '`', '\u00d2', //  210 Ò LATIN CAPITAL LETTER O WITH GRAVE (Vim 5.x compatible)
     'O', '\'', '\u00d3', //  211 Ó LATIN CAPITAL LETTER O WITH ACUTE
     'O', '>', '\u00d4', //  212 Ô LATIN CAPITAL LETTER O WITH CIRCUMFLEX
+    'O', '^', '\u00d4', //  212 Ô LATIN CAPITAL LETTER O WITH CIRCUMFLEX (Vim 5.x compatible)
     'O', '?', '\u00d5', //  213 Õ LATIN CAPITAL LETTER O WITH TILDE
+    'O', '~', '\u00d5', //  213 Õ LATIN CAPITAL LETTER O WITH TILDE (Vim 5.x compatible)
     'O', ':', '\u00d6', //  214 Ö LATIN CAPITAL LETTER O WITH DIAERESIS
     '*', 'X', '\u00d7', //  215 × MULTIPLICATION SIGN
+    '/', '\\', '\u00d7', //  215 × MULTIPLICATION SIGN (Vim 5.x compatible)
     'O', '/', '\u00d8', //  216 Ø LATIN CAPITAL LETTER O WITH STROKE
     'U', '!', '\u00d9', //  217 Ù LATIN CAPITAL LETTER U WITH GRAVE
+    'U', '`', '\u00d9', //  217 Ù LATIN CAPITAL LETTER U WITH GRAVE (Vim 5.x compatible)
     'U', '\'', '\u00da', //  218 Ú LATIN CAPITAL LETTER U WITH ACUTE
     'U', '>', '\u00db', //  219 Û LATIN CAPITAL LETTER U WITH CIRCUMFLEX
+    'U', '^', '\u00db', //  219 Û LATIN CAPITAL LETTER U WITH CIRCUMFLEX (Vim 5.x compatible)
     'U', ':', '\u00dc', //  220 Ü LATIN CAPITAL LETTER U WITH DIAERESIS
     'Y', '\'', '\u00dd', //  221 Ý LATIN CAPITAL LETTER Y WITH ACUTE
     'T', 'H', '\u00de', //  222 Þ LATIN CAPITAL LETTER THORN (Icelandic)
+    'I', 'p', '\u00de', //  222 Þ LATIN CAPITAL LETTER THORN (Icelandic) (Vim 5.x compatible)
     's', 's', '\u00df', //  223 ß LATIN SMALL LETTER SHARP S (German)
     'a', '!', '\u00e0', //  224 à LATIN SMALL LETTER A WITH GRAVE
+    'a', '`', '\u00e0', //  224 à LATIN SMALL LETTER A WITH GRAVE (Vim 5.x compatible)
     'a', '\'', '\u00e1', //  225 á LATIN SMALL LETTER A WITH ACUTE
     'a', '>', '\u00e2', //  226 â LATIN SMALL LETTER A WITH CIRCUMFLEX
+    'a', '^', '\u00e2', //  226 â LATIN SMALL LETTER A WITH CIRCUMFLEX (Vim 5.x compatible)
     'a', '?', '\u00e3', //  227 ã LATIN SMALL LETTER A WITH TILDE
+    'a', '~', '\u00e3', //  227 ã LATIN SMALL LETTER A WITH TILDE (Vim 5.x compatible)
     'a', ':', '\u00e4', //  228 ä LATIN SMALL LETTER A WITH DIAERESIS
+    'a', '"', '\u00e4', //  228 ä LATIN SMALL LETTER A WITH DIAERESIS (Vim 5.x compatible)
     'a', 'a', '\u00e5', //  229 å LATIN SMALL LETTER A WITH RING ABOVE
+    'a', '@', '\u00e5', //  229 å LATIN SMALL LETTER A WITH RING ABOVE (Vim 5.x compatible)
     'a', 'e', '\u00e6', //  230 æ LATIN SMALL LETTER AE
     'c', ',', '\u00e7', //  231 ç LATIN SMALL LETTER C WITH CEDILLA
     'e', '!', '\u00e8', //  232 è LATIN SMALL LETTER E WITH GRAVE
+    'e', '`', '\u00e8', //  232 è LATIN SMALL LETTER E WITH GRAVE (Vim 5.x compatible)
     'e', '\'', '\u00e9', //  233 é LATIN SMALL LETTER E WITH ACUTE
     'e', '>', '\u00ea', //  234 ê LATIN SMALL LETTER E WITH CIRCUMFLEX
+    'e', '^', '\u00ea', //  234 ê LATIN SMALL LETTER E WITH CIRCUMFLEX (Vim 5.x compatible)
     'e', ':', '\u00eb', //  235 ë LATIN SMALL LETTER E WITH DIAERESIS
+    'e', '"', '\u00eb', //  235 ë LATIN SMALL LETTER E WITH DIAERESIS (Vim 5.x compatible)
     'i', '!', '\u00ec', //  236 ì LATIN SMALL LETTER I WITH GRAVE
+    'i', '`', '\u00ec', //  236 ì LATIN SMALL LETTER I WITH GRAVE (Vim 5.x compatible)
     'i', '\'', '\u00ed', //  237 í LATIN SMALL LETTER I WITH ACUTE
     'i', '>', '\u00ee', //  238 î LATIN SMALL LETTER I WITH CIRCUMFLEX
+    'i', '^', '\u00ee', //  238 î LATIN SMALL LETTER I WITH CIRCUMFLEX (Vim 5.x compatible)
     'i', ':', '\u00ef', //  239 ï LATIN SMALL LETTER I WITH DIAERESIS
     'd', '-', '\u00f0', //  240 ð LATIN SMALL LETTER ETH (Icelandic)
     'n', '?', '\u00f1', //  241 ñ LATIN SMALL LETTER N WITH TILDE
+    'n', '~', '\u00f1', //  241 ñ LATIN SMALL LETTER N WITH TILDE (Vim 5.x compatible)
     'o', '!', '\u00f2', //  242 ò LATIN SMALL LETTER O WITH GRAVE
+    'o', '`', '\u00f2', //  242 ò LATIN SMALL LETTER O WITH GRAVE (Vim 5.x compatible)
     'o', '\'', '\u00f3', //  243 ó LATIN SMALL LETTER O WITH ACUTE
     'o', '>', '\u00f4', //  244 ô LATIN SMALL LETTER O WITH CIRCUMFLEX
+    'o', '^', '\u00f4', //  244 ô LATIN SMALL LETTER O WITH CIRCUMFLEX (Vim 5.x compatible)
     'o', '?', '\u00f5', //  245 õ LATIN SMALL LETTER O WITH TILDE
+    'o', '~', '\u00f5', //  245 õ LATIN SMALL LETTER O WITH TILDE (Vim 5.x compatible)
     'o', ':', '\u00f6', //  246 ö LATIN SMALL LETTER O WITH DIAERESIS
     '-', ':', '\u00f7', //  247 ÷ DIVISION SIGN
     'o', '/', '\u00f8', //  248 ø LATIN SMALL LETTER O WITH STROKE
     'u', '!', '\u00f9', //  249 ù LATIN SMALL LETTER U WITH GRAVE
+    'u', '`', '\u00f9', //  249 ù LATIN SMALL LETTER U WITH GRAVE (Vim 5.x compatible)
     'u', '\'', '\u00fa', //  250 ú LATIN SMALL LETTER U WITH ACUTE
     'u', '>', '\u00fb', //  251 û LATIN SMALL LETTER U WITH CIRCUMFLEX
+    'u', '^', '\u00fb', //  251 û LATIN SMALL LETTER U WITH CIRCUMFLEX (Vim 5.x compatible)
     'u', ':', '\u00fc', //  252 ü LATIN SMALL LETTER U WITH DIAERESIS
     'y', '\'', '\u00fd', //  253 ý LATIN SMALL LETTER Y WITH ACUTE
     't', 'h', '\u00fe', //  254 þ LATIN SMALL LETTER THORN (Icelandic)
     'y', ':', '\u00ff', //  255 ÿ LATIN SMALL LETTER Y WITH DIAERESIS
+    'y', '"', '\u00ff', //  255 ÿ LATIN SMALL LETTER Y WITH DIAERESIS (Vim 5.x compatible)
+
+    // See `:help digraph-table-mbyte`
     'A', '-', '\u0100', //  256 Ā LATIN CAPITAL LETTER A WITH MACRON
     'a', '-', '\u0101', //  257 ā LATIN SMALL LETTER A WITH MACRON
     'A', '(', '\u0102', //  258 Ă LATIN CAPITAL LETTER A WITH BREVE
@@ -403,14 +498,14 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'I', ';', '\u012e', //  302 Į LATIN CAPITAL LETTER I WITH OGONEK
     'i', ';', '\u012f', //  303 į LATIN SMALL LETTER I WITH OGONEK
     'I', '.', '\u0130', //  304 İ LATIN CAPITAL LETTER I WITH DOT ABOVE
-    'i', '.', '\u0131', //  305 ı LATIN SMALL LETTER I DOTLESS
+    'i', '.', '\u0131', //  305 ı LATIN SMALL LETTER DOTLESS I
     'I', 'J', '\u0132', //  306 Ĳ LATIN CAPITAL LIGATURE IJ
     'i', 'j', '\u0133', //  307 ĳ LATIN SMALL LIGATURE IJ
     'J', '>', '\u0134', //  308 Ĵ LATIN CAPITAL LETTER J WITH CIRCUMFLEX
     'j', '>', '\u0135', //  309 ĵ LATIN SMALL LETTER J WITH CIRCUMFLEX
     'K', ',', '\u0136', //  310 Ķ LATIN CAPITAL LETTER K WITH CEDILLA
     'k', ',', '\u0137', //  311 ķ LATIN SMALL LETTER K WITH CEDILLA
-    'k', 'k', '\u0138', //  312 ĸ LATIN SMALL LETTER KRA (Greenlandic)
+    'k', 'k', '\u0138', //  312 ĸ LATIN SMALL LETTER KRA
     'L', '\'', '\u0139', //  313 Ĺ LATIN CAPITAL LETTER L WITH ACUTE
     'l', '\'', '\u013a', //  314 ĺ LATIN SMALL LETTER L WITH ACUTE
     'L', ',', '\u013b', //  315 Ļ LATIN CAPITAL LETTER L WITH CEDILLA
@@ -428,8 +523,8 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'N', '<', '\u0147', //  327 Ň LATIN CAPITAL LETTER N WITH CARON
     'n', '<', '\u0148', //  328 ň LATIN SMALL LETTER N WITH CARON
     '\'', 'n', '\u0149', //  329 ŉ LATIN SMALL LETTER N PRECEDED BY APOSTROPHE
-    'N', 'G', '\u014a', //  330 Ŋ LATIN CAPITAL LETTER ENG (Lappish)
-    'n', 'g', '\u014b', //  331 ŋ LATIN SMALL LETTER ENG (Lappish)
+    'N', 'G', '\u014a', //  330 Ŋ LATIN CAPITAL LETTER ENG
+    'n', 'g', '\u014b', //  331 ŋ LATIN SMALL LETTER ENG
     'O', '-', '\u014c', //  332 Ō LATIN CAPITAL LETTER O WITH MACRON
     'o', '-', '\u014d', //  333 ō LATIN SMALL LETTER O WITH MACRON
     'O', '(', '\u014e', //  334 Ŏ LATIN CAPITAL LETTER O WITH BREVE
@@ -527,14 +622,14 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     '\'', '0', '\u02da', //  730 ˚ RING ABOVE
     '\'', ';', '\u02db', //  731 ˛ OGONEK
     '\'', '"', '\u02dd', //  733 ˝ DOUBLE ACUTE ACCENT
-    'A', '%', '\u0386', //  902 Ά GREEK CAPITAL LETTER ALPHA WITH ACUTE
-    'E', '%', '\u0388', //  904 Έ GREEK CAPITAL LETTER EPSILON WITH ACUTE
-    'Y', '%', '\u0389', //  905 Ή GREEK CAPITAL LETTER ETA WITH ACUTE
-    'I', '%', '\u038a', //  906 Ί GREEK CAPITAL LETTER IOTA WITH ACUTE
-    'O', '%', '\u038c', //  908 Ό GREEK CAPITAL LETTER OMICRON WITH ACUTE
-    'U', '%', '\u038e', //  910 Ύ GREEK CAPITAL LETTER UPSILON WITH ACUTE
-    'W', '%', '\u038f', //  911 Ώ GREEK CAPITAL LETTER OMEGA WITH ACUTE
-    'i', '3', '\u0390', //  912 ΐ GREEK SMALL LETTER IOTA WITH ACUTE AND DIAERESIS
+    'A', '%', '\u0386', //  902 Ά GREEK CAPITAL LETTER ALPHA WITH TONOS
+    'E', '%', '\u0388', //  904 Έ GREEK CAPITAL LETTER EPSILON WITH TONOS
+    'Y', '%', '\u0389', //  905 Ή GREEK CAPITAL LETTER ETA WITH TONOS
+    'I', '%', '\u038a', //  906 Ί GREEK CAPITAL LETTER IOTA WITH TONOS
+    'O', '%', '\u038c', //  908 Ό GREEK CAPITAL LETTER OMICRON WITH TONOS
+    'U', '%', '\u038e', //  910 Ύ GREEK CAPITAL LETTER UPSILON WITH TONOS
+    'W', '%', '\u038f', //  911 Ώ GREEK CAPITAL LETTER OMEGA WITH TONOS
+    'i', '3', '\u0390', //  912 ΐ GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS
     'A', '*', '\u0391', //  913 Α GREEK CAPITAL LETTER ALPHA
     'B', '*', '\u0392', //  914 Β GREEK CAPITAL LETTER BETA
     'G', '*', '\u0393', //  915 Γ GREEK CAPITAL LETTER GAMMA
@@ -545,7 +640,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'H', '*', '\u0398', //  920 Θ GREEK CAPITAL LETTER THETA
     'I', '*', '\u0399', //  921 Ι GREEK CAPITAL LETTER IOTA
     'K', '*', '\u039a', //  922 Κ GREEK CAPITAL LETTER KAPPA
-    'L', '*', '\u039b', //  923 Λ GREEK CAPITAL LETTER LAMDA
+    'L', '*', '\u039b', //  923 Λ GREEK CAPITAL LETTER LAMDA (aka LAMBDA)
     'M', '*', '\u039c', //  924 Μ GREEK CAPITAL LETTER MU
     'N', '*', '\u039d', //  925 Ν GREEK CAPITAL LETTER NU
     'C', '*', '\u039e', //  926 Ξ GREEK CAPITAL LETTER XI
@@ -559,13 +654,13 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'X', '*', '\u03a7', //  935 Χ GREEK CAPITAL LETTER CHI
     'Q', '*', '\u03a8', //  936 Ψ GREEK CAPITAL LETTER PSI
     'W', '*', '\u03a9', //  937 Ω GREEK CAPITAL LETTER OMEGA
-    'J', '*', '\u03aa', //  938 Ϊ GREEK CAPITAL LETTER IOTA WITH DIAERESIS
-    'V', '*', '\u03ab', //  939 Ϋ GREEK CAPITAL LETTER UPSILON WITH DIAERESIS
-    'a', '%', '\u03ac', //  940 ά GREEK SMALL LETTER ALPHA WITH ACUTE
-    'e', '%', '\u03ad', //  941 έ GREEK SMALL LETTER EPSILON WITH ACUTE
-    'y', '%', '\u03ae', //  942 ή GREEK SMALL LETTER ETA WITH ACUTE
-    'i', '%', '\u03af', //  943 ί GREEK SMALL LETTER IOTA WITH ACUTE
-    'u', '3', '\u03b0', //  944 ΰ GREEK SMALL LETTER UPSILON WITH ACUTE AND DIAERESIS
+    'J', '*', '\u03aa', //  938 Ϊ GREEK CAPITAL LETTER IOTA WITH DIALYTIKA
+    'V', '*', '\u03ab', //  939 Ϋ GREEK CAPITAL LETTER UPSILON WITH DIALYTIKA
+    'a', '%', '\u03ac', //  940 ά GREEK SMALL LETTER ALPHA WITH TONOS
+    'e', '%', '\u03ad', //  941 έ GREEK SMALL LETTER EPSILON WITH TONOS
+    'y', '%', '\u03ae', //  942 ή GREEK SMALL LETTER ETA WITH TONOS
+    'i', '%', '\u03af', //  943 ί GREEK SMALL LETTER IOTA WITH TONOS
+    'u', '3', '\u03b0', //  944 ΰ GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS
     'a', '*', '\u03b1', //  945 α GREEK SMALL LETTER ALPHA
     'b', '*', '\u03b2', //  946 β GREEK SMALL LETTER BETA
     'g', '*', '\u03b3', //  947 γ GREEK SMALL LETTER GAMMA
@@ -576,7 +671,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'h', '*', '\u03b8', //  952 θ GREEK SMALL LETTER THETA
     'i', '*', '\u03b9', //  953 ι GREEK SMALL LETTER IOTA
     'k', '*', '\u03ba', //  954 κ GREEK SMALL LETTER KAPPA
-    'l', '*', '\u03bb', //  955 λ GREEK SMALL LETTER LAMDA
+    'l', '*', '\u03bb', //  955 λ GREEK SMALL LETTER LAMDA (aka LAMBDA)
     'm', '*', '\u03bc', //  956 μ GREEK SMALL LETTER MU
     'n', '*', '\u03bd', //  957 ν GREEK SMALL LETTER NU
     'c', '*', '\u03be', //  958 ξ GREEK SMALL LETTER XI
@@ -591,36 +686,36 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'x', '*', '\u03c7', //  967 χ GREEK SMALL LETTER CHI
     'q', '*', '\u03c8', //  968 ψ GREEK SMALL LETTER PSI
     'w', '*', '\u03c9', //  969 ω GREEK SMALL LETTER OMEGA
-    'j', '*', '\u03ca', //  970 ϊ GREEK SMALL LETTER IOTA WITH DIAERESIS
-    'v', '*', '\u03cb', //  971 ϋ GREEK SMALL LETTER UPSILON WITH DIAERESIS
-    'o', '%', '\u03cc', //  972 ό GREEK SMALL LETTER OMICRON WITH ACUTE
-    'u', '%', '\u03cd', //  973 ύ GREEK SMALL LETTER UPSILON WITH ACUTE
-    'w', '%', '\u03ce', //  974 ώ GREEK SMALL LETTER OMEGA WITH ACUTE
-    '\'', 'G', '\u03d8', //  984 Ϙ GREEK NUMERAL SIGN
-    ',', 'G', '\u03d9', //  985 ϙ GREEK LOWER NUMERAL SIGN
-    'T', '3', '\u03da', //  986 Ϛ GREEK CAPITAL LETTER STIGMA
+    'j', '*', '\u03ca', //  970 ϊ GREEK SMALL LETTER IOTA WITH DIALYTIKA
+    'v', '*', '\u03cb', //  971 ϋ GREEK SMALL LETTER UPSILON WITH DIALYTIKA
+    'o', '%', '\u03cc', //  972 ό GREEK SMALL LETTER OMICRON WITH TONOS
+    'u', '%', '\u03cd', //  973 ύ GREEK SMALL LETTER UPSILON WITH TONOS
+    'w', '%', '\u03ce', //  974 ώ GREEK SMALL LETTER OMEGA WITH TONOS
+    '\'', 'G', '\u03d8', //  984 Ϙ GREEK LETTER ARCHAIC KOPPA
+    ',', 'G', '\u03d9', //  985 ϙ GREEK SMALL LETTER ARCHAIC KOPPA
+    'T', '3', '\u03da', //  986 Ϛ GREEK LETTER STIGMA
     't', '3', '\u03db', //  987 ϛ GREEK SMALL LETTER STIGMA
-    'M', '3', '\u03dc', //  988 Ϝ GREEK CAPITAL LETTER DIGAMMA
+    'M', '3', '\u03dc', //  988 Ϝ GREEK LETTER DIGAMMA
     'm', '3', '\u03dd', //  989 ϝ GREEK SMALL LETTER DIGAMMA
-    'K', '3', '\u03de', //  990 Ϟ GREEK CAPITAL LETTER KOPPA
+    'K', '3', '\u03de', //  990 Ϟ GREEK LETTER KOPPA
     'k', '3', '\u03df', //  991 ϟ GREEK SMALL LETTER KOPPA
-    'P', '3', '\u03e0', //  992 Ϡ GREEK CAPITAL LETTER SAMPI
+    'P', '3', '\u03e0', //  992 Ϡ GREEK LETTER SAMPI
     'p', '3', '\u03e1', //  993 ϡ GREEK SMALL LETTER SAMPI
-    '\'', '%', '\u03f4', // 1012 ϴ ACUTE ACCENT AND DIAERESIS (Tonos and Dialytika)
-    'j', '3', '\u03f5', // 1013 ϵ GREEK IOTA BELOW
+    '\'', '%', '\u03f4', // 1012 ϴ GREEK CAPITAL THETA SYMBOL
+    'j', '3', '\u03f5', // 1013 ϵ GREEK LUNATE EPSILON SYMBOL
     'I', 'O', '\u0401', // 1025 Ё CYRILLIC CAPITAL LETTER IO
-    'D', '%', '\u0402', // 1026 Ђ CYRILLIC CAPITAL LETTER DJE (Serbocroatian)
-    'G', '%', '\u0403', // 1027 Ѓ CYRILLIC CAPITAL LETTER GJE (Macedonian)
+    'D', '%', '\u0402', // 1026 Ђ CYRILLIC CAPITAL LETTER DJE
+    'G', '%', '\u0403', // 1027 Ѓ CYRILLIC CAPITAL LETTER GJE
     'I', 'E', '\u0404', // 1028 Є CYRILLIC CAPITAL LETTER UKRAINIAN IE
-    'D', 'S', '\u0405', // 1029 Ѕ CYRILLIC CAPITAL LETTER DZE (Macedonian)
+    'D', 'S', '\u0405', // 1029 Ѕ CYRILLIC CAPITAL LETTER DZE
     'I', 'I', '\u0406', // 1030 І CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I
-    'Y', 'I', '\u0407', // 1031 Ї CYRILLIC CAPITAL LETTER YI (Ukrainian)
+    'Y', 'I', '\u0407', // 1031 Ї CYRILLIC CAPITAL LETTER YI
     'J', '%', '\u0408', // 1032 Ј CYRILLIC CAPITAL LETTER JE
     'L', 'J', '\u0409', // 1033 Љ CYRILLIC CAPITAL LETTER LJE
     'N', 'J', '\u040a', // 1034 Њ CYRILLIC CAPITAL LETTER NJE
-    'T', 's', '\u040b', // 1035 Ћ CYRILLIC CAPITAL LETTER TSHE (Serbocroatian)
-    'K', 'J', '\u040c', // 1036 Ќ CYRILLIC CAPITAL LETTER KJE (Macedonian)
-    'V', '%', '\u040e', // 1038 Ў CYRILLIC CAPITAL LETTER SHORT U (Byelorussian)
+    'T', 's', '\u040b', // 1035 Ћ CYRILLIC CAPITAL LETTER TSHE
+    'K', 'J', '\u040c', // 1036 Ќ CYRILLIC CAPITAL LETTER KJE
+    'V', '%', '\u040e', // 1038 Ў CYRILLIC CAPITAL LETTER SHORT U
     'D', 'Z', '\u040f', // 1039 Џ CYRILLIC CAPITAL LETTER DZHE
     'A', '=', '\u0410', // 1040 А CYRILLIC CAPITAL LETTER A
     'B', '=', '\u0411', // 1041 Б CYRILLIC CAPITAL LETTER BE
@@ -687,18 +782,18 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'j', 'u', '\u044e', // 1102 ю CYRILLIC SMALL LETTER YU
     'j', 'a', '\u044f', // 1103 я CYRILLIC SMALL LETTER YA
     'i', 'o', '\u0451', // 1105 ё CYRILLIC SMALL LETTER IO
-    'd', '%', '\u0452', // 1106 ђ CYRILLIC SMALL LETTER DJE (Serbocroatian)
-    'g', '%', '\u0453', // 1107 ѓ CYRILLIC SMALL LETTER GJE (Macedonian)
+    'd', '%', '\u0452', // 1106 ђ CYRILLIC SMALL LETTER DJE
+    'g', '%', '\u0453', // 1107 ѓ CYRILLIC SMALL LETTER GJE
     'i', 'e', '\u0454', // 1108 є CYRILLIC SMALL LETTER UKRAINIAN IE
-    'd', 's', '\u0455', // 1109 ѕ CYRILLIC SMALL LETTER DZE (Macedonian)
+    'd', 's', '\u0455', // 1109 ѕ CYRILLIC SMALL LETTER DZE
     'i', 'i', '\u0456', // 1110 і CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I
-    'y', 'i', '\u0457', // 1111 ї CYRILLIC SMALL LETTER YI (Ukrainian)
+    'y', 'i', '\u0457', // 1111 ї CYRILLIC SMALL LETTER YI
     'j', '%', '\u0458', // 1112 ј CYRILLIC SMALL LETTER JE
     'l', 'j', '\u0459', // 1113 љ CYRILLIC SMALL LETTER LJE
     'n', 'j', '\u045a', // 1114 њ CYRILLIC SMALL LETTER NJE
-    't', 's', '\u045b', // 1115 ћ CYRILLIC SMALL LETTER TSHE (Serbocroatian)
-    'k', 'j', '\u045c', // 1116 ќ CYRILLIC SMALL LETTER KJE (Macedonian)
-    'v', '%', '\u045e', // 1118 ў CYRILLIC SMALL LETTER SHORT U (Byelorussian)
+    't', 's', '\u045b', // 1115 ћ CYRILLIC SMALL LETTER TSHE
+    'k', 'j', '\u045c', // 1116 ќ CYRILLIC SMALL LETTER KJE
+    'v', '%', '\u045e', // 1118 ў CYRILLIC SMALL LETTER SHORT U
     'd', 'z', '\u045f', // 1119 џ CYRILLIC SMALL LETTER DZHE
     'Y', '3', '\u0462', // 1122 Ѣ CYRILLIC CAPITAL LETTER YAT
     'y', '3', '\u0463', // 1123 ѣ CYRILLIC SMALL LETTER YAT
@@ -787,20 +882,20 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     '1', '+', '\u0650', // 1616 ِ ARABIC KASRA
     '3', '+', '\u0651', // 1617 ّ ARABIC SHADDA
     '0', '+', '\u0652', // 1618 ْ ARABIC SUKUN
-    'a', 'S', '\u0670', // 1648 ٰ SUPERSCRIPT ARABIC LETTER ALEF
+    'a', 'S', '\u0670', // 1648 ٰ ARABIC LETTER SUPERSCRIPT ALEF
     'p', '+', '\u067e', // 1662 پ ARABIC LETTER PEH
     'v', '+', '\u06a4', // 1700 ڤ ARABIC LETTER VEH
     'g', 'f', '\u06af', // 1711 گ ARABIC LETTER GAF
-    '0', 'a', '\u06f0', // 1776 ۰ EASTERN ARABIC-INDIC DIGIT ZERO
-    '1', 'a', '\u06f1', // 1777 ۱ EASTERN ARABIC-INDIC DIGIT ONE
-    '2', 'a', '\u06f2', // 1778 ۲ EASTERN ARABIC-INDIC DIGIT TWO
-    '3', 'a', '\u06f3', // 1779 ۳ EASTERN ARABIC-INDIC DIGIT THREE
-    '4', 'a', '\u06f4', // 1780 ۴ EASTERN ARABIC-INDIC DIGIT FOUR
-    '5', 'a', '\u06f5', // 1781 ۵ EASTERN ARABIC-INDIC DIGIT FIVE
-    '6', 'a', '\u06f6', // 1782 ۶ EASTERN ARABIC-INDIC DIGIT SIX
-    '7', 'a', '\u06f7', // 1783 ۷ EASTERN ARABIC-INDIC DIGIT SEVEN
-    '8', 'a', '\u06f8', // 1784 ۸ EASTERN ARABIC-INDIC DIGIT EIGHT
-    '9', 'a', '\u06f9', // 1785 ۹ EASTERN ARABIC-INDIC DIGIT NINE
+    '0', 'a', '\u06f0', // 1776 ۰ EXTENDED ARABIC-INDIC DIGIT ZERO
+    '1', 'a', '\u06f1', // 1777 ۱ EXTENDED ARABIC-INDIC DIGIT ONE
+    '2', 'a', '\u06f2', // 1778 ۲ EXTENDED ARABIC-INDIC DIGIT TWO
+    '3', 'a', '\u06f3', // 1779 ۳ EXTENDED ARABIC-INDIC DIGIT THREE
+    '4', 'a', '\u06f4', // 1780 ۴ EXTENDED ARABIC-INDIC DIGIT FOUR
+    '5', 'a', '\u06f5', // 1781 ۵ EXTENDED ARABIC-INDIC DIGIT FIVE
+    '6', 'a', '\u06f6', // 1782 ۶ EXTENDED ARABIC-INDIC DIGIT SIX
+    '7', 'a', '\u06f7', // 1783 ۷ EXTENDED ARABIC-INDIC DIGIT SEVEN
+    '8', 'a', '\u06f8', // 1784 ۸ EXTENDED ARABIC-INDIC DIGIT EIGHT
+    '9', 'a', '\u06f9', // 1785 ۹ EXTENDED ARABIC-INDIC DIGIT NINE
     'B', '.', '\u1e02', // 7682 Ḃ LATIN CAPITAL LETTER B WITH DOT ABOVE
     'b', '.', '\u1e03', // 7683 ḃ LATIN SMALL LETTER B WITH DOT ABOVE
     'B', '_', '\u1e06', // 7686 Ḇ LATIN CAPITAL LETTER B WITH LINE BELOW
@@ -852,7 +947,9 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'V', '?', '\u1e7c', // 7804 Ṽ LATIN CAPITAL LETTER V WITH TILDE
     'v', '?', '\u1e7d', // 7805 ṽ LATIN SMALL LETTER V WITH TILDE
     'W', '!', '\u1e80', // 7808 Ẁ LATIN CAPITAL LETTER W WITH GRAVE
+    'W', '`', '\u1e80', // 7808 Ẁ LATIN CAPITAL LETTER W WITH GRAVE (Vim 5.x compatible)
     'w', '!', '\u1e81', // 7809 ẁ LATIN SMALL LETTER W WITH GRAVE
+    'w', '`', '\u1e81', // 7809 ẁ LATIN SMALL LETTER W WITH GRAVE (Vim 5.x compatible)
     'W', '\'', '\u1e82', // 7810 Ẃ LATIN CAPITAL LETTER W WITH ACUTE
     'w', '\'', '\u1e83', // 7811 ẃ LATIN SMALL LETTER W WITH ACUTE
     'W', ':', '\u1e84', // 7812 Ẅ LATIN CAPITAL LETTER W WITH DIAERESIS
@@ -886,19 +983,21 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'U', '2', '\u1ee6', // 7910 Ủ LATIN CAPITAL LETTER U WITH HOOK ABOVE
     'u', '2', '\u1ee7', // 7911 ủ LATIN SMALL LETTER U WITH HOOK ABOVE
     'Y', '!', '\u1ef2', // 7922 Ỳ LATIN CAPITAL LETTER Y WITH GRAVE
+    'Y', '`', '\u1ef2', // 7922 Ỳ LATIN CAPITAL LETTER Y WITH GRAVE (Vim 5.x compatible)
     'y', '!', '\u1ef3', // 7923 ỳ LATIN SMALL LETTER Y WITH GRAVE
+    'y', '`', '\u1ef3', // 7923 ỳ LATIN SMALL LETTER Y WITH GRAVE (Vim 5.x compatible)
     'Y', '2', '\u1ef6', // 7926 Ỷ LATIN CAPITAL LETTER Y WITH HOOK ABOVE
     'y', '2', '\u1ef7', // 7927 ỷ LATIN SMALL LETTER Y WITH HOOK ABOVE
     'Y', '?', '\u1ef8', // 7928 Ỹ LATIN CAPITAL LETTER Y WITH TILDE
     'y', '?', '\u1ef9', // 7929 ỹ LATIN SMALL LETTER Y WITH TILDE
-    ';', '\'', '\u1f00', // 7936 ἀ GREEK DASIA AND ACUTE ACCENT
-    ',', '\'', '\u1f01', // 7937 ἁ GREEK PSILI AND ACUTE ACCENT
-    ';', '!', '\u1f02', // 7938 ἂ GREEK DASIA AND VARIA
-    ',', '!', '\u1f03', // 7939 ἃ GREEK PSILI AND VARIA
-    '?', ';', '\u1f04', // 7940 ἄ GREEK DASIA AND PERISPOMENI
-    '?', ',', '\u1f05', // 7941 ἅ GREEK PSILI AND PERISPOMENI
-    '!', ':', '\u1f06', // 7942 ἆ GREEK DIAERESIS AND VARIA
-    '?', ':', '\u1f07', // 7943 ἇ GREEK DIAERESIS AND PERISPOMENI
+    ';', '\'', '\u1f00', // 7936 ἀ GREEK SMALL LETTER ALPHA WITH PSILI
+    ',', '\'', '\u1f01', // 7937 ἁ GREEK SMALL LETTER ALPHA WITH DASIA
+    ';', '!', '\u1f02', // 7938 ἂ GREEK SMALL LETTER ALPHA WITH PSILI AND VARIA
+    ',', '!', '\u1f03', // 7939 ἃ GREEK SMALL LETTER ALPHA WITH DASIA AND VARIA
+    '?', ';', '\u1f04', // 7940 ἄ GREEK SMALL LETTER ALPHA WITH PSILI AND OXIA
+    '?', ',', '\u1f05', // 7941 ἅ GREEK SMALL LETTER ALPHA WITH DASIA AND OXIA
+    '!', ':', '\u1f06', // 7942 ἆ GREEK SMALL LETTER ALPHA WITH PSILI AND PERISPOMENI
+    '?', ':', '\u1f07', // 7943 ἇ GREEK SMALL LETTER ALPHA WITH DASIA AND PERISPOMENI
     '1', 'N', '\u2002', // 8194   EN SPACE
     '1', 'M', '\u2003', // 8195   EM SPACE
     '3', 'M', '\u2004', // 8196   THREE-PER-EM SPACE
@@ -922,12 +1021,14 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     '9', '"', '\u201f', // 8223 ‟ DOUBLE HIGH-REVERSED-9 QUOTATION MARK
     '/', '-', '\u2020', // 8224 † DAGGER
     '/', '=', '\u2021', // 8225 ‡ DOUBLE DAGGER
+    'o', 'o', '\u2022', // 8226 • BULLET
     '.', '.', '\u2025', // 8229 ‥ TWO DOT LEADER
-    ',', '.', '\u2026', // 8230 … ELLIPSIS
+    ',', '.', '\u2026', // 8230 … HORIZONTAL ELLIPSIS (Vim 5.x compatible)
     '%', '0', '\u2030', // 8240 ‰ PER MILLE SIGN
     '1', '\'', '\u2032', // 8242 ′ PRIME
     '2', '\'', '\u2033', // 8243 ″ DOUBLE PRIME
     '3', '\'', '\u2034', // 8244 ‴ TRIPLE PRIME
+    '4', '\'', '\u2057', // 8279 ⁗ QUADRUPLE PRIME
     '1', '"', '\u2035', // 8245 ‵ REVERSED PRIME
     '2', '"', '\u2036', // 8246 ‶ REVERSED DOUBLE PRIME
     '3', '"', '\u2037', // 8247 ‷ REVERSED TRIPLE PRIME
@@ -937,29 +1038,29 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     ':', 'X', '\u203b', // 8251 ※ REFERENCE MARK
     '\'', '-', '\u203e', // 8254 ‾ OVERLINE
     '/', 'f', '\u2044', // 8260 ⁄ FRACTION SLASH
-    '0', 'S', '\u2070', // 8304 ⁰ SUPERSCRIPT DIGIT ZERO
-    '4', 'S', '\u2074', // 8308 ⁴ SUPERSCRIPT DIGIT FOUR
-    '5', 'S', '\u2075', // 8309 ⁵ SUPERSCRIPT DIGIT FIVE
-    '6', 'S', '\u2076', // 8310 ⁶ SUPERSCRIPT DIGIT SIX
-    '7', 'S', '\u2077', // 8311 ⁷ SUPERSCRIPT DIGIT SEVEN
-    '8', 'S', '\u2078', // 8312 ⁸ SUPERSCRIPT DIGIT EIGHT
-    '9', 'S', '\u2079', // 8313 ⁹ SUPERSCRIPT DIGIT NINE
+    '0', 'S', '\u2070', // 8304 ⁰ SUPERSCRIPT ZERO
+    '4', 'S', '\u2074', // 8308 ⁴ SUPERSCRIPT FOUR
+    '5', 'S', '\u2075', // 8309 ⁵ SUPERSCRIPT FIVE
+    '6', 'S', '\u2076', // 8310 ⁶ SUPERSCRIPT SIX
+    '7', 'S', '\u2077', // 8311 ⁷ SUPERSCRIPT SEVEN
+    '8', 'S', '\u2078', // 8312 ⁸ SUPERSCRIPT EIGHT
+    '9', 'S', '\u2079', // 8313 ⁹ SUPERSCRIPT NINE
     '+', 'S', '\u207a', // 8314 ⁺ SUPERSCRIPT PLUS SIGN
     '-', 'S', '\u207b', // 8315 ⁻ SUPERSCRIPT MINUS
     '=', 'S', '\u207c', // 8316 ⁼ SUPERSCRIPT EQUALS SIGN
     '(', 'S', '\u207d', // 8317 ⁽ SUPERSCRIPT LEFT PARENTHESIS
     ')', 'S', '\u207e', // 8318 ⁾ SUPERSCRIPT RIGHT PARENTHESIS
     'n', 'S', '\u207f', // 8319 ⁿ SUPERSCRIPT LATIN SMALL LETTER N
-    '0', 's', '\u2080', // 8320 ₀ SUBSCRIPT DIGIT ZERO
-    '1', 's', '\u2081', // 8321 ₁ SUBSCRIPT DIGIT ONE
-    '2', 's', '\u2082', // 8322 ₂ SUBSCRIPT DIGIT TWO
-    '3', 's', '\u2083', // 8323 ₃ SUBSCRIPT DIGIT THREE
-    '4', 's', '\u2084', // 8324 ₄ SUBSCRIPT DIGIT FOUR
-    '5', 's', '\u2085', // 8325 ₅ SUBSCRIPT DIGIT FIVE
-    '6', 's', '\u2086', // 8326 ₆ SUBSCRIPT DIGIT SIX
-    '7', 's', '\u2087', // 8327 ₇ SUBSCRIPT DIGIT SEVEN
-    '8', 's', '\u2088', // 8328 ₈ SUBSCRIPT DIGIT EIGHT
-    '9', 's', '\u2089', // 8329 ₉ SUBSCRIPT DIGIT NINE
+    '0', 's', '\u2080', // 8320 ₀ SUBSCRIPT ZERO
+    '1', 's', '\u2081', // 8321 ₁ SUBSCRIPT ONE
+    '2', 's', '\u2082', // 8322 ₂ SUBSCRIPT TWO
+    '3', 's', '\u2083', // 8323 ₃ SUBSCRIPT THREE
+    '4', 's', '\u2084', // 8324 ₄ SUBSCRIPT FOUR
+    '5', 's', '\u2085', // 8325 ₅ SUBSCRIPT FIVE
+    '6', 's', '\u2086', // 8326 ₆ SUBSCRIPT SIX
+    '7', 's', '\u2087', // 8327 ₇ SUBSCRIPT SEVEN
+    '8', 's', '\u2088', // 8328 ₈ SUBSCRIPT EIGHT
+    '9', 's', '\u2089', // 8329 ₉ SUBSCRIPT NINE
     '+', 's', '\u208a', // 8330 ₊ SUBSCRIPT PLUS SIGN
     '-', 's', '\u208b', // 8331 ₋ SUBSCRIPT MINUS
     '=', 's', '\u208c', // 8332 ₌ SUBSCRIPT EQUALS SIGN
@@ -968,7 +1069,11 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'L', 'i', '\u20a4', // 8356 ₤ LIRA SIGN
     'P', 't', '\u20a7', // 8359 ₧ PESETA SIGN
     'W', '=', '\u20a9', // 8361 ₩ WON SIGN
-    'o', 'C', '\u2103', // 8451 ℃ DEGREE CENTIGRADE
+    '=', 'e', '\u20ac', // 8364 € EURO SIGN
+    'E', 'u', '\u20ac', // 8364 € EURO SIGN
+    '=', 'R', '\u20bd', // 8381 ₽ ROUBLE SIGN
+    '=', 'P', '\u20bd', // 8381 ₽ ROUBLE SIGN
+    'o', 'C', '\u2103', // 8451 ℃ DEGREE CELSIUS
     'c', 'o', '\u2105', // 8453 ℅ CARE OF
     'o', 'F', '\u2109', // 8457 ℉ DEGREE FAHRENHEIT
     'N', '0', '\u2116', // 8470 № NUMERO SIGN
@@ -977,7 +1082,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'S', 'M', '\u2120', // 8480 ℠ SERVICE MARK
     'T', 'M', '\u2122', // 8482 ™ TRADE MARK SIGN
     'O', 'm', '\u2126', // 8486 Ω OHM SIGN
-    'A', 'O', '\u212b', // 8491 Å ANGSTROEM SIGN
+    'A', 'O', '\u212b', // 8491 Å ANGSTROM SIGN
     '1', '3', '\u2153', // 8531 ⅓ VULGAR FRACTION ONE THIRD
     '2', '3', '\u2154', // 8532 ⅔ VULGAR FRACTION TWO THIRDS
     '1', '5', '\u2155', // 8533 ⅕ VULGAR FRACTION ONE FIFTH
@@ -1216,7 +1321,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     'c', 'C', '\u2663', // 9827 ♣ BLACK CLUB SUIT
     'M', 'd', '\u2669', // 9833 ♩ QUARTER NOTE
     'M', '8', '\u266a', // 9834 ♪ EIGHTH NOTE
-    'M', '2', '\u266b', // 9835 ♫ BARRED EIGHTH NOTES
+    'M', '2', '\u266b', // 9835 ♫ BEAMED EIGHTH NOTES
     'M', 'b', '\u266d', // 9837 ♭ MUSIC FLAT SIGN
     'M', 'x', '\u266e', // 9838 ♮ MUSIC NATURAL SIGN
     'M', 'X', '\u266f', // 9839 ♯ MUSIC SHARP SIGN
@@ -1225,9 +1330,9 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     '-', 'X', '\u2720', // 10016 ✠ MALTESE CROSS
     'I', 'S', '\u3000', // 12288 　 IDEOGRAPHIC SPACE
     ',', '_', '\u3001', // 12289 、 IDEOGRAPHIC COMMA
-    '.', '_', '\u3002', // 12290 。 IDEOGRAPHIC PERIOD
+    '.', '_', '\u3002', // 12290 。 IDEOGRAPHIC FULL STOP
     '+', '"', '\u3003', // 12291 〃 DITTO MARK
-    '+', '_', '\u3004', // 12292 〄 IDEOGRAPHIC DITTO MARK
+    '+', '_', '\u3004', // 12292 〄 JAPANESE INDUSTRIAL STANDARD SYMBOL
     '*', '_', '\u3005', // 12293 々 IDEOGRAPHIC ITERATION MARK
     ';', '_', '\u3006', // 12294 〆 IDEOGRAPHIC CLOSING MARK
     '0', '_', '\u3007', // 12295 〇 IDEOGRAPHIC NUMBER ZERO
@@ -1476,53 +1581,26 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     '7', 'c', '\u3226', // 12838 ㈦ PARENTHESIZED IDEOGRAPH SEVEN
     '8', 'c', '\u3227', // 12839 ㈧ PARENTHESIZED IDEOGRAPH EIGHT
     '9', 'c', '\u3228', // 12840 ㈨ PARENTHESIZED IDEOGRAPH NINE
-    '/', 'c', '\ue001', // 57345  JOIN THIS LINE WITH NEXT LINE (Mnemonic)
-    'U', 'A', '\ue002', // 57346 Unit space A (ISO-IR-8-1 064)
-    'U', 'B', '\ue003', // 57347  Unit space B (ISO-IR-8-1 096)
-    '"', '3', '\ue004', // 57348  NON-SPACING UMLAUT (ISO-IR-38 201) (character part)
-    '"', '1', '\ue005', // 57349  NON-SPACING DIAERESIS WITH ACCENT (ISO-IR-70 192) (character part)
-    '"', '!', '\ue006', // 57350  NON-SPACING GRAVE ACCENT (ISO-IR-103 193) (character part)
-    '"', '\'', '\ue007', // 57351  NON-SPACING ACUTE ACCENT (ISO-IR-103 194) (character part)
-    '"', '>', '\ue008', // 57352  NON-SPACING CIRCUMFLEX ACCENT (ISO-IR-103 195) (character part)
-    '"', '?', '\ue009', // 57353  NON-SPACING TILDE (ISO-IR-103 196) (character part)
-    '"', '-', '\ue00a', // 57354  NON-SPACING MACRON (ISO-IR-103 197) (character part)
-    '"', '(', '\ue00b', // 57355  NON-SPACING BREVE (ISO-IR-103 198) (character part)
-    '"', '.', '\ue00c', // 57356  NON-SPACING DOT ABOVE (ISO-IR-103 199) (character part)
-    '"', ':', '\ue00d', // 57357  NON-SPACING DIAERESIS (ISO-IR-103 200) (character part)
-    '"', '0', '\ue00e', // 57358  NON-SPACING RING ABOVE (ISO-IR-103 202) (character part)
-    '"', '"', '\ue00f', // 57359  NON-SPACING DOUBLE ACCUTE (ISO-IR-103 204) (character part)
-    '"', '<', '\ue010', // 57360  NON-SPACING CARON (ISO-IR-103 206) (character part)
-    '"', ',', '\ue011', // 57361  NON-SPACING CEDILLA (ISO-IR-103 203) (character part)
-    '"', ';', '\ue012', // 57362  NON-SPACING OGONEK (ISO-IR-103 206) (character part)
-    '"', '_', '\ue013', // 57363  NON-SPACING LOW LINE (ISO-IR-103 204) (character part)
-    '"', '=', '\ue014', // 57364  NON-SPACING DOUBLE LOW LINE (ISO-IR-38 217) (character part)
-    '"', '/', '\ue015', // 57365  NON-SPACING LONG SOLIDUS (ISO-IR-128 201) (character part)
-    '"', 'i', '\ue016', // 57366  GREEK NON-SPACING IOTA BELOW (ISO-IR-55 39) (character part)
-    '"', 'd', '\ue017', // 57367  GREEK NON-SPACING DASIA PNEUMATA (ISO-IR-55 38) (character part)
-    '"', 'p', '\ue018', // 57368  GREEK NON-SPACING PSILI PNEUMATA (ISO-IR-55 37) (character part)
-    ';', ';', '\ue019', // 57369  GREEK DASIA PNEUMATA (ISO-IR-18 92)
-    ',', ',', '\ue01a', // 57370  GREEK PSILI PNEUMATA (ISO-IR-18 124)
-    'b', '3', '\ue01b', // 57371  GREEK SMALL LETTER MIDDLE BETA (ISO-IR-18 99)
-    'C', 'i', '\ue01c', // 57372  CIRCLE (ISO-IR-83 0294)
-    'f', '(', '\ue01d', // 57373  FUNCTION SIGN (ISO-IR-143 221)
-    'e', 'd', '\ue01e', // 57374  LATIN SMALL LETTER EZH (ISO-IR-158 142)
-    'a', 'm', '\ue01f', // 57375  ANTE MERIDIAM SIGN (ISO-IR-149 0267)
-    'p', 'm', '\ue020', // 57376  POST MERIDIAM SIGN (ISO-IR-149 0268)
-    'F', 'l', '\ue023', // 57379  DUTCH GUILDER SIGN (IBM437 159)
-    'G', 'F', '\ue024', // 57380  GAMMA FUNCTION SIGN (ISO-10646-1DIS 032/032/037/122)
-    '>', 'V', '\ue025', // 57381  RIGHTWARDS VECTOR ABOVE (ISO-10646-1DIS 032/032/038/046)
-    '!', '*', '\ue026', // 57382  GREEK VARIA (ISO-10646-1DIS 032/032/042/164)
-    '?', '*', '\ue027', // 57383  GREEK PERISPOMENI (ISO-10646-1DIS 032/032/042/165)
-    'J', '<', '\ue028', // 57384  LATIN CAPITAL LETTER J WITH CARON (lowercase: 000/000/001/240)
     'f', 'f', '\ufb00', // 64256 ﬀ LATIN SMALL LIGATURE FF
     'f', 'i', '\ufb01', // 64257 ﬁ LATIN SMALL LIGATURE FI
     'f', 'l', '\ufb02', // 64258 ﬂ LATIN SMALL LIGATURE FL
-    'f', 't', '\ufb05', // 64261 ﬅ LATIN SMALL LIGATURE FT
+    'f', 't', '\ufb05', // 64261 ﬅ LATIN SMALL LIGATURE LONG S T
     's', 't', '\ufb06', // 64262 ﬆ LATIN SMALL LIGATURE ST
   )
 
-  protected val digraphs: HashMap<String, Char> = HashMap<String, Char>(defaultDigraphs.size)
-  protected val keys: TreeMap<Char, String> = TreeMap<Char, String>()
+  /**
+   * A map of digraph to character
+   *
+   * Note that this might contain duplicates for the character!
+   */
+  private val digraphToCharacter: MutableMap<String, Char> = HashMap<String, Char>(defaultDigraphs.size)
+
+  /**
+   * A map of character to digraph, as a concatenated string
+   *
+   * Note that when a character has multiple digraphs (e.g. `!I` and `~!`), only the first is kept!
+   */
+  private val characterToDigraph: MutableMap<Char, String> = TreeMap<Char, String>()
 
   init {
     loadDigraphs()
