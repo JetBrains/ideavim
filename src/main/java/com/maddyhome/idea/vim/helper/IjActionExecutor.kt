@@ -74,7 +74,7 @@ internal class IjActionExecutor : VimActionExecutor {
     val applicationEx = ApplicationManagerEx.getApplicationEx()
     if (ProgressIndicatorUtils.isWriteActionRunningOrPending(applicationEx)) {
       // This is needed for VIM-3376 and it should turn into error at soeme moment
-      thisLogger().warn(RuntimeException("Actions cannot be updated when write-action is running or pending", ))
+      thisLogger().warn("Actions cannot be updated when write-action is running or pending")
     }
 
     val ijAction = (action as IjNativeAction).action

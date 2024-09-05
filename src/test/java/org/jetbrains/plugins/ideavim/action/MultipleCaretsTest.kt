@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
@@ -1816,6 +1817,7 @@ $c five six se${c}ven eight
     )
   }
 
+  @Disabled("Action execution in tests is broken for 2024.2")
   @Test
   fun testInsertNewLineAboveAction() {
     typeTextInFile(
@@ -1842,6 +1844,7 @@ $c five six se${c}ven eight
     )
   }
 
+  @Disabled("Action execution in tests is broken for 2024.2")
   @VimBehaviorDiffers(originalVimAfter = "${c}\n${c}\nabcde\n${c}\n${c}\nabcde\n")
   @Test
   fun testInsertNewLineAboveActionWithMultipleCaretsInLine() {
@@ -1856,6 +1859,7 @@ $c five six se${c}ven eight
     assertState("${c}\nabcde\n${c}\nabcde\n")
   }
 
+  @Disabled("Action execution in tests is broken for 2024.2")
   @Test
   fun testInsertNewLineBelowAction() {
     typeTextInFile(
