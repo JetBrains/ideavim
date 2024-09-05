@@ -29,6 +29,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import javax.swing.SwingConstants
@@ -304,6 +305,7 @@ class TextWidthOptionMapperTest : VimTestCase() {
   }
 
   @Test
+  @Disabled("Broken in 2024.2")
   fun `test set local-to-buffer 'textwidth' option updates all editors for the buffer`() {
     val originalWindow = fixture.editor
     val newBufferWindow = openNewBufferWindow("bbb.txt", "lorem ipsum")

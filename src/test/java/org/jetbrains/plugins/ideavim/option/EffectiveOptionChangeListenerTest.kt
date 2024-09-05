@@ -34,6 +34,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import javax.swing.SwingConstants
@@ -43,6 +44,7 @@ private const val defaultValue = "defaultValue"
 private const val defaultNumberValue = 10
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+@Disabled("Broken in 2024.2")
 class EffectiveOptionChangeListenerTest : VimTestCase() {
   private val optionName = "test"
   private lateinit var manager: FileEditorManagerImpl

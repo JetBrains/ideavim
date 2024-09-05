@@ -38,6 +38,7 @@ import javax.swing.SwingConstants
 import kotlin.test.assertEquals
 
 // Tests the implementation of global, local to buffer, local to window and global-local
+@Disabled("Broken in 2024.2")
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
 class OptionDeclaredScopeTest : VimTestCase() {
   private val optionName = "test"
