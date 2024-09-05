@@ -28,7 +28,11 @@ dependencies {
   testImplementation("org.junit.vintage:junit-vintage-engine:5.10.3")
 
   intellijPlatform {
-    create(ideaType, ideaVersion)
+    // Snapshots don't use installers
+    // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html#target-versions-installers
+    val useInstaller = "EAP-SNAPSHOT" !in ideaVersion
+
+    create(ideaType, ideaVersion, useInstaller)
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
     instrumentationTools()
