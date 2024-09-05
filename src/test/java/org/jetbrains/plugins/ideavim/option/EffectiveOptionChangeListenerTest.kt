@@ -8,11 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.option
 
+import com.intellij.openapi.components.ComponentManagerEx
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
+import com.intellij.platform.util.coroutines.childScope
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
@@ -61,8 +63,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     super.setUp(testInfo)
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
-    @Suppress("DEPRECATION")
-    manager = FileEditorManagerImpl(fixture.project, fixture.project.coroutineScope)
+    manager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     // Create a new editor that will represent a new buffer in a separate window. It will have default values

@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.option.overrides
 
+import com.intellij.openapi.components.ComponentManagerEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
@@ -34,8 +35,7 @@ class WrapOptionMapperTest : VimTestCase() {
     super.setUp(testInfo)
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
-    @Suppress("DEPRECATION")
-    manager = FileEditorManagerImpl(fixture.project, fixture.project.coroutineScope.childScope())
+    manager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     configureByText("\n")
