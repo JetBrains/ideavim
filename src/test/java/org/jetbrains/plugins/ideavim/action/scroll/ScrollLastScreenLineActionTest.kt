@@ -8,14 +8,14 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
                                                        *zb*
 zb                      Like "z-", but leave the cursor in the same column.
  */
-class ScrollLastScreenLineActionTest : VimTestCase() {
+class ScrollLastScreenLineActionTest : VimTestCaseBase() {
   @Test
   fun `test scroll current line to bottom of screen`() {
     configureByPages(5)

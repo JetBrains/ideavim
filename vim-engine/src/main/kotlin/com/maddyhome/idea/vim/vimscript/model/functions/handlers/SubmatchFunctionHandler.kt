@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "submatch")
-internal class SubmatchFunctionHandler : FunctionHandler() {
+class SubmatchFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2
 

@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionUpActionTest : VimTestCase() {
+class MotionUpActionTest : VimTestCaseBase() {
   @Test
   fun `test last column empty`() {
     val keys = "k"

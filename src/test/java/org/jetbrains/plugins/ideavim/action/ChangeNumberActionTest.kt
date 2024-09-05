@@ -9,10 +9,10 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ChangeNumberActionTest : VimTestCase() {
+class ChangeNumberActionTest : VimTestCaseBase() {
   @Test
   fun testIncrementDecimalZero() {
     doTest("<C-A>", "0", "1", Mode.NORMAL())

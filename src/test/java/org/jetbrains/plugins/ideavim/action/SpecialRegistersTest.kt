@@ -12,14 +12,14 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 
-class SpecialRegistersTest : VimTestCase() {
+class SpecialRegistersTest : VimTestCaseBase() {
   @Throws(Exception::class)
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

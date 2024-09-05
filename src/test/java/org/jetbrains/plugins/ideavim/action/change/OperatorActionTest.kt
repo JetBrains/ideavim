@@ -8,11 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.action.change
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class OperatorActionTest : VimTestCase() {
+class OperatorActionTest : VimTestCaseBase() {
   @Test
   fun `test operator action throws error if operatorfunc is empty`() {
     doTest("g@w", "lorem ipsum", "lorem ipsum")

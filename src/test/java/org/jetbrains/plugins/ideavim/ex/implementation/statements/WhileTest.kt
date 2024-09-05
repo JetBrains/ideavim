@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class WhileTest : VimTestCase() {
+class WhileTest : VimTestCaseBase() {
 
   @Test
   fun `test while`() {

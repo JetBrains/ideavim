@@ -13,7 +13,7 @@ import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.assertHappened
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ import java.awt.Color
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class VimHighlightedYankTest : VimTestCase() {
+class VimHighlightedYankTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

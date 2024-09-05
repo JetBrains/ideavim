@@ -11,7 +11,7 @@ import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-class KeywordOptionTest : VimTestCase() {
+class KeywordOptionTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

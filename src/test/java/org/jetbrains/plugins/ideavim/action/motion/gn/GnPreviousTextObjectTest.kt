@@ -16,11 +16,11 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
 
-class GnPreviousTextObjectTest : VimTestCase() {
+class GnPreviousTextObjectTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
   fun `test delete word`() {

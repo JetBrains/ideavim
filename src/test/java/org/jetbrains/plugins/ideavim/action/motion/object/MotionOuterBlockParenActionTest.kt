@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionOuterBlockParenActionTest : VimTestCase() {
+class MotionOuterBlockParenActionTest : VimTestCaseBase() {
   // VIM-1633 |v_a)|
   @Test
   fun `test single letter with single parentheses`() {

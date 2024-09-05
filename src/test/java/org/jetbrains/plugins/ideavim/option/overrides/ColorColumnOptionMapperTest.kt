@@ -18,7 +18,7 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-class ColorColumnOptionMapperTest : VimTestCase() {
+class ColorColumnOptionMapperTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

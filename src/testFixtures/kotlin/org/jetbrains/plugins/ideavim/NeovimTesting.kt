@@ -71,7 +71,7 @@ object NeovimTesting {
   fun tearDown(test: TestInfo) {
     if (!neovimEnabled(test)) return
     println("Tested with neovim: $neovimTestsCounter")
-    if (VimTestCase.Checks.neoVim.exitOnTearDown) {
+    if (VimTestCaseBase.Checks.neoVim.exitOnTearDown) {
       neovimApi.input(exitCommand).get()
     }
     neovim.destroy()
@@ -184,7 +184,7 @@ object NeovimTesting {
   private fun assertRegisters() {
     for (register in VALID_REGISTERS) {
       if (register in nonCheckingRegisters) continue
-      if (register in VimTestCase.Checks.neoVim.ignoredRegisters) continue
+      if (register in VimTestCaseBase.Checks.neoVim.ignoredRegisters) continue
       val neovimRegister = getRegister(register)
       val vimPluginRegister = VimPlugin.getRegister().getRegister(register)
       val ideavimRegister = vimPluginRegister?.text ?: ""

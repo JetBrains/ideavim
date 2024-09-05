@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.statements
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.WhileLoop
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -19,7 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class WhileLoopTests : VimTestCase() {
+class WhileLoopTests : VimTestCaseBase() {
 
   companion object {
     val values = listOf("", " ")

@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ChangeNumberDecActionTest : VimTestCase() {
+class ChangeNumberDecActionTest : VimTestCaseBase() {
   @Test
   fun `test decrement hex to negative value`() {
     doTest("<C-X>", "0x0000", "0xffffffffffffffff", Mode.NORMAL())

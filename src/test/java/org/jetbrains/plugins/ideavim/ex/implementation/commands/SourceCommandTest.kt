@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.commands.SourceCommand
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -23,7 +23,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class SourceCommandTest : VimTestCase() {
+class SourceCommandTest : VimTestCaseBase() {
   @TempDir
   var tempDir: File? = null
 

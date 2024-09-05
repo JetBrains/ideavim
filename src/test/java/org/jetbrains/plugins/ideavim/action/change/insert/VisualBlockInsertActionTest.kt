@@ -13,10 +13,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class VisualBlockInsertActionTest : VimTestCase() {
+class VisualBlockInsertActionTest : VimTestCaseBase() {
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   @Test

@@ -15,14 +15,14 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
  * @author vlan
  */
-class MotionActionTest : VimTestCase() {
+class MotionActionTest : VimTestCaseBase() {
   @Test
   fun testDoubleToggleVisual() {
     val contents = "one tw${c}o\n"
@@ -382,7 +382,7 @@ class MotionActionTest : VimTestCase() {
   // VIM-1287 |d| |v_i{|
   @Test
   @VimBehaviorDiffers(
-    originalVimAfter = "{\"{foo, ${c}bar\", baz}}",
+    originalVimAfter = "{\"{foo, <caret>bar\", baz}}",
     description = "We have PSI and can resolve this case correctly. I'm not sure if it should be fixed"
   )
   fun testBadlyNestedBlockInsideString() {

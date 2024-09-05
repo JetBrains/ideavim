@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class FunctionTest : VimTestCase() {
+class FunctionTest : VimTestCaseBase() {
 
   @Test
   fun `test function for built-in function`() {

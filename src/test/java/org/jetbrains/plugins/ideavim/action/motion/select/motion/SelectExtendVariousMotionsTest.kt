@@ -13,7 +13,7 @@ package org.jetbrains.plugins.ideavim.action.motion.select.motion
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
  *
  * All dots in these tests are replaced with tabs
  */
-class SelectExtendVariousMotionsTest : VimTestCase() {
+class SelectExtendVariousMotionsTest : VimTestCaseBase() {
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   @Test

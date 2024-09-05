@@ -12,7 +12,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -20,7 +20,7 @@ import kotlin.test.assertNull
 /**
  * @author Jørgen Granseth
  */
-class DeleteMarksCommandTest : VimTestCase() {
+class DeleteMarksCommandTest : VimTestCaseBase() {
   private fun setUpMarks(marks: String) {
     configureByText(
       """Lorem ipsum dolor sit amet,

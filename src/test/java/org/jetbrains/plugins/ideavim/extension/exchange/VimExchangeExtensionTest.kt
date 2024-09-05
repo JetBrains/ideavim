@@ -13,12 +13,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class VimExchangeExtensionTest : VimTestCase() {
+class VimExchangeExtensionTest : VimTestCaseBase() {
   @Throws(Exception::class)
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -83,7 +83,7 @@ class VimExchangeExtensionTest : VimTestCase() {
 
   // |X|
   @VimBehaviorDiffers(
-    originalVimAfter = "The ${c}brown catch over the lazy dog",
+    originalVimAfter = "The <caret>brown catch over the lazy dog",
     shouldBeFixed = true,
   )
   @Test
@@ -98,7 +98,7 @@ class VimExchangeExtensionTest : VimTestCase() {
 
   // |X|
   @VimBehaviorDiffers(
-    originalVimAfter = "The brown ${c}catch over the lazy dog",
+    originalVimAfter = "The brown <caret>catch over the lazy dog",
     shouldBeFixed = true,
   )
   @Test
@@ -116,7 +116,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     originalVimAfter =
     """The quick
        catch over
-       ${c}brown fox
+       <caret>brown fox
        the lazy dog
        """,
     shouldBeFixed = true,
@@ -144,7 +144,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     originalVimAfter =
     """The quick
        catch over
-       ${c}brown fox
+       <caret>brown fox
        the lazy dog
        """,
     shouldBeFixed = true,
@@ -198,7 +198,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     """
          catch over
          the lazy dog
-         ${c}The quick
+         <caret>The quick
          brown fox
       """,
     shouldBeFixed = true,

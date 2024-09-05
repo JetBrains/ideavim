@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -20,7 +20,7 @@ CTRL-E                  Scroll window [count] lines downwards in the buffer.
                         The text moves upwards on the screen.
                         Mnemonic: Extra lines.
  */
-class ScrollLineDownActionTest : VimTestCase() {
+class ScrollLineDownActionTest : VimTestCaseBase() {
   @Test
   fun `test scroll single line down`() {
     configureByPages(5)

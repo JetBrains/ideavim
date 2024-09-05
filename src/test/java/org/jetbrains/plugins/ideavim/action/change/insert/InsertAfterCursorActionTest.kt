@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class InsertAfterCursorActionTest : VimTestCase() {
+class InsertAfterCursorActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @Test
   fun `test insert after cursor with inlay with preceding text places caret between inlay and preceding text`() {

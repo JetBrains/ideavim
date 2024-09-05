@@ -10,12 +10,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class RepeatCommandTest : VimTestCase() {
+class RepeatCommandTest : VimTestCaseBase() {
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("@:")

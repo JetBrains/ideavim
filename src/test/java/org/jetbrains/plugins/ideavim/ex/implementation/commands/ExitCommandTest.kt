@@ -8,13 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class ExitCommandTest : VimTestCase() {
+class ExitCommandTest : VimTestCaseBase() {
   @Test
   fun `test single file`() {
     setupChecks {

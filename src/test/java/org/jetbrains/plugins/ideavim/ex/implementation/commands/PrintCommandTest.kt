@@ -10,12 +10,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class PrintCommandTest : VimTestCase() {
+class PrintCommandTest : VimTestCaseBase() {
   @Test
   fun `test default range`() {
     configureByText(initialText)
@@ -27,7 +26,7 @@ class PrintCommandTest : VimTestCase() {
   fun `test clears output between execution`() {
     configureByText(initialText)
     typeText(commandToKeys("p"))
-    assertExOutput("    Lorem Ipsum", clear = false)
+    assertExOutput("    Lorem Ipsum")
     // TODO: We need a better way to handle output
     // We should be waiting for a keypress now, such as <Enter> or <Esc> to close the output panel. But that's handled
     // by a separate key event loop which doesn't operate in tests.

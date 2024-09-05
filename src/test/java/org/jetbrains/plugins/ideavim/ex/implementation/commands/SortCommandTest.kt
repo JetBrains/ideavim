@@ -11,14 +11,14 @@ import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import javax.swing.KeyStroke
 
 @Suppress("SpellCheckingInspection")
-class SortCommandTest : VimTestCase() {
+class SortCommandTest : VimTestCaseBase() {
   private fun assertSort(testCase: TestCase) {
     val (content, visualSelect, sortCommand, expected) = testCase
     configureByText(content)

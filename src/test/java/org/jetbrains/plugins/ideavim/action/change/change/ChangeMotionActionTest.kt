@@ -11,11 +11,11 @@
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class ChangeMotionActionTest : VimTestCase() {
+class ChangeMotionActionTest : VimTestCaseBase() {
   // VIM-515 |c| |W|
   @Test
   fun `test change big word with punctuation and alpha`() {

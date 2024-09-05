@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -21,7 +21,7 @@ z+                      Without [count]: Redraw with the line just below the
                         that line, at the first non-blank in the line.
                         With [count]: just like "z<CR>".
  */
-class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
+class ScrollFirstScreenLinePageStartActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scrolls first line on next page to top of screen`() {

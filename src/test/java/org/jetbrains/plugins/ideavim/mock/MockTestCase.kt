@@ -18,12 +18,12 @@ import com.intellij.testFramework.replaceService
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.mockito.Mockito
 import javax.swing.JTextArea
 
-open class MockTestCase : VimTestCase() {
+open class MockTestCase : VimTestCaseBase() {
 
   @TestDisposable
   lateinit var disposable: Disposable

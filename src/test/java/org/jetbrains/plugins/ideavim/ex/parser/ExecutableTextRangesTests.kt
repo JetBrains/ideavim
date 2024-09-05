@@ -11,11 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.parser
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.vimscript.model.statements.IfStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class ExecutableTextRangesTests : VimTestCase() {
+class ExecutableTextRangesTests : VimTestCaseBase() {
   @Test
   fun `test regular script`() {
     val scriptString = """

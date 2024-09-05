@@ -10,12 +10,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.WriteNextFileCommand
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class WriteNextCommandTest : VimTestCase() {
+class WriteNextCommandTest : VimTestCaseBase() {
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("wnext 42")

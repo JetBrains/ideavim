@@ -10,11 +10,11 @@ package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionSectionForwardEndActionTest : VimTestCase() {
-  @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+class MotionSectionForwardEndActionTest : VimTestCaseBase() {
+  @VimBehaviorDiffers(originalVimAfter = "<caret>", description = "Full text is deleted")
   @Test
   fun `test remove full text`() {
     doTest(
@@ -30,7 +30,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+  @VimBehaviorDiffers(originalVimAfter = "<caret>", description = "Full text is deleted")
   @Test
   fun `test remove full text with new line at the end`() {
     doTest(

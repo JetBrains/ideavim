@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionGotoLineFirstActionTest : VimTestCase() {
+class MotionGotoLineFirstActionTest : VimTestCaseBase() {
   @Test
   fun `test simple motion`() {
     doTest(

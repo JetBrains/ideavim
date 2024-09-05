@@ -12,14 +12,14 @@ import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
-class MotionPercentOrMatchActionTest : VimTestCase() {
+class MotionPercentOrMatchActionTest : VimTestCaseBase() {
   @Test
   fun `test percent match simple`() {
     typeTextInFile(

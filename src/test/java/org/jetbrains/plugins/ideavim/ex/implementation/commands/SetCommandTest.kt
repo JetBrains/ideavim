@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -23,7 +23,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class SetCommandTest : VimTestCase() {
+class SetCommandTest : VimTestCaseBase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

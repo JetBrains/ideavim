@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ReplaceWithRegisterTest : VimTestCase() {
+class ReplaceWithRegisterTest : VimTestCaseBase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -176,7 +176,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
-  @VimBehaviorDiffers("one on${c}e on${c}e four")
+  @VimBehaviorDiffers("one on<caret>e on<caret>e four")
   @Test
   fun `test replace with multiple carets`() {
     val text = "one ${c}two ${c}three four"
@@ -373,9 +373,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
   @VimBehaviorDiffers(
     """
             Lorem ipsum dolor sit amet,
-            ${c}Lorem ipsum dolor sit amet,
+            <caret>Lorem ipsum dolor sit amet,
             Sed in orci mauris.
-            ${c}Sed in orci mauris.
+            <caret>Sed in orci mauris.
   """,
   )
   @Test

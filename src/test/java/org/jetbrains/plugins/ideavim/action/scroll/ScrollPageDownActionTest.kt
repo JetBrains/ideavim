@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -25,7 +25,7 @@ CTRL-F                  Scroll window [count] pages Forwards (downwards) in
 <S-Down>        move window one page down      *i_<S-Down>*
 <PageDown>      move window one page down      *i_<PageDown>*
  */
-class ScrollPageDownActionTest : VimTestCase() {
+class ScrollPageDownActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll single page down with S-Down`() {

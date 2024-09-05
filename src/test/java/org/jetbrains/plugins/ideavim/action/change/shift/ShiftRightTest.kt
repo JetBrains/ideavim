@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.shift
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ShiftRightTest : VimTestCase() {
+class ShiftRightTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   @Test
   fun `test shift till new line`() {

@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-class ListOptionMapperTest : VimTestCase() {
+class ListOptionMapperTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

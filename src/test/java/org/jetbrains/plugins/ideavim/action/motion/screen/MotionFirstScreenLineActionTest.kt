@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionFirstScreenLineActionTest : VimTestCase() {
+class MotionFirstScreenLineActionTest : VimTestCaseBase() {
   @Test
   fun `test move caret to first line of screen`() {
     configureByLines(50, "    I found it in a legendary land")

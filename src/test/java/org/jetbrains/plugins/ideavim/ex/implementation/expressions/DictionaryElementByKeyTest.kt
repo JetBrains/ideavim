@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class DictionaryElementByKeyTest : VimTestCase() {
+class DictionaryElementByKeyTest : VimTestCaseBase() {
 
   @Test
   fun `test get element by key`() {

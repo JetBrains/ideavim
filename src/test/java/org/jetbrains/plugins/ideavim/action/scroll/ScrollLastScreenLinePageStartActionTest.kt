@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -24,7 +24,7 @@ z^                      Without [count]: Redraw with the line just above the
                         bottom of the window.  Put the cursor in that line, at
                         the first non-blank in the line.
  */
-class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
+class ScrollLastScreenLinePageStartActionTest : VimTestCaseBase() {
   @Test
   fun `test scrolls last line on previous page to bottom of screen`() {
     configureByPages(5)

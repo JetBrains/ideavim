@@ -16,11 +16,11 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection")
-class VisualSelectPreviousSearchTest : VimTestCase() {
+class VisualSelectPreviousSearchTest : VimTestCaseBase() {
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @Test
   fun testSearch() {

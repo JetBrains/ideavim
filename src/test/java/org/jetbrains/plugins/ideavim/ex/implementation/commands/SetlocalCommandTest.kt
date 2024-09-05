@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.commands.SetlocalCommand
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -25,7 +25,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class SetlocalCommandTest : VimTestCase() {
+class SetlocalCommandTest : VimTestCaseBase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

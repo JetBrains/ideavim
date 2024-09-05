@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.TestInfo
  * @author Shrikant Sharat Kandula (@sharat87)
  */
 @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-class VimIndentObjectTest : VimTestCase() {
+class VimIndentObjectTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

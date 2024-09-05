@@ -19,7 +19,7 @@ import com.intellij.testFramework.replaceService
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -27,7 +27,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-class WrapOptionMapperTest : VimTestCase() {
+class WrapOptionMapperTest : VimTestCaseBase() {
   private lateinit var manager: FileEditorManagerImpl
 
   @BeforeEach

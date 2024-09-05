@@ -12,12 +12,12 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test
  *   e h    --||------------------
  *   d      b ||  7  |  8  |  9  |
  */
-class PutVisualTextActionTest : VimTestCase() {
+class PutVisualTextActionTest : VimTestCaseBase() {
 
   // ----- Case 1: Copied | Characterwise | --- pasted | Characterwise | ---| small p |--------------------
 
@@ -74,8 +74,7 @@ class PutVisualTextActionTest : VimTestCase() {
   fun `test put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = "legendar${c}y it in a legendary land"
     assertState(after)
@@ -86,8 +85,7 @@ class PutVisualTextActionTest : VimTestCase() {
   fun `test put visual text twice`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("v2e" + "2p"))
     val after = "legendarylegendar${c}y in a legendary land"
     assertState(after)
@@ -98,8 +96,7 @@ class PutVisualTextActionTest : VimTestCase() {
   fun `test put visual text full line`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("v$" + "2p"))
     val after = "legendarylegendar${c}y"
     assertState(after)
@@ -132,8 +129,7 @@ class PutVisualTextActionTest : VimTestCase() {
   fun `test put visual text another direction`() {
     val before = "I foun${c}d it in a legendary land"
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("vb" + "p"))
     val after = "I legendar${c}y it in a legendary land"
     assertState(after)
@@ -153,8 +149,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -181,8 +176,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -209,8 +203,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -237,8 +230,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("v$" + "p"))
     val after = """
             A Discovery
@@ -454,8 +446,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -490,8 +481,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy ${c}underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -528,8 +518,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy ${c}underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "2p"))
     val after = """
             A Discovery
@@ -639,8 +628,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -665,8 +653,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("V" + "2p"))
     val after = """
             A Discovery
@@ -687,7 +674,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -702,8 +689,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by ${c}the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -721,10 +707,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -757,10 +743,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -793,10 +779,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -829,10 +815,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}Discovery
+            <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}Discovery
+            <caret>Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -875,8 +861,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -901,8 +886,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("V" + "2p"))
     val after = """
             A Discovery
@@ -923,7 +907,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -938,8 +922,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -957,10 +940,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -993,10 +976,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1029,10 +1012,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1065,10 +1048,10 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            ${c}A Discovery
+            <caret>A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1116,8 +1099,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -1149,7 +1131,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
     """,
@@ -1171,8 +1153,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy ${c}underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -1207,7 +1188,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
             |found|
@@ -1232,8 +1213,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy ${c}underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("V" + "2p"))
     val after = """
             A Discovery
@@ -1260,7 +1240,7 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
             al|l roc|ks and lavender and tufted grass,
@@ -1270,7 +1250,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
     """,
@@ -1321,7 +1301,7 @@ class PutVisualTextActionTest : VimTestCase() {
     originalVimAfter = """
             A Discovery
 
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
             al|l roc|ks and lavender and tufted grass,
@@ -1331,7 +1311,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            $c|found|
+            <caret>|found|
             |l roc|
             |ere i|
     """,
@@ -1408,8 +1388,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "p"))
     val after = """
             A Discovery
@@ -1434,8 +1413,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>3e2k" + "p"))
     val after = """
             A Discovery
@@ -1460,8 +1438,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "2p"))
     val after = """
             A Discovery
@@ -1486,8 +1463,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ha|rd by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>3j$" + "p"))
     val after = """
             A Discovery
@@ -1509,7 +1485,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
             hard by the torrent of a mountain pass.
     """,
   )
@@ -1519,14 +1495,13 @@ class PutVisualTextActionTest : VimTestCase() {
     val before = """
             A Discovery
 
-            I $c|found| it in a legendary land
+            I <caret>|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "p"))
     val after = """
             A Discovery
@@ -1534,7 +1509,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
 
             hard by the torrent of a mountain pass.
     """.trimIndent()
@@ -1553,8 +1528,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "P"))
     val after = """
             A Discovery
@@ -1575,7 +1549,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
             A Discovery
             hard by the torrent of a mountain pass.
             """,
@@ -1592,8 +1566,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "2p"))
     val after = """
             A Discovery
@@ -1617,7 +1590,7 @@ class PutVisualTextActionTest : VimTestCase() {
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
             ha the torrent of a mountain pass.
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1632,8 +1605,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ha|rd by| the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e3j" + "p"))
     val after = """
             A Discovery
@@ -1655,7 +1627,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I
             a
             w
-            ${c}A Discovery
+            <caret>A Discovery
             hard by the torrent of a mountain pass.
     """,
   )
@@ -1671,8 +1643,7 @@ class PutVisualTextActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2j$" + "p"))
     val after = """
             A Discovery
@@ -1706,8 +1677,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "p"))
     val after = """
             A Discovery
@@ -1742,8 +1712,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the |dingy un|derside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2e3j" + "p"))
     val after = """
             A Discovery
@@ -1778,8 +1747,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2ej" + "p"))
     val after = """
             A Discovery
@@ -1814,8 +1782,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the ding|y undersi|de, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>elj" + "p"))
     val after = """
             A Discovery
@@ -1851,8 +1818,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the dingy underside, the checquered fringe.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor, editor.primaryCaret(), editor.ij.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("<C-V>2j$" + "p"))
     val after = """
             A Discovery

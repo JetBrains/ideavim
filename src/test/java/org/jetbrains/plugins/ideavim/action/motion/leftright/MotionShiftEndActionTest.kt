@@ -17,13 +17,13 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
 @TraceOptions(TestOptionConstants.keymodel, TestOptionConstants.selectmode)
-class MotionShiftEndActionTest : VimTestCase() {
+class MotionShiftEndActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(
     VimOption(TestOptionConstants.keymodel, doesntAffectTest = true),

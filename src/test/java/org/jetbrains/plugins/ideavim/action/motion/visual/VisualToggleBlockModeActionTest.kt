@@ -12,10 +12,10 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class VisualToggleBlockModeActionTest : VimTestCase() {
+class VisualToggleBlockModeActionTest : VimTestCaseBase() {
   @Test
   fun `test enter visual with count`() {
     doTest(

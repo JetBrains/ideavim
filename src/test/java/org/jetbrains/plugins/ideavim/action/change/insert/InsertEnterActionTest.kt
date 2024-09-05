@@ -21,12 +21,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.RepetitionInfo
 
-class InsertEnterActionTest : VimTestCase() {
+class InsertEnterActionTest : VimTestCaseBase() {
   @BeforeEach
   fun setUp(repetitionInfo: RepetitionInfo) {
     // Set up a different combination of handlers for enter action

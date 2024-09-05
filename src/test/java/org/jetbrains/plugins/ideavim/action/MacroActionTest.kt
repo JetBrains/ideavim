@@ -18,7 +18,7 @@ import org.jetbrains.plugins.ideavim.ExceptionHandler
 import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.exceptionMappingOwner
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssert
@@ -32,7 +32,7 @@ import kotlin.test.assertTrue
 /**
  * @author vlan
  */
-class MacroActionTest : VimTestCase() {
+class MacroActionTest : VimTestCaseBase() {
 
   @AfterEach
   fun tearDown() {

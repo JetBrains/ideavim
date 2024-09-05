@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionRightInsertTest : VimTestCase() {
+class MotionRightInsertTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @Test
   fun `test whichwrap in the same line`() {

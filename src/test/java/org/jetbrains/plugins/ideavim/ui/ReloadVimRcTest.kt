@@ -14,14 +14,14 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.VimRcFileState
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import java.nio.file.Files
 
-class ReloadVimRcTest : VimTestCase() {
+class ReloadVimRcTest : VimTestCaseBase() {
   private val editorFactory = MockEditorFactory()
 
   @BeforeEach

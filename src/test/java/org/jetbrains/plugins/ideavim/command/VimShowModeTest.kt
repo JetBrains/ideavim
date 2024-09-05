@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.command
 import com.intellij.openapi.wm.WindowManager
 import com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory
 import com.maddyhome.idea.vim.ui.widgets.mode.VimModeWidget
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 
 // TODO it would be cool to test widget, but status bar is not initialized
-class VimShowModeTest : VimTestCase() {
+class VimShowModeTest : VimTestCaseBase() {
 //  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
 //  @Test
 //  fun `test status string in normal`() {

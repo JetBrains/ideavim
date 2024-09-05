@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
@@ -32,7 +32,7 @@ import java.util.*
  * @author Alex Plate
  */
 @TraceOptions(TestOptionConstants.clipboard)
-class PutViaIdeaTest : VimTestCase() {
+class PutViaIdeaTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test simple insert via idea`() {

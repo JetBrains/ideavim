@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.assertDoesntChange
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssert
@@ -29,7 +29,7 @@ import kotlin.test.assertEquals
 /**
  * @author Alex Plate
  */
-class NonVimVisualChangeTest : VimTestCase() {
+class NonVimVisualChangeTest : VimTestCaseBase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test save mode after removing text`() {

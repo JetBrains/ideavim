@@ -11,14 +11,14 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.TestOptionConstants
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
 @TraceOptions(TestOptionConstants.clipboard)
-class YankAndPutTest : VimTestCase() {
+class YankAndPutTest : VimTestCaseBase() {
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamedplus]))
   fun `test yank to number register with unnamedplus`() {
     val before = """

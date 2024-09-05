@@ -15,10 +15,10 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class SelectToggleVisualModeHandlerTest : VimTestCase() {
+class SelectToggleVisualModeHandlerTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
   fun `test switch to select mode characterwise`() {
@@ -298,7 +298,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
     originalVimAfter = """
                 A Discovery
 
-                ${s}${c}I${se} found it in a legendary land
+                ${s}<caret>I${se} found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -334,7 +334,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 A Discovery
 
                 ${s}I found it in a legendary land
-                ${c}a${se}ll rocks and lavender and tufted grass,
+                <caret>a${se}ll rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """,

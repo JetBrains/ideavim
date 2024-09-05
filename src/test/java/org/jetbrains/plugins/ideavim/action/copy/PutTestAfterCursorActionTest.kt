@@ -18,17 +18,18 @@ import com.intellij.testFramework.ExtensionTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
 import java.awt.datatransfer.Transferable
 
-class PutTestAfterCursorActionTest : VimTestCase() {
+class PutTestAfterCursorActionTest : VimTestCaseBase() {
   @Test
   fun `test platform handlers are called`() {
     injector.globalOptions().clipboard.prependValue(OptionConstants.clipboard_ideaput)
@@ -72,7 +73,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            ${c}A Discovery
+            <caret>A Discovery
     """,
   )
   @Test
@@ -86,9 +87,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
     VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+      .storeText(editor, editor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -106,7 +106,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
   @VimBehaviorDiffers(
     originalVimAfter = """
             A Discovery
-            ${c}I found it in a legendary land
+            <caret>I found it in a legendary land
             GUARD
             I found it in a legendary land
             all rocks and lavender and tufted grass,
@@ -120,7 +120,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
     """.trimIndent()
-    val editor = configureByText(before)
+    val editor = configureByText(before).ij
     // Add Guard to simulate Notebook behaviour. See (VIM-2577)
     val guardRange = before rangeOf "\nGUARD\n"
     editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
@@ -155,9 +155,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             ${c}hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
     VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+      .storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("vep"))
     val after = """
             A Discovery

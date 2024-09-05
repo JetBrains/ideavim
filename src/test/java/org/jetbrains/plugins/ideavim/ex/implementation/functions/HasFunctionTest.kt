@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class HasFunctionTest : VimTestCase() {
+class HasFunctionTest : VimTestCaseBase() {
 
   @Test
   fun `test has for supported feature`() {

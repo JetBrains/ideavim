@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoop
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoopWithList
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,7 +24,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ForLoopTests : VimTestCase() {
+class ForLoopTests : VimTestCaseBase() {
 
   companion object {
     @JvmStatic

@@ -13,17 +13,18 @@ import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
 /**
  * @author Vasily Alferov
  */
-class MultipleCaretsTest : VimTestCase() {
+class MultipleCaretsTest : VimTestCaseBase() {
   // com.maddyhome.idea.vim.action.visual.leftright
   @Test
   fun testMotionLeftAction() {
@@ -40,7 +41,7 @@ class MultipleCaretsTest : VimTestCase() {
   @Test
   fun testMovementMerging() {
     val editor = typeTextInFile(injector.parser.parseKeys("2h"), "o${c}n${c}e")
-    kotlin.test.assertEquals(1, editor.caretModel.caretCount)
+    kotlin.test.assertEquals(1, editor.ij.caretModel.caretCount)
     assertState("${c}one")
   }
 
@@ -1842,7 +1843,7 @@ $c five six se${c}ven eight
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = "${c}\n${c}\nabcde\n${c}\n${c}\nabcde\n")
+  @VimBehaviorDiffers(originalVimAfter = "<caret>\n<caret>\nabcde\n<caret>\n<caret>\nabcde\n")
   @Test
   fun testInsertNewLineAboveActionWithMultipleCaretsInLine() {
     typeTextInFile(
@@ -2173,7 +2174,7 @@ rtyfg${c}hzxc"""
     val editor = configureByText(before)
     injector.registerGroup.storeText('*', "fgh")
     VimPlugin.getRegister()
-      .storeText(IjVimEditor(editor), editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      .storeText(editor, editor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("\"*P"))
     val after = "fg${c}hqfg${c}hwe asd zxc rty fg${c}hfgh vbn"
     assertState(after)

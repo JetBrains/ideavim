@@ -15,14 +15,14 @@ import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 
-class BoundedStringListOptionTest : VimTestCase() {
+class BoundedStringListOptionTest : VimTestCaseBase() {
   private val optionName = "myOpt"
   private val defaultValue = "Monday,Tuesday"
   private val option = StringListOption(

@@ -15,9 +15,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 
-abstract class VimPropertyTestBase : VimTestCase() {
+abstract class VimPropertyTestBase : VimTestCaseBase() {
   protected fun moveCaretToRandomPlace(env: ImperativeCommand.Environment, editor: Editor) {
     val pos = env.generateValue(Generator.integers(0, editor.document.textLength - 1), "Put caret at position %s")
     editor.caretModel.currentCaret.vim.moveToOffset(pos)

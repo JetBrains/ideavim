@@ -11,14 +11,14 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 
-class ActionCommandTest : VimTestCase() {
+class ActionCommandTest : VimTestCaseBase() {
   // VIM-652 |:action|
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   @Test

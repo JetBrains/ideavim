@@ -10,12 +10,12 @@ package org.jetbrains.plugins.ideavim.listener
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.listener.VimListenerTestObject
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class VimListenersTest : VimTestCase() {
+class VimListenersTest : VimTestCaseBase() {
   @AfterEach
   fun tearDown() {
     VimListenerTestObject.disposedCounter = 0

@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class InsertBackspaceActionTest : VimTestCase() {
+class InsertBackspaceActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
   fun `test insert backspace`() {

@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,7 +43,7 @@ private const val defaultValue = "defaultValue"
 private const val defaultNumberValue = 10
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class EffectiveOptionChangeListenerTest : VimTestCase() {
+class EffectiveOptionChangeListenerTest : VimTestCaseBase() {
   private val optionName = "test"
   private lateinit var manager: FileEditorManagerImpl
   private lateinit var otherBufferWindow: Editor
@@ -71,7 +71,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
 
     // Create the original editor last, so that fixture.editor will point to this file
     // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
-    originalEditor = configureByText("\n")  // aaa.txt
+    originalEditor = configureByText("\n").ij  // aaa.txt
 
     // Split the current window. Since no options have been set, it will have default values
     splitWindow = openSplitWindow(originalEditor) // aaa.txt

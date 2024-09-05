@@ -11,11 +11,11 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
 
-class PutTextBeforeCursorActionTest : VimTestCase() {
+class PutTextBeforeCursorActionTest : VimTestCaseBase() {
   /**
    * @author Oskar Persson
    */
@@ -30,8 +30,7 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    val vimEditor = editor.vim
-    injector.registerGroup.storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    injector.registerGroup.storeText(editor, editor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("V" + "P"))
     typeText(injector.parser.parseKeys("V" + "P"))
     val after = """

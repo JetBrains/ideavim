@@ -15,10 +15,10 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class SetHandlerCommandTest : VimTestCase() {
+class SetHandlerCommandTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test parse a mappings`() {

@@ -15,14 +15,14 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 @Suppress("SpellCheckingInspection")
-class SearchHelperTest : VimTestCase() {
+class SearchHelperTest : VimTestCaseBase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun testFindNextWord() {

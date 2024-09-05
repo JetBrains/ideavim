@@ -12,10 +12,10 @@ import com.intellij.openapi.editor.Caret
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class SelectEscapeActionTest : VimTestCase() {
+class SelectEscapeActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
   fun `test exit char mode`() {

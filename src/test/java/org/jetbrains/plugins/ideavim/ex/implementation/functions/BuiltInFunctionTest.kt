@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class BuiltInFunctionTest : VimTestCase() {
+class BuiltInFunctionTest : VimTestCaseBase() {
 
   @Test
   fun `test abs`() {

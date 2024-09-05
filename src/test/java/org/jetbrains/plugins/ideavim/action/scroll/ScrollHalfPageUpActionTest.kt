@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -28,7 +28,7 @@ CTRL-U                  Scroll window Upwards in the buffer.  The number of
                         line of the buffer nothing happens and a beep is
                         produced.  See also 'startofline' option.
  */
-class ScrollHalfPageUpActionTest : VimTestCase() {
+class ScrollHalfPageUpActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll half window upwards keeps cursor on same relative line`() {

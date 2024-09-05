@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class SearchWholeWordForwardActionTest : VimTestCase() {
+class SearchWholeWordForwardActionTest : VimTestCaseBase() {
   @Test
   fun `test with tabs`() {
     val before = """
@@ -42,7 +42,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
           I found it in a legendary land
           all rocks and lavender and tufted grass,
           where it was settled on some sodden sand
-          hard by the torrent of a mountain pass$c.
+          hard by the torrent of a mountain pass<caret>.
         """,
   )
   @Test

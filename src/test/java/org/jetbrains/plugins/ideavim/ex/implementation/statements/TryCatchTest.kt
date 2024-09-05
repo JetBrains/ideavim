@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class TryCatchTest : VimTestCase() {
+class TryCatchTest : VimTestCaseBase() {
 
   @Test
   fun `test successful catch of a throw statement`() {

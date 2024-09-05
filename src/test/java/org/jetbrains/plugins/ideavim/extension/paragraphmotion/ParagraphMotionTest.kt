@@ -10,12 +10,12 @@ package org.jetbrains.plugins.ideavim.extension.paragraphmotion
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class ParagraphMotionTest : VimTestCase() {
+class ParagraphMotionTest : VimTestCaseBase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

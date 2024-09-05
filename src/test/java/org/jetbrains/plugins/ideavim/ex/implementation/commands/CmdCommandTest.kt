@@ -10,13 +10,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Elliot Courant
  */
-class CmdCommandTest : VimTestCase() {
+class CmdCommandTest : VimTestCaseBase() {
   @Test
   fun `test recursive`() {
     VimPlugin.getCommand().resetAliases()

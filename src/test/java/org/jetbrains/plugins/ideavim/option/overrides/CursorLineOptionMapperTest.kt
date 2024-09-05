@@ -13,7 +13,7 @@ import com.intellij.openapi.editor.impl.SettingsImpl
 import com.maddyhome.idea.vim.group.IjOptions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-class CursorLineOptionMapperTest : VimTestCase() {
+class CursorLineOptionMapperTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

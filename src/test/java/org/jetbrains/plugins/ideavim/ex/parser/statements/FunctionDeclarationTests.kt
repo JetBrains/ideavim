@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.params.ParameterizedTest
@@ -27,7 +27,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class FunctionDeclarationTests : VimTestCase() {
+class FunctionDeclarationTests : VimTestCaseBase() {
 
   companion object {
     @JvmStatic

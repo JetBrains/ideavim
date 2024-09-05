@@ -20,6 +20,7 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -28,7 +29,7 @@ import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -39,7 +40,7 @@ import kotlin.test.assertEquals
 
 // Tests the implementation of global, local to buffer, local to window and global-local
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class OptionDeclaredScopeTest : VimTestCase() {
+class OptionDeclaredScopeTest : VimTestCaseBase() {
   private val optionName = "test"
   private val defaultValue = VimString("defaultValue")
   private val setValue = VimString("setValue")
@@ -61,7 +62,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
     // Create the original editor last, so that fixture.editor will point to this file
     // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
-    originalEditor = configureByText("\n")  // aaa.txt
+    originalEditor = configureByText("\n").ij  // aaa.txt
 
     manager.currentWindow.let {
       // Split the original editor into a new window, then reset the focus back to the originalEditor's EditorWindow

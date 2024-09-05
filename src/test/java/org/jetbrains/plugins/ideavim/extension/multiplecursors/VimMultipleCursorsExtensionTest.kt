@@ -9,18 +9,17 @@
 package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class VimMultipleCursorsExtensionTest : VimTestCase() {
+class VimMultipleCursorsExtensionTest : VimTestCaseBase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -189,7 +188,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    editor.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-p>"))
 
@@ -272,7 +271,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    editor.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-x>"))
     assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
@@ -362,7 +361,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   fun `test ignores regex in search pattern`() {
     val before = "test ${s}t.*st${c}$se toast tallest t.*st"
     val editor = configureByText(before)
-    editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    editor.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("<A-n><A-n>"))
     val after = "test ${s}t.*st$se toast tallest ${s}t.*st$se"

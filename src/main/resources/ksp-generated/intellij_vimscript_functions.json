@@ -1,6 +1,3 @@
 {
-    "col": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ColFunctionHandler",
-    "has": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.HasFunctionHandler",
-    "line": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.LineFunctionHandler",
-    "submatch": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler"
+    "has": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.HasFunctionHandler"
 }

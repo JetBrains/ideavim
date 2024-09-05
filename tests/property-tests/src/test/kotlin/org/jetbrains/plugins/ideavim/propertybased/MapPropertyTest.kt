@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.propertybased
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -22,7 +23,7 @@ class MapPropertyTest : VimPropertyTestBase() {
   fun /*test*/RandomMappings() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByText(simpleText)
+        val editor = configureByText(simpleText).ij
         try {
           editor.caretModel.moveToOffset(58) // At the word "lavender"
 

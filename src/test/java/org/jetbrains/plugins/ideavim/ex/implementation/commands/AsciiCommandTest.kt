@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class AsciiCommandTest : VimTestCase() {
+class AsciiCommandTest : VimTestCaseBase() {
   @Test
   fun `test shows ascii value under caret`() {
     configureByText("${c}Hello world")

@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class ChangeLineActionTest : VimTestCase() {
+class ChangeLineActionTest : VimTestCaseBase() {
   @Test
   fun `test on empty file`() {
     setupChecks {

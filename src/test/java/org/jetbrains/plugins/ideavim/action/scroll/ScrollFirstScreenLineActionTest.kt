@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 zt                      Like "z<CR>", but leave the cursor in the same
                         column.
  */
-class ScrollFirstScreenLineActionTest : VimTestCase() {
+class ScrollFirstScreenLineActionTest : VimTestCaseBase() {
   @Test
   fun `test scroll current line to top of screen`() {
     configureByPages(5)

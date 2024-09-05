@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
+class InsertBeforeFirstNonBlankActionTest : VimTestCaseBase() {
   @Test
   fun `test insert multiple carets`() {
     doTest(

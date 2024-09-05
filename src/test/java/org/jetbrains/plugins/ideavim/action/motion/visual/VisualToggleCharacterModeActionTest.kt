@@ -14,11 +14,11 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
 
-class VisualToggleCharacterModeActionTest : VimTestCase() {
+class VisualToggleCharacterModeActionTest : VimTestCaseBase() {
   @Test
   fun `test vim start after enter visual`() {
     val before = """

@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class LockVarCommandTest : VimTestCase() {
+class LockVarCommandTest : VimTestCaseBase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test

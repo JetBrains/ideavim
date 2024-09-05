@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class InsertNewLineBelowActionTest : VimTestCase() {
+class InsertNewLineBelowActionTest : VimTestCaseBase() {
   @Test
   fun `test insert new line below`() {
     val before = """I found it in a legendary land

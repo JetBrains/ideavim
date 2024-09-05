@@ -13,10 +13,10 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class VimEditorTest : VimTestCase() {
+class VimEditorTest : VimTestCaseBase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test delete string`() {

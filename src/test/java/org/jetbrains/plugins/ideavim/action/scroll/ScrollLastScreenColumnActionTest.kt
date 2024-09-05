@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.intellij.openapi.editor.Inlay
 import com.maddyhome.idea.vim.helper.EditorHelper
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
@@ -21,7 +21,7 @@ ze                      Scroll the text horizontally to position the cursor
                         at the end (right side) of the screen.  This only
                         works when 'wrap' is off.
  */
-class ScrollLastScreenColumnActionTest : VimTestCase() {
+class ScrollLastScreenColumnActionTest : VimTestCaseBase() {
   @Test
   fun `test scroll caret column to last screen column`() {
     configureByColumns(200)

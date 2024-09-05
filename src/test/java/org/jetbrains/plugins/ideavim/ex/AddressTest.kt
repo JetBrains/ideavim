@@ -9,10 +9,10 @@ package org.jetbrains.plugins.ideavim.ex
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class AddressTest : VimTestCase() {
+class AddressTest : VimTestCaseBase() {
   @Test
   fun testNoRange() {
     configureByText("1\n2\n<caret>3\n4\n5\n")

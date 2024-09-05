@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MarksCommandTest : VimTestCase() {
+class MarksCommandTest : VimTestCaseBase() {
   @Test
   @TestFor(issues = ["VIM-3176"])
   fun `test gv after pasting to the same line`() {

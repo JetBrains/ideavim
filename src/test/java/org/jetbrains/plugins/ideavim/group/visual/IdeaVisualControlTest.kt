@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
@@ -35,7 +35,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
 import kotlin.test.assertNull
 
 @TraceOptions(TestOptionConstants.selectmode)
-class IdeaVisualControlTest : VimTestCase() {
+class IdeaVisualControlTest : VimTestCaseBase() {
   @OptionTest(VimOption(TestOptionConstants.selectmode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection no selection`() {
@@ -93,7 +93,7 @@ class IdeaVisualControlTest : VimTestCase() {
     originalVimAfter = """
             Lorem Ipsum
 
-            I ${s}found i${c}t$se in a legendary land
+            I ${s}found i<caret>t$se in a legendary land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.

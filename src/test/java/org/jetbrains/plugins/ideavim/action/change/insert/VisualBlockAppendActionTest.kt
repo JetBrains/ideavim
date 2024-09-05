@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class VisualBlockAppendActionTest : VimTestCase() {
+class VisualBlockAppendActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
   fun `test visual block append`() {

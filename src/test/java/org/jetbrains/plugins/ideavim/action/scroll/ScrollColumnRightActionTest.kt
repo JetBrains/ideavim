@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -20,7 +20,7 @@ zh                      Move the view on the text [count] characters to the
                         left, thus scroll the text [count] characters to the
                         right.  This only works when 'wrap' is off.
  */
-class ScrollColumnRightActionTest : VimTestCase() {
+class ScrollColumnRightActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun`test scrolls column to right`() {

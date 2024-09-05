@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class VisualExitModeActionTest : VimTestCase() {
+class VisualExitModeActionTest : VimTestCaseBase() {
   @Test
   fun `test exit visual mode after line end`() {
     doTest("vl<Esc>", "12${c}3", "12${c}3", Mode.NORMAL())

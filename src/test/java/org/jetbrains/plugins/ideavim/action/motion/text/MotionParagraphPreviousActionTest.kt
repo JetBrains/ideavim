@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionParagraphPreviousActionTest : VimTestCase() {
+class MotionParagraphPreviousActionTest : VimTestCaseBase() {
   @VimBehaviorDiffers("")
   @Test
   fun `test delete till start with empty line`() {

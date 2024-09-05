@@ -10,11 +10,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.RedoCommand
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
-class RedoCommandTest : VimTestCase() {
+class RedoCommandTest : VimTestCaseBase() {
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("redo")

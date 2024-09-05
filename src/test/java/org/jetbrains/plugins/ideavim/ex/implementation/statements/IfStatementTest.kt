@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class IfStatementTest : VimTestCase() {
+class IfStatementTest : VimTestCaseBase() {
 
   @Test
   fun `test simple if with true condition`() {

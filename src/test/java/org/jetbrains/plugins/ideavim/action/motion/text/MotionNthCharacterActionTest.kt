@@ -11,10 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.text
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionNthCharacterActionTest : VimTestCase() {
+class MotionNthCharacterActionTest : VimTestCaseBase() {
   @Test
   fun `test goto without count`() {
     doTest(
@@ -166,7 +166,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.$c
+            hard by the torrent of a mountain pass.<caret>
   """,
   )
   @Test
@@ -201,7 +201,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-            $c
+            <caret>
   """,
   )
   @Test

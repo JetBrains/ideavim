@@ -11,10 +11,11 @@ import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
@@ -24,7 +25,7 @@ import kotlin.test.assertTrue
  * @author vlan
  */
 @Suppress("SpellCheckingInspection")
-class CopyActionTest : VimTestCase() {
+class CopyActionTest : VimTestCaseBase() {
   // |y| |p| |count|
   @Test
   fun testYankPutCharacters() {
@@ -184,7 +185,7 @@ class CopyActionTest : VimTestCase() {
      
       """.trimIndent(),
     )
-    kotlin.test.assertEquals(0, editor.caretModel.offset)
+    kotlin.test.assertEquals(0, editor.ij.caretModel.offset)
   }
 
   // VIM-632 |CTRL-V| |v_y| |p|

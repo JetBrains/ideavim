@@ -8,10 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.search
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class SearchAgainNextActionTest : VimTestCase() {
+class SearchAgainNextActionTest : VimTestCaseBase() {
   @Test
   fun `test search next updates status line`() {
     doTest(

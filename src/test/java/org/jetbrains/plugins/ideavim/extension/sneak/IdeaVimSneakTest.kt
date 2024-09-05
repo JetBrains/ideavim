@@ -10,12 +10,12 @@ package org.jetbrains.plugins.ideavim.extension.sneak
 
 import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class IdeaVimSneakTest : VimTestCase() {
+class IdeaVimSneakTest : VimTestCaseBase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)

@@ -10,12 +10,12 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.system.measureTimeMillis
 
 // todo time limit
-class LongerScriptTest : VimTestCase() {
+class LongerScriptTest : VimTestCaseBase() {
 
   // it's always broken somehow
   @Test

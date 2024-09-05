@@ -14,11 +14,11 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.regexp.VimRegex
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class VimRegexEngineTest : VimTestCase() {
+class VimRegexEngineTest : VimTestCaseBase() {
   private fun findAll(pattern: String): List<TextRange> {
     val regex = VimRegex(pattern)
     return regex.findAll(fixture.editor.vim).map { it.range }

@@ -11,14 +11,14 @@ package org.jetbrains.plugins.ideavim.option
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 // TODO: 2019-06-18 VimOptionsTestCase
-class DigraphTest : VimTestCase() {
+class DigraphTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   @Test
   fun `test digraph`() {

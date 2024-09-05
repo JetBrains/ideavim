@@ -10,10 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class InsertDeleteInsertedTextActionTest : VimTestCase() {
+class InsertDeleteInsertedTextActionTest : VimTestCaseBase() {
   // VIM-1655
   @Test
   fun `test deleted text is not yanked`() {

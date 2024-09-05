@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -18,7 +18,7 @@ z<CR>                   Redraw, line [count] at top of window (default
                         cursor line).  Put cursor at first non-blank in the
                         line.
  */
-class ScrollFirstScreenLineStartActionTest : VimTestCase() {
+class ScrollFirstScreenLineStartActionTest : VimTestCaseBase() {
   @Test
   fun `test scroll current line to top of screen`() {
     configureByPages(5)

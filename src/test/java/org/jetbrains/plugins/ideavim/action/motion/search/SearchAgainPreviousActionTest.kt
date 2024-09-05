@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.Direction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class SearchAgainPreviousActionTest : VimTestCase() {
+class SearchAgainPreviousActionTest : VimTestCaseBase() {
   @Test
   fun `test search previous updates status line`() {
     doTest(

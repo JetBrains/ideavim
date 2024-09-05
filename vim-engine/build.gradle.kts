@@ -22,6 +22,15 @@ val sourcesJarArtifacts by configurations.registering {
   }
 }
 
+val testArtifacts: Configuration by configurations.creating {
+  extendsFrom(configurations.testImplementation.get())
+}
+
+val testJar by tasks.creating(Jar::class) {
+  archiveClassifier.set("tests")
+  from(sourceSets.test.get().output)
+}
+
 val kotlinVersion: String by project
 val kotlinxSerializationVersion: String by project
 
@@ -109,6 +118,7 @@ java {
 }
 
 artifacts.add(sourcesJarArtifacts.name, tasks.named("sourcesJar"))
+artifacts.add(testArtifacts.name, tasks.named("testJar"))
 
 val spaceUsername: String by project
 val spacePassword: String by project

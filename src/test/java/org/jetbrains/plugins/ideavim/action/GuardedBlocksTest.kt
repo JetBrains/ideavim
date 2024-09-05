@@ -12,12 +12,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
-class GuardedBlocksTest : VimTestCase() {
+class GuardedBlocksTest : VimTestCaseBase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
   fun `test delete char with block`() {

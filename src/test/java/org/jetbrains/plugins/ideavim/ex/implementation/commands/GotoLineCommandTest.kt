@@ -11,13 +11,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @Suppress("SpellCheckingInspection")
-class GotoLineCommandTest : VimTestCase() {
+class GotoLineCommandTest : VimTestCaseBase() {
   @Test
   fun `test goto explicit line`() {
     val before = """

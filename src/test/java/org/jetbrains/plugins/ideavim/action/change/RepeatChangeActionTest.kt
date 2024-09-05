@@ -13,10 +13,10 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class RepeatChangeActionTest : VimTestCase() {
+class RepeatChangeActionTest : VimTestCaseBase() {
   @Test
   fun `test simple repeat`() {
     val keys = listOf("v2erXj^", ".")
@@ -248,7 +248,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXXnd it in a legendary land
                 XXXXXocks and lavender and tufted grass,
                 XXXXX it was settled on some sodden sand
-                hard ${c}XXXXXe torrent of a mountain pass.
+                hard <caret>XXXXXe torrent of a mountain pass.
 
     """,
   )

@@ -10,12 +10,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.EditFileCommand
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class EditFileCommandTest : VimTestCase() {
+class EditFileCommandTest : VimTestCaseBase() {
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("edit ~/.ideavimrc")

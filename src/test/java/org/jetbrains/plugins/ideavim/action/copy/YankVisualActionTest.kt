@@ -17,13 +17,13 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
 import kotlin.test.assertNotNull
 
-class YankVisualActionTest : VimTestCase() {
+class YankVisualActionTest : VimTestCaseBase() {
   @Test
   fun `test simple yank`() {
     doTest(

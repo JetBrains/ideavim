@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.intellij.idea.TestFor
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class EnterNormalActionTest : VimTestCase() {
+class EnterNormalActionTest : VimTestCaseBase() {
   @Test
   @TestFor(issues = ["VIM-3190"])
   fun `mapping to control enter`() {

@@ -10,14 +10,14 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.fail
 
 /**
  * @author Alex Plate
  */
-class MarkCommandTest : VimTestCase() {
+class MarkCommandTest : VimTestCaseBase() {
   @Test
   fun `test simple mark`() {
     configureByText(

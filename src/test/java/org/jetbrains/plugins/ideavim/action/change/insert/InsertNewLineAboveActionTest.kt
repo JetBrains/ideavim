@@ -14,12 +14,12 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class InsertNewLineAboveActionTest : VimTestCase() {
+class InsertNewLineAboveActionTest : VimTestCaseBase() {
   @Test
   fun `test insert new line above`() {
     val before = """Lorem ipsum dolor sit amet,

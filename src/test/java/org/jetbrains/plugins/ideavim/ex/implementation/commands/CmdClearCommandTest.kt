@@ -9,13 +9,13 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /**
  * @author Elliot Courant
  */
-class CmdClearCommandTest : VimTestCase() {
+class CmdClearCommandTest : VimTestCaseBase() {
   @Test
   fun `test clear aliases`() {
     VimPlugin.getCommand().resetAliases()

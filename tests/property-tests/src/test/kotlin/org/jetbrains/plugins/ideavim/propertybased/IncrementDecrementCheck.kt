@@ -12,13 +12,14 @@ import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 import kotlin.math.absoluteValue
 import kotlin.math.sign
@@ -29,7 +30,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
   fun testPlayingWithNumbers() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByText(numbers)
+        val editor = configureByText(numbers).ij
         try {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, this)))
@@ -51,7 +52,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val number = env.generateValue(testNumberGenerator, "Generate %s number")
-        val editor = configureByText(number)
+        val editor = configureByText(number).ij
         try {
           moveCaretToRandomPlace(env, editor)
 
@@ -69,13 +70,13 @@ class IncrementDecrementTest : VimPropertyTestBase() {
   }
 }
 
-private class IncrementDecrementActions(private val editor: Editor, val test: VimTestCase) : ImperativeCommand {
+private class IncrementDecrementActions(private val editor: Editor, val test: VimTestCaseBase) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
     val generator = Generator.sampledFrom("<C-A>", "<C-X>")
     val key = env.generateValue(generator, null)
     val action = injector.parser.parseKeys(key).single()
     env.logMessage("Use command: ${injector.parser.toKeyNotation(action)}.")
-    VimTestCase.typeText(listOf(action), editor, editor.project)
+    VimTestCaseBase.typeText(listOf(action), editor, editor.project)
     NeovimTesting.typeCommand(key, test.testInfo, editor)
 
     IdeEventQueue.getInstance().flushQueue()

@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.api.Test
@@ -36,7 +36,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CommandTests : VimTestCase() {
+class CommandTests : VimTestCaseBase() {
 
   companion object {
     @JvmStatic

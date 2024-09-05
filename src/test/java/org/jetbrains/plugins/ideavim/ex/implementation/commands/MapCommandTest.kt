@@ -19,7 +19,7 @@ import org.jetbrains.plugins.ideavim.ExceptionHandler
 import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.jetbrains.plugins.ideavim.exceptionMappingOwner
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Disabled
@@ -32,7 +32,7 @@ import kotlin.test.assertTrue
 /**
  * @author vlan
  */
-class MapCommandTest : VimTestCase() {
+class MapCommandTest : VimTestCaseBase() {
 
   @AfterEach
   fun tearDown() {

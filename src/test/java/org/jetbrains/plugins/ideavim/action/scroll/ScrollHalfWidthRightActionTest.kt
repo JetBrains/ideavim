@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
 /*
@@ -26,7 +26,7 @@ zH                      Move the view on the text half a screenwidth to the
 
 [count] is used but undocumented.
  */
-class ScrollHalfWidthRightActionTest : VimTestCase() {
+class ScrollHalfWidthRightActionTest : VimTestCaseBase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll half page width`() {

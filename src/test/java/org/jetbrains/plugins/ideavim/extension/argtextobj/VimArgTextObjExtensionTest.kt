@@ -11,14 +11,14 @@ import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import java.util.*
 
 @Suppress("SpellCheckingInspection")
-class VimArgTextObjExtensionTest : VimTestCase() {
+class VimArgTextObjExtensionTest : VimTestCaseBase() {
   @Throws(Exception::class)
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

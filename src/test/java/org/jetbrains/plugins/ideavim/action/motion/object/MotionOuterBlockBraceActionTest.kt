@@ -9,10 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.Test
 
-class MotionOuterBlockBraceActionTest : VimTestCase() {
+class MotionOuterBlockBraceActionTest : VimTestCaseBase() {
   @Test
   fun testOutside() {
     typeTextInFile(

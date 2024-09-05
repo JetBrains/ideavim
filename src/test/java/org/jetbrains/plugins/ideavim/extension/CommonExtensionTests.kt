@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCaseBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class OpMappingTest : VimTestCase() {
+class OpMappingTest : VimTestCaseBase() {
   private lateinit var extension: ExtensionBeanClass
 
   private var disposable: Disposable = Disposer.newDisposable()
@@ -194,7 +194,7 @@ class OpMappingTest : VimTestCase() {
   }
 }
 
-class PlugExtensionsTest : VimTestCase() {
+class PlugExtensionsTest : VimTestCaseBase() {
 
   private lateinit var extension: ExtensionBeanClass
 
@@ -238,7 +238,7 @@ class PlugExtensionsTest : VimTestCase() {
   }
 }
 
-class PlugMissingKeysTest : VimTestCase() {
+class PlugMissingKeysTest : VimTestCaseBase() {
 
   private lateinit var extension: ExtensionBeanClass
 
