@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.newapi.ij
+import org.jetbrains.annotations.TestOnly
 import java.awt.Font
 import java.awt.event.KeyEvent
 import java.util.*
@@ -45,15 +46,26 @@ private const val DEFAULT_HIGHLIGHT_DURATION_SNEAK = 300
 // By [Mikhail Levchenko](https://github.com/Mishkun)
 // Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak
 internal class IdeaVimSneakExtension : VimExtension {
+  @Suppress("CompanionObjectInExtension")
+  companion object {
+    private var highlightHandler: HighlightHandler? = null
+
+    @TestOnly
+    internal fun stopTimer() {
+      highlightHandler?.stopExistingTimer()
+    }
+  }
+
   override fun getName(): String = "sneak"
 
   override fun init() {
-    val highlightHandler = HighlightHandler()
-    mapToFunctionAndProvideKeys("s", SneakHandler(highlightHandler, Direction.FORWARD), MappingMode.NXO)
+    val _highlightHandler = HighlightHandler()
+    highlightHandler = _highlightHandler
+    mapToFunctionAndProvideKeys("s", SneakHandler(_highlightHandler, Direction.FORWARD), MappingMode.NXO)
 
     // vim-sneak uses `Z` for visual mode because `S` conflict with vim-sneak plugin VIM-3330
-    mapToFunctionAndProvideKeys("S", SneakHandler(highlightHandler, Direction.BACKWARD), MappingMode.NO)
-    mapToFunctionAndProvideKeys("Z", SneakHandler(highlightHandler, Direction.BACKWARD), MappingMode.X)
+    mapToFunctionAndProvideKeys("S", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.NO)
+    mapToFunctionAndProvideKeys("Z", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.X)
 
     // workaround to support ; and , commands
     mapToFunctionAndProvideKeys("f", SneakMemoryHandler("f"), MappingMode.NXO)
@@ -61,8 +73,8 @@ internal class IdeaVimSneakExtension : VimExtension {
     mapToFunctionAndProvideKeys("t", SneakMemoryHandler("t"), MappingMode.NXO)
     mapToFunctionAndProvideKeys("T", SneakMemoryHandler("T"), MappingMode.NXO)
 
-    mapToFunctionAndProvideKeys(";", SneakRepeatHandler(highlightHandler, RepeatDirection.IDENTICAL), MappingMode.NXO)
-    mapToFunctionAndProvideKeys(",", SneakRepeatHandler(highlightHandler, RepeatDirection.REVERSE), MappingMode.NXO)
+    mapToFunctionAndProvideKeys(";", SneakRepeatHandler(_highlightHandler, RepeatDirection.IDENTICAL), MappingMode.NXO)
+    mapToFunctionAndProvideKeys(",", SneakRepeatHandler(_highlightHandler, RepeatDirection.REVERSE), MappingMode.NXO)
   }
 
   private class SneakHandler(
@@ -209,6 +221,7 @@ internal class IdeaVimSneakExtension : VimExtension {
   private class HighlightHandler {
     private var editor: Editor? = null
     private val sneakHighlighters: MutableSet<RangeHighlighter> = mutableSetOf()
+    private var timer: Timer? = null
 
     fun highlightSneakRange(editor: Editor, range: TextRange) {
       clearAllSneakHighlighters()
@@ -254,13 +267,19 @@ internal class IdeaVimSneakExtension : VimExtension {
     }
 
     private fun setClearHighlightRangeTimer(highlighter: RangeHighlighter) {
-      val timer = Timer(DEFAULT_HIGHLIGHT_DURATION_SNEAK) {
+      stopExistingTimer()
+      timer = Timer(DEFAULT_HIGHLIGHT_DURATION_SNEAK) {
         if (editor?.isDisposed != true) {
           editor?.markupModel?.removeHighlighter(highlighter)
         }
       }
-      timer.isRepeats = false
-      timer.start()
+      timer?.isRepeats = false
+      timer?.start()
+    }
+
+    fun stopExistingTimer() {
+      timer?.stop()
+      timer?.actionListeners?.forEach { it.actionPerformed(null) }
     }
 
     private fun getHighlightTextAttributes() = TextAttributes(

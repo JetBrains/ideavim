@@ -9,8 +9,10 @@
 package org.jetbrains.plugins.ideavim.extension.sneak
 
 import com.maddyhome.idea.vim.api.keys
+import com.maddyhome.idea.vim.extension.sneak.IdeaVimSneakExtension
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -20,6 +22,12 @@ class IdeaVimSneakTest : VimTestCase() {
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     enableExtensions("sneak")
+  }
+
+  @AfterEach
+  override fun tearDown(testInfo: TestInfo) {
+    IdeaVimSneakExtension.stopTimer()
+    super.tearDown(testInfo)
   }
 
   @Test

@@ -11,9 +11,11 @@
 package org.jetbrains.plugins.ideavim.extension.surround
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.extension.sneak.IdeaVimSneakExtension
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -27,6 +29,12 @@ class VimSurroundExtensionTest : VimTestCase() {
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     enableExtensions("surround")
+  }
+
+  @AfterEach
+  override fun tearDown(testInfo: TestInfo) {
+    IdeaVimSneakExtension.stopTimer()
+    super.tearDown(testInfo)
   }
 
   /* surround */
