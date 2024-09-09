@@ -112,23 +112,25 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         SelectionType.CHARACTER_WISE,
         caret,
       )
-      val pos = caret.offset
-      val norm = editor.normalizeOffset(caret.getBufferPosition().line, pos, isChange)
-      if (norm != pos ||
+      val pos = min(caret.offset, endOffset.offset)
+      val norm = editor.normalizeOffset(editor.offsetToBufferPosition(pos).line, pos, isChange)
+      val newCaret = if (norm != pos ||
         editor.offsetToVisualPosition(norm) !==
         injector.engineEditorHelper.inlayAwareOffsetToVisualPosition(editor, norm)
       ) {
         caret.moveToOffset(norm)
+      } else {
+        caret
       }
       // Always move the caret. Our position might or might not have changed, but an inlay might have been moved to our
       // location, or deleting the character(s) might have caused us to scroll sideways in long files. Moving the caret
       // will make sure it's in the right place, and visible
       val offset = editor.normalizeOffset(
-        caret.getBufferPosition().line,
-        caret.offset,
+        newCaret.getBufferPosition().line,
+        newCaret.offset,
         isChange,
       )
-      caret.moveToOffset(offset)
+      newCaret.moveToOffset(offset)
       return res
     }
     return false
