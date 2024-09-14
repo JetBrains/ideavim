@@ -65,11 +65,7 @@ internal class ApplicationConfigurationMigrator(migrationComponents: MigrationCo
   }
 
   private fun getCurrentVersion(): Int? {
-    for (detector in versionDetectors) {
-      val version = detector.extractVersion()
-      if (version != null) return version
-    }
-    return null
+    return versionDetectors.find { it.extractVersion() != null }?.extractVersion()
   }
 
   private fun performMigration(startVersion: Int) {
