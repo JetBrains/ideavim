@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.indexOfOrNull
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -316,7 +317,31 @@ object Options {
   // Note that IntelliJ overrides clipboard's default value to include the `ideaput` option.
   // TODO: Technically, we should validate values, but that requires handling exclude, which is irrelevant to us
   val clipboard: StringListOption = addOption(
-    StringListOption("clipboard", GLOBAL, "cb", "autoselect,exclude:cons\\|linux")
+    object : StringListOption("clipboard", GLOBAL, "cb", "autoselect") {
+      override fun split(value: String): List<String> {
+        val result = mutableListOf<String>()
+        var remaining = value
+        while (remaining.isNotEmpty()) {
+          val nextSeparator = remaining.indexOfOrNull(',')
+          if (nextSeparator == null) {
+            if (remaining.isNotEmpty()) {
+              result.add(remaining)
+            }
+            break
+          } else {
+            val nextValue = remaining.substring(0, nextSeparator)
+            if (nextValue.startsWith("exclude:")) {
+              result.add(remaining)
+              break
+            } else if (nextValue.isNotEmpty()) {
+              result.add(nextValue)
+            }
+            remaining = remaining.substring(nextSeparator + 1)
+          }
+        }
+        return result
+      }
+    }
   )
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
