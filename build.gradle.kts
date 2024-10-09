@@ -150,10 +150,10 @@ dependencies {
   // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.2")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.3")
   testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.11.2")
   testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.3")
   testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
 
