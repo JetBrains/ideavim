@@ -19,6 +19,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
 /**
  * @author dhleong
@@ -616,5 +618,21 @@ class VimSurroundExtensionTest : VimTestCase() {
       "Hello (HI test test) extra information"
     """
     doTest(listOf("cs\")"), before, after, Mode.NORMAL())
+  }
+
+  // VIM-1824
+  @ParameterizedTest(name = "testRemoveWhiteSpaceWithOpeningBracket for {2}")
+  @MethodSource("removeWhiteSpaceWithClosingBracketParams")
+  fun testRemoveWhiteSpaceWithClosingBracket(before: String, after: String, motion: String) {
+    doTest(listOf("cs${motion}"), before, after, Mode.NORMAL())
+  }
+
+  companion object {
+    @JvmStatic
+    fun removeWhiteSpaceWithClosingBracketParams() = listOf(
+      arrayOf("{ ${c}example }", "${c}{example}", "{}"),
+      arrayOf("( ${c}example )", "${c}(example)", "()"),
+      arrayOf("[ ${c}example ]", "${c}[example]", "[]"),
+    )
   }
 }
