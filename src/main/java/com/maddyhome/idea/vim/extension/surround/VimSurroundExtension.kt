@@ -159,7 +159,7 @@ internal class VimSurroundExtension : VimExtension {
     }
 
     companion object {
-      fun change(editor: VimEditor, context: ExecutionContext, charFrom: Char, newSurround: Pair<String, String>?) {
+      fun change(editor: VimEditor, context: ExecutionContext, charFrom: Char, newSurround: SurroundPair?) {
         // Save old register values for carets
         val surroundings = editor.sortedCarets()
           .map {
@@ -195,7 +195,10 @@ internal class VimSurroundExtension : VimExtension {
           .filter { it.innerText != null } // we do nothing with carets that are not inside the surrounding
           .map { surrounding ->
             val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
-            val text = newSurround?.let { it.first + innerValue + it.second } ?: innerValue
+            val text = newSurround?.let {
+              val trimmedValue = if (newSurround.shouldTrim && innerValue.take(1) == " " && innerValue.takeLast(1) == " ") innerValue.substring(1, innerValue.length - 1) else innerValue
+              it.first + trimmedValue + it.second
+            } ?: innerValue
             val textData = PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.CHARACTER_WISE)
             val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
 
@@ -302,33 +305,35 @@ private const val REGISTER = '"'
 
 private const val OPERATOR_FUNC = "SurroundOperatorFunc"
 
-    private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
+private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
+
+private data class SurroundPair(val first: String, val second: String, val shouldTrim: Boolean)
 
 private val SURROUND_PAIRS = mapOf(
-  'b' to ("(" to ")"),
-  '(' to ("( " to " )"),
-  ')' to ("(" to ")"),
-  'B' to ("{" to "}"),
-  '{' to ("{ " to " }"),
-  '}' to ("{" to "}"),
-  'r' to ("[" to "]"),
-  '[' to ("[ " to " ]"),
-  ']' to ("[" to "]"),
-  'a' to ("<" to ">"),
-  '>' to ("<" to ">"),
-  's' to (" " to ""),
+  'b' to SurroundPair("(", ")", false),
+  '(' to SurroundPair("( ", " )", false),
+  ')' to SurroundPair("(", ")", true),
+  'B' to SurroundPair("{", "}", false),
+  '{' to SurroundPair("{ ", " }", false),
+  '}' to SurroundPair("{", "}", true),
+  'r' to SurroundPair("[", "]", false),
+  '[' to SurroundPair("[ ", " ]", false),
+  ']' to SurroundPair("[", "]", true),
+  'a' to SurroundPair("<", ">", false),
+  '>' to SurroundPair("<", ">", false),
+  's' to SurroundPair(" ", "", false),
 )
 
-private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_PAIRS) {
+private fun getSurroundPair(c: Char): SurroundPair? = if (c in SURROUND_PAIRS) {
   SURROUND_PAIRS[c]
 } else if (!c.isLetter()) {
   val s = c.toString()
-  s to s
+  SurroundPair(s, s, false)
 } else {
   null
 }
 
-private fun inputTagPair(editor: Editor, context: DataContext): Pair<String, String>? {
+private fun inputTagPair(editor: Editor, context: DataContext): SurroundPair? {
   val tagInput = inputString(editor, context, "<", '>')
   if (editor.vim.mode is Mode.CMD_LINE) {
     editor.vim.mode = editor.vim.mode.returnTo()
@@ -337,7 +342,7 @@ private fun inputTagPair(editor: Editor, context: DataContext): Pair<String, Str
   return if (matcher.find()) {
     val tagName = matcher.group(1)
     val tagAttributes = matcher.group(2)
-    "<$tagName$tagAttributes>" to "</$tagName>"
+    SurroundPair("<$tagName$tagAttributes>", "</$tagName>", false)
   } else {
     null
   }
@@ -347,16 +352,20 @@ private fun inputFunctionName(
   editor: Editor,
   context: DataContext,
   withInternalSpaces: Boolean,
-): Pair<String, String>? {
+): SurroundPair? {
   val functionNameInput = inputString(editor, context, "function: ", null)
   if (editor.vim.mode is Mode.CMD_LINE) {
     editor.vim.mode = editor.vim.mode.returnTo()
   }
   if (functionNameInput.isEmpty()) return null
-  return if (withInternalSpaces) "$functionNameInput( " to " )" else "$functionNameInput(" to ")"
+  return if (withInternalSpaces) {
+    SurroundPair("$functionNameInput( ", " )", false)
+  } else {
+    SurroundPair("$functionNameInput(", ")", false)
+  }
 }
 
-private fun getOrInputPair(c: Char, editor: Editor, context: DataContext): Pair<String, String>? = when (c) {
+private fun getOrInputPair(c: Char, editor: Editor, context: DataContext): SurroundPair? = when (c) {
   '<', 't' -> inputTagPair(editor, context)
   'f' -> inputFunctionName(editor, context, false)
   'F' -> inputFunctionName(editor, context, true)
@@ -375,7 +384,7 @@ private fun getChar(editor: Editor): Char {
   return res
 }
 
-private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
+private fun performSurround(pair: SurroundPair, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
   runWriteAction {
     val editor = caret.editor
     val change = VimPlugin.getChange()
