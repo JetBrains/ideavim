@@ -183,6 +183,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
  * - App code - set handler after
  * - Template - doesn't intersect with enter anymore
  * - rd.client.editor.enter - set handler before. Otherwise, rider will add new line on enter even in normal mode
+ * - inline.completion.enter - set handler before. Otherwise, AI completion is not invoked on enter.
  *
  * This rule is disabled due to VIM-3124
  * - before terminalEnter - not necessary, but terminalEnter causes "file is read-only" tooltip for readonly files VIM-3122
