@@ -102,7 +102,8 @@ private fun updateSearchHighlights(
   // Update highlights in all visible editors. We update non-visible editors when they get focus.
   // Note that this now includes all editors - main, diff windows, even toolwindows like the Commit editor and consoles
   val editors = injector.editorGroup.getEditors().filter {
-    injector.application.isUnitTest() || it.ij.component.isShowing
+    (injector.application.isUnitTest() || it.ij.component.isShowing)
+      && (currentEditor == null || it.projectId == currentEditor.projectId)
   }
 
   editors.forEach {
