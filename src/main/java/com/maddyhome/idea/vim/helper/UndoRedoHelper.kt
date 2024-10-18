@@ -14,7 +14,9 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.TextEditorWithPreview
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.registry.Registry
@@ -42,19 +44,28 @@ internal class UndoRedoHelper : UndoRedoBase() {
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
-    val fileEditor = TextEditorProvider.getInstance().getTextEditor(editor.ij)
+    val textEditor = getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
-    if (undoManager.isUndoAvailable(fileEditor)) {
+    if (undoManager.isUndoAvailable(textEditor)) {
       val scrollingModel = editor.getScrollingModel()
       scrollingModel.accumulateViewportChanges()
 
-      performUndo(editor, undoManager, fileEditor)
+      performUndo(editor, undoManager, textEditor)
 
       scrollingModel.flushViewportChanges()
 
       return true
     }
     return false
+  }
+
+  private fun getTextEditor(editor: Editor): TextEditor {
+    // If the Editor is hosted in a TextEditor with a preview, then TextEditorProvider will return a TextEditor for the
+    // hosted instance, not for the main editor that also contains the preview. If we pass the inner TextEditor to the
+    // UndoManager, it doesn't correctly restore state. Specifically, the change is undone/redone, but the caret is not
+    // moved. See VIM-3671.
+    val currentTextEditor = TextEditorProvider.getInstance().getTextEditor(editor)
+    return TextEditorWithPreview.getParentSplitEditor(currentTextEditor) as? TextEditor ?: currentTextEditor
   }
 
   private fun performUndo(
@@ -112,10 +123,10 @@ internal class UndoRedoHelper : UndoRedoBase() {
   override fun redo(editor: VimEditor, context: ExecutionContext): Boolean {
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
-    val fileEditor = TextEditorProvider.getInstance().getTextEditor(editor.ij)
+    val textEditor = getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
-    if (undoManager.isRedoAvailable(fileEditor)) {
-      performRedo(undoManager, fileEditor, editor)
+    if (undoManager.isRedoAvailable(textEditor)) {
+      performRedo(undoManager, textEditor, editor)
 
       return true
     }
