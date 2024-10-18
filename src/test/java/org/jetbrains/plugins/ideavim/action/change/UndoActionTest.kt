@@ -162,6 +162,16 @@ class UndoActionTest : VimTestCase() {
     configureByText("Lorem ${c}ipsum dolor sit amet")
   }
 
+  @Test
+  @TestFor(issues = ["VIM-3671"])
+  fun `test undo scrolls caret to reset scrolloff`() {
+    configureByLines(200, "lorem ipsum dolor sit amet")
+    enterCommand("set scrolloff=10")
+    typeText("50G", "dd", "G", "u")
+    assertPosition(49, 0)
+    assertVisibleArea(39, 73)
+  }
+
   private fun hasSelection(): Boolean {
     val editor = fixture.editor
     return editor.caretModel.primaryCaret.hasSelection()

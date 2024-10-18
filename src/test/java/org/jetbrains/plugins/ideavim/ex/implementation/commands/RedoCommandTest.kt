@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.RedoCommand
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -19,5 +20,16 @@ class RedoCommandTest : VimTestCase() {
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("redo")
     assertTrue(command is RedoCommand)
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3671"])
+  fun `test redo scrolls caret to reset scrolloff`() {
+    configureByLines(200, "lorem ipsum dolor sit amet")
+    enterCommand("set scrolloff=10")
+    typeText("50G", "dd", "u", "G")
+    enterCommand("redo")
+    assertPosition(49, 0)
+    assertVisibleArea(39, 73)
   }
 }

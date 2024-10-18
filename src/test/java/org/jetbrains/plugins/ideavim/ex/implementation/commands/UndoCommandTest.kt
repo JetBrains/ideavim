@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.UndoCommand
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -19,5 +20,16 @@ class UndoCommandTest : VimTestCase() {
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("undo")
     assertTrue(command is UndoCommand)
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-3671"])
+  fun `test undo scrolls caret to reset scrolloff`() {
+    configureByLines(200, "lorem ipsum dolor sit amet")
+    enterCommand("set scrolloff=10")
+    typeText("50G", "dd", "G")
+    enterCommand("undo")
+    assertPosition(49, 0)
+    assertVisibleArea(39, 73)
   }
 }
