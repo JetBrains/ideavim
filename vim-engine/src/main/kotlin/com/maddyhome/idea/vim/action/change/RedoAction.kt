@@ -31,6 +31,7 @@ class RedoAction : VimActionHandler.SingleExecution() {
     while ((--count > 0) && result) {
       result = injector.undo.redo(editor, context)
     }
+    injector.scroll.scrollCaretIntoView(editor)
     return result
   }
 }

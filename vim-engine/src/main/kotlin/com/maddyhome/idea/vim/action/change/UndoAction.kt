@@ -31,6 +31,7 @@ class UndoAction : VimActionHandler.SingleExecution() {
     while ((--count > 0) && result) {
       result = injector.undo.undo(editor, context)
     }
+    injector.scroll.scrollCaretIntoView(editor)
     return result
   }
 }
