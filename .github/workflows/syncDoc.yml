@@ -34,6 +34,17 @@ jobs:
         id: update_authors
         run: cp -a origin/doc/. docs
 
+      # The Wiki for github should have no `.md` in references
+      # Otherwise, such links will lead to the raw text.
+      # However, the `.md` should exist to have a navigation in GitHub code.
+      - name: Replace `.md)` with `)`
+        run: |
+          # Define the directory you want to process
+          DIRECTORY="docs"
+
+          # Find all files in the directory and perform the replacement
+          find $DIRECTORY -type f -exec sed -i 's/\.md)//g' {} +
+
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
