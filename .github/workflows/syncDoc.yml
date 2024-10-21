@@ -43,7 +43,7 @@ jobs:
           DIRECTORY="docs"
 
           # Find all files in the directory and perform the replacement
-          find $DIRECTORY -type f -exec sed -i 's/\.md)//g' {} +
+          find $DIRECTORY -type f -exec sed -i 's/\.md)/)/g' {} +
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
