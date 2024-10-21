@@ -42,7 +42,7 @@ data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val 
       // the line _before_ the first line (i.e., copy to above the first line).
       val address1 = getAddressFromArgument(editor)
 
-      val transferableData = injector.clipboardManager.getTransferableData(editor, range, text)
+      val transferableData = injector.clipboardManager.getTransferableData(editor, range)
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData, null)
       var mutableCaret = caret
       val putData = if (address1 == 0) {
