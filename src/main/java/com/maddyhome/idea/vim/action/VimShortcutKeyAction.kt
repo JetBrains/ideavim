@@ -298,26 +298,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         .addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK))
         .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK))
-        .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK))
-        .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK))
-        .addAll(
-          getKeyStrokes(
-            KeyEvent.VK_LEFT,
-            0,
-            InputEvent.CTRL_DOWN_MASK,
-            InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
-          ),
-        )
-        .addAll(
-          getKeyStrokes(
-            KeyEvent.VK_RIGHT,
-            0,
-            InputEvent.CTRL_DOWN_MASK,
-            InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
-          ),
-        )
+        .addAll(getKeyStrokes(KeyEvent.VK_UP, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0))
         .addAll(
           getKeyStrokes(
             KeyEvent.VK_HOME,
