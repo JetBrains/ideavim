@@ -32,7 +32,7 @@ interface VimClipboardManager {
   fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
   fun setPrimaryText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
 
-  fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any>
+  fun getTransferableData(vimEditor: VimEditor, textRange: TextRange): List<Any>
 
   fun preprocessText(
     vimEditor: VimEditor,
