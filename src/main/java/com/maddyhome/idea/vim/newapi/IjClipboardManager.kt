@@ -92,7 +92,7 @@ internal class IjClipboardManager : VimClipboardManager {
     return null
   }
 
-  override fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any> {
+  override fun getTransferableData(vimEditor: VimEditor, textRange: TextRange): List<Any> {
     val editor = (vimEditor as IjVimEditor).editor
     val transferableData: MutableList<TextBlockTransferableData> = ArrayList()
     val project = editor.project ?: return emptyList()
@@ -117,7 +117,7 @@ internal class IjClipboardManager : VimClipboardManager {
         }
       }
     }
-    transferableData.add(CaretStateTransferableData(intArrayOf(0), intArrayOf(text.length)))
+    transferableData.add(CaretStateTransferableData(intArrayOf(0), intArrayOf(textRange.endOffset - textRange.startOffset)))
 
     // These data provided by {@link com.intellij.openapi.editor.richcopy.TextWithMarkupProcessor} doesn't work with
     //   IdeaVim and I don't see a way to fix it
