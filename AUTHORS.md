@@ -539,6 +539,14 @@ Contributors:
   [![icon][github]](https://github.com/felixwiemuth)
   &nbsp;
   Felix Wiemuth
+* [![icon][mail]](mailto:kirill.karnaukhov@jetbrains.com)
+  [![icon][github]](https://github.com/kkarnauk)
+  &nbsp;
+  Kirill Karnaukhov, 
+* [![icon][mail]](mailto:sander.hestvik@gmail.com)
+  [![icon][github]](https://github.com/SanderHestvik)
+  &nbsp;
+  SanderHestvik
 
 Previous contributors:
 
