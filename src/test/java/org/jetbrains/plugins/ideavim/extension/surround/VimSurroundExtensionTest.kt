@@ -354,6 +354,12 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   @Test
+  fun testChangeSurroundingEmptyParens() {
+    doTest(listOf("cs)}"), "${c}()", "${c}{}", Mode.NORMAL())
+    doTest(listOf("cs)}"), "(${c})", "${c}{}", Mode.NORMAL())
+  }
+
+  @Test
   fun testChangeSurroundingBlock() {
     val before = "if (condition) {${c}return;}"
     val after = "if (condition) (return;)"
@@ -621,18 +627,30 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-1824
-  @ParameterizedTest(name = "testRemoveWhiteSpaceWithOpeningBracket for {2}")
+  @ParameterizedTest(name = "testRemoveWhiteSpaceWithClosingBracket for ({0}, {1}, {2})")
   @MethodSource("removeWhiteSpaceWithClosingBracketParams")
   fun testRemoveWhiteSpaceWithClosingBracket(before: String, after: String, motion: String) {
-    doTest(listOf("cs${motion}"), before, after, Mode.NORMAL())
+    doTest(listOf(motion), before, after, Mode.NORMAL())
   }
 
   companion object {
     @JvmStatic
     fun removeWhiteSpaceWithClosingBracketParams() = listOf(
-      arrayOf("{ ${c}example }", "${c}{example}", "{}"),
-      arrayOf("( ${c}example )", "${c}(example)", "()"),
-      arrayOf("[ ${c}example ]", "${c}[example]", "[]"),
+      arrayOf("{ ${c}example }", "${c}{example}", "cs{}"),
+      arrayOf("( ${c}example )", "${c}(example)", "cs()"),
+      arrayOf("[ ${c}example ]", "${c}[example]", "cs[]"),
+
+      // mutliple surrounding spaces are trimmed at once
+      arrayOf("[  ${c}example  ]", "${c}[example]", "cs[]"),
+      arrayOf("[${c}  ]", "${c}[]", "cs[]"),
+      arrayOf("[${c} ]", "${c}[]", "cs[]"),
+
+      // asymetric spaces are also trimmed at once
+      arrayOf("[ ${c}example]", "${c}[example]", "cs[]"),
+      arrayOf("[   ${c}example ]", "${c}[example]", "cs[]"),
+
+      // empty brackets are not removed
+      arrayOf("[${c}]", "${c}[]", "cs[]"),
     )
   }
 }
