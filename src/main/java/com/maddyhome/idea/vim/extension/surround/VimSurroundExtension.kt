@@ -165,7 +165,7 @@ internal class VimSurroundExtension : VimExtension {
           .map {
             val oldValue: List<KeyStroke>? = getRegisterForCaret(REGISTER, it)
             setRegisterForCaret(REGISTER, it, null)
-            SurroundingInfo(it, null, oldValue)
+            SurroundingInfo(it, null, oldValue, false)
           }
 
         // Delete surrounding's content
@@ -181,22 +181,23 @@ internal class VimSurroundExtension : VimExtension {
           }
 
           val registerValue = getRegisterForCaret(REGISTER, it.caret)
-          val innerValue = if (registerValue.isNullOrEmpty()) null else registerValue
+          val innerValue = if (registerValue.isNullOrEmpty()) emptyList() else registerValue
           it.innerText = innerValue
-        }
 
-        surroundings.forEach {
-          if (it.innerText == null && getRegisterForCaret(REGISTER, it.caret)?.isNotEmpty() == true) {
-            it.innerText = emptyList()
+          // Valid surroundings are only those that:
+          // - are validly wrapping with surround characters (i.e. parenthesis, brackets, tags, quotes, etc.);
+          // - or have non-empty inner text (e.g. when we are surrounding words: `csw"`)
+          if (currentSurrounding != null || innerValue.isNotEmpty()) {
+            it.isValidSurrounding = true
           }
         }
 
         surroundings
-          .filter { it.innerText != null } // we do nothing with carets that are not inside the surrounding
+          .filter { it.isValidSurrounding } // we do nothing with carets that are not inside the surrounding
           .map { surrounding ->
             val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
             val text = newSurround?.let {
-              val trimmedValue = if (newSurround.shouldTrim && innerValue.take(1) == " " && innerValue.takeLast(1) == " ") innerValue.substring(1, innerValue.length - 1) else innerValue
+              val trimmedValue = if (newSurround.shouldTrim) innerValue.trim() else innerValue
               it.first + trimmedValue + it.second
             } ?: innerValue
             val textData = PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.CHARACTER_WISE)
@@ -251,7 +252,7 @@ internal class VimSurroundExtension : VimExtension {
     }
   }
 
-  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?) {
+  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?, var isValidSurrounding: Boolean) {
     fun restoreRegister() {
       setRegisterForCaret(REGISTER, caret, oldRegisterContent)
     }
