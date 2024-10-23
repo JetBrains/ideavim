@@ -51,7 +51,7 @@ abstract class VimPutBase : VimPut {
     saveToRegister: Boolean,
   ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
-    deleteSelectedText(editor, data, operatorArguments, saveToRegister)
+    deleteSelectedText(editor, context, data, operatorArguments, saveToRegister)
     val processedText = processText(null, data) ?: return false
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
@@ -98,7 +98,7 @@ abstract class VimPutBase : VimPut {
   }
 
   @RWLockLabel.SelfSynchronized
-  private fun deleteSelectedText(editor: VimEditor, caret: VimCaret, data: PutData, operatorArguments: OperatorArguments, saveToRegister: Boolean): VimCaret? {
+  private fun deleteSelectedText(editor: VimEditor, context: ExecutionContext, caret: VimCaret, data: PutData, operatorArguments: OperatorArguments, saveToRegister: Boolean): VimCaret? {
     if (data.visualSelection == null) return null
     if (!caret.isValid) return null
 
@@ -107,13 +107,13 @@ abstract class VimPutBase : VimPut {
 
     val range = selectionForCaret.toVimTextRange(false).normalize()
     injector.application.runWriteAction {
-      injector.changeGroup.deleteRange(editor, caret, range, selectionForCaret.type, false, operatorArguments, saveToRegister)
+      injector.changeGroup.deleteRange(editor, context, caret, range, selectionForCaret.type, false, operatorArguments, saveToRegister)
     }
     return caret.moveToInlayAwareOffset(range.startOffset)
   }
 
   @RWLockLabel.SelfSynchronized
-  private fun deleteSelectedText(editor: VimEditor, data: PutData, operatorArguments: OperatorArguments, saveToRegister: Boolean) {
+  private fun deleteSelectedText(editor: VimEditor, context: ExecutionContext, data: PutData, operatorArguments: OperatorArguments, saveToRegister: Boolean) {
     if (data.visualSelection == null) return
 
     data.visualSelection.caretsAndSelections.entries.sortedByDescending { it.key.getBufferPosition() }
@@ -122,7 +122,7 @@ abstract class VimPutBase : VimPut {
         val range = selection.toVimTextRange(false).normalize()
 
         injector.application.runWriteAction {
-          injector.changeGroup.deleteRange(editor, caret, range, selection.type, false, operatorArguments, saveToRegister)
+          injector.changeGroup.deleteRange(editor, context, caret, range, selection.type, false, operatorArguments, saveToRegister)
         }
         caret.moveToInlayAwareOffset(range.startOffset)
       }
@@ -524,6 +524,7 @@ abstract class VimPutBase : VimPut {
     data.visualSelection?.let {
       currentCaret = deleteSelectedText(
         editor,
+        context,
         caret,
         data,
         OperatorArguments(false, 0, editor.mode),

@@ -44,6 +44,7 @@ class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution(
       val range = caretsAndSelections[caret] ?: return@forEach
       if (!injector.changeGroup.deleteJoinRange(
           editor,
+          context,
           caret,
           range.toVimTextRange(true).normalize(),
           false,

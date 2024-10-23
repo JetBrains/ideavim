@@ -99,6 +99,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun deleteCharacter(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     count: Int,
     isChange: Boolean,
@@ -108,6 +109,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (endOffset is AbsoluteOffset) {
       val res = deleteText(
         editor,
+        context,
         TextRange(caret.offset, endOffset.offset),
         SelectionType.CHARACTER_WISE,
         caret,
@@ -161,6 +163,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   protected fun deleteText(
     editor: VimEditor,
+    context: ExecutionContext,
     range: TextRange,
     type: SelectionType?,
     caret: VimCaret,
@@ -182,7 +185,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (type == null ||
       (mode == Mode.INSERT || mode == Mode.REPLACE) ||
       !saveToRegister ||
-      caret.registerStorage.storeText(editor, updatedRange, type, true)
+      caret.registerStorage.storeText(editor, context, updatedRange, type, true)
     ) {
       val startOffsets = updatedRange.startOffsets
       val endOffsets = updatedRange.endOffsets
@@ -645,7 +648,19 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
   }
 
-  /**
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun deleteCharacter(
+     editor: VimEditor,
+     caret: VimCaret,
+     count: Int,
+     isChange: Boolean,
+     operatorArguments: OperatorArguments,
+   ): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return deleteCharacter(editor, context, caret, count, isChange, operatorArguments)
+   }
+
+   /**
    * While in INSERT or REPLACE mode the user can enter a single NORMAL mode command and then automatically
    * return to INSERT or REPLACE mode.
    *
@@ -656,7 +671,18 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     clearStrokes(editor)
   }
 
-  /**
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun deleteEndOfLine(
+     editor: VimEditor,
+     caret: VimCaret,
+     count: Int,
+     operatorArguments: OperatorArguments,
+   ): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return deleteEndOfLine(editor, context, caret, count, operatorArguments)
+   }
+
+   /**
    * Delete from the cursor to the end of count - 1 lines down
    *
    * @param editor The editor to delete from
@@ -666,6 +692,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun deleteEndOfLine(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     count: Int,
     operatorArguments: OperatorArguments,
@@ -679,7 +706,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val rangeToDelete = TextRange(startOffset, offset)
       editor.nativeCarets().filter { it != caret && rangeToDelete.contains(it.offset) }
         .forEach { editor.removeCaret(it) }
-      val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret, operatorArguments)
+      val res = deleteText(editor, context, rangeToDelete, SelectionType.CHARACTER_WISE, caret, operatorArguments)
       if (editor.usesVirtualSpace) {
         caret.moveToOffset(startOffset)
       } else {
@@ -691,7 +718,19 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return false
   }
 
-  /**
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun deleteJoinLines(
+     editor: VimEditor,
+     caret: VimCaret,
+     count: Int,
+     spaces: Boolean,
+     operatorArguments: OperatorArguments,
+   ): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return deleteJoinLines(editor, context, caret, count, spaces, operatorArguments)
+   }
+
+   /**
    * Joins count lines together starting at the cursor. No count or a count of one still joins two lines.
    *
    * @param editor The editor to join the lines in
@@ -703,6 +742,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun deleteJoinLines(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     count: Int,
     spaces: Boolean,
@@ -715,7 +755,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return if (lline + myCount > total) {
       false
     } else {
-      deleteJoinNLines(editor, caret, lline, myCount, spaces, operatorArguments)
+      deleteJoinNLines(editor, context, caret, lline, myCount, spaces, operatorArguments)
     }
   }
 
@@ -764,7 +804,18 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return res
   }
 
-  /**
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun deleteLine(
+     editor: VimEditor,
+     caret: VimCaret,
+     count: Int,
+     operatorArguments: OperatorArguments,
+   ): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return deleteLine(editor, context, caret, count, operatorArguments)
+   }
+
+   /**
    * Deletes count lines including the current line
    *
    * @param editor The editor to remove the lines from
@@ -773,6 +824,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun deleteLine(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     count: Int,
     operatorArguments: OperatorArguments,
@@ -786,7 +838,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       logger.debug("offset=$offset")
     }
     if (offset != -1) {
-      val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret, operatorArguments)
+      val res = deleteText(editor, context, TextRange(start, offset), SelectionType.LINE_WISE, caret, operatorArguments)
       if (res && caret.offset >= editor.fileSize() && caret.offset != 0) {
         caret.moveToOffset(
           injector.motion.moveCaretToRelativeLineStartSkipLeading(
@@ -801,7 +853,19 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return false
   }
 
-  override fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean {
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun deleteJoinRange(
+     editor: VimEditor,
+     caret: VimCaret,
+     range: TextRange,
+     spaces: Boolean,
+     operatorArguments: OperatorArguments,
+   ): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return deleteJoinRange(editor, context, caret, range, spaces, operatorArguments)
+   }
+
+   override fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean {
     val executions = if (count > 1) count - 1 else 1
     val allowedExecution = editor.nativeCarets().any { caret: ImmutableVimCaret ->
       val lline = caret.getBufferPosition().line
@@ -830,6 +894,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun deleteJoinRange(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     range: TextRange,
     spaces: Boolean,
@@ -839,7 +904,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val endLine = editor.offsetToBufferPosition(range.endOffset).line
     var count = endLine - startLine + 1
     if (count < 2) count = 2
-    return deleteJoinNLines(editor, caret, startLine, count, spaces, operatorArguments)
+    return deleteJoinNLines(editor, context, caret, startLine, count, spaces, operatorArguments)
   }
 
   override fun joinViaIdeaBySelections(
@@ -900,7 +965,21 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return Pair(range, type)
   }
 
-  /**
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun deleteRange(
+     editor: VimEditor,
+     caret: VimCaret,
+     range: TextRange,
+     type: SelectionType?,
+     isChange: Boolean,
+     operatorArguments: OperatorArguments,
+     saveToRegister: Boolean,
+   ): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return deleteRange(editor, context, caret, range, type, isChange, operatorArguments)
+   }
+
+   /**
    * Delete the range of text.
    *
    * @param editor   The editor to delete the text from
@@ -913,6 +992,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun deleteRange(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     range: TextRange,
     type: SelectionType?,
@@ -923,7 +1003,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val intendedColumn = caret.vimLastColumn
 
     val removeLastNewLine = removeLastNewLine(editor, range, type)
-    val res = deleteText(editor, range, type, caret, operatorArguments, saveToRegister)
+    val res = deleteText(editor, context, range, type, caret, operatorArguments, saveToRegister)
     var processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
@@ -956,7 +1036,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return res
   }
 
-  private fun removeLastNewLine(editor: VimEditor, range: TextRange, type: SelectionType?): Boolean {
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return changeCharacters(editor, context, caret, operatorArguments)
+   }
+
+   private fun removeLastNewLine(editor: VimEditor, range: TextRange, type: SelectionType?): Boolean {
     var endOffset = range.endOffset
     val fileSize = editor.fileSize().toInt()
     if (endOffset > fileSize) {
@@ -976,11 +1062,12 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun changeEndOfLine(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     count: Int,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val res = deleteEndOfLine(editor, caret, count, operatorArguments)
+    val res = deleteEndOfLine(editor, context, caret, count, operatorArguments)
     if (res) {
       caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
       editor.vimChangeActionSwitchMode = Mode.INSERT
@@ -995,22 +1082,33 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param caret  The caret to be moved
    * @return true if able to delete count characters, false if not
    */
-  override fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
+  override fun changeCharacters(editor: VimEditor, context: ExecutionContext, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
     val count = operatorArguments.count1
     // TODO  is it correct to use primary caret? There is a caret as an argument
     val len = editor.lineLength(editor.primaryCaret().getBufferPosition().line)
     val col = caret.getBufferPosition().column
     if (col + count >= len) {
-      return changeEndOfLine(editor, caret, 1, operatorArguments)
+      return changeEndOfLine(editor, context, caret, 1, operatorArguments)
     }
-    val res = deleteCharacter(editor, caret, count, true, operatorArguments)
+    val res = deleteCharacter(editor, context, caret, count, true, operatorArguments)
     if (res) {
       editor.vimChangeActionSwitchMode = Mode.INSERT
     }
     return res
   }
 
-  protected abstract fun reformatCode(editor: VimEditor, start: Int, end: Int)
+   @Deprecated("Please use the same method, but with ExecutionContext")
+   override fun changeEndOfLine(
+     editor: VimEditor,
+     caret: VimCaret,
+     count: Int,
+     operatorArguments: OperatorArguments,
+   ): Boolean {
+     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+     return changeEndOfLine(editor, context, caret, count, operatorArguments)
+   }
+
+   protected abstract fun reformatCode(editor: VimEditor, start: Int, end: Int)
 
   /**
    * Clears all the keystrokes from the current insert command
@@ -1038,6 +1136,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   private fun deleteJoinNLines(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     startLine: Int,
     count: Int,
@@ -1059,7 +1158,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         return i > 1
       }
       // Note that caret isn't moved here; it's only used for register + mark storage
-      deleteText(editor, TextRange(startOffset, endOffset), null, caret, operatorArguments)
+      deleteText(editor, context, TextRange(startOffset, endOffset), null, caret, operatorArguments)
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, startOffset, " ")
       }
@@ -1158,7 +1257,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (charType !== CharacterHelper.CharacterType.WHITESPACE) {
         val lastWordChar = offset >= fileSize - 1 || charType(editor, chars[offset + 1], bigWord) !== charType
         if (wordMotions.contains(id) && lastWordChar && motion.count == 1) {
-          val res = deleteCharacter(editor, caret, 1, true, operatorArguments)
+          val res = deleteCharacter(editor, context, caret, 1, true, operatorArguments)
           if (res) {
             editor.vimChangeActionSwitchMode = Mode.INSERT
           }
@@ -1264,7 +1363,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val after = range.endOffset >= editor.fileSize()
     val lp = editor.offsetToBufferPosition(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
-    val res = deleteRange(editor, caret, range, type, true, operatorArguments)
+    val res = deleteRange(editor, context, caret, range, type, true, operatorArguments)
     val updatedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (res) {
       if (type === SelectionType.LINE_WISE) {
@@ -1926,7 +2025,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
               pos++
             }
             if (pos > wsoff) {
-              deleteText(editor, TextRange(wsoff, pos), null, caret, operatorArguments, true)
+              deleteText(editor, context, TextRange(wsoff, pos), null, caret, operatorArguments, true)
             }
           }
         }

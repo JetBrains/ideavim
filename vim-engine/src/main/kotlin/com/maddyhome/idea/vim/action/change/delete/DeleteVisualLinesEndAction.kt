@@ -54,6 +54,7 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
       val blockRange = TextRange(starts, ends)
       injector.changeGroup.deleteRange(
         editor,
+        context,
         editor.primaryCaret(),
         blockRange,
         SelectionType.BLOCK_WISE,
@@ -67,7 +68,7 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
         editor.getLineStartForOffset(vimTextRange.startOffset),
         lineEndForOffset + endsWithNewLine,
       )
-      injector.changeGroup.deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false, operatorArguments)
+      injector.changeGroup.deleteRange(editor, context, caret, lineRange, SelectionType.LINE_WISE, false, operatorArguments)
     }
   }
 }

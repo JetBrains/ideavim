@@ -36,7 +36,7 @@ class InsertDeleteInsertedTextAction : ChangeEditorActionHandler.ForEachCaret() 
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return insertDeleteInsertedText(editor, caret, operatorArguments)
+    return insertDeleteInsertedText(editor, context, caret, operatorArguments)
   }
 }
 
@@ -50,6 +50,7 @@ class InsertDeleteInsertedTextAction : ChangeEditorActionHandler.ForEachCaret() 
  */
 private fun insertDeleteInsertedText(
   editor: VimEditor,
+  context: ExecutionContext,
   caret: VimCaret,
   operatorArguments: OperatorArguments,
 ): Boolean {
@@ -61,6 +62,7 @@ private fun insertDeleteInsertedText(
   if (deleteTo != -1) {
     injector.changeGroup.deleteRange(
       editor,
+      context,
       caret,
       TextRange(deleteTo, offset),
       SelectionType.CHARACTER_WISE,

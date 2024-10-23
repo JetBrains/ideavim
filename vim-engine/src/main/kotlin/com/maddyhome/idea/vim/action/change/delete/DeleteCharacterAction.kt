@@ -39,6 +39,7 @@ abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : Change
   ): Boolean {
     return injector.changeGroup.deleteCharacter(
       editor,
+      context,
       caret,
       countModifier(operatorArguments.count1),
       false,

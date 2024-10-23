@@ -34,6 +34,6 @@ class ChangeEndOfLineAction : ChangeInInsertSequenceAction() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.changeGroup.changeEndOfLine(editor, caret, operatorArguments.count1, operatorArguments)
+    return injector.changeGroup.changeEndOfLine(editor, context, caret, operatorArguments.count1, operatorArguments)
   }
 }

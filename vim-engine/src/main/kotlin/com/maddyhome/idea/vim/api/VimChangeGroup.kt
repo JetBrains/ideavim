@@ -46,8 +46,11 @@ interface VimChangeGroup {
 
   fun processCommand(editor: VimEditor, cmd: Command)
 
+  @Deprecated("Please use the same method, but with ExecutionContext")
+  fun deleteCharacter(editor: VimEditor, caret: VimCaret, count: Int, isChange: Boolean, operatorArguments: OperatorArguments): Boolean
   fun deleteCharacter(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     count: Int,
     isChange: Boolean,
@@ -56,10 +59,15 @@ interface VimChangeGroup {
 
   fun processSingleCommand(editor: VimEditor)
 
+  @Deprecated("Please use the same method, but with ExecutionContext")
   fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun deleteEndOfLine(editor: VimEditor, context: ExecutionContext, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
+  @Deprecated("Please use the same method, but with ExecutionContext")
+  fun deleteJoinLines(editor: VimEditor, caret: VimCaret, count: Int, spaces: Boolean, operatorArguments: OperatorArguments): Boolean
   fun deleteJoinLines(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     count: Int,
     spaces: Boolean,
@@ -70,10 +78,15 @@ interface VimChangeGroup {
 
   fun processKeyInSelectMode(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
+  @Deprecated("Please use the same method, but with ExecutionContext")
   fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun deleteLine(editor: VimEditor, context: ExecutionContext, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
+  @Deprecated("Please use the same method, but with ExecutionContext")
+  fun deleteJoinRange(editor: VimEditor, caret: VimCaret, range: TextRange, spaces: Boolean, operatorArguments: OperatorArguments): Boolean
   fun deleteJoinRange(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     range: TextRange,
     spaces: Boolean,
@@ -86,8 +99,11 @@ interface VimChangeGroup {
 
   fun getDeleteRangeAndType(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
+  @Deprecated("Please use the same method, but with ExecutionContext")
+  fun deleteRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType?, isChange: Boolean, operatorArguments: OperatorArguments, saveToRegister: Boolean = true): Boolean
   fun deleteRange(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: VimCaret,
     range: TextRange,
     type: SelectionType?,
@@ -95,9 +111,13 @@ interface VimChangeGroup {
     operatorArguments: OperatorArguments,
     saveToRegister: Boolean = true,
   ): Boolean
+  @Deprecated("Please use the same method, but with ExecutionContext")
   fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
+  fun changeCharacters(editor: VimEditor, context: ExecutionContext, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
 
+  @Deprecated("Please use the same method, but with ExecutionContext")
   fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun changeEndOfLine(editor: VimEditor, context: ExecutionContext, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
   /**
    * Delete the text covered by the motion command argument and enter insert mode
