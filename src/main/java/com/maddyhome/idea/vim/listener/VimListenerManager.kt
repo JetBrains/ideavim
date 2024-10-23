@@ -32,7 +32,7 @@ import com.intellij.openapi.editor.event.EditorMouseMotionListener
 import com.intellij.openapi.editor.event.SelectionEvent
 import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
-import com.intellij.openapi.editor.ex.EditorEventMulticasterEx
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -62,7 +62,6 @@ import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.IjOptions
@@ -217,10 +216,6 @@ internal object VimListenerManager {
 
       // Listen for focus change to update various features such as mode widget
       val eventMulticaster = EditorFactory.getInstance().eventMulticaster
-      (eventMulticaster as? EditorEventMulticasterEx)?.addFocusChangeListener(
-        VimFocusListener,
-        VimPlugin.getInstance().onOffDisposable
-      )
 
       // Listen for document changes to update document state such as marks
       eventMulticaster.addDocumentListener(VimDocumentListener, VimPlugin.getInstance().onOffDisposable)
@@ -322,6 +317,8 @@ internal object VimListenerManager {
 
       VimPlugin.getEditor().editorCreated(editor)
       VimPlugin.getChange().editorCreated(editor, listenersDisposable)
+
+      (editor as EditorEx).addFocusListener(VimFocusListener, listenersDisposable)
 
       injector.listenersNotifier.notifyEditorCreated(vimEditor)
 
