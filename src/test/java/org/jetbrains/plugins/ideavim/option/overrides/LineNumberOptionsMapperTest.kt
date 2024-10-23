@@ -14,7 +14,6 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.IjOptions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase

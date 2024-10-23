@@ -7,7 +7,6 @@
  */
 package com.maddyhome.idea.vim.ui.ex
 
-import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim

@@ -18,11 +18,8 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
-import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Options
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
@@ -30,21 +27,16 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.Direction.Companion.fromInt
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.TestInputModel.Companion.getInstance
 import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
 import com.maddyhome.idea.vim.helper.highlightSearchResults
-import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
 import com.maddyhome.idea.vim.helper.vimLastHighlighters
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
-import com.maddyhome.idea.vim.ui.ModalEntry
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler
 import org.jdom.Element
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.TestOnly
-import javax.swing.KeyStroke
 
 @State(
   name = "VimSearchSettings",
