@@ -36,7 +36,7 @@ class InsertDeleteInsertedTextAction : ChangeEditorActionHandler.ForEachCaret() 
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return insertDeleteInsertedText(editor, caret)
+    return insertDeleteInsertedText(editor, context, caret)
   }
 }
 
@@ -48,7 +48,7 @@ class InsertDeleteInsertedTextAction : ChangeEditorActionHandler.ForEachCaret() 
  * @param caret  The caret on which the action is performed
  * @return true if able to delete the text, false if not
  */
-private fun insertDeleteInsertedText(editor: VimEditor, caret: VimCaret): Boolean {
+private fun insertDeleteInsertedText(editor: VimEditor, context: ExecutionContext, caret: VimCaret): Boolean {
   var deleteTo = caret.vimInsertStart.startOffset
   val offset = caret.offset
   if (offset == deleteTo) {
@@ -57,6 +57,7 @@ private fun insertDeleteInsertedText(editor: VimEditor, caret: VimCaret): Boolea
   if (deleteTo != -1) {
     injector.changeGroup.deleteRange(
       editor,
+      context,
       caret,
       TextRange(deleteTo, offset),
       SelectionType.CHARACTER_WISE,

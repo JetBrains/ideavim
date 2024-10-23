@@ -34,6 +34,6 @@ class ChangeCharactersAction : ChangeInInsertSequenceAction() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.changeGroup.changeCharacters(editor, caret, operatorArguments)
+    return injector.changeGroup.changeCharacters(editor, context, caret, operatorArguments)
   }
 }

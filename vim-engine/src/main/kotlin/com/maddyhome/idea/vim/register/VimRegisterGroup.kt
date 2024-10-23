@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.register
 
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -21,6 +22,7 @@ interface VimRegisterGroup {
    *
    * @return The register, null if no such register
    */
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getLastRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   val lastRegister: Register?
   var lastRegisterChar: Char
   val currentRegister: Char
@@ -37,6 +39,7 @@ interface VimRegisterGroup {
   val isRegisterSpecifiedExplicitly: Boolean
   val defaultRegister: Char
 
+  fun getLastRegister(editor: VimEditor, context: ExecutionContext): Register?
   fun isValid(reg: Char): Boolean
   fun selectRegister(reg: Char): Boolean
   fun resetRegister()
@@ -46,8 +49,17 @@ interface VimRegisterGroup {
   fun isRegisterWritable(reg: Char): Boolean
 
   /** Store text into the last register. */
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, com.maddyhome.idea.vim.api.ImmutableVimCaret, com.maddyhome.idea.vim.common.TextRange, com.maddyhome.idea.vim.state.mode.SelectionType, boolean)")
   fun storeText(
     editor: VimEditor,
+    caret: ImmutableVimCaret,
+    range: TextRange,
+    type: SelectionType,
+    isDelete: Boolean,
+  ): Boolean
+  fun storeText(
+    editor: VimEditor,
+    context: ExecutionContext,
     caret: ImmutableVimCaret,
     range: TextRange,
     type: SelectionType,
@@ -57,14 +69,19 @@ interface VimRegisterGroup {
   /**
    * Stores text to any writable register (used for the let command)
    */
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.lang.String)")
   fun storeText(register: Char, text: String): Boolean
+  fun storeText(editor: VimEditor, context: ExecutionContext, register: Char, text: String): Boolean
 
   /**
    * Stores text to any writable register (used for multicaret tests)
    */
   @TestOnly
   // todo better tests
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.lang.String, com.maddyhome.idea.vim.state.mode.SelectionType)")
   fun storeText(register: Char, text: String, selectionType: SelectionType): Boolean
+  @TestOnly
+  fun storeText(editor: VimEditor, context: ExecutionContext, register: Char, text: String, selectionType: SelectionType): Boolean
 
   /**
    * Stores text, character wise, in the given special register
@@ -80,16 +97,26 @@ interface VimRegisterGroup {
    * preferable to yank from the fixture editor.
    */
   fun storeTextSpecial(register: Char, text: String): Boolean
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char)")
   fun getRegister(r: Char): Register?
+  fun getRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register?
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegisters(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   fun getRegisters(): List<Register>
+  fun getRegisters(editor: VimEditor, context: ExecutionContext): List<Register>
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#saveRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, com.maddyhome.idea.vim.register.Register)")
   fun saveRegister(r: Char, register: Register)
+  fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register)
   fun startRecording(register: Char): Boolean
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getPlaybackRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char)")
   fun getPlaybackRegister(r: Char): Register?
+  fun getPlaybackRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register?
   fun recordText(text: String)
   fun setKeys(register: Char, keys: List<KeyStroke>)
   fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType)
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#finishRecording(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   fun finishRecording()
+  fun finishRecording(editor: VimEditor, context: ExecutionContext)
   fun getCurrentRegisterForMulticaret(): Char // `set clipbaard+=unnamedplus` should not make system register the default one when working with multiple carets VIM-2804
   fun isSystemClipboard(register: Char): Boolean
   fun isPrimaryRegisterSupported(): Boolean

@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.register
 
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
@@ -73,11 +74,16 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   override val defaultRegister: Char
     get() = defaultRegisterChar
 
+  override fun getLastRegister(editor: VimEditor, context: ExecutionContext): Register? {
+    return getRegister(editor, context, lastRegisterChar)
+  }
+
   /**
    * Get the last register selected by the user
    *
    * @return The register, null if no such register
    */
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getLastRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   override val lastRegister: Register?
     get() = getRegister(lastRegisterChar)
 
@@ -114,8 +120,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return if (isValid(reg)) {
       isRegisterSpecifiedExplicitly = true
       lastRegisterChar = reg
-      logger.debug { "register selected: $lastRegister" }
-
+      logger.debug { "register selected: $lastRegisterChar" }
       true
     } else {
       false
@@ -171,7 +176,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   fun storeTextInternal(
     editor: VimEditor,
-    caret: ImmutableVimCaret,
+    context: ExecutionContext,
     range: TextRange,
     text: String,
     type: SelectionType,
@@ -279,6 +284,17 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return true
   }
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, com.maddyhome.idea.vim.api.ImmutableVimCaret, com.maddyhome.idea.vim.common.TextRange, com.maddyhome.idea.vim.state.mode.SelectionType, boolean)")
+  override fun storeText(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    range: TextRange,
+    type: SelectionType,
+    isDelete: Boolean
+  ): Boolean {
+    return storeText(editor, injector.executionContextManager.getEditorExecutionContext(editor), caret, range, type, isDelete)
+  }
+
   /**
    * Store text into the last register.
    *
@@ -290,6 +306,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    */
   override fun storeText(
     editor: VimEditor,
+    context: ExecutionContext,
     caret: ImmutableVimCaret,
     range: TextRange,
     type: SelectionType,
@@ -297,7 +314,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   ): Boolean {
     if (isRegisterWritable()) {
       val text = preprocessTextBeforeStoring(editor.getText(range), type)
-      return storeTextInternal(editor, caret, range, text, type, lastRegisterChar, isDelete)
+      return storeTextInternal(editor, context, range, text, type, lastRegisterChar, isDelete)
     }
 
     return false
@@ -337,26 +354,53 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return true
   }
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char)")
+  override fun getRegister(r: Char): Register? {
+    val dummyEditor = injector.fallbackWindow
+    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
+    return getRegister(dummyEditor, dummyContext, r)
+  }
+
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.lang.String, com.maddyhome.idea.vim.state.mode.SelectionType)")
   override fun storeText(register: Char, text: String, selectionType: SelectionType): Boolean {
+    val dummyEditor = injector.fallbackWindow
+    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
+    return storeText(dummyEditor, dummyContext, register, text, selectionType)
+  }
+
+  override fun storeText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    register: Char,
+    text: String,
+    selectionType: SelectionType
+  ): Boolean {
     if (!WRITABLE_REGISTERS.contains(register)) {
       return false
     }
     logger.debug { "register '$register' contains: \"$text\"" }
     val textToStore = if (register.isUpperCase()) {
-      (getRegister(register.lowercaseChar())?.text ?: "") + text
+      (getRegister(editor, context, register.lowercaseChar())?.text ?: "") + text
     } else {
       text
     }
     val reg = Register(register, selectionType, textToStore, ArrayList())
-    saveRegister(register, reg)
+    saveRegister(editor, context, register, reg)
     if (register == '/') {
       injector.searchGroup.lastSearchPattern = text // todo we should not have this field if we have the "/" register
     }
     return true
   }
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.lang.String)")
   override fun storeText(register: Char, text: String): Boolean {
-    return storeText(register, text, SelectionType.CHARACTER_WISE)
+    val dummyEditor = injector.fallbackWindow
+    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
+    return storeText(dummyEditor, dummyContext, register, text)
+  }
+
+  override fun storeText(editor: VimEditor, context: ExecutionContext, register: Char, text: String): Boolean {
+    return storeText(editor, context, register, text, SelectionType.CHARACTER_WISE)
   }
 
   private fun guessSelectionType(text: String): SelectionType {
@@ -370,10 +414,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    * @param r - the register character corresponding to either the primary selection (*) or clipboard selection (+)
    * @return the content of the selection, if available, otherwise null
    */
-  private fun refreshClipboardRegister(r: Char): Register? {
+  private fun refreshClipboardRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
     return when (r) {
-      PRIMARY_REGISTER -> refreshPrimaryRegister()
-      CLIPBOARD_REGISTER -> refreshClipboardRegister()
+      PRIMARY_REGISTER -> refreshPrimaryRegister(editor, context)
+      CLIPBOARD_REGISTER -> refreshClipboardRegister(editor, context)
       else -> throw RuntimeException("Clipboard register expected, got $r")
     }
   }
@@ -382,34 +426,34 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return System.getenv("DISPLAY") != null && injector.systemInfoService.isXWindow
   }
 
-  private fun setSystemPrimaryRegisterText(text: String, rawText: String, transferableData: List<Any>) {
+  private fun setSystemPrimaryRegisterText(editor: VimEditor, context: ExecutionContext, text: String, transferableData: List<Any>) {
     logger.trace("Setting text: $text to primary selection...")
     if (isPrimaryRegisterSupported()) {
       try {
-        injector.clipboardManager.setPrimaryText(text, rawText, transferableData)
+        injector.clipboardManager.setPrimaryText(editor, context, text, transferableData)
       } catch (e: Exception) {
         logger.warn("False positive X11 primary selection support")
         logger.trace("Setting text to primary selection failed. Setting it to clipboard selection instead")
-        setSystemClipboardRegisterText(text, rawText, transferableData)
+        setSystemClipboardRegisterText(editor, context, text, transferableData)
       }
     } else {
       logger.trace("X11 primary selection is not supporting. Setting clipboard selection instead")
-      setSystemClipboardRegisterText(text, rawText, transferableData)
+      setSystemClipboardRegisterText(editor, context, text, transferableData)
     }
   }
 
-  private fun setSystemClipboardRegisterText(text: String, rawText: String, transferableData: List<Any>) {
-    injector.clipboardManager.setClipboardText(text, rawText, transferableData)
+  private fun setSystemClipboardRegisterText(editor: VimEditor, context: ExecutionContext, text: String, transferableData: List<Any>) {
+    injector.clipboardManager.setClipboardText(editor, context, text, transferableData)
   }
 
-  private fun refreshPrimaryRegister(): Register? {
+  private fun refreshPrimaryRegister(editor: VimEditor, context: ExecutionContext): Register? {
     logger.trace("Syncing cached primary selection value..")
     if (!isPrimaryRegisterSupported()) {
       logger.trace("X11 primary selection is not supported. Syncing clipboard selection..")
-      return refreshClipboardRegister()
+      return refreshClipboardRegister(editor, context)
     }
     try {
-      val clipboardData = injector.clipboardManager.getPrimaryTextAndTransferableData() ?: return null
+      val clipboardData = injector.clipboardManager.getPrimaryTextAndTransferableData(editor, context) ?: return null
       val currentRegister = myRegisters[PRIMARY_REGISTER]
       val text = clipboardData.first
       val transferableData = clipboardData.second?.toMutableList()
@@ -420,15 +464,15 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     } catch (e: Exception) {
       logger.warn("False positive X11 primary selection support")
       logger.trace("Syncing primary selection failed. Syncing clipboard selection instead")
-      return refreshClipboardRegister()
+      return refreshClipboardRegister(editor, context)
     }
   }
 
-  private fun refreshClipboardRegister(): Register? {
+  private fun refreshClipboardRegister(editor: VimEditor, context: ExecutionContext): Register? {
     // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
     val systemAwareClipboardRegister = if (isPrimaryRegisterSupported()) CLIPBOARD_REGISTER else PRIMARY_REGISTER
 
-    val clipboardData = injector.clipboardManager.getClipboardTextAndTransferableData() ?: return null
+    val clipboardData = injector.clipboardManager.getClipboardTextAndTransferableData(editor, context) ?: return null
     val currentRegister = myRegisters[systemAwareClipboardRegister]
     val text = clipboardData.first
     val transferableData = clipboardData.second?.toMutableList()
@@ -438,25 +482,39 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return transferableData?.let { Register(systemAwareClipboardRegister, guessSelectionType(text), text, it) }
   }
 
-  override fun getRegister(r: Char): Register? {
+  override fun getRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
     var myR = r
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(myR)) {
       myR = Character.toLowerCase(myR)
     }
-    return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(myR) else myRegisters[myR]
+    return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(editor, context, myR) else myRegisters[myR]
   }
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegisters(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   override fun getRegisters(): List<Register> {
+    val dummyEditor = injector.fallbackWindow
+    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
+    return getRegisters(dummyEditor, dummyContext)
+  }
+
+  override fun getRegisters(editor: VimEditor, context: ExecutionContext): List<Register> {
     val filteredRegisters = myRegisters.values.filterNot { CLIPBOARD_REGISTERS.contains(it.name) }.toMutableList()
     val clipboardRegisters = CLIPBOARD_REGISTERS
       .filterNot { it == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported() } // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
-      .mapNotNull { refreshClipboardRegister(it) }
+      .mapNotNull { refreshClipboardRegister(editor, context, it) }
 
     return (filteredRegisters + clipboardRegisters).sortedWith(Register.KeySorter)
   }
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#saveRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, com.maddyhome.idea.vim.register.Register)")
   override fun saveRegister(r: Char, register: Register) {
+    val dummyEditor = injector.fallbackWindow
+    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
+    saveRegister(dummyEditor, dummyContext, r, register)
+  }
+
+  override fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register) {
     var myR = if (Character.isUpperCase(r)) Character.toLowerCase(r) else r
     val text = register.text
 
@@ -467,10 +525,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
             // it looks wrong, but for some reason non-X systems use the * register to store the clipboard content
             myR = PRIMARY_REGISTER
           }
-          setSystemClipboardRegisterText(text, text, ArrayList(register.transferableData))
+          setSystemClipboardRegisterText(editor, context, text, ArrayList(register.transferableData))
         }
         PRIMARY_REGISTER -> {
-          setSystemPrimaryRegisterText(text, text, ArrayList(register.transferableData))
+          setSystemPrimaryRegisterText(editor, context, text, ArrayList(register.transferableData))
         }
       }
     }
@@ -487,8 +545,15 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
   }
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getPlaybackRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char)")
   override fun getPlaybackRegister(r: Char): Register? {
-    return if (PLAYBACK_REGISTERS.indexOf(r) != 0) getRegister(r) else null
+    val dummyEditor = injector.fallbackWindow
+    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
+    return getPlaybackRegister(dummyEditor, dummyContext, r)
+  }
+
+  override fun getPlaybackRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
+    return if (PLAYBACK_REGISTERS.indexOf(r) != 0) getRegister(editor, context, r) else null
   }
 
   override fun recordText(text: String) {
@@ -506,12 +571,19 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     myRegisters[register] = Register(register, type, keys.toMutableList())
   }
 
+  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#finishRecording(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   override fun finishRecording() {
+    val dummyEditor = injector.fallbackWindow
+    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
+    finishRecording(dummyEditor, dummyContext)
+  }
+
+  override fun finishRecording(editor: VimEditor, context: ExecutionContext) {
     val register = recordRegister
     if (register != null) {
       var reg: Register? = null
       if (Character.isUpperCase(register)) {
-        reg = getRegister(register)
+        reg = getRegister(editor, context, register)
       }
 
       val myRecordList = recordList

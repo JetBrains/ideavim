@@ -29,6 +29,6 @@ class DeleteEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.changeGroup.deleteEndOfLine(editor, caret, operatorArguments.count1, operatorArguments)
+    return injector.changeGroup.deleteEndOfLine(editor, context, caret, operatorArguments.count1, operatorArguments)
   }
 }
