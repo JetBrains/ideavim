@@ -56,6 +56,6 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
         Triple(caret, lineRange, SelectionType.LINE_WISE)
       }
     }
-    return injector.changeGroup.deleteRange(editor, usedCaret, usedRange, usedType, false)
+    return injector.changeGroup.deleteRange(editor, context, usedCaret, usedRange, usedType, false)
   }
 }

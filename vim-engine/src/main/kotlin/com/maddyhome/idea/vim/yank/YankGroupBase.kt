@@ -26,6 +26,7 @@ import kotlin.math.min
 open class YankGroupBase : VimYankGroup {
   private fun yankRange(
     editor: VimEditor,
+    context: ExecutionContext,
     caretToRange: Map<ImmutableVimCaret, TextRange>,
     range: TextRange,
     type: SelectionType,
@@ -39,7 +40,7 @@ open class YankGroupBase : VimYankGroup {
 
     var result = true
     for ((caret, myRange) in caretToRange) {
-      result = caret.registerStorage.storeText(editor, myRange, type, false) && result
+      result = caret.registerStorage.storeText(editor, context, myRange, type, false) && result
     }
     return result
   }
@@ -113,11 +114,18 @@ open class YankGroupBase : VimYankGroup {
 
     return yankRange(
       editor,
+      context,
       caretToRange,
       range,
       motionType,
       startOffsets,
     )
+  }
+
+  @Deprecated("Please use the same method, but with ExecutionContext")
+  override fun yankLine(editor: VimEditor, count: Int): Boolean {
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    return yankLine(editor, context, count)
   }
 
   /**
@@ -127,7 +135,7 @@ open class YankGroupBase : VimYankGroup {
    * @param count  The number of lines to yank
    * @return true if able to yank the lines, false if not
    */
-  override fun yankLine(editor: VimEditor, count: Int): Boolean {
+  override fun yankLine(editor: VimEditor, context: ExecutionContext, count: Int): Boolean {
     val caretCount = editor.nativeCarets().size
     val ranges = ArrayList<Pair<Int, Int>>(caretCount)
     val caretToRange = HashMap<ImmutableVimCaret, TextRange>(caretCount)
@@ -142,7 +150,13 @@ open class YankGroupBase : VimYankGroup {
     }
 
     val range = getTextRange(ranges, SelectionType.LINE_WISE) ?: return false
-    return yankRange(editor, caretToRange, range, SelectionType.LINE_WISE, null)
+    return yankRange(editor, context, caretToRange, range, SelectionType.LINE_WISE, null)
+  }
+
+  @Deprecated("Please use the same method, but with ExecutionContext")
+  override fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    return yankRange(editor, context, range, type, moveCursor)
   }
 
   /**
@@ -153,7 +167,7 @@ open class YankGroupBase : VimYankGroup {
    * @param type   The type of yank
    * @return true if able to yank the range, false if not
    */
-  override fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
+  override fun yankRange(editor: VimEditor, context: ExecutionContext, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
     range ?: return false
     val caretToRange = HashMap<ImmutableVimCaret, TextRange>()
 
@@ -185,9 +199,9 @@ open class YankGroupBase : VimYankGroup {
     }
 
     return if (moveCursor) {
-      yankRange(editor, caretToRange, range, type, startOffsets)
+      yankRange(editor, context, caretToRange, range, type, startOffsets)
     } else {
-      yankRange(editor, caretToRange, range, type, null)
+      yankRange(editor, context, caretToRange, range, type, null)
     }
   }
 }

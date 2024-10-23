@@ -43,6 +43,7 @@ data class JoinLinesCommand(val range: Range, val modifier: CommandModifier, val
     // Join the given range, which might not match the current location of the caret
     val success = injector.changeGroup.deleteJoinRange(
       editor,
+      context,
       caret,
       TextRange(textRange.startOffset, textRange.endOffset - 1),
       spaces,

@@ -139,7 +139,7 @@ class ChangeGroup : VimChangeGroupBase() {
     var primaryTextAndTransferableData: Pair<String, List<Any>?>? = null
     try {
       if (injector.registerGroup.isPrimaryRegisterSupported()) {
-        primaryTextAndTransferableData = injector.clipboardManager.getPrimaryTextAndTransferableData()
+        primaryTextAndTransferableData = injector.clipboardManager.getPrimaryTextAndTransferableData(editor, context)
       }
     } catch (e: Exception) {
       // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
