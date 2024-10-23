@@ -80,6 +80,15 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
+  fun `test default exclusive visual mode caret is bar`() {
+    configureByText("Lorem ipsum dolor sit amet,")
+    enterCommand("set selection=exclusive")
+    typeText("ve")
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.35F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test visual block hides secondary carets`() {
     configureByLines(5, "Lorem ipsum dolor sit amet,")
     typeText("w", "<C-V>2j5l")
@@ -91,14 +100,19 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     }
   }
 
-  @VimBehaviorDiffers(description = "Vim does not change the caret for select mode", shouldBeFixed = false)
+  @VimBehaviorDiffers(
+    description = "IdeaVim treats Select mode as exclusive, rather than acting the same as Visual",
+    shouldBeFixed = true
+  )
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
-  fun `test select mode uses insert mode caret`() {
-    // Vim doesn't have a different caret for SELECT, and doesn't have an option in guicursor to change SELECT mode
+  fun `test select mode uses visual-exclusive mode caret`() {
+    // TODO: Select mode should use the same caret as Visual, based on the 'selection' option
+    // IdeaVim has implemented Select mode to always be exclusive, rather than based on the 'selection' option.
+    // Therefore, we must always use the `ve` Visual-exclusive caret
     configureByText("Lorem ipsum dolor sit amet,")
     typeText("v7l", "<C-G>")
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.35F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
