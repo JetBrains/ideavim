@@ -40,16 +40,10 @@ abstract class VimMacroBase : VimMacro {
     val register = injector.registerGroup.getPlaybackRegister(reg) ?: return false
     ++macroDepth
     try {
-      val keys: List<KeyStroke> = if (register.rawText == null) {
-        register.keys
-      } else {
-        injector.parser.parseKeys(register.rawText)
-      }
-
       logger.trace {
         "Adding new keys to keyStack as part of playback. State before adding keys: ${KeyHandler.getInstance().keyStack.dump()}"
       }
-      KeyHandler.getInstance().keyStack.addKeys(keys)
+      KeyHandler.getInstance().keyStack.addKeys(register.keys)
       playbackKeys(editor, context, count)
     } finally {
       --macroDepth
