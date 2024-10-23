@@ -617,13 +617,11 @@ class ExEntryTest : VimTestCase() {
   fun `test insert multi-line register`() {
     // parseKeys parses <CR> in a way that Register#getText doesn't like
     val keys = mutableListOf<KeyStroke>()
-    keys.addAll(injector.parser.parseKeys("hello"))
-    keys.add(KeyStroke.getKeyStroke('\n'))
-    keys.addAll(injector.parser.parseKeys("world"))
+    keys.addAll(injector.parser.parseKeys("hello<CR>world"))
     VimPlugin.getRegister().setKeys('c', keys)
 
     typeExInput(":<C-R>c")
-    assertExText("hello world")
+    assertExText("hello\u000Dworld")
   }
 
   // TODO: Test other special registers, if/when supported
