@@ -197,7 +197,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     // If this is an uppercase register, we need to append the text to the corresponding lowercase register
     val transferableData: List<Any> =
-      if (start != -1) injector.clipboardManager.getTransferableData(editor, range, text) else ArrayList()
+      if (start != -1) injector.clipboardManager.getTransferableData(editor, range) else ArrayList()
     val processedText =
       if (start != -1) injector.clipboardManager.preprocessText(editor, range, text, transferableData) else text
     logger.debug {
@@ -209,7 +209,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       val r = myRegisters[lreg]
       // Append the text if the lowercase register existed
       if (r != null) {
-        r.addTextAndResetTransferableData(processedText)
+        myRegisters[lreg] = r.addText(processedText)
       } else {
         myRegisters[lreg] = Register(lreg, type, processedText, ArrayList(transferableData))
         logger.debug { "register '$register' contains: \"$processedText\"" }
@@ -259,8 +259,8 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
         while (d >= '1') {
           val t = myRegisters[d]
           if (t != null) {
-            t.name = (d.code + 1).toChar()
-            myRegisters[(d.code + 1).toChar()] = t
+            val incName = (d.code + 1).toChar()
+            myRegisters[incName] = Register(incName, t.text, t.type, t.transferableData)
           }
           d--
         }
@@ -343,7 +343,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
     logger.debug { "register '$register' contains: \"$text\"" }
     val textToStore = if (register.isUpperCase()) {
-      (getRegister(register.lowercaseChar())?.rawText ?: "") + text
+      (getRegister(register.lowercaseChar())?.text ?: "") + text
     } else {
       text
     }
@@ -459,19 +459,18 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   override fun saveRegister(r: Char, register: Register) {
     var myR = if (Character.isUpperCase(r)) Character.toLowerCase(r) else r
     val text = register.text
-    val rawText = register.rawText
 
-    if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0 && text != null && rawText != null) {
+    if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) {
       when (myR) {
         CLIPBOARD_REGISTER -> {
           if (!isPrimaryRegisterSupported()) {
             // it looks wrong, but for some reason non-X systems use the * register to store the clipboard content
             myR = PRIMARY_REGISTER
           }
-          setSystemClipboardRegisterText(text, rawText, ArrayList(register.transferableData))
+          setSystemClipboardRegisterText(text, text, ArrayList(register.transferableData))
         }
         PRIMARY_REGISTER -> {
-          setSystemPrimaryRegisterText(text, rawText, ArrayList(register.transferableData))
+          setSystemPrimaryRegisterText(text, text, ArrayList(register.transferableData))
         }
       }
     }
@@ -521,7 +520,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
           reg = Register(Character.toLowerCase(register), SelectionType.CHARACTER_WISE, myRecordList)
           myRegisters[Character.toLowerCase(register)] = reg
         } else {
-          reg.addKeys(myRecordList)
+          myRegisters[reg.name.lowercaseChar()] = reg.addText(injector.parser.toPrintableString(myRecordList))
         }
       }
     }

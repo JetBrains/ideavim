@@ -37,8 +37,7 @@ data class RegistersCommand(val range: Range, val modifier: CommandModifier, val
           SelectionType.CHARACTER_WISE -> "c"
           SelectionType.BLOCK_WISE -> "b"
         }
-        val text = reg.rawText?.let { injector.parser.parseKeys(it) } ?: reg.keys
-        "  $type  \"${reg.name}   ${EngineStringHelper.toPrintableCharacters(text).take(200)}"
+        "  $type  \"${reg.name}   ${reg.printableString.take(200)}"
       }
 
     injector.outputPanel.output(editor, context, regs)
