@@ -547,8 +547,11 @@ abstract class VimNoWriteActionTestCase {
   }
 
   protected fun assertRegister(char: Char, expected: String?) {
-    val actual = injector.registerGroup.getRegister(char)?.keys?.let(injector.parser::toKeyNotation)
-    assertEquals(expected, actual, "Wrong register contents")
+    if (expected == null) {
+      assertNull(injector.registerGroup.getRegister(char))
+    } else {
+      assertEquals(expected, injector.registerGroup.getRegister(char)?.printableString)
+    }
   }
 
   protected fun assertRegisterString(char: Char, expected: String?) {

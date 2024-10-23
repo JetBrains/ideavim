@@ -109,7 +109,7 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput(
       """
         |Type Name Content
-        |  c  "a   ^IHello World^J^[
+        |  c  "a   ^IHello World^M^[
       """.trimMargin(),
     )
   }
