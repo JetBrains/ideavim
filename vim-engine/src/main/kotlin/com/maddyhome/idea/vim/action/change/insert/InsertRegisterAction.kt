@@ -80,8 +80,7 @@ private fun insertRegister(
 ): Boolean {
   val register: Register? = injector.registerGroup.getRegister(key)
   if (register != null) {
-    val text = register.rawText ?: injector.parser.toPrintableString(register.keys)
-    val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList(), register.name)
+    val textData = PutData.TextData(register.text, SelectionType.CHARACTER_WISE, emptyList(), register.name)
     val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)
     injector.put.putText(editor, context, putData, operatorArguments = operatorArguments)
     return true

@@ -52,7 +52,7 @@ class MacroActionTest : VimTestCase() {
     configureByText("")
     enterCommand("imap pp hello")
     typeText(injector.parser.parseKeys("qa" + "i" + "pp<Esc>" + "q"))
-    assertRegister('a', "ipp<Esc>")
+    assertRegister('a', "ipp^[")
   }
 
   @Test
@@ -60,7 +60,7 @@ class MacroActionTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("qa" + "i" + "<C-K>OK<Esc>" + "q"), "")
     val register = VimPlugin.getRegister().getRegister('a')
     assertNotNull<Any>(register)
-    assertRegister('a', "i<C-K>OK<Esc>")
+    assertRegister('a', "i^KOK^[")
   }
 
   @Test

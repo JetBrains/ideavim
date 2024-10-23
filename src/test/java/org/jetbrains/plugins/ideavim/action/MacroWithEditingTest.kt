@@ -28,8 +28,8 @@ class MacroWithEditingTest : VimTestCase() {
 
   @Test
   fun `test copy and perform macro`() {
-    typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "iHello<Esc>")
-    kotlin.test.assertEquals("iHello<Esc>", VimPlugin.getRegister().getRegister('w')?.rawText)
+    typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "iHello")
+    kotlin.test.assertEquals("iHello", VimPlugin.getRegister().getRegister('w')?.text)
     setText("")
     typeText(injector.parser.parseKeys("@w"))
     waitAndAssert {
@@ -39,8 +39,8 @@ class MacroWithEditingTest : VimTestCase() {
 
   @Test
   fun `test copy and perform macro ctrl_a`() {
-    typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "<C-A>")
-    kotlin.test.assertEquals("<C-A>", VimPlugin.getRegister().getRegister('w')?.rawText)
+    typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "\u0001")
+    kotlin.test.assertEquals(injector.parser.parseKeys("<C-A>"), injector.registerGroup.getRegister('w')!!.keys)
     setText("1")
     typeText(injector.parser.parseKeys("@w"))
     waitAndAssert {
