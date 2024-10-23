@@ -89,6 +89,16 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
+  fun `test exclusive visual falls back to visual if not specified`() {
+    configureByText("Lorem ipsum dolor sit amet,")
+    enterCommand("set guicursor=v:hor10-Cursor/lCursor")
+    enterCommand("set selection=exclusive")
+    typeText("ve")
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.1F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test visual block hides secondary carets`() {
     configureByLines(5, "Lorem ipsum dolor sit amet,")
     typeText("w", "<C-V>2j5l")

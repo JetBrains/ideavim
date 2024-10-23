@@ -76,7 +76,11 @@ object GuiCursorOptionHelper {
 
   fun getAttributes(mode: GuiCursorMode): GuiCursorAttributes {
     val attributes = injector.optionGroup.getParsedEffectiveOptionValue(Options.guicursor, null, ::parseGuicursor)
-    return attributes[mode] ?: GuiCursorAttributes.DEFAULT
+
+    // `ve` falls back to `v` if not specified
+    return attributes[mode]
+      ?: (if (mode == GuiCursorMode.VISUAL_EXCLUSIVE) attributes[GuiCursorMode.VISUAL] else null)
+      ?: GuiCursorAttributes.DEFAULT
   }
 
   private fun parseGuicursor(guicursor: VimString) = GuiCursorAttributeBuilders().also { builders ->
