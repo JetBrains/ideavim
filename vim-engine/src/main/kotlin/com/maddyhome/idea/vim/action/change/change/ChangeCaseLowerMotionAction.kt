@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.helper.CharacterHelper
 
 @CommandOrMotion(keys = ["gu"], modes = [Mode.NORMAL])
 class ChangeCaseLowerMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
