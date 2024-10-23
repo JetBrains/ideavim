@@ -85,7 +85,6 @@ val ideaVersion: String by project
 val ideaType: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
-val splitModeVersion: String by project
 
 val publishChannels: String by project
 val publishToken: String by project
@@ -233,6 +232,7 @@ tasks {
 
   // Uncomment to run the plugin in a custom IDE, rather than the IDE specified as a compile target in dependencies
   // Note that the version must be greater than the plugin's target version, for obvious reasons
+  // You can also set splitMode and splitModeTarget here to test split mode in a custom IDE
 //  val runIdeCustom by intellijPlatformTesting.runIde.registering {
 //    type = IntelliJPlatformType.Rider
 //    version = "2024.1.2"
@@ -265,10 +265,6 @@ tasks {
   val runIdeSplitMode by intellijPlatformTesting.runIde.registering {
     splitMode = true
     splitModeTarget = SplitModeAware.SplitModeTarget.FRONTEND
-
-    // Frontend split mode support requires 242+
-    // TODO: Remove this once IdeaVim targets 242, as the task will naturally use the target version to run
-    version.set(splitModeVersion)
   }
 
   // Add plugin open API sources to the plugin ZIP
