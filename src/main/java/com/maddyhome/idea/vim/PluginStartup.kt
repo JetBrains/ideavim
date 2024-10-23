@@ -33,6 +33,9 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
 
   private var firstInitializationOccurred = false
 
+  // TODO
+  // We should migrate to some solution from https://plugins.jetbrains.com/docs/intellij/plugin-components.html#application-startup
+  // If you'd like to add a new code here, please consider using one of the things described there.
   override suspend fun execute(project: Project) {
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
