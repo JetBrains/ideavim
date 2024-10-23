@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.options.helpers
 
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -163,17 +164,20 @@ enum class GuiCursorMode(val token: String) {
         return REPLACE
       }
 
-      // Note that Vim does not change the caret for SELECT mode and continues to use VISUAL or VISUAL_EXCLUSIVE. IdeaVim
-      // makes much more use of SELECT than Vim does (e.g. it's the default for idearefactormode) so it makes sense for us
-      // to more visually distinguish VISUAL and SELECT. So we use INSERT; a selection and the insert caret is intuitively
-      // the same as SELECT
+      // TODO: SELECT should behave the same as VISUAL
+      // Note that IdeaVim incorrectly treats Select mode as exclusive at all times, regardless of the 'selection'
+      // option. Previously, we would use the Insert cursor to try to make Select mode feel more intuitive, like a
+      // "traditional" Windows-like selection, especially with 'idearefactormode' defaults and live template fields
+      // during a refactoring. However, at some point, we need to fix the exclusive/inclusive nature, and then the caret
+      // shape will be more important - if the selection is inclusive, a bar caret on the last (selected) character will
+      // look weird
       return when (mode) {
         is Mode.NORMAL -> NORMAL
         is Mode.OP_PENDING -> OP_PENDING
         Mode.INSERT -> INSERT
         Mode.REPLACE -> REPLACE
-        is Mode.SELECT -> INSERT
-        is Mode.VISUAL -> VISUAL // TODO: VISUAL_EXCLUSIVE
+        is Mode.SELECT -> VISUAL_EXCLUSIVE  // TODO: Should match VISUAL
+        is Mode.VISUAL -> if (injector.globalOptions().selection == "exclusive") VISUAL_EXCLUSIVE else VISUAL
         // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
         is Mode.CMD_LINE -> CMD_LINE
       }
@@ -212,4 +216,3 @@ data class GuiCursorAttributes(
     )
   }
 }
-
