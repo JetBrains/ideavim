@@ -8,7 +8,6 @@ import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.Qodana
 import _Self.buildTypes.TestingBuildType
 import _Self.subprojects.GitHub
-import _Self.subprojects.OldTests
 import _Self.subprojects.Releases
 import _Self.vcsRoots.GitHubPullRequest
 import _Self.vcsRoots.ReleasesVcsRoot
@@ -18,7 +17,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 object Project : Project({
   description = "Vim engine for JetBrains IDEs"
 
-  subProjects(Releases, OldTests, GitHub)
+  subProjects(Releases, GitHub)
 
   // VCS roots
   vcsRoot(GitHubPullRequest)
