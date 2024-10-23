@@ -126,6 +126,8 @@
                          implementationClass="com.maddyhome.idea.vim.handler.StartNewLineBeforeCurrentDetector"
                          id="ideavim-start-new-line-before-current-detector"
                          order="first"/>
+    <editorFactoryDocumentListener
+        implementation="com.maddyhome.idea.vim.listener.VimListenerManager$VimDocumentListener"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

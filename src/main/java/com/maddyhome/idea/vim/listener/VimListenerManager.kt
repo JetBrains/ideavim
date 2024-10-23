@@ -16,7 +16,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.event.CaretEvent
@@ -213,12 +212,6 @@ internal object VimListenerManager {
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
       val busConnection = ApplicationManager.getApplication().messageBus.connect(VimPlugin.getInstance().onOffDisposable)
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
-
-      // Listen for focus change to update various features such as mode widget
-      val eventMulticaster = EditorFactory.getInstance().eventMulticaster
-
-      // Listen for document changes to update document state such as marks
-      eventMulticaster.addDocumentListener(VimDocumentListener, VimPlugin.getInstance().onOffDisposable)
     }
 
     fun disable() {
@@ -360,7 +353,7 @@ internal object VimListenerManager {
    * open in non-local Code With Me guest editors, which we still want to process (e.g. to update marks when a guest
    * edits a file. Updating search highlights will be a no-op if there are no open local editors)
    */
-  private object VimDocumentListener : DocumentListener {
+  class VimDocumentListener : DocumentListener {
     override fun beforeDocumentChange(event: DocumentEvent) {
       VimMarkServiceImpl.MarkUpdater.beforeDocumentChange(event)
       IjVimSearchGroup.DocumentSearchListener.INSTANCE.beforeDocumentChange(event)
