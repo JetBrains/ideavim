@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToBottomOfScre
 import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToMiddleOfScreen
 import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToTopOfScreen
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.state.VimStateMachine
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt

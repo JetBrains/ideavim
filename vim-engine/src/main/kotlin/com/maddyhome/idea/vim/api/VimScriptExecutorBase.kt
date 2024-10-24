@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
-import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext

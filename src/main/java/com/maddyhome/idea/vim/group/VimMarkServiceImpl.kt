@@ -7,7 +7,6 @@
  */
 package com.maddyhome.idea.vim.group
 
-import com.intellij.codeWithMe.ClientId
 import com.intellij.ide.bookmark.Bookmark
 import com.intellij.ide.bookmark.BookmarkGroup
 import com.intellij.ide.bookmark.BookmarksListener

@@ -24,7 +24,6 @@ import com.intellij.util.Alarm.ThreadToUse
 import com.jetbrains.rd.util.first
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ModeChangeListener

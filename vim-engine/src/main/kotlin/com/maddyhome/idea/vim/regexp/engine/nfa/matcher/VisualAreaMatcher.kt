@@ -8,13 +8,10 @@
 
 package com.maddyhome.idea.vim.regexp.engine.nfa.matcher
 
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.returnTo
 
 /**
  * Matcher used to check if index is inside the visual area.
