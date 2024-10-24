@@ -19,6 +19,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
 /**
  * @author dhleong
@@ -352,6 +354,12 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   @Test
+  fun testChangeSurroundingEmptyParens() {
+    doTest(listOf("cs)}"), "${c}()", "${c}{}", Mode.NORMAL())
+    doTest(listOf("cs)}"), "(${c})", "${c}{}", Mode.NORMAL())
+  }
+
+  @Test
   fun testChangeSurroundingBlock() {
     val before = "if (condition) {${c}return;}"
     val after = "if (condition) (return;)"
@@ -616,5 +624,33 @@ class VimSurroundExtensionTest : VimTestCase() {
       "Hello (HI test test) extra information"
     """
     doTest(listOf("cs\")"), before, after, Mode.NORMAL())
+  }
+
+  // VIM-1824
+  @ParameterizedTest(name = "testRemoveWhiteSpaceWithClosingBracket for ({0}, {1}, {2})")
+  @MethodSource("removeWhiteSpaceWithClosingBracketParams")
+  fun testRemoveWhiteSpaceWithClosingBracket(before: String, after: String, motion: String) {
+    doTest(listOf(motion), before, after, Mode.NORMAL())
+  }
+
+  companion object {
+    @JvmStatic
+    fun removeWhiteSpaceWithClosingBracketParams() = listOf(
+      arrayOf("{ ${c}example }", "${c}{example}", "cs{}"),
+      arrayOf("( ${c}example )", "${c}(example)", "cs()"),
+      arrayOf("[ ${c}example ]", "${c}[example]", "cs[]"),
+
+      // mutliple surrounding spaces are trimmed at once
+      arrayOf("[  ${c}example  ]", "${c}[example]", "cs[]"),
+      arrayOf("[${c}  ]", "${c}[]", "cs[]"),
+      arrayOf("[${c} ]", "${c}[]", "cs[]"),
+
+      // asymetric spaces are also trimmed at once
+      arrayOf("[ ${c}example]", "${c}[example]", "cs[]"),
+      arrayOf("[   ${c}example ]", "${c}[example]", "cs[]"),
+
+      // empty brackets are not removed
+      arrayOf("[${c}]", "${c}[]", "cs[]"),
+    )
   }
 }
