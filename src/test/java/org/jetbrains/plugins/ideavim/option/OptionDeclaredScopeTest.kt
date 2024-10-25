@@ -8,11 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.option
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ComponentManagerEx
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
 import com.intellij.platform.util.coroutines.childScope
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
@@ -28,7 +30,8 @@ import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimNoWriteActionTestCase
+import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -38,9 +41,8 @@ import javax.swing.SwingConstants
 import kotlin.test.assertEquals
 
 // Tests the implementation of global, local to buffer, local to window and global-local
-@Disabled("Broken in 2024.2")
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class OptionDeclaredScopeTest : VimTestCase() {
+class OptionDeclaredScopeTest : VimNoWriteActionTestCase() {
   private val optionName = "test"
   private val defaultValue = VimString("defaultValue")
   private val setValue = VimString("setValue")
@@ -60,11 +62,15 @@ class OptionDeclaredScopeTest : VimTestCase() {
     // Create a new editor that will represent a new buffer in a separate window. It will have default values
     otherBufferWindow = openNewBufferWindow("bbb.txt")
 
-    // Create the original editor last, so that fixture.editor will point to this file
-    // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
-    originalEditor = configureByText("\n")  // aaa.txt
+    var curWindow: EditorWindow? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      // Create the original editor last, so that fixture.editor will point to this file
+      // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
+      originalEditor = configureByText("\n")  // aaa.txt
+      curWindow = manager.currentWindow
+    }
 
-    manager.currentWindow.let {
+    curWindow.let {
       // Split the original editor into a new window, then reset the focus back to the originalEditor's EditorWindow
       // We do this before setting any custom options, so it will have default values for everything
       splitWindow = openSplitWindow(originalEditor) // aaa.txt
@@ -79,19 +85,31 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
   // Note that this overwrites fixture.editor! This is the equivalent of `:new {file}`
   private fun openNewBufferWindow(filename: String): Editor {
-    fixture.openFileInEditor(fixture.createFile(filename, "lorem ipsum"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(fixture.createFile(filename, "lorem ipsum"))
+    }
     return fixture.editor
   }
 
   // Note that the new split window (in a new EditorWindow) will be selected!
   private fun openSplitWindow(editor: Editor): Editor {
     val fileManager = FileEditorManagerEx.getInstanceEx(fixture.project)
-    return (fileManager.currentWindow!!.split(
-      SwingConstants.VERTICAL,
-      true,
-      editor.virtualFile,
-      false
-    )!!.allComposites.first().selectedEditor as TextEditor).editor
+    var split: EditorWindow? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      val currentWindow = fileManager.currentWindow
+      split = currentWindow!!.split(
+        SwingConstants.VERTICAL,
+        true,
+        editor.virtualFile,
+        false
+      )
+    }
+
+    // Waiting till the selected editor will appear
+    waitUntil {
+      split!!.allComposites.first().selectedEditor != null
+    }
+    return (split!!.allComposites.first().selectedEditor as TextEditor).editor
   }
 
   private fun closeWindow(editor: Editor) {
@@ -354,8 +372,10 @@ class OptionDeclaredScopeTest : VimTestCase() {
       setLocalValue(otherBufferWindow)
 
       val file = otherBufferWindow.virtualFile
-      closeWindow(otherBufferWindow)
-      fixture.openFileInEditor(file)
+      ApplicationManager.getApplication().invokeAndWait {
+        closeWindow(otherBufferWindow)
+        fixture.openFileInEditor(file)
+      }
       val newBufferWindow = fixture.editor
 
       assertEffectiveValueChanged(newBufferWindow)
@@ -386,8 +406,10 @@ class OptionDeclaredScopeTest : VimTestCase() {
     withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
       setEffectiveValue(fixture.editor)
 
-      VimPlugin.setEnabled(false)
-      VimPlugin.setEnabled(true)
+      ApplicationManager.getApplication().invokeAndWait {
+        VimPlugin.setEnabled(false)
+        VimPlugin.setEnabled(true)
+      }
 
       assertEffectiveValueChanged(fixture.editor)
     }

@@ -111,7 +111,40 @@ import kotlin.test.assertTrue
  */
 @RunInEdt(writeIntent = true)
 @ApiStatus.Internal
-abstract class VimTestCase {
+abstract class VimTestCase : VimNoWriteActionTestCase() {
+  object Checks {
+    var caretShape: Boolean = true
+
+    val neoVim = NeoVim()
+
+    var keyHandler = KeyHandlerMethod.VIA_IDE
+
+    fun reset() {
+      caretShape = true
+
+      neoVim.reset()
+      keyHandler = KeyHandlerMethod.VIA_IDE
+    }
+
+    class NeoVim {
+      var ignoredRegisters: Set<Char> = setOf()
+      var exitOnTearDown = true
+
+      fun reset() {
+        ignoredRegisters = setOf()
+        exitOnTearDown = true
+      }
+    }
+
+    enum class KeyHandlerMethod {
+      VIA_IDE,
+      DIRECT_TO_VIM,
+    }
+  }
+}
+
+@ApiStatus.Internal
+abstract class VimNoWriteActionTestCase {
   protected lateinit var fixture: CodeInsightTestFixture
 
   lateinit var testInfo: TestInfo
@@ -134,7 +167,7 @@ abstract class VimTestCase {
     VimPlugin.getSearch().resetState()
     if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
     injector.globalOptions().ideastrictmode = true
-    Checks.reset()
+    VimTestCase.Checks.reset()
     clearClipboard()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
@@ -414,9 +447,9 @@ abstract class VimTestCase {
       editor,
     )
     val project = fixture.project
-    when (Checks.keyHandler) {
-      Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys.filterNotNull(), editor, project)
-      Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys.filterNotNull(), editor)
+    when (VimTestCase.Checks.keyHandler) {
+      VimTestCase.Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys.filterNotNull(), editor, project)
+      VimTestCase.Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys.filterNotNull(), editor)
     }
     return editor
   }
@@ -696,7 +729,7 @@ abstract class VimTestCase {
   }
 
   protected fun assertCaretsVisualAttributes() {
-    if (!Checks.caretShape) return
+    if (!VimTestCase.Checks.caretShape) return
     val editor = fixture.editor
     val attributes = GuiCursorOptionHelper.getAttributes(getGuiCursorMode(editor))
     val colour = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
@@ -809,8 +842,8 @@ abstract class VimTestCase {
   }
 
   // Disable or enable checks for the particular test
-  protected inline fun setupChecks(setup: Checks.() -> Unit) {
-    Checks.setup()
+  protected inline fun setupChecks(setup: VimTestCase.Checks.() -> Unit) {
+    VimTestCase.Checks.setup()
   }
 
   protected fun assertExException(expectedErrorMessage: String, action: () -> Unit) {
@@ -936,35 +969,5 @@ abstract class VimTestCase {
     fun String.dotToTab(): String = replace('.', '\t')
 
     fun String.dotToSpace(): String = replace('.', ' ')
-  }
-
-  object Checks {
-    var caretShape: Boolean = true
-
-    val neoVim = NeoVim()
-
-    var keyHandler = KeyHandlerMethod.VIA_IDE
-
-    fun reset() {
-      caretShape = true
-
-      neoVim.reset()
-      keyHandler = KeyHandlerMethod.VIA_IDE
-    }
-
-    class NeoVim {
-      var ignoredRegisters: Set<Char> = setOf()
-      var exitOnTearDown = true
-
-      fun reset() {
-        ignoredRegisters = setOf()
-        exitOnTearDown = true
-      }
-    }
-
-    enum class KeyHandlerMethod {
-      VIA_IDE,
-      DIRECT_TO_VIM,
-    }
   }
 }

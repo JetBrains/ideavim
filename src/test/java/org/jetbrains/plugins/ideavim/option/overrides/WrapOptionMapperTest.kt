@@ -28,7 +28,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-@Disabled("Broken in 2024.2")
 class WrapOptionMapperTest : VimTestCase() {
   private lateinit var manager: FileEditorManagerImpl
 
@@ -249,6 +248,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
+  @Disabled("Doesn't work in 242")
   fun `test open new window after setting option copies value as explicitly set`() {
     enterCommand("set nowrap")
     assertCommandOutput("set wrap?", "nowrap")
@@ -278,6 +278,7 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
+  @Disabled("Doesn't work in 242")
   fun `test setlocal 'wrap' then open new window uses value from setglobal`() {
     enterCommand("setlocal nowrap")
     assertCommandOutput("setglobal wrap?", "  wrap")

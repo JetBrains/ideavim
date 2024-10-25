@@ -8,11 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.option
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ComponentManagerEx
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
 import com.intellij.platform.util.coroutines.childScope
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
@@ -31,10 +33,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimNoWriteActionTestCase
+import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import javax.swing.SwingConstants
@@ -44,8 +46,7 @@ private const val defaultValue = "defaultValue"
 private const val defaultNumberValue = 10
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-@Disabled("Broken in 2024.2")
-class EffectiveOptionChangeListenerTest : VimTestCase() {
+class EffectiveOptionChangeListenerTest : VimNoWriteActionTestCase() {
   private val optionName = "test"
   private lateinit var manager: FileEditorManagerImpl
   private lateinit var otherBufferWindow: Editor
@@ -71,9 +72,11 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
     // Create a new editor that will represent a new buffer in a separate window. It will have default values
     otherBufferWindow = openNewBufferWindow("bbb.txt")
 
-    // Create the original editor last, so that fixture.editor will point to this file
-    // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
-    originalEditor = configureByText("\n")  // aaa.txt
+    ApplicationManager.getApplication().invokeAndWait {
+      // Create the original editor last, so that fixture.editor will point to this file
+      // It is STRONGLY RECOMMENDED to use originalEditor instead of fixture.editor, so we know which editor we're using
+      originalEditor = configureByText("\n")  // aaa.txt
+    }
 
     // Split the current window. Since no options have been set, it will have default values
     splitWindow = openSplitWindow(originalEditor) // aaa.txt
@@ -86,18 +89,31 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
 
   // Note that this overwrites fixture.editor! This is the equivalent of `:new {file}`
   private fun openNewBufferWindow(filename: String): Editor {
-    fixture.openFileInEditor(fixture.createFile(filename, "lorem ipsum"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(fixture.createFile(filename, "lorem ipsum"))
+    }
     return fixture.editor
   }
 
   private fun openSplitWindow(editor: Editor): Editor {
     val fileManager = FileEditorManagerEx.getInstanceEx(fixture.project)
-    return (fileManager.currentWindow!!.split(
-      SwingConstants.VERTICAL,
-      true,
-      editor.virtualFile,
-      false
-    )!!.allComposites.first().selectedEditor as TextEditor).editor
+    var split: EditorWindow? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      val currentWindow = fileManager.currentWindow
+      split = currentWindow!!.split(
+        SwingConstants.VERTICAL,
+        true,
+        editor.virtualFile,
+        false
+      )
+    }
+
+    // Waiting till the selected editor will appear
+    waitUntil {
+      split!!.allComposites.first().selectedEditor != null
+    }
+
+    return (split!!.allComposites.first().selectedEditor as TextEditor).editor
   }
 
   @AfterEach

@@ -111,3 +111,14 @@ fun waitAndAssertMode(
   val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + 1000)
   waitAndAssert(timeout) { fixture.editor.vim.mode == mode }
 }
+
+internal fun waitUntil(timeout: Int = 10_000, condition: () -> Boolean): Boolean {
+  val timeEnd = System.currentTimeMillis() + timeout
+  while (System.currentTimeMillis() < timeEnd) {
+    if (condition()) {
+      return true // Condition met within the time limit
+    }
+    Thread.sleep(100) // Pause briefly to prevent tight loop
+  }
+  return false // Timed out
+}
