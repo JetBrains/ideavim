@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimNoWriteActionTestCase
 import org.jetbrains.plugins.ideavim.propertybased.samples.javaText
 import org.jetbrains.plugins.ideavim.propertybased.samples.loremText
 import org.junit.jupiter.api.Test
@@ -105,7 +105,7 @@ private class AvailableActions(private val editor: Editor) : ImperativeCommand {
     val node = currentNode[usedKey]
 
     env.logMessage("Use command: ${injector.parser.toKeyNotation(usedKey)}. ${if (node is CommandNode) "Action: ${node.actionHolder.actionId}" else ""}")
-    VimTestCase.typeText(listOf(usedKey), editor, editor.project)
+    VimNoWriteActionTestCase.typeText(listOf(usedKey), editor, editor.project)
 
     IdeEventQueue.getInstance().flushQueue()
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
