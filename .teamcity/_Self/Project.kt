@@ -44,6 +44,8 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
   artifactRules = """
         +:build/reports => build/reports
         +:tests/java-tests/build/reports => java-tests/build/reports
+        +:tests/long-running-tests/build/reports => long-running-tests/build/reports
+        +:tests/property-tests/build/reports => property-tests/build/reports
         +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
     """.trimIndent()
 

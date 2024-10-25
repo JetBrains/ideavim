@@ -39,9 +39,11 @@ open class TestingBuildType(
 
   steps {
     gradle {
+      clearConditions()
       tasks = "clean test"
       buildFile = ""
       enableStacktrace = true
+      jdkHome = "/usr/lib/jvm/java-17-amazon-corretto"
     }
   }
 

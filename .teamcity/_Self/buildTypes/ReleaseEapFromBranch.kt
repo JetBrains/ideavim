@@ -41,7 +41,7 @@ object ReleaseEapFromBranch : IdeaVimBuildType({
   vcs {
     root(ReleasesVcsRoot)
     branchFilter = """
-      +:heads/(releases/*)
+      +:heads/releases/*
       """.trimIndent()
 
     checkoutMode = CheckoutMode.AUTO
