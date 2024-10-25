@@ -54,6 +54,19 @@ intellijPlatform {
 tasks {
   test {
     useJUnitPlatform()
+
+    // Set teamcity env variable locally to run additional tests for leaks.
+    // By default, this test runs on TC only, but this test doesn't take a lot of time,
+    //   so we can turn it on for local development
+    if (environment["TEAMCITY_VERSION"] == null) {
+      println("Set env TEAMCITY_VERSION to X to enable project leak checks from the platform")
+      environment("TEAMCITY_VERSION" to "X")
+    }
+
+    // IJ platform has JUnit5TestSessionListener with some additional checks;
+    // however, in 242 there is a problem with disposing so these checks always fail on TeamCity (works locally).
+    // This property disables these checks
+    systemProperty("intellij.build.test.ignoreFirstAndLastTests", true)
   }
 }
 
