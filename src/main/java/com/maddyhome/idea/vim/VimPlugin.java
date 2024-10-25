@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -24,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.util.SlowOperations;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
@@ -335,7 +337,9 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // 4) ~/.ideavimrc execution
     // Evaluate in the context of the fallback window, to capture local option state, to copy to the first editor window
-    registerIdeavimrc(VimInjectorKt.getInjector().getFallbackWindow());
+    try (AccessToken ignore = SlowOperations.knownIssue("VIM-3661")) {
+      registerIdeavimrc(VimInjectorKt.getInjector().getFallbackWindow());
+    }
 
     // Turing on should be performed after all commands registration
     getSearch().turnOn();

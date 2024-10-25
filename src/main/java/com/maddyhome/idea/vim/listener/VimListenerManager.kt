@@ -49,6 +49,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.removeUserData
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ExceptionUtil
+import com.intellij.util.SlowOperations
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
@@ -151,7 +152,9 @@ internal object VimListenerManager {
 
   fun turnOn() {
     GlobalListeners.enable()
-    EditorListeners.addAll()
+    SlowOperations.knownIssue("VIM-3648, VIM-3649").use {
+      EditorListeners.addAll()
+    }
     check(correctorRequester.tryEmit(Unit))
     check(keyCheckRequests.tryEmit(Unit))
 
@@ -380,7 +383,9 @@ internal object VimListenerManager {
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
       VimPlugin.getSearch().fileEditorManagerSelectionChangedCallback(event)
-      OptionGroup.fileEditorManagerSelectionChangedCallback(event)
+      SlowOperations.knownIssue("VIM-3658").use {
+        OptionGroup.fileEditorManagerSelectionChangedCallback(event)
+      }
       IjVimRedrawService.fileEditorManagerSelectionChangedCallback(event)
     }
   }
