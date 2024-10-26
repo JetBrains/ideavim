@@ -547,6 +547,10 @@ Contributors:
   [![icon][github]](https://github.com/SanderHestvik)
   &nbsp;
   SanderHestvik
+* [![icon][mail]](mailto:gregory.shrago@jetbrains.com)
+  [![icon][github]](https://github.com/gregsh)
+  &nbsp;
+  Greg Shrago
 
 Previous contributors:
 
