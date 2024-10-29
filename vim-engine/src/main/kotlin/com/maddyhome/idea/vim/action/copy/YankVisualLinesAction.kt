@@ -53,6 +53,6 @@ class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
 
     val selection =
       if (vimSelection.type == SelectionType.BLOCK_WISE) SelectionType.BLOCK_WISE else SelectionType.LINE_WISE
-    return injector.yank.yankRange(editor, TextRange(startsArray, endsArray), selection, true)
+    return injector.yank.yankRange(editor, context, TextRange(startsArray, endsArray), selection, true)
   }
 }

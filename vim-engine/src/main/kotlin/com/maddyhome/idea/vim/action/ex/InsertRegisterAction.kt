@@ -41,7 +41,7 @@ class InsertRegisterAction: VimActionHandler.SingleExecution() {
     val argument = cmd.argument as? Argument.Character ?: return false
     val keyStroke = KeyStroke.getKeyStroke(argument.character)
     val pasteContent = if ((keyStroke.modifiers and KeyEvent.CTRL_DOWN_MASK) == 0)  {
-      injector.registerGroup.getRegister(keyStroke.keyChar)?.text
+      injector.registerGroup.getRegister(editor, context, keyStroke.keyChar)?.text
     } else {
       throw ExException("Not yet implemented")
     } ?: return false

@@ -108,7 +108,7 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
 
   @Throws(ExException::class)
   override fun executeLastCommand(editor: VimEditor, context: ExecutionContext): Boolean {
-    val reg = injector.registerGroup.getRegister(':') ?: return false
+    val reg = injector.registerGroup.getRegister(editor, context,':') ?: return false
     val text = reg.text ?: return false
     execute(text, editor, context, skipHistory = false, indicateErrors = true, CommandLineVimLContext)
     return true

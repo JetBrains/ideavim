@@ -48,6 +48,7 @@ data class YankLinesCommand(val range: Range, val modifier: CommandModifier, val
 
     return if (injector.yank.yankRange(
         editor,
+        context,
         TextRange(starts.toIntArray(), ends.toIntArray()),
         SelectionType.LINE_WISE,
         false

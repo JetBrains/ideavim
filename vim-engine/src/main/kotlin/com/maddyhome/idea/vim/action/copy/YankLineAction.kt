@@ -28,6 +28,6 @@ class YankLineAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.yank.yankLine(editor, cmd.count)
+    return injector.yank.yankLine(editor, context, cmd.count)
   }
 }

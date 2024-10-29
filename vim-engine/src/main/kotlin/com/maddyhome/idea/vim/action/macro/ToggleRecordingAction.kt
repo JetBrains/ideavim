@@ -30,7 +30,7 @@ class ToggleRecordingAction : VimActionHandler.SingleExecution() {
       val reg = argument.character
       injector.registerGroup.startRecording(reg)
     } else {
-      injector.registerGroup.finishRecording()
+      injector.registerGroup.finishRecording(editor, context)
       true
     }
   }
