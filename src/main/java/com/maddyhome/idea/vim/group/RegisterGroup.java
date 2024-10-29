@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+
 /**
  * This group works with command associated with copying and pasting text
  */
@@ -129,7 +131,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           final String text = VimPlugin.getXML().getSafeXmlText(textElement);
           if (text != null) {
             logger.trace("Register data parsed");
-            register = new Register(key, type, text, Collections.emptyList());
+            register = new Register(key, injector.getClipboardManager().dumbCopiedText(text), type);
           }
           else {
             logger.trace("Cannot parse register data");

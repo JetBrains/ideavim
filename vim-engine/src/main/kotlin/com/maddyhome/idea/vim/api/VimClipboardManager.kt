@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.VimCopiedText
 import java.awt.datatransfer.Transferable
 
 /**
@@ -20,7 +21,7 @@ import java.awt.datatransfer.Transferable
 interface VimClipboardManager {
   @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#getPrimaryTextAndTransferableData")
   fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>?
-  fun getPrimaryTextAndTransferableData(editor: VimEditor, context: ExecutionContext): Pair<String, List<Any>?>?
+  fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): VimCopiedText?
   
   /**
    * Returns the string currently on the system clipboard.
@@ -29,16 +30,19 @@ interface VimClipboardManager {
    */
   @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#getClipboardTextAndTransferableData")
   fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>?
-  fun getClipboardTextAndTransferableData(editor: VimEditor, context: ExecutionContext): Pair<String, List<Any>?>?
+  fun getClipboardContent(editor: VimEditor, context: ExecutionContext): VimCopiedText?
   
-  fun setClipboardText(editor: VimEditor, context: ExecutionContext, text: String, transferableData: List<Any>): Boolean
-  fun setPrimaryText(editor: VimEditor, context: ExecutionContext, text: String, transferableData: List<Any>): Boolean
+  fun setClipboardContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
+  fun setPrimaryContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
   
   @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setClipboardText")
   fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
   @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setPrimaryText")
   fun setPrimaryText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
 
+  fun collectCopiedText(editor: VimEditor, context: ExecutionContext, range: TextRange, text: String = editor.getText(range)): VimCopiedText
+  fun dumbCopiedText(text: String): VimCopiedText // TODO this method is NOT preffered, it does not collect transferableData
+  
   fun getTransferableData(vimEditor: VimEditor, textRange: TextRange): List<Any>
 
   fun preprocessText(
@@ -48,3 +52,4 @@ interface VimClipboardManager {
     transferableData: List<*>,
   ): String
 }
+

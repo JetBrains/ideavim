@@ -68,9 +68,9 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
  */
 @RWLockLabel.SelfSynchronized
 private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
-  val register: Register? = injector.registerGroup.getRegister(key)
+  val register: Register? = injector.registerGroup.getRegister(editor, context, key)
   if (register != null) {
-    val textData = PutData.TextData(register.text, SelectionType.CHARACTER_WISE, emptyList(), register.name)
+    val textData = PutData.TextData(register.name, injector.clipboardManager.dumbCopiedText(register.text), SelectionType.CHARACTER_WISE)
     val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)
     injector.put.putText(editor, context, putData)
     return true

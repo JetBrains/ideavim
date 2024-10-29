@@ -83,7 +83,7 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
     val selectionEndOffset = lastSelectionInfo.end?.let { editor.bufferPositionToOffset(it) }
 
     val text = editor.getText(range)
-    val textData = PutData.TextData(text, SelectionType.LINE_WISE, emptyList(), null)
+    val textData = PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.LINE_WISE)
 
     val dropNewLineInEnd = (line + linesMoved == editor.lineCount() - 1 && text.last() == '\n') ||
       (lineRange.endLine == editor.lineCount() - 1)

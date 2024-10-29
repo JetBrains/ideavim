@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.register
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.NonNls
@@ -16,15 +17,15 @@ import javax.swing.KeyStroke
 // TODO should we prefer keys over text, as they are more informative?
 // TODO e.g.  could be both <Esc> and <C-[> after trying to restore original keys
 data class Register(val name: Char,
-                    val text: String,
+                    val copiedText: VimCopiedText,
                     val type: SelectionType,
-                    val transferableData: List<Any>,
 ) {
-  val keys get() = injector.parser.stringToKeys(text)
+  val text = copiedText.text
+  val keys get() = injector.parser.stringToKeys(copiedText.text)
   val printableString: String = EngineStringHelper.toPrintableCharacters(keys) // should be the same as [text], but we can't render control notation properly
 
-  constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) : this(name, injector.parser.toPrintableString(keys), type, emptyList())
-  constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out Any>) : this(name, text, type, transferableData)
+  constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) : this(name, injector.clipboardManager.dumbCopiedText(injector.parser.toPrintableString(keys)), type)
+//  constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out Any>) : this(name, text, type, transferableData)
 
   override fun toString(): String = "@$name = $printableString"
 
@@ -51,13 +52,13 @@ data class Register(val name: Char,
 fun Register.addText(text: String): Register {
   return when (this.type) {
     SelectionType.CHARACTER_WISE -> {
-      Register(this.name, this.text + text, SelectionType.CHARACTER_WISE, emptyList()) // todo it's empty for historical reasons, but should we really clear transferable data?
+      Register(this.name, injector.clipboardManager.dumbCopiedText(this.text + text), SelectionType.CHARACTER_WISE) // todo it's empty for historical reasons, but should we really clear transferable data?
     }
     SelectionType.LINE_WISE -> {
-      Register(this.name, this.text + text + (if (text.endsWith('\n')) "" else "\n"), SelectionType.LINE_WISE, emptyList()) // todo it's empty for historical reasons, but should we really clear transferable data?
+      Register(this.name, injector.clipboardManager.dumbCopiedText(this.text + text + (if (text.endsWith('\n')) "" else "\n")), SelectionType.LINE_WISE) // todo it's empty for historical reasons, but should we really clear transferable data?
     }
     SelectionType.BLOCK_WISE -> {
-      Register(this.name, this.text + "\n" + text, SelectionType.BLOCK_WISE, emptyList()) // todo it's empty for historical reasons, but should we really clear transferable data?
+      Register(this.name, injector.clipboardManager.dumbCopiedText(this.text + "\n" + text), SelectionType.BLOCK_WISE) // todo it's empty for historical reasons, but should we really clear transferable data?
     }
   }
 }
