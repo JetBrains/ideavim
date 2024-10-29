@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -29,7 +28,7 @@ data class RegistersCommand(val range: Range, val modifier: CommandModifier, val
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val registerGroup = injector.registerGroup
-    val regs = registerGroup.getRegisters()
+    val regs = registerGroup.getRegisters(editor, context)
       .filter { argument.isEmpty() || argument.contains(it.name) }
       .joinToString("\n", prefix = "Type Name Content\n") { reg ->
         val type = when (reg.type) {

@@ -44,6 +44,6 @@ class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
     val vimSelection = selections.firstOrNull() ?: return false
     val startsArray = starts.toIntArray()
     val endsArray = ends.toIntArray()
-    return injector.yank.yankRange(editor, TextRange(startsArray, endsArray), vimSelection.type, true)
+    return injector.yank.yankRange(editor, context, TextRange(startsArray, endsArray), vimSelection.type, true)
   }
 }

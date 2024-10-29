@@ -197,7 +197,7 @@ data class LetCommand(
 
       is Register -> {
         if (RegisterConstants.WRITABLE_REGISTERS.contains(variable.char)) {
-          val result = injector.registerGroup.storeText(variable.char, expression.evaluate(editor, context, vimContext).asString())
+          val result = injector.registerGroup.storeText(editor, context, variable.char, expression.evaluate(editor, context, vimContext).asString())
           if (!result) {
             logger.error(
               """
