@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimCopiedText
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -136,10 +137,10 @@ class ChangeGroup : VimChangeGroupBase() {
 
     // FIXME: Here we do selection, and it is not a good idea, because it updates primary selection in Linux
     // FIXME: I'll leave here a dirty fix that restores primary selection, but it would be better to rewrite this method
-    var primaryTextAndTransferableData: Pair<String, List<Any>?>? = null
+    var copiedText: IjVimCopiedText? = null
     try {
       if (injector.registerGroup.isPrimaryRegisterSupported()) {
-        primaryTextAndTransferableData = injector.clipboardManager.getPrimaryTextAndTransferableData(editor, context)
+        copiedText = injector.clipboardManager.getPrimaryContent(editor, context) as IjVimCopiedText
       }
     } catch (e: Exception) {
       // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
@@ -169,12 +170,8 @@ class ChangeGroup : VimChangeGroupBase() {
       afterAction.invoke()
     }
     try {
-      if (primaryTextAndTransferableData != null) {
-        injector.clipboardManager.setPrimaryText(
-          primaryTextAndTransferableData.first,
-          primaryTextAndTransferableData.first,
-          primaryTextAndTransferableData.second ?: emptyList()
-        )
+      if (copiedText != null) {
+        injector.clipboardManager.setPrimaryContent(editor, context, copiedText)
       }
     } catch (e: Exception) {
       // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection

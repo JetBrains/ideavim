@@ -33,7 +33,7 @@ data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val 
     val carets = editor.sortedCarets()
     for (caret in carets) {
       val range = getLineRange(editor, caret).toTextRange(editor)
-      val text = editor.getText(range)
+      val copiedText = injector.clipboardManager.collectCopiedText(editor, context, range)
 
       // Copy is defined as:
       // :[range]co[py] {address}
@@ -42,8 +42,7 @@ data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val 
       // the line _before_ the first line (i.e., copy to above the first line).
       val address1 = getAddressFromArgument(editor)
 
-      val transferableData = injector.clipboardManager.getTransferableData(editor, range)
-      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData, null)
+      val textData = PutData.TextData(null, copiedText, SelectionType.LINE_WISE)
       var mutableCaret = caret
       val putData = if (address1 == 0) {
         // TODO: This should maintain current column location

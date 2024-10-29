@@ -9,8 +9,10 @@
 package com.maddyhome.idea.vim.put
 
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.register.Register
 
 /**
  * [putToLine] has affect only of [insertTextBeforeCaret] is false and [visualSelection] is null
@@ -33,9 +35,12 @@ data class PutData(
   )
 
   data class TextData(
-    val rawText: String?,
-    val typeInRegister: SelectionType,
-    val transferableData: List<Any>,
     val registerChar: Char?,
-  )
+    val copiedText: VimCopiedText,
+    val typeInRegister: SelectionType,
+  ) {
+    constructor(register: Register): this(register.name, register.copiedText, register.type)
+
+    val rawText = copiedText.text // TODO do not call it raw text...
+  }
 }

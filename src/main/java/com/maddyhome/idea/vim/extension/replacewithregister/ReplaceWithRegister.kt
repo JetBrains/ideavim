@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.IjVimCopiedText
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -153,7 +154,8 @@ private fun doReplace(editor: Editor, context: DataContext, caret: ImmutableVimC
     usedType = SelectionType.CHARACTER_WISE
   }
 
-  val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData, savedRegister.name)
+  val copiedText = IjVimCopiedText(usedText, (savedRegister.copiedText as IjVimCopiedText).transferableData)
+  val textData = PutData.TextData(savedRegister.name, copiedText, usedType)
 
   val putData = PutData(
     textData,

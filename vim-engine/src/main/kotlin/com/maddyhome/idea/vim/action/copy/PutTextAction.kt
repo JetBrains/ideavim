@@ -36,7 +36,7 @@ sealed class PutTextBaseAction(
     val count = operatorArguments.count1
     val sortedCarets = editor.sortedCarets()
     return if (sortedCarets.size > 1) {
-      val caretToPutData = sortedCarets.associateWith { getPutDataForCaret(it, count) }
+      val caretToPutData = sortedCarets.associateWith { getPutDataForCaret(editor, context, it, count) }
       var result = true
       injector.application.runWriteAction {
         caretToPutData.forEach {
@@ -45,27 +45,20 @@ sealed class PutTextBaseAction(
       }
       result
     } else {
-      val putData = getPutDataForCaret(sortedCarets.single(), count)
+      val putData = getPutDataForCaret(editor, context, sortedCarets.single(), count)
       injector.put.putText(editor, context, putData)
     }
   }
 
-  private fun getPutDataForCaret(caret: ImmutableVimCaret, count: Int): PutData {
+  private fun getPutDataForCaret(editor: VimEditor, context: ExecutionContext, caret: ImmutableVimCaret, count: Int): PutData {
     val registerService = injector.registerGroup
     val registerChar = if (caret.editor.carets().size == 1) {
       registerService.currentRegister
     } else {
       registerService.getCurrentRegisterForMulticaret()
     }
-    val register = caret.registerStorage.getRegister(registerChar)
-    val textData = register?.let {
-      TextData(
-        register.text ?: injector.parser.toPrintableString(register.keys),
-        register.type,
-        register.transferableData,
-        register.name,
-      )
-    }
+    val register = caret.registerStorage.getRegister(editor, context, registerChar)
+    val textData = register?.let { TextData(register) }
     return PutData(textData, null, count, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)
   }
 }

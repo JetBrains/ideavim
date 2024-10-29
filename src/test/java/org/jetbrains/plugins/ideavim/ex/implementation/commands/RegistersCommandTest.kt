@@ -235,7 +235,7 @@ class RegistersCommandTest : VimTestCase() {
   fun `test clipboard registers are not duplicated`() {
     configureByText("<caret>line 0 ")
 
-    injector.registerGroup.saveRegister('+', Register('+', SelectionType.LINE_WISE, "Lorem ipsum dolor", mutableListOf()))
+    injector.registerGroup.saveRegister('+', Register('+', injector.clipboardManager.dumbCopiedText("Lorem ipsum dolor"), SelectionType.LINE_WISE))
     injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
     typeText("V<Esc>")
 
@@ -435,7 +435,7 @@ class RegistersCommandTest : VimTestCase() {
   fun `test clipboard registers are not duplicated linux`() {
     configureByText("<caret>line 0 ")
 
-    injector.registerGroup.saveRegister('+', Register('+', SelectionType.LINE_WISE, "Lorem ipsum dolor", mutableListOf()))
+    injector.registerGroup.saveRegister('+', Register('+', injector.clipboardManager.dumbCopiedText("Lorem ipsum dolor"), SelectionType.LINE_WISE))
     injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
     typeText("V<Esc>")
 
