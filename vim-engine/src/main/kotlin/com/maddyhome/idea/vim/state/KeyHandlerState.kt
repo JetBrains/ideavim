@@ -23,7 +23,7 @@ data class KeyHandlerState(
   val editorCommandBuilder: CommandBuilder,
   var commandLineCommandBuilder: CommandBuilder?,
 ): Cloneable {
-  constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.NORMAL)), null)
+  constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getBuiltinCommandsTrie(MappingMode.NORMAL)), null)
 
   companion object {
     private val logger = vimLogger<KeyHandlerState>()
@@ -57,7 +57,7 @@ data class KeyHandlerState(
     // argument with the search string. The command has a count of `6`. And a command such as `3:p` becomes an action to
     // process Ex entry with an argument of `.,.+2p` and a count of 3. The count is ignored by this action.
     // Note that we use the calculated count. In Vim, `2"a3"b:` transforms to `:.,.+5`, which is the same behaviour
-    commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getKeyRoot(MappingMode.CMD_LINE),
+    commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getBuiltinCommandsTrie(MappingMode.CMD_LINE),
       editorCommandBuilder.calculateCount0Snapshot())
   }
 
@@ -68,7 +68,7 @@ data class KeyHandlerState(
   fun partialReset(mode: Mode) {
     logger.trace("entered partialReset. mode: $mode")
     mappingState.resetMappingSequence()
-    commandBuilder.resetCommandTrieRootNode(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
+    commandBuilder.resetCommandTrie(injector.keyGroup.getBuiltinCommandsTrie(mode.toMappingMode()))
   }
 
   fun reset(mode: Mode) {
@@ -77,7 +77,7 @@ data class KeyHandlerState(
     mappingState.resetMappingSequence()
 
     commandLineCommandBuilder = null
-    editorCommandBuilder.resetAll(injector.keyGroup.getKeyRoot(mode.toMappingMode()))
+    editorCommandBuilder.resetAll(injector.keyGroup.getBuiltinCommandsTrie(mode.toMappingMode()))
   }
 
   public override fun clone(): KeyHandlerState {

@@ -14,7 +14,6 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
-import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
@@ -92,19 +91,23 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
 
 private class AvailableActions(private val editor: Editor) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
-    val currentNode = KeyHandler.getInstance().keyHandlerState.commandBuilder.getCurrentTrie()
+    val trie = KeyHandler.getInstance().keyHandlerState.commandBuilder.getCurrentTrie()
+    val currentKeys = KeyHandler.getInstance().keyHandlerState.commandBuilder.getCurrentCommandKeys()
 
     // Note: esc is always an option
-    val possibleKeys = (currentNode.children.keys.toList() + esc).sortedBy { injector.parser.toKeyNotation(it) }
-    println("Keys: ${possibleKeys.joinToString(", ")}")
+    val possibleKeys: List<KeyStroke> = buildList {
+      add(esc)
+      trie.getTrieNode(currentKeys)?.visit { stroke, _ -> add(stroke) }
+    }.sortedBy { injector.parser.toKeyNotation(it) }
+
+//    println("Keys: ${possibleKeys.joinToString(", ")}")
     val keyGenerator = Generator.integers(0, possibleKeys.lastIndex)
       .suchThat { injector.parser.toKeyNotation(possibleKeys[it]) !in stinkyKeysList }
       .map { possibleKeys[it] }
 
     val usedKey = env.generateValue(keyGenerator, null)
-    val node = currentNode[usedKey]
-
-    env.logMessage("Use command: ${injector.parser.toKeyNotation(usedKey)}. ${if (node is CommandNode) "Action: ${node.actionHolder.actionId}" else ""}")
+    val node = trie.getTrieNode(currentKeys + usedKey)
+    env.logMessage("Use command: ${injector.parser.toKeyNotation(currentKeys + usedKey)}. ${if (node?.data != null) "Action: ${node.data!!.actionId}" else ""}")
     VimNoWriteActionTestCase.typeText(listOf(usedKey), editor, editor.project)
 
     IdeEventQueue.getInstance().flushQueue()

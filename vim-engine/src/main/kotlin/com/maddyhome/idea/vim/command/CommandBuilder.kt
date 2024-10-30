@@ -20,20 +20,19 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.key.CommandNode
-import com.maddyhome.idea.vim.key.CommandPartNode
-import com.maddyhome.idea.vim.key.RootNode
+import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
 class CommandBuilder private constructor(
-  private var currentCommandPartNode: CommandPartNode<LazyVimCommand>,
+  private var keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>,
   private val counts: MutableList<Int>,
-  private val keyList: MutableList<KeyStroke>,
+  private val typedKeyStrokes: MutableList<KeyStroke>,
+  private val commandKeyStrokes: MutableList<KeyStroke>
 ) : Cloneable {
 
-  constructor(rootNode: RootNode<LazyVimCommand>, initialUncommittedRawCount: Int = 0)
-    : this(rootNode, mutableListOf(initialUncommittedRawCount), mutableListOf())
+  constructor(keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>, initialUncommittedRawCount: Int = 0)
+    : this(keyStrokeTrie, mutableListOf(initialUncommittedRawCount), mutableListOf(), mutableListOf())
 
   private var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
   private var selectedRegister: Char? = null
@@ -51,7 +50,7 @@ class CommandBuilder private constructor(
     }
 
   /** Provide the typed keys for `'showcmd'` */
-  val keys: Iterable<KeyStroke> get() = keyList
+  val keys: Iterable<KeyStroke> get() = typedKeyStrokes
 
   /** Returns true if the command builder is clean and ready to start building */
   val isEmpty
@@ -167,12 +166,12 @@ class CommandBuilder private constructor(
     if (currentCount < 0) {
       currentCount = 999999999
     }
-    addKey(key)
+    addTypedKeyStroke(key)
   }
 
   fun deleteCountCharacter() {
     currentCount /= 10
-    keyList.removeAt(keyList.size - 1)
+    typedKeyStrokes.removeLast()
   }
 
   var isRegisterPending: Boolean = false
@@ -180,7 +179,7 @@ class CommandBuilder private constructor(
 
   fun startWaitingForRegister(key: KeyStroke) {
     isRegisterPending = true
-    addKey(key)
+    addTypedKeyStroke(key)
   }
 
   fun selectRegister(register: Char) {
@@ -197,9 +196,9 @@ class CommandBuilder private constructor(
    * Only public use is when entering a digraph/literal, where each key isn't handled by [CommandBuilder], but should
    * be added to the `'showcmd'` output.
    */
-  fun addKey(key: KeyStroke) {
+  fun addTypedKeyStroke(key: KeyStroke) {
     logger.trace { "added key to command builder: $key" }
-    keyList.add(key)
+    typedKeyStrokes.add(key)
   }
 
   /**
@@ -268,24 +267,26 @@ class CommandBuilder private constructor(
    * part node.
    */
   fun processKey(key: KeyStroke, processor: (EditorActionHandlerBase) -> Unit): Boolean {
-    val node = currentCommandPartNode[key]
-    when (node) {
-      is CommandNode -> {
-        logger.trace { "Found full command node ($key) - ${node.debugString}" }
-        addKey(key)
-        processor(node.actionHolder.instance)
-        return true
-      }
-      is CommandPartNode -> {
-        logger.trace { "Found command part node ($key) - ${node.debugString}" }
-        currentCommandPartNode = node
-        addKey(key)
-        return true
-      }
+    commandKeyStrokes.add(key)
+    val node = keyStrokeTrie.getTrieNode(commandKeyStrokes)
+    if (node == null) {
+      logger.trace { "No command or part command for key sequence: ${injector.parser.toPrintableString(commandKeyStrokes)}" }
+      commandKeyStrokes.clear()
+      return false
     }
 
-    logger.trace { "No command/command part node found for key: $key" }
-    return false
+    addTypedKeyStroke(key)
+
+    val command = node.data
+    if (command == null) {
+      logger.trace { "Found unfinished key sequence for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}"}
+      return true
+    }
+
+    logger.trace { "Found command for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}"}
+    commandKeyStrokes.clear()
+    processor(command.instance)
+    return true
   }
 
   /**
@@ -319,8 +320,8 @@ class CommandBuilder private constructor(
     //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
     // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
     // get a match. This means we'll still process the rest of the keys of the prefix.
-    val isMultikey = currentCommandPartNode !is RootNode
-    logger.debug { "Building multikey command: $isMultikey" }
+    val isMultikey = commandKeyStrokes.isNotEmpty()
+    logger.debug { "Building multikey command: $commandKeyStrokes" }
     return isMultikey
   }
 
@@ -332,21 +333,22 @@ class CommandBuilder private constructor(
   fun buildCommand(): Command {
     val rawCount = calculateCount0Snapshot()
     val command = Command(selectedRegister, rawCount, action!!, argument, action!!.type, action?.flags ?: noneOfEnum())
-    resetAll(currentCommandPartNode.root as RootNode<LazyVimCommand>)
+    resetAll(keyStrokeTrie)
     return command
   }
 
-  fun resetAll(rootNode: RootNode<LazyVimCommand>) {
+  fun resetAll(keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>) {
     logger.trace("resetAll is executed")
-    currentCommandPartNode = rootNode
+    this.keyStrokeTrie = keyStrokeTrie
     commandState = CurrentCommandState.NEW_COMMAND
+    commandKeyStrokes.clear()
     counts.clear()
     counts.add(0)
     isRegisterPending = false
     selectedRegister = null
     action = null
     argument = null
-    keyList.clear()
+    typedKeyStrokes.clear()
     fallbackArgumentType = null
   }
 
@@ -357,13 +359,16 @@ class CommandBuilder private constructor(
    * mode - this is handled by [resetAll]. This function allows us to change the root node without executing a command
    * or fully resetting the command builder, such as when switching to Op-pending while entering an operator+motion.
    */
-  fun resetCommandTrieRootNode(rootNode: RootNode<LazyVimCommand>) {
+  fun resetCommandTrie(keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>) {
     logger.trace("resetCommandTrieRootNode is executed")
-    currentCommandPartNode = rootNode
+    this.keyStrokeTrie = keyStrokeTrie
   }
 
   @TestOnly
-  fun getCurrentTrie(): CommandPartNode<LazyVimCommand> = currentCommandPartNode
+  fun getCurrentTrie(): KeyStrokeTrie<LazyVimCommand> = keyStrokeTrie
+
+  @TestOnly
+  fun getCurrentCommandKeys(): List<KeyStroke> = commandKeyStrokes
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -371,12 +376,12 @@ class CommandBuilder private constructor(
 
     other as CommandBuilder
 
-    if (currentCommandPartNode != other.currentCommandPartNode) return false
+    if (keyStrokeTrie != other.keyStrokeTrie) return false
     if (counts != other.counts) return false
     if (selectedRegister != other.selectedRegister) return false
     if (action != other.action) return false
     if (argument != other.argument) return false
-    if (keyList != other.keyList) return false
+    if (typedKeyStrokes != other.typedKeyStrokes) return false
     if (commandState != other.commandState) return false
     if (expectedArgumentType != other.expectedArgumentType) return false
     if (fallbackArgumentType != other.fallbackArgumentType) return false
@@ -385,12 +390,12 @@ class CommandBuilder private constructor(
   }
 
   override fun hashCode(): Int {
-    var result = currentCommandPartNode.hashCode()
+    var result = keyStrokeTrie.hashCode()
     result = 31 * result + counts.hashCode()
     result = 31 * result + selectedRegister.hashCode()
     result = 31 * result + action.hashCode()
     result = 31 * result + argument.hashCode()
-    result = 31 * result + keyList.hashCode()
+    result = 31 * result + typedKeyStrokes.hashCode()
     result = 31 * result + commandState.hashCode()
     result = 31 * result + expectedArgumentType.hashCode()
     result = 31 * result + fallbackArgumentType.hashCode()
@@ -399,9 +404,10 @@ class CommandBuilder private constructor(
 
   public override fun clone(): CommandBuilder {
     val result = CommandBuilder(
-      currentCommandPartNode,
+      keyStrokeTrie,
       counts.toMutableList(),
-      keyList.toMutableList()
+      typedKeyStrokes.toMutableList(),
+      commandKeyStrokes.toMutableList()
     )
     result.selectedRegister = selectedRegister
     result.action = action
@@ -413,12 +419,12 @@ class CommandBuilder private constructor(
 
   override fun toString(): String {
     return "Command state = $commandState, " +
-      "key list = ${ injector.parser.toKeyNotation(keyList) }, " +
+      "key list = ${ injector.parser.toKeyNotation(typedKeyStrokes) }, " +
       "selected register = $selectedRegister, " +
       "counts = $counts, " +
       "action = $action, " +
       "argument = $argument, " +
-      "command part node - $currentCommandPartNode"
+      "command part node - $keyStrokeTrie"
   }
 
   companion object {

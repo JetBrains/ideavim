@@ -42,13 +42,10 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
-import com.maddyhome.idea.vim.key.CommandNode
-import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RequiredShortcut
-import com.maddyhome.idea.vim.key.RootNode
-import com.maddyhome.idea.vim.key.addLeafs
+import com.maddyhome.idea.vim.key.add
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -198,6 +195,8 @@ internal class NerdTree : VimExtension {
     internal var waitForSearch = false
     internal var speedSearchListenerInstalled = false
 
+    private val keys = mutableListOf<KeyStroke>()
+
     override fun actionPerformed(e: AnActionEvent) {
       var keyStroke = getKeyStroke(e) ?: return
       val keyChar = keyStroke.keyChar
@@ -205,20 +204,14 @@ internal class NerdTree : VimExtension {
         keyStroke = KeyStroke.getKeyStroke(keyChar)
       }
 
-      val nextNode = currentNode[keyStroke]
-
-      when (nextNode) {
-        null -> currentNode = actionsRoot
-        is CommandNode<NerdAction> -> {
-          currentNode = actionsRoot
-
-          val action = nextNode.actionHolder
-          when (action) {
-            is NerdAction.ToIj -> Util.callAction(null, action.name, e.dataContext.vim)
-            is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
-          }
+      keys.add(keyStroke)
+      actionsRoot.getData(keys)?.let { action ->
+        when (action) {
+          is NerdAction.ToIj -> Util.callAction(null, action.name, e.dataContext.vim)
+          is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
         }
-        is CommandPartNode<NerdAction> -> currentNode = nextNode
+
+        keys.clear()
       }
     }
 
@@ -540,38 +533,29 @@ private fun addCommand(alias: String, handler: CommandAliasHandler) {
   VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
 }
 
-private fun registerCommand(variable: String, default: String, action: NerdAction) {
+private fun registerCommand(variable: String, defaultMapping: String, action: NerdAction) {
   val variableValue = VimPlugin.getVariableService().getGlobalVariableValue(variable)
-  val mappings = if (variableValue is VimString) {
+  val mapping = if (variableValue is VimString) {
     variableValue.value
   } else {
-    default
+    defaultMapping
   }
-  actionsRoot.addLeafs(mappings, action)
+  registerCommand(mapping, action)
 }
 
-private fun registerCommand(default: String, action: NerdAction) {
-  actionsRoot.addLeafs(default, action)
-}
-
-
-private val actionsRoot: RootNode<NerdAction> = RootNode("NERDTree")
-private var currentNode: CommandPartNode<NerdAction> = actionsRoot
-
-private fun collectShortcuts(node: Node<NerdAction>): Set<KeyStroke> {
-  return if (node is CommandPartNode<NerdAction>) {
-    val res = node.children.keys.toMutableSet()
-    res += node.children.values.map { collectShortcuts(it) }.flatten()
-    res
-  } else {
-    emptySet()
+private fun registerCommand(mapping: String, action: NerdAction) {
+  actionsRoot.add(mapping, action)
+  injector.parser.parseKeys(mapping).forEach {
+    distinctShortcuts.add(it)
   }
 }
+
+private val actionsRoot: KeyStrokeTrie<NerdAction> = KeyStrokeTrie<NerdAction>("NERDTree")
+private val distinctShortcuts = mutableSetOf<KeyStroke>()
 
 private fun installDispatcher(project: Project) {
   val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
-  val shortcuts =
-    collectShortcuts(actionsRoot).map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
+  val shortcuts = distinctShortcuts.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
   dispatcher.registerCustomShortcutSet(
     KeyGroup.toShortcutSet(shortcuts),
     (ProjectView.getInstance(project) as ProjectViewImpl).component,
