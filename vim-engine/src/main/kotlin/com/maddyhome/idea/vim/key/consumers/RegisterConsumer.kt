@@ -35,7 +35,7 @@ class RegisterConsumer : KeyConsumer {
     if (!commandBuilder.isRegisterPending) return false
 
     logger.trace("Pending mode.")
-    commandBuilder.addKey(key)
+    commandBuilder.addTypedKeyStroke(key)
 
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
     handleSelectRegister(chKey, keyProcessResultBuilder)

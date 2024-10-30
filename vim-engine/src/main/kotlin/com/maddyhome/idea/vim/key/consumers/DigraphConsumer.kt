@@ -47,12 +47,12 @@ class DigraphConsumer : KeyConsumer {
       logger.trace("Expected argument is digraph")
       if (digraphSequence.isDigraphStart(key)) {
         digraphSequence.startDigraphSequence()
-        commandBuilder.addKey(key)
+        commandBuilder.addTypedKeyStroke(key)
         return true
       }
       if (digraphSequence.isLiteralStart(key)) {
         digraphSequence.startLiteralSequence()
-        commandBuilder.addKey(key)
+        commandBuilder.addTypedKeyStroke(key)
         return true
       }
     }
@@ -63,7 +63,7 @@ class DigraphConsumer : KeyConsumer {
       is DigraphResult.Handled -> {
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ ->
           keyHandler.setPromptCharacterEx(res.promptCharacter)
-          lambdaKeyState.commandBuilder.addKey(key)
+          lambdaKeyState.commandBuilder.addTypedKeyStroke(key)
         }
         return true
       }
@@ -87,7 +87,7 @@ class DigraphConsumer : KeyConsumer {
         }
         val stroke = res.stroke ?: return false
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditorState, lambdaContext ->
-          lambdaKeyState.commandBuilder.addKey(key)
+          lambdaKeyState.commandBuilder.addTypedKeyStroke(key)
           keyHandler.handleKey(lambdaEditorState, stroke, lambdaContext, lambdaKeyState)
         }
         return true

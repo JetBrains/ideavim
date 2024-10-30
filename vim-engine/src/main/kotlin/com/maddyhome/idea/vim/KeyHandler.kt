@@ -7,14 +7,12 @@
  */
 package com.maddyhome.idea.vim
 
-import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingProcessor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
@@ -23,7 +21,6 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
-import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
@@ -269,7 +266,7 @@ class KeyHandler {
     editor.isReplaceCharacter = false
     editor.resetOpPending()
     keyHandlerState.partialReset(editor.mode)
-    keyHandlerState.commandBuilder.resetAll(getKeyRoot(editor.mode.toMappingMode()))
+    keyHandlerState.commandBuilder.resetAll(injector.keyGroup.getBuiltinCommandsTrie(editor.mode.toMappingMode()))
   }
 
   // TODO we should have a single reset method
@@ -277,11 +274,7 @@ class KeyHandler {
     logger.trace { "Reset is executed" }
     injector.commandLine.getActiveCommandLine()?.clearCurrentAction()
     keyHandlerState.partialReset(mode)
-    keyState.commandBuilder.resetAll(getKeyRoot(mode.toMappingMode()))
-  }
-
-  private fun getKeyRoot(mappingMode: MappingMode): RootNode<LazyVimCommand> {
-    return injector.keyGroup.getKeyRoot(mappingMode)
+    keyState.commandBuilder.resetAll(injector.keyGroup.getBuiltinCommandsTrie(mode.toMappingMode()))
   }
 
   fun updateState(keyState: KeyHandlerState) {

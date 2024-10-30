@@ -18,7 +18,6 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
@@ -28,7 +27,6 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -199,8 +197,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
 
       for (MappingMode mappingMode : command.getModes()) {
-        Node<LazyVimCommand> node = getKeyRoot(mappingMode);
-        NodesKt.addLeafs(node, keyStrokes, command);
+        getBuiltinCommandsTrie(mappingMode).add(keyStrokes, command);
       }
     }
   }

@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
+import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
@@ -29,7 +30,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   @JvmField
   val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
   val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
-  val keyRoots: MutableMap<MappingMode, RootNode<LazyVimCommand>> = EnumMap(MappingMode::class.java)
+  val builtinCommands: MutableMap<MappingMode, KeyStrokeTrie<LazyVimCommand>> = EnumMap(MappingMode::class.java)
   val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
 
   override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>) {
@@ -56,13 +57,19 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     keyMappings.clear()
   }
 
+  @Suppress("DEPRECATION")
+  @Deprecated("Use getBuiltinCommandTrie", ReplaceWith("getBuiltinCommandsTrie(mappingMode)"))
+  override fun getKeyRoot(mappingMode: MappingMode): com.maddyhome.idea.vim.key.CommandPartNode<LazyVimCommand> =
+    RootNode(getBuiltinCommandsTrie(mappingMode))
+
   /**
-   * Returns the root of the key mapping for the given mapping mode
+   * Returns the root node of the builtin command keystroke trie
    *
    * @param mappingMode The mapping mode
-   * @return The key mapping tree root
+   * @return The root node of the builtin command trie
    */
-  override fun getKeyRoot(mappingMode: MappingMode): RootNode<LazyVimCommand> = keyRoots.getOrPut(mappingMode) { RootNode(mappingMode.name.get(0).lowercase()) }
+  override fun getBuiltinCommandsTrie(mappingMode: MappingMode): KeyStrokeTrie<LazyVimCommand> =
+    builtinCommands.getOrPut(mappingMode) { KeyStrokeTrie<LazyVimCommand>(mappingMode.name[0].lowercase()) }
 
   override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
 
@@ -75,6 +82,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     for (mappingMode in mappingModes) {
       checkIdentity(mappingMode, action.id, keys)
     }
+    @Suppress("DEPRECATION")
     checkCorrectCombination(action, keys)
   }
 
@@ -236,6 +244,6 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun unregisterCommandActions() {
-    keyRoots.clear()
+    builtinCommands.clear()
   }
 }
