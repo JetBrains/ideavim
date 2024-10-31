@@ -11,6 +11,13 @@ package com.maddyhome.idea.vim.key
 import javax.swing.KeyStroke
 
 interface KeyMappingLayer {
-  fun isPrefix(keys: Iterable<KeyStroke>): Boolean
-  fun getLayer(keys: Iterable<KeyStroke>): MappingInfoLayer?
+  fun isPrefix(keys: List<KeyStroke>): Boolean
+  fun getLayer(keys: List<KeyStroke>): MappingInfoLayer?
+}
+
+internal fun KeyMappingLayer.isPrefix(keys: Iterable<KeyStroke>): Boolean {
+  if (keys is List<KeyStroke>) {
+    return isPrefix(keys)
+  }
+  return isPrefix(keys.toList())
 }

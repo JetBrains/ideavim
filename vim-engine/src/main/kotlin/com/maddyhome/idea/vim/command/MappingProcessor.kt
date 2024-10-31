@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfoLayer
+import com.maddyhome.idea.vim.key.isPrefix
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
@@ -94,7 +95,7 @@ object MappingProcessor: KeyConsumer {
     // unless a sequence is also a prefix for another mapping. We eagerly evaluate the shortest mapping, so even if a
     // mapping is a prefix, it will get evaluated when the next character is entered.
     // Note that currentlyUnhandledKeySequence is the same as the state after commandState.getMappingKeys().add(key). It
-    // would be nice to tidy ths up
+    // would be nice to tidy this up
     if (!mapping.isPrefix(processBuilder.state.mappingState.keys)) {
       log.debug("There are no mappings that start with the current sequence. Returning false.")
       return false
@@ -161,7 +162,7 @@ object MappingProcessor: KeyConsumer {
     log.trace("Processing complete mapping sequence...")
     // The current sequence isn't a prefix, check to see if it's a completed sequence.
     val mappingState = processBuilder.state.mappingState
-    val currentMappingInfo = mapping.getLayer(mappingState.keys)
+    val currentMappingInfo = mapping.getLayer(mappingState.keys.toList())
     var mappingInfo = currentMappingInfo
     if (mappingInfo == null) {
       log.trace("Haven't found any mapping info for the given sequence. Trying to apply mapping to a subsequence.")
