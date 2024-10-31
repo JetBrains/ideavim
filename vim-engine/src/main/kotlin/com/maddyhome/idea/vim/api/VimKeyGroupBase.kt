@@ -50,7 +50,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun getKeyMapping(mode: MappingMode): KeyMapping {
-    return keyMappings.getOrPut(mode) { KeyMapping() }
+    return keyMappings.getOrPut(mode) { KeyMapping(mode.name[0].lowercase() + "map") }
   }
 
   override fun resetKeyMappings() {

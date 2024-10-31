@@ -27,7 +27,7 @@ class KeyStrokeTrie<T>(private val name: String) {
     val debugString: String
   }
 
-  private class TrieNodeImpl<T>(val name: String, val depth: Int, override val data: T?)
+  private class TrieNodeImpl<T>(val name: String, val depth: Int, override var data: T?)
     : TrieNode<T> {
 
     val children = lazy { mutableMapOf<KeyStroke, TrieNodeImpl<T>>() }
@@ -86,6 +86,9 @@ class KeyStrokeTrie<T>(private val name: String) {
         TrieNodeImpl(name, current.depth + 1, if (i == keyStrokes.lastIndex) data else null)
       }
     }
+
+    // Last write wins (also means we can't cache results)
+    current.data = data
   }
 
   /**
@@ -116,6 +119,41 @@ class KeyStrokeTrie<T>(private val name: String) {
       current = current.children.value[it] ?: return null
     }
     return current
+  }
+
+  /**
+   * Returns true if the given keys are a prefix to a longer sequence of keys
+   *
+   * Will return true even if the current keys map to a node with data.
+   */
+  fun isPrefix(keyStrokes: List<KeyStroke>): Boolean {
+    val node = getTrieNode(keyStrokes) as? TrieNodeImpl<T> ?: return false
+    return node.children.isInitialized() && node.children.value.isNotEmpty()
+  }
+
+  fun remove(keys: List<KeyStroke>) {
+    val path = buildList {
+      var current = root
+      keys.forEach { key ->
+        if (!current.children.isInitialized()) return
+        val next = current.children.value[key] ?: return
+        add(Pair(current, key))
+        current = next
+      }
+    }
+
+    path.asReversed().forEach { (parent, key) ->
+      val child = parent.children.value[key] ?: return
+      if (child.children.isInitialized() && child.children.value.isNotEmpty()) return
+      parent.children.value.remove(key)
+      if (parent.children.value.isNotEmpty() || parent.data != null) return
+    }
+  }
+
+  fun clear() {
+    if (root.children.isInitialized()) {
+      root.children.value.clear()
+    }
   }
 
   override fun toString(): String {
