@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.history.HistoryConstants
+import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.ExceptionHandler
 import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
@@ -32,6 +32,7 @@ import kotlin.test.assertTrue
 /**
  * @author vlan
  */
+@Suppress("SpellCheckingInspection")
 class MapCommandTest : VimTestCase() {
 
   @AfterEach
@@ -49,10 +50,10 @@ class MapCommandTest : VimTestCase() {
   
       """.trimIndent(),
     )
-    typeText(commandToKeys("nmap k j"))
+    enterCommand("nmap k j")
     assertPluginError(false)
     assertOffset(0)
-    typeText(injector.parser.parseKeys("k"))
+    typeText("k")
     assertOffset(4)
   }
 
@@ -60,9 +61,9 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testInsertMapJKtoEsc() {
     configureByText("${c}World!\n")
-    typeText(commandToKeys("imap jk <Esc>"))
+    enterCommand("imap jk <Esc>")
     assertPluginError(false)
-    typeText(injector.parser.parseKeys("i" + "Hello, " + "jk"))
+    typeText("i" + "Hello, " + "jk")
     assertState("Hello, World!\n")
     assertMode(Mode.NORMAL())
     assertOffset(6)
@@ -71,9 +72,9 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testBackslashAtEnd() {
     configureByText("\n")
-    typeText(commandToKeys("imap foo\\ bar"))
+    enterCommand("imap foo\\ bar")
     assertPluginError(false)
-    typeText(injector.parser.stringToKeys("ifoo\\"))
+    typeText("ifoo\\")
     assertState("bar\n")
   }
 
@@ -81,8 +82,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testUnfinishedSpecialKey() {
     configureByText("\n")
-    typeText(commandToKeys("imap <Esc foo"))
-    typeText(injector.parser.stringToKeys("i<Esc"))
+    enterCommand("imap <Esc foo")
+    typeText("i<Esc")
     assertState("foo\n")
   }
 
@@ -90,21 +91,21 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testUnknownSpecialKey() {
     configureByText("\n")
-    typeText(commandToKeys("imap <foo> bar"))
-    typeText(injector.parser.stringToKeys("i<foo>"))
+    enterCommand("imap <foo> bar")
+    typeText("i<foo>")
     assertState("bar\n")
   }
 
   @Test
   fun testMapTable() {
     configureByText("\n")
-    typeText(commandToKeys("map <C-Down> gt"))
-    typeText(commandToKeys("imap foo bar"))
-    typeText(commandToKeys("imap bar <Esc>"))
-    typeText(commandToKeys("imap <C-Down> <C-O>gt"))
-    typeText(commandToKeys("nmap ,f <Plug>Foo"))
-    typeText(commandToKeys("nmap <Plug>Foo iHello<Esc>"))
-    typeText(commandToKeys("imap"))
+    enterCommand("map <C-Down> gt")
+    enterCommand("imap foo bar")
+    enterCommand("imap bar <Esc>")
+    enterCommand("imap <C-Down> <C-O>gt")
+    enterCommand("nmap ,f <Plug>Foo")
+    enterCommand("nmap <Plug>Foo iHello<Esc>")
+    enterCommand("imap")
     assertExOutput(
       """
         |i  <C-Down>      <C-O>gt
@@ -112,7 +113,7 @@ class MapCommandTest : VimTestCase() {
         |i  foo           bar
       """.trimMargin(),
     )
-    typeText(commandToKeys("map"))
+    enterCommand("map")
     assertExOutput(
       """
         |   <C-Down>      gt
@@ -125,10 +126,10 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testRecursiveMapping() {
     configureByText("\n")
-    typeText(commandToKeys("imap foo bar"))
-    typeText(commandToKeys("imap bar baz"))
-    typeText(commandToKeys("imap baz quux"))
-    typeText(injector.parser.parseKeys("i" + "foo"))
+    enterCommand("imap foo bar")
+    enterCommand("imap bar baz")
+    enterCommand("imap baz quux")
+    typeText("i" + "foo")
     assertState("quux\n")
   }
 
@@ -140,8 +141,8 @@ class MapCommandTest : VimTestCase() {
       Hello 2
       """.trimIndent(),
     )
-    typeText(commandToKeys("nmap dc k"))
-    typeText(injector.parser.parseKeys("dd"))
+    enterCommand("nmap dc k")
+    typeText("dd")
     assertState(
       """
       Hello 2
@@ -152,19 +153,19 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testNonRecursiveMapping() {
     configureByText("\n")
-    typeText(commandToKeys("inoremap a b"))
+    enterCommand("inoremap a b")
     assertPluginError(false)
-    typeText(commandToKeys("inoremap b a"))
-    typeText(injector.parser.parseKeys("i" + "ab"))
+    enterCommand("inoremap b a")
+    typeText("i" + "ab")
     assertState("ba\n")
   }
 
   @Test
   fun testNonRecursiveMapTable() {
     configureByText("\n")
-    typeText(commandToKeys("inoremap jj <Esc>"))
-    typeText(commandToKeys("imap foo bar"))
-    typeText(commandToKeys("imap"))
+    enterCommand("inoremap jj <Esc>")
+    enterCommand("imap foo bar")
+    enterCommand("imap")
     assertExOutput(
       """
         |i  foo           bar
@@ -183,9 +184,9 @@ class MapCommandTest : VimTestCase() {
   
       """.trimIndent(),
     )
-    typeText(commandToKeys("noremap <Right> <nop>"))
+    enterCommand("noremap <Right> <nop>")
     assertPluginError(false)
-    typeText(injector.parser.parseKeys("l" + "<Right>"))
+    typeText("l" + "<Right>")
     assertPluginError(false)
     assertState(
       """
@@ -195,21 +196,21 @@ class MapCommandTest : VimTestCase() {
       """.trimIndent(),
     )
     assertOffset(1)
-    typeText(commandToKeys("nmap"))
+    enterCommand("nmap")
     assertExOutput("n  <Right>     * <Nop>")
   }
 
   @Test
   fun testIgnoreModifiers() {
     configureByText("\n")
-    typeText(commandToKeys("nmap <buffer> ,a /a<CR>"))
-    typeText(commandToKeys("nmap <nowait> ,b /b<CR>"))
-    typeText(commandToKeys("nmap <silent> ,c /c<CR>"))
-    typeText(commandToKeys("nmap <special> ,d /d<CR>"))
-    typeText(commandToKeys("nmap <script> ,e /e<CR>"))
-    typeText(commandToKeys("nmap <expr> ,f '/f<CR>'"))
-    typeText(commandToKeys("nmap <unique> ,g /g<CR>"))
-    typeText(commandToKeys("nmap"))
+    enterCommand("nmap <buffer> ,a /a<CR>")
+    enterCommand("nmap <nowait> ,b /b<CR>")
+    enterCommand("nmap <silent> ,c /c<CR>")
+    enterCommand("nmap <special> ,d /d<CR>")
+    enterCommand("nmap <script> ,e /e<CR>")
+    enterCommand("nmap <expr> ,f '/f<CR>'")
+    enterCommand("nmap <unique> ,g /g<CR>")
+    enterCommand("nmap")
     assertExOutput(
       """
         |n  ,a            /a<CR>
@@ -227,10 +228,10 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapSpace() {
     configureByText("foo\n")
-    typeText(commandToKeys("nmap <space> dw"))
-    typeText(injector.parser.parseKeys(" "))
+    enterCommand("nmap <space> dw")
+    typeText(" ")
     assertState("\n")
-    typeText(injector.parser.parseKeys("i" + " " + "<Esc>"))
+    typeText("i" + " " + "<Esc>")
     assertState(" \n")
   }
 
@@ -238,8 +239,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testNoMappingInReplaceCharacterArgument() {
     configureByText("${c}foo\n")
-    typeText(commandToKeys("noremap A Z"))
-    typeText(injector.parser.parseKeys("rA"))
+    enterCommand("noremap A Z")
+    typeText("rA")
     assertState("Aoo\n")
   }
 
@@ -247,8 +248,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testNoMappingInNonFirstCharOfOperatorPendingMode() {
     configureByText("${c}foo, bar\n")
-    typeText(commandToKeys("omap , ?"))
-    typeText(injector.parser.parseKeys("dt,"))
+    enterCommand("omap , ?")
+    typeText("dt,")
     assertState(", bar\n")
   }
 
@@ -257,8 +258,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testIgnoreEverythingAfterBar() {
     configureByText("${c}foo\n")
-    typeText(commandToKeys("imap a b |c \" Something else"))
-    typeText(injector.parser.parseKeys("ia"))
+    enterCommand("imap a b |c \" Something else")
+    typeText("ia")
     assertState("b foo\n")
   }
 
@@ -266,8 +267,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testBarEscaped() {
     configureByText("${c}foo\n")
-    typeText(commandToKeys("imap a b \\| c"))
-    typeText(injector.parser.parseKeys("ia"))
+    enterCommand("imap a b \\| c")
+    typeText("ia")
     assertState("b | cfoo\n")
   }
 
@@ -276,8 +277,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testBarEscapedSeveralSpaces() {
     configureByText("${c}foo\n")
-    typeText(commandToKeys("imap a b \\| c    |"))
-    typeText(injector.parser.parseKeys("ia"))
+    enterCommand("imap a b \\| c    |")
+    typeText("ia")
     assertState("b | c    foo\n")
   }
 
@@ -285,8 +286,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testFirstCharIsNonRecursive() {
     configureByText("\n")
-    typeText(commandToKeys("map ab abcd"))
-    typeText(injector.parser.parseKeys("ab"))
+    enterCommand("map ab abcd")
+    typeText("ab")
     assertState("bcd\n")
   }
 
@@ -294,7 +295,7 @@ class MapCommandTest : VimTestCase() {
   @TestFor(issues = ["VIM-3507"])
   fun `test bar in mapping in search`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(commandToKeys(":map t /4\\\\|a<CR>"))
+    enterCommand(":map t /4\\\\|a<CR>")
     typeText("t")
     assertState("I found it in ${c}a legendary land")
   }
@@ -303,7 +304,7 @@ class MapCommandTest : VimTestCase() {
   @TestFor(issues = ["VIM-3569"])
   fun `test bar in mapping`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(commandToKeys("nmap <leader>\\| dw"))
+    enterCommand("nmap <leader>\\| dw")
     typeText("<leader>|")
     assertState("${c}found it in a legendary land")
   }
@@ -314,10 +315,10 @@ class MapCommandTest : VimTestCase() {
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
     executeVimscript("inoremap # X\u0008#\n")
-    typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
+    typeText("i" + "#" + "<Esc>")
     assertState("#\n")
     assertMode(Mode.NORMAL())
-    typeText(commandToKeys("imap"))
+    enterCommand("imap")
     assertExOutput("i  #           * X<C-H>#")
   }
 
@@ -333,7 +334,7 @@ class MapCommandTest : VimTestCase() {
       """.trimIndent(),
     )
     executeVimscript("map \u0018i dd\n", true)
-    typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
+    typeText("i" + "#" + "<Esc>")
     assertState(
       """
   #foo
@@ -342,9 +343,9 @@ class MapCommandTest : VimTestCase() {
       """.trimIndent(),
     )
     assertMode(Mode.NORMAL())
-    typeText(commandToKeys("map"))
+    enterCommand("map")
     assertExOutput("   <C-X>i        dd")
-    typeText(injector.parser.parseKeys("<C-X>i"))
+    typeText("<C-X>i")
     assertState("bar\n")
   }
 
@@ -354,7 +355,7 @@ class MapCommandTest : VimTestCase() {
   fun testBarCtrlVEscaped() {
     configureByText("${c}foo\n")
     executeVimscript("imap a b \u0016|\u0016| c |\n")
-    typeText(injector.parser.parseKeys("ia"))
+    typeText("ia")
     assertState("b || c foo\n")
   }
 
@@ -364,7 +365,7 @@ class MapCommandTest : VimTestCase() {
   fun testCtrlMCtrlLAsNewLine() {
     configureByText("${c}foo\n")
     executeVimscript("map A :%s/foo/bar/g\r\u000C\n")
-    typeText(injector.parser.parseKeys("A"))
+    typeText("A")
     assertState("bar\n")
   }
 
@@ -372,8 +373,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testRemappingZero() {
     configureByText("x${c}yz\n")
-    typeText(commandToKeys("map 0 ~"))
-    typeText(injector.parser.parseKeys("0"))
+    enterCommand("map 0 ~")
+    typeText("0")
     assertState("xYz\n")
   }
 
@@ -383,7 +384,7 @@ class MapCommandTest : VimTestCase() {
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
     executeVimscript("map 0 ^")
-    typeText(injector.parser.parseKeys("10~"))
+    typeText("10~")
     assertState("aBCDEFGHIJKlmnop\n")
   }
 
@@ -392,8 +393,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testRemappingDeleteOverridesRemovingLastDigitFromCount() {
     configureByText("a${c}bcdefghijklmnop\n")
-    typeText(commandToKeys("map <Del> ~"))
-    typeText(injector.parser.parseKeys("10<Del>"))
+    enterCommand("map <Del> ~")
+    typeText("10<Del>")
     assertState("aBCDEFGHIJKlmnop\n")
   }
 
@@ -402,9 +403,9 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapLeader() {
     configureByText("\n")
-    typeText(commandToKeys("let mapleader = \",\""))
-    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
-    typeText(injector.parser.parseKeys(",z"))
+    enterCommand("let mapleader = \",\"")
+    enterCommand("nmap <Leader>z izzz<Esc>")
+    typeText(",z")
     assertState("zzz\n")
   }
 
@@ -413,9 +414,9 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapLeaderToSpace() {
     configureByText("\n")
-    typeText(commandToKeys("let mapleader = \"\\<SPACE>\""))
-    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
-    typeText(injector.parser.parseKeys(" z"))
+    enterCommand("let mapleader = \"\\<SPACE>\"")
+    enterCommand("nmap <Leader>z izzz<Esc>")
+    typeText(" z")
     assertState("zzz\n")
   }
 
@@ -424,9 +425,9 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapLeaderToSpaceWithWhitespace() {
     configureByText("\n")
-    typeText(commandToKeys("let mapleader = \" \""))
-    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
-    typeText(injector.parser.parseKeys(" z"))
+    enterCommand("let mapleader = \" \"")
+    enterCommand("nmap <Leader>z izzz<Esc>")
+    typeText(" z")
     assertState("zzz\n")
   }
 
@@ -434,13 +435,13 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testAmbiguousMapping() {
     configureByText("\n")
-    typeText(commandToKeys("nmap ,f iHello<Esc>"))
-    typeText(commandToKeys("nmap ,fc iBye<Esc>"))
-    typeText(injector.parser.parseKeys(",fdh"))
+    enterCommand("nmap ,f iHello<Esc>")
+    enterCommand("nmap ,fc iBye<Esc>")
+    typeText(",fdh")
     assertState("Helo\n")
-    typeText(injector.parser.parseKeys("diw"))
+    typeText("diw")
     assertState("\n")
-    typeText(injector.parser.parseKeys(",fch"))
+    typeText(",fch")
     assertState("Bye\n")
   }
 
@@ -448,13 +449,13 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testLongAmbiguousMapping() {
     configureByText("\n")
-    typeText(commandToKeys("nmap ,foo iHello<Esc>"))
-    typeText(commandToKeys("nmap ,fooc iBye<Esc>"))
-    typeText(injector.parser.parseKeys(",foodh"))
+    enterCommand("nmap ,foo iHello<Esc>")
+    enterCommand("nmap ,fooc iBye<Esc>")
+    typeText(",foodh")
     assertState("Helo\n")
-    typeText(injector.parser.parseKeys("diw"))
+    typeText("diw")
     assertState("\n")
-    typeText(injector.parser.parseKeys(",fooch"))
+    typeText(",fooch")
     assertState("Bye\n")
   }
 
@@ -462,18 +463,18 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testPlugMapping() {
     configureByText("\n")
-    typeText(commandToKeys("nmap ,f <Plug>Foo"))
-    typeText(commandToKeys("nmap <Plug>Foo iHello<Esc>"))
-    typeText(injector.parser.parseKeys(",fa!<Esc>"))
+    enterCommand("nmap ,f <Plug>Foo")
+    enterCommand("nmap <Plug>Foo iHello<Esc>")
+    typeText(",fa!<Esc>")
     assertState("Hello!\n")
   }
 
   @Test
   fun testIntersectingCommands() {
     configureByText("123${c}4567890")
-    typeText(commandToKeys("map ds h"))
-    typeText(commandToKeys("map I 3l"))
-    typeText(injector.parser.parseKeys("dI"))
+    enterCommand("map ds h")
+    enterCommand("map I 3l")
+    typeText("dI")
     assertState("123${c}7890")
   }
 
@@ -481,17 +482,17 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testIncompleteMapping() {
     configureByText("123${c}4567890")
-    typeText(commandToKeys("map <Plug>(Hi)l lll"))
-    typeText(commandToKeys("map I <Plug>(Hi)"))
-    typeText(injector.parser.parseKeys("Ih"))
+    enterCommand("map <Plug>(Hi)l lll")
+    enterCommand("map I <Plug>(Hi)")
+    typeText("Ih")
     assertState("12${c}34567890")
   }
 
   @Test
   fun testIntersectingCommands2() {
     configureByText("123${c}4567890")
-    typeText(commandToKeys("map as x"))
-    typeText(injector.parser.parseKeys("gas"))
+    enterCommand("map as x")
+    typeText("gas")
     assertState("123${c}567890")
   }
 
@@ -499,8 +500,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapZero() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap 0 w"))
-    typeText(injector.parser.parseKeys("0"))
+    enterCommand("nmap 0 w")
+    typeText("0")
     assertOffset(14)
   }
 
@@ -508,8 +509,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapZeroIgnoredInCount() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap 0 w"))
-    typeText(injector.parser.parseKeys("10w"))
+    enterCommand("nmap 0 w")
+    typeText("10w")
     assertOffset(51)
   }
 
@@ -517,8 +518,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapNonZeroDigit() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap 2 w"))
-    typeText(injector.parser.parseKeys("2"))
+    enterCommand("nmap 2 w")
+    typeText("2")
     assertOffset(14)
   }
 
@@ -526,8 +527,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testMapNonZeroDigitNotIncludedInCount() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap 2 w"))
-    typeText(injector.parser.parseKeys("92"))
+    enterCommand("nmap 2 w")
+    typeText("92")
     assertOffset(45)
   }
 
@@ -535,8 +536,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testShiftSpace() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap <S-Space> w"))
-    typeText(injector.parser.parseKeys("<S-Space>"))
+    enterCommand("nmap <S-Space> w")
+    typeText("<S-Space>")
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -544,8 +545,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testShiftSpaceAndWorkInInsertMode() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap <S-Space> w"))
-    typeText(injector.parser.parseKeys("i<S-Space>"))
+    enterCommand("nmap <S-Space> w")
+    typeText("i<S-Space>")
     assertState("A quick  ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -553,16 +554,16 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun testShiftLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap <S-D> w"))
-    typeText(injector.parser.parseKeys("<S-D>"))
+    enterCommand("nmap <S-D> w")
+    typeText("<S-D>")
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
   @Test
   fun testUppercaseLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap D w"))
-    typeText(injector.parser.parseKeys("D"))
+    enterCommand("nmap D w")
+    typeText("D")
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -570,11 +571,11 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun `test shift letter doesn't break insert mode`() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
-    typeText(commandToKeys("nmap <S-D> w"))
-    typeText(injector.parser.parseKeys("<S-D>"))
+    enterCommand("nmap <S-D> w")
+    typeText("<S-D>")
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
 
-    typeText(injector.parser.parseKeys("iD<Esc>"))
+    typeText("iD<Esc>")
     assertState("A quick brown ${c}Dfox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -596,11 +597,11 @@ class MapCommandTest : VimTestCase() {
       ),
     )
     assertState("\n")
-    typeText(commandToKeys("call T()"))
+    enterCommand("call T()")
     assertPluginError(false)
     assertState("text\n")
 
-    typeText(injector.parser.parseKeys("t"))
+    typeText("t")
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:var")
   }
@@ -609,8 +610,8 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun `test rhc with triangle brackets`() {
     configureByText("\n")
-    typeText(commandToKeys("inoremap p <p>"))
-    typeText(injector.parser.parseKeys("ip"))
+    enterCommand("inoremap p <p>")
+    typeText("ip")
     assertState("<p>\n")
   }
 
@@ -623,8 +624,8 @@ class MapCommandTest : VimTestCase() {
       }
       """.trimIndent(),
     )
-    typeText(commandToKeys("nnoremap ,f ?\\<fun\\><CR>"))
-    typeText(injector.parser.parseKeys(",f"))
+    enterCommand("nnoremap ,f ?\\<fun\\><CR>")
+    typeText(",f")
     assertState(
       """
       private ${c}fun myfun(funArg: String) {
@@ -637,16 +638,16 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun `test autocast to action notation`() {
     configureByText("\n")
-    typeText(commandToKeys("nmap ,a :action Back<CR>"))
-    typeText(commandToKeys("nmap ,b :action Back<Cr>"))
-    typeText(commandToKeys("nmap ,c :action Back<cr>"))
-    typeText(commandToKeys("nmap ,d :action Back<ENTER>"))
-    typeText(commandToKeys("nmap ,e :action Back<Enter>"))
-    typeText(commandToKeys("nmap ,f :action Back<enter>"))
-    typeText(commandToKeys("nmap ,g :action Back<C-M>"))
-    typeText(commandToKeys("nmap ,h :action Back<C-m>"))
-    typeText(commandToKeys("nmap ,i :action Back<c-m>"))
-    typeText(commandToKeys("nmap"))
+    enterCommand("nmap ,a :action Back<CR>")
+    enterCommand("nmap ,b :action Back<Cr>")
+    enterCommand("nmap ,c :action Back<cr>")
+    enterCommand("nmap ,d :action Back<ENTER>")
+    enterCommand("nmap ,e :action Back<Enter>")
+    enterCommand("nmap ,f :action Back<enter>")
+    enterCommand("nmap ,g :action Back<C-M>")
+    enterCommand("nmap ,h :action Back<C-m>")
+    enterCommand("nmap ,i :action Back<c-m>")
+    enterCommand("nmap")
     assertExOutput(
       """
         |n  ,a            <Action>(Back)
@@ -665,16 +666,16 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun `test autocast to action notation 2`() {
     configureByText("\n")
-    typeText(commandToKeys("nnoremap ,a :action Back<CR>"))
-    typeText(commandToKeys("nnoremap ,b :action Back<Cr>"))
-    typeText(commandToKeys("nnoremap ,c :action Back<cr>"))
-    typeText(commandToKeys("nnoremap ,d :action Back<ENTER>"))
-    typeText(commandToKeys("nnoremap ,e :action Back<Enter>"))
-    typeText(commandToKeys("nnoremap ,f :action Back<enter>"))
-    typeText(commandToKeys("nnoremap ,g :action Back<C-M>"))
-    typeText(commandToKeys("nnoremap ,h :action Back<C-m>"))
-    typeText(commandToKeys("nnoremap ,i :action Back<c-m>"))
-    typeText(commandToKeys("nnoremap"))
+    enterCommand("nnoremap ,a :action Back<CR>")
+    enterCommand("nnoremap ,b :action Back<Cr>")
+    enterCommand("nnoremap ,c :action Back<cr>")
+    enterCommand("nnoremap ,d :action Back<ENTER>")
+    enterCommand("nnoremap ,e :action Back<Enter>")
+    enterCommand("nnoremap ,f :action Back<enter>")
+    enterCommand("nnoremap ,g :action Back<C-M>")
+    enterCommand("nnoremap ,h :action Back<C-m>")
+    enterCommand("nnoremap ,i :action Back<c-m>")
+    enterCommand("nnoremap")
     assertExOutput(
       """
         |n  ,a            <Action>(Back)
@@ -693,12 +694,12 @@ class MapCommandTest : VimTestCase() {
   @Test
   fun `test command from map isn't added to history`() {
     configureByText("\n")
-    typeText(commandToKeys("map A :echo 42<CR>"))
-    typeText(injector.parser.parseKeys("A"))
+    enterCommand("map A :echo 42<CR>")
+    typeText("A")
     assertExOutput("42")
-    kotlin.test.assertEquals(
+    assertEquals(
       "map A :echo 42<CR>",
-      injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry,
+      injector.historyGroup.getEntries(VimHistory.Type.Command, 0, 0).last().entry,
     )
   }
 
@@ -716,7 +717,7 @@ class MapCommandTest : VimTestCase() {
      Cras id tellus in ex imperdiet egestas. 
     """.trimIndent()
     )
-    typeText(commandToKeys("map <Enter> <Action>(EditorSelectWord)"))
+    enterCommand("map <Enter> <Action>(EditorSelectWord)")
     typeText("<Enter>")
     assertState("""
      Lorem Ipsum
@@ -744,7 +745,7 @@ class MapCommandTest : VimTestCase() {
     )
     injector.keyGroup.putKeyMapping(MappingMode.NXO, keys("abc"), exceptionMappingOwner, ExceptionHandler(), false)
 
-    typeText(commandToKeys("map k abcx"))
+    enterCommand("map k abcx")
 
     val exception = assertThrows<Throwable> {
       LoggedErrorProcessor.executeWith<Throwable>(OnlyThrowLoggedErrorProcessor) {
@@ -769,7 +770,7 @@ class MapCommandTest : VimTestCase() {
      Cras id tellus in ex imperdiet egestas. 
     """.trimIndent()
     )
-    typeText(commandToKeys("map k :echo 4<CR> \\| :echo 42<CR>"))
+    enterCommand("map k :echo 4<CR> \\| :echo 42<CR>")
     assertNull(injector.outputPanel.getCurrentOutputPanel())
     typeText("k")
     assertEquals("4\n42", injector.outputPanel.getCurrentOutputPanel()!!.text)
