@@ -8,7 +8,9 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
@@ -19,16 +21,19 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
-class KeyMapping(name: String) : Iterable<List<KeyStroke>>, KeyMappingLayer {
-  private val keysTrie = KeyStrokeTrie<MappingInfo>(name)
+class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, KeyMappingLayer {
+  private val keysTrie = KeyStrokeTrie<MappingInfo>(mode.name)
 
   override fun iterator(): Iterator<List<KeyStroke>> = ArrayList(keysTrie.getAll().keys).iterator()
 
   operator fun get(keys: List<KeyStroke>): MappingInfo? {
     keysTrie.getData(keys)?.let { return it }
 
+    // Mapping a keystroke to an IDE action is a recursive mapping. The lhs is the keys, and the rhs is the
+    // <Action>(...) key sequence. Like <Plug>, this needs to be mapped to a handler, but we have far too many IDE
+    // actions to be able to pre-register them. We'll dynamically create the rhs mapping on demand.
     getActionNameFromActionMapping(keys)?.let {
-      return ToActionMappingInfo(it, keys, false, MappingOwner.IdeaVim.System)
+      return ToActionMappingInfo(it, keys, false, MappingOwner.IdeaVim.System, enumSetOf(mode))
     }
 
     return null
@@ -58,29 +63,32 @@ class KeyMapping(name: String) : Iterable<List<KeyStroke>>, KeyMappingLayer {
   fun put(
     fromKeys: List<KeyStroke>,
     owner: MappingOwner,
+    originalModes: Set<MappingMode>,
     extensionHandler: ExtensionHandler,
     recursive: Boolean,
   ) {
-    add(fromKeys, ToHandlerMappingInfo(extensionHandler, fromKeys, recursive, owner))
+    add(fromKeys, ToHandlerMappingInfo(extensionHandler, fromKeys, recursive, owner, originalModes))
   }
 
   fun put(
     fromKeys: List<KeyStroke>,
     toKeys: List<KeyStroke>,
     owner: MappingOwner,
+    originalModes: Set<MappingMode>,
     recursive: Boolean,
   ) {
-    add(fromKeys, ToKeysMappingInfo(toKeys, fromKeys, recursive, owner))
+    add(fromKeys, ToKeysMappingInfo(toKeys, fromKeys, recursive, owner, originalModes))
   }
 
   fun put(
     fromKeys: List<KeyStroke>,
     toExpression: Expression,
     owner: MappingOwner,
+    originalModes: Set<MappingMode>,
     originalString: String,
     recursive: Boolean,
   ) {
-    add(fromKeys, ToExpressionMappingInfo(toExpression, fromKeys, recursive, owner, originalString))
+    add(fromKeys, ToExpressionMappingInfo(toExpression, fromKeys, recursive, owner, originalModes, originalString))
   }
 
   private fun add(keys: List<KeyStroke>, mappingInfo: MappingInfo) {

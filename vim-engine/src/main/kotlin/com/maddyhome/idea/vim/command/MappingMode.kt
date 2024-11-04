@@ -49,27 +49,23 @@ enum class MappingMode {
   ;
 
   companion object {
-    @JvmField
-    val N: EnumSet<MappingMode> = EnumSet.of(NORMAL)
-    val X: EnumSet<MappingMode> = EnumSet.of(VISUAL)
-    val O: EnumSet<MappingMode> = EnumSet.of(OP_PENDING)
-    val I: EnumSet<MappingMode> = EnumSet.of(INSERT)
-    val C: EnumSet<MappingMode> = EnumSet.of(CMD_LINE)
-    val S: EnumSet<MappingMode> = EnumSet.of(SELECT)
-    val V: EnumSet<MappingMode> = EnumSet.of(VISUAL, SELECT)
+    @JvmField val N: EnumSet<MappingMode> = EnumSet.of(NORMAL)
+    @JvmField val X: EnumSet<MappingMode> = EnumSet.of(VISUAL)
+    @JvmField val O: EnumSet<MappingMode> = EnumSet.of(OP_PENDING)
+    @JvmField val I: EnumSet<MappingMode> = EnumSet.of(INSERT)
+    @JvmField val C: EnumSet<MappingMode> = EnumSet.of(CMD_LINE)
+    @JvmField val S: EnumSet<MappingMode> = EnumSet.of(SELECT)
+    @JvmField val V: EnumSet<MappingMode> = EnumSet.of(VISUAL, SELECT)
     val NO: EnumSet<MappingMode> = EnumSet.of(NORMAL, OP_PENDING)
 
-    @JvmField
-    val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
+    @JvmField val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
     val NX: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL)
-    val IC: EnumSet<MappingMode> = EnumSet.of(INSERT, CMD_LINE)
+    @JvmField val IC: EnumSet<MappingMode> = EnumSet.of(INSERT, CMD_LINE)
     val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
 
-    @JvmField
-    val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
+    @JvmField val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
 
-    @JvmField
-    val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
+    @JvmField val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
     val INV: EnumSet<MappingMode> = EnumSet.of(INSERT, NORMAL, VISUAL, SELECT)
     val ALL: EnumSet<MappingMode> = EnumSet.allOf(MappingMode::class.java)
 

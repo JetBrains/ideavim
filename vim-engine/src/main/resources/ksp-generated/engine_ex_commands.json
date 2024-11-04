@@ -63,7 +63,6 @@
     "nm[ap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
     "nmapc[lear]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand",
     "nn[oremap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
-    "no[map]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
     "no[remap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
     "noh[lsearch]": "com.maddyhome.idea.vim.vimscript.model.commands.NoHLSearchCommand",
     "norm[al]": "com.maddyhome.idea.vim.vimscript.model.commands.NormalCommand",

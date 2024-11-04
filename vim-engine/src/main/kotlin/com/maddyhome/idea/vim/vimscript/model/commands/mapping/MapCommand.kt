@@ -31,7 +31,7 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-@ExCommand(command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],no[map],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]")
+@ExCommand(command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]")
 data class MapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
@@ -49,7 +49,7 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
 
     val arguments = try {
       parseCommandArguments(argument) ?: return false
-    } catch (ignored: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
       return false
     }
 
@@ -70,20 +70,25 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
       injector.keyGroup
         .putKeyMapping(modes, arguments.fromKeys, mappingOwner, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
     } else {
-      val actionId = extractActionId(arguments.secondArgument)
-      if (actionId != null) {
-        // workaround for https://youtrack.jetbrains.com/issue/VIM-2607/Action-BackForward-no-longer-work-the-same
-        val newMapping = "<Action>($actionId)"
-        val toKeys = injector.parser.parseKeys(newMapping)
-        injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, true)
-        logger.debug("Replaced ${arguments.secondArgument} with $newMapping")
-      } else {
-        val toKeys = injector.parser.parseKeys(arguments.secondArgument)
-        injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, commandInfo.isRecursive)
-      }
+      val mapping = transformOldActionSyntax(arguments.secondArgument)
+      val toKeys = injector.parser.parseKeys(mapping)
+      val isRecursive = mapping != arguments.secondArgument || commandInfo.isRecursive
+      injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, isRecursive)
     }
 
     return true
+  }
+
+  private fun transformOldActionSyntax(argument: String): String {
+    extractActionId(argument)?.let {
+      // Prefer `<Action>(...)` syntax to `:action ...<CR>` syntax. It's just better.
+      // Workaround for https://youtrack.jetbrains.com/issue/VIM-2607/Action-BackForward-no-longer-work-the-same
+      val newMapping = "<Action>($it)"
+      logger.debug("Replaced $argument with $newMapping")
+      return newMapping
+    }
+
+    return argument
   }
 
   private fun extractActionId(argument: String): String? {
@@ -132,7 +137,6 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
   )
 
   companion object {
-    private const val CTRL_V = '\u0016'
     private val COMMAND_INFOS = arrayOf(
       // TODO: Support smap, map!, lmap
       CommandInfo("map", "", MappingMode.NVO, true),

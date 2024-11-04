@@ -123,6 +123,259 @@ class MapCommandTest : VimTestCase() {
     )
   }
 
+  private fun addTestMaps() {
+    // TODO: Support smap, map! and lmap
+    enterCommand("map all foo") // NVO
+    enterCommand("nmap normal foo")
+    enterCommand("imap insert foo")
+    enterCommand("vmap visual+select foo")  // V -> Visual+Select
+//    enterCommand("smap select foo") // TODO: Support smap
+    enterCommand("xmap visual foo")
+    enterCommand("omap op-pending foo")
+//    enterCommand("map! insert+cmdline foo") // IC. TODO: Support map!
+    enterCommand("cmap cmdline foo")
+//    enterCommand("lmap lang foo")   // TODO: Support lmap
+  }
+
+  @Test
+  fun `test output of map shows maps for NVO modes`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("map")
+
+    // Note that Vim doesn't appear to have an order. Items are kinda sorted, but also not. I.e. `m{something}` are
+    // grouped together, but followed later by `g{something}`. We'll sort by {lhs}, so we're at least consistent
+    assertExOutput(
+      """
+        |   all           foo
+        |n  normal        foo
+        |o  op-pending    foo
+        |x  visual        foo
+        |v  visual+select   foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test output of nmap shows maps for Normal mode`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("nmap")
+
+    assertExOutput(
+      """
+        |   all           foo
+        |n  normal        foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test output of vmap shows maps for Visual and Select modes`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("vmap")
+
+    assertExOutput(
+      """
+        |   all           foo
+        |x  visual        foo
+        |v  visual+select   foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  @Disabled("smap not yet supported")
+  fun `test output of smap shows maps for Select mode`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("smap")
+
+    assertExOutput(
+      """
+        |   all           foo
+        |s  select        foo
+        |v  visual+select   foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test output of xmap shows maps for Visual mode`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("xmap")
+
+    assertExOutput(
+      """
+        |   all           foo
+        |x  visual        foo
+        |v  visual+select   foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test output of omap shows maps for Op-pending mode`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("omap")
+
+    assertExOutput(
+      """
+        |   all           foo
+        |o  op-pending    foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  @Disabled("map! not yet supported")
+  fun `test output of map! shows maps for Insert and Cmdline modes`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("map!")
+
+    assertExOutput(
+      """
+        |c  cmdline       foo
+        |!  insert+cmdline   foo
+        |i  insert        foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test output of imap shows maps for Insert mode`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("imap")
+
+    // TODO: Support map!
+//    assertExOutput(
+//      """
+//        |!  insert+cmdline   foo
+//        |i  insert        foo
+//      """.trimMargin()
+//    )
+    assertExOutput(
+      """
+        |i  insert        foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  @Disabled("lmap not yet supported")
+  fun `test output of lmap shows maps for Language specific modes`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("lmap")
+
+    assertExOutput(
+      """
+        |l  lang          foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test output of cmap shows maps for Command-line mode`() {
+    configureByText("\n")
+    addTestMaps()
+
+    enterCommand("cmap")
+
+    // TODO: Support map!
+//    assertExOutput(
+//      """
+//        |c  cmdline       foo
+//        |!  insert+cmdline   foo
+//      """.trimMargin()
+//    )
+    assertExOutput(
+      """
+        |c  cmdline       foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test ouptut of map shows correct modes after unmapping a single mode`() {
+    configureByText("\n")
+    addTestMaps() // Adds a mapping of all for NVO
+
+    enterCommand("sunmap all")  // Removes Select from the NVO mapping for foo
+    enterCommand("map")
+
+    // Note that the formatting is exactly how Vim shows it. Messy, isn't it?
+    assertExOutput(
+      """
+        |noxall           foo
+        |n  normal        foo
+        |o  op-pending    foo
+        |x  visual        foo
+        |v  visual+select   foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test ouptut of map shows correct modes after unmapping multiple modes`() {
+    configureByText("\n")
+    addTestMaps() // Adds a mapping of all for NVO
+
+    enterCommand("vunmap all")  // Removes Visual+Select from the NVO mapping for foo
+    enterCommand("map")
+
+    assertExOutput(
+      """
+        |no all           foo
+        |n  normal        foo
+        |o  op-pending    foo
+        |x  visual        foo
+        |v  visual+select   foo
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test output of map shows correct modes after unmapping from vmap and map`() {
+    configureByText("\n")
+    enterCommand("map foo bar") // Normal, Visual, Select, Op-pending
+    enterCommand("vmap foo baz")  // Visual, Select
+
+    // Just to be sure we're set up correctly
+    enterCommand("map")
+    assertExOutput(
+      """
+        |no foo           bar
+        |v  foo           baz
+      """.trimMargin()
+    )
+
+    enterCommand("sunmap foo")
+    enterCommand("ounmap foo")
+
+    enterCommand("map")
+    assertExOutput(
+      """
+        |n  foo           bar
+        |x  foo           baz
+      """.trimMargin()
+    )
+  }
+
   @Test
   fun testRecursiveMapping() {
     configureByText("\n")
@@ -184,7 +437,7 @@ class MapCommandTest : VimTestCase() {
   
       """.trimIndent(),
     )
-    enterCommand("noremap <Right> <nop>")
+    enterCommand("nnoremap <Right> <nop>")
     assertPluginError(false)
     typeText("l" + "<Right>")
     assertPluginError(false)
