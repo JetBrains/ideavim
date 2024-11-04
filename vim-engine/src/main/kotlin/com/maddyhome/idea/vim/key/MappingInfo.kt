@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.trace
@@ -41,6 +42,7 @@ sealed class MappingInfo(
   val fromKeys: List<KeyStroke>,
   val isRecursive: Boolean,
   val owner: MappingOwner,
+  val originalModes: Set<MappingMode>,
 ) : Comparable<MappingInfo>, MappingInfoLayer {
 
   @VimNlsSafe
@@ -79,7 +81,8 @@ class ToKeysMappingInfo(
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
-) : MappingInfo(fromKeys, isRecursive, owner) {
+  originalModes: Set<MappingMode>,
+) : MappingInfo(fromKeys, isRecursive, owner, originalModes) {
   override fun getPresentableString(): String = injector.parser.toKeyNotation(toKeys)
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
@@ -115,8 +118,9 @@ class ToExpressionMappingInfo(
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
+  originalModes: Set<MappingMode>,
   private val originalString: String,
-) : MappingInfo(fromKeys, isRecursive, owner) {
+) : MappingInfo(fromKeys, isRecursive, owner, originalModes) {
   override fun getPresentableString(): String = originalString
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
@@ -142,7 +146,8 @@ class ToHandlerMappingInfo(
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
-) : MappingInfo(fromKeys, isRecursive, owner) {
+  originalModes: Set<MappingMode>,
+) : MappingInfo(fromKeys, isRecursive, owner, originalModes) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
@@ -248,7 +253,8 @@ class ToActionMappingInfo(
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
-) : MappingInfo(fromKeys, isRecursive, owner) {
+  originalModes: Set<MappingMode>,
+) : MappingInfo(fromKeys, isRecursive, owner, originalModes) {
   override fun getPresentableString(): String = "action $action"
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {

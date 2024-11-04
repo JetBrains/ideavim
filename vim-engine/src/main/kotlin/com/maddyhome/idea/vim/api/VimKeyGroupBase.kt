@@ -50,7 +50,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun getKeyMapping(mode: MappingMode): KeyMapping {
-    return keyMappings.getOrPut(mode) { KeyMapping(mode.name[0].lowercase() + "map") }
+    return keyMappings.getOrPut(mode) { KeyMapping(mode) }
   }
 
   override fun resetKeyMappings() {
@@ -212,7 +212,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     toKeys: List<KeyStroke>,
     recursive: Boolean,
   ) {
-    modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toKeys, owner, recursive) }
+    modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toKeys, owner, modes, recursive) }
     registerKeyMapping(fromKeys, owner)
   }
 
@@ -224,7 +224,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     originalString: String,
     recursive: Boolean,
   ) {
-    modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toExpr, owner, originalString, recursive) }
+    modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toExpr, owner, modes, originalString, recursive) }
     registerKeyMapping(fromKeys, owner)
   }
 
@@ -235,7 +235,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     extensionHandler: ExtensionHandler,
     recursive: Boolean,
   ) {
-    modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, owner, extensionHandler, recursive) }
+    modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, owner, modes, extensionHandler, recursive) }
     registerKeyMapping(fromKeys, owner)
   }
 
