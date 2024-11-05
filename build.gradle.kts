@@ -128,6 +128,18 @@ dependencies {
 
     // AceJump is an optional dependency. We use their SessionManager class to check if it's active
     plugin("AceJump", "3.8.19")
+
+    // [VERSION UPDATE] 2025.1+
+    // Dirty hack: in 2025.1+ the json plugin is extracted. So, the tests that use JSON don't work.
+    // If the IdeaVim minimal version is bumped to 2025.1, leave only `bundledPlugins...` line
+    // If we start to support a new version like 2024.2.2 or 2025.1.1, please add it to the correct branch of this when
+    // This check intentionally has a pattern where we explicitly specify if to use the JSON plugin for each
+    //   supported version or not to prevent developers from figuring out what happened with JSON.
+    when (ideaVersion) {
+      "2024.2.1" -> { /* Nothing */ }
+      "LATEST-EAP-SNAPSHOT" -> bundledPlugins("com.intellij.modules.json")
+      else -> error("Unsupported version: $ideaVersion")
+    }
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
