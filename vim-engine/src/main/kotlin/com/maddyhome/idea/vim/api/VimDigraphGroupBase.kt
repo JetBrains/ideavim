@@ -94,15 +94,6 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
   }
 
   override fun parseCommandLine(editor: VimEditor, args: String): Boolean {
-    if (args.isEmpty()) {
-      showDigraphs(editor, false)
-      return true
-    }
-    else if (args == "!") {
-      showDigraphs(editor, true)
-      return true
-    }
-
     val tokenizer = StringTokenizer(args)
     while (tokenizer.hasMoreTokens()) {
       val digraph = tokenizer.nextToken()

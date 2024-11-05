@@ -19,7 +19,9 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 @ExCommand(command = "sethandler")
-data class SetHandlerCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class SetHandlerCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -35,7 +37,7 @@ data class SetHandlerCommand(val range: Range, val argument: String) : Command.S
     val key = try {
       val shortcut = args[0]
       if (shortcut.startsWith('<')) injector.parser.parseKeys(shortcut).first() else null
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
       null
     }
 

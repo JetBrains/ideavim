@@ -124,7 +124,7 @@ class MapCommandTest : VimTestCase() {
   }
 
   private fun addTestMaps() {
-    // TODO: Support smap, map! and lmap
+    // TODO: Support smap and lmap
     enterCommand("map all foo") // NVO
     enterCommand("nmap normal foo")
     enterCommand("imap insert foo")
@@ -132,7 +132,7 @@ class MapCommandTest : VimTestCase() {
 //    enterCommand("smap select foo") // TODO: Support smap
     enterCommand("xmap visual foo")
     enterCommand("omap op-pending foo")
-//    enterCommand("map! insert+cmdline foo") // IC. TODO: Support map!
+    enterCommand("map! insert+cmdline foo") // IC
     enterCommand("cmap cmdline foo")
 //    enterCommand("lmap lang foo")   // TODO: Support lmap
   }
@@ -237,7 +237,6 @@ class MapCommandTest : VimTestCase() {
   }
 
   @Test
-  @Disabled("map! not yet supported")
   fun `test output of map! shows maps for Insert and Cmdline modes`() {
     configureByText("\n")
     addTestMaps()
@@ -247,10 +246,19 @@ class MapCommandTest : VimTestCase() {
     assertExOutput(
       """
         |c  cmdline       foo
-        |!  insert+cmdline   foo
         |i  insert        foo
+        |!  insert+cmdline   foo
       """.trimMargin()
     )
+  }
+
+  @Test
+  fun `test bang modifier reports error except for map!`() {
+    configureByText("\n")
+    enterCommand("vmap!")
+
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E477: No ! allowed")
   }
 
   @Test
@@ -260,16 +268,10 @@ class MapCommandTest : VimTestCase() {
 
     enterCommand("imap")
 
-    // TODO: Support map!
-//    assertExOutput(
-//      """
-//        |!  insert+cmdline   foo
-//        |i  insert        foo
-//      """.trimMargin()
-//    )
     assertExOutput(
       """
         |i  insert        foo
+        |!  insert+cmdline   foo
       """.trimMargin()
     )
   }
@@ -296,16 +298,10 @@ class MapCommandTest : VimTestCase() {
 
     enterCommand("cmap")
 
-    // TODO: Support map!
-//    assertExOutput(
-//      """
-//        |c  cmdline       foo
-//        |!  insert+cmdline   foo
-//      """.trimMargin()
-//    )
     assertExOutput(
       """
         |c  cmdline       foo
+        |!  insert+cmdline   foo
       """.trimMargin()
     )
   }
@@ -331,7 +327,7 @@ class MapCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test ouptut of map shows correct modes after unmapping multiple modes`() {
+  fun `test output of map shows correct modes after unmapping multiple modes`() {
     configureByText("\n")
     addTestMaps() // Adds a mapping of all for NVO
 
@@ -1027,5 +1023,56 @@ class MapCommandTest : VimTestCase() {
     assertNull(injector.outputPanel.getCurrentOutputPanel())
     typeText("k")
     assertEquals("4\n42", injector.outputPanel.getCurrentOutputPanel()!!.text)
+  }
+
+  @Test
+  fun `test map! parsing`() {
+    doTest(
+      listOf("i", "foo", "<Esc>"),
+      """|
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """|
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |ba${c}rconsectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin()
+    ) {
+      enterCommand("map! foo bar")
+    }
+  }
+
+  @Test
+  fun `test map! parsing 2`() {
+    doTest(
+      "!",
+      """|
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """|
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |${c}Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin()
+    ) {
+      // Make sure we parse `map !` differently to `map!`
+      // Remember that `map` is NVO and `map!` is IC. If this is correctly parsed, we have to test it in e.g., Normal
+      enterCommand("map ! dd")
+    }
   }
 }

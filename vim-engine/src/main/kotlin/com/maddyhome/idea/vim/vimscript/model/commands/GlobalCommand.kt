@@ -29,7 +29,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 // FIXME: I'm such a mess, please refactor me, responsible developer
 @ExCommand(command = "g[lobal],v[global]")
-data class GlobalCommand(val range: Range, val argument: String, val invert: Boolean) : Command.SingleExecution(range, argument) {
+data class GlobalCommand(val range: Range, val modifier: CommandModifier, val argument: String, val invert: Boolean) :
+  Command.SingleExecution(range, modifier, argument) {
 
   init {
     // Most commands have a default range of the current line ("."). Global has a default range of the whole file

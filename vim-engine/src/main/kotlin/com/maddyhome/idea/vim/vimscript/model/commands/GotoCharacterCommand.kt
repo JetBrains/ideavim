@@ -22,7 +22,9 @@ import kotlin.math.min
  * see "h :goto"
  */
 @ExCommand(command = "go[to]")
-data class GotoCharacterCommand(val range: Range, val argument: String) : Command.ForEachCaret(range, argument) {
+data class GotoCharacterCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.ForEachCaret(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(

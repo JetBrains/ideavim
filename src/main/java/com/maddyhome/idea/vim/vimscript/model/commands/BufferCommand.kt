@@ -27,13 +27,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author John Weigel
  */
 @ExCommand(command = "b[uffer]")
-internal data class BufferCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+internal data class BufferCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier) {
+
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val arg = argument.trim()
-    val overrideModified = arg.startsWith('!')
-    val buffer = if (overrideModified) arg.replace(Regex("^!\\s*"), "") else arg
+    val overrideModified = modifier == CommandModifier.BANG
+    val buffer = argument.trim()
     var result = true
 
     if (buffer.isNotEmpty()) {

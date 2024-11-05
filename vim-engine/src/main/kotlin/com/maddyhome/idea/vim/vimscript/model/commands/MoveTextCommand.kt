@@ -38,7 +38,9 @@ import kotlin.math.min
  * see "h :move"
  */
 @ExCommand(command = "m[ove]")
-data class MoveTextCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
   @Throws(ExException::class)

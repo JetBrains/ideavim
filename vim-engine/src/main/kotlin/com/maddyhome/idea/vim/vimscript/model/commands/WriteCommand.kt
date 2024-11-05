@@ -20,8 +20,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :write"
  */
 @ExCommand(command = "w[rite]")
-data class WriteCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class WriteCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     injector.file.saveFile(editor, context)
     return ExecutionResult.Success

@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
  * see "h :call"
  */
 @ExCommand(command = "cal[l]")
-class CallCommand(val range: Range, val functionCall: Expression) : Command.SingleExecution(range) {
+class CallCommand(val range: Range, val functionCall: Expression) : Command.SingleExecution(range, CommandModifier.NONE) {
 
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 

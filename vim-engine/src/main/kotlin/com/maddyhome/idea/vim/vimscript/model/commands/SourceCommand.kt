@@ -24,8 +24,11 @@ import java.io.File
  * see "h :source"
  */
 @ExCommand(command = "so[urce]")
-data class SourceCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class SourceCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val path = expandUser(argument.trim())
     val file = File(path)

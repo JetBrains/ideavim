@@ -20,8 +20,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :delcommand"
  */
 @ExCommand(command = "delc[ommand]")
-data class DelCmdCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class DelCmdCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (!injector.commandGroup.hasAlias(argument)) {
       injector.messages.showStatusBarMessage(editor, injector.messages.message("e184.no.such.user.defined.command.0", argument))

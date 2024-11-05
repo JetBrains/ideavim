@@ -657,7 +657,7 @@ abstract class VimNoWriteActionTestCase {
   fun assertNoMapping(from: String, modes: Set<MappingMode>) {
     val keys = injector.parser.parseKeys(from)
     for (mode in modes) {
-      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
+      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys], "Expected no mapping for $mode")
     }
   }
 

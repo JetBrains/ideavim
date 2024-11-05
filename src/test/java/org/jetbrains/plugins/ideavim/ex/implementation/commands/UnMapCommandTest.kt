@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
@@ -65,5 +66,43 @@ class UnMapCommandTest : VimTestCase() {
     typeText(commandToKeys("unmap jk"))
 
     assertMappingExists("jk", "<Esc>", MappingMode.I)
+  }
+
+  @Test
+  fun `test removing IC mapping`() {
+    putMapping(MappingMode.IC, "foo", "bar", false)
+    putMapping(MappingMode.IC, "quux", "baz", false)
+    putMapping(MappingMode.N, "foo", "bar", false)
+
+    // We've just mapped "foo" to "bar" in Command-line mode. We can't type it directly!
+    // And enterCommand doesn't parse special keys!
+    typeText(injector.parser.parseKeys(":unmap! fox<BS>o<CR>"))
+
+    assertNoMapping("foo", MappingMode.IC)
+    assertMappingExists("quux", "baz", MappingMode.IC)
+    assertMappingExists("foo", "bar", MappingMode.N)
+  }
+
+  @Test
+  fun `test removing IC mapping with abbreviated command`() {
+    putMapping(MappingMode.IC, "foo", "bar", false)
+    putMapping(MappingMode.IC, "quux", "baz", false)
+    putMapping(MappingMode.N, "foo", "bar", false)
+
+    // We've just mapped "foo" to "bar" in Command-line mode. We can't type it directly!
+    // And enterCommand doesn't parse special keys!
+    typeText(injector.parser.parseKeys(":unmap! fox<BS>o<CR>"))
+
+    assertNoMapping("foo", MappingMode.IC)
+    assertMappingExists("quux", "baz", MappingMode.IC)
+    assertMappingExists("foo", "bar", MappingMode.N)
+  }
+
+  @Test
+  fun `test error using bang with unmap commands`() {
+    enterCommand("vunmap! foo")
+
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E477: No ! allowed")
   }
 }

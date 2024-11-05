@@ -32,7 +32,9 @@ import org.jetbrains.annotations.NonNls
  * @author John Weigel
  */
 @ExCommand(command = "ls,files,buffers")
-internal data class BufferListCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+internal data class BufferListCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier) {
+
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   companion object {

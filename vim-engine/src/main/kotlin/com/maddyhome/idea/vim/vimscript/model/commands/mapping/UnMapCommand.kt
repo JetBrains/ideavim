@@ -14,12 +14,16 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "unm[ap],nun[map],vu[nmap],xu[nmap],sunm[ap],ou[nmap],unm[ap],iu[nmap],lu[nmap],cu[nmap]")
-data class UnMapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
+@ExCommand(command = "unm[ap],nun[map],vu[nmap],xu[nmap],sunm[ap],ou[nmap],iu[nmap],lu[nmap],cu[nmap]")
+data class UnMapCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -27,7 +31,12 @@ data class UnMapCommand(val range: Range, val argument: String, val cmd: String)
   }
 
   private fun executeCommand(): Boolean {
-    val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) } ?: return false
+    val bang = modifier == CommandModifier.BANG
+    val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) && it.bang == bang }
+    if (commandInfo == null) {
+      if (modifier == CommandModifier.BANG) throw exExceptionMessage("E477")  // E477: No ! allowed
+      return false
+    }
 
     if (argument.isEmpty()) return false
 
@@ -40,7 +49,9 @@ data class UnMapCommand(val range: Range, val argument: String, val cmd: String)
 
   companion object {
     private val COMMAND_INFOS = arrayOf(
+      // TODO: Support lunmap
       CommandInfo("unm", "ap", MappingMode.NVO, false),
+      CommandInfo("unm", "ap", MappingMode.IC, false, bang = true),
       CommandInfo("nun", "map", MappingMode.N, false),
       CommandInfo("vu", "nmap", MappingMode.V, false),
       CommandInfo("xu", "nmap", MappingMode.X, false),

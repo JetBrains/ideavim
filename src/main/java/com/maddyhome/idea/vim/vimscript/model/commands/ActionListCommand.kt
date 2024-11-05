@@ -24,7 +24,9 @@ import java.util.*
  * @author smartbomb
  */
 @ExCommand(command = "actionl[ist]")
-internal data class ActionListCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+internal data class ActionListCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier) {
+
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

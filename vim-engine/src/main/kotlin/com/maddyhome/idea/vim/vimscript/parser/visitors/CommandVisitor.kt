@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.parser.generated.VimscriptParser.RangeContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.RangeOffsetContext
 import com.maddyhome.idea.vim.vimscript.model.commands.CallCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 import com.maddyhome.idea.vim.vimscript.model.commands.DelfunctionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ExecuteCommand
@@ -174,34 +175,38 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   override fun visitCommandWithComment(ctx: VimscriptParser.CommandWithCommentContext): Command {
     val ranges = parseRange(ctx.range())
     val commandName = ctx.name.text
+    val modifier = if (ctx.bangModifier != null) CommandModifier.BANG else CommandModifier.NONE
     val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
-    return createCommandByCommandContext(ranges, argument, commandName, ctx)
+    return createCommandByCommandContext(ranges, commandName, modifier, argument, ctx)
   }
 
   override fun visitCommandWithoutComments(ctx: VimscriptParser.CommandWithoutCommentsContext): Command {
     val ranges = parseRange(ctx.range())
     val commandName = ctx.name.text
+    val modifier = if (ctx.bangModifier != null) CommandModifier.BANG else CommandModifier.NONE
     val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
-    return createCommandByCommandContext(ranges, argument, commandName, ctx)
+    return createCommandByCommandContext(ranges, commandName, modifier, argument, ctx)
   }
 
   override fun visitCommandWithBars(ctx: VimscriptParser.CommandWithBarsContext): Command {
     val ranges = parseRange(ctx.range())
     val commandName = ctx.name.text
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
-    return createCommandByCommandContext(ranges, argument, commandName, ctx)
+    val modifier = if (ctx.bangModifier != null) CommandModifier.BANG else CommandModifier.NONE
+    return createCommandByCommandContext(ranges, commandName, modifier, argument, ctx)
   }
 
-  private fun createCommandByCommandContext(range: Range, argument: String, commandName: String, ctx: ParserRuleContext): Command {
+  private fun createCommandByCommandContext(range: Range, commandName: String, modifier: CommandModifier, argument: String, ctx: ParserRuleContext): Command {
     val command = when (getCommandByName(commandName)) {
-      MapCommand::class -> MapCommand(range, argument, commandName)
-      MapClearCommand::class -> MapClearCommand(range, argument, commandName)
-      UnMapCommand::class -> UnMapCommand(range, argument, commandName)
+      MapCommand::class -> MapCommand(range, commandName, modifier, argument)
+      MapClearCommand::class -> MapClearCommand(range, commandName, modifier, argument)
+      UnMapCommand::class -> UnMapCommand(range, commandName, modifier, argument)
       GlobalCommand::class -> {
         if (commandName.startsWith("v")) {
-          GlobalCommand(range, argument, true)
+          GlobalCommand(range, modifier, argument, true)
         } else {
-          if (argument.startsWith("!")) GlobalCommand(range, argument.substring(1), true) else GlobalCommand(range, argument, false)
+          val inverse = modifier == CommandModifier.BANG
+          GlobalCommand(range, modifier, argument, inverse)
         }
       }
       SplitCommand::class -> {
@@ -212,7 +217,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
         }
       }
       SubstituteCommand::class -> SubstituteCommand(range, argument, commandName)
-      else -> getCommandByName(commandName).primaryConstructor!!.call(range, argument)
+      else -> getCommandByName(commandName).primaryConstructor!!.call(range, modifier, argument)
     }
     command.rangeInScript = ctx.getTextRange()
     return command
@@ -257,6 +262,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   override fun visitOtherCommand(ctx: OtherCommandContext): Command {
     val range: Range = parseRange(ctx.range())
     val name = ctx.commandName().text
+    val modifier = if (ctx.bangModifier == null) CommandModifier.NONE else CommandModifier.BANG
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
 
     val alphabeticPart = name.split(Regex("\\P{Alpha}"))[0]
@@ -266,9 +272,13 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       return command
     }
     val commandConstructor = getCommandByName(name).constructors
-      .filter { it.parameters.size == 2 }
-      .firstOrNull { it.parameters[0].type == Range::class.createType() && it.parameters[1].type == String::class.createType() }
-    val command = commandConstructor?.call(range, argument) ?: UnknownCommand(range, name, argument)
+      .filter { it.parameters.size == 3 }
+      .firstOrNull {
+        it.parameters[0].type == Range::class.createType()
+          && it.parameters[1].type == CommandModifier::class.createType()
+          && it.parameters[2].type == String::class.createType()
+      }
+    val command = commandConstructor?.call(range, modifier, argument) ?: UnknownCommand(range, name, modifier, argument)
     command.rangeInScript = ctx.getTextRange()
     return command
   }

@@ -50,7 +50,7 @@ data class LetCommand(
   val operator: AssignmentOperator,
   val expression: Expression,
   val isSyntaxSupported: Boolean,
-) : Command.SingleExecution(range) {
+) : Command.SingleExecution(range, CommandModifier.NONE) {
 
   private companion object {
     private val logger = vimLogger<LetCommand>()
@@ -103,7 +103,7 @@ data class LetCommand(
             }
             if (valueToStore is VimFuncref && !valueToStore.isSelfFixed &&
               valueToStore.handler is DefinedFunctionHandler &&
-              (valueToStore.handler as DefinedFunctionHandler).function.flags.contains(FunctionFlag.DICT)
+              valueToStore.handler.function.flags.contains(FunctionFlag.DICT)
             ) {
               valueToStore = valueToStore.copy()
               valueToStore.dictionary = containerValue
