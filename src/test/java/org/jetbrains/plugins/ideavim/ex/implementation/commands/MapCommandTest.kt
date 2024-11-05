@@ -124,12 +124,12 @@ class MapCommandTest : VimTestCase() {
   }
 
   private fun addTestMaps() {
-    // TODO: Support smap and lmap
+    // TODO: Support lmap
     enterCommand("map all foo") // NVO
     enterCommand("nmap normal foo")
     enterCommand("imap insert foo")
     enterCommand("vmap visual+select foo")  // V -> Visual+Select
-//    enterCommand("smap select foo") // TODO: Support smap
+    enterCommand("smap select foo")
     enterCommand("xmap visual foo")
     enterCommand("omap op-pending foo")
     enterCommand("map! insert+cmdline foo") // IC
@@ -151,6 +151,7 @@ class MapCommandTest : VimTestCase() {
         |   all           foo
         |n  normal        foo
         |o  op-pending    foo
+        |s  select        foo
         |x  visual        foo
         |v  visual+select   foo
       """.trimMargin()
@@ -182,6 +183,7 @@ class MapCommandTest : VimTestCase() {
     assertExOutput(
       """
         |   all           foo
+        |s  select        foo
         |x  visual        foo
         |v  visual+select   foo
       """.trimMargin()
@@ -189,7 +191,6 @@ class MapCommandTest : VimTestCase() {
   }
 
   @Test
-  @Disabled("smap not yet supported")
   fun `test output of smap shows maps for Select mode`() {
     configureByText("\n")
     addTestMaps()
@@ -320,6 +321,7 @@ class MapCommandTest : VimTestCase() {
         |noxall           foo
         |n  normal        foo
         |o  op-pending    foo
+        |s  select        foo
         |x  visual        foo
         |v  visual+select   foo
       """.trimMargin()
@@ -339,6 +341,7 @@ class MapCommandTest : VimTestCase() {
         |no all           foo
         |n  normal        foo
         |o  op-pending    foo
+        |s  select        foo
         |x  visual        foo
         |v  visual+select   foo
       """.trimMargin()
