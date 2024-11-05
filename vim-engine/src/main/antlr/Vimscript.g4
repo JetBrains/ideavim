@@ -692,6 +692,7 @@ MAP_CLEAR:              ('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc
                     |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lea')
                     |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lear');
 MAP:                    'map'
+                    |   'smap'
                     |   'nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm'
                     |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm') 'a')
                     |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm') 'ap')
@@ -701,7 +702,8 @@ MAP:                    'map'
                     |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 're')
                     |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'rem')
                     |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'rema')
-                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'remap');
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'remap')
+                    |   ('snor' | 'snore' | 'snorem' | 'snorema' | 'snoremap');
 UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu'
                     |   'vun' | 'xun' | 'oun' | 'iun' | 'cun'
                     |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm'

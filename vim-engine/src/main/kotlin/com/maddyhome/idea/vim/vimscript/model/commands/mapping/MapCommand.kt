@@ -148,22 +148,24 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
 
   companion object {
     private val COMMAND_INFOS = arrayOf(
-      // TODO: Support smap, lmap
+      // TODO: Support lmap
       CommandInfo("map", "", MappingMode.NVO, true),
       CommandInfo("map", "", MappingMode.IC, true, bang = true),
       CommandInfo("nm", "ap", MappingMode.N, true),
       CommandInfo("vm", "ap", MappingMode.V, true),
       CommandInfo("xm", "ap", MappingMode.X, true),
+      CommandInfo("smap", "", MappingMode.S, true),
       CommandInfo("om", "ap", MappingMode.O, true),
       CommandInfo("im", "ap", MappingMode.I, true),
       CommandInfo("cm", "ap", MappingMode.C, true),
 
-      // TODO: Support snoremap, noremap!, lnoremap
+      // TODO: Support lnoremap
       CommandInfo("no", "remap", MappingMode.NVO, false),
       CommandInfo("no", "remap", MappingMode.IC, false, bang = true),
       CommandInfo("nn", "oremap", MappingMode.N, false),
       CommandInfo("vn", "oremap", MappingMode.V, false),
       CommandInfo("xn", "oremap", MappingMode.X, false),
+      CommandInfo("snor", "emap", MappingMode.S, false),
       CommandInfo("ono", "remap", MappingMode.O, false),
       CommandInfo("ino", "remap", MappingMode.I, false),
       CommandInfo("cno", "remap", MappingMode.C, false),
