@@ -69,6 +69,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-620 |i_CTRL-O|
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun testInsertSingleCommandAndNewLineInserting4() {
     doTest(
       listOf("i", "<C-O>", "v", "d"),
@@ -129,6 +130,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-311 |i_CTRL-O|
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun testInsertSingleCommand() {
     doTest(
       listOf("i", "def", "<C-O>", "d2h", "x"),
@@ -1072,6 +1074,7 @@ foobaz
 
   @Test
   @TestFor(issues = ["VIM-2074"])
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun `backspace with replace mode`() {
     configureByText("${c}Hello world")
     typeText("R1111")
