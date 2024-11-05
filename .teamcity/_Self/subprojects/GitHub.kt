@@ -1,6 +1,5 @@
 package _Self.subprojects
 
-import _Self.Constants
 import _Self.IdeaVimBuildType
 import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -25,7 +24,6 @@ class GithubBuildType(command: String, desc: String) : IdeaVimBuildType({
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", Constants.GITHUB_TESTS)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 

@@ -5,7 +5,6 @@ object Constants {
   const val EAP_CHANNEL = "eap"
   const val DEV_CHANNEL = "Dev"
 
-  const val GITHUB_TESTS = "2024.1.1"
   const val NVIM_TESTS = "2024.1.1"
   const val PROPERTY_TESTS = "2024.1.1"
   const val LONG_RUNNING_TESTS = "2024.1.1"
