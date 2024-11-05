@@ -38,21 +38,29 @@ import kotlin.math.ceil
  * see "h :set"
  */
 @ExCommand(command = "se[t]")
-data class SetCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
+data class SetCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  SetCommandBase(range, modifier, argument) {
+
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.EFFECTIVE(editor)
 }
 
 @ExCommand(command = "setg[lobal]")
-data class SetglobalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
+data class SetglobalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  SetCommandBase(range, modifier, argument) {
+
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.GLOBAL(editor)
 }
 
 @ExCommand(command = "setl[ocal]")
-data class SetlocalCommand(val range: Range, val argument: String) : SetCommandBase(range, argument) {
+data class SetlocalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  SetCommandBase(range, modifier, argument) {
+
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.LOCAL(editor)
 }
 
-abstract class SetCommandBase(range: Range, argument: String) : Command.SingleExecution(range, argument) {
+abstract class SetCommandBase(range: Range, modifier: CommandModifier, argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
@@ -61,7 +69,7 @@ abstract class SetCommandBase(range: Range, argument: String) : Command.SingleEx
     context: ExecutionContext,
     operatorArguments: OperatorArguments
   ): ExecutionResult {
-    parseOptionLine(editor, context, commandArgument, getScope(editor))
+    parseOptionLine(editor, context, commandModifier, commandArgument, getScope(editor))
     return ExecutionResult.Success
   }
 
@@ -90,14 +98,19 @@ abstract class SetCommandBase(range: Range, argument: String) : Command.SingleEx
  *    the first error, such as an unknown option or an incorrectly formatted operation.
  *
  * @param editor    The editor the command was entered for, null if no editor - reading .ideavimrc
- * @param args      The raw text passed to the `:set` command
+ * @param argument      The raw text passed to the `:set` command
  * @throws ExException Thrown if any option names or operations are incorrect
  */
-fun parseOptionLine(editor: VimEditor, context: ExecutionContext, args: String, scope: OptionAccessScope) {
+fun parseOptionLine(
+  editor: VimEditor,
+  context: ExecutionContext,
+  commandModifier: CommandModifier,
+  argument: String,
+  scope: OptionAccessScope
+) {
   val optionGroup = injector.optionGroup
 
-  val columnFormat = args.startsWith("!")
-  val argument = args.removePrefix("!").trimStart()
+  val columnFormat = commandModifier == CommandModifier.BANG
 
   when {
     argument.isEmpty() -> {

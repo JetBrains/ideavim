@@ -64,7 +64,7 @@ finallyBlock:           (WS | COLON)* FINALLY WS* ((inline_comment NEW_LINE) | (
 ;
 
 functionDefinition:
-                        (WS | COLON)* FUNCTION (replace = EXCLAMATION)? WS+ (SID | SNR)? (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? (functionName | (literalDictionaryKey (DOT literalDictionaryKey)+)) WS* L_PAREN WS* argumentsDeclaration WS* R_PAREN WS* (functionFlag WS*)* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
+                        (WS | COLON)* FUNCTION (replace = BANG)? WS+ (SID | SNR)? (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? (functionName | (literalDictionaryKey (DOT literalDictionaryKey)+)) WS* L_PAREN WS* argumentsDeclaration WS* R_PAREN WS* (functionFlag WS*)* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
                             blockMember*
                         (WS | COLON)* ENDFUNCTION WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
 ;
@@ -92,7 +92,7 @@ command:
     (WS | COLON)* range? (WS | COLON)* ECHO (WS* expr)* WS* (NEW_LINE | BAR)+
     #EchoCommand|
 
-    (WS | COLON)* range? (WS | COLON)* DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
+    (WS | COLON)* range? (WS | COLON)* DELF (replace = BANG)? WS+ (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #DelfunctionCommand|
 
     (WS | COLON)* range? (WS | COLON)* CALL WS+ expr WS* ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
@@ -124,6 +124,7 @@ command:
         | T_LOWERCASE | COPY | CMD_CLEAR | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
         | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR | PACKADD | TABMOVE
       )
+      bangModifier = BANG?
     WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR)) (NEW_LINE | BAR)*
     #CommandWithComment|
 
@@ -131,17 +132,19 @@ command:
       name = (
         MAP | MAP_CLEAR | UNMAP | SORT | REGISTERS | CMD | H_LOWERCASE | HELP | NORMAL
       )
+      bangModifier = BANG?
     WS* commandArgumentWithoutBars? (NEW_LINE | BAR)+
     #CommandWithoutComments|
 
     (WS | COLON)* range? (WS | COLON)*
       name = (
-        G_LOWERCASE | GLOBAL | V_LOWERCASE | V_GLOBAL | S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND | EXCLAMATION
+        G_LOWERCASE | GLOBAL | V_LOWERCASE | V_GLOBAL | S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND | BANG
       )
+      bangModifier = BANG?
     WS* commandArgumentWithBars? NEW_LINE+
     #CommandWithBars|
 
-    (WS | COLON)* range? (WS | COLON)* commandName WS* commandArgumentWithBars? (NEW_LINE | BAR)+
+    (WS | COLON)* range? (WS | COLON)* commandName (bangModifier = BANG?) WS* commandArgumentWithBars? (NEW_LINE | BAR)+
     #OtherCommand
 ;
 commandArgumentWithBars: ~(NEW_LINE)+;
@@ -208,7 +211,7 @@ commandName:
     (LESS)+
 |   (GREATER)+
 |   anyCaseNameWithDigitsAndUnderscoresExceptKeywords
-|   commandName EXCLAMATION
+|   commandName (bang = BANG)
 ;
 
 
@@ -220,7 +223,7 @@ commandName:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 expr:
                         expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
-                    |   WS* EXCLAMATION WS* expr                                                                        #UnaryExpression
+                    |   WS* BANG WS* expr                                                                        #UnaryExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET                          #SublistExpression
                     |   expr WS* binaryOperator1 WS* expr                                                               #BinExpression1
                     |   expr WS* binaryOperator2 WS* expr                                                               #BinExpression2
@@ -728,7 +731,7 @@ IDENTIFIER_LOWERCASE:   [a-z]+;
 IDENTIFIER_ANY_CASE:    [a-zA-Z]+;
 
 // Unary operators
-EXCLAMATION:            '!';
+BANG:                   '!';
 
 // Punctuation
 L_PAREN:                '(';

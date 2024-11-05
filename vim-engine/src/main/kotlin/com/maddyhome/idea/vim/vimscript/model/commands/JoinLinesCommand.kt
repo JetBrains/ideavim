@@ -23,7 +23,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :join"
  */
 @ExCommand(command = "j[oin]")
-data class JoinLinesCommand(val range: Range, val argument: String) : Command.ForEachCaret(range, argument) {
+data class JoinLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String)
+  : Command.ForEachCaret(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
@@ -33,8 +35,7 @@ data class JoinLinesCommand(val range: Range, val argument: String) : Command.Fo
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val arg = argument
-    val spaces = arg.isEmpty() || arg[0] != '!'
+    val spaces = modifier != CommandModifier.BANG
 
     val lineRange = getLineRangeWithCount(editor, caret)
     val textRange = lineRange.toTextRange(editor)

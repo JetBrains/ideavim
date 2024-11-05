@@ -34,7 +34,7 @@ class MapClearCommandTest : VimTestCase() {
   fun testMapKtoJ() {
     putMapping(MappingMode.N, "k", "j", false)
 
-    typeText(commandToKeys("mapclear"))
+    enterCommand("mapclear")
 
     assertNoMapping("k")
   }
@@ -43,7 +43,7 @@ class MapClearCommandTest : VimTestCase() {
   fun `test mappings in insert mode`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 
-    typeText(commandToKeys("imapclear"))
+    enterCommand("imapclear")
 
     assertNoMapping("jk")
   }
@@ -53,9 +53,39 @@ class MapClearCommandTest : VimTestCase() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
     putMapping(MappingMode.N, "jk", "<Esc>", false)
 
-    typeText(commandToKeys("imapclear"))
+    enterCommand("imapclear")
 
     assertNoMapping("jk", MappingMode.I)
     assertMappingExists("jk", "<Esc>", MappingMode.N)
+  }
+
+  @Test
+  fun `test removing IC mappings`() {
+    putMapping(MappingMode.IC, "foo", "bar", false)
+    putMapping(MappingMode.N, "foo", "bar", false)
+
+    enterCommand("mapclear!")
+
+    assertNoMapping("foo", MappingMode.IC)
+    assertMappingExists("foo", "bar", MappingMode.N)
+  }
+
+  @Test
+  fun `test removing IC mappings with abbreviated command`() {
+    putMapping(MappingMode.IC, "foo", "bar", false)
+    putMapping(MappingMode.N, "foo", "bar", false)
+
+    enterCommand("mapc!")
+
+    assertNoMapping("foo", MappingMode.IC)
+    assertMappingExists("foo", "bar", MappingMode.N)
+  }
+
+  @Test
+  fun `test error using bang with mapclear commands`() {
+    enterCommand("cmapclear!")
+
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E477: No ! allowed")
   }
 }

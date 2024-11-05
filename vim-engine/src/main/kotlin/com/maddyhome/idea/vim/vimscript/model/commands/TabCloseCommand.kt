@@ -21,7 +21,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :tabclose"
  */
 @ExCommand(command = "tabc[lose]")
-data class TabCloseCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class TabCloseCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 

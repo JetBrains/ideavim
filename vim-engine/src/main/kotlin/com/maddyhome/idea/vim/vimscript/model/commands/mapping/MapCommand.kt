@@ -16,10 +16,12 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.SCRIPT
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -32,7 +34,9 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 @ExCommand(command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]")
-data class MapCommand(val range: Range, val argument: String, val cmd: String) : Command.SingleExecution(range, argument) {
+data class MapCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
@@ -42,7 +46,13 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
 
   @Throws(ExException::class)
   private fun executeCommand(editor: VimEditor?): Boolean {
-    val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) } ?: return false
+    val bang = modifier == CommandModifier.BANG
+    val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) && it.bang == bang }
+    if (commandInfo == null) {
+      if (modifier == CommandModifier.BANG) throw exExceptionMessage("E477") // E477: No ! allowed
+      return false
+    }
+
     val modes = commandInfo.mappingModes
 
     if (argument.isEmpty()) return editor != null && injector.keyGroup.showKeyMappings(modes, editor)
@@ -138,8 +148,9 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
 
   companion object {
     private val COMMAND_INFOS = arrayOf(
-      // TODO: Support smap, map!, lmap
+      // TODO: Support smap, lmap
       CommandInfo("map", "", MappingMode.NVO, true),
+      CommandInfo("map", "", MappingMode.IC, true, bang = true),
       CommandInfo("nm", "ap", MappingMode.N, true),
       CommandInfo("vm", "ap", MappingMode.V, true),
       CommandInfo("xm", "ap", MappingMode.X, true),
@@ -149,6 +160,7 @@ data class MapCommand(val range: Range, val argument: String, val cmd: String) :
 
       // TODO: Support snoremap, noremap!, lnoremap
       CommandInfo("no", "remap", MappingMode.NVO, false),
+      CommandInfo("no", "remap", MappingMode.IC, false, bang = true),
       CommandInfo("nn", "oremap", MappingMode.N, false),
       CommandInfo("vn", "oremap", MappingMode.V, false),
       CommandInfo("xn", "oremap", MappingMode.X, false),

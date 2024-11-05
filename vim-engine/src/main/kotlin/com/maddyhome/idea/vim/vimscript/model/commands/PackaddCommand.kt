@@ -21,11 +21,13 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // Currently support only matchit
 @ExCommand(command = "pa[ckadd]")
-class PackaddCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+class PackaddCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    if (argument == "matchit" || (argument.startsWith("!") && argument.drop(1).trim() == "matchit")) {
+    if (argument == "matchit") {
       val option = injector.optionGroup.getOption("matchit") as ToggleOption
       injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL(editor))
     }

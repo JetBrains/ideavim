@@ -24,7 +24,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :yank"
  */
 @ExCommand(command = "y[ank]")
-data class YankLinesCommand(val range: Range, var argument: String) : Command.SingleExecution(range, argument) {
+data class YankLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)

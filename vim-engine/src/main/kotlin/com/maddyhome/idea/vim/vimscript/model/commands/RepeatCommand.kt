@@ -22,7 +22,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :@"
  */
 @ExCommand(command = "@")
-data class RepeatCommand(val range: Range, val argument: String) : Command.ForEachCaret(range, argument) {
+data class RepeatCommand(val range: Range, val modifier: CommandModifier, val argument: String)
+  : Command.ForEachCaret(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED)
 
   private var lastArg = ':'

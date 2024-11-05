@@ -26,7 +26,9 @@ import java.util.*
  */
 // todo make it multicaret
 @ExCommand(command = "sor[t]")
-data class SortCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class SortCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   @Throws(ExException::class)
@@ -73,7 +75,7 @@ data class SortCommand(val range: Range, val argument: String) : Command.SingleE
     val pattern = patternRange?.let { arg.substring(it) }
     val flags = patternRange?.let { arg.removeRange(patternRange)} ?: arg
     return SortOption(
-      reverse = "!" in flags,
+      reverse = modifier == CommandModifier.BANG,
       ignoreCase = "i" in flags,
       numeric = "n" in flags,
       unique = "u" in flags,
@@ -83,7 +85,7 @@ data class SortCommand(val range: Range, val argument: String) : Command.SingleE
   }
 
   private fun extractPattern(arg: String): IntRange? {
-    val startIndex = arg.indexOf('/',)
+    val startIndex = arg.indexOf('/')
     val endIndex = arg.indexOf('/', startIndex + 2)
     if (startIndex >= 0 && endIndex >= 0) {
       return IntRange(startIndex + 1, endIndex - 1)

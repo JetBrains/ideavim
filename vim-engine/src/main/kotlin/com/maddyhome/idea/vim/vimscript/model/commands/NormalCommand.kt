@@ -23,7 +23,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // todo make it for each caret
 @ExCommand(command = "norm[al]")
-data class NormalCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class NormalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
@@ -32,12 +34,7 @@ data class NormalCommand(val range: Range, val argument: String) : Command.Singl
   )
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    var useMappings = true
-    var argument = argument
-    if (argument.startsWith("!")) {
-      useMappings = false
-      argument = argument.substring(1)
-    }
+    val useMappings = modifier != CommandModifier.BANG
 
     val rangeUsed = range.size() != 0
     when (editor.mode) {

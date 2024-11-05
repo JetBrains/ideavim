@@ -23,12 +23,14 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
  * see :h lockvar
  */
 @ExCommand(command = "lockv[ar]")
-class LockVarCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+class LockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val variableAndDepth = parseVariableAndDepth(argument)
+    val variableAndDepth = parseVariableAndDepth(modifier, argument)
     injector.variableService.lockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, vimContext)
     return ExecutionResult.Success
   }
@@ -38,31 +40,28 @@ class LockVarCommand(val range: Range, val argument: String) : Command.SingleExe
  * see :h unlockvar
  */
 @ExCommand(command = "unlo[ckvar]")
-class UnlockVarCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+class UnlockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val variableAndDepth = parseVariableAndDepth(argument)
+    val variableAndDepth = parseVariableAndDepth(modifier, argument)
     injector.variableService.unlockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, vimContext)
     return ExecutionResult.Success
   }
 }
 
-private fun parseVariableAndDepth(argument: String): Pair<Variable, Int> {
+private fun parseVariableAndDepth(modifier: CommandModifier, argument: String): Pair<Variable, Int> {
   val variable: String
-  var arg = argument
-  var depth = 2
-  if (arg.startsWith("!")) {
-    depth = 100
-    arg = arg.substring(1)
-  }
-  val splittedArg = arg.trim().split(" ")
-  when (splittedArg.size) {
-    1 -> variable = splittedArg[0]
+  var depth = if (modifier == CommandModifier.BANG) 100 else 2
+  val args = argument.trim().split(" ")
+  when (args.size) {
+    1 -> variable = args[0]
     2 -> {
-      depth = splittedArg[0].toIntOrNull() ?: 2
-      variable = splittedArg[1]
+      depth = args[0].toIntOrNull() ?: 2
+      variable = args[1]
     }
     else -> throw ExException("Unknown error during lockvar command execution")
   }

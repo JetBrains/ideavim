@@ -21,7 +21,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :tabmove"
  */
 @ExCommand(command = "tabm[ove]")
-data class TabMoveCommand(val range: Range, var argument: String) : Command.SingleExecution(range, argument) {
+data class TabMoveCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -35,7 +37,7 @@ data class TabMoveCommand(val range: Range, var argument: String) : Command.Sing
     val index: Int
 
     try {
-      argument = argument.trim()
+      var argument = argument.trim()
       if (argument == "+" || argument == "-") {
         argument += "1"
       }
@@ -60,7 +62,7 @@ data class TabMoveCommand(val range: Range, var argument: String) : Command.Sing
         if (number > currentIndex) number -= 1
         number
       }
-    } catch (e: NumberFormatException) {
+    } catch (_: NumberFormatException) {
       throw ExException("E474: Invalid argument")
     }
 

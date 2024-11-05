@@ -29,7 +29,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :!"
  */
 @ExCommand(command = "!")
-internal data class CmdFilterCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+internal data class CmdFilterCommand(val range: Range, val modifier: CommandModifier, val argument: String)
+  : Command.SingleExecution(range, modifier) {
+
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -98,7 +100,7 @@ internal data class CmdFilterCommand(val range: Range, val argument: String) : C
         lastCommand = command
         ExecutionResult.Success
       }
-    } catch (e: ProcessCanceledException) {
+    } catch (_: ProcessCanceledException) {
       throw ExException("Command terminated")
     } catch (e: Exception) {
       throw ExException(e.message)

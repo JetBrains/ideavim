@@ -24,7 +24,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :command"
  */
 @ExCommand(command = "com[mand]")
-data class CmdCommand(val range: Range, val argument: String) : Command.SingleExecution(range) {
+data class CmdCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   private val unsupportedArgs = listOf(
@@ -41,8 +43,6 @@ data class CmdCommand(val range: Range, val argument: String) : Command.SingleEx
 
   // Static definitions needed for aliases.
   private companion object {
-    const val overridePrefix = "!"
-
     @VimNlsSafe
     const val argsPrefix = "-nargs"
 
@@ -50,6 +50,7 @@ data class CmdCommand(val range: Range, val argument: String) : Command.SingleEx
     const val zeroOrOneArguments = "?"
     const val moreThanZeroArguments = "+"
   }
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val result: Boolean = if (argument.trim().isEmpty()) {
       this.listAlias(editor, context, "")
@@ -75,10 +76,7 @@ data class CmdCommand(val range: Range, val argument: String) : Command.SingleEx
     var argument = argument.trim()
 
     // Handle overwriting of aliases
-    val overrideAlias = argument.startsWith(overridePrefix)
-    if (overrideAlias) {
-      argument = argument.removePrefix(overridePrefix).trim()
-    }
+    val overrideAlias = modifier == CommandModifier.BANG
 
     for ((arg, message) in unsupportedArgs) {
       val match = arg.find(argument)
@@ -160,11 +158,6 @@ data class CmdCommand(val range: Range, val argument: String) : Command.SingleEx
     }
 
     if (argument.isEmpty()) {
-      if (editor == null) {
-        // If there is no editor then we can't list aliases, just return false.
-        // No message should be shown either, since there is no editor.
-        return false
-      }
       return this.listAlias(editor, context, alias)
     }
 

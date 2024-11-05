@@ -21,12 +21,20 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :digraphs"
  */
 @ExCommand(command = "dig[raphs]")
-data class DigraphCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class DigraphCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val arg = argument
     logger.debug("arg=$arg")
+
+    if (argument.isEmpty()) {
+      val showHeaders = modifier == CommandModifier.BANG
+      injector.digraphGroup.showDigraphs(editor, showHeaders)
+      return ExecutionResult.Success
+    }
 
     return if (injector.digraphGroup.parseCommandLine(editor, arg)) ExecutionResult.Success else ExecutionResult.Error
   }

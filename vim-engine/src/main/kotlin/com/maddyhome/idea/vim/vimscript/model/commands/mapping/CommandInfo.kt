@@ -16,6 +16,7 @@ internal class CommandInfo(
   @NonNls suffix: String,
   val mappingModes: Set<MappingMode>,
   val isRecursive: Boolean,
+  val bang: Boolean = false,
 ) {
   val command = if (suffix.isBlank()) prefix else "$prefix[$suffix]"
 }

@@ -24,8 +24,11 @@ import java.net.URLEncoder
  * see "h :help"
  */
 @ExCommand(command = "h[elp]")
-internal data class HelpCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+internal data class HelpCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     BrowserUtil.browse(helpTopicUrl(argument))
     return ExecutionResult.Success
@@ -37,7 +40,7 @@ internal data class HelpCommand(val range: Range, val argument: String) : Comman
 
     return try {
       String.format("%s?docs=help&search=%s", HELP_QUERY_URL, URLEncoder.encode(topic, "UTF-8"))
-    } catch (e: UnsupportedEncodingException) {
+    } catch (_: UnsupportedEncodingException) {
       HELP_ROOT_URL
     }
   }

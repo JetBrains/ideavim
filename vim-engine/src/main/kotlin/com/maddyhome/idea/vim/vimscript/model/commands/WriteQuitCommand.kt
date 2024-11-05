@@ -20,8 +20,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :exit"
  */
 @ExCommand(command = "wq,x[it],exi[t]")
-data class WriteQuitCommand(val range: Range, val argument: String) : Command.SingleExecution(range, argument) {
+data class WriteQuitCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
+
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     injector.file.saveFile(editor, context)
     injector.file.closeFile(editor, context)

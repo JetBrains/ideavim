@@ -28,7 +28,16 @@ import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
-sealed class Command(private val commandRange: Range, val commandArgument: String) : Executable {
+enum class CommandModifier {
+  NONE,
+  BANG
+}
+
+sealed class Command(
+  private val commandRange: Range,
+  protected val commandModifier: CommandModifier,
+  val commandArgument: String,
+) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
@@ -39,7 +48,8 @@ sealed class Command(private val commandRange: Range, val commandArgument: Strin
   private var nextArgumentTokenOffset = 0
   private val logger = vimLogger<Command>()
 
-  abstract class ForEachCaret(range: Range, argument: String = "") : Command(range, argument) {
+  abstract class ForEachCaret(range: Range, modifier: CommandModifier, argument: String = "") :
+    Command(range, modifier, argument) {
     abstract fun processCommand(
       editor: VimEditor,
       caret: VimCaret,
@@ -48,7 +58,8 @@ sealed class Command(private val commandRange: Range, val commandArgument: Strin
     ): ExecutionResult
   }
 
-  abstract class SingleExecution(range: Range, argument: String = "") : Command(range, argument) {
+  abstract class SingleExecution(range: Range, modifier: CommandModifier, argument: String = "") :
+    Command(range, modifier, argument) {
     abstract fun processCommand(
       editor: VimEditor,
       context: ExecutionContext,
@@ -123,6 +134,7 @@ sealed class Command(private val commandRange: Range, val commandArgument: Strin
 
   private fun validate(editor: VimEditor) {
     checkRanges(editor)
+    // TODO: Consider adding something like ModifiersFlag.BANG_ALLOWED with validation
     checkArgument()
   }
 
@@ -179,8 +191,9 @@ sealed class Command(private val commandRange: Range, val commandArgument: Strin
     RANGE_FORBIDDEN,
 
     /**
-     * Indicates that the command takes a count, not a range - effects default
-     * Works like RANGE_OPTIONAL
+     * Indicates that the command takes a count, not a range - affects the default value if range isn't specified
+     *
+     * Implies range is optional
      */
     RANGE_IS_COUNT,
   }
