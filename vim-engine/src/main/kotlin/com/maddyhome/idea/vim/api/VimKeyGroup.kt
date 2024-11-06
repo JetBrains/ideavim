@@ -61,8 +61,14 @@ interface VimKeyGroup {
   fun updateShortcutKeysRegistration()
   fun unregisterCommandActions()
   fun resetKeyMappings()
+
+  /**
+   * Returns true if there exists a mapping to the given left-hand side keystrokes
+   *
+   * Note that the Vim function `hasmapto()` can accept a set of modes, and checks if any mapping _contains_ the given
+   * left-hand side mapping, rather than is a direct map. (It also handles abbreviations)
+   */
   fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
-  fun hasmapfrom(mode: MappingMode, fromKeys: List<KeyStroke>): Boolean
 
   val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
   val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>

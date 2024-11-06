@@ -326,7 +326,7 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
     VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(commandFromOriginalPlugin(keys)))
   }
   val filteredFromModes = mappingModes.filterNotTo(HashSet()) {
-    injector.keyGroup.hasmapfrom(it, fromKeys)
+    injector.keyGroup.getKeyMapping(it)[fromKeys] != null
   }
 
   val doubleFiltered = mappingModes
