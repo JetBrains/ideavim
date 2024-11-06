@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
-import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -59,9 +58,7 @@ interface VimKeyGroup {
   fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
   fun showKeyMappings(modes: Set<MappingMode>, prefix: List<KeyStroke>, editor: VimEditor): Boolean
   fun getKeyMapping(mode: MappingMode): KeyMapping
-  fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>>
   fun updateShortcutKeysRegistration()
-  fun getMapTo(mode: MappingMode, toKeys: List<KeyStroke>): List<Pair<List<KeyStroke>, MappingInfo>>
   fun unregisterCommandActions()
   fun resetKeyMappings()
   fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
