@@ -38,13 +38,9 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     return null
   }
 
-  @Deprecated("Use get(List<KeyStroke>)")
-  operator fun get(keys: Iterable<KeyStroke>): MappingInfo? {
-    if (keys is List<KeyStroke>) {
-      return get(keys)
-    }
-    return get(keys.toList())
-  }
+  @Deprecated("Use get(List<KeyStroke>) to maintain the same lookup key type and avoid unnecessary wrapping")
+  operator fun get(keys: Iterable<KeyStroke>): MappingInfo? =
+    get(keys as? List<KeyStroke> ?: keys.toList())
 
   private fun getActionNameFromActionMapping(keys: List<KeyStroke>): String? {
     if (keys.size > 3

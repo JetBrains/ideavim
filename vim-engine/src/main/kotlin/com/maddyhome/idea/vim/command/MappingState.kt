@@ -35,6 +35,8 @@ class MappingState: Cloneable {
     --mapDepth
   }
 
+  // TODO: This should probably return List<KeyStroke> to match the keys we're using in KeyMapping
+  // Let's avoid creating temporary wrapper lists when we could use this list directly
   val keys: Iterable<KeyStroke>
     get() = keyList
   

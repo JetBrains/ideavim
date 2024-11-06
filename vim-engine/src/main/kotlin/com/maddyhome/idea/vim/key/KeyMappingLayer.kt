@@ -15,9 +15,13 @@ interface KeyMappingLayer {
   fun getLayer(keys: List<KeyStroke>): MappingInfoLayer?
 }
 
-internal fun KeyMappingLayer.isPrefix(keys: Iterable<KeyStroke>): Boolean {
-  if (keys is List<KeyStroke>) {
-    return isPrefix(keys)
-  }
-  return isPrefix(keys.toList())
-}
+// TODO: Migrate MappingState.keys to a List<KeyStroke> so that we can avoid creating wrapper lists and these helpers
+// We should use the same type for looking up key strokes in the trie as we at storing/exposing the current state.
+// Be careful when migrating - MappingState.keys is used externally, so would be expecting an Iterable<KeyStroke>
+@Deprecated("Use getLayer(List<KeyStroke>")
+internal fun KeyMappingLayer.getLayer(keys: Iterable<KeyStroke>): MappingInfoLayer? =
+  getLayer(keys as? List<KeyStroke> ?: keys.toList())
+
+@Deprecated("Use getLayer(List<KeyStroke>")
+internal fun KeyMappingLayer.isPrefix(keys: Iterable<KeyStroke>): Boolean =
+  isPrefix(keys as? List<KeyStroke> ?: keys.toList())

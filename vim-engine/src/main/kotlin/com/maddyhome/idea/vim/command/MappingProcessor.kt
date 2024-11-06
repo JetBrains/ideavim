@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfoLayer
+import com.maddyhome.idea.vim.key.getLayer
 import com.maddyhome.idea.vim.key.isPrefix
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
@@ -162,7 +163,7 @@ object MappingProcessor: KeyConsumer {
     log.trace("Processing complete mapping sequence...")
     // The current sequence isn't a prefix, check to see if it's a completed sequence.
     val mappingState = processBuilder.state.mappingState
-    val currentMappingInfo = mapping.getLayer(mappingState.keys.toList())
+    val currentMappingInfo = mapping.getLayer(mappingState.keys)
     var mappingInfo = currentMappingInfo
     if (mappingInfo == null) {
       log.trace("Haven't found any mapping info for the given sequence. Trying to apply mapping to a subsequence.")
