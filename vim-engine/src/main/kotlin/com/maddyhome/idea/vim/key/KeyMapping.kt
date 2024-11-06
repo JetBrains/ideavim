@@ -11,8 +11,26 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.key.KeyStrokeTrie.TrieNode
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import javax.swing.KeyStroke
+
+data class KeyMappingEntry(private val node: TrieNode<MappingInfo>) {
+  val mappingInfo = node.data!!
+
+  fun collectPath(path: MutableList<KeyStroke>): List<KeyStroke> {
+    path.clear()
+    var current: TrieNode<MappingInfo>? = node
+    while (current != null && current.parent != null) {
+      path.add(current.key)
+      current = current.parent
+    }
+    path.reverse()
+    return path
+  }
+
+  fun getPath() = buildList { collectPath(this) }
+}
 
 /**
  * Container for key mappings for some mode
@@ -23,8 +41,17 @@ import javax.swing.KeyStroke
 class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, KeyMappingLayer {
   private val keysTrie = KeyStrokeTrie<MappingInfo>(mode.name)
 
-  override fun iterator(): Iterator<List<KeyStroke>> = ArrayList(keysTrie.getAll().keys).iterator()
+  // Used by idea-which-key
+  @Deprecated(
+    "Use getAll to return a sequence that does not allocate a list of for all entries and a list for the keystrokes of each entry",
+    ReplaceWith("getAll()")
+  )
+  override fun iterator(): Iterator<List<KeyStroke>> =
+    keysTrie.getEntries().map { KeyMappingEntry(it).getPath() }.iterator()
 
+  /**
+   * Returns mapping info for the given key sequence, if any
+   */
   operator fun get(keys: List<KeyStroke>): MappingInfo? {
     keysTrie.getData(keys)?.let { return it }
 
@@ -90,46 +117,66 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     keysTrie.add(keys, mappingInfo)
   }
 
-  fun delete(owner: MappingOwner) {
-    getByOwner(owner).forEach { (keys, _) ->
-      keysTrie.remove(keys)
-    }
+  /**
+   * Delete all key sequences owned by the given owner
+   */
+  fun removeKeyMappingsByOwner(owner: MappingOwner) {
+    // Make a copy of the sequence, so we can modify it without exceptions
+    val toRemove = getAllByOwner(owner).toList()
+    val keys = mutableListOf<KeyStroke>()
+    toRemove.forEach { keysTrie.remove(it.collectPath(keys)) }
   }
 
-  fun delete(keys: List<KeyStroke>) {
+  /**
+   * Delete mapping info for the given key sequence
+   *
+   * If the key sequence is also a prefix, all child sequences are not modified
+   */
+  fun removeKeyMapping(keys: List<KeyStroke>) {
     keysTrie.remove(keys)
   }
 
-  fun delete() {
+  /**
+   * Clears all maps for this mapping mode
+   */
+  fun clear() {
     keysTrie.clear()
   }
 
-  fun getByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> =
-    buildList {
-      keysTrie.getAll().forEach { (keys, mappingInfo) ->
-        if (mappingInfo.owner == owner) {
-          add(Pair(keys, mappingInfo))
-        }
-      }
-    }
+  /**
+   * Return a sequence of all valid key sequences belonging to the given owner
+   */
+  fun getAllByOwner(owner: MappingOwner) =
+    keysTrie.getEntries().filter { it.data?.owner == owner }.map { KeyMappingEntry(it) }
 
+  /**
+   * Returns true if the given list of keystrokes is a prefix
+   *
+   * Used while handling unfinished mapping sequences. Note that a list of keystrokes that is both a key sequence and a
+   * prefix is treated as a prefix.
+   */
   override fun isPrefix(keys: List<KeyStroke>): Boolean {
     if (keys.isEmpty()) return false
-
     if (keysTrie.isPrefix(keys)) return true
 
-    val firstChar = keys.first().keyCode
-    val lastChar = keys.last().keyChar
-    return firstChar == injector.parser.actionKeyStroke.keyCode && lastChar != ')'
+    // Is this an incomplete RHS on-demand <Action>(...)?
+    return keys.first().keyCode == injector.parser.actionKeyStroke.keyCode && keys.last().keyChar != ')'
   }
 
-  fun getPrefixed(prefix: List<KeyStroke>): Map<List<KeyStroke>, MappingInfo> {
-    return keysTrie.getPrefixed(prefix)
-  }
+  /**
+   * Returns a sequence of all valid key sequences
+   *
+   * Does not return any prefixes.
+   */
+  fun getAll(prefix: List<KeyStroke>): Sequence<KeyMappingEntry> =
+    keysTrie.getEntries(prefix).map { KeyMappingEntry(it) }
 
-  fun hasmapto(toKeys: List<KeyStroke>) = keysTrie.getAll().any { (_, mappingInfo) ->
-    mappingInfo is ToKeysMappingInfo && mappingInfo.toKeys == toKeys
-  }
+  /**
+   * Returns true if there exists a mapping to keys that match the given key sequence
+   */
+  fun hasmapto(toKeys: List<KeyStroke>) =
+    keysTrie.getEntries().any { (it.data as? ToKeysMappingInfo)?.toKeys == toKeys }
 
+  // TODO: Do we need this as well as get()?
   override fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
 }

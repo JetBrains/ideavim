@@ -33,11 +33,11 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
 
   override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>) {
-    modes.map { getKeyMapping(it) }.forEach { it.delete(keys) }
+    modes.map { getKeyMapping(it) }.forEach { it.removeKeyMapping(keys) }
   }
 
   override fun removeKeyMapping(modes: Set<MappingMode>) {
-    modes.map { getKeyMapping(it) }.forEach { it.delete() }
+    modes.map { getKeyMapping(it) }.forEach { it.clear() }
   }
 
   override fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean {
@@ -192,7 +192,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun removeKeyMapping(owner: MappingOwner) {
-    MappingMode.entries.map { getKeyMapping(it) }.forEach { it.delete(owner) }
+    MappingMode.entries.map { getKeyMapping(it) }.forEach { it.removeKeyMappingsByOwner(owner) }
     unregisterKeyMapping(owner)
   }
 
