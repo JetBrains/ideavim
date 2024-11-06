@@ -29,6 +29,9 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.key.MappingInfo
+import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -39,6 +42,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import javax.swing.KeyStroke
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -117,63 +122,72 @@ class OpMappingTest : VimTestCase() {
   @Test
   fun `test disable extension via set`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I$c found it in a legendary land")
 
     enterCommand("set TestExtension")
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I ${c}found it in a legendary land")
   }
 
   @Test
   fun `test disable extension as extension point`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I$c found it in a legendary land")
 
     Disposer.dispose(disposable)
     disposable = Disposer.newDisposable()
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
-    typeText(injector.parser.parseKeys("Q"))
+    assertEmpty(getKeyMappingByOwner(extension.instance.owner))
+    typeText("Q")
     assertState("I$c found it in a legendary land")
 
     VimExtension.EP_NAME.point.registerExtension(extension, disposable)
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
+    assertEmpty(getKeyMappingByOwner(extension.instance.owner))
     enableExtensions("TestExtension")
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I ${c}found it in a legendary land")
+  }
+
+  private fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<String, MappingInfo>> {
+    return MappingMode.entries
+      .map { VimPlugin.getKey().getKeyMapping(it) }
+      .flatMap { it.getByOwner(owner) }
+      .map {
+        injector.parser.toKeyNotation(it.first) to it.second
+      }
   }
 
   @Test
   fun `test disable disposed extension`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
     Disposer.dispose(disposable)
     disposable = Disposer.newDisposable()
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I$c found it in a legendary land")
 
     VimExtension.EP_NAME.point.registerExtension(extension, disposable)
     enableExtensions("TestExtension")
-    typeText(injector.parser.parseKeys("Q"))
+    typeText("Q")
     assertState("I ${c}found it in a legendary land")
   }
 
   @Test
   fun `test delayed action`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(injector.parser.parseKeys("R"))
+    typeText("R")
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I fou${c}nd it in a legendary land")
 
-    typeText(injector.parser.parseKeys("dR"))
+    typeText("dR")
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I fou$c in a legendary land")
   }
@@ -184,11 +198,11 @@ class OpMappingTest : VimTestCase() {
   @Test
   fun `test delayed incorrect action`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(injector.parser.parseKeys("E"))
+    typeText("E")
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I fou${c}nd it in a legendary land")
 
-    typeText(injector.parser.parseKeys("dE"))
+    typeText("dE")
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I found it$c in a legendary land")
   }
@@ -267,13 +281,21 @@ class PlugMissingKeysTest : VimTestCase() {
     )
 
     // Mapping to Z was override by the mapping to myKey
-    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
-    kotlin.test.assertEquals(1, keyMappings.size)
-    kotlin.test.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
+    val normalMaps = getMapFromRhs(MappingMode.NORMAL, "<Plug>TestMissing")
+    assertEquals(1, normalMaps.size)
+    assertEquals(injector.parser.parseKeys("myKey"), normalMaps.first())
 
-    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, injector.parser.parseKeys("<Plug>TestMissing"))
-    kotlin.test.assertEquals(1, iKeyMappings.size)
-    kotlin.test.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
+    val insertMaps = getMapFromRhs(MappingMode.INSERT, "<Plug>TestMissing")
+    assertEquals(1, insertMaps.size)
+    assertEquals(injector.parser.parseKeys("L"), insertMaps.first())
+  }
+
+  private fun getMapFromRhs(mode: MappingMode, rhs: String): List<List<KeyStroke>> {
+    val toKeys = injector.parser.parseKeys(rhs)
+    val mapping = injector.keyGroup.getKeyMapping(mode)
+    return mapping.filter { strokes ->
+      (mapping[strokes] as? ToKeysMappingInfo)?.let { it.toKeys == toKeys } == true
+    }
   }
 
   @Test
@@ -284,13 +306,13 @@ class PlugMissingKeysTest : VimTestCase() {
     )
 
     // Mapping to Z was override by the mapping to myKey
-    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
-    kotlin.test.assertEquals(1, keyMappings.size)
-    kotlin.test.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
+    val normalMaps = getMapFromRhs(MappingMode.NORMAL, "<Plug>TestMissing")
+    assertEquals(1, normalMaps.size)
+    assertEquals(injector.parser.parseKeys("myKey"), normalMaps.first())
 
-    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, injector.parser.parseKeys("<Plug>TestMissing"))
-    kotlin.test.assertEquals(1, iKeyMappings.size)
-    kotlin.test.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
+    val insertMaps = getMapFromRhs(MappingMode.INSERT, "<Plug>TestMissing")
+    assertEquals(1, insertMaps.size)
+    assertEquals(injector.parser.parseKeys("L"), insertMaps.first())
   }
 
   @Test

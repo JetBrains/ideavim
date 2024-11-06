@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
-import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
@@ -170,10 +169,6 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   private var identityChecker: MutableMap<MappingMode, MutableSet<MutableList<KeyStroke>>>? = null
   private var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
 
-  override fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> {
-    return MappingMode.entries.map { getKeyMapping(it) }.flatMap { it.getByOwner(owner) }
-  }
-
   private fun registerKeyMapping(fromKeys: List<KeyStroke>, owner: MappingOwner) {
     val oldSize = requiredShortcutKeys.size
     for (key in fromKeys) {
@@ -237,10 +232,6 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   ) {
     modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, owner, modes, extensionHandler, recursive) }
     registerKeyMapping(fromKeys, owner)
-  }
-
-  override fun getMapTo(mode: MappingMode, toKeys: List<KeyStroke>): List<Pair<List<KeyStroke>, MappingInfo>> {
-    return getKeyMapping(mode).getMapTo(toKeys)
   }
 
   override fun unregisterCommandActions() {

@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
 /**
@@ -137,12 +136,6 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   }
 
   fun hasmapfrom(fromKeys: List<KeyStroke>) = keysTrie.getData(fromKeys) != null
-
-  @TestOnly
-  fun getMapTo(toKeys: List<KeyStroke?>) =
-    keysTrie.getAll().filter { (_, mappingInfo) ->
-      mappingInfo is ToKeysMappingInfo && mappingInfo.toKeys == toKeys
-    }.map { it.toPair() }
 
   override fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
 }
