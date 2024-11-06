@@ -41,14 +41,6 @@ data class KeyMappingEntry(private val node: TrieNode<MappingInfo>) {
 class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, KeyMappingLayer {
   private val keysTrie = KeyStrokeTrie<MappingInfo>(mode.name)
 
-  // Used by idea-which-key
-  @Deprecated(
-    "Use getAll to return a sequence that does not allocate a list of for all entries and a list for the keystrokes of each entry",
-    ReplaceWith("getAll()")
-  )
-  override fun iterator(): Iterator<List<KeyStroke>> =
-    keysTrie.getEntries().map { KeyMappingEntry(it).getPath() }.iterator()
-
   /**
    * Returns mapping info for the given key sequence, if any
    */
@@ -64,6 +56,9 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
 
     return null
   }
+
+  // TODO: Do we need this as well as get()?
+  override fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
 
   @Deprecated("Use get(List<KeyStroke>) to maintain the same lookup key type and avoid unnecessary wrapping")
   operator fun get(keys: Iterable<KeyStroke>): MappingInfo? =
@@ -81,6 +76,28 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     }
     return null
   }
+
+  // Used by idea-which-key
+  @Deprecated(
+    "Use getAll to return a sequence that does not allocate a list of for all entries and a list for the keystrokes of each entry",
+    ReplaceWith("getAll()")
+  )
+  override fun iterator(): Iterator<List<KeyStroke>> =
+    keysTrie.getEntries().map { KeyMappingEntry(it).getPath() }.iterator()
+
+  /**
+   * Returns a sequence of all valid key sequences
+   *
+   * Does not return any prefixes.
+   */
+  fun getAll(prefix: List<KeyStroke>): Sequence<KeyMappingEntry> =
+    keysTrie.getEntries(prefix).map { KeyMappingEntry(it) }
+
+  /**
+   * Return a sequence of all valid key sequences belonging to the given owner
+   */
+  fun getAllByOwner(owner: MappingOwner) =
+    keysTrie.getEntries().filter { it.data?.owner == owner }.map { KeyMappingEntry(it) }
 
   fun put(
     fromKeys: List<KeyStroke>,
@@ -118,6 +135,15 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   }
 
   /**
+   * Delete mapping info for the given key sequence
+   *
+   * If the key sequence is also a prefix, all child sequences are not modified
+   */
+  fun removeKeyMapping(keys: List<KeyStroke>) {
+    keysTrie.remove(keys)
+  }
+
+  /**
    * Delete all key sequences owned by the given owner
    */
   fun removeKeyMappingsByOwner(owner: MappingOwner) {
@@ -128,26 +154,11 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   }
 
   /**
-   * Delete mapping info for the given key sequence
-   *
-   * If the key sequence is also a prefix, all child sequences are not modified
-   */
-  fun removeKeyMapping(keys: List<KeyStroke>) {
-    keysTrie.remove(keys)
-  }
-
-  /**
    * Clears all maps for this mapping mode
    */
   fun clear() {
     keysTrie.clear()
   }
-
-  /**
-   * Return a sequence of all valid key sequences belonging to the given owner
-   */
-  fun getAllByOwner(owner: MappingOwner) =
-    keysTrie.getEntries().filter { it.data?.owner == owner }.map { KeyMappingEntry(it) }
 
   /**
    * Returns true if the given list of keystrokes is a prefix
@@ -164,19 +175,8 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   }
 
   /**
-   * Returns a sequence of all valid key sequences
-   *
-   * Does not return any prefixes.
-   */
-  fun getAll(prefix: List<KeyStroke>): Sequence<KeyMappingEntry> =
-    keysTrie.getEntries(prefix).map { KeyMappingEntry(it) }
-
-  /**
    * Returns true if there exists a mapping to keys that match the given key sequence
    */
   fun hasmapto(toKeys: List<KeyStroke>) =
     keysTrie.getEntries().any { (it.data as? ToKeysMappingInfo)?.toKeys == toKeys }
-
-  // TODO: Do we need this as well as get()?
-  override fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
 }
