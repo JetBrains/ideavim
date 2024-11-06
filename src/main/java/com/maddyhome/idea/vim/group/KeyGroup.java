@@ -222,7 +222,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return new CustomShortcutSet(shortcuts.toArray(new Shortcut[0]));
   }
 
-  private static @NotNull List<Pair<Set<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes) {
+  private static @NotNull List<Pair<Set<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes,
+                                                                                      @NotNull List<? extends KeyStroke> prefix) {
     // Some map commands set a mapping for more than one mode (e.g. `map` sets for Normal, Visual, Select and
     // Op-pending). Vim treats this as a single mapping, and when listing all maps only lists it once, with the
     // appropriate mode indicator(s) in the first column (NVO is a space char). If the lhs mapping is changed or cleared
@@ -237,8 +238,9 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     final MultiMap<List<? extends KeyStroke>, Set<MappingMode>> multiModeMappings = MultiMap.create();
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
-      for (List<? extends KeyStroke> fromKeys : mapping) {
-        final MappingInfo mappingInfo = mapping.get(fromKeys);
+      for (Map.Entry<List<KeyStroke>, MappingInfo> map : mapping.getPrefixed(prefix).entrySet()) {
+        final List<KeyStroke> fromKeys = map.getKey();
+        final MappingInfo mappingInfo = map.getValue();
         if (mappingInfo != null) {
           final Set<@NotNull MappingMode> originalModes = mappingInfo.getOriginalModes();
           if (originalModes.size() == 1) {
@@ -350,8 +352,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   @Override
-  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull VimEditor editor) {
-    List<Pair<Set<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes);
+  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull List<? extends KeyStroke> prefix, @NotNull VimEditor editor) {
+    List<Pair<Set<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes, prefix);
 
     final StringBuilder builder = new StringBuilder();
     for (Pair<Set<MappingMode>, MappingInfo> row : rows) {

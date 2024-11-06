@@ -376,6 +376,49 @@ class MapCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test output of map shows maps with matching prefixes`() {
+    configureByText("\n")
+    enterCommand("map foo bar")
+    enterCommand("imap faa baz")
+    enterCommand("nmap fee bap")
+    enterCommand("nmap zzz ppp")
+
+    enterCommand("map f")
+    assertExOutput(
+      """
+        |n  fee           bap
+        |   foo           bar
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test map with only trailing spaces treated as no arguments`() {
+    configureByText("\n")
+    enterCommand("map foo bar")
+
+    enterCommand("map     ")
+    assertExOutput(
+      """
+        |   foo           bar
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test map with prefix ignores trailing spaces`() {
+    configureByText("\n")
+    enterCommand("imap foo bar")
+
+    enterCommand("imap f    ")
+    assertExOutput(
+      """
+        |i  foo           bar
+      """.trimMargin()
+    )
+  }
+
+  @Test
   fun testRecursiveMapping() {
     configureByText("\n")
     enterCommand("imap foo bar")
@@ -1076,6 +1119,17 @@ class MapCommandTest : VimTestCase() {
       // Make sure we parse `map !` differently to `map!`
       // Remember that `map` is NVO and `map!` is IC. If this is correctly parsed, we have to test it in e.g., Normal
       enterCommand("map ! dd")
+    }
+  }
+
+  @Test
+  fun `test map with trailing spaces`() {
+    doTest(
+      listOf("i", "b", "<Esc>"),
+      "",
+      "test    "
+    ) {
+      enterCommand("imap b test    ")
     }
   }
 }
