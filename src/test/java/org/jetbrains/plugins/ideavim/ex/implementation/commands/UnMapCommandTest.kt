@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
@@ -35,7 +34,7 @@ class UnMapCommandTest : VimTestCase() {
   fun testMapKtoJ() {
     putMapping(MappingMode.N, "k", "j", false)
 
-    typeText(commandToKeys("unmap k"))
+    enterCommand("unmap k")
 
     assertNoMapping("k")
   }
@@ -44,7 +43,7 @@ class UnMapCommandTest : VimTestCase() {
   fun `test mappings in insert mode`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 
-    typeText(commandToKeys("iunmap jk"))
+    enterCommand("iunmap jk")
 
     assertNoMapping("jk")
   }
@@ -53,17 +52,28 @@ class UnMapCommandTest : VimTestCase() {
   fun `test removing only part of keys`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 
-    typeText(commandToKeys("unmap j"))
+    enterCommand("iunmap j")
 
     assertNoMapping("j")
     assertMappingExists("jk", "<Esc>", MappingMode.I)
   }
 
   @Test
+  fun `test removing mapping that is also a prefix`() {
+    putMapping(MappingMode.I, "jk", "<Esc>", false)
+    putMapping(MappingMode.I, "jkl", "<Esc>", false)
+
+    enterCommand("iunmap jk")
+
+    assertNoMapping("jk")
+    assertMappingExists("jkl", "<Esc>", MappingMode.I)
+  }
+
+  @Test
   fun `test removing keys from a different mode`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 
-    typeText(commandToKeys("unmap jk"))
+    enterCommand("unmap jk")
 
     assertMappingExists("jk", "<Esc>", MappingMode.I)
   }
@@ -76,7 +86,7 @@ class UnMapCommandTest : VimTestCase() {
 
     // We've just mapped "foo" to "bar" in Command-line mode. We can't type it directly!
     // And enterCommand doesn't parse special keys!
-    typeText(injector.parser.parseKeys(":unmap! fox<BS>o<CR>"))
+    typeText(":unmap! fox<BS>o<CR>")
 
     assertNoMapping("foo", MappingMode.IC)
     assertMappingExists("quux", "baz", MappingMode.IC)
@@ -91,7 +101,7 @@ class UnMapCommandTest : VimTestCase() {
 
     // We've just mapped "foo" to "bar" in Command-line mode. We can't type it directly!
     // And enterCommand doesn't parse special keys!
-    typeText(injector.parser.parseKeys(":unmap! fox<BS>o<CR>"))
+    typeText(":unmap! fox<BS>o<CR>")
 
     assertNoMapping("foo", MappingMode.IC)
     assertMappingExists("quux", "baz", MappingMode.IC)
