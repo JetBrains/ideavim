@@ -25,7 +25,7 @@ dependencies {
   implementation("io.ktor:ktor-client-core:3.0.1")
   implementation("io.ktor:ktor-client-cio:3.0.0")
   implementation("io.ktor:ktor-client-content-negotiation:2.3.10")
-  implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.1")
   implementation("io.ktor:ktor-client-auth:3.0.1")
   implementation("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
