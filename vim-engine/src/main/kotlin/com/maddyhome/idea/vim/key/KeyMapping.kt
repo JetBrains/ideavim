@@ -135,7 +135,5 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     mappingInfo is ToKeysMappingInfo && mappingInfo.toKeys == toKeys
   }
 
-  fun hasmapfrom(fromKeys: List<KeyStroke>) = keysTrie.getData(fromKeys) != null
-
   override fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
 }
