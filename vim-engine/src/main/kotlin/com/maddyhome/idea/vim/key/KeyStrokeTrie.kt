@@ -174,9 +174,9 @@ class KeyStrokeTrie<T>(private val name: String) {
       }
     }
 
-    // TODO: This is wrong. If the sequence exists but is also a prefix, it should just null out the data
     path.asReversed().forEach { (parent, key) ->
       val child = parent.children.value[key] ?: return
+      child.data = null
       if (child.children.isInitialized() && child.children.value.isNotEmpty()) return
       parent.children.value.remove(key)
       if (parent.children.value.isNotEmpty() || parent.data != null) return
