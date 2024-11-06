@@ -16,7 +16,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
@@ -55,8 +54,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
   private static final @NonNls String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
-
-  private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
   public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance()
@@ -236,18 +233,24 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     // valid as we collect output
     final List<Pair<Set<MappingMode>, MappingInfo>> rows = new ArrayList<>();
     final MultiMap<List<? extends KeyStroke>, Set<MappingMode>> multiModeMappings = MultiMap.create();
+    final List<KeyStroke> fromKeys = new ArrayList<>();
+
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
-      for (Map.Entry<List<KeyStroke>, MappingInfo> map : mapping.getPrefixed(prefix).entrySet()) {
-        final List<KeyStroke> fromKeys = map.getKey();
-        final MappingInfo mappingInfo = map.getValue();
-        if (mappingInfo != null) {
-          final Set<@NotNull MappingMode> originalModes = mappingInfo.getOriginalModes();
-          if (originalModes.size() == 1) {
-            rows.add(new Pair<>(originalModes, mappingInfo));
-          }
-          else if (!multiModeMappings.get(fromKeys).contains(originalModes)) {
-            multiModeMappings.putValue(fromKeys, originalModes);
+
+      final Iterator<KeyMappingEntry> iterator = mapping.getAll(prefix).iterator();
+      while (iterator.hasNext()) {
+        final KeyMappingEntry entry = iterator.next();
+        final MappingInfo mappingInfo = entry.getMappingInfo();
+
+        final Set<@NotNull MappingMode> originalModes = mappingInfo.getOriginalModes();
+        if (originalModes.size() == 1) {
+          rows.add(new Pair<>(originalModes, mappingInfo));
+        }
+        else {
+          entry.collectPath(fromKeys);
+          if (!multiModeMappings.get(fromKeys).contains(originalModes)) {
+            multiModeMappings.putValue(new ArrayList<>(fromKeys), originalModes);
             rows.add(new Pair<>(getModesForMapping(fromKeys, originalModes), mappingInfo));
           }
         }

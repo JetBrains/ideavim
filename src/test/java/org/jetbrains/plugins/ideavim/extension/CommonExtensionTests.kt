@@ -156,10 +156,8 @@ class OpMappingTest : VimTestCase() {
   private fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<String, MappingInfo>> {
     return MappingMode.entries
       .map { VimPlugin.getKey().getKeyMapping(it) }
-      .flatMap { it.getByOwner(owner) }
-      .map {
-        injector.parser.toKeyNotation(it.first) to it.second
-      }
+      .flatMap { it.getAllByOwner(owner) }
+      .map { injector.parser.toKeyNotation(it.getPath()) to it.mappingInfo }
   }
 
   @Test

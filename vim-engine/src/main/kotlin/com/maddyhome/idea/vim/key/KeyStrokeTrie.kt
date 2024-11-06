@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.injector
+import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 /**
@@ -20,17 +21,26 @@ import javax.swing.KeyStroke
  */
 class KeyStrokeTrie<T>(private val name: String) {
   interface TrieNode<T> {
+    val key: KeyStroke
     val data: T?
+    val parent: TrieNode<T>?
 
     fun visit(visitor: (KeyStroke, TrieNode<T>) -> Unit)
 
     val debugString: String
   }
 
-  private class TrieNodeImpl<T>(val name: String, val depth: Int, override var data: T?)
-    : TrieNode<T> {
+  private class TrieNodeImpl<T>(
+    val name: String,
+    override val key: KeyStroke,
+    override val parent: TrieNodeImpl<T>?,
+    override var data: T?,
+  ) : TrieNode<T> {
 
     val children = lazy { mutableMapOf<KeyStroke, TrieNodeImpl<T>>() }
+
+    val depth: Int
+      get() = parent?.let { it.depth + 1  } ?: 0
 
     override fun visit(visitor: (KeyStroke, TrieNode<T>) -> Unit) {
       if (!children.isInitialized()) return
@@ -71,19 +81,19 @@ class KeyStrokeTrie<T>(private val name: String) {
     override fun toString() = "TrieNode('$name', ${children.value.size} children): $data"
   }
 
-  private val root = TrieNodeImpl<T>("", 0, null)
-
-  fun visit(visitor: (KeyStroke, TrieNode<T>) -> Unit) {
-    // Does not visit the (empty) root node
-    root.visit(visitor)
-  }
+  private val root = TrieNodeImpl<T>(
+    name = "",
+    key = KeyStroke.getKeyStroke(KeyEvent.CHAR_UNDEFINED),
+    parent = null,
+    data = null
+  )
 
   fun add(keyStrokes: List<KeyStroke>, data: T) {
     var current = root
     keyStrokes.forEachIndexed { i, stroke ->
       current = current.children.value.getOrPut(stroke) {
         val name = current.name + injector.parser.toKeyNotation(stroke)
-        TrieNodeImpl(name, current.depth + 1, if (i == keyStrokes.lastIndex) data else null)
+        TrieNodeImpl(name, stroke, current, if (i == keyStrokes.lastIndex) data else null)
       }
     }
 
@@ -122,6 +132,23 @@ class KeyStrokeTrie<T>(private val name: String) {
   }
 
   /**
+   * Returns a sequence of nodes that contain data
+   *
+   * Prefixes are skipped
+   */
+  fun getEntries(prefix: List<KeyStroke>? = null): Sequence<TrieNode<T>> {
+    suspend fun SequenceScope<TrieNode<T>>.yieldTrieNode(node: TrieNodeImpl<T>) {
+      if (node.data != null) yield(node)
+      if (node.children.isInitialized()) {
+        node.children.value.forEach { yieldTrieNode(it.value) }
+      }
+    }
+
+    val node = prefix?.let { getTrieNode(it) as TrieNodeImpl<T> } ?: root
+    return sequence { yieldTrieNode(node) }
+  }
+
+  /**
    * Returns true if the given keys are a prefix to a longer sequence of keys
    *
    * Will return true even if the current keys map to a node with data.
@@ -131,6 +158,11 @@ class KeyStrokeTrie<T>(private val name: String) {
     return node.children.isInitialized() && node.children.value.isNotEmpty()
   }
 
+  /**
+   * Removes the given key sequence from the trie
+   *
+   * If the key sequence is also a prefix, removes the associated data, but does not modify any child sequences.
+   */
   fun remove(keys: List<KeyStroke>) {
     val path = buildList {
       var current = root
@@ -142,6 +174,7 @@ class KeyStrokeTrie<T>(private val name: String) {
       }
     }
 
+    // TODO: This is wrong. If the sequence exists but is also a prefix, it should just null out the data
     path.asReversed().forEach { (parent, key) ->
       val child = parent.children.value[key] ?: return
       if (child.children.isInitialized() && child.children.value.isNotEmpty()) return
@@ -170,25 +203,3 @@ class KeyStrokeTrie<T>(private val name: String) {
 fun <T> KeyStrokeTrie<T>.add(keys: String, data: T) {
   add(injector.parser.parseKeys(keys), data)
 }
-
-/**
- * Returns a map containing all keystroke sequences that start with the given prefix
- *
- * This only returns keystroke sequences that have associated data. A keystroke sequence without data is considered a
- * prefix and not included in the map.
- */
-fun <T> KeyStrokeTrie<T>.getPrefixed(prefix: List<KeyStroke>): Map<List<KeyStroke>, T> {
-  fun visitor(prefix: List<KeyStroke>, map: MutableMap<List<KeyStroke>, T>) {
-    getTrieNode(prefix)?.let { node ->
-      node.data?.let { map[prefix] = it }
-      node.visit { key, value -> visitor(prefix + key, map) }
-    }
-  }
-
-  return buildMap { visitor(prefix, this) }
-}
-
-/**
- * Returns all keystroke sequences with associated data
- */
-fun <T> KeyStrokeTrie<T>.getAll(): Map<List<KeyStroke>, T> = getPrefixed(emptyList())

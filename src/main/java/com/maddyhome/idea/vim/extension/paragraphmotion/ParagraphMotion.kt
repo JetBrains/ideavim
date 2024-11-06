@@ -62,7 +62,7 @@ internal class ParagraphMotion : VimExtension {
     toKeys: List<KeyStroke>,
     recursive: Boolean,
   ) {
-    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().getKeyMapping(it)[fromKeys] != null }
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().getKeyMapping(it).getLayer(fromKeys) != null }
     putKeyMappingIfMissing(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
   }
 }
