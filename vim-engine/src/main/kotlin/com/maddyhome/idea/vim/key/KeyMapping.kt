@@ -128,6 +128,10 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     return firstChar == injector.parser.actionKeyStroke.keyCode && lastChar != ')'
   }
 
+  fun getPrefixed(prefix: List<KeyStroke>): Map<List<KeyStroke>, MappingInfo> {
+    return keysTrie.getPrefixed(prefix)
+  }
+
   fun hasmapto(toKeys: List<KeyStroke>) = keysTrie.getAll().any { (_, mappingInfo) ->
     mappingInfo is ToKeysMappingInfo && mappingInfo.toKeys == toKeys
   }

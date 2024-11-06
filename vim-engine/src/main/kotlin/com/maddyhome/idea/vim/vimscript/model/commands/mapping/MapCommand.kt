@@ -45,7 +45,7 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
   }
 
   @Throws(ExException::class)
-  private fun executeCommand(editor: VimEditor?): Boolean {
+  private fun executeCommand(editor: VimEditor): Boolean {
     val bang = modifier == CommandModifier.BANG
     val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) && it.bang == bang }
     if (commandInfo == null) {
@@ -55,7 +55,13 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
 
     val modes = commandInfo.mappingModes
 
-    if (argument.isEmpty()) return editor != null && injector.keyGroup.showKeyMappings(modes, editor)
+    // Trailing whitespace is trimmed from the argument, unless it's separated with a bar.
+    // If there are no spaces (ignoring trailing spaces), then it's a single argument and should be treated as a prefix.
+    // Empty string is an empty prefix that matches everything.
+    if (argument.isBlank() || !argument.trim().contains(' ')) {
+      val prefix = injector.parser.parseKeys(argument.trim())
+      return injector.keyGroup.showKeyMappings(modes, prefix, editor)
+    }
 
     val arguments = try {
       parseCommandArguments(argument) ?: return false
