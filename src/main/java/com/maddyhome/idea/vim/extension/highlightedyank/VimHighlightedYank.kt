@@ -47,6 +47,10 @@ private val HIGHLIGHT_DURATION_VARIABLE_NAME = "highlightedyank_highlight_durati
 
 @NonNls
 private val HIGHLIGHT_COLOR_VARIABLE_NAME = "highlightedyank_highlight_color"
+
+@NonNls
+private val HIGHLIGHT_FOREGROUND_COLOR_VARIABLE_NAME = "highlightedyank_highlight_foreground_color"
+
 private var defaultHighlightTextColor: Color? = null
 
 private fun getDefaultHighlightTextColor(): Color {
@@ -76,6 +80,9 @@ internal class HighlightColorResetter : LafManagerListener {
  *
  * if you want to change background color of highlight you can provide the rgba of the color you want e.g.
  * let g:highlightedyank_highlight_color = "rgba(160, 160, 160, 155)"
+ *
+ * if you want to change text color of highlight you can provide the rgba of the color you want e.g.
+ * let g:highlightedyank_highlight_foreground_color = "rgba(0, 0, 0, 255)"
  *
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
@@ -186,13 +193,15 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
       highlighters.clear()
     }
 
-    private fun getHighlightTextAttributes(editor: Editor) = TextAttributes(
-      null,
-      extractUsersHighlightColor(),
-      editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
-      EffectType.SEARCH_MATCH,
-      Font.PLAIN,
-    )
+    private fun getHighlightTextAttributes(editor: Editor): TextAttributes {
+      return TextAttributes(
+        extractUserHighlightForegroundColor(),
+        extractUsersHighlightColor(),
+        editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
+        EffectType.SEARCH_MATCH,
+        Font.PLAIN,
+      )
+    }
 
     private fun extractUsersHighlightDuration(): Int {
       return extractVariable(HIGHLIGHT_DURATION_VARIABLE_NAME, DEFAULT_HIGHLIGHT_DURATION) {
@@ -205,15 +214,52 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
     }
 
     private fun extractUsersHighlightColor(): Color {
-      return extractVariable(HIGHLIGHT_COLOR_VARIABLE_NAME, getDefaultHighlightTextColor()) { value ->
-        val rgba = value.asString()
-          .substring(4)
-          .filter { it != '(' && it != ')' && !it.isWhitespace() }
-          .split(',')
-          .map { it.toInt() }
-
-        Color(rgba[0], rgba[1], rgba[2], rgba[3])
+      val value = VimPlugin.getVariableService().getGlobalVariableValue(HIGHLIGHT_COLOR_VARIABLE_NAME)
+      if (value != null) {
+        return try {
+          parseRgbaColor(value.asString())
+        } catch (e: Exception) {
+          @VimNlsSafe val message = MessageHelper.message(
+            "highlightedyank.invalid.value.of.0.1",
+            "g:$HIGHLIGHT_COLOR_VARIABLE_NAME",
+            e.message ?: "",
+          )
+          VimPlugin.showMessage(message)
+          getDefaultHighlightTextColor()
+        }
       }
+      return getDefaultHighlightTextColor()
+    }
+
+    private fun extractUserHighlightForegroundColor(): Color? {
+      val value = VimPlugin.getVariableService().getGlobalVariableValue(HIGHLIGHT_FOREGROUND_COLOR_VARIABLE_NAME)
+        ?: return null
+
+      return try {
+        parseRgbaColor(value.asString())
+      } catch (e: Exception) {
+        @VimNlsSafe val message = MessageHelper.message(
+          "highlightedyank.invalid.value.of.0.1",
+          "g:$HIGHLIGHT_FOREGROUND_COLOR_VARIABLE_NAME",
+          e.message ?: "",
+        )
+        VimPlugin.showMessage(message)
+        null
+      }
+    }
+
+    private fun parseRgbaColor(colorString: String): Color {
+      val rgba = colorString
+        .substring(4)
+        .filter { it != '(' && it != ')' && !it.isWhitespace() }
+        .split(',')
+        .map { it.toInt() }
+
+      if (rgba.size != 4 || rgba.any { it < 0 || it > 255 }) {
+        throw IllegalArgumentException("Invalid RGBA values. Each component must be between 0 and 255")
+      }
+
+      return Color(rgba[0], rgba[1], rgba[2], rgba[3])
     }
 
     private fun <T> extractVariable(variable: String, default: T, extractFun: (value: VimDataType) -> T): T {
