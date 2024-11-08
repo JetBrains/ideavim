@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.highlightedyank
 
+import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.VimPlugin
@@ -180,6 +181,84 @@ class VimHighlightedYankTest : VimTestCase() {
         color,
       )
     }
+  }
+
+  @Test
+  fun `test no foreground color used when not explicitly provided`() {
+    configureByText(code)
+    typeText("yy")
+
+    val attributes = getFirstHighlighter().getTextAttributes(null)
+    assertEquals(null, attributes?.foregroundColor)
+  }
+
+  @Test
+  fun `test custom foreground colour used when provided by user`() {
+    configureByText(code)
+    enterCommand("let g:highlightedyank_highlight_foreground_color=\"rgba(100,10,20,30)\"")
+    typeText("yy")
+
+    val highlighter = getFirstHighlighter()
+    assertEquals(Color(100, 10, 20, 30), highlighter.getTextAttributes(null)?.foregroundColor)
+  }
+
+  @Test
+  fun `test indicating error when incorrect background highlight color was provided by user`() {
+    configureByText(code)
+
+    listOf(
+      "rgba(1,2,3)",
+      "rgba(1, 2, 3, 0.1)",
+      "rgb(1,2,3)",
+      "rgba(260, 2, 5, 6)",
+      "rgba(0, 0, 0, 300)"
+    ).forEach { color ->
+      enterCommand("let g:highlightedyank_highlight_color = \"$color\"")
+      typeText("yy")
+
+      assertTrue(
+        VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color"),
+        color,
+      )
+      // Should fall back to default background color when there's an error
+      val defaultColor = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor
+      assertEquals(defaultColor, getFirstHighlighter().getTextAttributes(null)?.backgroundColor)
+    }
+  }
+
+  @Test
+  fun `test indicating error when incorrect foreground highlight color was provided by user`() {
+    configureByText(code)
+
+    listOf(
+      "rgba(1,2,3)",
+      "rgba(1, 2, 3, 0.1)",
+      "rgb(1,2,3)",
+      "rgba(260, 2, 5, 6)",
+      "rgba(0, 0, 0, 300)"
+    ).forEach { color ->
+      enterCommand("let g:highlightedyank_highlight_foreground_color = \"$color\"")
+      typeText("yy")
+
+      assertTrue(
+        VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_foreground_color"),
+        color,
+      )
+      // Should not set a foreground color when there's an error
+      assertEquals(null, getFirstHighlighter().getTextAttributes(null)?.foregroundColor)
+    }
+  }
+
+  @Test
+  fun `test both foreground and background colors can be set simultaneously`() {
+    configureByText(code)
+    enterCommand("let g:highlightedyank_highlight_foreground_color=\"rgba(255,0,0,255)\"")
+    enterCommand("let g:highlightedyank_highlight_color=\"rgba(0,255,0,128)\"")
+    typeText("yy")
+
+    val attributes = getFirstHighlighter().getTextAttributes(null)
+    assertEquals(Color(255, 0, 0, 255), attributes?.foregroundColor)
+    assertEquals(Color(0, 255, 0, 128), attributes?.backgroundColor)
   }
 
   private val code = """

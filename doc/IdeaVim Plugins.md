@@ -321,7 +321,10 @@ If you want to optimize highlight duration, assign a time in milliseconds:
    
 If you want to change background color of highlight you can provide the rgba of the color you want e.g.  
       `let g:highlightedyank_highlight_color = "rgba(160, 160, 160, 155)"`
-   
+
+If you want to change text color of highlight you can provide the rgba of the color you want e.g.  
+`let g:highlightedyank_highlight_foreground_color = "rgba(0, 0, 0, 255)"`
+
 https://github.com/machakann/vim-highlightedyank/blob/master/doc/highlightedyank.txt
 
 </details>
