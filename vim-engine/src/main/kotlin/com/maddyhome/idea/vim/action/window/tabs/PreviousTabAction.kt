@@ -16,8 +16,23 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["gT"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(keys = ["gT", "<C-PageUp>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 class PreviousTabAction : VimActionHandler.SingleExecution() {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    injector.motion.moveCaretGotoPreviousTab(editor, context, cmd.rawCount)
+    return true
+  }
+
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+}
+
+@CommandOrMotion(keys = ["<C-PageUp>"], modes = [Mode.INSERT])
+class InsertPreviousTabAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: VimEditor,
     context: ExecutionContext,
