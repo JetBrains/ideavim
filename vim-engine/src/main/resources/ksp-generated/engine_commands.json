@@ -360,6 +360,26 @@
         "modes": "I"
     },
     {
+        "keys": "<C-PageDown>",
+        "class": "com.maddyhome.idea.vim.action.window.tabs.InsertNextTabAction",
+        "modes": "I"
+    },
+    {
+        "keys": "<C-PageDown>",
+        "class": "com.maddyhome.idea.vim.action.window.tabs.NextTabAction",
+        "modes": "NXO"
+    },
+    {
+        "keys": "<C-PageUp>",
+        "class": "com.maddyhome.idea.vim.action.window.tabs.InsertPreviousTabAction",
+        "modes": "I"
+    },
+    {
+        "keys": "<C-PageUp>",
+        "class": "com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction",
+        "modes": "NXO"
+    },
+    {
         "keys": "<C-Q>",
         "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction",
         "modes": "IC"

@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["gt"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(keys = ["gt", "<C-PageDown>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 class NextTabAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: VimEditor,
@@ -24,6 +24,22 @@ class NextTabAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    injector.motion.moveCaretGotoNextTab(editor, context, cmd.rawCount)
+    return true
+  }
+
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+}
+
+@CommandOrMotion(keys = ["<C-PageDown>"], modes = [Mode.INSERT])
+class InsertNextTabAction : VimActionHandler.SingleExecution() {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    // Vim doesn't change mode
     injector.motion.moveCaretGotoNextTab(editor, context, cmd.rawCount)
     return true
   }
