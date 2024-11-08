@@ -48,6 +48,56 @@ class VimArgTextObjExtensionTest : VimTestCase() {
   }
 
   @Test
+  fun testDeleteAnArgumentLookAhead() {
+    doTest(
+      Lists.newArrayList("daa"),
+      "<caret>void function(int arg1, int arg2)",
+      "void function(<caret>int arg2)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testDeleteInnerArgumentLookAhead() {
+    doTest(
+      Lists.newArrayList("dia"),
+      "def <caret>my_func(arg1, arg2):",
+      "def my_func(<caret>, arg2):",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testChangeAnArgumentLookAhead() {
+    doTest(
+      Lists.newArrayList("caa"),
+      "<caret>void function(int arg1, int arg2)",
+      "void function(<caret>int arg2)",
+      Mode.INSERT,
+    )
+  }
+
+  @Test
+  fun testChangeInnerArgumentLookAhead() {
+    doTest(
+      Lists.newArrayList("cia"),
+      "def <caret>my_func(arg1, arg2):",
+      "def my_func(<caret>, arg2):",
+      Mode.INSERT,
+    )
+  }
+
+  @Test
+  fun testDeleteTwoArgumentsLookAhead() {
+    doTest(
+      Lists.newArrayList("d2aa"),
+      "<caret>function(int arg1,    char* arg2=\"a,b,c(d,e)\")",
+      "function(<caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
   fun testChangeInnerArgument() {
     doTest(
       Lists.newArrayList("cia"),
@@ -280,8 +330,11 @@ Mode.INSERT,
 {   methodCall(arg1, "{ arg1 , 2");
    otherMeth<caret>odcall(arg, 3);
 }"""
-    doTest(Lists.newArrayList("dia"), before, before, Mode.NORMAL())
-    assertPluginError(true)
+    val after = """void foo(int arg1)
+{   methodCall(arg1, "{ arg1 , 2");
+   otherMethodcall(<caret>, 3);
+}"""
+    doTest(Lists.newArrayList("dia"), before, after, Mode.NORMAL())
   }
 
   @Test

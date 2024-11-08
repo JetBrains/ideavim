@@ -298,33 +298,52 @@ public class VimArgTextObjExtension implements VimExtension {
      * @param position starting position.
      */
     boolean findBoundsAt(int position) throws IllegalStateException {
-      if (text.isEmpty()) {
+      if (text.length() == 0) {
         error = "empty document";
         return false;
       }
+
+      // First try original position
       leftBound = Math.min(position, leftBound);
       rightBound = Math.max(position, rightBound);
+
+      // Get out of quoted text and handle any current position
       getOutOfQuotedText();
+      char ch = getCharAt(rightBound);
       if (rightBound == leftBound) {
-        if (brackets.isCloseBracket(getCharAt(rightBound))) {
+        if (ch == 0) {
+          error = "invalid position";
+          return false;
+        }
+        if (brackets.isCloseBracket(ch)) {
           --leftBound;
+        } else if (brackets.isOpenBracket(ch)) {
+          ++rightBound;
         } else {
           ++rightBound;
         }
       }
+
+      // Find the closest containing argument
       int nextLeft = leftBound;
       int nextRight = rightBound;
       final int leftLimit = leftLimit(position);
       final int rightLimit = rightLimit(position);
-      //
-      // Try to extend the bounds until one of the bounds is a comma.
-      // This handles cases like: fun(a, (30 + <cursor>x) * 20, c)
-      //
+
       boolean bothBrackets;
       do {
         leftBracket = nextLeft;
         rightBracket = nextRight;
         if (!findOuterBrackets(leftLimit, rightLimit)) {
+          // If we can't find brackets and we're at a function name, try inside its brackets
+          if (isBeforeFunction(position)) {
+            int pos = findOpeningBracket(position);
+            if (pos != -1) {
+              leftBound = pos + 1;
+              rightBound = pos + 1;
+              return findBoundsAt(leftBound);
+            }
+          }
           error = "not inside argument list";
           return false;
         }
@@ -334,9 +353,7 @@ public class VimArgTextObjExtension implements VimExtension {
         rightBound = nextRight;
         findRightBound();
         nextRight = rightBound + 1;
-        //
-        // If reached text boundaries
-        //
+
         if (nextLeft < leftLimit || nextRight > rightLimit) {
           error = "not an argument";
           return false;
@@ -344,13 +361,76 @@ public class VimArgTextObjExtension implements VimExtension {
         bothBrackets = getCharAt(leftBound) != ',' && getCharAt(rightBound) != ',';
         final boolean nonEmptyArg = (rightBound - leftBound) > 1;
         if (bothBrackets && nonEmptyArg && isIdentPreceding()) {
-          // Looking at a pair of brackets preceded by an
-          // identifier -- single argument function call.
           break;
         }
       }
       while (leftBound > leftLimit && rightBound < rightLimit && bothBrackets);
       return true;
+    }
+
+    private boolean isBeforeFunction(int position) {
+      int pos = position;
+      int rightLimit = rightLimit(position);
+
+      // Skip whitespace before potential function name
+      while (pos < rightLimit && Character.isWhitespace(getCharAt(pos))) {
+        pos++;
+      }
+
+      // Must start with identifier character
+      char ch = getCharAt(pos);
+      return ch != 0 && Character.isJavaIdentifierStart(ch);
+    }
+
+    private int findOpeningBracket(int position) {
+      int pos = position;
+      int rightLimit = rightLimit(position);
+
+      // Skip leading whitespace
+      while (pos < rightLimit && Character.isWhitespace(getCharAt(pos))) {
+        pos++;
+      }
+
+      // Keep going until we find the actual function call
+      while (pos < rightLimit) {
+        // Skip past any identifier or qualified name (handles a::b::c etc)
+        while (pos < rightLimit) {
+          char ch = getCharAt(pos);
+          // Allow common identifier characters across languages:
+          // - alphanumeric
+          // - underscore
+          // - :: for C++ namespaces
+          // - : for Objective-C
+          // - . for method calls
+          // - -> and <- for various languages
+          // - ' and ? and ! for Rust, Ruby, etc.
+          if (Character.isLetterOrDigit(ch) ||
+              ch == '_' || ch == ':' || ch == '.' ||
+              ch == '<' || ch == '>' || ch == '-' ||
+              ch == '\'' || ch == '?' || ch == '!') {
+            pos++;
+          } else {
+            break;
+          }
+        }
+
+        // Skip whitespace after identifier
+        while (pos < rightLimit && Character.isWhitespace(getCharAt(pos))) {
+          pos++;
+        }
+
+        // If we found opening bracket, we found the function
+        if (pos < rightLimit && brackets.isOpenBracket(getCharAt(pos))) {
+          return pos;
+        }
+
+        // Otherwise move past this part and try again
+        while (pos < rightLimit && !Character.isWhitespace(getCharAt(pos)) && !brackets.isOpenBracket(getCharAt(pos))) {
+          pos++;
+        }
+      }
+
+      return -1;
     }
 
     /**
@@ -473,7 +553,9 @@ public class VimArgTextObjExtension implements VimExtension {
     }
 
     private char getCharAt(int logicalOffset) {
-      assert logicalOffset < text.length();
+      if (logicalOffset < 0 || logicalOffset >= text.length()) {
+        return 0; // Return null character for out of bounds
+      }
       return text.charAt(logicalOffset);
     }
 
