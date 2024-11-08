@@ -58,6 +58,16 @@ class ScrollPageDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
+  fun `test scroll single page down with S-Enter`() {
+    configureByPages(5)
+    setPositionAndScroll(0, 0)
+    typeText("<S-Enter>")
+    assertPosition(33, 0)
+    assertVisibleArea(33, 67)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll page down in insert mode with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)

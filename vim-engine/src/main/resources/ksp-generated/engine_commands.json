@@ -845,6 +845,11 @@
         "modes": "INXS"
     },
     {
+        "keys": "<S-Enter>",
+        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
+        "modes": "NXO"
+    },
+    {
         "keys": "<S-Home>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction",
         "modes": "INXS"
