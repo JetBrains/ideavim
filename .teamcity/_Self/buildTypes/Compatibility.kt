@@ -40,6 +40,7 @@ object Compatibility : IdeaVimBuildType({
               # java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.julienphalip.ideavim.peekaboo' [latest-IU] -team-city
             """.trimIndent()
     }
   }

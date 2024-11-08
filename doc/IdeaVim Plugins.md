@@ -435,3 +435,14 @@ Original plugin: [vim-which-key](https://github.com/liuchengxu/vim-which-key).
 https://github.com/TheBlob42/idea-which-key?tab=readme-ov-file#installation
 
 </details>
+<details>
+<summary><h2>Vim Peekaboo</h2></summary>
+
+By Julien Phalip  
+Original plugin: [vim-peekaboo](https://github.com/junegunn/vim-peekaboo).
+
+### Instructions
+
+https://plugins.jetbrains.com/plugin/25776-vim-peekaboo
+
+</details>

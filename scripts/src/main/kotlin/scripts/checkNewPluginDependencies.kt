@@ -40,6 +40,7 @@ val knownPlugins = setOf(
   "com.protoseo.input-source-auto-converter",
 
 //   "cc.implicated.intellij.plugins.bunny", // I don't want to include this plugin in the list of IdeaVim plugins as I don't understand what this is for
+  "com.julienphalip.ideavim.peekaboo", // https://plugins.jetbrains.com/plugin/25776-vim-peekaboo
 )
 
 suspend fun main() {
