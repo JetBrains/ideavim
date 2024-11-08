@@ -93,100 +93,93 @@ abstract class VimStringParserBase : VimStringParser {
       }
       try {
         name = String(Character.toChars(keyCode))
-      } catch (ignored: IllegalArgumentException) {
+      } catch (_: IllegalArgumentException) {
       }
     }
     return if (name != null) "<$prefix$name>" else "<<$keyStroke>>"
   }
 
-  override fun parseKeys(string: String): List<KeyStroke> {
-    val result: MutableList<KeyStroke> = ArrayList()
-    var specialKeyStart = '<'
+  override fun parseKeys(string: String): List<KeyStroke> = buildList {
+    val specialKeyBuilder = StringBuilder()
     var state = KeyParserState.INIT
-    var specialKeyBuilder = StringBuilder()
-    for (element in string) {
+
+    for (c in string) {
       when (state) {
-        KeyParserState.INIT -> when (element) {
+        KeyParserState.INIT -> when (c) {
           '\\' -> state = KeyParserState.ESCAPE
-          '<', '«' -> {
-            specialKeyStart = element
+          '<' -> {
             state = KeyParserState.SPECIAL
-            specialKeyBuilder = StringBuilder()
+            specialKeyBuilder.clear()
           }
           else -> {
-            val stroke: KeyStroke = if (element == '\t' || element == '\n') {
-              KeyStroke.getKeyStroke(element.code, 0)
-            } else if (isControlCharacter(element)) {
-              KeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
+            val stroke: KeyStroke = if (c == '\t' || c == '\n') {
+              KeyStroke.getKeyStroke(c.code, 0)
+            } else if (isControlCharacter(c)) {
+              KeyStroke.getKeyStroke(c.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
             } else {
-              KeyStroke.getKeyStroke(element)
+              KeyStroke.getKeyStroke(c)
             }
-            result.add(stroke)
+            add(stroke)
           }
         }
+
         KeyParserState.ESCAPE -> {
           state = KeyParserState.INIT
-          if (element != '\\') {
-            result.add(KeyStroke.getKeyStroke('\\'))
+          if (c != '\\') {
+            add(KeyStroke.getKeyStroke('\\'))
           }
-          result.add(KeyStroke.getKeyStroke(element))
+          add(KeyStroke.getKeyStroke(c))
         }
-        KeyParserState.SPECIAL -> if (element == '>' || element == '»') {
-          state = KeyParserState.INIT
-          val specialKeyName = specialKeyBuilder.toString()
-          val lower = specialKeyName.lowercase(Locale.getDefault())
-          require("sid" != lower) { "<$specialKeyName> is not supported" }
-          if ("comma" == lower) {
-            result.add(KeyStroke.getKeyStroke(','))
-          } else if ("nop" != lower) {
-            val leader = parseMapLeader(specialKeyName)
-            val specialKey = parseSpecialKey(specialKeyName, 0)
-            if (leader != null) {
-              result.addAll(leader)
-            } else if (specialKey != null && specialKeyName.length > 1) {
-              result.add(specialKey)
+
+        KeyParserState.SPECIAL -> {
+          if (c == '>') {
+            state = KeyParserState.INIT
+            val specialKeyName = specialKeyBuilder.toString()
+            val lower = specialKeyName.lowercase(Locale.getDefault())
+            require("sid" != lower) { "<$specialKeyName> is not supported" }
+
+            if ("leader" == lower) {
+              addAll(getMapLeader())
+            } else if ("nop" != lower) {
+              val specialKey = parseSpecialKey(specialKeyName, 0)
+              if (specialKey != null && specialKeyName.length > 1) {
+                add(specialKey)
+              } else {
+                add(KeyStroke.getKeyStroke('<'))
+                addAll(stringToKeys(specialKeyName))
+                add(KeyStroke.getKeyStroke('>'))
+              }
+            }
+          } else {
+            // e.g. move '<-2<CR> - the first part does not belong to any special key
+            if (c == '<') {
+              add(KeyStroke.getKeyStroke('<'))
+              addAll(stringToKeys(specialKeyBuilder.toString()))
+              specialKeyBuilder.clear()
             } else {
-              result.add(KeyStroke.getKeyStroke('<'))
-              result.addAll(stringToKeys(specialKeyName))
-              result.add(KeyStroke.getKeyStroke('>'))
+              specialKeyBuilder.append(c)
             }
           }
-        } else {
-          // e.g. move '<-2<CR> - the first part does not belong to any special key
-          if (element == '<' || element == '«') {
-            result.add(KeyStroke.getKeyStroke(specialKeyStart))
-            result.addAll(stringToKeys(specialKeyBuilder.toString()))
-            specialKeyBuilder = StringBuilder()
-          } else {
-            specialKeyBuilder.append(element)
-          }
         }
       }
     }
+
     if (state == KeyParserState.ESCAPE) {
-      result.add(KeyStroke.getKeyStroke('\\'))
+      add(KeyStroke.getKeyStroke('\\'))
     } else if (state == KeyParserState.SPECIAL) {
-      result.add(KeyStroke.getKeyStroke(specialKeyStart))
-      result.addAll(stringToKeys(specialKeyBuilder.toString()))
+      add(KeyStroke.getKeyStroke('<'))
+      addAll(stringToKeys(specialKeyBuilder.toString()))
     }
-    return result
   }
 
-  private fun parseMapLeader(s: String): List<KeyStroke>? {
-    if ("leader".equals(s, ignoreCase = true)) {
-      val mapLeader: Any? = injector.variableService.getGlobalVariableValue("mapleader")
-      return if (mapLeader is VimString) {
-        stringToKeys(mapLeader.value)
-      } else {
-        stringToKeys("\\")
-      }
+  private fun getMapLeader(): List<KeyStroke> {
+    val mapLeader: Any? = injector.variableService.getGlobalVariableValue("mapleader")
+    return if (mapLeader is VimString) {
+      stringToKeys(mapLeader.value)
+    } else {
+      stringToKeys("\\")
     }
-    return null
   }
-
-//  override fun parseKeysSet(@NonNls vararg keys: String): Set<List<KeyStroke>> = List(keys.size) {
-//    injector.parser.parseKeys(keys[it])
-//  }.toSet()
 
   override fun stringToKeys(string: @NonNls String): List<KeyStroke> {
     val res: MutableList<KeyStroke> = ArrayList()
@@ -211,6 +204,7 @@ abstract class VimStringParserBase : VimStringParser {
     return c < '\u0020'
   }
 
+  @Suppress("SpellCheckingInspection")
   private fun getVimKeyValue(c: Int): @NonNls String? {
     return when (c) {
       KeyEvent.VK_ENTER -> "cr"
@@ -498,6 +492,7 @@ abstract class VimStringParserBase : VimStringParser {
     return null
   }
 
+  @Suppress("SpellCheckingInspection")
   private fun getVimKeyName(lower: @NonNls String?): Int? {
     return when (lower) {
       "cr", "enter", "return" -> KeyEvent.VK_ENTER
@@ -549,6 +544,7 @@ abstract class VimStringParserBase : VimStringParser {
     }
   }
 
+  @Suppress("SpellCheckingInspection")
   private fun getVimTypedKeyName(lower: String): Char? {
     return when (lower) {
       "space" -> ' '
