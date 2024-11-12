@@ -43,6 +43,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.ex.FileEditorWithProvider
 import com.intellij.openapi.fileEditor.impl.EditorComposite
 import com.intellij.openapi.fileEditor.impl.EditorWindow
+import com.intellij.openapi.observable.util.addKeyListener
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
@@ -102,7 +103,6 @@ import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.macro.macroWidgetOptionListener
 import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.mode.modeWidgetOptionListener
-import com.maddyhome.idea.vim.vimDisposable
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities
@@ -276,49 +276,52 @@ internal object VimListenerManager {
       // TODO: If the user changes the 'ideavimsupport' option, existing editors won't be initialised
       if (vimDisabled(editor)) return
 
-      // As I understand, there is no need to pass a disposable that also disposes on editor close
-      //   because all editor resources will be garbage collected anyway on editor close
-      // Note that this uses the plugin's main disposable, rather than VimPlugin.onOffDisposable, because we don't need
-      // to - we explicitly call VimListenerManager.removeAll from VimPlugin.turnOffPlugin, and this disposes each
-      // editor's disposable individually.
-      val disposable = editor.project?.vimDisposable ?: return
-
       // Protect against double initialisation
       if (editor.getUserData(editorListenersDisposableKey) != null) {
         return
       }
 
-      val listenersDisposable = Disposer.newDisposable(disposable)
-      editor.putUserData(editorListenersDisposableKey, listenersDisposable)
+      // Make sure we explicitly dispose this per-editor disposable!
+      // Because the listeners are registered with a parent disposable, they add child disposables that have to call a
+      // method on the editor to remove the listener. This means the disposable contains a reference to the editor (even
+      // if the listener handler is a singleton that doesn't hold a reference).
+      // Unless the per-editor disposable is disposed, all of these disposables sit in the disposer tree until the
+      // parent disposable is disposed, which will mean we leak editor instances.
+      // The per-editor disposable is explicitly disposed when the editor is released, and disposed via its parent when
+      // the plugin's on/off functionality is toggled, and so also when the plugin is disabled/unloaded by the platform.
+      // It doesn't matter if we explicitly remove all listeners before disposing onOffDisposable, as that will remove
+      // the per-editor disposable from the disposer tree.
+      val perEditorDisposable = Disposer.newDisposable(VimPlugin.getInstance().onOffDisposable)
+      editor.putUserData(editorListenersDisposableKey, perEditorDisposable)
 
-      Disposer.register(listenersDisposable) {
+      Disposer.register(perEditorDisposable) {
         if (VimListenerTestObject.enabled) {
           VimListenerTestObject.disposedCounter += 1
         }
       }
 
-      editor.contentComponent.addKeyListener(VimKeyListener)
-      Disposer.register(listenersDisposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
+      // This listener and several below add a reference to the editor to the disposer tree
+      editor.contentComponent.addKeyListener(perEditorDisposable, VimKeyListener)
 
       // Initialise the local options. We MUST do this before anything has the chance to query options
       val vimEditor = editor.vim
       VimPlugin.getOptionGroup().initialiseLocalOptions(vimEditor, openingEditor, scenario)
 
       val eventFacade = EventFacade.getInstance()
-      eventFacade.addEditorMouseListener(editor, EditorMouseHandler, listenersDisposable)
-      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler, listenersDisposable)
-      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler, listenersDisposable)
-      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, listenersDisposable)
-      eventFacade.addCaretListener(editor, EditorCaretHandler, listenersDisposable)
+      eventFacade.addEditorMouseListener(editor, EditorMouseHandler, perEditorDisposable)
+      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler, perEditorDisposable)
+      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler, perEditorDisposable)
+      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, perEditorDisposable)
+      eventFacade.addCaretListener(editor, EditorCaretHandler, perEditorDisposable)
 
       VimPlugin.getEditor().editorCreated(editor)
-      VimPlugin.getChange().editorCreated(editor, listenersDisposable)
+      VimPlugin.getChange().editorCreated(editor, perEditorDisposable)
 
-      (editor as EditorEx).addFocusListener(VimFocusListener, listenersDisposable)
+      (editor as EditorEx).addFocusListener(VimFocusListener, perEditorDisposable)
 
       injector.listenersNotifier.notifyEditorCreated(vimEditor)
 
-      Disposer.register(listenersDisposable) {
+      Disposer.register(perEditorDisposable) {
         VimPlugin.getEditor().editorDeinit(editor)
       }
     }
@@ -460,6 +463,7 @@ internal object VimListenerManager {
     override fun editorReleased(event: EditorFactoryEvent) {
       if (vimDisabled(event.editor)) return
       val vimEditor = event.editor.vim
+      EditorListeners.remove(event.editor)
       injector.listenersNotifier.notifyEditorReleased(vimEditor)
       injector.markService.editorReleased(vimEditor)
     }
