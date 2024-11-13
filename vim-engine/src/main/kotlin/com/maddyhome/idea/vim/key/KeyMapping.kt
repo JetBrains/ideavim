@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.key.KeyStrokeTrie.TrieNode
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
 data class KeyMappingEntry(private val node: TrieNode<MappingInfo>) {
@@ -179,4 +180,17 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
    */
   fun hasmapto(toKeys: List<KeyStroke>) =
     keysTrie.getEntries().any { (it.data as? ToKeysMappingInfo)?.toKeys == toKeys }
+
+
+  // Currently used externally by peekaboo plugin
+  @Deprecated("Use different approach")
+  @TestOnly
+  fun getMapTo(toKeys: List<KeyStroke?>): List<Pair<List<KeyStroke>, MappingInfo>> {
+    return keysTrie.getEntries().filter { node ->
+      if (node.data == null) return@filter false
+      val mappingInfo = node.data
+      KeyMappingEntry(node).getPath()
+      mappingInfo is ToKeysMappingInfo && mappingInfo.toKeys == toKeys
+    }.map { KeyMappingEntry(it).getPath() to it.data!! }.toList()
+  }
 }
