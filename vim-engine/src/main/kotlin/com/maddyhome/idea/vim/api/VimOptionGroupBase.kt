@@ -260,20 +260,29 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
 
   private fun <T : VimDataType> initialiseNewOptionDefaultValues(option: Option<T>) {
-    if (option.declaredScope != LOCAL_TO_WINDOW) {
-      storage.setOptionValue(option, OptionAccessScope.GLOBAL(null), OptionValue.Default(option.defaultValue))
-    }
-    injector.editorGroup.getEditors().forEach { editor ->
+    fun initialiseNewOptionDefaultValuesForWindow(editor: VimEditor) {
       when (option.declaredScope) {
-        GLOBAL -> { }
-        LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> {
+        GLOBAL -> {}
+        LOCAL_TO_BUFFER -> {
           storage.setOptionValue(option, OptionAccessScope.LOCAL(editor), OptionValue.Default(option.defaultValue))
         }
+
+        LOCAL_TO_WINDOW -> {
+          storage.setOptionValue(option, OptionAccessScope.GLOBAL(editor), OptionValue.Default(option.defaultValue))
+          storage.setOptionValue(option, OptionAccessScope.LOCAL(editor), OptionValue.Default(option.defaultValue))
+        }
+
         GLOBAL_OR_LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_WINDOW -> {
           storage.setOptionValue(option, OptionAccessScope.LOCAL(editor), OptionValue.Default(option.unsetValue))
         }
       }
     }
+
+    if (option.declaredScope != LOCAL_TO_WINDOW) {
+      storage.setOptionValue(option, OptionAccessScope.GLOBAL(null), OptionValue.Default(option.defaultValue))
+    }
+    initialiseNewOptionDefaultValuesForWindow(injector.fallbackWindow)
+    injector.editorGroup.getEditors().forEach(::initialiseNewOptionDefaultValuesForWindow)
   }
 }
 
