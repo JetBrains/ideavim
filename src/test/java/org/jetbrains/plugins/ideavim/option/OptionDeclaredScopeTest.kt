@@ -148,7 +148,17 @@ class OptionDeclaredScopeTest : VimNoWriteActionTestCase() {
    * Closes the given editor
    */
   private fun closeWindow(editor: Editor) {
-    fileEditorManager.closeFile(editor.virtualFile)
+    ApplicationManager.getApplication().invokeAndWait {
+      // Just using fileEditorManager.closeFile(editor.virtualFile) can cause weird side effects, like opening a
+      // different buffer in an open editor. See FileGroup.closeFile
+      val editorWindow = fileEditorManager.currentWindow
+      val virtualFile = editor.virtualFile
+
+      if (editorWindow != null && virtualFile != null) {
+        editorWindow.closeFile(virtualFile)
+        editorWindow.requestFocus(true)
+      }
+    }
   }
 
   // Check option values are correct after dynamically adding an option
@@ -477,8 +487,10 @@ class OptionDeclaredScopeTest : VimNoWriteActionTestCase() {
       assertOptionValues(otherBufferWindow, local = _changed_, effective = _changed_, global = unchanged)
 
       val file = otherBufferWindow.virtualFile
-      closeWindow(otherBufferWindow)
-      fixture.openFileInEditor(file)
+      ApplicationManager.getApplication().invokeAndWait {
+        closeWindow(otherBufferWindow)
+        fixture.openFileInEditor(file)
+      }
       val newBufferWindow = fixture.editor
 
       assertOptionValues(mainWindow,        local = unchanged, effective = unchanged, global = unchanged)
@@ -507,6 +519,135 @@ class OptionDeclaredScopeTest : VimNoWriteActionTestCase() {
       assertOptionValues(fallbackWindow,    local = unchanged, effective = unchanged, global = unchanged)
     }
   }
+
+  // Test handling of the fallback window when closing windows
+  // Vim always has an open window, so currently set local options are passed on to the next buffer edited in the
+  // current window, or the next opened window/split. IntelliJ does not always have a currently open window, so there's
+  // a dummy "fallback" window that is updated when the last window in a project is closed. This is used to initialise
+  // the next new window
+  // Previous tests make sure that the fallback window is not unnecessarily updated when values changed (apart from
+  // global, obviously)
+  // * Test fallback window IS NOT updated when closing arbitrary windows. Local values only, plus per-window global
+  // * Test fallback window IS updated when closing the last window. Again, local values only, plus per-window global
+  // We don't need to test global values because they will obviously be the same for the fallback window. We also
+  // don't need to test effective values because that will update both local + global, and if we've test local, we
+  // know it's working
+
+  @Test
+  fun `test closing arbitrary window does not update fallback window for local-to-buffer local value`() {
+    withOption(OptionDeclaredScope.LOCAL_TO_BUFFER) {
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = unchanged, effective = unchanged, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing arbitrary window does not update fallback window for local-to-window local value`() {
+    withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = unchanged, effective = unchanged, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing arbitrary window does not update fallback window for local-to-window per-window global value`() {
+    withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
+      setGlobalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = unchanged, effective = unchanged, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing arbitrary window does not update fallback window for global-local-to-buffer local value`() {
+    withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER) {
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = __unset__, effective = unchanged, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing arbitrary window does not update fallback window for global-local-to-window local value`() {
+    withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW) {
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = __unset__, effective = unchanged, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing last window updates fallback window with local-to-buffer local value`() {
+    withOption(OptionDeclaredScope.LOCAL_TO_BUFFER) {
+      closeWindow(splitWindow)
+      closeWindow(otherBufferWindow)
+
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = _changed_, effective = _changed_, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing last window updates fallback window with local-to-window local value`() {
+    withOption(OptionDeclaredScope.LOCAL_TO_WINDOW) {
+      closeWindow(splitWindow)
+      closeWindow(otherBufferWindow)
+
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = _changed_, effective = _changed_, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing last window updates fallback window with global-local-to-buffer local value`() {
+    withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER) {
+      closeWindow(splitWindow)
+      closeWindow(otherBufferWindow)
+
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = _changed_, effective = _changed_, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing last window updates fallback window with global-local-to-window local value`() {
+    withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW) {
+      closeWindow(splitWindow)
+      closeWindow(otherBufferWindow)
+
+      setLocalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = _changed_, effective = _changed_, global = unchanged)
+    }
+  }
+
+  @Test
+  fun `test closing last window updates fallback window with local-to-window per-window global value`() {
+    withOption(OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW) {
+      closeWindow(splitWindow)
+      closeWindow(otherBufferWindow)
+
+      setGlobalValue(mainWindow)
+      closeWindow(mainWindow)
+
+      assertOptionValues(fallbackWindow,    local = __unset__, effective = _changed_, global = _changed_)
+    }
+  }
+
 
   private inline fun withOption(declaredScope: OptionDeclaredScope, action: Option<VimString>.() -> Unit) {
     StringOption(optionName, declaredScope, optionName, defaultValue).let { option ->

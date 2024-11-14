@@ -259,6 +259,9 @@ abstract class VimNoWriteActionTestCase {
     injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = false, resetCaret = false)
     (injector.digraphGroup as VimDigraphGroupBase).clearCustomDigraphs()
 
+    // Important to reset in tearDown as well as setUp, so we reset modified test options
+    resetAllOptions()
+
     // Tear down neovim
     NeovimTesting.tearDown(testInfo)
   }
