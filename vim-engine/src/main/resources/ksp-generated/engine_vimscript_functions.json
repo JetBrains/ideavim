@@ -2,6 +2,7 @@
     "abs": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.AbsFunctionHandler",
     "col": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ColFunctionHandler",
     "empty": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.EmptyFunctionHandler",
+    "escape": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.EscapeFunctionHandler",
     "exists": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ExistsFunctionHandler",
     "funcref": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.FuncrefFunctionHandler",
     "function": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.FunctionFunctionHandler",
