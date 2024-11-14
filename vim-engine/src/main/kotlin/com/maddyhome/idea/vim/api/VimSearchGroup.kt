@@ -195,4 +195,9 @@ interface VimSearchGroup {
    * Gets the direction lastly used in a search.
    */
   fun getLastSearchDirection(): Direction
+
+  /**
+   * Returns true if any text is selected in the visible editors, false otherwise.
+   */
+  fun isSomeTextHighlighted(): Boolean
 }

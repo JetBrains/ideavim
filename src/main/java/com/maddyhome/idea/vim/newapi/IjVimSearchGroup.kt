@@ -110,6 +110,19 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     showSearchHighlight = injector.globalOptions().hlsearch
   }
 
+  override fun isSomeTextHighlighted(): Boolean {
+    val vimEditors = injector.editorGroup.getEditors().filter {
+      (injector.application.isUnitTest() || it.ij.component.isShowing)
+    }
+    for (vimEditor in vimEditors) {
+      val editor = vimEditor.ij
+      if (editor.vimLastHighlighters != null) {
+        return true
+      }
+    }
+    return false
+  }
+
   override fun setShouldShowSearchHighlights() {
     showSearchHighlight = injector.globalOptions().hlsearch
   }

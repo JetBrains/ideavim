@@ -22,11 +22,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import com.maddyhome.idea.vim.vimscript.model.variables.HighLightVariable
 import com.maddyhome.idea.vim.vimscript.model.variables.RegisterVariable
 
 abstract class VimVariableServiceBase : VariableService {
@@ -181,6 +181,9 @@ abstract class VimVariableServiceBase : VariableService {
       "count" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot())
       "count1" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1))
       "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
+      "hlsearch" -> {
+        HighLightVariable().evaluate(name, editor, context, vimContext)
+      }
       "register" -> {
          RegisterVariable().evaluate(name, editor, context, vimContext)
       }
