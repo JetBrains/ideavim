@@ -386,9 +386,6 @@ internal object VimListenerManager {
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
       VimPlugin.getSearch().fileEditorManagerSelectionChangedCallback(event)
-      SlowOperations.knownIssue("VIM-3658").use {
-        OptionGroup.fileEditorManagerSelectionChangedCallback(event)
-      }
       IjVimRedrawService.fileEditorManagerSelectionChangedCallback(event)
     }
   }
@@ -466,6 +463,18 @@ internal object VimListenerManager {
       EditorListeners.remove(event.editor)
       injector.listenersNotifier.notifyEditorReleased(vimEditor)
       injector.markService.editorReleased(vimEditor)
+
+      // This ticket will have a different stack trace, but it's the same problem. Originally, we tracked the last
+      // editor closing based on file selection (closing an editor would select the next editor - so a null selection
+      // was taken to mean that there were no more editors to select). This assumption broke in 242, so it's changed to
+      // check when the editor is released.
+      // However, the actions taken when the last editor closes can still be expensive/slow because we copy options, and
+      // some options are backed by PSI options. E.g. 'textwidth' is mapped to
+      // CodeStyle.getSettings(ijEditor).isWrapOnTyping(language)), and getting the document's PSI language is a slow
+      // operation. This underlying issue still needs to be addressed, even though the method has moved
+      SlowOperations.knownIssue("VIM-3658").use {
+        OptionGroup.editorReleased(event.editor)
+      }
     }
 
     override fun fileOpenedSync(

@@ -12,6 +12,7 @@ import com.intellij.application.options.CodeStyle
 import com.intellij.codeStyle.AbstractConvertLineSeparatorsAction
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ScrollPositionCalculator
@@ -19,8 +20,6 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.editor.impl.softwrap.SoftWrapAppliancePlaces
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent
-import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.impl.LoadTextUtil
 import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl
 import com.intellij.openapi.project.Project
@@ -158,25 +157,24 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOpt
   }
 
   companion object {
-    fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
-      // Vim only has one window, and it's not possible to close it. This means that editing a new file will always
-      // reuse an existing window (opening a new window will always open from an existing window). More importantly,
-      // this means that any newly edited file will always get up-to-date local-to-window options. A new window is based
-      // on the opening window (treated as split then edit, so copy local + per-window "global" window values, then
-      // apply the per-window "global" values) and an edit reapplies the per-window "global" values.
-      // If we close all windows, and open a new one, we can only use the per-window "global" values from the fallback
-      // window, but this is only initialised when we first read `~/.ideavimrc` during startup. Vim would use the values
-      // from the current window, so to simulate this, we should update the fallback window with the values from the
-      // window that was selected at the time that the last window was closed.
-      // Unfortunately, we can't reliably know if a closing editor is the selected editor. Instead, we rely on selection
-      // change events. If an editor is losing selection and there is no new selection, we can assume this means that
-      // the last editor has been closed, and use the closed editor to update the fallback window
-      //
-      // XXX: event.oldEditor will must probably return a disposed editor. So, it should be treated with care
-      if (event.newEditor == null) {
-        (event.oldEditor as? TextEditor)?.editor?.let {
-          (VimPlugin.getOptionGroup() as OptionGroup).updateFallbackWindow(injector.fallbackWindow, it.vim)
-        }
+    fun editorReleased(editor: Editor) {
+      // Vim always has at least one window; it's not possible to close it. Editing a new file will open a new buffer in
+      // the current window, or it's possible to split the current buffer into a new window, or open a new buffer in a
+      // new window. This is important for us because when Vim opens a new window, the new window's local options are
+      // copied from the current window.
+      // In detail: splitting the current window gets a complete copy of local and per-window global option values.
+      // Editing a new file will split the current window and then edit the new buffer in-place.
+      // IntelliJ does not always have an open window. It would be weird to close the last editor tab, and then open
+      // the next tab with different options - the user would expect the editor to look like the last one did.
+      // Therefore, we have a dummy "fallback" window that captures the options of the last closed editor. When opening
+      // an editor and there are no currently open editors, we use the fallback window to initialise the new window.
+      // This callback tracks when editors are closed, and if the last editor in a project is being closed, updates the
+      // fallback window's options.
+      val project = editor.project ?: return
+      if (!injector.editorGroup.getEditorsRaw()
+          .any { it.ij != editor && it.ij.project === project && it.ij.editorKind == EditorKind.MAIN_EDITOR }
+      ) {
+        (VimPlugin.getOptionGroup() as OptionGroup).updateFallbackWindow(injector.fallbackWindow, editor.vim)
       }
     }
   }

@@ -151,7 +151,13 @@ class OptionDeclaredScopeTest : VimNoWriteActionTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       // Just using fileEditorManager.closeFile(editor.virtualFile) can cause weird side effects, like opening a
       // different buffer in an open editor. See FileGroup.closeFile
-      val editorWindow = fileEditorManager.currentWindow
+      // But we can't just rely on the current EditorWindow. E.g., if we're trying to close a file that's not currently
+      // open in the current window, or is open in a split while we want to close the *other* editor...
+      val editorWindow = fileEditorManager.windows.first { window ->
+        window.allComposites.any { composite ->
+          composite.allEditors.filterIsInstance<TextEditor>().any { textEditor -> textEditor.editor == editor }
+        }
+      }
       val virtualFile = editor.virtualFile
 
       if (editorWindow != null && virtualFile != null) {
