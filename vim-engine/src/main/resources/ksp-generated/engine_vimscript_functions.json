@@ -5,6 +5,7 @@
     "funcref": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.FuncrefFunctionHandler",
     "function": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.FunctionFunctionHandler",
     "get": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.GetFunctionHandler",
+    "getcmdtype": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.GetCmdTypeFunctionHandler",
     "join": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.JoinFunctionHandler",
     "len": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.LenFunctionHandler",
     "sin": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SinFunctionHandler",
