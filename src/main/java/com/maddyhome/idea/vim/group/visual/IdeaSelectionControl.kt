@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.visual
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Editor
@@ -15,6 +16,8 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
+import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl.controlNonVimSelectionChange
+import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl.predictMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
@@ -63,12 +66,15 @@ internal object IdeaSelectionControl {
       //  - There was no selection and now it is
       //  - There was a selection and now it doesn't exist
       //  - There was a selection and now it exists as well (transforming char selection to line selection, for example)
-      if (initialMode?.hasVisualSelection == false && !editor.selectionModel.hasSelection(true)) {
+      val hasSelection = ApplicationManager.getApplication().runReadAction<Boolean> {
+        editor.selectionModel.hasSelection(true)
+      }
+      if (initialMode?.hasVisualSelection == false && !hasSelection) {
         logger.trace { "Exiting without selection adjusting" }
         return@singleTask
       }
 
-      if (editor.selectionModel.hasSelection(true)) {
+      if (hasSelection) {
         if (editor.vim.inCommandLineMode && editor.vim.mode.returnTo().hasVisualSelection) {
           logger.trace { "Modifying selection while in Command-line mode, most likely incsearch" }
           return@singleTask
