@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimMoveBlockSelectionToOffset
 import com.maddyhome.idea.vim.group.visual.vimMoveSelectionToCaret
 import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.register.Register
@@ -40,7 +41,9 @@ interface ImmutableVimCaret {
   val isValid: Boolean
   val isPrimary: Boolean
 
+  @RWLockLabel.Readonly
   val selectionStart: Int
+  @RWLockLabel.Readonly
   val selectionEnd: Int
   val vimSelectionStart: Int
 

@@ -17,7 +17,7 @@ annotation class RWLockLabel {
    * [Readonly] annotation means that annotated function should be called from read action
    * This annotation is only a marker and doesn't enable r/w lock automatically
    */
-  @Target(AnnotationTarget.FUNCTION)
+  @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
   annotation class Readonly
 
   /**

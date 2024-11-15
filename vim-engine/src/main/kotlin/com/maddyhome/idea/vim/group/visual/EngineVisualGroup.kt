@@ -8,8 +8,15 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.maddyhome.idea.vim.api.*
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.VimVisualPosition
+import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.isLineEmpty
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
@@ -135,6 +142,7 @@ fun VimCaret.vimUpdateEditorSelection() {
 /**
  * This works almost like [Caret.getLeadSelectionOffset] in IJ, but vim-specific
  */
+@RWLockLabel.Readonly
 val ImmutableVimCaret.vimLeadSelectionOffset: Int
   get() {
     val caretOffset = offset
