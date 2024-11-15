@@ -44,7 +44,7 @@ import org.jetbrains.annotations.TestOnly
 )
 open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Element> {
   companion object {
-    private val logger = vimLogger<IjVimSearchGroup>()
+    private val logger by lazy { vimLogger<IjVimSearchGroup>() }
   }
 
   init {
