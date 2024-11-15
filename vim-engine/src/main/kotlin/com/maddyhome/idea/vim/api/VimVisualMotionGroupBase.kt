@@ -162,10 +162,14 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
     editor.mode = Mode.VISUAL(autodetectedSubMode)
     //    editor.vimStateMachine.setMode(VimStateMachine.Mode.VISUAL, autodetectedSubMode)
-    if (autodetectedSubMode == SelectionType.BLOCK_WISE) {
-      editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
-    } else {
-      editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
+
+    // vimLeadSelectionOffset requires read action
+    injector.application.runReadAction {
+      if (autodetectedSubMode == SelectionType.BLOCK_WISE) {
+        editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
+      } else {
+        editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
+      }
     }
     return true
   }
