@@ -136,7 +136,7 @@ dependencies {
     // This check intentionally has a pattern where we explicitly specify if to use the JSON plugin for each
     //   supported version or not to prevent developers from figuring out what happened with JSON.
     when (ideaVersion) {
-      "2024.2.1" -> { /* Nothing */ }
+      "2024.2.1", "2024.3" -> { /* Nothing */ }
       "LATEST-EAP-SNAPSHOT" -> bundledPlugins("com.intellij.modules.json")
       else -> error("Unsupported version: $ideaVersion")
     }
