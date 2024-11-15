@@ -73,6 +73,7 @@ import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ijOptions
@@ -242,6 +243,7 @@ abstract class VimNoWriteActionTestCase {
     bookmarksManager?.bookmarks?.forEach { bookmark ->
       bookmarksManager.remove(bookmark)
     }
+    VimListenerManager.VimLastSelectedEditorTracker.resetLastSelectedEditor(fixture.project)
     SelectionVimListenerSuppressor.lock().use { fixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
     VimPlugin.getVariableService().clear()

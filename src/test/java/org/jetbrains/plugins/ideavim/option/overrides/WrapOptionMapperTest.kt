@@ -21,7 +21,6 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertFalse
@@ -248,7 +247,6 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  @Disabled("Doesn't work in 242")
   fun `test open new window after setting option copies value as explicitly set`() {
     enterCommand("set nowrap")
     assertCommandOutput("set wrap?", "nowrap")
@@ -278,7 +276,6 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  @Disabled("Doesn't work in 242")
   fun `test setlocal 'wrap' then open new window uses value from setglobal`() {
     enterCommand("setlocal nowrap")
     assertCommandOutput("setglobal wrap?", "  wrap")
@@ -294,7 +291,6 @@ class WrapOptionMapperTest : VimTestCase() {
   }
 
   @Test
-  @Disabled("Doesn't work in 242")
   fun `test setting global IDE value will update effective Vim value in new window initialised from value set during startup`() {
     try {
       injector.optionGroup.startInitVimRc()
