@@ -19,6 +19,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.state.KeyHandlerState
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -132,8 +134,22 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
       return
     }
 
+    updateUndoKey(editor, cmd)
     if (!baseExecute(editor, caret, context, cmd, operatorArguments)) {
       injector.messages.indicateError()
+    }
+  }
+  
+  private fun updateUndoKey(editor: VimEditor, command: Command) {
+    val undo = (injector.undo as? VimKeyBasedUndoService) ?: return
+    
+    if (editor.mode == Mode.INSERT) return // typing handles undo on its own
+    if (command.flags.contains(CommandFlags.FLAG_UNDO_AWARE)) return
+    
+    if (command.type == Command.Type.MOTION) {
+      undo.setMergeUndoKey()
+    } else {
+      undo.updateNonMergeUndoKey()
     }
   }
 

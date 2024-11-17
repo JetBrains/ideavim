@@ -60,6 +60,8 @@ import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import org.jetbrains.annotations.ApiStatus
 import java.lang.System.identityHashCode
 
@@ -140,7 +142,13 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
 
   override fun insertText(caret: VimCaret, atPosition: Int, text: CharSequence) {
     if (injector.vimState.mode is Mode.INSERT) {
-      injector.undo.startInsertSequence(caret, atPosition, System.nanoTime())
+      val undo = injector.undo
+      when (undo) {
+        is VimKeyBasedUndoService -> undo.setInsertNonMergeUndoKey()
+        is VimTimestampBasedUndoService -> {
+          undo.startInsertSequence(caret, atPosition, System.nanoTime())
+        }
+      }
     }
     editor.document.insertString(atPosition, text)
   }
@@ -532,7 +540,7 @@ internal class InsertTimeRecorder: ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     editor as IjVimEditor
     if (oldMode == Mode.INSERT) {
-      val undo = injector.undo
+      val undo = injector.undo as? VimTimestampBasedUndoService ?: return
       val nanoTime = System.nanoTime()
       editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
     }

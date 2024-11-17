@@ -15,6 +15,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 
 abstract class ChangeInInsertSequenceAction : ChangeEditorActionHandler.ForEachCaret() {
   final override fun execute(
@@ -25,9 +27,15 @@ abstract class ChangeInInsertSequenceAction : ChangeEditorActionHandler.ForEachC
     operatorArguments: OperatorArguments
   ): Boolean {
     // We start an insert sequence before entering the insert mode to unify future world deletion with future typing into a single undo step
-    injector.undo.startInsertSequence(caret, caret.offset, System.nanoTime())
+    val undo = injector.undo
+    when (undo) {
+      is VimKeyBasedUndoService -> undo.setInsertNonMergeUndoKey()
+      is VimTimestampBasedUndoService -> {
+        undo.startInsertSequence(caret, caret.offset, System.nanoTime())
+      }
+    }
     val result = executeInInsertSequence(editor, caret, context, argument, operatorArguments)
-    if (!result) injector.undo.abandonCurrentInsertSequence(caret)
+    if (!result) (injector.undo as? VimTimestampBasedUndoService)?.abandonCurrentInsertSequence(caret)
     return result
   }
 

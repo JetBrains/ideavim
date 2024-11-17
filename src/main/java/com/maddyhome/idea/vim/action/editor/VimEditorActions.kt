@@ -20,6 +20,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.IdeActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.util.*
 
 @CommandOrMotion(keys = ["<Del>"], modes = [Mode.INSERT])
@@ -39,8 +41,13 @@ internal class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CA
     operatorArguments: OperatorArguments
   ): Boolean {
     val undo = injector.undo
-    val nanoTime = System.nanoTime()
-    editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+    when (undo) {
+      is VimKeyBasedUndoService -> undo.setMergeUndoKey()
+      is VimTimestampBasedUndoService -> {
+        val nanoTime = System.nanoTime()
+        editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+      }
+    }
     return super.execute(editor, context, cmd, operatorArguments)
   }
 }
@@ -63,8 +70,13 @@ internal class VimEditorUp : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARE
     operatorArguments: OperatorArguments
   ): Boolean {
     val undo = injector.undo
-    val nanoTime = System.nanoTime()
-    editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+    when (undo) {
+      is VimKeyBasedUndoService -> undo.setMergeUndoKey()
+      is VimTimestampBasedUndoService -> {
+        val nanoTime = System.nanoTime()
+        editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+      }
+    }
     return super.execute(editor, context, cmd, operatorArguments)
   }
 }

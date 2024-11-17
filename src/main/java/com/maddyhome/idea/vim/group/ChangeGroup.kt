@@ -40,6 +40,8 @@ import com.maddyhome.idea.vim.newapi.IjVimCopiedText
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import kotlin.math.min
 
 /**
@@ -63,9 +65,15 @@ class ChangeGroup : VimChangeGroupBase() {
     val editor = (vimEditor as IjVimEditor).editor
     val ijContext = context.ij
     val doc = vimEditor.editor.document
+
     val undo = injector.undo
-    val nanoTime = System.nanoTime()
-    vimEditor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+    when (undo) {
+      is VimKeyBasedUndoService -> undo.setInsertNonMergeUndoKey()
+      is VimTimestampBasedUndoService -> {
+        val nanoTime = System.nanoTime()
+        vimEditor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+      }
+    }
     CommandProcessor.getInstance().executeCommand(
       editor.project, {
         ApplicationManager.getApplication()

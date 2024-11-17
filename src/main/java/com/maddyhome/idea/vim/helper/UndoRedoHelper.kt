@@ -30,13 +30,13 @@ import com.maddyhome.idea.vim.common.InsertSequence
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.undo.UndoRedoBase
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 
 /**
  * @author oleg
  */
 @Service
-internal class UndoRedoHelper : UndoRedoBase() {
+internal class UndoRedoHelper : VimTimestampBasedUndoService {
   companion object {
     private val logger = logger<UndoRedoHelper>()
   }

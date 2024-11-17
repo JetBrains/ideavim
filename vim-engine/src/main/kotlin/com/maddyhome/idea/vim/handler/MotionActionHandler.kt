@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 
 /**
  * @author Alex Plate
@@ -137,8 +139,13 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       is SingleExecution -> run {
         if (editor.mode == Mode.INSERT) {
           val undo = injector.undo
-          val nanoTime = System.nanoTime()
-          editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+          when (undo) {
+            is VimKeyBasedUndoService -> undo.setMergeUndoKey()
+            is VimTimestampBasedUndoService -> {
+              val nanoTime = System.nanoTime()
+              editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+            }
+          }
         }
         val offset = handler.getOffset(editor, context, cmd.argument, operatorArguments)
 
@@ -188,7 +195,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     operatorArguments: OperatorArguments,
   ) {
     if (editor.mode == Mode.INSERT) {
-      injector.undo.endInsertSequence(caret, caret.offset, System.nanoTime())
+      val undo = injector.undo
+      when (undo) {
+        is VimKeyBasedUndoService -> undo.setMergeUndoKey()
+        is VimTimestampBasedUndoService -> undo.endInsertSequence(caret, caret.offset, System.nanoTime())
+      }
     }
     val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
     when (offset) {

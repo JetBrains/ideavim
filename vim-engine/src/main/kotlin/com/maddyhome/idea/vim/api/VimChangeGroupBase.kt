@@ -40,6 +40,8 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGI
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.toReturnTo
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.TestOnly
@@ -483,8 +485,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         // We use enter action for `o`, `O` commands. If we want to undo the added \n and indent, we should record start of insert
         if (editor.mode == Mode.INSERT) {
           val undo = injector.undo
-          val nanoTime = System.nanoTime()
-          editor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+          when (undo) {
+            is VimKeyBasedUndoService -> undo.setInsertNonMergeUndoKey()
+            is VimTimestampBasedUndoService -> {
+              val nanoTime = System.nanoTime()
+              editor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+            }
+          }
         }
         strokes.add(action)
         injector.actionExecutor.executeAction(editor, action, context)

@@ -52,6 +52,8 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.state.mode.isChar
 import com.maddyhome.idea.vim.state.mode.isLine
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.awt.datatransfer.DataFlavor
 
 @Service
@@ -86,9 +88,15 @@ internal class PutGroup : VimPutBase() {
     val context = vimContext.context as DataContext
     val carets: MutableMap<Caret, RangeMarker> = mutableMapOf()
     if (injector.vimState.mode is Mode.INSERT) {
-      val undo = injector.undo
       val nanoTime = System.nanoTime()
-      vimEditor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+
+      val undo = injector.undo
+      when (undo) {
+        is VimKeyBasedUndoService -> undo.setInsertNonMergeUndoKey()
+        is VimTimestampBasedUndoService -> {
+          vimEditor.forEachCaret { undo.startInsertSequence(it, it.offset, nanoTime) }
+        }
+      }
     }
     EditorHelper.getOrderedCaretsList(editor).forEach { caret ->
       val startOffset =
