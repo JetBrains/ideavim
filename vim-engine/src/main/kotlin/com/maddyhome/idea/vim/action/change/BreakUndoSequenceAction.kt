@@ -16,6 +16,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 
 @CommandOrMotion(keys = ["<C-G>u"], modes = [Mode.INSERT])
 class BreakUndoSequenceAction : VimActionHandler.SingleExecution() {
@@ -28,8 +30,13 @@ class BreakUndoSequenceAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val undo = injector.undo
-    val nanoTime = System.nanoTime()
-    editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+    when (undo) {
+      is VimKeyBasedUndoService -> undo.setInsertNonMergeUndoKey(refresh = true)
+      is VimTimestampBasedUndoService -> {
+        val nanoTime = System.nanoTime()
+        editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+      }
+    }
     return true
   }
 }

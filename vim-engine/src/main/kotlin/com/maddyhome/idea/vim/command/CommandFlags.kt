@@ -72,4 +72,9 @@ enum class CommandFlags {
   FLAG_END_EX,
 
   FLAG_TEXT_BLOCK,
+
+  /**
+   * TODO come up with a better solution
+   */
+  FLAG_UNDO_AWARE,
 }
