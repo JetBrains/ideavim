@@ -8,8 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.services
 
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class VimVariableServiceTest : VimTestCase() {
   @Test
@@ -112,5 +114,36 @@ class VimVariableServiceTest : VimTestCase() {
     assertState("1\n2\n1\n2\n1\n2\n${c}1\n2\n1\n")
     typeText("n")
     assertState("1\n2\n1\n2\n1\n2\n1\n2\n${c}1\n")
+  }
+
+  @Test
+  fun `test v register`() {
+    configureByText("abcd")
+    // Check default register
+    typeText(commandToKeys("echo v:register"))
+    assertExOutput("\"")
+    // Check default register in expression
+    enterCommand(
+      """
+      nnoremap <expr> X ':echo v:register<CR>'
+      """.trimIndent(),
+    )
+    typeText("X")
+    assertExOutput("\"")
+    // Check named register
+    typeText("\"w")
+    typeText(commandToKeys("echo v:register"))
+    assertExOutput("w")
+    // Check named register in expression
+    // Here the key is that the register is defined as part of the expression
+    // itself, i.e. it hasn't been committed yet as the current register
+    enterCommand(
+      """
+      vnoremap <expr> y '"' . v:register . 'y'
+      """.trimIndent(),
+    )
+    typeText("vl\"zy")
+    val register = injector.registerGroup.getRegisters().filter { reg -> reg.name == 'z' }.first()
+    assertEquals("ab", register.text)
   }
 }

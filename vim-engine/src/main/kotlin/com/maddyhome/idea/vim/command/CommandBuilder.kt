@@ -87,14 +87,11 @@ class CommandBuilder private constructor(
     return if (counts.all { it == 0 }) 0 else counts.map { it.coerceAtLeast(1) }.reduce { acc, i -> acc * i }
   }
 
-  // TODO: Try to remove this. We shouldn't be looking at the unbuilt command
   // This is used by the extension mapping handler, to select the current register before invoking the extension. We
   // need better handling of extensions so that they integrate better with half-built commands, either by finishing or
   // resetting the command.
-  // If we keep this, consider renaming to something like `uncommittedRegister`, to reflect that the register could
-  // still change, if more keys are processed. E.g., it's perfectly valid to select register multiple times `"a"b`.
-  // This doesn't cause any issues with existing extensions
-  val register: Char?
+  // This is also used by the `v:register` variable.
+  val registerSnapshot: Char?
     get() = selectedRegister
 
   // TODO: Try to remove this too. Also used by extension handling
