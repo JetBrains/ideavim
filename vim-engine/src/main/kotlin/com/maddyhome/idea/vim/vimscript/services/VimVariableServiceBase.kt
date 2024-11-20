@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import com.maddyhome.idea.vim.vimscript.model.variables.RegisterVariable
 
 abstract class VimVariableServiceBase : VariableService {
   private var globalVariables: MutableMap<String, VimDataType> = mutableMapOf()
@@ -181,16 +182,7 @@ abstract class VimVariableServiceBase : VariableService {
       "count1" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1))
       "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
       "register" -> {
-        // The name of the register in effect for the current normal mode
-        // command (regardless of whether that command actually used a
-        // register). Or for the currently executing normal mode mapping
-        // (use this in custom commands that take a register).
-        // If none is supplied it is the default register '"', unless
-        // 'clipboard' contains "unnamed" or "unnamedplus", then it is
-        // "*" or '+' ("unnamedplus" prevails).
-        val register = KeyHandler.getInstance().keyHandlerState.commandBuilder.registerSnapshot
-          ?: injector.registerGroup.currentRegister
-        VimString(register.toString())
+         RegisterVariable().evaluate(name, editor, context, vimContext)
       }
       else -> throw ExException("The 'v:${name}' variable is not implemented yet")
     }
