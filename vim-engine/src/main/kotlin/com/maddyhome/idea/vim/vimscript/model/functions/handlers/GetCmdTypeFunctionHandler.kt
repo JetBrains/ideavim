@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 /*
 Return the current command-line type. Possible return values are:
     :	normal Ex command
-    >	debug mode command debug-mode
     /	forward search command
     ?	backward search command
     =	i_CTRL-R_=
@@ -30,6 +29,7 @@ Return the current command-line type. Possible return values are:
 Returns an empty string otherwise.
 
 Not yet implemented:
+    >	debug mode command debug-mode
     @	input() command
     -	:insert or :append command
  */
