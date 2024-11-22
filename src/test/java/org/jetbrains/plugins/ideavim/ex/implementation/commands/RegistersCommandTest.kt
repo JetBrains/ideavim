@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -170,7 +171,10 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     // Clipboard registers "* "+
-    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val clipboardContent = injector.clipboardManager.dumbCopiedText("clipboard content")
+    injector.clipboardManager.setClipboardContent(vimEditor, context, clipboardContent)
 
     // Last search register "/
     enterSearch("search pattern")
@@ -235,8 +239,11 @@ class RegistersCommandTest : VimTestCase() {
   fun `test clipboard registers are not duplicated`() {
     configureByText("<caret>line 0 ")
 
-    injector.registerGroup.saveRegister('+', Register('+', injector.clipboardManager.dumbCopiedText("Lorem ipsum dolor"), SelectionType.LINE_WISE))
-    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    injector.registerGroup.saveRegister(vimEditor, context, '+', Register('+', injector.clipboardManager.dumbCopiedText("Lorem ipsum dolor"), SelectionType.LINE_WISE))
+    val clipboardContent = injector.clipboardManager.dumbCopiedText("clipboard content")
+    injector.clipboardManager.setClipboardContent(vimEditor, context, clipboardContent)
     typeText("V<Esc>")
 
     enterCommand("registers")
@@ -368,7 +375,10 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     // Clipboard registers "* "+
-    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val clipboardContent = injector.clipboardManager.dumbCopiedText("clipboard content")
+    injector.clipboardManager.setClipboardContent(vimEditor, context, clipboardContent)
 
     // Last search register "/
     enterSearch("search pattern")
@@ -435,8 +445,11 @@ class RegistersCommandTest : VimTestCase() {
   fun `test clipboard registers are not duplicated linux`() {
     configureByText("<caret>line 0 ")
 
-    injector.registerGroup.saveRegister('+', Register('+', injector.clipboardManager.dumbCopiedText("Lorem ipsum dolor"), SelectionType.LINE_WISE))
-    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val clipboardContent = injector.clipboardManager.dumbCopiedText("clipboard content")
+    injector.registerGroup.saveRegister(vimEditor, context, '+', Register('+', injector.clipboardManager.dumbCopiedText("Lorem ipsum dolor"), SelectionType.LINE_WISE))
+    injector.clipboardManager.setClipboardContent(vimEditor, context, clipboardContent)
     typeText("V<Esc>")
 
     enterCommand("registers")

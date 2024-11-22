@@ -15,7 +15,6 @@ import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.ExtensionTestUtil
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -87,8 +86,9 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
-    VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -124,9 +124,12 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     // Add Guard to simulate Notebook behaviour. See (VIM-2577)
     val guardRange = before rangeOf "\nGUARD\n"
     editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
-    val vimEditor = editor.vim
-    injector.registerGroup.storeText(
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    registerService.storeText(
       vimEditor,
+      context,
       vimEditor.primaryCaret(),
       before rangeOf "I found it in a legendary land\n",
       SelectionType.LINE_WISE,
@@ -154,10 +157,10 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             ${c}hard by the torrent of a mountain pass.
     """.trimIndent()
-    val editor = configureByText(before)
-    val vimEditor = editor.vim
-    VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("vep"))
     val after = """
             A Discovery

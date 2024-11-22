@@ -11,6 +11,7 @@ import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -250,7 +251,10 @@ class CopyActionTest : VimTestCase() {
     enterCommand("set clipboard=unnamed")
     kotlin.test.assertEquals('*', VimPlugin.getRegister().defaultRegister)
     typeText("yy")
-    val starRegister = VimPlugin.getRegister().getRegister('*')
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val starRegister = registerService.getRegister(vimEditor, context, '*')
     assertNotNull<Any>(starRegister)
     kotlin.test.assertEquals("bar\n", starRegister.text)
   }
@@ -262,7 +266,10 @@ class CopyActionTest : VimTestCase() {
   fun testLineWiseClipboardYankPaste() {
     configureByText("<caret>foo\n")
     typeText("\"*yy" +  "\"*p")
-    val register = VimPlugin.getRegister().getRegister('*')
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val register = registerService.getRegister(vimEditor, context, '*')
     assertNotNull<Any>(register)
     kotlin.test.assertEquals("foo\n", register.text)
     val editor = fixture.editor
@@ -290,7 +297,10 @@ class CopyActionTest : VimTestCase() {
       """.trimIndent(),
     )
     typeText("<C-V>j" + "\"*y" + "\"*p")
-    val register = VimPlugin.getRegister().getRegister('*')
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val register = registerService.getRegister(vimEditor, context, '*')
     assertNotNull<Any>(register)
     kotlin.test.assertEquals(
       """

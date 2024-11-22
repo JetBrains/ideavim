@@ -9,6 +9,8 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -111,7 +113,9 @@ class GotoLineCommandTest : VimTestCase() {
     """.trimIndent()
     assertState(after)
 
-    val register = VimPlugin.getRegister().getRegister(':')
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val register = VimPlugin.getRegister().getRegister(vimEditor, context, ':')
     assertNotNull(register)
     assertEquals("3", register.text)
   }

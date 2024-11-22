@@ -222,10 +222,10 @@ internal class VimExchangeExtension : VimExtension {
         }
       }
 
-      val zRegText = getRegister('z')
-      val unnRegText = getRegister('"')
-      val startRegText = getRegister('*')
-      val plusRegText = getRegister('+')
+      val zRegText = getRegister(editor.vim, 'z')
+      val unnRegText = getRegister(editor.vim, '"')
+      val startRegText = getRegister(editor.vim, '*')
+      val plusRegText = getRegister(editor.vim, '+')
       runWriteAction {
         // TODO handle:
         // 	" Compare using =~ because "'==' != 0" returns 0
@@ -299,7 +299,7 @@ internal class VimExchangeExtension : VimExtension {
 
     private fun getExchange(editor: Editor, isVisual: Boolean, selectionType: SelectionType): Exchange {
       // TODO: improve KeyStroke list to sting conversion
-      fun getRegisterText(reg: Char): String = getRegister(reg)?.map { it.keyChar }?.joinToString("") ?: ""
+      fun getRegisterText(reg: Char): String = getRegister(editor.vim, reg)?.map { it.keyChar }?.joinToString("") ?: ""
       fun getMarks(isVisual: Boolean): Pair<Mark, Mark> {
         val (startMark, endMark) =
           if (isVisual) {
@@ -313,9 +313,9 @@ internal class VimExchangeExtension : VimExtension {
         return Pair(marks.getMark(vimEditor.primaryCaret(), startMark)!!, marks.getMark(vimEditor.primaryCaret(), endMark)!!)
       }
 
-      val unnRegText = getRegister('"')
-      val starRegText = getRegister('*')
-      val plusRegText = getRegister('+')
+      val unnRegText = getRegister(editor.vim, '"')
+      val starRegText = getRegister(editor.vim, '*')
+      val plusRegText = getRegister(editor.vim, '+')
 
       val (selectionStart, selectionEnd) = getMarks(isVisual)
       if (isVisual) {

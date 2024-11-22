@@ -547,15 +547,19 @@ abstract class VimNoWriteActionTestCase {
   }
 
   protected fun assertRegister(char: Char, expected: String?) {
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     if (expected == null) {
-      assertNull(injector.registerGroup.getRegister(char))
+      assertNull(injector.registerGroup.getRegister(vimEditor, context, char))
     } else {
-      assertEquals(expected, injector.registerGroup.getRegister(char)?.printableString)
+      assertEquals(expected, injector.registerGroup.getRegister(vimEditor, context, char)?.printableString)
     }
   }
 
   protected fun assertRegisterString(char: Char, expected: String?) {
-    val actual = injector.registerGroup.getRegister(char)?.keys?.let(injector.parser::toPrintableString)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val actual = injector.registerGroup.getRegister(vimEditor, context, char)?.keys?.let(injector.parser::toPrintableString)
     assertEquals(expected, actual, "Wrong register contents")
   }
 

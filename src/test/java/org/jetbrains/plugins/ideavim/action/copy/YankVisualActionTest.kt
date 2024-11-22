@@ -10,7 +10,6 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -90,8 +89,9 @@ class YankVisualActionTest : VimTestCase() {
     configureByText(text)
     typeText(injector.parser.parseKeys("viw" + "y"))
     val editor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
     val lastRegister = injector.registerGroup.lastRegisterChar
-    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.text }
+    val registers = editor.carets().map { it.registerStorage.getRegister(editor, context, lastRegister)?.text }
     kotlin.test.assertEquals(listOf("found", "was"), registers)
   }
 
@@ -109,7 +109,10 @@ class YankVisualActionTest : VimTestCase() {
     configureByText(before)
     typeText(injector.parser.parseKeys("vey"))
 
-    val lastRegister = VimPlugin.getRegister().lastRegister
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val lastRegister = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)
     assertNotNull<Any>(lastRegister)
     val text = lastRegister.text
     assertNotNull<Any>(text)
@@ -171,8 +174,9 @@ class YankVisualActionTest : VimTestCase() {
     configureByText(text)
     typeText(injector.parser.parseKeys("V" + "y"))
     val editor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
     val lastRegister = injector.registerGroup.lastRegisterChar
-    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.text }
+    val registers = editor.carets().map { it.registerStorage.getRegister(editor, context, lastRegister)?.text }
     kotlin.test.assertEquals(
       listOf("all rocks and lavender and tufted grass,\n", "hard by the torrent of a mountain pass.\n"),
       registers,
@@ -307,7 +311,10 @@ class YankVisualActionTest : VimTestCase() {
     configureByText(before)
     typeText(keys)
 
-    val lastRegister = VimPlugin.getRegister().lastRegister!!
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val lastRegister = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)!!
     val text = lastRegister.text
     val type = lastRegister.type
     kotlin.test.assertEquals(expectedText, text)

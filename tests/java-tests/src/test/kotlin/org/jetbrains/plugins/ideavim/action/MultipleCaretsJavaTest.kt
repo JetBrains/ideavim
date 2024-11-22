@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.junit.jupiter.api.Test
@@ -198,7 +199,9 @@ y = true; // And this will not
     ${c}private int myK = 0;
 }"""
     configureByJavaText(before)
-    injector.registerGroup.storeText('*', "private int myK = 0;\n", SelectionType.LINE_WISE)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    injector.registerGroup.storeText(vimEditor, context, '*', "private int myK = 0;\n", SelectionType.LINE_WISE)
     typeText(injector.parser.parseKeys("\"*P"))
     val after = """class C {
     C(int i) {
@@ -229,7 +232,9 @@ y = true; // And this will not
     ${c}private int myK = 0;
 }"""
     configureByJavaText(before)
-    injector.registerGroup.storeText('*', "private int myK = 0;", SelectionType.LINE_WISE)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    injector.registerGroup.storeText(vimEditor, context, '*', "private int myK = 0;", SelectionType.LINE_WISE)
     typeText(injector.parser.parseKeys("\"*p"))
     val after = """class C {
     C(int i) {

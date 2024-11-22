@@ -37,7 +37,7 @@ abstract class VimMacroBase : VimMacro {
    */
   override fun playbackRegister(editor: VimEditor, context: ExecutionContext, reg: Char, count: Int): Boolean {
     logger.debug { "play back register $reg $count times" }
-    val register = injector.registerGroup.getPlaybackRegister(reg) ?: return false
+    val register = injector.registerGroup.getPlaybackRegister(editor, context, reg) ?: return false
     ++macroDepth
     try {
       logger.trace {

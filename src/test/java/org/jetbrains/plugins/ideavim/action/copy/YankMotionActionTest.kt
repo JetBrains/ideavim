@@ -8,8 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -25,7 +25,10 @@ class YankMotionActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     typeTextInFile("yW", file)
-    val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val text = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
 
     kotlin.test.assertEquals("and", text)
   }
@@ -55,10 +58,13 @@ class YankMotionActionTest : VimTestCase() {
     enterCommand("set clipboard=unnamed")
     typeText("yiw")
 
-    val starRegister = VimPlugin.getRegister().getRegister('*') ?: kotlin.test.fail("Register * is empty")
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val starRegister = registerService.getRegister(vimEditor, context, '*') ?: kotlin.test.fail("Register * is empty")
     kotlin.test.assertEquals("legendary", starRegister.text)
 
-    val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
+    val quoteRegister = registerService.getRegister(vimEditor, context, '"') ?: kotlin.test.fail("Register \" is empty")
     kotlin.test.assertEquals("legendary", quoteRegister.text)
   }
 
@@ -68,10 +74,13 @@ class YankMotionActionTest : VimTestCase() {
     configureByText("I found it in a ${c}legendary land")
     typeText("\"zyiw")
 
-    val starRegister = VimPlugin.getRegister().getRegister('z') ?: kotlin.test.fail("Register z is empty")
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val starRegister = registerService.getRegister(vimEditor, context, 'z') ?: kotlin.test.fail("Register z is empty")
     kotlin.test.assertEquals("legendary", starRegister.text)
 
-    val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
+    val quoteRegister = registerService.getRegister(vimEditor, context, '"') ?: kotlin.test.fail("Register \" is empty")
     kotlin.test.assertEquals("legendary", quoteRegister.text)
   }
 
@@ -81,7 +90,10 @@ class YankMotionActionTest : VimTestCase() {
     configureByText("I found it in a ${c}legendary land")
     typeText("\"zyiw")
 
-    val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val quoteRegister = registerService.getRegister(vimEditor, context, '"') ?: kotlin.test.fail("Register \" is empty")
     kotlin.test.assertEquals("legendary", quoteRegister.text)
   }
 
@@ -112,7 +124,10 @@ class YankMotionActionTest : VimTestCase() {
             $c
     """.trimIndent()
     typeTextInFile("y$", file)
-    val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val text = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
 
     kotlin.test.assertEquals("", text)
   }
@@ -129,7 +144,10 @@ class YankMotionActionTest : VimTestCase() {
     """.trimIndent()
     typeTextInFile(commandToKeys("map * *zz"), file)
     typeTextInFile("\"*yiw", file)
-    val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val text = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
 
     kotlin.test.assertEquals("legendary", text)
   }
@@ -146,7 +164,10 @@ class YankMotionActionTest : VimTestCase() {
     """.trimIndent()
     typeTextInFile(commandToKeys("map * *yiw"), file)
     typeTextInFile("\"*", file)
-    kotlin.test.assertNull(VimPlugin.getRegister().lastRegister?.text)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    kotlin.test.assertNull(registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text)
   }
 
   @Test
@@ -161,7 +182,10 @@ class YankMotionActionTest : VimTestCase() {
     """.trimIndent()
 
     doTest("yy", file, file)
-    val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val text = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
 
     kotlin.test.assertEquals("hard by the torrent of a mountain pass.\n", text)
   }

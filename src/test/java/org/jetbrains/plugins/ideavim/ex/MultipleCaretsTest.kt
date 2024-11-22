@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -129,8 +130,9 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
     val after = """
           qwe
@@ -164,8 +166,9 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
     val after = """
           qwe
@@ -200,8 +203,9 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
     val after = """
           qwe
@@ -236,8 +240,9 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
     val after = """
           qwe
@@ -257,8 +262,10 @@ class MultipleCaretsTest : VimTestCase() {
   fun testPutVisualLines() {
     val before = "${c}qwe\n" + "rty\n" + "as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
     val editor = configureByText(before)
+    val vimEditor = editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     VimPlugin.getRegister()
-      .storeText(editor.vim, editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      .storeText(vimEditor, context, editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
 
     typeText("vj")
     typeText(commandToKeys("pu"))
@@ -309,7 +316,10 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("y"))
 
-    val lastRegister = VimPlugin.getRegister().lastRegister
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val lastRegister = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)
     assertNotNull<Any>(lastRegister)
     val text = lastRegister.text
     assertNotNull<Any>(text)
@@ -340,7 +350,10 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("d"))
 
-    val lastRegister = VimPlugin.getRegister().lastRegister
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val lastRegister = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)
     assertNotNull<Any>(lastRegister)
     val text = lastRegister.text
     assertNotNull<Any>(text)
