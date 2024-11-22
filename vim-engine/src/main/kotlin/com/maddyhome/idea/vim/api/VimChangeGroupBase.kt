@@ -717,10 +717,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
      caret: VimCaret,
      count: Int,
      spaces: Boolean,
-     operatorArguments: OperatorArguments,
    ): Boolean {
      val context = injector.executionContextManager.getEditorExecutionContext(editor)
-     return deleteJoinLines(editor, context, caret, count, spaces, operatorArguments)
+     return deleteJoinLines(editor, context, caret, count, spaces)
    }
 
    /**
@@ -967,7 +966,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
      saveToRegister: Boolean,
    ): Boolean {
      val context = injector.executionContextManager.getEditorExecutionContext(editor)
-     return deleteRange(editor, context, caret, range, type, isChange, operatorArguments)
+     return deleteRange(editor, context, caret, range, type, isChange)
    }
 
    /**
