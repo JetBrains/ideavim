@@ -57,7 +57,7 @@ data class RepeatCommand(val range: Range, val modifier: CommandModifier, val ar
       }
     }
 
-    val reg = injector.registerGroup.getPlaybackRegister(arg) ?: return ExecutionResult.Error
+    val reg = injector.registerGroup.getPlaybackRegister(editor, context, arg) ?: return ExecutionResult.Error
     val text = reg.text ?: return ExecutionResult.Error
 
     injector.vimscriptExecutor.execute(

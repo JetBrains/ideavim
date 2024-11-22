@@ -32,8 +32,9 @@ class IdeaPutNotificationsTest : VimTestCase() {
     configureByText(before)
     appReadySetup(false)
     val vimEditor = fixture.editor.vim
-    VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notification = notifications().last()
@@ -52,8 +53,9 @@ class IdeaPutNotificationsTest : VimTestCase() {
     configureByText(before)
     appReadySetup(false)
     val vimEditor = fixture.editor.vim
-    VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notifications = notifications()
@@ -70,8 +72,9 @@ class IdeaPutNotificationsTest : VimTestCase() {
     configureByText(before)
     appReadySetup(true)
     val vimEditor = fixture.editor.vim
-    VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notifications = EventLog.getLogModel(fixture.project).notifications

@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -22,7 +23,9 @@ class YankLineActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("\"4yy"))
-    val register = VimPlugin.getRegister().getRegister('4')!!
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val register = VimPlugin.getRegister().getRegister(vimEditor, context, '4')!!
     kotlin.test.assertEquals("Lorem ipsum dolor sit amet,\n", register.text)
   }
 }

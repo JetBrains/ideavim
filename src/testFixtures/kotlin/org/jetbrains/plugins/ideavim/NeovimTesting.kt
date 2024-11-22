@@ -15,6 +15,7 @@ import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.ALTERNATE_BUFFER_REGISTER
@@ -137,7 +138,7 @@ object NeovimTesting {
     assertText(editor)
     assertCaret(editor, test)
     assertMode(editor)
-    assertRegisters()
+    assertRegisters(editor)
   }
 
   fun setRegister(register: Char, keys: String, test: TestInfo) {
@@ -181,12 +182,14 @@ object NeovimTesting {
       EXPRESSION_BUFFER_REGISTER +
       CURRENT_FILENAME_REGISTER
 
-  private fun assertRegisters() {
+  private fun assertRegisters(editor: Editor) {
     for (register in VALID_REGISTERS) {
       if (register in nonCheckingRegisters) continue
       if (register in VimTestCase.Checks.neoVim.ignoredRegisters) continue
       val neovimRegister = getRegister(register)
-      val vimPluginRegister = VimPlugin.getRegister().getRegister(register)
+      val vimEditor = editor.vim
+      val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+      val vimPluginRegister = VimPlugin.getRegister().getRegister(vimEditor, context, register)
       val ideavimRegister = vimPluginRegister?.text ?: ""
       assertEquals(neovimRegister, ideavimRegister, "Register '$register'")
 

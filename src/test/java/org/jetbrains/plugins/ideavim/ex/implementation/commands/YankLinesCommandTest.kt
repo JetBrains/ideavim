@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -113,7 +113,10 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimIndent(),
     )
     typeText(commandToKeys("%y"))
-    val yanked = VimPlugin.getRegister().lastRegister!!.text
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val yanked = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text
     assertEquals(
       """
                 Lorem Ipsum
@@ -317,19 +320,21 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     enterCommand("y")
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val carets = fixture.editor.vim.carets()
     assertEquals(3, carets.size)
     assertEquals(
       "Morbi nec luctus tortor, id venenatis lacus.\n",
-      carets[0].registerStorage.getRegister(RegisterConstants.UNNAMED_REGISTER)?.text
+      carets[0].registerStorage.getRegister(vimEditor, context, RegisterConstants.UNNAMED_REGISTER)?.text
     )
     assertEquals(
       "Nunc sit amet tellus vel purus cursus posuere et at purus.\n",
-      carets[1].registerStorage.getRegister(RegisterConstants.UNNAMED_REGISTER)?.text
+      carets[1].registerStorage.getRegister(vimEditor, context, RegisterConstants.UNNAMED_REGISTER)?.text
     )
     assertEquals(
       "Ut id dapibus augue.\n",
-      carets[2].registerStorage.getRegister(RegisterConstants.UNNAMED_REGISTER)?.text
+      carets[2].registerStorage.getRegister(vimEditor, context, RegisterConstants.UNNAMED_REGISTER)?.text
     )
   }
 }

@@ -10,7 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
@@ -102,7 +103,10 @@ class DeleteMotionActionTest : VimTestCase() {
           expression${c} two
       """.trimIndent(),
     )
-    val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val savedText = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: ""
     kotlin.test.assertEquals("  expression two\n", savedText)
   }
 

@@ -8,8 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -35,7 +35,10 @@ class YankVisualLinesActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     typeText(injector.parser.parseKeys("vjY"))
-    val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val savedText = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
     kotlin.test.assertEquals(yankedTest, savedText)
   }
 
@@ -63,7 +66,10 @@ class YankVisualLinesActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             
     """.trimIndent()
-    val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val savedText = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
     kotlin.test.assertEquals(yankedTest, savedText)
   }
 
@@ -84,7 +90,10 @@ class YankVisualLinesActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     typeText(injector.parser.parseKeys("VjY"))
-    val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val savedText = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
     kotlin.test.assertEquals(yankedTest, savedText)
   }
 }

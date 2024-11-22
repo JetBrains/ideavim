@@ -9,6 +9,7 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
@@ -210,7 +211,9 @@ class SpecialRegistersTest : VimTestCase() {
 
   private fun getRegisterText(registerName: Char): String? {
     val registerGroup = VimPlugin.getRegister()
-    val register = registerGroup.getRegister(registerName)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val register = registerGroup.getRegister(vimEditor, context, registerName)
     assertNotNull<Any>(register)
     return register!!.text
   }
