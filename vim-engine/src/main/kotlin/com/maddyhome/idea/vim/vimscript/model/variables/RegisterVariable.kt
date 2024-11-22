@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
  * 'clipboard' contains "unnamed" or "unnamedplus", then it is
  * "*" or '+' ("unnamedplus" prevails).
  */
-class RegisterVariable : Variable() {
+class RegisterVariable : Variable {
 
   override fun evaluate(
     name: String,
