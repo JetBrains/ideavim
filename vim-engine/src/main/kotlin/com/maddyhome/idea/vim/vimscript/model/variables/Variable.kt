@@ -16,6 +16,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 /**
  * Base class for Vim variables
  */
-abstract class Variable {
-  abstract fun evaluate(name: String, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
+interface Variable {
+  fun evaluate(name: String, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
 }
