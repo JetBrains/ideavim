@@ -146,7 +146,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     if (editor.mode == Mode.INSERT) return // typing handles undo on its own
     if (command.flags.contains(CommandFlags.FLAG_UNDO_AWARE)) return
     
-    if (command.type == Command.Type.MOTION) {
+    if (command.type == Command.Type.MOTION || command.type == Command.Type.MODE_CHANGE) {
       undo.setMergeUndoKey()
     } else {
       undo.updateNonMergeUndoKey()

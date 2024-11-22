@@ -14,14 +14,18 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
+import java.util.EnumSet
 
 @CommandOrMotion(keys = ["<C-G>u"], modes = [Mode.INSERT])
 class BreakUndoSequenceAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_UNDO_AWARE)
 
   override fun execute(
     editor: VimEditor,
