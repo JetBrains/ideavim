@@ -29,7 +29,8 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    val vimEditor = fixture.editor.vim
+    val editor = configureByText(before)
+    val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
     registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)

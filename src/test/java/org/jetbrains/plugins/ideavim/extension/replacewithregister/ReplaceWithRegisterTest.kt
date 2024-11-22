@@ -81,11 +81,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
   @Test
   fun `test replace use different register`() {
     val text = "one ${c}two three four"
-    val vimEditor = fixture.editor.vim
+    val editor = configureByText(text)
+    val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-
-    configureByText(text)
     typeText(injector.parser.parseKeys("\"ayiw" + "w" + "\"agriw"))
     assertState("one two tw${c}o four")
     assertEquals("two", registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text)
@@ -97,11 +96,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
   @Test
   fun `test replace use clipboard register`() {
     val text = "one ${c}two three four"
-    val vimEditor = fixture.editor.vim
+    val editor = configureByText(text)
+    val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-
-    configureByText(text)
     typeText(injector.parser.parseKeys("\"+yiw" + "w" + "\"+griw" + "w" + "\"+griw"))
     assertState("one two two tw${c}o")
     assertEquals("two", registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text)
