@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 
 @CommandOrMotion(keys = ["<C-q>", "<C-v>"], modes = [Mode.NORMAL, Mode.VISUAL])
 class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.MODE_CHANGE
 
   override fun execute(
     editor: VimEditor,

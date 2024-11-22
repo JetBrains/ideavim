@@ -25,7 +25,7 @@ import java.util.*
 @CommandOrMotion(keys = ["<Esc>", "<C-[>", "<C-C>"], modes = [Mode.CMD_LINE])
 class LeaveCommandLineAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_END_EX)
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.MODE_CHANGE
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument as? Argument.ExString ?: return true

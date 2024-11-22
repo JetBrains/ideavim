@@ -93,11 +93,12 @@ data class Command(
      */
     OTHER_SELF_SYNCHRONIZED,
 
+    MODE_CHANGE,
     ;
 
     val isRead: Boolean
       get() = when (this) {
-        MOTION, COPY, OTHER_READONLY -> true
+        MOTION, COPY, OTHER_READONLY, MODE_CHANGE -> true
         else -> false
       }
 

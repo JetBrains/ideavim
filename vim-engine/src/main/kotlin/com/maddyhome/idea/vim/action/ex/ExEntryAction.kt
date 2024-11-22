@@ -22,7 +22,7 @@ import java.util.*
 @CommandOrMotion(keys = [":"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 class ExEntryAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX)
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.MODE_CHANGE
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     if (editor.isOneLineMode()) return false
