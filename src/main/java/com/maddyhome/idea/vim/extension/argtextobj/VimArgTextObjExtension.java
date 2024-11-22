@@ -60,6 +60,8 @@ public class VimArgTextObjExtension implements VimExtension {
 
   /**
    * The pairs of brackets that delimit different types of argument lists.
+   * Brackets are ordered by rank (highest to lowest priority) and used to handle
+   * nested structures correctly, e.g. handling function arguments inside code blocks.
    */
   private static class BracketPairs {
     // NOTE: brackets must match by the position, and ordered by rank (highest to lowest).
@@ -298,7 +300,7 @@ public class VimArgTextObjExtension implements VimExtension {
      * @param position starting position.
      */
     boolean findBoundsAt(int position) throws IllegalStateException {
-      if (text.length() == 0) {
+      if (text.isEmpty()) {
         error = "empty document";
         return false;
       }
@@ -317,8 +319,6 @@ public class VimArgTextObjExtension implements VimExtension {
         }
         if (brackets.isCloseBracket(ch)) {
           --leftBound;
-        } else if (brackets.isOpenBracket(ch)) {
-          ++rightBound;
         } else {
           ++rightBound;
         }
@@ -368,18 +368,35 @@ public class VimArgTextObjExtension implements VimExtension {
       return true;
     }
 
+    /**
+     * Checks if there is a function-like construct (bracket pair) ahead.
+     * Uses simple bracket matching rather than language-specific identifier rules
+     * to work across different programming languages.
+     *
+     * @param position starting position to search from
+     * @return true if potential function call found
+     */
     private boolean isBeforeFunction(int position) {
       int pos = position;
       int rightLimit = rightLimit(position);
 
-      // Skip whitespace before potential function name
-      while (pos < rightLimit && Character.isWhitespace(getCharAt(pos))) {
+      while (pos < rightLimit) {
+        char ch = getCharAt(pos);
+
+        if (brackets.isOpenBracket(ch)) {
+          // Found opening bracket, check if it's matched
+          int matchingClose = skipSexp(pos, rightLimit, SexpDirection.forward(brackets));
+          if (matchingClose > pos + 1) {  // Must have at least one character between brackets
+            leftBound = pos + 1;  // Inside the brackets
+            rightBound = pos + 1;
+            return true;
+          }
+        }
+
         pos++;
       }
 
-      // Must start with identifier character
-      char ch = getCharAt(pos);
-      return ch != 0 && Character.isJavaIdentifierStart(ch);
+      return false;
     }
 
     private int findOpeningBracket(int position) {
@@ -486,7 +503,6 @@ public class VimArgTextObjExtension implements VimExtension {
     /**
      * Detects if current position is inside a quoted string and adjusts
      * left and right bounds to the boundaries of the string.
-     *
      * NOTE: Does not support line continuations for quoted string ('\' at the end of line).
      */
     private void getOutOfQuotedText() {
@@ -728,34 +744,44 @@ public class VimArgTextObjExtension implements VimExtension {
 
     /**
      * Find a pair of brackets surrounding (leftBracket..rightBracket) block.
+     * If brackets have different priorities, will attempt to skip higher priority
+     * brackets to find matching pairs of lower priority brackets.
      *
      * @param start minimum position to look for
      * @param end   maximum position
-     * @return true if found
+     * @return true if found matching bracket pair
      */
+
     boolean findOuterBrackets(final int start, final int end) {
       boolean hasNewBracket = findPrevOpenBracket(start) && findNextCloseBracket(end);
       while (hasNewBracket) {
-        final int leftPrio = brackets.getBracketPrio(getCharAt(leftBracket));
-        final int rightPrio = brackets.getBracketPrio(getCharAt(rightBracket));
-        if (leftPrio == rightPrio) {
-          // matching brackets
+        char leftChar = getCharAt(leftBracket);
+        char rightChar = getCharAt(rightBracket);
+
+        // If brackets match, we're done
+        if (brackets.matchingBracket(leftChar) == rightChar) {
           return true;
-        } else {
-          if (leftPrio < rightPrio) {
-            if (rightBracket + 1 < end) {
-              ++rightBracket;
-              hasNewBracket = findNextCloseBracket(end);
-            } else {
-              hasNewBracket = false;
-            }
+        }
+
+        // Handle unmatched brackets based on priority
+        int leftPrio = brackets.getBracketPrio(leftChar);
+        int rightPrio = brackets.getBracketPrio(rightChar);
+
+        if (leftPrio > rightPrio) {
+          // If left bracket has higher priority (e.g. {), ignore it and try next
+          if (leftBracket > start) {
+            leftBracket--;
+            hasNewBracket = findPrevOpenBracket(start);
           } else {
-            if (leftBracket > 1) {
-              --leftBracket;
-              hasNewBracket = findPrevOpenBracket(start);
-            } else {
-              hasNewBracket = false;
-            }
+            hasNewBracket = false;
+          }
+        } else {
+          // If right bracket has higher priority, ignore it and try next
+          if (rightBracket < end) {
+            rightBracket++;
+            hasNewBracket = findNextCloseBracket(end);
+          } else {
+            hasNewBracket = false;
           }
         }
       }

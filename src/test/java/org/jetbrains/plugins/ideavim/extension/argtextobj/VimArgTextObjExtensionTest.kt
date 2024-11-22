@@ -81,8 +81,8 @@ class VimArgTextObjExtensionTest : VimTestCase() {
   fun testChangeInnerArgumentLookAhead() {
     doTest(
       Lists.newArrayList("cia"),
-      "def <caret>my_func(arg1, arg2):",
-      "def my_func(<caret>, arg2):",
+      "<caret>12 + 100 + my_func(arg1, arg2):",
+      "12 + 100 + my_func(<caret>, arg2):",
       Mode.INSERT,
     )
   }
