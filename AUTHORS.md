@@ -551,6 +551,10 @@ Contributors:
   [![icon][github]](https://github.com/gregsh)
   &nbsp;
   Greg Shrago
+* [![icon][mail]](mailto:jphalip@gmail.com)
+  [![icon][github]](https://github.com/jphalip)
+  &nbsp;
+  Julien Phalip
 
 Previous contributors:
 
