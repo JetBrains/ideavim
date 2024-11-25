@@ -41,6 +41,8 @@ val knownPlugins = setOf(
 
 //   "cc.implicated.intellij.plugins.bunny", // I don't want to include this plugin in the list of IdeaVim plugins as I don't understand what this is for
   "com.julienphalip.ideavim.peekaboo", // https://plugins.jetbrains.com/plugin/25776-vim-peekaboo
+  "com.julienphalip.ideavim.switch", // https://plugins.jetbrains.com/plugin/25899-vim-switch
+  "com.julienphalip.ideavim.functiontextobj", // https://plugins.jetbrains.com/plugin/25897-vim-functiontextobj
 )
 
 suspend fun main() {
