@@ -444,8 +444,44 @@ https://github.com/TheBlob42/idea-which-key?tab=readme-ov-file#installation
 By Julien Phalip  
 Original plugin: [vim-peekaboo](https://github.com/junegunn/vim-peekaboo).
 
+### Setup
+
+Add `set peekaboo` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+or restart the IDE.
+
 ### Instructions
 
 https://plugins.jetbrains.com/plugin/25776-vim-peekaboo
+</details>
+
+<details>
+<summary><h2>FunctionTextObj</h2></summary>
+
+By Julien Phalip  
+
+### Setup
+
+Add `set functiontextobj` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+or restart the IDE.
+
+### Instructions
+
+https://plugins.jetbrains.com/plugin/25897-vim-functiontextobj
+</details>
+
+<details>
+<summary><h2>Switch</h2></summary>
+
+By Julien Phalip  
+Original plugin: [switch.vim](https://github.com/AndrewRadev/switch.vim).
+
+### Setup
+
+Add `set switch` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+or restart the IDE.
+
+### Instructions
+
+https://plugins.jetbrains.com/plugin/25899-vim-switch
 
 </details>
