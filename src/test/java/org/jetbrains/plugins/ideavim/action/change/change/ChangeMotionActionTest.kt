@@ -194,4 +194,16 @@ Mode.INSERT,
   fun testLastSymbolInWord() {
     doTest("cw", "fo${c}o", "fo${c}", Mode.INSERT)
   }
+
+  // VIM-3729
+  @Test
+  fun `test change with count applies only to motion when repeated`() {
+    doTest(listOf("2c3l", "foo<Esc>", "w", "."),
+      """
+        banana banana
+      """.trimIndent(),
+      """
+        foo foo
+      """.trimIndent())
+  }
 }
