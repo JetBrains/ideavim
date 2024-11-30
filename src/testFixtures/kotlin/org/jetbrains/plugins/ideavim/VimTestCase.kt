@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorSettings
@@ -29,9 +30,11 @@ import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
@@ -765,6 +768,76 @@ abstract class VimNoWriteActionTestCase {
         editor.caretModel.primaryCaret.visualAttributes.color?.let {
           assertEquals(colour, it)
         }
+      }
+    }
+  }
+
+  @Suppress("DEPRECATION", "SameParameterValue")
+  protected fun assertSearchHighlights(tooltip: String, expected: String) {
+    val allHighlighters = fixture.editor.markupModel.allHighlighters
+
+    thisLogger().debug("Current text: ${fixture.editor.document.text}")
+    val actual = StringBuilder(fixture.editor.document.text)
+    val inserts = mutableMapOf<Int, String>()
+
+    // Digraphs:
+    // <C-K>3" → ‷ + <C-K>3' → ‴ (current match)
+    // <C-K><< → « + <C-K>>> → » (normal match)
+    allHighlighters.forEach {
+      // TODO: This is not the nicest way to check for current match. Add something to the highlight's user data?
+      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
+        inserts.compute(it.startOffset) { _, v -> if (v == null) "‷" else "$v‷" }
+        inserts.compute(it.endOffset) { _, v -> if (v == null) "‴" else "$v‴" }
+      } else {
+        inserts.compute(it.startOffset) { _, v -> if (v == null) "«" else "$v«" }
+        inserts.compute(it.endOffset) { _, v -> if (v == null) "»" else "$v»" }
+      }
+    }
+
+    var offset = 0
+    inserts.toSortedMap().forEach { (k, v) ->
+      actual.insert(k + offset, v)
+      offset += v.length
+    }
+
+    assertEquals(expected, actual.toString())
+
+    // Assert all highlighters have the correct tooltip and text attributes
+    val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
+    val attributes = editorColorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
+    val caretColour = editorColorsScheme.getColor(EditorColors.CARET_COLOR)
+    allHighlighters.forEach {
+      val offsets = "(${it.startOffset}, ${it.endOffset})"
+      assertEquals(tooltip, it.errorStripeTooltip, "Incorrect tooltip for highlighter at $offsets")
+      assertEquals(
+        attributes.backgroundColor,
+        it.textAttributes?.backgroundColor,
+        "Incorrect background colour for highlighter at $offsets",
+      )
+      assertEquals(
+        attributes.foregroundColor,
+        it.textAttributes?.foregroundColor,
+        "Incorrect foreground colour for highlighter at $offsets",
+      )
+      // TODO: Find a better way to identify the current match
+      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
+        assertEquals(
+          EffectType.ROUNDED_BOX,
+          it.textAttributes?.effectType,
+          "Incorrect effect type for highlighter at $offsets",
+        )
+        assertEquals(caretColour, it.textAttributes?.effectColor, "Incorrect effect colour for highlighter at $offsets")
+      } else {
+        assertEquals(
+          attributes.effectType,
+          it.textAttributes?.effectType,
+          "Incorrect effect type for highlighter at $offsets",
+        )
+        assertEquals(
+          attributes.effectColor,
+          it.textAttributes?.effectColor,
+          "Incorrect effect colour for highlighter at $offsets",
+        )
       }
     }
   }
