@@ -66,7 +66,8 @@ tasks {
     // IJ platform has JUnit5TestSessionListener with some additional checks;
     // however, in 242 there is a problem with disposing so these checks always fail on TeamCity (works locally).
     // This property disables these checks
-    systemProperty("intellij.build.test.ignoreFirstAndLastTests", true)
+    // IJPL-165238
+//    systemProperty("intellij.build.test.ignoreFirstAndLastTests", true)
   }
 }
 
