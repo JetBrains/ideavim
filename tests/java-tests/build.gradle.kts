@@ -62,12 +62,6 @@ tasks {
       println("Set env TEAMCITY_VERSION to X to enable project leak checks from the platform")
       environment("TEAMCITY_VERSION" to "X")
     }
-
-    // IJ platform has JUnit5TestSessionListener with some additional checks;
-    // however, in 242 there is a problem with disposing so these checks always fail on TeamCity (works locally).
-    // This property disables these checks
-    // IJPL-165238
-//    systemProperty("intellij.build.test.ignoreFirstAndLastTests", true)
   }
 }
 
