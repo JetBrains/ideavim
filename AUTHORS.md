@@ -555,6 +555,14 @@ Contributors:
   [![icon][github]](https://github.com/jphalip)
   &nbsp;
   Julien Phalip
+* [![icon][mail]](mailto:j.trimailovas@gmail.com)
+  [![icon][github]](https://github.com/trimailov)
+  &nbsp;
+  Justas Trimailovas, 
+* [![icon][mail]](mailto:justast@wix.com)
+  [![icon][github]](https://github.com/justast-wix)
+  &nbsp;
+  Justas Trimailovas
 
 Previous contributors:
 
