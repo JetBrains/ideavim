@@ -1340,6 +1340,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       } else if (lastPatternTrailing!![ppos + 1] == '?') {
         Direction.BACKWARDS
       } else {
+        injector.listenersNotifier.notifySearchUpdated(editor, res)
         return if (res == -1) null else Pair(res, motionType)
       }
       if (lastPatternTrailing!!.length - ppos > 2) {
@@ -1347,6 +1348,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       }
       res = processSearchCommand(editor, lastPatternTrailing!!.substring(ppos + 1), res, 1, nextDir)?.first ?: -1
     }
+    injector.listenersNotifier.notifySearchUpdated(editor, res)
     return if (res == -1) null else Pair(res, motionType)
   }
 
