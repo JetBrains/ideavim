@@ -952,21 +952,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @Test
-  fun `test search beginning of file atom with old regex engine`() {
-    configureByText(
-      """
-      one
-      ${c}two
-      one
-      two
-    """.trimIndent()
-    )
-    enterCommand("set nousenewregex")
-    enterSearch("""\%^""")
-    assertPosition(0, 0)
-  }
-
-  @Test
   fun `test search end of file atom`() {
     configureByText(
       """
@@ -976,21 +961,6 @@ class SearchGroupTest : VimTestCase() {
       two
     """.trimIndent()
     )
-    enterSearch("""two\%$""")
-    assertPosition(3, 0)
-  }
-
-  @Test
-  fun `test search end of file atom with old regex engine`() {
-    configureByText(
-      """
-      one
-      two
-      one
-      two
-    """.trimIndent()
-    )
-    enterCommand("set nousenewregex")
     enterSearch("""two\%$""")
     assertPosition(3, 0)
   }
@@ -2832,24 +2802,6 @@ class SearchGroupTest : VimTestCase() {
   fun `test find last cr in file`() {
     val res = search("\\n", "Something\n")
     assertEquals(9, res)
-  }
-
-  // VIM-2510
-  @Test
-  fun `test backslash-i does not hang while trying to highlight all instances with old regex engine`() {
-    // \i - identifier character class.
-    // The old regex engine would treat '\0' as a valid identifier, which is unfortunate, because that marks the end of
-    // each search input line. There is also no validation on the column, so it would continuously match the end of line
-    // marker and increment the column even though there was no column.
-    // We should also be using 'isident' instead of Character.isJavaIdentifierPart, but let's not worry about the old
-    // engine now.
-    doTest(
-      searchCommand("/\\i"),
-      """lorem ipsum""",
-      """l${c}orem ipsum"""
-    ) {
-      enterCommand("set hlsearch nousenewregex")
-    }
   }
 
   private fun search(pattern: String, input: String): Int {
