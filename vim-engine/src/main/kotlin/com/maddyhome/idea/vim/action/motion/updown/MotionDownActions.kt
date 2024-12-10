@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-@CommandOrMotion(keys = ["j"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(keys = ["j", "<C-J>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true

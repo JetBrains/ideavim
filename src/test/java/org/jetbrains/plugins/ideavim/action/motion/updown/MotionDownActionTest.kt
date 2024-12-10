@@ -23,6 +23,74 @@ import org.junit.jupiter.api.Test
  */
 class MotionDownActionTest : VimTestCase() {
   @Test
+  fun `test motion down with CTRL-J`() {
+    doTest(
+      "<C-J>",
+      """
+        |Lorem ipsum
+        |
+        |Lorem ${c}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consec${c}tetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test motion down with CTRL-J in Visual`() {
+    doTest(
+      "v<C-J>",
+      """
+        |Lorem ipsum
+        |
+        |Lorem ${c}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem ipsum
+        |
+        |Lorem ${s}ipsum dolor sit amet,
+        |consec${c}t${se}etur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test motion down with CTRL-J in Operator-pending`() {
+    doTest(
+      "d<C-J>",
+      """
+        |Lorem ipsum
+        |
+        |Lorem ${c}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem ipsum
+        |
+        |${c}Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
   fun `test motion down in visual block mode`() {
     val keys = "<C-V>2kjjj"
     val before = """
