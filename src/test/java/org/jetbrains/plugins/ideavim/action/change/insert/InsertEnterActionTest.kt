@@ -119,6 +119,23 @@ class InsertEnterActionTest : VimTestCase() {
     doTest(listOf("i", "<C-M>"), before, after, Mode.INSERT)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
+  @RepeatedTest(3)
+  fun `test insert enter with C-J`() {
+    val before = """Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    val after = """Lorem ipsum dolor sit amet,
+        |
+        |${c}consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    doTest(listOf("i", "<C-J>"), before, after, Mode.INSERT)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @RepeatedTest(3)
   fun `test insert enter scrolls view up at scrolloff`() {
@@ -156,4 +173,3 @@ internal class DestroyerHandlerSingle(private val nextHandler: EditorActionHandl
     return nextHandler.isEnabled(editor, caret, dataContext)
   }
 }
-
