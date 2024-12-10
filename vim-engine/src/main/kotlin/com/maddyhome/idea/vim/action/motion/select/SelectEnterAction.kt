@@ -21,9 +21,8 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["<Enter>"], modes = [Mode.SELECT])
+@CommandOrMotion(keys = ["<CR>", "<C-J>", "<C-M>"], modes = [Mode.SELECT])
 class SelectEnterAction : VimActionHandler.SingleExecution() {
-
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(

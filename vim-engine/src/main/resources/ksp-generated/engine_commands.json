@@ -281,8 +281,23 @@
     },
     {
         "keys": "<C-J>",
+        "class": "com.maddyhome.idea.vim.action.change.insert.InsertEnterAction",
+        "modes": "I"
+    },
+    {
+        "keys": "<C-J>",
         "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
         "modes": "C"
+    },
+    {
+        "keys": "<C-J>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
+        "modes": "S"
+    },
+    {
+        "keys": "<C-J>",
+        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownAction",
+        "modes": "NXO"
     },
     {
         "keys": "<C-K>",
@@ -313,6 +328,11 @@
         "keys": "<C-M>",
         "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
         "modes": "C"
+    },
+    {
+        "keys": "<C-M>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
+        "modes": "S"
     },
     {
         "keys": "<C-M>",
@@ -666,6 +686,11 @@
     },
     {
         "keys": "<CR>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
+        "modes": "S"
+    },
+    {
+        "keys": "<CR>",
         "class": "com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction",
         "modes": "NXO"
     },
@@ -713,11 +738,6 @@
         "keys": "<End>",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnInsertAction",
         "modes": "I"
-    },
-    {
-        "keys": "<Enter>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
-        "modes": "S"
     },
     {
         "keys": "<Esc>",
