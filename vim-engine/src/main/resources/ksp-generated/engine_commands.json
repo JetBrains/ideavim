@@ -1240,6 +1240,11 @@
         "modes": "NXO"
     },
     {
+        "keys": "[`",
+        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoPreviousMarkAction",
+        "modes": "NXO"
+    },
+    {
         "keys": "[b",
         "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelLeftAction",
         "modes": "NXO"
@@ -1302,6 +1307,11 @@
     {
         "keys": "]]",
         "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction",
+        "modes": "NXO"
+    },
+    {
+        "keys": "]`",
+        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoNextMarkAction",
         "modes": "NXO"
     },
     {

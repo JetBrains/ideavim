@@ -83,6 +83,7 @@ interface VimMotionGroup {
 
   // Move caret to other
   fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Motion
+  fun moveCaretToMarkRelative(caret: ImmutableVimCaret, count: Int): Motion
   fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
   fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Motion
 

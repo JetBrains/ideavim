@@ -63,3 +63,26 @@ class MotionGotoMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
     return injector.motion.moveCaretToMark(caret, mark, false)
   }
 }
+
+@CommandOrMotion(keys = ["]`"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+class MotionGotoNextMarkAction: MotionGotoRelativeMarkAction(countMultiplier = 1) {
+}
+
+@CommandOrMotion(keys = ["[`"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+class MotionGotoPreviousMarkAction: MotionGotoRelativeMarkAction(countMultiplier = -1) {
+}
+
+sealed class MotionGotoRelativeMarkAction(private val countMultiplier: Int) : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
+  override fun getOffset(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    return injector.motion.moveCaretToMarkRelative(caret, operatorArguments.count1 * countMultiplier)
+  }
+
+}
