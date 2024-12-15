@@ -121,6 +121,53 @@ abstract class VimMarkServiceBase : VimMarkService {
     }
   }
 
+  override fun getRelativeLowercaseMark(caret: ImmutableVimCaret, count: Int): Mark? {
+    val path = caret.editor.getPath() ?: return null
+    if (count == 0) return null
+    val marks = if (caret.isPrimary) {
+      getLocalMarks(path).values
+    } else {
+      caret.markStorage.getMarks().values.toSet()
+    }
+    val lowerCaseMarksWithDistinctPositions = marks.filter { LOWERCASE_MARKS.contains(it.key) }
+      .sortedWithAndDistinctBy(Mark.PositionSorter)
+    // Use a fake mark to easily find the position of the caret in the list of marks.
+    val caretMark = createMark(caret, '[', caret.offset) ?: return null
+    val result = lowerCaseMarksWithDistinctPositions.binarySearch(caretMark, Mark.PositionSorter)
+    val targetIndex = if (result >= 0) {
+      // Caret is on a mark.
+      result + count
+    } else {
+      val insertionPoint = -1 * (result + 1)
+      if ((insertionPoint == 0 && count < 0)
+        || (insertionPoint == lowerCaseMarksWithDistinctPositions.size && count > 0)) {
+        // Moving left if before first mark, or moving right after last mark.
+        return null
+      }
+      if (count < 0) insertionPoint + count else insertionPoint + count - 1
+    }
+    // Excessive values of count.absoluteValue cause us to stop at the first/last mark.
+    val actualIndex = targetIndex.coerceIn(0, lowerCaseMarksWithDistinctPositions.lastIndex)
+    return lowerCaseMarksWithDistinctPositions[actualIndex]
+  }
+
+  /**
+   * Sorts [this] using [comparator], then drops elements that are duplicate by [comparator].
+   *
+   * This is more efficient than calling `sortedWith(comparator).distinctBy {}` because the distinct step can
+   * assume the input is sorted by the same Comparator.
+   */
+  private fun List<Mark>.sortedWithAndDistinctBy(comparator: Comparator<Mark>): List<Mark> {
+    val sorted = this.sortedWith(Mark.PositionSorter)
+    return sorted.fold(ArrayList<Mark>(sorted.size)) { outputList, mark ->
+        val previousMark = outputList.lastOrNull()
+        if (previousMark == null || Mark.PositionSorter.compare(previousMark, mark) != 0) {
+          outputList.add(mark)
+        }
+        outputList
+      }
+  }
+
   override fun getAllLocalMarks(caret: ImmutableVimCaret): Set<Mark> {
     val path = caret.editor.getPath() ?: return emptySet()
     val marks = if (caret.isPrimary) {

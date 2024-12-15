@@ -46,6 +46,11 @@ interface VimMarkService {
   fun getMark(caret: ImmutableVimCaret, char: Char): Mark?
 
   /**
+   * Get previous / next lowercase mark for specified caret
+   */
+  fun getRelativeLowercaseMark(caret: ImmutableVimCaret, count: Int): Mark?
+
+  /**
    * Gets all marks for caret
    */
   fun getAllLocalMarks(caret: ImmutableVimCaret): Set<Mark>

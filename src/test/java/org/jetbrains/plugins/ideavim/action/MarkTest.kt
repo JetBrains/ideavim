@@ -271,6 +271,186 @@ class MarkTest : VimTestCase() {
     assertOffset(14)
   }
 
+  // VIM-3731 |m| |[`|
+  @Test
+  fun testGotoPreviousMark() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "[`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(14)
+  }
+
+  // VIM-3731 |m| |[`|
+  @Test
+  fun testGotoPreviousMarkIgnoresPlacingOrder() {
+    typeTextInFile(
+      injector.parser.parseKeys("mb" + "kma" + "jwmc" + "[`"),
+      """
+      one two
+      three
+      <caret>four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(14)
+  }
+
+  // VIM-3731 |m| |[`|
+  @Test
+  fun testGotoPreviousMarkMultipleMarksOnSamePosition() {
+    typeTextInFile(
+      injector.parser.parseKeys("mb" + "kma" + "jwmcmd" + "[`"),
+      """
+      one two
+      three
+      <caret>four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(14)
+  }
+
+  // VIM-3731 |m| |[`|
+  @Test
+  fun testGotoPreviousMarkWithCount() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "2[`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(8)
+  }
+
+  // VIM-3731 |m| |[`|
+  @Test
+  fun testGotoPreviousMarkWithExcessiveCount() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "5[`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(8)
+  }
+
+  // VIM-3731 |m| |[`|
+  @Test
+  fun testGotoPreviousMarkBeforeFirstMarkDoesNothing() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "ggw"+ "[`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(4)
+  }
+
+  // VIM-3731 |m| |]`|
+  @Test
+  fun testGotoNextMark() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "gg" + "]`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(8)
+  }
+
+  // VIM-3731 |m| |]`|
+  @Test
+  fun testGotoNextMarkIgnoresPlacingOrder() {
+    typeTextInFile(
+      injector.parser.parseKeys("mb" + "kma" + "jwmc" + "gg" + "]`"),
+      """
+      one two
+      three
+      <caret>four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(8)
+  }
+
+  // VIM-3731 |m| |]`|
+  @Test
+  fun testGotoNextMarkMultipleMarksOnSamePosition() {
+    typeTextInFile(
+      injector.parser.parseKeys("mbmd" + "kma" + "jwmc" + "ggjj" + "]`"),
+      """
+      one two
+      three
+      <caret>four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(19)
+  }
+
+  // VIM-3731 |m| |]`|
+  @Test
+  fun testGotoNextMarkWithCount() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "gg" + "2]`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(14)
+  }
+
+  // VIM-3731 |m| |]`|
+  @Test
+  fun testGotoNextMarkWithExcessiveCount() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "gg" + "5]`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(19)
+  }
+
+  // VIM-3731 |m| |]`|
+  @Test
+  fun testGotoNextMarkAfterLastMarkDoesNothing() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "jmb" + "wmc" + "ll"+ "]`"),
+      """
+      one two
+      <caret>three
+      four five
+     
+      """.trimIndent(),
+    )
+    assertOffset(21)
+  }
+
   // |i| |`]|
   @Test
   fun testGotoLastChangePositionEnd() {
@@ -538,6 +718,69 @@ class MarkTest : VimTestCase() {
     My mother <selection>taugh<caret>t</selection> me this trick:taught
     if you repeat something <selection>ove<caret>r</selection> and over again it loses its meaning.over
     For example: homework, homework, homework, homework, <selection>homewor<caret>k</selection>, homework, homework, homework, homework.homework
+    See, nothing.
+    
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testMulticaretPreviousNextMark() {
+    configureByText(
+      """
+    My mother <caret>taught me this trick:
+    if you repeat something <caret>over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
+    See, nothing.
+    
+      """.trimIndent(),
+    )
+    typeText("mawmbw")
+    assertState(
+      """
+    My mother taught me <caret>this trick:
+    if you repeat something over and <caret>over again it loses its meaning.
+    For example: homework, homework, homework, homework, homework, <caret>homework, homework, homework, homework.
+    See, nothing.
+    
+      """.trimIndent(),
+    )
+    typeText("[`")
+    assertState(
+      """
+    My mother taught <caret>me this trick:
+    if you repeat something over <caret>and over again it loses its meaning.
+    For example: homework, homework, homework, homework, homework<caret>, homework, homework, homework, homework.
+    See, nothing.
+    
+      """.trimIndent(),
+    )
+    typeText("[`")
+    assertState(
+      """
+    My mother <caret>taught me this trick:
+    if you repeat something <caret>over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
+    See, nothing.
+    
+      """.trimIndent(),
+    )
+    typeText("[`") // Does nothing on first mark.
+    assertState(
+      """
+    My mother <caret>taught me this trick:
+    if you repeat something <caret>over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
+    See, nothing.
+    
+      """.trimIndent(),
+    )
+    typeText("5]`") // Excessive count goes to last mark.
+    assertState(
+      """
+    My mother taught <caret>me this trick:
+    if you repeat something over <caret>and over again it loses its meaning.
+    For example: homework, homework, homework, homework, homework<caret>, homework, homework, homework, homework.
     See, nothing.
     
       """.trimIndent(),
