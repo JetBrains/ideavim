@@ -109,7 +109,7 @@ import org.jetbrains.annotations.TestOnly
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.lang.ref.WeakReference
-import java.util.WeakHashMap
+import java.util.*
 import javax.swing.SwingUtilities
 
 /**
@@ -780,11 +780,16 @@ internal object VimListenerManager {
         //   https://youtrack.jetbrains.com/issue/IDEA-277716
         //   https://youtrack.jetbrains.com/issue/VIM-2368
         if (event.mouseEvent.clickCount == 1 && !SwingUtilities.isRightMouseButton(event.mouseEvent)) {
-          if (editor.inVisualMode) {
-            editor.vim.exitVisualMode()
-          } else if (editor.vim.inSelectMode) {
-            editor.exitSelectMode(false)
-            KeyHandler.getInstance().reset(editor.vim)
+          val hasSelection = ApplicationManager.getApplication().runReadAction<Boolean> {
+            editor.selectionModel.hasSelection(true)
+          }
+          if (!hasSelection) {
+            if (editor.inVisualMode) {
+              editor.vim.exitVisualMode()
+            } else if (editor.vim.inSelectMode) {
+              editor.exitSelectMode(false)
+              KeyHandler.getInstance().reset(editor.vim)
+            }
           }
         }
       } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&
