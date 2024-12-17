@@ -76,7 +76,6 @@ internal class ModeWidgetListener: ModeChangeListener, EditorListener, VimWidget
     if (editorProject == null) return null
     return recursionGuard.doPreventingRecursion(recursionKey, false) {
       val fileEditorManager = FileEditorManager.getInstance(editorProject)
-      getFocusedEditorForProject(editorProject)
       fileEditorManager.selectedTextEditor
     }
   }
