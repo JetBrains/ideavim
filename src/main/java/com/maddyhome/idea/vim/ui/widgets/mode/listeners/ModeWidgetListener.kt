@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.ui.widgets.mode.listeners
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.RecursionManager
 import com.intellij.openapi.wm.WindowManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.EditorListener
@@ -73,7 +74,15 @@ internal class ModeWidgetListener: ModeChangeListener, EditorListener, VimWidget
 
   private fun getFocusedEditorForProject(editorProject: Project?): Editor? {
     if (editorProject == null) return null
-    val fileEditorManager = FileEditorManager.getInstance(editorProject)
-    return fileEditorManager.selectedTextEditor
+    return recursionGuard.doPreventingRecursion(recursionKey, false) {
+      val fileEditorManager = FileEditorManager.getInstance(editorProject)
+      getFocusedEditorForProject(editorProject)
+      fileEditorManager.selectedTextEditor
+    }
+  }
+
+  companion object {
+    private val recursionGuard = RecursionManager.createGuard<Any>("IdeaVim.modeWidgetListener")
+    private val recursionKey = Any()
   }
 }
