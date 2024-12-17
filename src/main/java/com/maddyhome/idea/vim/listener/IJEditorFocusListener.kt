@@ -13,6 +13,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorKind
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.LastUsedEditorInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -31,10 +32,9 @@ import com.maddyhome.idea.vim.state.mode.Mode
  */
 class IJEditorFocusListener : EditorListener {
   override fun focusGained(editor: VimEditor) {
-    val oldEditor = KeyHandler.getInstance().editorInFocus
-    if (oldEditor != null && oldEditor.ij == editor.ij) return
-
-    KeyHandler.getInstance().editorInFocus = editor
+    val oldEditorInfo = KeyHandler.getInstance().lastUsedEditorInfo
+    val currentEditorHashCode = editor.ij.hashCode()
+    if (oldEditorInfo.hash == currentEditorHashCode) return
 
     // We add Vim bindings to all opened editors, including editors used as UI controls rather than just project file
     // editors. This includes editors used as part of the UI, such as the VCS commit message, or used as read-only
@@ -57,15 +57,17 @@ class IJEditorFocusListener : EditorListener {
     // to know that a read-only editor that is hosting a console view with a running process can be treated as writable.
 
     val ijEditor = editor.ij
+    val isCurrentEditorTerminal = isTerminal(ijEditor)
 
+    KeyHandler.getInstance().lastUsedEditorInfo = LastUsedEditorInfo(currentEditorHashCode, isCurrentEditorTerminal)
 
     val switchToInsertMode = Runnable {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
     }
-    if (isTerminal(ijEditor) && !ijEditor.inInsertMode) {
+    if (isCurrentEditorTerminal && !ijEditor.inInsertMode) {
       switchToInsertMode.run()
-    } else if (ijEditor.isInsertMode && ((oldEditor != null && isTerminal(oldEditor.ij)) || !ijEditor.document.isWritable)) {
+    } else if (ijEditor.isInsertMode && (oldEditorInfo.isTerminal || !ijEditor.document.isWritable)) {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       val mode = injector.vimState.mode
       when (mode) {
