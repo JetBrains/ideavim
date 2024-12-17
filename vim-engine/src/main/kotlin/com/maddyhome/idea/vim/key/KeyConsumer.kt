@@ -17,7 +17,7 @@ interface KeyConsumer {
    * @return true if consumed key and could do something meaningful wit it
    */
   fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,

@@ -38,8 +38,10 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
+import com.maddyhome.idea.vim.helper.vim
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -77,7 +79,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
-      val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
+      val vimKeyStroke = keyStroke.vim
+      val owner = VimPlugin.getKey().savedShortcutConflicts[vimKeyStroke]
       if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED) {
         VimPlugin.getNotifications(editor.project).notifyAboutShortcutConflict(keyStroke)
       }
@@ -85,7 +88,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       try {
         val start = if (traceTime) System.currentTimeMillis() else null
         val keyHandler = KeyHandler.getInstance()
-        keyHandler.handleKey(editor.vim, keyStroke, e.dataContext.vim, keyHandler.keyHandlerState)
+        keyHandler.handleKey(editor.vim, vimKeyStroke, e.dataContext.vim, keyHandler.keyHandlerState)
         if (start != null) {
           val duration = System.currentTimeMillis() - start
           LOG.info("VimShortcut update '$keyStroke': $duration ms")
@@ -152,7 +155,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         return ActionEnableStatus.no("AceJump is active", LogLevel.INFO)
       }
 
-      if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
+      if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke.vim)) {
         return ActionEnableStatus.no("Lookup keys are active", LogLevel.INFO)
       }
 
@@ -200,7 +203,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       }
 
       val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
-      val info = savedShortcutConflicts[keyStroke]
+      val vimKeyStroke = keyStroke.vim
+      val info = savedShortcutConflicts[vimKeyStroke]
       return when (info?.forEditor(editor.vim)) {
         ShortcutOwner.VIM -> {
           return ActionEnableStatus.yes("Owner is vim", LogLevel.DEBUG)
@@ -214,7 +218,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         }
         else -> {
           if (isShortcutConflict(keyStroke)) {
-            savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
+            savedShortcutConflicts[vimKeyStroke] = ShortcutOwnerInfo.allUndefined
           }
           ActionEnableStatus.yes("Enable vim for shortcut without owner", LogLevel.DEBUG)
         }
@@ -276,7 +280,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
    *   if the pressed key is presented in this list. The caches are used to speedup the process.
    */
   private object LookupKeys {
-    fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
+    fun isEnabledForLookup(keyStroke: VimKeyStroke): Boolean {
       val parsedLookupKeys =
         injector.optionGroup.getParsedEffectiveOptionValue(IjOptions.lookupkeys, null, ::parseLookupKeys)
       return keyStroke !in parsedLookupKeys

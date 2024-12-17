@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.key.interceptors
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * Modal key interceptor
@@ -21,7 +21,7 @@ interface VimInputInterceptor<T> {
    * Process a single keystroke and attempt to build a complete input of type [T].
    */
   fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     context: ExecutionContext
   )
@@ -32,7 +32,7 @@ interface VimInputInterceptor<T> {
    * @param key The current keystroke to process.
    * @return The complete input of type [T] if it can be constructed, or null if more keystrokes are needed.
    */
-  fun buildInput(key: KeyStroke): T?
+  fun buildInput(key: VimKeyStroke): T?
 
   /**
    * Execute the action associated with the complete input.

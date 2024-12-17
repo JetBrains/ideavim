@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.vim
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -194,7 +195,7 @@ internal class VimSurroundExtension : VimExtension {
         surroundings
           .filter { it.innerText != null } // we do nothing with carets that are not inside the surrounding
           .map { surrounding ->
-            val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
+            val innerValue = injector.parser.toPrintableString(surrounding.innerText!!.map { it.vim })
             val text = newSurround?.let { it.first + innerValue + it.second } ?: innerValue
             val textData = PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.CHARACTER_WISE)
             val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)

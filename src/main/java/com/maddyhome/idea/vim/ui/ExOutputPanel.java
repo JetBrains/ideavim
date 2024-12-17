@@ -21,9 +21,11 @@ import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimOutputPanel;
 import com.maddyhome.idea.vim.diagnostic.VimLogger;
+import com.maddyhome.idea.vim.helper.IjVimKeyCodeProviderKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
+import com.maddyhome.idea.vim.key.VimKeyStroke;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -309,8 +311,8 @@ public class ExOutputPanel extends JPanel {
       final Project project = myEditor.getProject();
 
       if (project != null && key != null && key.getKeyChar() != '\n') {
-        final List<KeyStroke> keys = new ArrayList<>(1);
-        keys.add(key);
+        final List<VimKeyStroke> keys = new ArrayList<>(1);
+        keys.add(IjVimKeyCodeProviderKt.getVim(key));
         if (LOG.isTrace()) {
           LOG.trace("Adding new keys to keyStack as part of playback. State before adding keys: " +
                     KeyHandler.getInstance().getKeyStack().dump());
@@ -343,7 +345,7 @@ public class ExOutputPanel extends JPanel {
       Character keyChar = e.getKeyChar();
       int modifiers = e.getModifiersEx();
       KeyStroke keyStroke = (keyChar == KeyEvent.CHAR_UNDEFINED) ? KeyStroke.getKeyStroke(keyCode, modifiers) : KeyStroke.getKeyStroke(keyChar, modifiers);
-      currentPanel.handleKey(keyStroke);
+      currentPanel.handleKey(IjVimKeyCodeProviderKt.getVim(keyStroke));
     }
   }
 

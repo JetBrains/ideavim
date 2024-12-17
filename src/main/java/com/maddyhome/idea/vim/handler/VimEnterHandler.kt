@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.awt
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -349,7 +350,7 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
     val enterKey = key(key)
-    return isOctopusEnabled(enterKey, editor)
+    return isOctopusEnabled(enterKey.awt, editor)
   }
 }
 

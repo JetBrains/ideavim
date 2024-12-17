@@ -14,7 +14,9 @@ import com.intellij.openapi.diagnostic.trace
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.awt
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
+import com.maddyhome.idea.vim.helper.vim
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.Toolkit
@@ -35,7 +37,7 @@ object ModalEntry {
     LOG.trace { mappingStack.dump() }
     var stroke = mappingStack.feedSomeStroke()
     while (stroke != null) {
-      val result = processor(stroke)
+      val result = processor(stroke.awt)
       if (!result) {
         LOG.trace("Got char from mapping stack")
         return
@@ -61,7 +63,7 @@ object ModalEntry {
           return true
         }
         if (injector.registerGroup.isRecording) {
-          KeyHandler.getInstance().modalEntryKeys += stroke
+          KeyHandler.getInstance().modalEntryKeys += stroke.vim
         }
         if (!processor(stroke)) {
           LOG.trace("Got char from keyboard input: $stroke. Event: $e")

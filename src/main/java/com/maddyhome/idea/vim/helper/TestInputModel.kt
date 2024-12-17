@@ -9,17 +9,17 @@ package com.maddyhome.idea.vim.helper
 
 import com.google.common.collect.Lists
 import com.intellij.openapi.editor.Editor
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 // Do not remove until it's used in EasyMotion plugin in tests
 class TestInputModel private constructor() {
-  private val myKeyStrokes: MutableList<KeyStroke> = Lists.newArrayList()
-  fun setKeyStrokes(keyStrokes: List<KeyStroke>) {
+  private val myKeyStrokes: MutableList<VimKeyStroke> = Lists.newArrayList()
+  fun setKeyStrokes(keyStrokes: List<VimKeyStroke>) {
     myKeyStrokes.clear()
     myKeyStrokes.addAll(keyStrokes)
   }
 
-  fun nextKeyStroke(): KeyStroke? {
+  fun nextKeyStroke(): VimKeyStroke? {
     // Return key from the unfinished mapping
     /*
 MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();

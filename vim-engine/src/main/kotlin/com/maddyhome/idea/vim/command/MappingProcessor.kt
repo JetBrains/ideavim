@@ -21,17 +21,15 @@ import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfoLayer
-import com.maddyhome.idea.vim.key.getLayer
-import com.maddyhome.idea.vim.key.isPrefix
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.state.KeyHandlerState
-import javax.swing.KeyStroke
 
 object MappingProcessor: KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,

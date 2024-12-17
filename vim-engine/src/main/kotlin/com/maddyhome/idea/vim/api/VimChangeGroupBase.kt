@@ -29,7 +29,9 @@ import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.NumberType
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
+import com.maddyhome.idea.vim.key.VimShortcutStroke
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
@@ -45,10 +47,8 @@ import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.TestOnly
-import java.awt.event.KeyEvent
 import java.math.BigInteger
 import java.util.*
-import javax.swing.KeyStroke
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -597,7 +597,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
-    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+    val enterKeyStroke = VimShortcutStroke(injector.keyCodeProvider.ENTER, noneOfEnum())
     val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
     for (action in actions) {
       if (injector.actionExecutor.executeAction(editor, action, context)) {

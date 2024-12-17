@@ -12,8 +12,8 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import org.jetbrains.annotations.TestOnly
-import javax.swing.KeyStroke
 
 interface VimRegisterGroup {
 
@@ -44,7 +44,7 @@ interface VimRegisterGroup {
   fun selectRegister(reg: Char): Boolean
   fun resetRegister()
   fun resetRegisters()
-  fun recordKeyStroke(key: KeyStroke)
+  fun recordKeyStroke(key: VimKeyStroke)
   fun isRegisterWritable(): Boolean
   fun isRegisterWritable(reg: Char): Boolean
 
@@ -112,8 +112,8 @@ interface VimRegisterGroup {
   fun getPlaybackRegister(r: Char): Register?
   fun getPlaybackRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register?
   fun recordText(text: String)
-  fun setKeys(register: Char, keys: List<KeyStroke>)
-  fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType)
+  fun setKeys(register: Char, keys: List<VimKeyStroke>)
+  fun setKeys(register: Char, keys: List<VimKeyStroke>, type: SelectionType)
   @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#finishRecording(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   fun finishRecording()
   fun finishRecording(editor: VimEditor, context: ExecutionContext)

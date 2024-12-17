@@ -6,13 +6,19 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.api
+package com.maddyhome.idea.vim.helper
 
+import com.jetbrains.Service
+import com.maddyhome.idea.vim.key.VimKeyCodeProvider
 import com.maddyhome.idea.vim.key.VimKeyStroke
 import javax.swing.KeyStroke
 
-abstract class VimModalInputBase : VimModalInput {
-  override fun handleKey(key: VimKeyStroke, editor: VimEditor, executionContext: ExecutionContext) {
-    inputInterceptor.consumeKey(key, editor, executionContext)
-  }
+@Service
+class IjVimKeyCodeProvider : VimKeyCodeProvider {
 }
+
+val KeyStroke.vim : VimKeyStroke
+  get() = TODO()
+
+val VimKeyStroke.awt : KeyStroke
+  get() = TODO()

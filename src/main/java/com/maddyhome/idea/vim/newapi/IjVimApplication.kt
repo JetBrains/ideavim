@@ -17,6 +17,8 @@ import com.maddyhome.idea.vim.api.VimApplicationBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.RunnableHelper
+import com.maddyhome.idea.vim.helper.awt
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.Window
@@ -47,9 +49,9 @@ internal class IjVimApplication : VimApplicationBase() {
     return ApplicationManager.getApplication().isInternal
   }
 
-  override fun postKey(stroke: KeyStroke, editor: VimEditor) {
+  override fun postKey(stroke: VimKeyStroke, editor: VimEditor) {
     val component: Component = SwingUtilities.getAncestorOfClass(Window::class.java, editor.ij.component)
-    val event = createKeyEvent(stroke, component)
+    val event = createKeyEvent(stroke.awt, component)
     ApplicationManager.getApplication().invokeLater {
       if (logger.isDebug()) {
         logger.debug("posting $event")

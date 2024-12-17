@@ -77,9 +77,11 @@ import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
+import com.maddyhome.idea.vim.helper.IjVimKeyCodeProvider
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
 import com.maddyhome.idea.vim.history.VimHistory
+import com.maddyhome.idea.vim.key.VimKeyCodeProvider
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
@@ -205,7 +207,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val parser: VimStringParser
     get() = service<IjVimStringParser>()
-
+  override val keyCodeProvider: VimKeyCodeProvider
+    get() = service<IjVimKeyCodeProvider>()
   override val systemInfoService: SystemInfoService
     get() = service()
   override val vimStorageService: VimStorageService

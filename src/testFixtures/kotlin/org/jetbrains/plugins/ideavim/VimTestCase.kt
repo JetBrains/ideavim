@@ -69,9 +69,11 @@ import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.awt
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -276,7 +278,7 @@ abstract class VimNoWriteActionTestCase {
     assertTrue(collection.isEmpty(), "Collection should be empty, but it contains ${collection.size} elements")
   }
 
-  protected fun typeTextInFile(keys: List<KeyStroke?>, fileContents: String): Editor {
+  protected fun typeTextInFile(keys: List<VimKeyStroke?>, fileContents: String): Editor {
     configureByText(fileContents)
     return typeText(keys)
   }
@@ -436,13 +438,13 @@ abstract class VimNoWriteActionTestCase {
 
   protected fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
 
-  protected fun typeText(keys: List<KeyStroke?>): Editor {
+  protected fun typeText(keys: List<VimKeyStroke?>): Editor {
     return typeText(fixture.editor, keys)
   }
 
-  protected fun typeText(editor: Editor, keys: List<KeyStroke?>): Editor {
+  protected fun typeText(editor: Editor, keys: List<VimKeyStroke?>): Editor {
     NeovimTesting.typeCommand(
-      keys.filterNotNull().joinToString(separator = "") { injector.parser.toKeyNotation(it) },
+      keys.filterNotNull().joinToString(separator = "") { it.toVimNotation() },
       testInfo,
       editor,
     )
@@ -860,11 +862,11 @@ abstract class VimNoWriteActionTestCase {
     assertEquals(expectedErrorMessage, exception.message)
   }
 
-  private fun typeTextViaIde(keys: List<KeyStroke?>, editor: Editor) {
+  private fun typeTextViaIde(keys: List<VimKeyStroke?>, editor: Editor) {
     TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
 
     val inputModel = TestInputModel.getInstance(editor)
-    var key = inputModel.nextKeyStroke()
+    var key = inputModel.nextKeyStroke()?.awt
     while (key != null) {
       val keyChar = key.getChar(editor)
       when (keyChar) {
@@ -898,7 +900,7 @@ abstract class VimNoWriteActionTestCase {
         }
       }
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-      key = inputModel.nextKeyStroke()
+      key = inputModel.nextKeyStroke()?.awt
     }
   }
 
@@ -931,7 +933,7 @@ abstract class VimNoWriteActionTestCase {
     const val s = EditorTestUtil.SELECTION_START_TAG
     const val se = EditorTestUtil.SELECTION_END_TAG
 
-    fun typeText(keys: List<KeyStroke?>, editor: Editor, project: Project?) {
+    fun typeText(keys: List<VimKeyStroke?>, editor: Editor, project: Project?) {
       val keyHandler = KeyHandler.getInstance()
       val dataContext = injector.executionContextManager.getEditorExecutionContext(editor.vim)
       TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
@@ -951,20 +953,20 @@ abstract class VimNoWriteActionTestCase {
     }
 
     @JvmStatic
-    fun commandToKeys(command: String): List<KeyStroke> {
-      val keys: MutableList<KeyStroke> = ArrayList()
+    fun commandToKeys(command: String): List<VimKeyStroke> {
+      val keys: MutableList<VimKeyStroke> = ArrayList()
       if (!command.startsWith(":")) {
-        keys.addAll(injector.parser.parseKeys(":"))
+        keys.add(VimKeyStroke.COLON)
       }
       keys.addAll(injector.parser.stringToKeys(command)) // Avoids trying to parse 'command ... <args>' as a special char
-      keys.addAll(injector.parser.parseKeys("<Enter>"))
+      keys.add(VimKeyStroke.CR)
       return keys
     }
 
     fun exCommand(command: String) = ":$command<CR>"
 
-    fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
-      val keys: MutableList<KeyStroke> = ArrayList()
+    fun searchToKeys(pattern: String, forwards: Boolean): List<VimKeyStroke> {
+      val keys: MutableList<VimKeyStroke> = ArrayList()
       keys.addAll(injector.parser.parseKeys(if (forwards) "/" else "?"))
       keys.addAll(injector.parser.stringToKeys(pattern)) // Avoids trying to parse 'command ... <args>' as a special char
       keys.addAll(injector.parser.parseKeys("<CR>"))

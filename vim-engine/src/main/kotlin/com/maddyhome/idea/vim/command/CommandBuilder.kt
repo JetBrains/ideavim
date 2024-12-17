@@ -21,14 +21,14 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import org.jetbrains.annotations.TestOnly
-import javax.swing.KeyStroke
 
 class CommandBuilder private constructor(
   private var keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>,
   private val counts: MutableList<Int>,
-  private val typedKeyStrokes: MutableList<KeyStroke>,
-  private val commandKeyStrokes: MutableList<KeyStroke>
+  private val typedKeyStrokes: MutableList<VimKeyStroke>,
+  private val commandKeyStrokes: MutableList<VimKeyStroke>
 ) : Cloneable {
 
   constructor(keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>, initialUncommittedRawCount: Int = 0)
@@ -50,7 +50,7 @@ class CommandBuilder private constructor(
     }
 
   /** Provide the typed keys for `'showcmd'` */
-  val keys: Iterable<KeyStroke> get() = typedKeyStrokes
+  val keys: Iterable<VimKeyStroke> get() = typedKeyStrokes
 
   /** Returns true if the command builder is clean and ready to start building */
   val isEmpty
@@ -158,8 +158,8 @@ class CommandBuilder private constructor(
    */
   fun hasCountCharacters() = currentCount > 0
 
-  fun addCountCharacter(key: KeyStroke) {
-    currentCount = (currentCount * 10) + (key.keyChar - '0')
+  fun addCountCharacter(key: VimKeyStroke.Printable) {
+    currentCount = (currentCount * 10) + (key.char - '0')
     // If count overflows and flips negative, reset to 999999999L. In Vim, count is a long, which is *usually* 32 bits,
     // so will flip at 2147483648. We store count as an Int, which is also 32 bit.
     // See https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/normal.c#L631
@@ -177,7 +177,7 @@ class CommandBuilder private constructor(
   var isRegisterPending: Boolean = false
     private set
 
-  fun startWaitingForRegister(key: KeyStroke) {
+  fun startWaitingForRegister(key: VimKeyStroke) {
     isRegisterPending = true
     addTypedKeyStroke(key)
   }
@@ -196,7 +196,7 @@ class CommandBuilder private constructor(
    * Only public use is when entering a digraph/literal, where each key isn't handled by [CommandBuilder], but should
    * be added to the `'showcmd'` output.
    */
-  fun addTypedKeyStroke(key: KeyStroke) {
+  fun addTypedKeyStroke(key: VimKeyStroke) {
     logger.trace { "added key to command builder: $key" }
     typedKeyStrokes.add(key)
   }
@@ -266,7 +266,7 @@ class CommandBuilder private constructor(
    * If the given keystroke does not yet match an action, the internal state is updated to track the current command
    * part node.
    */
-  fun processKey(key: KeyStroke, processor: (EditorActionHandlerBase) -> Unit): Boolean {
+  fun processKey(key: VimKeyStroke, processor: (EditorActionHandlerBase) -> Unit): Boolean {
     commandKeyStrokes.add(key)
     val node = keyStrokeTrie.getTrieNode(commandKeyStrokes)
     if (node == null) {
@@ -298,20 +298,17 @@ class CommandBuilder private constructor(
    *
    * @see DuplicableOperatorAction
    */
-  fun convertDuplicateOperatorKeyStrokeToMotion(key: KeyStroke): KeyStroke {
+  fun convertDuplicateOperatorKeyStrokeToMotion(key: VimKeyStroke): VimKeyStroke {
     logger.trace { "convertDuplicateOperatorKeyStrokeToMotion is executed. key = $key" }
 
     // Simple check to ensure that we're in OP_PENDING. If we don't have an action, we don't have an operator. If we
     // have an argument, we can't be in OP_PENDING
-    if (action != null && argument == null) {
-      (action as? DuplicableOperatorAction)?.let {
-        logger.trace { "action = $action" }
-        if (it.duplicateWith == key.keyChar) {
-          return KeyStroke.getKeyStroke('_')
-        }
-      }
+    return if (key is VimKeyStroke.Printable && argument == null && (action as? DuplicableOperatorAction)?.duplicateWith == key.char) {
+      logger.trace { "action = $action" }
+      return VimKeyStroke.Printable('_')
+    } else {
+      key
     }
-    return key
   }
 
   fun isBuildingMultiKeyCommand(): Boolean {
@@ -368,7 +365,7 @@ class CommandBuilder private constructor(
   fun getCurrentTrie(): KeyStrokeTrie<LazyVimCommand> = keyStrokeTrie
 
   @TestOnly
-  fun getCurrentCommandKeys(): List<KeyStroke> = commandKeyStrokes
+  fun getCurrentCommandKeys(): List<VimKeyStroke> = commandKeyStrokes
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

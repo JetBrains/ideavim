@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.history.VimHistory
+import com.maddyhome.idea.vim.key.VimKeyCodeProvider
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
@@ -41,6 +42,7 @@ interface VimInjector {
 
   // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
   val parser: VimStringParser
+  val keyCodeProvider: VimKeyCodeProvider
 
   // [FINISHED] Can't be fully moved to vim-engine
   val messages: VimMessages

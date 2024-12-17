@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.handler.KeyMapIssue
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.vim
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -161,7 +162,7 @@ internal class NotificationService(private val project: Project?) {
       "<b>$shortcutText</b> is used as a Vim command"
     }
 
-    conflicts[keyStroke] = ShortcutOwnerInfo.allVim
+    conflicts[keyStroke.vim] = ShortcutOwnerInfo.allVim
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -170,7 +171,7 @@ internal class NotificationService(private val project: Project?) {
     )
     notification.addAction(object : DumbAwareAction("Use as IDE Shortcut") {
       override fun actionPerformed(e: AnActionEvent) {
-        conflicts[keyStroke] = ShortcutOwnerInfo.allIde
+        conflicts[keyStroke.vim] = ShortcutOwnerInfo.allIde
         notification.expire()
       }
     })

@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import javax.swing.KeyStroke
 
 abstract class VimMacroBase : VimMacro {
   override var lastRegister: Char = 0.toChar()

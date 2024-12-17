@@ -24,10 +24,13 @@ import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.awt
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.vim
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ModalEntry
@@ -40,7 +43,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
-import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -64,6 +66,16 @@ object VimExtensionFacade {
     extensionHandler: ExtensionHandler,
     recursive: Boolean,
   ) {
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vim  }, pluginOwner, extensionHandler, recursive)
+  }
+  @JvmStatic
+  fun putExtensionHandlerMapping(
+    modes: Set<MappingMode>,
+    fromKeys: List<VimKeyStroke>,
+    pluginOwner: MappingOwner,
+    extensionHandler: ExtensionHandler,
+    recursive: Boolean,
+  ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
@@ -82,6 +94,15 @@ object VimExtensionFacade {
     extensionHandler: VimExtensionHandler,
     recursive: Boolean,
   ) {
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vim }, pluginOwner, extensionHandler, recursive)
+  }
+  fun putExtensionHandlerMapping(
+    modes: Set<MappingMode>,
+    fromKeys: List<VimKeyStroke>,
+    pluginOwner: MappingOwner,
+    extensionHandler: VimExtensionHandler,
+    recursive: Boolean,
+  ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
@@ -94,7 +115,7 @@ object VimExtensionFacade {
     toKeys: List<KeyStroke>,
     recursive: Boolean,
   ) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vim }, pluginOwner, toKeys.map { it.vim }, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
@@ -104,6 +125,17 @@ object VimExtensionFacade {
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
     toKeys: List<KeyStroke>,
+    recursive: Boolean,
+  ) {
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys.map { it.vim }) }
+    VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys.map { it.vim }, pluginOwner, toKeys.map { it.vim }, recursive)
+  }
+  @JvmStatic
+  fun putKeyMappingIfMissing(
+    modes: Set<MappingMode>,
+    fromKeys: List<VimKeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<VimKeyStroke>,
     recursive: Boolean,
   ) {
     val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
@@ -145,6 +177,12 @@ object VimExtensionFacade {
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
     val keyHandler = KeyHandler.getInstance()
+    keys.forEach { keyHandler.handleKey(editor.vim, it.vim, context, false, false, keyHandler.keyHandlerState) }
+  }
+  @JvmStatic
+  fun executeNormalWithoutMapping(keys: List<VimKeyStroke>, editor: Editor) {
+    val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
+    val keyHandler = KeyHandler.getInstance()
     keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, false, keyHandler.keyHandlerState) }
   }
 
@@ -157,10 +195,10 @@ object VimExtensionFacade {
       return input ?: error("Not enough keystrokes saved: ${Extension.lastExtensionHandler}")
     }
 
-    val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
+    val key: VimKeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
       LOG.trace("Unit test mode is active")
       val mappingStack = KeyHandler.getInstance().keyStack
-      mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
+      mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.vim?.also {
         if (injector.registerGroup.isRecording) {
           KeyHandler.getInstance().modalEntryKeys += it
         }
@@ -173,9 +211,9 @@ object VimExtensionFacade {
         false
       }
       LOG.trace("Got char $ref")
-      ref
+      ref?.vim
     }
-    val result = key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())
+    val result = (key ?: VimKeyStroke.ESC).awt
     Extension.addKeystroke(result)
     return result
   }
@@ -191,20 +229,20 @@ object VimExtensionFacade {
   @Deprecated("Please use com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister(com.maddyhome.idea.vim.api.VimEditor, char)")
   fun getRegister(register: Char): List<KeyStroke>? {
     val reg = VimPlugin.getRegister().getRegister(register) ?: return null
-    return reg.keys
+    return reg.keys.map { it.awt }
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */
   @JvmStatic
   fun getRegister(editor: VimEditor, register: Char): List<KeyStroke>? {
     val reg = VimPlugin.getRegister().getRegister(editor, injector.executionContextManager.getEditorExecutionContext(editor), register) ?: return null
-    return reg.keys
+    return reg.keys.map { it.awt }
   }
 
   @JvmStatic
   fun getRegisterForCaret(register: Char, caret: VimCaret): List<KeyStroke>? {
     val reg = caret.registerStorage.getRegister(register) ?: return null
-    return reg.keys
+    return reg.keys.map { it.awt }
   }
 
   /** Set the current contents of the given register */

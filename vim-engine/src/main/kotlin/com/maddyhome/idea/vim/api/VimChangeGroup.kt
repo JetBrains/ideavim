@@ -14,11 +14,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.TestOnly
-import javax.swing.KeyStroke
 
 interface VimChangeGroup {
   fun setInsertRepeat(lines: Int, column: Int, append: Boolean)
@@ -89,9 +89,9 @@ interface VimChangeGroup {
     spaces: Boolean,
   ): Boolean
 
-  fun processKey(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
+  fun processKey(editor: VimEditor, key: VimKeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
-  fun processKeyInSelectMode(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
+  fun processKeyInSelectMode(editor: VimEditor, key: VimKeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
 
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean

@@ -21,6 +21,8 @@ import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
+import com.maddyhome.idea.vim.helper.awt
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
@@ -109,7 +111,7 @@ private fun verifyKeymap() {
       "esc",
       "editor escape",
       IdeActions.ACTION_EDITOR_ESCAPE,
-      key("<esc>")
+      VimKeyStroke.ESC.awt
     )
   }
   shortcutsStartingFromEsc.forEach {
@@ -128,7 +130,7 @@ private fun verifyKeymap() {
       "enter",
       "editor enter",
       IdeActions.ACTION_EDITOR_ENTER,
-      key("<enter>")
+      VimKeyStroke.CR.awt
     )
   }
   shortcutsStartingFromEnter.forEach {

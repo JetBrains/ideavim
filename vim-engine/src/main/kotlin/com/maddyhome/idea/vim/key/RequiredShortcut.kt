@@ -8,9 +8,7 @@
 
 package com.maddyhome.idea.vim.key
 
-import javax.swing.KeyStroke
-
-data class RequiredShortcut(val keyStroke: KeyStroke, val owner: MappingOwner)
+data class RequiredShortcut(val keyStroke: VimKeyStroke, val owner: MappingOwner)
 
 /**
  * Every mapping in IdeaVim (like `map jk <esc>`) has an owner. That is needed to understand where this mapping comes

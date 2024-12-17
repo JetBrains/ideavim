@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTER
@@ -35,7 +36,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import javax.swing.KeyStroke
 
 abstract class VimRegisterGroupBase : VimRegisterGroup {
 
@@ -53,7 +53,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
 
   @JvmField
-  protected var recordList: MutableList<KeyStroke>? = null
+  protected var recordList: MutableList<VimKeyStroke>? = null
 
   @JvmField
   protected val myRegisters: java.util.HashMap<Char, Register> = HashMap()
@@ -137,7 +137,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     logger.debug("Last register reset to default register")
   }
 
-  override fun recordKeyStroke(key: KeyStroke) {
+  override fun recordKeyStroke(key: VimKeyStroke) {
     val myRecordList = recordList
     if (isRecording && myRecordList != null) {
       myRecordList.add(key)
@@ -557,11 +557,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
   }
 
-  override fun setKeys(register: Char, keys: List<KeyStroke>) {
+  override fun setKeys(register: Char, keys: List<VimKeyStroke>) {
     myRegisters[register] = Register(register, SelectionType.CHARACTER_WISE, keys.toMutableList())
   }
 
-  override fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType) {
+  override fun setKeys(register: Char, keys: List<VimKeyStroke>, type: SelectionType) {
     myRegisters[register] = Register(register, type, keys.toMutableList())
   }
 

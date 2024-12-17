@@ -13,6 +13,7 @@ import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.helper.vim
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import java.awt.event.InputEvent
@@ -38,7 +39,7 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
   }
 
   private fun getHandlersForShortcut(shortcut: KeyStroke): List<HandledModes> {
-    val modes = VimPlugin.getKey().shortcutConflicts[shortcut] ?: return listOf(HandledModes.NORMAL_UNDEFINED, HandledModes.INSERT_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED)
+    val modes = VimPlugin.getKey().shortcutConflicts[shortcut.vim] ?: return listOf(HandledModes.NORMAL_UNDEFINED, HandledModes.INSERT_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED)
 
     return when (modes) {
       is ShortcutOwnerInfo.AllModes -> {

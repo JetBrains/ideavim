@@ -13,9 +13,9 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.EngineStringHelper
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import org.jetbrains.annotations.TestOnly
 import java.util.*
-import javax.swing.KeyStroke
 import kotlin.Char
 import kotlin.math.ceil
 
@@ -56,7 +56,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         editor,
         String.format(
           "<%s>  %d,  Hex %02x,  Oct %03o%s",
-          EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),
+          VimKeyStroke.Printable(ch).toShortVimNotation(),
           ch.code,
           ch.code,
           ch.code,
@@ -68,7 +68,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         editor,
         String.format(
           "<%s> %d, Hex %04x, Oct %o%s",
-          EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),
+          VimKeyStroke.Printable(ch).toShortVimNotation(),
           ch.code,
           ch.code,
           ch.code,
