@@ -119,4 +119,85 @@ class MotionBigWordEndRightActionTest : VimTestCase() {
     doTest("300E", "${c}Lorem ipsum", "Lorem ipsu${c}m")
     assertPluginError(false)
   }
+
+  @Test
+  fun `test move to WORD end does not treat empty line as WORD`() {
+    doTest(
+      "E",
+      """
+        |Lorem Ipsu${c}m
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lore${c}m ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test move to WORD end does not treat empty line as WORD 2`() {
+    doTest(
+      "E",
+      """
+        |Lorem Ipsu${c}m
+        |
+        |
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |
+        |
+        |
+        |Lore${c}m ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test move to WORD end does not treat blank line as WORD`() {
+    doTest(
+      "E",
+      """
+        |Lorem Ipsu${c}m
+        |
+        |..........
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |..........
+        |
+        |
+        |Lore${c}m ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace()
+    )
+  }
 }
