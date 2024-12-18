@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 
 abstract class VimCommandLineServiceBase : VimCommandLineService {
@@ -24,9 +23,6 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
     if (!isCommandLineSupported(editor)) throw ExException("Command line is not allowed in one line editors")
 
     val currentMode = editor.mode
-    check(currentMode is ReturnableFromCmd) {
-      "Cannot enable cmd mode from current mode $currentMode"
-    }
 
     if (removeSelections) {
       // Make sure the Visual selection marks are up to date before we use them.

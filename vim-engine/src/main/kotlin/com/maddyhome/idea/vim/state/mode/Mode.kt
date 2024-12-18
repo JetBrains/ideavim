@@ -20,31 +20,32 @@ import com.maddyhome.idea.vim.state.VimStateMachine
  *
  * Modes with selection have [selectionType] variable representing if the selection is character-, line-, or block-wise.
  *
- * To update the current mode, use [VimStateMachine.setMode]. To get the current mode use [VimStateMachine.mode].
+ * To update the current mode, use [VimStateMachine.mode]. To get the current mode use [VimStateMachine.mode].
  *
  * [Mode] also has a bunch of extension functions like [Mode.isSingleModeActive].
  *
  * Also read about how modes work in Vim: https://github.com/JetBrains/ideavim/wiki/how-many-modes-does-vim-have
  */
 sealed interface Mode {
-  data class NORMAL(val returnTo: ReturnTo? = null) : Mode, ReturnableFromCmd
-  data class OP_PENDING(val returnTo: ReturnTo? = null, val forcedVisual: SelectionType? = null) :
-    Mode, ReturnableFromCmd
-  data class VISUAL(val selectionType: SelectionType, val returnTo: ReturnTo? = null) : Mode,
-    ReturnableFromCmd
+  data class NORMAL(val returnTo: ReturnTo? = null) : Mode
+  data class OP_PENDING(val returnTo: ReturnTo? = null, val forcedVisual: SelectionType? = null) : Mode
+  data class VISUAL(val selectionType: SelectionType, val returnTo: ReturnTo? = null) : Mode
   data class SELECT(val selectionType: SelectionType, val returnTo: ReturnTo? = null) : Mode
-  object INSERT : Mode, ReturnableFromCmd
+  object INSERT : Mode
   object REPLACE : Mode
-  data class CMD_LINE(val returnTo: ReturnableFromCmd) : Mode
+  data class CMD_LINE(val returnTo: Mode) : Mode {
+    init {
+      require(returnTo is NORMAL || returnTo is OP_PENDING || returnTo is VISUAL || returnTo is INSERT) {
+        "CMD_LINE mode can be active only in NORMAL, OP_PENDING, VISUAL or INSERT modes"
+      }
+    }
+  }
 }
 
 sealed interface ReturnTo {
   object INSERT : ReturnTo
   object REPLACE : ReturnTo
 }
-
-// Marks modes that can we return from CMD_LINE mode
-sealed interface ReturnableFromCmd
 
 enum class SelectionType {
   LINE_WISE,

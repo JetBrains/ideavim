@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnableFromCmd
 import com.maddyhome.idea.vim.ui.ModalEntry
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -91,7 +90,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
         }
       }
       if (text != null) {
-        Extension.addString(text!!)
+        Extension.addString(text)
       }
       return text
     }
@@ -105,9 +104,6 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     processing: (String) -> Unit,
   ) {
     val currentMode = editor.mode
-    check(currentMode is ReturnableFromCmd) {
-      "Cannot enable cmd mode from current mode $currentMode"
-    }
 
     // Make sure the Visual selection marks are up to date before we use them.
     injector.markService.setVisualSelectionMarks(editor)
@@ -136,6 +132,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     return panel
   }
 
+  @Deprecated("Please use ModalInputService.create()")
   override fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {
     val panel = ExEntryPanel.getInstanceWithoutShortcuts()
     panel.activate(editor.ij, context.ij, label, initText)
