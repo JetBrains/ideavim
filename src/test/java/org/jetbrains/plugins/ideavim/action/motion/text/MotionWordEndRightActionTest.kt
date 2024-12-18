@@ -119,4 +119,85 @@ class MotionWordEndRightActionTest : VimTestCase() {
     doTest("300e", "${c}Lorem ipsum", "Lorem ipsu${c}m")
     assertPluginError(false)
   }
+
+  @Test
+  fun `test move to word end does not treat empty line as word`() {
+    doTest(
+      "e",
+      """
+        |Lorem Ipsu${c}m
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lore${c}m ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test move to word end does not treat empty line as word 2`() {
+    doTest(
+      "e",
+      """
+        |Lorem Ipsu${c}m
+        |
+        |
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |
+        |
+        |
+        |Lore${c}m ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test move to word end does not treat blank line as word`() {
+    doTest(
+      "e",
+      """
+        |Lorem Ipsu${c}m
+        |
+        |..........
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |..........
+        |
+        |
+        |Lore${c}m ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace()
+    )
+  }
 }

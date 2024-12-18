@@ -195,4 +195,149 @@ class MotionBigWordLeftActionTest : VimTestCase() {
     doTest("B", "${c}Lorem Ipsum", "${c}Lorem Ipsum")
     assertPluginError(true)
   }
+
+  @Test
+  fun `test empty line is treated as WORD`() {
+    doTest(
+      "<C-Left>",
+      """
+        |Lorem Ipsum
+        |
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |${c}
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test empty line is treated as WORD 2`() {
+    doTest(
+      "B",
+      """
+        |Lorem Ipsum
+        |
+        |
+        |${c}
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |${c}
+        |
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test empty line is treated as WORD 3`() {
+    doTest(
+      "3<C-Left>",
+      """
+        |Lorem Ipsum
+        |
+        |
+        |
+        |
+        |
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |
+        |${c}
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test blank line is not treated as WORD`() {
+    doTest(
+      "B",
+      """
+        |Lorem Ipsum
+        |
+        |...
+        |${c}
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |${c}
+        |...
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace()
+    )
+  }
+
+  @Test
+  fun `test blank line is not treated as WORD 2`() {
+    doTest(
+      "<C-Left>",
+      """
+        |Lorem Ipsum
+        |
+        |
+        |.${c}..
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |${c}
+        |...
+        |
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace()
+    )
+  }
 }

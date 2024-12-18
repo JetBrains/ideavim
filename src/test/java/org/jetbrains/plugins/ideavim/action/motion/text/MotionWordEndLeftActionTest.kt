@@ -127,4 +127,136 @@ class MotionWordEndLeftActionTest : VimTestCase() {
     doTest("100ge", "Lorem ip${c}sum", "${c}Lorem ipsum")
     assertPluginError(false)
   }
+
+  @Test
+  fun `test move to previous word end should treat empty lines as word`() {
+    doTest(
+      "ge",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |${c}
+        |consectetur adipiscing elit
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test move to previous word end should treat empty lines as word 2`() {
+    doTest(
+      "ge",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |
+        |
+        |${c}
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |
+        |${c}
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test move to previous word end with count across empty lines`() {
+    doTest(
+      "3ge",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |
+        |
+        |
+        |${c}
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}
+        |
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test move to previous word end with count includes empty lines`() {
+    doTest(
+      "5ge",
+      """
+        |Lorem ipsum
+        |
+        |Lorem ipsum
+        |
+        |${c}
+        |Lorem ipsum
+      """.trimMargin(),
+      """
+        |Lorem ipsu${c}m
+        |
+        |Lorem ipsum
+        |
+        |
+        |Lorem ipsum
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test move to previous word end should ignore blank lines`() {
+    doTest(
+      "ge",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |..........
+        |${c}
+        |consectetur adipiscing elit
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |${c}
+        |..........
+        |
+        |consectetur adipiscing elit
+      """.trimMargin().dotToSpace(),
+    )
+  }
+
+  @Test
+  fun `test move to previous word end should ignore blank lines in count`() {
+    doTest(
+      "3ge",
+      """
+        |Lorem ipsum
+        |
+        |..........
+        |${c}
+        |Lorem ipsum
+      """.trimMargin().dotToSpace(),
+      """
+        |Lore${c}m ipsum
+        |
+        |..........
+        |
+        |Lorem ipsum
+      """.trimMargin().dotToSpace(),
+    )
+  }
 }
