@@ -24,13 +24,10 @@ import com.maddyhome.idea.vim.newapi.vim
 @Service
 internal class IjEditorHelper : EngineEditorHelperBase() {
   override fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int {
-    return (editor as IjVimEditor).editor.amountOfInlaysBeforeVisualPosition(
-      VisualPosition(
-        pos.line,
-        pos.column,
-        pos.leansRight,
-      ),
-    )
+    require(pos.line >= 0)
+    require(pos.column >= 0)
+    val visualPosition = VisualPosition(pos.line, pos.column, pos.leansRight)
+    return (editor as IjVimEditor).editor.amountOfInlaysBeforeVisualPosition(visualPosition)
   }
 
   override fun getVisualLineAtTopOfScreen(editor: VimEditor): Int {
