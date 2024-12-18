@@ -35,7 +35,7 @@ object IjOptions {
 
     // We also override the default value of 'clipboard', because IntelliJ supports the 'ideaput' item, which will use
     // IntelliJ's paste processes (e.g. to convert pasted Java to Kotlin)
-    Options.overrideDefaultValue(Options.clipboard, VimString("ideaput,autoselect,exclude:cons\\|linux"))
+    Options.overrideDefaultValue(Options.clipboard, VimString("ideaput,autoselect"))
   }
 
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
