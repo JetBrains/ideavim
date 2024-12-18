@@ -59,15 +59,16 @@ class IJEditorFocusListener : EditorListener {
     val ijEditor = editor.ij
     val isCurrentEditorTerminal = isTerminal(ijEditor)
 
-    KeyHandler.getInstance().lastUsedEditorInfo = LastUsedEditorInfo(currentEditorHashCode, isCurrentEditorTerminal)
+    KeyHandler.getInstance().lastUsedEditorInfo = LastUsedEditorInfo(currentEditorHashCode, false)
 
     val switchToInsertMode = Runnable {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
+      KeyHandler.getInstance().lastUsedEditorInfo = LastUsedEditorInfo(currentEditorHashCode, true)
     }
     if (isCurrentEditorTerminal && !ijEditor.inInsertMode) {
       switchToInsertMode.run()
-    } else if (ijEditor.isInsertMode && (oldEditorInfo.isTerminal || !ijEditor.document.isWritable)) {
+    } else if (ijEditor.isInsertMode && (oldEditorInfo.isInsertModeForced || !ijEditor.document.isWritable)) {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
       val mode = injector.vimState.mode
       when (mode) {

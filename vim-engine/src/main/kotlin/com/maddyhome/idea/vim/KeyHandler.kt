@@ -479,5 +479,8 @@ typealias KeyProcessing = (KeyHandlerState, VimEditor, ExecutionContext) -> Unit
 
 data class LastUsedEditorInfo(
   val hash: Int,
-  val isTerminal: Boolean,
+  /**
+   * If true, this editor was initialized in insert mode
+   */
+  val isInsertModeForced: Boolean,
 )
