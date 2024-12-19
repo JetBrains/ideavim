@@ -185,7 +185,7 @@ class SetCommandTest : VimTestCase() {
         |  history=50        nonumber            nosmartcase           whichwrap=b,s
         |nohlsearch            operatorfunc=     nosneak               wrap
         |noideajoin          norelativenumber      startofline         wrapscan
-        |  clipboard=ideaput,autoselect,exclude:cons\|linux
+        |  clipboard=ideaput,autoselect
         |  fileencoding=utf-8
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
         |  ide=IntelliJ IDEA Community Edition
@@ -242,7 +242,7 @@ class SetCommandTest : VimTestCase() {
       |noargtextobj
       |nobomb
       |nobreakindent
-      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  clipboard=ideaput,autoselect
       |  colorcolumn=
       |nocommentary
       |nocursorline

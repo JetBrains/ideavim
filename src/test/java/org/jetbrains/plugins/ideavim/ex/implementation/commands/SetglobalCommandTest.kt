@@ -450,7 +450,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  history=50          operatorfunc=       startofline
       |nohlsearch          norelativenumber    nosurround
       |noideajoin            scroll=0          notextobj-entire
-      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  clipboard=ideaput,autoselect
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
       |noideacopypreprocess
@@ -508,7 +508,7 @@ class SetglobalCommandTest : VimTestCase() {
       |noargtextobj
       |nobomb
       |nobreakindent
-      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  clipboard=ideaput,autoselect
       |  colorcolumn=
       |nocommentary
       |nocursorline
