@@ -503,7 +503,7 @@ class SetlocalCommandTest : VimTestCase() {
       |  history=50          nrformats=hex       sidescrolloff=-1    whichwrap=b,s
       |nohlsearch          nonumber            nosmartcase           wrap
       |--ideajoin            operatorfunc=     nosneak               wrapscan
-      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  clipboard=ideaput,autoselect
       |  fileencoding=utf-8
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -561,7 +561,7 @@ class SetlocalCommandTest : VimTestCase() {
       |noargtextobj
       |nobomb
       |nobreakindent
-      |  clipboard=ideaput,autoselect,exclude:cons\|linux
+      |  clipboard=ideaput,autoselect
       |  colorcolumn=
       |nocommentary
       |nocursorline
