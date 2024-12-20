@@ -233,6 +233,25 @@ internal class PutGroup : VimPutBase() {
 
     VimPlugin.getNotifications(project).notifyAboutIdeaPut()
   }
+
+  override fun smartPutText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    offset: Int,
+    text: String,
+    transferableData: Any,
+    type: SelectionType,
+  ) {
+    if (injector.globalOptions().clipboard.contains(OptionConstants.clipboard_ideaput)) {
+      val idePasteProvider = getProviderForPasteViaIde(editor, text.typeInRegister, data)
+      if (idePasteProvider != null) {
+        logger.debug("Perform put via idea paste")
+        putTextViaIde(idePasteProvider, editor, context, text, subMode, data, additionalData)
+        return
+      }
+    }
+    TODO("Not yet implemented")
+  }
 }
 
 internal class IjPasteProvider(val pasteProvider: PasteProvider) : VimPasteProvider

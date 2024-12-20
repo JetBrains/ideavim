@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.put.ProcessedTextData
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
@@ -33,12 +34,16 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 
 interface Read {}
 
-fun Read.getReg(name: Char): String? {
+fun Read.getReg(caretId: CaretId, name: Char): String? {
   return injector.registerGroup.getRegister(apiEditor, apiContext, name)?.text
 }
 
-fun Read.getRegType(name: Char): SelectionType? {
+fun Read.getRegType(caretId: CaretId, name: Char): SelectionType? {
   return injector.registerGroup.getRegister(apiEditor, apiContext, name)?.type
+}
+
+fun Read.getRegContent(caretId: CaretId, name: Char): RegisterContent? {
+  TODO()
 }
 
 enum class RegType {
@@ -168,3 +173,10 @@ fun Transaction.deleteText(startOffset: Int, endOffset: Int) {
 fun Transaction.replaceText(startOffset: Int, endOffset: Int, text: String) {
   (apiEditor as MutableVimEditor).replaceString(startOffset, endOffset, text)
 }
+
+fun Transaction.replaceText(startOffset: Int, endOffset: Int, registerContent: RegisterContent) {
+  apiEditor.deleteString(TextRange(startOffset, endOffset))
+  injector.put.smartPutText(apiEditor, apiContext, startOffset, registerContent.text, registerContent.transferableData, registerContent.type)
+}
+
+data class RegisterContent(val text: String, val type: SelectionType, val transferableData: Any)

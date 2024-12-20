@@ -37,6 +37,15 @@ interface VimPut {
     modifyRegister: Boolean = true,
   ): Boolean
 
+  fun smartPutText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    offset: Int,
+    text: String,
+    transferableData: Any,
+    type: SelectionType,
+  )
+
   @RWLockLabel.SelfSynchronized
   fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false, modifyRegister: Boolean = true): Boolean
 

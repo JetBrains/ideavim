@@ -10,12 +10,14 @@ package com.maddyhome.idea.vim.extension.replacewithregister
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
+import com.intellij.vim.api.RegisterContent
 import com.intellij.vim.api.Transaction
 import com.intellij.vim.api.apiContext
 import com.intellij.vim.api.apiEditor
 import com.intellij.vim.api.change
 import com.intellij.vim.api.forEachCaretSorted
 import com.intellij.vim.api.getReg
+import com.intellij.vim.api.getRegContent
 import com.intellij.vim.api.getRegType
 import com.intellij.vim.api.register
 import com.intellij.vim.api.replaceText
@@ -64,11 +66,10 @@ internal class ReplaceWithRegister : VimExtension {
   }
 }
 
-private fun Transaction.doReplace(caret: CaretId, caretInfo: CaretInfo) {
+private fun Transaction.doReplace(caretId: CaretId, caretInfo: CaretInfo) {
   val selection = caretInfo.selection ?: return
 
-  var usedText = getReg(register) ?: return
-  var usedType = getRegType(register) ?: return
+  var (usedText, usedType, usedData) = getRegContent(caretId, register) ?: return
 
   if (usedType.isLine && usedText.endsWith('\n') == true) {
     // Code from original plugin implementation. Correct text for linewise selected text
@@ -79,8 +80,8 @@ private fun Transaction.doReplace(caret: CaretId, caretInfo: CaretInfo) {
   replaceText(
     selection.first,
     selection.second,
-    usedText,
+    RegisterContent(usedText, usedType, usedData),
   )
 
-  updateCaret(caret, CaretInfo(selection.first + usedText.length - 1, null))
+  updateCaret(caretId, CaretInfo(selection.first + usedText.length - 1, null))
 }
