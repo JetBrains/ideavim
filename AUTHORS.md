@@ -563,6 +563,10 @@ Contributors:
   [![icon][github]](https://github.com/justast-wix)
   &nbsp;
   Justas Trimailovas
+* [![icon][mail]](mailto:wangxinhe06@gmail.com)
+  [![icon][github]](https://github.com/wxh06)
+  &nbsp;
+  Xinhe Wang
 
 Previous contributors:
 
