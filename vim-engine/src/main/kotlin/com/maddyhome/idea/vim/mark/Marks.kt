@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.mark
 
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.mark.Mark.KeySorter.ORDER
 import org.jetbrains.annotations.NonNls
 
 interface Mark {
@@ -27,6 +28,13 @@ interface Mark {
 
     override fun compare(o1: Mark, o2: Mark): Int {
       return ORDER.indexOf(o1.key) - ORDER.indexOf(o2.key)
+    }
+  }
+  // Same as in BufferPosition.
+  // TODO: Consider having a shared Interface / comparator for Mark and BufferPosition to avoid this duplication.
+  object PositionSorter: Comparator<Mark> {
+    override fun compare(o1: Mark, o2: Mark): Int {
+      return if (o1.line != o2.line) o1.line - o2.line else o1.col - o2.col
     }
   }
 }

@@ -283,6 +283,13 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return Motion.Error
   }
 
+  override fun moveCaretToMarkRelative(caret: ImmutableVimCaret, count: Int): Motion {
+    val markService = injector.markService
+    val mark = markService.getRelativeLowercaseMark(caret, count) ?: return Motion.Error
+    val offset = caret.editor.bufferPositionToOffset(BufferPosition(mark.line, mark.col, false))
+    return offset.toMotionOrError()
+  }
+
   override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
     val jumpService = injector.jumpService
     val spot = jumpService.getJumpSpot(editor)
