@@ -31,7 +31,7 @@ import javax.swing.JComponent
 import kotlin.math.max
 
 class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarWidget {
-  private companion object {
+  companion object {
     private const val INSERT = "INSERT"
     private const val NORMAL = "NORMAL"
     private const val INSERT_NORMAL = "(insert)"
@@ -46,6 +46,50 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
     private const val SELECT = "SELECT"
     private const val SELECT_LINE = "S-LINE"
     private const val SELECT_BLOCK = "S-BLOCK"
+
+    fun getModeText(mode: Mode?): String? {
+      return when (mode) {
+        Mode.INSERT -> INSERT
+        Mode.REPLACE -> REPLACE
+        is Mode.NORMAL -> getNormalModeText(mode)
+        is Mode.CMD_LINE -> COMMAND
+        is Mode.VISUAL -> getVisualModeText(mode)
+        is Mode.SELECT -> getSelectModeText(mode)
+        is Mode.OP_PENDING, null -> null
+      }
+    }
+
+    private fun getNormalModeText(mode: Mode.NORMAL) = when {
+      mode.isInsertPending -> INSERT_NORMAL
+      mode.isReplacePending -> REPLACE_NORMAL
+      else -> NORMAL
+    }
+
+    private fun getVisualModeText(mode: Mode.VISUAL): String {
+      val prefix = when {
+        mode.isInsertPending -> INSERT_PENDING_PREFIX
+        mode.isReplacePending -> REPLACE_PENDING_PREFIX
+        else -> ""
+      }
+      return prefix + when (mode.selectionType) {
+        SelectionType.CHARACTER_WISE -> VISUAL
+        SelectionType.LINE_WISE -> VISUAL_LINE
+        SelectionType.BLOCK_WISE -> VISUAL_BLOCK
+      }
+    }
+
+    private fun getSelectModeText(mode: Mode.SELECT): String {
+      val prefix = when {
+        mode.isInsertPending -> INSERT_PENDING_PREFIX
+        mode.isReplacePending -> REPLACE_PENDING_PREFIX
+        else -> ""
+      }
+      return prefix + when (mode.selectionType) {
+        SelectionType.CHARACTER_WISE -> SELECT
+        SelectionType.LINE_WISE -> SELECT_LINE
+        SelectionType.BLOCK_WISE -> SELECT_BLOCK
+      }
+    }
   }
 
   private val label = JBLabelWiderThan(setOf(REPLACE)).apply { isOpaque = true }
@@ -95,50 +139,6 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
   private fun getFocusedEditor(project: Project): Editor? {
     val fileEditorManager = FileEditorManager.getInstance(project)
     return fileEditorManager.selectedTextEditor
-  }
-
-  private fun getModeText(mode: Mode?): String? {
-    return when (mode) {
-      Mode.INSERT -> INSERT
-      Mode.REPLACE -> REPLACE
-      is Mode.NORMAL -> getNormalModeText(mode)
-      is Mode.CMD_LINE -> COMMAND
-      is Mode.VISUAL -> getVisualModeText(mode)
-      is Mode.SELECT -> getSelectModeText(mode)
-      is Mode.OP_PENDING, null -> null
-    }
-  }
-
-  private fun getNormalModeText(mode: Mode.NORMAL) = when {
-    mode.isInsertPending -> INSERT_NORMAL
-    mode.isReplacePending -> REPLACE_NORMAL
-    else -> NORMAL
-  }
-
-  private fun getVisualModeText(mode: Mode.VISUAL): String {
-    val prefix = when {
-      mode.isInsertPending -> INSERT_PENDING_PREFIX
-      mode.isReplacePending -> REPLACE_PENDING_PREFIX
-      else -> ""
-    }
-    return prefix + when (mode.selectionType) {
-      SelectionType.CHARACTER_WISE -> VISUAL
-      SelectionType.LINE_WISE -> VISUAL_LINE
-      SelectionType.BLOCK_WISE -> VISUAL_BLOCK
-    }
-  }
-
-  private fun getSelectModeText(mode: Mode.SELECT): String {
-    val prefix = when {
-      mode.isInsertPending -> INSERT_PENDING_PREFIX
-      mode.isReplacePending -> REPLACE_PENDING_PREFIX
-      else -> ""
-    }
-    return prefix + when (mode.selectionType) {
-      SelectionType.CHARACTER_WISE -> SELECT
-      SelectionType.LINE_WISE -> SELECT_LINE
-      SelectionType.BLOCK_WISE -> SELECT_BLOCK
-    }
   }
 
   private class JBLabelWiderThan(private val words: Collection<String>): JBLabel("", CENTER) {
