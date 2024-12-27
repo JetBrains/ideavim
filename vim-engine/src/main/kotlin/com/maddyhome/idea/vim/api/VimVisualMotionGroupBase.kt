@@ -17,10 +17,8 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.setSelectMode
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.state.mode.selectionType
 
 abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
@@ -47,7 +45,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     count: Int,
     rawCount: Int,
     selectionType: SelectionType,
-    returnTo: ReturnTo?
+    returnTo: Mode?
   ): Boolean {
     if (!editor.inVisualMode) {
       // Enable visual subMode

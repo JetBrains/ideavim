@@ -53,8 +53,6 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
-import com.maddyhome.idea.vim.state.mode.returnTo
 import org.jetbrains.annotations.Range
 import kotlin.math.max
 import kotlin.math.min
@@ -332,12 +330,7 @@ internal class MotionGroup : VimMotionGroupBase() {
       } else {
         val state = injector.vimState as VimStateMachineImpl
         if (state.mode is Mode.VISUAL) {
-          val returnTo = state.mode.returnTo
-          when (returnTo) {
-            ReturnTo.INSERT -> state.mode = Mode.INSERT
-            ReturnTo.REPLACE -> state.mode = Mode.REPLACE
-            null -> state.mode = Mode.NORMAL()
-          }
+          state.mode = state.mode.returnTo
         }
         val keyHandler = KeyHandler.getInstance()
         KeyHandler.getInstance().reset(keyHandler.keyHandlerState, state.mode)

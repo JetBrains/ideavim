@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isSingleModeActive
-import com.maddyhome.idea.vim.state.mode.returnTo
 import java.util.*
 
 inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
@@ -50,9 +49,9 @@ inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (
 }
 
 fun VimEditor.setSelectMode(submode: SelectionType) {
-  mode = Mode.SELECT(submode, this.mode.returnTo)
+  mode = Mode.SELECT(submode, mode.returnTo)
 }
 
 fun VimEditor.pushVisualMode(submode: SelectionType) {
-  mode = Mode.VISUAL(submode, this.mode.returnTo)
+  mode = Mode.VISUAL(submode, mode.returnTo)
 }

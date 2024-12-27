@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.state.mode.ReturnTo
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 interface VimVisualMotionGroup {
@@ -22,7 +22,7 @@ interface VimVisualMotionGroup {
    * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
    * If visual mode is enabled with the same [selectionType], disable it
    */
-  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: ReturnTo? = null): Boolean
+  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: Mode? = null): Boolean
   fun enterSelectMode(editor: VimEditor, subMode: SelectionType): Boolean
 
   /**
