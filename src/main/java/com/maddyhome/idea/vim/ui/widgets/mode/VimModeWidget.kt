@@ -28,6 +28,7 @@ import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
+import javax.swing.SwingUtilities
 import kotlin.math.max
 
 class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarWidget {
@@ -100,14 +101,20 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
 
     label.addMouseListener(object : MouseAdapter() {
       override fun mouseClicked(e: MouseEvent) {
-        val popup = ModeWidgetPopup.createPopup() ?: return
-        val dimension = popup.content.preferredSize
+        if (SwingUtilities.isLeftMouseButton(e)) {
+          val popup = ModeWidgetPopup.createPopup() ?: return
+          val dimension = popup.content.preferredSize
 
-        val widgetLocation = e.component.locationOnScreen
-        popup.show(RelativePoint(Point(
-          widgetLocation.x + e.component.width - dimension.width,
-          widgetLocation.y - dimension.height,
-        )))
+          val widgetLocation = e.component.locationOnScreen
+          popup.show(
+            RelativePoint(
+              Point(
+                widgetLocation.x + e.component.width - dimension.width,
+                widgetLocation.y - dimension.height,
+              )
+            )
+          )
+        }
       }
     })
   }
