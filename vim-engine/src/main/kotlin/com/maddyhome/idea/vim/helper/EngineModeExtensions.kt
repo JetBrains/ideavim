@@ -12,40 +12,24 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
-import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.state.mode.selectionType
 
 fun VimEditor.exitVisualMode() {
-  val selectionType = this.mode.selectionType ?: CHARACTER_WISE
+  val selectionType = mode.selectionType ?: SelectionType.CHARACTER_WISE
   SelectionVimListenerSuppressor.lock().use {
     if (inBlockSelection) {
-      this.removeSecondaryCarets()
+      removeSecondaryCarets()
     }
-    this.nativeCarets().forEach(VimCaret::removeSelection)
+    nativeCarets().forEach(VimCaret::removeSelection)
   }
-  if (this.inVisualMode) {
-    this.vimLastSelectionType = selectionType
+  if (inVisualMode) {
+    vimLastSelectionType = selectionType
     injector.markService.setVisualSelectionMarks(this)
-    this.nativeCarets().forEach { it.vimSelectionStartClear() }
+    nativeCarets().forEach { it.vimSelectionStartClear() }
 
-    val returnTo = this.mode.returnTo
-    when (returnTo) {
-      ReturnTo.INSERT -> {
-        this.mode = Mode.INSERT
-      }
-
-      ReturnTo.REPLACE -> {
-        this.mode = Mode.REPLACE
-      }
-
-      null -> {
-        this.mode = Mode.NORMAL()
-      }
-    }
+    mode = mode.returnTo
   }
 }

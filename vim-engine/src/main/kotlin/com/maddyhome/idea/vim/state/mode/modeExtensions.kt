@@ -19,20 +19,7 @@ val Mode.selectionType: SelectionType?
   get() = when (this) {
     is Mode.VISUAL -> this.selectionType
     is Mode.SELECT -> this.selectionType
-    is Mode.CMD_LINE -> this.returnTo().selectionType
-    else -> null
-  }
-
-/**
- * Get the mode that we need to return to if the one-command-mode (':h i_Ctrl-o') is active.
- * Otherwise, returns null.
- */
-val Mode.returnTo: ReturnTo?
-  get() = when (this) {
-    is Mode.NORMAL -> this.returnTo
-    is Mode.SELECT -> this.returnTo
-    is Mode.VISUAL -> this.returnTo
-    is Mode.OP_PENDING -> this.returnTo
+    is Mode.CMD_LINE -> this.returnTo.selectionType
     else -> null
   }
 
@@ -40,7 +27,21 @@ val Mode.returnTo: ReturnTo?
  * Check if one-command-mode (':h i_Ctrl-o') is active.
  */
 val Mode.isSingleModeActive: Boolean
-  get() = returnTo != null
+  get() {
+    // TODO: This check isn't accurate. Needs updating
+    // If we're in Normal and returning to something other than Normal, then we're definitely in single-execution mode
+    // ("Insert Normal mode"). This doesn't apply to all modes - Visual returning to Normal is fine, as is Command-line
+    // returning to Normal. We can even have Command-line returning to Visual returning to Normal, and this isn't
+    // single-execution mode.
+    // Single-execution mode allows changing mode further, so we can be in Visual returning to Normal returning to
+    // Insert (returning to Normal) with `i<C-O>v` aka "Insert Visual mode". We could even be in Command-line ultimately
+    // returning to Replace with `R<C-O>v/foo`. But they all have Normal mode returning to non-Normal, so we could
+    // recursively look for this.
+    // We also need to check for Support mode, which also supports single-execution mode, although this switches to
+    // Visual mode. E.g. with `:set selectmode=key keymodel=startsel`, then `i<S-Right>` will be Select mode returning
+    // to Normal, returning to Insert (returning to Normal) aka "Insert Select mode". See also `:help v_CTRL-O`.
+    return (this != Mode.NORMAL() && this.returnTo != Mode.NORMAL()) || (this == Mode.NORMAL() && this.returnTo != this)
+  }
 
 /**
  * Check if the caret can be placed after the end of line.
@@ -126,51 +127,3 @@ fun Mode.toVimNotation(): String {
     is Mode.OP_PENDING -> "no"
   }
 }
-
-fun Mode.returnTo(): Mode {
-  return when (this) {
-    is Mode.CMD_LINE -> {
-      val returnMode = returnTo as Mode
-      // We need to understand logic that doesn't exit visual if it's just visual,
-      //   but exits visual if it's one-time visual
-      if (returnMode.returnTo != null) {
-        returnMode.returnTo()
-      } else {
-        returnMode
-      }
-    }
-
-    Mode.INSERT -> Mode.NORMAL()
-    is Mode.NORMAL -> when (returnTo) {
-      ReturnTo.INSERT -> Mode.INSERT
-      ReturnTo.REPLACE -> Mode.REPLACE
-      null -> Mode.NORMAL()
-    }
-
-    is Mode.OP_PENDING -> when (returnTo) {
-      ReturnTo.INSERT -> Mode.INSERT
-      ReturnTo.REPLACE -> Mode.REPLACE
-      null -> Mode.NORMAL()
-    }
-
-    Mode.REPLACE -> Mode.NORMAL()
-    is Mode.SELECT -> when (returnTo) {
-      ReturnTo.INSERT -> Mode.INSERT
-      ReturnTo.REPLACE -> Mode.REPLACE
-      null -> Mode.NORMAL()
-    }
-
-    is Mode.VISUAL -> when (returnTo) {
-      ReturnTo.INSERT -> Mode.INSERT
-      ReturnTo.REPLACE -> Mode.REPLACE
-      null -> Mode.NORMAL()
-    }
-  }
-}
-
-val Mode.toReturnTo: ReturnTo
-  get() = when (this) {
-    Mode.INSERT -> ReturnTo.INSERT
-    Mode.REPLACE -> ReturnTo.REPLACE
-    else -> error("Cannot get return to from $this")
-  }

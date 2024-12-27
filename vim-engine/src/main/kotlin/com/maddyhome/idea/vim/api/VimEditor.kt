@@ -13,9 +13,7 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.returnTo
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -281,12 +279,7 @@ interface VimEditor {
 
   fun resetOpPending() {
     if (this.mode is Mode.OP_PENDING) {
-      val returnTo = this.mode.returnTo
-      mode = when (returnTo) {
-        ReturnTo.INSERT -> Mode.INSERT
-        ReturnTo.REPLACE -> Mode.INSERT
-        null -> Mode.NORMAL()
-      }
+      mode = mode.returnTo
     }
   }
 

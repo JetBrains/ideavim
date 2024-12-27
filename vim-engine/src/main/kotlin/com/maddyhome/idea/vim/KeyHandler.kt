@@ -34,8 +34,6 @@ import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
-import com.maddyhome.idea.vim.state.mode.returnTo
 import javax.swing.KeyStroke
 
 /**
@@ -334,11 +332,7 @@ class KeyHandler {
       // mode commands. An exception is if this command should leave us in the temporary mode such as
       // "select register"
       if (editorState.mode is Mode.NORMAL && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
-        when (editorState.mode.returnTo) {
-          ReturnTo.INSERT -> editor.mode = Mode.INSERT
-          ReturnTo.REPLACE -> editor.mode = Mode.REPLACE
-          null -> {}
-        }
+        editor.mode = editorState.mode.returnTo
       }
 
       instance.reset(keyState, editorState.mode)

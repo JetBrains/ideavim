@@ -47,7 +47,6 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
-import com.maddyhome.idea.vim.state.mode.returnTo
 
 /**
  * Port of vim-surround.
@@ -289,7 +288,7 @@ internal class VimSurroundExtension : VimExtension {
     private fun getSurroundRange(caret: VimCaret): TextRange? {
       val editor = caret.editor
       if (editor.mode is Mode.CMD_LINE) {
-        editor.mode = (editor.mode as Mode.CMD_LINE).returnTo()
+        editor.mode = editor.mode.returnTo
       }
       return when (editor.mode) {
         is Mode.NORMAL -> injector.markService.getChangeMarks(caret)
@@ -337,7 +336,7 @@ private fun getSurroundPair(c: Char): SurroundPair? = if (c in SURROUND_PAIRS) {
 private fun inputTagPair(editor: Editor, context: DataContext): SurroundPair? {
   val tagInput = inputString(editor, context, "<", '>')
   if (editor.vim.mode is Mode.CMD_LINE) {
-    editor.vim.mode = editor.vim.mode.returnTo()
+    editor.vim.mode = editor.vim.mode.returnTo
   }
   val matcher = tagNameAndAttributesCapturePattern.matcher(tagInput)
   return if (matcher.find()) {
@@ -356,7 +355,7 @@ private fun inputFunctionName(
 ): SurroundPair? {
   val functionNameInput = inputString(editor, context, "function: ", null)
   if (editor.vim.mode is Mode.CMD_LINE) {
-    editor.vim.mode = editor.vim.mode.returnTo()
+    editor.vim.mode = editor.vim.mode.returnTo
   }
   if (functionNameInput.isEmpty()) return null
   return if (withInternalSpaces) {

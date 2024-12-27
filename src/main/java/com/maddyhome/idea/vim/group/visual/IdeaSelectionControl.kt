@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.state.mode.inCommandLineMode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeSelect
@@ -75,7 +74,7 @@ internal object IdeaSelectionControl {
       }
 
       if (hasSelection) {
-        if (editor.vim.inCommandLineMode && editor.vim.mode.returnTo().hasVisualSelection) {
+        if (editor.vim.inCommandLineMode && editor.vim.mode.returnTo.hasVisualSelection) {
           logger.trace { "Modifying selection while in Command-line mode, most likely incsearch" }
           return@singleTask
         }
