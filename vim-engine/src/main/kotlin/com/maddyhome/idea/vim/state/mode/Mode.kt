@@ -57,6 +57,20 @@ sealed interface Mode {
   data class NORMAL(private val originalMode: Mode? = null) : Mode {
     override val returnTo: Mode
       get() = originalMode ?: this
+
+    /**
+     * Returns true if Insert mode is pending, after the completion of the current Normal command. AKA "Insert Normal"
+     *
+     * When in Insert mode the `<C-O>` keystroke will temporarily switch to Normal for the duration of a single command.
+     */
+    val isInsertPending = originalMode is INSERT
+
+    /**
+     * Returns true if Replace mode is pending, after the completion of the current Normal command.
+     *
+     * Like "Insert Normal", but with `<C-O>` used in Replace mode.
+     */
+    val isReplacePending = originalMode is REPLACE
   }
 
   data class OP_PENDING(override val returnTo: Mode) : Mode {
@@ -77,6 +91,21 @@ sealed interface Mode {
         "VISUAL mode can be active only in NORMAL, INSERT or REPLACE modes, not ${returnTo.javaClass.simpleName}"
       }
     }
+
+    /**
+     * Returns true if Insert mode is pending, after the completion of the current Visual command. AKA "Insert Visual"
+     *
+     * Vim can enter Visual mode from Insert mode, either using shifted keys (based on `'keymodel'` and `'selectmode'`
+     * values) or via "Insert Normal" (`i<C-O>v`).
+     */
+    val isInsertPending = returnTo is INSERT
+
+    /**
+     * Returns true if Replace mode is pending, after the completion of the current Visual command.
+     *
+     * Like "Insert Visual", but starting from (and returning to) Replace (`R<C-O>v`).
+     */
+    val isReplacePending = returnTo is REPLACE
   }
 
   data class SELECT(val selectionType: SelectionType, override val returnTo: Mode = NORMAL()) : Mode {
@@ -88,6 +117,21 @@ sealed interface Mode {
         "SELECT mode can be active only in NORMAL, INSERT or REPLACE modes, not ${returnTo.javaClass.simpleName}"
       }
     }
+
+    /**
+     * Returns true if Insert mode is pending, after the completion of the current Visual command. AKA "Insert Visual"
+     *
+     * Vim can enter Select mode from Insert mode, either using shifted keys (based on `'keymodel'` and `'selectmode'`
+     * values) or via "Insert Normal" (`i<C-O>gh`).
+     */
+    val isInsertPending = returnTo is INSERT
+
+    /**
+     * Returns true if Replace mode is pending, after the completion of the current Visual command.
+     *
+     * Like "Insert Select", but starting from (and returning to) Replace (e.g., `R<C-O>gh`).
+     */
+    val isReplacePending = returnTo is REPLACE
   }
 
   object INSERT : Mode {
