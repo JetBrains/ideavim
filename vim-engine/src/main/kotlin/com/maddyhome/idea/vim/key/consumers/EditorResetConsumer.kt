@@ -60,19 +60,26 @@ class EditorResetConsumer : KeyConsumer {
     if (commandBuilder.isEmpty) {
       val register = injector.registerGroup
       if (register.currentRegister == register.defaultRegister) {
-        var indicateError = true
-        if (key.keyCode == KeyEvent.VK_ESCAPE) {
-          val executed = arrayOf<Boolean?>(null)
-          injector.actionExecutor.executeCommand(
-            editor,
-            { executed[0] = injector.actionExecutor.executeEsc(editor, context) },
-            "",
-            null,
-          )
-          indicateError = !executed[0]!!
+        // Escape should exit "Insert Normal" mode. We don't have a handler for <Esc> in Normal mode, so we do it here
+        val mode = editor.mode
+        if (mode is Mode.NORMAL && (mode.isInsertPending || mode.isReplacePending)) {
+          editor.mode = mode.returnTo
         }
-        if (indicateError) {
-          injector.messages.indicateError()
+        else {
+          var indicateError = true
+          if (key.keyCode == KeyEvent.VK_ESCAPE) {
+            val executed = arrayOf<Boolean?>(null)
+            injector.actionExecutor.executeCommand(
+              editor,
+              { executed[0] = injector.actionExecutor.executeEsc(editor, context) },
+              "",
+              null,
+            )
+            indicateError = !executed[0]!!
+          }
+          if (indicateError) {
+            injector.messages.indicateError()
+          }
         }
       }
     }
