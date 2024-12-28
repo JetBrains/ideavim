@@ -99,6 +99,14 @@ class VimShowModeTest : VimTestCase() {
   }
 
   @Test
+  fun `test status string after escape out of Insert Normal mode`() {
+    configureByText("123")
+    typeText("i<C-O><Esc>")
+    val statusString = VimModeWidget.getModeText(fixture.editor.vim.mode)
+    assertEquals("INSERT", statusString)
+  }
+
+  @Test
   fun `test status string for Replace pending Normal mode`() {
     configureByText("123")
     typeText("R<C-O>")
