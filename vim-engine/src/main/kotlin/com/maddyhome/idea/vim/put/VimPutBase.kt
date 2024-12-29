@@ -491,9 +491,9 @@ abstract class VimPutBase : VimPut {
     val startOffsets = prepareDocumentAndGetStartOffsets(editor, updated, text.typeInRegister, data, additionalData)
 
     startOffsets.forEach { startOffset ->
-      val subMode = data.visualSelection?.typeInEditor ?: SelectionType.CHARACTER_WISE
+      val selectionType = data.visualSelection?.typeInEditor ?: SelectionType.CHARACTER_WISE
       val (endOffset, updatedCaret) = putTextInternal(
-        editor, updated, context, text.copiedText.text, text.typeInRegister, subMode,
+        editor, updated, context, text.copiedText.text, text.typeInRegister, selectionType,
         startOffset, data.count, data.indent, data.caretAfterInsertedText,
       )
       updated = updatedCaret
@@ -504,7 +504,7 @@ abstract class VimPutBase : VimPut {
         startOffset,
         endOffset,
         text.typeInRegister,
-        subMode,
+        selectionType,
         data.caretAfterInsertedText,
       )
     }
@@ -541,12 +541,12 @@ abstract class VimPutBase : VimPut {
     additionalData: Map<String, Any>,
   ) {
     val visualSelection = data.visualSelection
-    val subMode = visualSelection?.typeInEditor ?: SelectionType.CHARACTER_WISE
+    val selectionType = visualSelection?.typeInEditor ?: SelectionType.CHARACTER_WISE
     if (injector.globalOptions().clipboard.contains(OptionConstants.clipboard_ideaput)) {
       val idePasteProvider = getProviderForPasteViaIde(editor, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")
-        putTextViaIde(idePasteProvider, editor, context, text, subMode, data, additionalData)
+        putTextViaIde(idePasteProvider, editor, context, text, selectionType, data, additionalData)
         return
       }
     }

@@ -39,7 +39,7 @@ interface VimVisualMotionGroup {
   /**
    * Enters visual mode based on current editor state.
    *
-   * If [subMode] is null, subMode will be detected automatically
+   * If [selectionType] is null, it will be detected automatically
    *
    * it:
    * - Updates command state
@@ -51,6 +51,6 @@ interface VimVisualMotionGroup {
    * - DOES NOT move caret
    * - DOES NOT check if carets actually have any selection
    */
-  fun enterVisualMode(editor: VimEditor, subMode: SelectionType? = null): Boolean
-  fun autodetectVisualSubmode(editor: VimEditor): SelectionType
+  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType? = null): Boolean
+  fun detectSelectionType(editor: VimEditor): SelectionType
 }
