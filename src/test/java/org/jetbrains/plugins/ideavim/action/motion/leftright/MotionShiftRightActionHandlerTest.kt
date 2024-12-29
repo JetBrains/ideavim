@@ -82,6 +82,62 @@ class MotionShiftRightActionHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(
     VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
+  )
+  fun `test visual shift right in Insert mode enters Insert Visual mode`() {
+    doTest(
+      listOf("i<S-Right>"),
+      """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+                A Discovery
+
+                I ${s}f${c}o${se}und it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
+  )
+  fun `test visual shift right in Replace mode enters Replace Visual mode`() {
+    doTest(
+      listOf("R<S-Right>"),
+      """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+                A Discovery
+
+                I ${s}f${c}o${se}und it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.REPLACE),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
     VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
   fun `test select right`() {
@@ -132,6 +188,62 @@ class MotionShiftRightActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
+  )
+  fun `test select shift right in Insert enters Insert Select mode`() {
+    doTest(
+      listOf("i<S-Right>"),
+      """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+                A Discovery
+
+                I ${s}f${c}${se}ound it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      Mode.SELECT(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @OptionTest(
+    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
+  )
+  fun `test select shift right in Replace enters Replace Select mode`() {
+    doTest(
+      listOf("R<S-Right>"),
+      """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+                A Discovery
+
+                I ${s}f${c}${se}ound it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      Mode.SELECT(SelectionType.CHARACTER_WISE, returnTo = Mode.REPLACE),
     )
   }
 

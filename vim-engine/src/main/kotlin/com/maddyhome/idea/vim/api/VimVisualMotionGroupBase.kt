@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
-import com.maddyhome.idea.vim.helper.setSelectMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inVisualMode
@@ -27,8 +26,15 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 
-  override fun enterSelectMode(editor: VimEditor, subMode: SelectionType): Boolean {
-    editor.setSelectMode(subMode)
+  override fun enterSelectMode(editor: VimEditor, selectionType: SelectionType): Boolean {
+    // If we're already in Select or toggling from Visual, replace the current mode (keep the existing returnTo),
+    // otherwise push Select, using the current mode as returnTo.
+    // If we're entering from Normal, use its own returnTo, as this will handle both Normal and "Internal Normal"
+    editor.mode = when (editor.mode) {
+      is Mode.SELECT, is Mode.VISUAL -> Mode.SELECT(selectionType, editor.mode.returnTo)
+      is Mode.NORMAL -> Mode.SELECT(selectionType, editor.mode.returnTo)
+      else -> Mode.SELECT(selectionType, editor.mode)
+    }
     editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     return true
   }
@@ -67,10 +73,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
           it.vimLastColumn = intendedColumn
         }
       } else {
-        editor.mode = Mode.VISUAL(
-          selectionType,
-          returnTo ?: editor.mode.returnTo
-        )
+        editor.mode = Mode.VISUAL(selectionType, returnTo ?: editor.mode.returnTo)
         editor.forEachCaret { it.vimSetSelection(it.offset) }
       }
       return true
