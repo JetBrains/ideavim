@@ -32,8 +32,7 @@ class VisualToggleCharacterModeAction : VimActionHandler.SingleExecution() {
     return if (injector.options(editor).selectmode.contains(OptionConstants.selectmode_cmd)) {
       injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
     } else {
-      injector.visualMotionGroup
-        .toggleVisual(editor, cmd.count, cmd.rawCount, SelectionType.CHARACTER_WISE)
+      injector.visualMotionGroup.toggleVisual(editor, cmd.count, cmd.rawCount, SelectionType.CHARACTER_WISE)
     }
   }
 }

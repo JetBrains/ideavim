@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.ui.widgets.mode.VimModeWidget
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -170,8 +169,6 @@ class VimShowModeTest : VimTestCase() {
     assertEquals("(insert) SELECT", statusString)
   }
 
-  // TODO: Not currently working
-  @Disabled
   @Test
   fun `test status string in Insert Select mode 2`() {
     configureByText("123")

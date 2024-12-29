@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 import com.maddyhome.idea.vim.state.mode.inSelectMode
@@ -94,10 +93,12 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
     if (withKey) {
       if (!inVisualMode && !inSelectMode) {
         if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
+          // Note that this will correctly choose either Select or Insert Select modes
           injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
         } else {
           if (editor.isInsertionAllowed) {
-            injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE, Mode.INSERT)
+            // Enter Insert/Replace Visual mode
+            injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE, editor.mode)
           } else {
             injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
           }

@@ -61,10 +61,6 @@ inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (
   else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
 }
 
-fun VimEditor.setSelectMode(submode: SelectionType) {
-  mode = Mode.SELECT(submode, mode.returnTo)
-}
-
 fun VimEditor.pushVisualMode(submode: SelectionType) {
   mode = Mode.VISUAL(submode, mode.returnTo)
 }
