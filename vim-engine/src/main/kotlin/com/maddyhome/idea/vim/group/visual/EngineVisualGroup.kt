@@ -27,9 +27,9 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) {
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
   val editor = caret.editor
-  val subMode = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
+  val selectionType = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
   val mode = editor.mode
-  when (subMode) {
+  when (selectionType) {
     SelectionType.CHARACTER_WISE -> {
       val (nativeStart, nativeEnd) = charToNativeSelection(editor, start, end, mode)
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)

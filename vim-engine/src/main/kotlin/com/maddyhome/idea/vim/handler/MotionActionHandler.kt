@@ -132,7 +132,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val blockSubmodeActive = editor.inBlockSelection
+    val blockSelectionActive = editor.inBlockSelection
 
     val handler = if (this is AmbiguousExecution) this.getMotionActionHandler(cmd.argument) else this
     when (handler) {
@@ -159,7 +159,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       }
       is ForEachCaret -> run {
         when {
-          blockSubmodeActive || editor.carets().size == 1 -> {
+          blockSelectionActive || editor.carets().size == 1 -> {
             val primaryCaret = editor.primaryCaret()
             handler.doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
           }

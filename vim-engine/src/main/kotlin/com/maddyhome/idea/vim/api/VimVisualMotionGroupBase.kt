@@ -54,10 +54,9 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     returnTo: Mode?
   ): Boolean {
     if (!editor.inVisualMode) {
-      // Enable visual subMode
       if (rawCount > 0) {
-        val primarySubMode = editor.primaryCaret().vimLastVisualOperatorRange?.type ?: selectionType
-        editor.pushVisualMode(primarySubMode)
+        val primarySelectionType = editor.primaryCaret().vimLastVisualOperatorRange?.type ?: selectionType
+        editor.pushVisualMode(primarySelectionType)
 
         editor.forEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(selectionType)
@@ -80,7 +79,6 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     }
 
     if (selectionType == editor.mode.selectionType) {
-      // Disable visual subMode
       editor.exitVisualMode()
       return true
     }
@@ -88,7 +86,6 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     val mode = editor.mode
     check(mode is Mode.VISUAL)
 
-    // Update visual subMode with new sub subMode
     editor.mode = mode.copy(selectionType = selectionType)
     for (caret in editor.carets()) {
       if (!caret.isValid) continue
@@ -126,7 +123,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     return true
   }
 
-  override fun autodetectVisualSubmode(editor: VimEditor): SelectionType {
+  override fun detectSelectionType(editor: VimEditor): SelectionType {
     if (editor.carets().size > 1 && seemsLikeBlockMode(editor)) {
       return SelectionType.BLOCK_WISE
     }
@@ -147,7 +144,8 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
 
   /**
    * Enters visual mode based on current editor state.
-   * If [subMode] is null, subMode will be detected automatically
+   *
+   * If [selectionType] is null, it will be detected automatically
    *
    * it:
    * - Updates command state
@@ -159,14 +157,14 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
    * - DOES NOT move caret
    * - DOES NOT check if carets actually have any selection
    */
-  override fun enterVisualMode(editor: VimEditor, subMode: SelectionType?): Boolean {
-    val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
-    editor.mode = Mode.VISUAL(autodetectedSubMode)
-    //    editor.vimStateMachine.setMode(VimStateMachine.Mode.VISUAL, autodetectedSubMode)
+  override fun enterVisualMode(editor: VimEditor, selectionType: SelectionType?): Boolean {
+    val newSelectionType = selectionType ?: detectSelectionType(editor)
+
+    editor.mode = Mode.VISUAL(newSelectionType)
 
     // vimLeadSelectionOffset requires read action
     injector.application.runReadAction {
-      if (autodetectedSubMode == SelectionType.BLOCK_WISE) {
+      if (newSelectionType == SelectionType.BLOCK_WISE) {
         editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
       } else {
         editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }

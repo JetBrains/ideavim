@@ -80,7 +80,7 @@ internal class PutGroup : VimPutBase() {
     vimEditor: VimEditor,
     vimContext: ExecutionContext,
     text: ProcessedTextData,
-    subMode: SelectionType,
+    selectionType: SelectionType,
     data: PutData,
     additionalData: Map<String, Any>,
   ) {
@@ -148,7 +148,7 @@ internal class PutGroup : VimPutBase() {
         startOffset,
         endOffset,
         text.typeInRegister,
-        subMode,
+        selectionType,
         data.caretAfterInsertedText,
       )
     }
