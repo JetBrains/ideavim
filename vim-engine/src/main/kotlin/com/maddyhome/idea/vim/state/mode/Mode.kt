@@ -87,8 +87,9 @@ sealed interface Mode {
     init {
       // VISUAL will normally return to NORMAL, but can return to INSERT or REPLACE if i_CTRL-O is followed by `v`
       // I.e. "Insert Visual mode" and "Replace Visual mode"
-      require(returnTo is NORMAL || returnTo is INSERT || returnTo is REPLACE) {
-        "VISUAL mode can be active only in NORMAL, INSERT or REPLACE modes, not ${returnTo.javaClass.simpleName}"
+      // VISUAL can return to SELECT after `<C-O>`
+      require(returnTo is NORMAL || returnTo is INSERT || returnTo is REPLACE || returnTo is SELECT) {
+        "VISUAL mode can be active only in NORMAL, INSERT, REPLACE or SELECT modes, not ${returnTo.javaClass.simpleName}"
       }
     }
 
@@ -106,6 +107,13 @@ sealed interface Mode {
      * Like "Insert Visual", but starting from (and returning to) Replace (`R<C-O>v`).
      */
     val isReplacePending = returnTo is REPLACE
+
+    /**
+     * Returns true if the mode is temporarily switched from Select to Visual for the duration of one command
+     *
+     * See `:help v_CTRL-O`
+     */
+    val isSelectPending = returnTo is SELECT
   }
 
   data class SELECT(val selectionType: SelectionType, override val returnTo: Mode = NORMAL()) : Mode {

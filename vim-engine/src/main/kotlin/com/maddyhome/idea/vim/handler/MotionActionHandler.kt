@@ -275,6 +275,18 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     return resultOffset
   }
 
+  override fun postExecute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
+  ) {
+    // If we're in single-execution Visual mode, return to Select. See `:help v_CTRL-O`
+    if ((editor.mode as? Mode.VISUAL)?.isSelectPending == true) {
+      injector.visualMotionGroup.processSingleVisualCommand(editor)
+    }
+  }
+
   private object CaretMergingWatcher : VimCaretListener {
     override fun caretRemoved(caret: ImmutableVimCaret?) {
       caret ?: return

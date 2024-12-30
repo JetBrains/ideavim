@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inVisualMode
@@ -30,6 +31,13 @@ fun VimEditor.exitVisualMode() {
     injector.markService.setVisualSelectionMarks(this)
     nativeCarets().forEach { it.vimSelectionStartClear() }
 
-    mode = mode.returnTo
+    // We usually want to return to the mode that we were in before we started Visual. Typically, this will be NORMAL,
+    // but can be INSERT for "Insert Visual" (`i<C-O>v`). For "Select Visual" (`gh<C-O>`) we can't return to SELECT,
+    // because we've just removed the selection. We have to return to NORMAL.
+    val mode = this.mode
+    this.mode = when {
+      mode is Mode.VISUAL && mode.isSelectPending -> Mode.NORMAL()
+      else -> mode.returnTo
+    }
   }
 }
