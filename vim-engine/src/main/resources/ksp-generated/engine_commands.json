@@ -365,6 +365,11 @@
         "modes": "N"
     },
     {
+        "keys": "<C-O>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.SelectToggleSingleVisualCommandAction",
+        "modes": "SX"
+    },
+    {
         "keys": "<C-P>",
         "class": "com.maddyhome.idea.vim.action.ex.HistoryUpAction",
         "modes": "C"

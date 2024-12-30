@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
@@ -29,11 +30,14 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override fun enterSelectMode(editor: VimEditor, selectionType: SelectionType): Boolean {
     // If we're already in Select or toggling from Visual, replace the current mode (keep the existing returnTo),
     // otherwise push Select, using the current mode as returnTo.
-    // If we're entering from Normal, use its own returnTo, as this will handle both Normal and "Internal Normal"
-    editor.mode = when (editor.mode) {
-      is Mode.SELECT, is Mode.VISUAL -> Mode.SELECT(selectionType, editor.mode.returnTo)
-      is Mode.NORMAL -> Mode.SELECT(selectionType, editor.mode.returnTo)
-      else -> Mode.SELECT(selectionType, editor.mode)
+    // If we're entering from Normal, use its own returnTo, as this will handle both Normal and "Internal Normal".
+    // And return back to Select if we were originally in Select and entered Visual for a single command (eg `gh<C-O>e`)
+    val mode = editor.mode
+    editor.mode = when {
+      mode is Mode.VISUAL && mode.isSelectPending -> mode.returnTo
+      mode is Mode.VISUAL || mode is Mode.SELECT -> Mode.SELECT(selectionType, mode.returnTo)
+      mode is Mode.NORMAL -> Mode.SELECT(selectionType, mode.returnTo)
+      else -> Mode.SELECT(selectionType, mode)
     }
     editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     return true
@@ -171,5 +175,36 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       }
     }
     return true
+  }
+
+  /**
+   * When in Select mode, enter Visual mode for a single command
+   *
+   * While the Vim docs state that this is for the duration of a single Visual command, it also includes motions. This
+   * is different to "Insert Visual" mode (`i<C-O>v`) which allows multiple motions until an operator is invoked.
+   *
+   * If already in Visual, this function will return to Select.
+   *
+   * See `:help v_CTRL-O`.
+   */
+  override fun processSingleVisualCommand(editor: VimEditor) {
+    val mode = editor.mode
+    if (mode is Mode.SELECT) {
+      editor.mode = Mode.VISUAL(mode.selectionType, returnTo = mode)
+      // TODO: This is a copy of code from SelectToggleVisualMode.toggleMode. It should be moved to VimVisualMotionGroup
+      // IdeaVim always treats Select mode as exclusive. This will adjust the caret from exclusive to (potentially)
+      // inclusive, depending on the value of 'selection'
+      if (mode.selectionType != SelectionType.LINE_WISE) {
+        editor.nativeCarets().forEach {
+          if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - injector.visualMotionGroup.selectionAdj) {
+            it.moveToInlayAwareOffset(it.offset - injector.visualMotionGroup.selectionAdj)
+          }
+        }
+      }
+    }
+    else if (mode is Mode.VISUAL && mode.isSelectPending) {
+      // TODO: It would be better to move this to VimVisualMotionGroup
+      SelectToggleVisualMode.toggleMode(editor)
+    }
   }
 }

@@ -53,4 +53,16 @@ interface VimVisualMotionGroup {
    */
   fun enterVisualMode(editor: VimEditor, selectionType: SelectionType? = null): Boolean
   fun detectSelectionType(editor: VimEditor): SelectionType
+
+  /**
+   * When in Select mode, enter Visual mode for a single command
+   *
+   * While the Vim docs state that this is for the duration of a single Visual command, it also includes motions. This
+   * is different to "Insert Visual" mode (`i<C-O>v`) which allows multiple motions until an operator is invoked.
+   *
+   * If already in Visual, this function will return to Select.
+   *
+   * See `:help v_CTRL-O`.
+   */
+  fun processSingleVisualCommand(editor: VimEditor)
 }

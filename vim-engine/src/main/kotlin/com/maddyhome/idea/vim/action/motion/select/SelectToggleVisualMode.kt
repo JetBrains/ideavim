@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
@@ -51,7 +50,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
           }
         }
       } else if (myMode is com.maddyhome.idea.vim.state.mode.Mode.SELECT) {
-        editor.pushVisualMode(myMode.selectionType)
+        injector.visualMotionGroup.enterVisualMode(editor, myMode.selectionType)
         if (myMode.selectionType != SelectionType.LINE_WISE) {
           editor.nativeCarets().forEach {
             if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - injector.visualMotionGroup.selectionAdj) {
