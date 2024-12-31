@@ -94,7 +94,7 @@ class VimShowModeTest : VimTestCase() {
     configureByText("123")
     typeText("i<C-O>")
     val statusString = VimModeWidget.getModeText(fixture.editor.vim.mode)
-    assertEquals("(insert)", statusString)
+    assertEquals("(insert) NORMAL", statusString)
   }
 
   @Test
@@ -110,7 +110,7 @@ class VimShowModeTest : VimTestCase() {
     configureByText("123")
     typeText("R<C-O>")
     val statusString = VimModeWidget.getModeText(fixture.editor.vim.mode)
-    assertEquals("(replace)", statusString)
+    assertEquals("(replace) NORMAL", statusString)
   }
 
   @Test
@@ -192,5 +192,14 @@ class VimShowModeTest : VimTestCase() {
     typeText("i<C-O>gH")
     val statusString = VimModeWidget.getModeText(fixture.editor.vim.mode)
     assertEquals("(insert) S-LINE", statusString)
+  }
+
+  @Test
+  fun `test status string in Visual with Select pending`() {
+    configureByText("123")
+    enterCommand("set selectmode=key keymodel=startsel")
+    typeText("<S-Right><C-O>")
+    val statusString = VimModeWidget.getModeText(fixture.editor.vim.mode)
+    assertEquals("(select) VISUAL", statusString)
   }
 }

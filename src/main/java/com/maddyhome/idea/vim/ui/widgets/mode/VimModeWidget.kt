@@ -35,10 +35,8 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
   companion object {
     private const val INSERT = "INSERT"
     private const val NORMAL = "NORMAL"
-    private const val INSERT_NORMAL = "(insert)"
     private const val INSERT_PENDING_PREFIX = "(insert) "
     private const val REPLACE = "REPLACE"
-    private const val REPLACE_NORMAL = "(replace)"
     private const val REPLACE_PENDING_PREFIX = "(replace) "
     private const val COMMAND = "COMMAND"
     private const val VISUAL = "VISUAL"
@@ -47,6 +45,7 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
     private const val SELECT = "SELECT"
     private const val SELECT_LINE = "S-LINE"
     private const val SELECT_BLOCK = "S-BLOCK"
+    private const val SELECT_PENDING_PREFIX = "(select) "
 
     fun getModeText(mode: Mode?): String? {
       return when (mode) {
@@ -60,16 +59,30 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
       }
     }
 
+    /**
+     * Return the text to show in Normal mode
+     *
+     * Vim doesn't show any text for Normal, but that doesn't work for IdeaVim's status widget. We also show "NORMAL"
+     * when Insert or Replace is pending. I.e. "(insert) NORMAL" and "(replace) NORMAL". Vim only shows the pending mode
+     */
     private fun getNormalModeText(mode: Mode.NORMAL) = when {
-      mode.isInsertPending -> INSERT_NORMAL
-      mode.isReplacePending -> REPLACE_NORMAL
+      mode.isInsertPending -> INSERT_PENDING_PREFIX + NORMAL
+      mode.isReplacePending -> REPLACE_PENDING_PREFIX + NORMAL
       else -> NORMAL
     }
 
+    /**
+     * Return the text to show in Visual mode
+     *
+     * IdeaVim shows the Insert and Replace pending modes, but we also show Select pending - "(select) VISUAL". Vim
+     * doesn't show this, but IdeaVim's status widget isn't like Vim's status bar, and this addition keeps things a
+     * little more consistent.
+     */
     private fun getVisualModeText(mode: Mode.VISUAL): String {
       val prefix = when {
         mode.isInsertPending -> INSERT_PENDING_PREFIX
         mode.isReplacePending -> REPLACE_PENDING_PREFIX
+        mode.isSelectPending -> SELECT_PENDING_PREFIX
         else -> ""
       }
       return prefix + when (mode.selectionType) {
