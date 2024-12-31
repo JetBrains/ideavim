@@ -26,6 +26,25 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 
+  /**
+   * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
+   *
+   * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
+   */
+  override fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean {
+    editor.mode = Mode.VISUAL(selectionType)
+
+    // vimLeadSelectionOffset requires read action
+    injector.application.runReadAction {
+      if (selectionType == SelectionType.BLOCK_WISE) {
+        editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
+      } else {
+        editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
+      }
+    }
+    return true
+  }
+
   override fun enterSelectMode(editor: VimEditor, selectionType: SelectionType): Boolean {
     // If we're already in Select or toggling from Visual, replace the current mode (keep the existing returnTo),
     // otherwise push Select, using the current mode as returnTo.
@@ -100,72 +119,6 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     return true
   }
 
-  protected fun seemsLikeBlockMode(editor: VimEditor): Boolean {
-    val selections = editor.nativeCarets().map {
-      val adj = if (editor.offsetToBufferPosition(it.selectionEnd).column == 0) 1 else 0
-      it.selectionStart to (it.selectionEnd - adj).coerceAtLeast(0)
-    }.sortedBy { it.first }
-    val selectionStartColumn = editor.offsetToBufferPosition(selections.first().first).column
-    val selectionStartLine = editor.offsetToBufferPosition(selections.first().first).line
-
-    val maxColumn = selections.maxOfOrNull { editor.offsetToBufferPosition(it.second).column } ?: return false
-    selections.forEachIndexed { i, it ->
-      if (editor.offsetToBufferPosition(it.first).line != editor.offsetToBufferPosition(it.second).line) {
-        return false
-      }
-      if (editor.offsetToBufferPosition(it.first).column != selectionStartColumn) {
-        return false
-      }
-      val lineEnd =
-        editor.offsetToBufferPosition(editor.getLineEndForOffset(it.second)).column
-      if (editor.offsetToBufferPosition(it.second).column != maxColumn.coerceAtMost(lineEnd)) {
-        return false
-      }
-      if (editor.offsetToBufferPosition(it.first).line != selectionStartLine + i) {
-        return false
-      }
-    }
-    return true
-  }
-
-  override fun detectSelectionType(editor: VimEditor): SelectionType {
-    if (editor.carets().size > 1 && seemsLikeBlockMode(editor)) {
-      return SelectionType.BLOCK_WISE
-    }
-    val all = editor.nativeCarets().all { caret ->
-      // Detect if visual mode is character wise or line wise
-      val selectionStart = caret.selectionStart
-      val selectionEnd = caret.selectionEnd
-      val startLine = editor.offsetToBufferPosition(selectionStart).line
-      val endPosition = editor.offsetToBufferPosition(selectionEnd)
-      val endLine = if (endPosition.column == 0) (endPosition.line - 1).coerceAtLeast(0) else endPosition.line
-      val lineStartOfSelectionStart = editor.getLineStartOffset(startLine)
-      val lineEndOfSelectionEnd = editor.getLineEndOffset(endLine, true)
-      lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
-    }
-    if (all) return SelectionType.LINE_WISE
-    return SelectionType.CHARACTER_WISE
-  }
-
-  /**
-   * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
-   *
-   * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
-   */
-  override fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean {
-    editor.mode = Mode.VISUAL(selectionType)
-
-    // vimLeadSelectionOffset requires read action
-    injector.application.runReadAction {
-      if (selectionType == SelectionType.BLOCK_WISE) {
-        editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
-      } else {
-        editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
-      }
-    }
-    return true
-  }
-
   /**
    * When in Select mode, enter Visual mode for a single command
    *
@@ -195,5 +148,52 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       // TODO: It would be better to move this to VimVisualMotionGroup
       SelectToggleVisualMode.toggleMode(editor)
     }
+  }
+
+  override fun detectSelectionType(editor: VimEditor): SelectionType {
+    if (editor.carets().size > 1 && seemsLikeBlockMode(editor)) {
+      return SelectionType.BLOCK_WISE
+    }
+    val all = editor.nativeCarets().all { caret ->
+      // Detect if visual mode is character wise or line wise
+      val selectionStart = caret.selectionStart
+      val selectionEnd = caret.selectionEnd
+      val startLine = editor.offsetToBufferPosition(selectionStart).line
+      val endPosition = editor.offsetToBufferPosition(selectionEnd)
+      val endLine = if (endPosition.column == 0) (endPosition.line - 1).coerceAtLeast(0) else endPosition.line
+      val lineStartOfSelectionStart = editor.getLineStartOffset(startLine)
+      val lineEndOfSelectionEnd = editor.getLineEndOffset(endLine, true)
+      lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
+    }
+    if (all) return SelectionType.LINE_WISE
+    return SelectionType.CHARACTER_WISE
+  }
+
+  protected fun seemsLikeBlockMode(editor: VimEditor): Boolean {
+    val selections = editor.nativeCarets().map {
+      val adj = if (editor.offsetToBufferPosition(it.selectionEnd).column == 0) 1 else 0
+      it.selectionStart to (it.selectionEnd - adj).coerceAtLeast(0)
+    }.sortedBy { it.first }
+    val selectionStartColumn = editor.offsetToBufferPosition(selections.first().first).column
+    val selectionStartLine = editor.offsetToBufferPosition(selections.first().first).line
+
+    val maxColumn = selections.maxOfOrNull { editor.offsetToBufferPosition(it.second).column } ?: return false
+    selections.forEachIndexed { i, it ->
+      if (editor.offsetToBufferPosition(it.first).line != editor.offsetToBufferPosition(it.second).line) {
+        return false
+      }
+      if (editor.offsetToBufferPosition(it.first).column != selectionStartColumn) {
+        return false
+      }
+      val lineEnd =
+        editor.offsetToBufferPosition(editor.getLineEndForOffset(it.second)).column
+      if (editor.offsetToBufferPosition(it.second).column != maxColumn.coerceAtMost(lineEnd)) {
+        return false
+      }
+      if (editor.offsetToBufferPosition(it.first).line != selectionStartLine + i) {
+        return false
+      }
+    }
+    return true
   }
 }
