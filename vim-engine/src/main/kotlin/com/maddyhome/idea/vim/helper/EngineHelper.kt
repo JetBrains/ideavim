@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
 
 inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
@@ -59,8 +58,4 @@ inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (
   0 -> noneOfEnum()
   1 -> EnumSet.of(value[0])
   else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
-}
-
-fun VimEditor.pushVisualMode(selectionType: SelectionType) {
-  mode = Mode.VISUAL(selectionType, mode.returnTo)
 }
