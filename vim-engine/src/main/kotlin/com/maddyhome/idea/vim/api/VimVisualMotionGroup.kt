@@ -16,15 +16,11 @@ interface VimVisualMotionGroup {
   val selectionAdj: Int
 
   /**
-   * This function toggles visual mode according to the logic required for `v`, `V` and `<C-V>`
+   * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
    *
-   * This is the implementation for `v`, `V` and `<C-V>`. If you need to enter Visual mode, use [enterVisualMode].
-   *
-   * * If visual mode is disabled, enable it
-   * * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
-   * * If visual mode is enabled with the same [selectionType], disable it
+   * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
    */
-  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: Mode? = null): Boolean
+  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean
 
   /**
    * Enter Select mode with the given selection type
@@ -39,13 +35,15 @@ interface VimVisualMotionGroup {
   fun enterSelectMode(editor: VimEditor, selectionType: SelectionType): Boolean
 
   /**
-   * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
+   * This function toggles visual mode according to the logic required for `v`, `V` and `<C-V>`
    *
-   * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
+   * This is the implementation for `v`, `V` and `<C-V>`. If you need to enter Visual mode, use [enterVisualMode].
+   *
+   * * If visual mode is disabled, enable it
+   * * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
+   * * If visual mode is enabled with the same [selectionType], disable it
    */
-  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean
-
-  fun detectSelectionType(editor: VimEditor): SelectionType
+  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: Mode? = null): Boolean
 
   /**
    * When in Select mode, enter Visual mode for a single command
@@ -58,4 +56,11 @@ interface VimVisualMotionGroup {
    * See `:help v_CTRL-O`.
    */
   fun processSingleVisualCommand(editor: VimEditor)
+
+  /**
+   * Detect the current selection type based on the editor's current selection state
+   *
+   * If the IDE changes the selection, this function can be used to understand what the current selection type is.
+   */
+  fun detectSelectionType(editor: VimEditor): SelectionType
 }
