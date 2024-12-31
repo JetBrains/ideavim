@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inVisualMode
@@ -60,7 +59,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     if (!editor.inVisualMode) {
       if (rawCount > 0) {
         val primarySelectionType = editor.primaryCaret().vimLastVisualOperatorRange?.type ?: selectionType
-        editor.pushVisualMode(primarySelectionType)
+        editor.mode = Mode.VISUAL(primarySelectionType, editor.mode.returnTo)
 
         editor.forEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(selectionType)
