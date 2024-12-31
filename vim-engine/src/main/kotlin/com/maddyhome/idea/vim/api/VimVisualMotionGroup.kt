@@ -16,7 +16,9 @@ interface VimVisualMotionGroup {
   val selectionAdj: Int
 
   /**
-   * This function toggles visual mode.
+   * This function toggles visual mode according to the logic required for `v`, `V` and `<C-V>`
+   *
+   * This is the implementation for `v`, `V` and `<C-V>`. If you need to enter Visual mode, use [enterVisualMode].
    *
    * * If visual mode is disabled, enable it
    * * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
@@ -37,21 +39,12 @@ interface VimVisualMotionGroup {
   fun enterSelectMode(editor: VimEditor, selectionType: SelectionType): Boolean
 
   /**
-   * Enters visual mode based on current editor state.
+   * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
    *
-   * If [selectionType] is null, it will be detected automatically
-   *
-   * it:
-   * - Updates command state
-   * - Updates [VimCaret.vimSelectionStart] property
-   * - Updates caret colors
-   * - Updates care shape
-   *
-   * - DOES NOT change selection
-   * - DOES NOT move caret
-   * - DOES NOT check if carets actually have any selection
+   * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
    */
-  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType? = null): Boolean
+  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean
+
   fun detectSelectionType(editor: VimEditor): SelectionType
 
   /**

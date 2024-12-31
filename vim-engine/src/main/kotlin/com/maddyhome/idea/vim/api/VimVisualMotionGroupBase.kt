@@ -43,11 +43,13 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   }
 
   /**
-   * This function toggles visual mode.
+   * This function toggles visual mode according to the logic required for `v`, `V` and `<C-V>`
    *
-   * If visual mode is disabled, enable it
-   * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
-   * If visual mode is enabled with the same [selectionType], disable it
+   * This is the implementation for `v`, `V` and `<C-V>`. If you need to enter Visual mode, use [enterVisualMode].
+   *
+   * * If visual mode is disabled, enable it
+   * * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
+   * * If visual mode is enabled with the same [selectionType], disable it
    */
   override fun toggleVisual(
     editor: VimEditor,
@@ -146,28 +148,16 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   }
 
   /**
-   * Enters visual mode based on current editor state.
+   * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
    *
-   * If [selectionType] is null, it will be detected automatically
-   *
-   * it:
-   * - Updates command state
-   * - Updates [ImmutableVimCaret.vimSelectionStart] property
-   * - Updates caret colors
-   * - Updates care shape
-   *
-   * - DOES NOT change selection
-   * - DOES NOT move caret
-   * - DOES NOT check if carets actually have any selection
+   * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
    */
-  override fun enterVisualMode(editor: VimEditor, selectionType: SelectionType?): Boolean {
-    val newSelectionType = selectionType ?: detectSelectionType(editor)
-
-    editor.mode = Mode.VISUAL(newSelectionType)
+  override fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean {
+    editor.mode = Mode.VISUAL(selectionType)
 
     // vimLeadSelectionOffset requires read action
     injector.application.runReadAction {
-      if (newSelectionType == SelectionType.BLOCK_WISE) {
+      if (selectionType == SelectionType.BLOCK_WISE) {
         editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
       } else {
         editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
