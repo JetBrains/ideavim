@@ -20,7 +20,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -56,7 +56,7 @@ internal object AppCodeTemplates {
         if (myEditor != null) {
           VimVisualTimer.doNow()
           if (myEditor.inVisualMode) {
-            SelectToggleVisualMode.toggleMode(myEditor.vim)
+            injector.visualMotionGroup.toggleSelectVisual(myEditor.vim)
             KeyHandler.getInstance().partialReset(myEditor.vim)
           }
         }
