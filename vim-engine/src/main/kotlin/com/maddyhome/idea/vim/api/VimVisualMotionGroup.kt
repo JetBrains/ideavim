@@ -19,8 +19,21 @@ interface VimVisualMotionGroup {
    * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
    *
    * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
+   *
+   * This overload needs to remain for compatibility with external IdeaVim extensions
    */
-  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean
+  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean {
+    return enterVisualMode(editor, selectionType, Mode.NORMAL())
+  }
+
+  /**
+   * Enters Visual mode, ensuring that the caret's selection start offset is correctly set
+   *
+   * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection. You can
+   * specify the mode to return to when Visual command exits. Typically, this is [Mode.NORMAL], but can be [Mode.INSERT]
+   * or [Mode.REPLACE] for "Insert Visual" or [Mode.SELECT] when processing a single Visual command in Select mode.
+   */
+  fun enterVisualMode(editor: VimEditor, selectionType: SelectionType, returnTo: Mode): Boolean
 
   /**
    * Enter Select mode with the given selection type

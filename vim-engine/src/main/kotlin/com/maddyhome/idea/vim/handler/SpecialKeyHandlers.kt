@@ -61,7 +61,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
       if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
         injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
       } else {
-        injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
+        injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE)
       }
     }
     return true
@@ -97,10 +97,10 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
           injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
         } else {
           if (editor.isInsertionAllowed) {
-            // Enter Insert/Replace Visual mode
-            injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE, editor.mode)
+            // Enter Insert/Replace Visual mode, passing in the current Insert/Replace mode as pending
+            injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE, editor.mode)
           } else {
-            injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
+            injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE)
           }
         }
       }

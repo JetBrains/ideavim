@@ -31,8 +31,8 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
    *
    * Use this to programmatically enter Visual mode. Note that it does not modify the editor's selection.
    */
-  override fun enterVisualMode(editor: VimEditor, selectionType: SelectionType): Boolean {
-    editor.mode = Mode.VISUAL(selectionType)
+  override fun enterVisualMode(editor: VimEditor, selectionType: SelectionType, returnTo: Mode): Boolean {
+    editor.mode = Mode.VISUAL(selectionType, returnTo)
 
     // vimLeadSelectionOffset requires read action
     injector.application.runReadAction {
