@@ -59,6 +59,17 @@ interface VimVisualMotionGroup {
   fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: Mode? = null): Boolean
 
   /**
+   * Toggles between Select and Visual modes
+   *
+   * IdeaVim treats Select mode as always exclusive, regardless of the value in `'selection'`. As such, when toggling
+   * between Visual and Select, the caret is adjusted to be more natural for exclusive selection. Specifically, when
+   * toggling from Visual with inclusive selection to Select (always exclusive), the caret is adjusted one character to
+   * the right, to put it as exclusive to the current selection. When toggling from Select (exclusive) to Visual with
+   * inclusive selection, the caret is adjusted one character to the left from exclusive position to inclusive.
+   */
+  fun toggleSelectVisual(editor: VimEditor)
+
+  /**
    * When in Select mode, enter Visual mode for a single command
    *
    * While the Vim docs state that this is for the duration of a single Visual command, it also includes motions. This

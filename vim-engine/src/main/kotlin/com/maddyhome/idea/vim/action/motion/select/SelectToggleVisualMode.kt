@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * @author Alex Plate
@@ -33,32 +32,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    toggleMode(editor)
+    injector.visualMotionGroup.toggleSelectVisual(editor)
     return true
-  }
-
-  companion object {
-    fun toggleMode(editor: VimEditor) {
-      val myMode = editor.mode
-      if (myMode is com.maddyhome.idea.vim.state.mode.Mode.VISUAL) {
-        injector.visualMotionGroup.enterSelectMode(editor, myMode.selectionType)
-        if (myMode.selectionType != SelectionType.LINE_WISE) {
-          editor.nativeCarets().forEach {
-            if (it.offset + injector.visualMotionGroup.selectionAdj == it.selectionEnd) {
-              it.moveToInlayAwareOffset(it.offset + injector.visualMotionGroup.selectionAdj)
-            }
-          }
-        }
-      } else if (myMode is com.maddyhome.idea.vim.state.mode.Mode.SELECT) {
-        injector.visualMotionGroup.enterVisualMode(editor, myMode.selectionType)
-        if (myMode.selectionType != SelectionType.LINE_WISE) {
-          editor.nativeCarets().forEach {
-            if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - injector.visualMotionGroup.selectionAdj) {
-              it.moveToInlayAwareOffset(it.offset - injector.visualMotionGroup.selectionAdj)
-            }
-          }
-        }
-      }
-    }
   }
 }

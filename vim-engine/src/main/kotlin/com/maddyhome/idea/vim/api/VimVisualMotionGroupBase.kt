@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
@@ -119,6 +118,66 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     return true
   }
 
+  override fun toggleSelectVisual(editor: VimEditor) {
+    val mode = editor.mode
+    if (mode is Mode.VISUAL) {
+      val previouslyExclusive = exclusiveSelection
+      enterSelectMode(editor, mode.selectionType)
+      adjustCaretsForSelectionPolicy(editor, previouslyExclusive)
+    }
+    else if (mode is Mode.SELECT) {
+      val previouslyExclusive = true  // IdeaVim treats Select as always exclusive
+      enterVisualMode(editor, mode.selectionType)
+      adjustCaretsForSelectionPolicy(editor, previouslyExclusive)
+    }
+  }
+
+  /**
+   * Move the caret after toggling Visual/Select mode, if this also toggles selection policy (inclusive/exclusive)
+   *
+   * Toggling Visual/Select mode does not update the caret position in Vim. This is because the inclusive/exclusive
+   * state of the selection does not change. It is the value of the `'selection'` option, and the same for Visual and
+   * Select.
+   *
+   * IdeaVim can have a different selection policy for Visual and Select; it is more intuitive for Select mode to use
+   * "exclusive", but more familiar for Visual to be inclusive (see [VimEditor.isSelectionExclusive] for more
+   * background). IdeaVim will therefore try to update the caret position to match what the selection would be if it
+   * has just been created with the new selection policy, rather than toggled after the selection was made.
+   *
+   * In other words, Vim places the caret at the end of the selection when creating an inclusive selection, and
+   * _after_ the end of selection when creating an exclusive selection, and IdeaVim updates to match this.
+   *
+   * Specifically, when switching from inclusive to exclusive, and the caret is at the end of the selection, the caret
+   * is moved to be after the selection. And when switching from exclusive to inclusive and the caret is after the end
+   * of the selection, it is moved to be at the end of selection.
+   */
+  private fun adjustCaretsForSelectionPolicy(editor: VimEditor, previouslyExclusive: Boolean) {
+    val mode = editor.mode
+    // TODO: Improve handling of this.exclusiveSelection
+    val isSelectionExclusive = this.exclusiveSelection || mode is Mode.SELECT
+    if (mode.selectionType != SelectionType.LINE_WISE) {
+      // Remember that VimCaret.selectionEnd is exclusive!
+      if (isSelectionExclusive && !previouslyExclusive) {
+        // Inclusive -> exclusive
+        editor.nativeCarets().forEach {
+          if (it.offset == it.selectionEnd - 1) {
+            it.moveToInlayAwareOffset(it.selectionEnd) // Caret is on the selection end, move to after
+          }
+        }
+      }
+      else if (!isSelectionExclusive && previouslyExclusive) {
+        // Exclusive -> inclusive
+        editor.nativeCarets().forEach {
+          // If caret offset matches the exclusive selection end offset, then it's positioned after the selection, so
+          // move it to the actual end of the selection. Make sure there's enough room on this line to do so
+          if (it.offset == it.selectionEnd && it.visualLineStart < it.offset) {
+            it.moveToInlayAwareOffset(it.selectionEnd - 1)
+          }
+        }
+      }
+    }
+  }
+
   /**
    * When in Select mode, enter Visual mode for a single command
    *
@@ -132,21 +191,16 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override fun processSingleVisualCommand(editor: VimEditor) {
     val mode = editor.mode
     if (mode is Mode.SELECT) {
+      // We can't use toggleSelectVisual because when toggling between Select and Visual, we replace the current mode,
+      // but here we want to "push" Visual, so we return to Select.
+      val previouslyExclusive = true  // Select is always exclusive
       editor.mode = Mode.VISUAL(mode.selectionType, returnTo = mode)
-      // TODO: This is a copy of code from SelectToggleVisualMode.toggleMode. It should be moved to VimVisualMotionGroup
-      // IdeaVim always treats Select mode as exclusive. This will adjust the caret from exclusive to (potentially)
-      // inclusive, depending on the value of 'selection'
-      if (mode.selectionType != SelectionType.LINE_WISE) {
-        editor.nativeCarets().forEach {
-          if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - injector.visualMotionGroup.selectionAdj) {
-            it.moveToInlayAwareOffset(it.offset - injector.visualMotionGroup.selectionAdj)
-          }
-        }
-      }
+      adjustCaretsForSelectionPolicy(editor, previouslyExclusive)
     }
     else if (mode is Mode.VISUAL && mode.isSelectPending) {
-      // TODO: It would be better to move this to VimVisualMotionGroup
-      SelectToggleVisualMode.toggleMode(editor)
+      // We can use toggleSelectVisual because we're replacing the "pushed" Visual mode with a simple Select, which is
+      // the same as when we toggle from Visual to Select
+      toggleSelectVisual(editor)
     }
   }
 
