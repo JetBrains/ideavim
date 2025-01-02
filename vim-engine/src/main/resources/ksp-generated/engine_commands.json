@@ -126,7 +126,7 @@
     },
     {
         "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction",
+        "class": "com.maddyhome.idea.vim.action.motion.select.SelectBackspaceAction",
         "modes": "S"
     },
     {
