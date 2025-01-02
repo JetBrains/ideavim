@@ -39,7 +39,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -65,12 +64,11 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
-  fun `test exit char mode on line end`() {
+  fun `test exit char mode on line end puts caret at correct offset when returning to Normal mode`() {
     this.doTest(
       listOf("gh", "<esc>"),
       """
@@ -91,7 +89,33 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
+  fun `test exit char mode on line end puts caret at correct offset when returning to Insert mode`() {
+    this.doTest(
+      listOf("i", "<S-Right>", "<esc>"),
+      """
+                A Discovery
+
+                I found it in a legendary lan${c}d
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+                A Discovery
+
+                I found it in a legendary land${c}
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      Mode.INSERT,
+    ) {
+      enterCommand("set selectmode=key keymodel=startsel")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -117,7 +141,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -143,7 +166,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -169,7 +191,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -195,7 +216,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -221,7 +241,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -247,7 +266,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -273,7 +291,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -299,7 +316,6 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -328,7 +344,6 @@ class SelectEscapeActionTest : VimTestCase() {
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -357,7 +372,6 @@ class SelectEscapeActionTest : VimTestCase() {
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -386,7 +400,6 @@ class SelectEscapeActionTest : VimTestCase() {
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -415,6 +428,5 @@ class SelectEscapeActionTest : VimTestCase() {
     kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
-    assertMode(Mode.NORMAL())
   }
 }

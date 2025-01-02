@@ -33,7 +33,7 @@ internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
     this.caretModel.allCarets.forEach {
       it.removeSelection()
       it.vim.vimSelectionStartClear()
-      if (adjustCaretPosition) {
+      if (adjustCaretPosition && !vimEditor.isEndAllowed) {
         val lineEnd = IjVimEditor(this).getLineEndForOffset(it.offset)
         val lineStart = IjVimEditor(this).getLineStartForOffset(it.offset)
         if (it.offset == lineEnd && it.offset != lineStart) {
@@ -54,7 +54,7 @@ internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
       val caret = (vimCaret as IjVimCaret).caret
       caret.removeSelection()
       caret.vim.vimSelectionStartClear()
-      if (adjustCaretPosition) {
+      if (adjustCaretPosition && !isEndAllowed) {
         val lineEnd = IjVimEditor((this as IjVimEditor).editor).getLineEndForOffset(caret.offset)
         val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
         if (caret.offset == lineEnd && caret.offset != lineStart) {

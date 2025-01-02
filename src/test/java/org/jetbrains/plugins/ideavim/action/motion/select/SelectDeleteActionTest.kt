@@ -6,6 +6,8 @@
  * https://opensource.org/licenses/MIT.
  */
 
+@file:Suppress("SpellCheckingInspection")
+
 package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -160,6 +162,61 @@ class SelectDeleteActionTest : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       Mode.REPLACE
+    ) {
+      enterCommand("set selectmode=key keymodel=startsel")
+    }
+  }
+
+  // VIM-3042
+  // We don't need to test Del and BS separately for this
+  @Test
+  fun `test deleting last word of line places caret at correct offset when returning to Normal mode`() {
+    doTest(
+      listOf("ve", "<C-G>", "<Del>"),
+      """
+        |Lorem Ipsum
+        |
+        |I found it in a legendary${c} land
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |I found it in a legendar${c}y
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.NORMAL()
+    )
+  }
+
+  // VIM-3042
+  @Test
+  fun `test deleting last word of line places caret at correct offset when returning to Insert mode`() {
+    // Remember that IdeaVim treats Select mode as exclusive, so we need 5x<S-Right> to select " land" and the caret
+    // will finish up _after_ the word, on the new line char
+    doTest(
+      listOf("i", "<S-Right>".repeat(5), "<Del>"),
+      """
+        |Lorem Ipsum
+        |
+        |I found it in a legendary${c} land
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |I found it in a legendary${c}
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.INSERT
     ) {
       enterCommand("set selectmode=key keymodel=startsel")
     }
