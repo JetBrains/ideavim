@@ -563,7 +563,67 @@ class IncsearchTests : VimTestCase() {
   }
 
   @Test
-  fun `test incsearch updates selection when started in Visual mode`() {
+  fun `test incsearch updates Visual selection`() {
+    doTest(
+      listOf("ve", "/dolor"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ipsum ${c}d${se}olor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("dolor",
+      """
+        |Lorem ipsum ‷dolor‴ sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test incsearch updates empty Visual selection`() {
+    doTest(
+      "v/ipsum",
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}i${se}psum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("ipsum",
+      """
+        |Lorem ‷ipsum‴ dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test incsearch updates exclusive Visual selection`() {
     doTest(
       listOf("ve", "/dolor"),
       """
@@ -580,8 +640,48 @@ class IncsearchTests : VimTestCase() {
       """.trimMargin(),
       Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
     ) {
+      enterCommand("set selection=exclusive")
       enterCommand("set hlsearch incsearch")
     }
+    assertSearchHighlights("dolor",
+      """
+        |Lorem ipsum ‷dolor‴ sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test incsearch updates empty exclusive Visual selection`() {
+    doTest(
+      "v/ipsum",
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}${se}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set selection=exclusive")
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("ipsum",
+      """
+        |Lorem ‷ipsum‴ dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
   }
 
   @Test

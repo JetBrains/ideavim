@@ -156,6 +156,13 @@ sealed interface Mode {
         "CMD_LINE mode can be active only in NORMAL, OP_PENDING, VISUAL or INSERT modes, not ${returnTo.javaClass.simpleName}"
       }
     }
+
+    /**
+     * Returns true if Visual mode is pending, by starting Command-line with a Visual selection
+     *
+     * For example, `v/foo` or `v:<C-U>normal 3j`
+     */
+    val isVisualPending = returnTo is VISUAL
   }
 }
 
