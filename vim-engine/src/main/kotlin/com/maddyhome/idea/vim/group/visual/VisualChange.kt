@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 
 data class VisualChange(val lines: Int, val columns: Int, val type: SelectionType) {
   companion object {
-    fun default(subMode: SelectionType): VisualChange =
-      when (subMode) {
-        SelectionType.LINE_WISE, SelectionType.CHARACTER_WISE -> VisualChange(1, 1, subMode)
-        SelectionType.BLOCK_WISE -> VisualChange(0, 1, subMode)
+    fun default(selectionType: SelectionType): VisualChange =
+      when (selectionType) {
+        SelectionType.LINE_WISE, SelectionType.CHARACTER_WISE -> VisualChange(1, 1, selectionType)
+        SelectionType.BLOCK_WISE -> VisualChange(0, 1, selectionType)
       }
   }
 }

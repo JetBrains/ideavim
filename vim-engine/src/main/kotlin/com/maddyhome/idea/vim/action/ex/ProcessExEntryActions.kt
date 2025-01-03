@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.state.mode.returnTo
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.util.*
 
@@ -87,7 +86,7 @@ class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
       // startExEntry). Remember from startExEntry that we might still have selection and/or multiple carets, even
       // though we're in Normal. This will be handled by Command.execute once we know if we should be clearing the
       // selection.
-      editor.mode = editor.mode.returnTo()
+      editor.mode = editor.mode.returnTo
 
       logger.debug("processing command")
 

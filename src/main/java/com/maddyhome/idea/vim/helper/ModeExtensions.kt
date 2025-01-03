@@ -21,29 +21,14 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.inSelectMode
-import com.maddyhome.idea.vim.state.mode.returnTo
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
 internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
-  if (!this.vim.inSelectMode) return
+  val vimEditor = this.vim
+  if (!vimEditor.inSelectMode) return
 
-  val returnTo = this.vim.mode.returnTo
-  when (returnTo) {
-    ReturnTo.INSERT -> {
-      this.vim.mode = Mode.INSERT
-    }
-
-    ReturnTo.REPLACE -> {
-      this.vim.mode = Mode.REPLACE
-    }
-
-    null -> {
-      this.vim.mode = Mode.NORMAL()
-    }
-  }
+  vimEditor.mode = vimEditor.mode.returnTo
   SelectionVimListenerSuppressor.lock().use {
     this.caretModel.allCarets.forEach {
       it.removeSelection()
@@ -63,28 +48,15 @@ internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
 internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
-  val returnTo = this.mode.returnTo
-  when (returnTo) {
-    ReturnTo.INSERT -> {
-      this.mode = Mode.INSERT
-    }
-
-    ReturnTo.REPLACE -> {
-      this.mode = Mode.REPLACE
-    }
-
-    null -> {
-      this.mode = Mode.NORMAL()
-    }
-  }
+  mode = mode.returnTo
   SelectionVimListenerSuppressor.lock().use {
-    this.carets().forEach { vimCaret ->
+    carets().forEach { vimCaret ->
       val caret = (vimCaret as IjVimCaret).caret
       caret.removeSelection()
       caret.vim.vimSelectionStartClear()
       if (adjustCaretPosition) {
         val lineEnd = IjVimEditor((this as IjVimEditor).editor).getLineEndForOffset(caret.offset)
-        val lineStart = IjVimEditor(this.editor).getLineStartForOffset(caret.offset)
+        val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
         if (caret.offset == lineEnd && caret.offset != lineStart) {
           caret.moveToInlayAwareOffset(caret.offset - 1)
         }

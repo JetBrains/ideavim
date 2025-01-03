@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 import com.maddyhome.idea.vim.state.mode.inSelectMode
@@ -62,8 +61,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
       if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
         injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
       } else {
-        injector.visualMotionGroup
-          .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
+        injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE)
       }
     }
     return true
@@ -95,14 +93,14 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
     if (withKey) {
       if (!inVisualMode && !inSelectMode) {
         if (injector.globalOptions().selectmode.contains(OptionConstants.selectmode_key)) {
+          // Note that this will correctly choose either Select or Insert Select modes
           injector.visualMotionGroup.enterSelectMode(editor, SelectionType.CHARACTER_WISE)
         } else {
           if (editor.isInsertionAllowed) {
-            injector.visualMotionGroup
-              .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE, ReturnTo.INSERT)
+            // Enter Insert/Replace Visual mode, passing in the current Insert/Replace mode as pending
+            injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE, editor.mode)
           } else {
-            injector.visualMotionGroup
-              .toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
+            injector.visualMotionGroup.enterVisualMode(editor, SelectionType.CHARACTER_WISE)
           }
         }
       }
