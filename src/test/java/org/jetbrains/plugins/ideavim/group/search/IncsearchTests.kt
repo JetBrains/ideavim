@@ -685,6 +685,136 @@ class IncsearchTests : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch updates selection when editing search pattern`() {
+    // This will initially move selection to the "it" in "sit" on the first line, then back to the start of "ipsum".
+    // Tests that the selection is correctly updated as the current target changes
+    doTest(
+      listOf("vl", "/it", "<BS>", "p"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}i${se}psum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("ip",
+      """
+        |Lorem ‷ip‴sum dolor sit amet,
+        |consectetur ad«ip»iscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test incsearch updates empty selection when editing search pattern`() {
+    // This will initially move selection to the "it" in "sit" on the first line, then back to the start of "ipsum".
+    // Tests that the selection is correctly updated as the current target changes
+    doTest(
+      listOf("v", "/it", "<BS>", "p"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}i${se}psum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("ip",
+      """
+        |Lorem ‷ip‴sum dolor sit amet,
+        |consectetur ad«ip»iscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test incsearch updates exclusive selection when editing search pattern`() {
+    // This will initially move selection to the "it" in "sit" on the first line, then back to the start of "ipsum".
+    // Tests that the selection is correctly updated as the current target changes
+    doTest(
+      listOf("vl", "/it", "<BS>", "p"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}${se}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set selection=exclusive")
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("ip",
+      """
+        |Lorem ‷ip‴sum dolor sit amet,
+        |consectetur ad«ip»iscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test incsearch updates empty exclusive selection when editing search pattern`() {
+    // This will initially move selection to the "it" in "sit" on the first line, then back to the start of "ipsum".
+    // Tests that the selection is correctly updated as the current target changes
+    doTest(
+      listOf("vl", "/it", "<BS>", "p"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}${se}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set selection=exclusive")
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("ip",
+      """
+        |Lorem ‷ip‴sum dolor sit amet,
+        |consectetur ad«ip»iscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin()
+    )
+  }
+
+  @Test
   fun `test incsearch updates block selection when started in Visual mode`() {
     doTest(
       listOf("ll", "<C-V>2j", "/mauris"),
