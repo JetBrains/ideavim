@@ -314,7 +314,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       if (c instanceof JComponent) {
         final List<AnAction> actions = ActionUtil.getActions((JComponent)c);
         for (AnAction action : actions) {
-          if (action instanceof VimShortcutKeyAction) {
+          if (action instanceof VimShortcutKeyAction || action == VimShortcutKeyAction.getInstance()) {
             continue;
           }
           final Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
@@ -334,7 +334,11 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     final Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
     for (String id : keymap.getActionIds(keyStroke)) {
       final AnAction action = ActionManager.getInstance().getAction(id);
-      if (action != null) {
+
+      // EmptyAction is used to reserve a shortcut, but can't be executed. Code can ask for an action by ID and
+      // use its shortcut(s) to dynamically register a new action on a component in the UI hierarchy. It's not
+      // useful for our needs here - we'll pick up the real action when we get local actions.
+      if (action != null && !(action instanceof EmptyAction)) {
         results.add(action);
       }
     }

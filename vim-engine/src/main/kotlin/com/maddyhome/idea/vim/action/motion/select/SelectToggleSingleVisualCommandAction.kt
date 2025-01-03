@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,14 +17,10 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-/**
- * @author Alex Plate
- */
-
-@CommandOrMotion(keys = ["<C-G>"], modes = [Mode.VISUAL, Mode.SELECT])
-class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
-
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+// See `:help v_CTRL-O`
+@CommandOrMotion(keys = ["<C-O>"], modes = [Mode.SELECT, Mode.VISUAL])
+class SelectToggleSingleVisualCommandAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(
     editor: VimEditor,
@@ -32,7 +28,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.visualMotionGroup.toggleSelectVisual(editor)
+    injector.visualMotionGroup.processSingleVisualCommand(editor)
     return true
   }
 }
