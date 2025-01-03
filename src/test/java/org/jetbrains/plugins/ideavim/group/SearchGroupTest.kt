@@ -867,6 +867,48 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(9, res)
   }
 
+  @Test
+  fun `test update selection with search result`() {
+    doTest(
+      listOf("v", "/ipsum", "<CR>"),
+      """
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}i${se}psum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    )
+  }
+
+  @Test
+  fun `test update selection with search result and selection option set to exclusive`() {
+    doTest(
+      listOf("v", "/ipsum", "<CR>"),
+      """
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}${se}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    ) {
+      enterCommand("set selection=exclusive")
+    }
+  }
+
   private fun search(pattern: String, input: String): Int {
     configureByText(input)
     val editor = fixture.editor
