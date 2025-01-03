@@ -26,6 +26,9 @@ val VimEditor.inSelectMode: Boolean
 val VimEditor.inCommandLineMode: Boolean
   get() = this.mode is Mode.CMD_LINE
 
+val VimEditor.inCommandLineModeWithVisual: Boolean
+  get() = (this.mode as? Mode.CMD_LINE)?.isVisualPending == true
+
 val VimEditor.singleModeActive: Boolean
   get() = this.mode.isSingleModeActive
 

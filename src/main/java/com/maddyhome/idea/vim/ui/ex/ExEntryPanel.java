@@ -308,6 +308,9 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     protected void textChanged(@NotNull DocumentEvent e) {
       try {
         final Editor editor = entry.getEditor();
+        if (editor == null) {
+          return;
+        }
 
         final String labelText = label.getText(); // Either '/', '?' or ':'boolean searchCommand = false;
 
@@ -351,8 +354,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
         if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
           final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
-          int pattenEnd = injector.getSearchGroup().findEndOfPattern(searchText, separator, 0);
-          final String pattern = searchText.substring(0, pattenEnd);
+          int patternEnd = injector.getSearchGroup().findEndOfPattern(searchText, separator, 0);
+          final String pattern = searchText.substring(0, patternEnd);
 
           VimPlugin.getEditor().closeEditorSearchSession(editor);
           final int matchOffset =

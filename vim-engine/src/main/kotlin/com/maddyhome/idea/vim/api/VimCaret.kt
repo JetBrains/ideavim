@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import com.maddyhome.idea.vim.state.mode.inCommandLineMode
+import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import javax.swing.KeyStroke
@@ -98,27 +98,26 @@ per-caret marks.
     // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
     // changes in surrounding text, especially with inline inlays.
     val oldOffset = this.offset
-    var caretAfterMove = moveToInlayAwareOffset(offset)
+    var updatedCaret = moveToInlayAwareOffset(offset)
 
     // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
     // position relative to the view, without changing offset.
     if (this == editor.primaryCaret()) {
       injector.scroll.scrollCaretIntoView(editor)
     }
-    caretAfterMove = if (editor.inVisualMode || editor.inSelectMode) {
+
+    // If we're in Visual or Select mode, update the selection. We also need to handle Command-line mode, with Visual
+    // pending, e.g. `v/foo` or `v:<C-U>normal 3j`
+    updatedCaret = if (editor.inVisualMode || editor.inSelectMode || editor.inCommandLineModeWithVisual) {
       // Another inconsistency with immutable caret. This method should be called on the new caret instance.
-      caretAfterMove.vimMoveSelectionToCaret(this.vimSelectionStart)
-      editor.findLastVersionOfCaret(caretAfterMove) ?: caretAfterMove
-    } else if (editor.inCommandLineMode && caretAfterMove.hasSelection()) {
-      // If we're updating the caret in Command-line mode, it's most likely due to incsearch
-      caretAfterMove.setSelection(caretAfterMove.selectionStart, offset)
-      editor.findLastVersionOfCaret(caretAfterMove) ?: caretAfterMove
+      updatedCaret.vimMoveSelectionToCaret(this.vimSelectionStart)
+      editor.findLastVersionOfCaret(updatedCaret) ?: updatedCaret
     } else {
       editor.exitVisualMode()
-      caretAfterMove
+      updatedCaret
     }
     injector.motion.onAppCodeMovement(editor, this, offset, oldOffset)
-    return caretAfterMove
+    return updatedCaret
   }
 
   fun moveToOffsetNative(offset: Int)
