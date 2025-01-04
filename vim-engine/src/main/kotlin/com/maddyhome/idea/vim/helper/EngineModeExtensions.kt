@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.selectionType
 
@@ -26,7 +27,7 @@ fun VimEditor.exitVisualMode() {
     }
     nativeCarets().forEach(VimCaret::removeSelection)
   }
-  if (inVisualMode) {
+  if (inVisualMode || inCommandLineModeWithVisual) {
     vimLastSelectionType = selectionType
     injector.markService.setVisualSelectionMarks(this)
     nativeCarets().forEach { it.vimSelectionStartClear() }
@@ -34,9 +35,12 @@ fun VimEditor.exitVisualMode() {
     // We usually want to return to the mode that we were in before we started Visual. Typically, this will be NORMAL,
     // but can be INSERT for "Insert Visual" (`i<C-O>v`). For "Select Visual" (`gh<C-O>`) we can't return to SELECT,
     // because we've just removed the selection. We have to return to NORMAL.
+    // We might also be in Visual while working with the command line, i.e. Command-line with Visual pending. In this
+    // case, we need to get rid of Visual, but keep the Command-line
     val mode = this.mode
     this.mode = when {
       mode is Mode.VISUAL && mode.isSelectPending -> Mode.NORMAL()
+      mode is Mode.CMD_LINE && mode.isVisualPending -> Mode.CMD_LINE(Mode.NORMAL())
       else -> mode.returnTo
     }
   }
