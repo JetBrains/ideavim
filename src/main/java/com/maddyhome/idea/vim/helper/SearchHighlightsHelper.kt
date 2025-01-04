@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import org.jetbrains.annotations.Contract
 import java.awt.Font
 import java.util.*
@@ -145,7 +147,10 @@ private fun updateSearchHighlights(
       }
       editor.vimLastSearch = pattern
     } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
-      // nohlsearch + incsearch. Only highlight the current editor
+      // nohlsearch + incsearch. Even though search highlights are disabled, we still show a highlight (current editor
+      // only), because 'incsearch' is active. But we don't show a search if Visual is active (behind Command-line of
+      // course), because the Visual selection is enough. We still need to find the current offset to update the
+      // selection
       if (editor === currentEditor?.ij) {
         val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
         if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
@@ -153,8 +158,10 @@ private fun updateSearchHighlights(
         if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
         val result = injector.searchHelper.findPattern(it, pattern, initialOffset, count1, searchOptions)
         if (result != null) {
-          val results = listOf(result)
-          highlightSearchResults(editor, pattern, results, result.startOffset)
+          if (!it.inVisualMode && !it.inCommandLineModeWithVisual) {
+            val results = listOf(result)
+            highlightSearchResults(editor, pattern, results, result.startOffset)
+          }
           currentMatchOffset = result.startOffset
         }
       }
