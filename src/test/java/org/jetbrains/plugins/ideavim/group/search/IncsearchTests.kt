@@ -987,4 +987,34 @@ class IncsearchTests : VimTestCase() {
       enterCommand("set hlsearch incsearch")
     }
   }
+
+  @Test
+  fun `test incsearch removes Visual when searching with no Visual range`() {
+    doTest(
+      listOf("v", ":<C-U>%s/dolor"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |Lorem ipsum ${c}dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.NORMAL())
+    ) {
+      enterCommand("set hlsearch incsearch")
+    }
+    assertSearchHighlights("dolor",
+      """
+        |Lorem ipsum ‷dolor‴ sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin()
+    )
+  }
 }
