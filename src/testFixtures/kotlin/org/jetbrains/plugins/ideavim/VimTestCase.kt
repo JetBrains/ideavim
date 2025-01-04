@@ -842,6 +842,10 @@ abstract class VimNoWriteActionTestCase {
     }
   }
 
+  protected fun assertNoSearchHighlights() {
+    assertEquals(0, fixture.editor.markupModel.allHighlighters.size)
+  }
+
   @JvmOverloads
   fun doTest(
     keys: List<String>,
