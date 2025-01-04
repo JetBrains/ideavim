@@ -46,7 +46,7 @@ interface VimPut {
     vimEditor: VimEditor,
     vimContext: ExecutionContext,
     text: ProcessedTextData,
-    subMode: SelectionType,
+    selectionType: SelectionType,
     data: PutData,
     additionalData: Map<String, Any>,
   )

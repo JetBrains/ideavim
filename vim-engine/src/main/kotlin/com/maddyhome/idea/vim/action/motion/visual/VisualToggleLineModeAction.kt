@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.options.OptionConstants
 
 @CommandOrMotion(keys = ["V"], modes = [Mode.NORMAL, Mode.VISUAL])
 class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
+
   override fun runAsMulticaret(
     editor: VimEditor,
     context: ExecutionContext,
@@ -57,7 +57,6 @@ class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.visualMotionGroup
-      .toggleVisual(editor, cmd.count, cmd.rawCount, SelectionType.LINE_WISE)
+    return injector.visualMotionGroup.toggleVisual(editor, cmd.count, cmd.rawCount, SelectionType.LINE_WISE)
   }
 }

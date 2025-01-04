@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.ReturnTo
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -52,7 +51,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "v"),
       "12${c}345",
       "12${s}${c}3${se}45",
-      Mode.VISUAL(SelectionType.CHARACTER_WISE, ReturnTo.INSERT)
+      Mode.VISUAL(SelectionType.CHARACTER_WISE, Mode.INSERT)
     )
   }
 
@@ -87,7 +86,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "v", "<C-G>"),
       "12${c}345",
       "12${s}3${c}${se}45",
-      Mode.SELECT(SelectionType.CHARACTER_WISE, ReturnTo.INSERT),
+      Mode.SELECT(SelectionType.CHARACTER_WISE, Mode.INSERT),
     )
   }
 
@@ -99,7 +98,7 @@ class ChangeActionTest : VimTestCase() {
       listOf("i", "<C-O>", "gh"),
       "12${c}345",
       "12${s}3${c}${se}45",
-      Mode.SELECT(SelectionType.CHARACTER_WISE, ReturnTo.INSERT),
+      Mode.SELECT(SelectionType.CHARACTER_WISE, Mode.INSERT),
     )
   }
 

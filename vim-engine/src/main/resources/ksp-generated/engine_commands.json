@@ -126,7 +126,7 @@
     },
     {
         "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction",
+        "class": "com.maddyhome.idea.vim.action.motion.select.SelectBackspaceAction",
         "modes": "S"
     },
     {
@@ -343,6 +343,11 @@
         "keys": "<C-O>",
         "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction",
         "modes": "N"
+    },
+    {
+        "keys": "<C-O>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.SelectToggleSingleVisualCommandAction",
+        "modes": "SX"
     },
     {
         "keys": "<C-P>",

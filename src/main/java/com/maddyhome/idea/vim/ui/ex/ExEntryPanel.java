@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
+import com.maddyhome.idea.vim.helper.EngineModeExtensionsKt;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor;
@@ -307,6 +308,9 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     protected void textChanged(@NotNull DocumentEvent e) {
       try {
         final Editor editor = entry.getEditor();
+        if (editor == null) {
+          return;
+        }
 
         final String labelText = label.getText(); // Either '/', '?' or ':'boolean searchCommand = false;
 
@@ -350,14 +354,23 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
         if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
           final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
-          int pattenEnd = injector.getSearchGroup().findEndOfPattern(searchText, separator, 0);
-          final String pattern = searchText.substring(0, pattenEnd);
+          int patternEnd = injector.getSearchGroup().findEndOfPattern(searchText, separator, 0);
+          final String pattern = searchText.substring(0, patternEnd);
 
           VimPlugin.getEditor().closeEditorSearchSession(editor);
           final int matchOffset =
             SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, count1, forwards, caretOffset,
                                                              searchRange);
           if (matchOffset != -1) {
+            // Moving the caret will update the Visual selection, which is only valid while performing a search. We want
+            // to remove the Visual selection when the incsearch is for a command, as this is always unrelated to the
+            // current selection.
+            // E.g. `V/foo` should update the selection to the location of the search result. But `V` followed by
+            // `:<C-U>%s/foo` should remove the selection first.
+            // We're actually in Command-line with Visual pending. Exiting Visual replaces this with just Command-line
+            if (searchCommand) {
+              EngineModeExtensionsKt.exitVisualMode(new IjVimEditor(editor));
+            }
             new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
           }
           else {

@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -27,9 +28,9 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) {
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
   val editor = caret.editor
-  val subMode = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
+  val selectionType = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
   val mode = editor.mode
-  when (subMode) {
+  when (selectionType) {
     SelectionType.CHARACTER_WISE -> {
       val (nativeStart, nativeEnd) = charToNativeSelection(editor, start, end, mode)
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
@@ -122,7 +123,7 @@ fun vimMoveBlockSelectionToOffset(editor: VimEditor, offset: Int) {
  * @see vimMoveBlockSelectionToOffset for blockwise selection
  */
 fun VimCaret.vimMoveSelectionToCaret(vimSelectionStart: Int = this.vimSelectionStart) {
-  if (!editor.inVisualMode && !editor.inSelectMode) error("Attempt to extent selection in non-visual mode")
+  if (!editor.inVisualMode && !editor.inSelectMode && !editor.inCommandLineModeWithVisual) error("Attempt to extent selection in non-visual mode")
   if (editor.inBlockSelection) error("Move caret with [vimMoveBlockSelectionToOffset]")
 
   val startOffsetMark = vimSelectionStart
