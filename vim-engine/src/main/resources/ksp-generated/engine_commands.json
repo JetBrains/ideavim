@@ -311,6 +311,11 @@
     },
     {
         "keys": "<C-Left>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionBigWordLeftAction",
+        "modes": "S"
+    },
+    {
+        "keys": "<C-Left>",
         "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction",
         "modes": "NXO"
     },
@@ -428,6 +433,11 @@
         "keys": "<C-Right>",
         "class": "com.maddyhome.idea.vim.action.ex.MoveToNextWordAction",
         "modes": "C"
+    },
+    {
+        "keys": "<C-Right>",
+        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionBigWordRightAction",
+        "modes": "S"
     },
     {
         "keys": "<C-Right>",
