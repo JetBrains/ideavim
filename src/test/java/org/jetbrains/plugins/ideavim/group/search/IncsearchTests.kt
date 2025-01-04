@@ -623,6 +623,55 @@ class IncsearchTests : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch updates Visual selection but not highlights with nohlsearch`() {
+    // We don't show a highlight when nohlsearch is active and we're in Visual - the selection is enough
+    doTest(
+      listOf("ve", "/dolor"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ipsum ${c}d${se}olor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set nohlsearch")
+      enterCommand("set incsearch")
+    }
+    assertNoSearchHighlights()
+  }
+
+  @Test
+  fun `test incsearch updates empty Visual selection but not highlights with nohlsearch`() {
+    doTest(
+      "v/ipsum",
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}i${se}psum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set nohlsearch")
+      enterCommand("set incsearch")
+    }
+    assertNoSearchHighlights()
+  }
+
+  @Test
   fun `test incsearch updates exclusive Visual selection`() {
     doTest(
       listOf("ve", "/dolor"),
@@ -682,6 +731,56 @@ class IncsearchTests : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin()
     )
+  }
+
+  @Test
+  fun `test incsearch updates exclusive Visual selection but not highlights with nohlsearch`() {
+    doTest(
+      listOf("ve", "/dolor"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ipsum ${c}${se}dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set selection=exclusive")
+      enterCommand("set nohlsearch")
+      enterCommand("set incsearch")
+    }
+    assertNoSearchHighlights()
+  }
+
+  @Test
+  fun `test incsearch updates empty exclusive Visual selection but not highlights with nohlsearch`() {
+    doTest(
+      "v/ipsum",
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}${se}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set selection=exclusive")
+      enterCommand("set nohlseach")
+      enterCommand("set incsearch")
+    }
+    assertNoSearchHighlights()
   }
 
   @Test
@@ -749,6 +848,32 @@ class IncsearchTests : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch updates empty selection when editing search pattern with nohlsearch`() {
+    // This will initially move selection to the "it" in "sit" on the first line, then back to the start of "ipsum".
+    // Tests that the selection is correctly updated as the current target changes
+    doTest(
+      listOf("v", "/it", "<BS>", "p"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}i${se}psum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set nohlsearch")
+      enterCommand("set incsearch")
+    }
+    assertNoSearchHighlights()
+  }
+
+  @Test
   fun `test incsearch updates exclusive selection when editing search pattern`() {
     // This will initially move selection to the "it" in "sit" on the first line, then back to the start of "ipsum".
     // Tests that the selection is correctly updated as the current target changes
@@ -812,6 +937,33 @@ class IncsearchTests : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin()
     )
+  }
+
+  @Test
+  fun `test incsearch updates empty exclusive selection when editing search pattern with nohlsearch`() {
+    // This will initially move selection to the "it" in "sit" on the first line, then back to the start of "ipsum".
+    // Tests that the selection is correctly updated as the current target changes
+    doTest(
+      listOf("v", "/it", "<BS>", "p"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${s}Lorem ${c}${se}ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      Mode.CMD_LINE(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    ) {
+      enterCommand("set selection=exclusive")
+      enterCommand("set nohlsearch")
+      enterCommand("set incsearch")
+    }
+    assertNoSearchHighlights()
   }
 
   @Test

@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.group.search
 
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 class SearchHighlightsTest : VimTestCase() {
   @Test
@@ -519,9 +518,5 @@ class SearchHighlightsTest : VimTestCase() {
     val pattern = "foo"
     enterSearch(pattern)
     assertSearchHighlights(pattern, "\t«foo»")
-  }
-
-  private fun assertNoSearchHighlights() {
-    assertEquals(0, fixture.editor.markupModel.allHighlighters.size)
   }
 }
