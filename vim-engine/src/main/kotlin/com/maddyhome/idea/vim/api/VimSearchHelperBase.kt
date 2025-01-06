@@ -1440,14 +1440,16 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     var goBack = (startSpace && !hasSelection) || (!startSpace && hasSelection && !onWordStart)
     if (dir == 1 && isOuter) {
-      var firstEnd = end
-      if (count > 1) {
-        firstEnd = findNextWordEnd(editor, pos, 1, isBig, false)
-      }
-      if (firstEnd < max - 1) {
-        if (charType(editor, chars[firstEnd + 1], false) !== CharacterHelper.CharacterType.WHITESPACE) {
+      // If there's no whitespace after the end of the word/WORD to select, go back for the leading whitespace
+      // This behaviour isn't strictly documented, but you can see it mentioned in `:help v_a'`
+      if (end < max - 1) {
+        val c = chars[end + 1]
+        if (charType(editor, c, false) !== CharacterHelper.CharacterType.WHITESPACE || c == '\n') {
           goBack = true
         }
+      }
+      else {
+        goBack = true
       }
     }
     if (dir == -1 && isOuter && startSpace) {
