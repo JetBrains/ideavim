@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -107,11 +106,9 @@ class MotionBigWordEndLeftActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter = "${c}Lorem ipsum")
   @Test
   fun `test move to previous word end on first word moves to start of file`() {
-    doTest("gE", "Lore${c}m ipsum", "Lore${c}m ipsum")
+    doTest("gE", "Lore${c}m ipsum", "${c}Lorem ipsum")
   }
 
   @Test
@@ -125,11 +122,9 @@ class MotionBigWordEndLeftActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter = "${c}Lorem ipsum")
   @Test
   fun `test move to previous word end with large count moves to start of file without reporting error`() {
-    doTest("100gE", "Lorem ip${c}sum", "Lore${c}m ipsum")
+    doTest("100gE", "Lorem ip${c}sum", "${c}Lorem ipsum")
     assertPluginError(false)
   }
 }
