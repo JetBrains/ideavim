@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection", "RemoveCurlyBracesFromTemplate")
@@ -228,7 +227,7 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Lorem Ipsum
         |
         |Lorem ipsum dolor sit amet,
-        |consectetur adipiscing ${s}elit
+        |consectetur adipiscing${s} elit
         |Se${c}d${se} in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
@@ -236,17 +235,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem Ipsum
-      |
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing${s} elit
-      |    Se${c}d${se} in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test repeated text object expands over whitespace following new line`() {
     doTest(
@@ -263,7 +251,7 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Lorem Ipsum
         |
         |Lorem ipsum dolor sit amet,
-        |consectetur adipiscing ${s}elit
+        |consectetur adipiscing${s} elit
         |    Se${c}d${se} in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
@@ -271,17 +259,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem${s} Ipsum
-      |
-      |Lore${c}m${se} ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test repeated text object expands to empty line`() {
     doTest(
@@ -295,7 +272,7 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       """
-        |Lorem ${s}Ipsum
+        |Lorem${s} Ipsum
         |
         |Lore${c}m${se} ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -333,7 +310,7 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       """
-        |Lorem ${s}Ipsum
+        |Lorem${s} Ipsum
         |
         |
         |
@@ -346,16 +323,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem${s} Ipsum
-      |........
-      |Lore${c}m${se} ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test repeated text object expands to cover whitespace on following blank line`() {
     doTest(
@@ -369,7 +336,7 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin().dotToSpace(),
       """
-        |Lorem ${s}Ipsum
+        |Lorem${s} Ipsum
         |........
         |Lore${c}m${se} ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -408,7 +375,7 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin().dotToSpace(),
       """
-        |Lorem ${s}Ipsum
+        |Lorem${s} Ipsum
         |
         |........
         |
@@ -470,13 +437,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet, consectetur adipiscing${s} eli${c}t${se}
-      |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test select outer word at end of line selects preceding whitespace`() {
     doTest(
@@ -486,11 +446,32 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       """
-        |Lorem ipsum dolor sit amet, consectetur adipiscing ${s}eli${c}t${se}
+        |Lorem ipsum dolor sit amet, consectetur adipiscing${s} eli${c}t${se}
         |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
+  }
+
+  @Test
+  fun `test select outer word at end of file selects preceding whitespace`() {
+    doTest(
+      "vaw",
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        |Sed in orci mauris. Cras id tellus in ex imperdiet eg${c}estas
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        |Sed in orci mauris. Cras id tellus in ex imperdiet${s} egesta${c}s${se}
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer word on only word on line does not select leading whitespace`() {
+    doTest("vaw", "    Lor${c}em", "    ${s}Lore${c}m${se}", Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test
@@ -579,7 +560,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  @Disabled("Implementation bug")
   @Test
   fun `test select multiple outer words with no following whitespace selects preceding whitespace 2`() {
     // Implementation bug: caret placed anywhere other than last character would not select preceding whitespace

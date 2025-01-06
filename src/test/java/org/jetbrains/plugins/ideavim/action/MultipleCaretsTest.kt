@@ -470,11 +470,13 @@ $c  tw${c}o
 
   @Test
   fun testMotionOuterBigWordAction() {
+    // Careful with the trailing whitespace. If there isn't any, `vaW` will select leading whitespace and the carets
+    // will merge
     typeTextInFile(
       injector.parser.parseKeys("v" + "aW"),
-      " a${c}bcd${c}e.abcde.a${c}bcde  a${c}bcde.abcde\n",
+      " a${c}bcd${c}e.abcde.a${c}bcde  a${c}bcde.abcde \n",
     )
-    assertState(" <selection>abcde.abcde.abcde  </selection><selection>abcde.abcde</selection>\n")
+    assertState(" <selection>abcde.abcde.abcde  </selection><selection>abcde.abcde</selection> \n")
   }
 
   @Test
@@ -1069,11 +1071,13 @@ $c  tw${c}o
 
   @Test
   fun testMergingSelections() {
+    // Careful of the trailing whitespace. Without it, `vaW` will select leading whitespace, and the carets will merge
+    // too soon. With it, the entire line is selected, but with two carets and the `l` and `h` merge into a single one
     typeTextInFile(
       injector.parser.parseKeys("v" + "aW" + "l" + "h"),
-      "a${c}bcde.abcde.abcde  ab${c}cde.abcde\n",
+      "a${c}bcde.abcde.abcde  ab${c}cde.abcde \n",
     )
-    assertState("<selection>abcde.abcde.abcde  abcde.abcde</selection>\n")
+    assertState("<selection>abcde.abcde.abcde  abcde.abcde</selection> \n")
   }
 
   @Test
