@@ -422,6 +422,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       }
     } else if (pos == size) {
       res = size - 1
+    } else if (pos <= 0) {
+      res = 0
     }
     return res
   }
