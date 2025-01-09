@@ -85,7 +85,7 @@ Here are some examples of supported vim features and commands:
 * Motion / deletion / change / window / etc. commands
 * Key mappings
 * Marks / Macros / Digraphs / Registers
-* Some [set commands](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands)
+* Some [set commands](https://github.com/JetBrains/ideavim/wiki/set-commands)
 * Full Vim regexps for search and search/replace
 * Vim web help
 * `~/.ideavimrc` configuration file
@@ -324,11 +324,11 @@ IdeaVim tips and tricks
     - `set ideajoin` to enable join via the IDE. See the [examples](https://jb.gg/f9zji9).
     - Make sure `ideaput` is enabled for `clipboard` to enable native IJ insertion in Vim.
     - Sync IJ bookmarks and IdeaVim global marks: `set ideamarks` (works for marks with capital letters only)
-    - Check out more [ex commands](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
+    - Check out more [ex commands](https://github.com/JetBrains/ideavim/wiki/set-commands).
 
 - Use your vim settings with IdeaVim. Put `source ~/.vimrc` in `~/.ideavimrc`.
-- Control the status bar icon via the [`ideastatusicon` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
-- Not familiar with the default behaviour during a refactoring? See the [`idearefactormode` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
+- Control the status bar icon via the [`ideastatusicon` option](https://github.com/JetBrains/ideavim/wiki/set-commands).
+- Not familiar with the default behaviour during a refactoring? See the [`idearefactormode` option](https://github.com/JetBrains/ideavim/wiki/set-commands).
 
 Some facts about Vim
 -------
