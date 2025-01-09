@@ -113,7 +113,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     }
     gradle {
       name = "Publish release"
-      tasks = "publishPlugin"
+      tasks = "publishPlugin -x buildSearchableOptions"
     }
 //    script {
 //      name = "Checkout master branch"
