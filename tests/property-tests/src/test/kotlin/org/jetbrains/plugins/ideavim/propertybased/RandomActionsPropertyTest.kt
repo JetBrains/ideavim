@@ -129,4 +129,7 @@ private val stinkyKeysList = arrayListOf(
 
   // Next / previous method fails because of vfs sync
   "]",
+
+  // Doesn't work with test implementation of splitters
+  "<C-Pageup>", "<C-Pagedown>", "<C-N>",
 )
