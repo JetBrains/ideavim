@@ -567,6 +567,10 @@ Contributors:
   [![icon][github]](https://github.com/wxh06)
   &nbsp;
   Xinhe Wang
+* [![icon][mail]](mailto:vladimir.parfinenko@jetbrains.com)
+  [![icon][github]](https://github.com/cypok)
+  &nbsp;
+  Vladimir Parfinenko
 
 Previous contributors:
 
