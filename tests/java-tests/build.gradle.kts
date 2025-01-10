@@ -62,6 +62,13 @@ tasks {
       println("Set env TEAMCITY_VERSION to X to enable project leak checks from the platform")
       environment("TEAMCITY_VERSION" to "X")
     }
+
+    dependencies {
+      intellijPlatform {
+        // Temporal solution to make tests work on the latest EAP release. See LLM-13649
+        bundledPlugins("com.intellij.llmInstaller")
+      }
+    }
   }
 }
 
