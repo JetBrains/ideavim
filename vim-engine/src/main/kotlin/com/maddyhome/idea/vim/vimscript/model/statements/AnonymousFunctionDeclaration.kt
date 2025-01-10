@@ -51,9 +51,19 @@ data class AnonymousFunctionDeclaration(
         throw ExException("E718: Funcref required")
       }
     }
-    val declaration = FunctionDeclaration(null, VimFuncref.anonymousCounter++.toString(), args, defaultArgs, body, replaceExisting, flags + FunctionFlag.DICT, hasOptionalArguments)
+    val declaration = FunctionDeclaration(
+      null,
+      VimFuncref.anonymousCounter++.toString(),
+      args,
+      defaultArgs,
+      body,
+      replaceExisting,
+      flags + FunctionFlag.DICT,
+      hasOptionalArguments
+    )
     declaration.vimContext = this.vimContext
-    container.dictionary[index] = VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
+    container.dictionary[index] =
+      VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
     container.dictionary[index]
     return ExecutionResult.Success
   }

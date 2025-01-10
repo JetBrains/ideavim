@@ -159,18 +159,22 @@ internal object IdeaSelectionControl {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")
         Mode.SELECT(VimPlugin.getVisualMotion().detectSelectionType(editor.vim))
       }
+
       selectionSource == VimListenerManager.SelectionSource.MOUSE && OptionConstants.selectmode_mouse in selectmode -> {
         if (logReason) logger.debug("Enter select mode. Selection source is mouse and selectMode option has mouse")
         Mode.SELECT(VimPlugin.getVisualMotion().detectSelectionType(editor.vim))
       }
+
       editor.isTemplateActive() && editor.vim.isIdeaRefactorModeSelect -> {
         if (logReason) logger.debug("Enter select mode. Template is active and selectMode has template")
         Mode.SELECT(VimPlugin.getVisualMotion().detectSelectionType(editor.vim))
       }
+
       selectionSource == VimListenerManager.SelectionSource.OTHER && OptionConstants.selectmode_ideaselection in selectmode -> {
         if (logReason) logger.debug("Enter select mode. Selection source is OTHER and selectMode has refactoring")
         Mode.SELECT(VimPlugin.getVisualMotion().detectSelectionType(editor.vim))
       }
+
       else -> {
         if (logReason) logger.debug("Enter visual mode")
         Mode.VISUAL(VimPlugin.getVisualMotion().detectSelectionType(editor.vim))

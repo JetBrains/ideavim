@@ -219,14 +219,17 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
           patterns.add(injector.searchGroup.lastSearchPattern)
           directions.add(Direction.FORWARDS)
         }
+
         "\\?" -> {
           patterns.add(injector.searchGroup.lastSearchPattern)
           directions.add(Direction.BACKWARDS)
         }
+
         "\\&" -> {
           patterns.add(injector.searchGroup.lastSubstitutePattern)
           directions.add(Direction.FORWARDS)
         }
+
         else -> {
           if (pat[0] == '/') {
             directions.add(Direction.FORWARDS)
@@ -268,8 +271,7 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
       if (searchOffset == -1) {
         if (injector.options(editor).wrapscan) {
           throw exExceptionMessage("E486", pattern) // E486: Pattern not found: $pattern
-        }
-        else {
+        } else {
           throw exExceptionMessage("E385", pattern) // E385: Search hit BOTTOM without match for: $pattern
         }
       }

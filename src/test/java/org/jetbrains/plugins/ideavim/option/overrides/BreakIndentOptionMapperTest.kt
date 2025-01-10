@@ -179,8 +179,7 @@ class BreakIndentOptionMapperTest : VimTestCase() {
 
       // This is the same value as the global IDE setting. That's ok. We just want to explicitly set the Vim option
       enterCommand("set breakindent")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 
@@ -301,8 +300,7 @@ class BreakIndentOptionMapperTest : VimTestCase() {
 
       // This is the same value as the global IDE setting. That's ok. We just want to explicitly set the Vim option
       enterCommand("set breakindent")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 

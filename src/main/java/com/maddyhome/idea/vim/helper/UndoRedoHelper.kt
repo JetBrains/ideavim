@@ -119,7 +119,7 @@ internal class UndoRedoHelper : VimTimestampBasedUndoService {
   private fun hasSelection(editor: VimEditor): Boolean {
     return editor.primaryCaret().ij.hasSelection()
   }
-  
+
   override fun redo(editor: VimEditor, context: ExecutionContext): Boolean {
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false

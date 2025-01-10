@@ -107,7 +107,7 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'colorcolumn' reports '+0' at end of visual guide list`() {
     fixture.editor.settings.isRightMarginShown = true
-    fixture.editor.settings.setSoftMargins(listOf(10,20,30))
+    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
     assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
   }
 
@@ -178,14 +178,14 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   @Test
   fun `test 'colorcolumn' does not report current visual guides if global right margin option is disabled`() {
     EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    fixture.editor.settings.setSoftMargins(listOf(10,20,30))
+    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
     assertCommandOutput("set colorcolumn?", "  colorcolumn=")
   }
 
   @Test
   fun `test 'colorcolumn' does not report current visual guides if local right margin option is disabled`() {
     fixture.editor.settings.isRightMarginShown = false
-    fixture.editor.settings.setSoftMargins(listOf(10,20,30))
+    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
     assertCommandOutput("set colorcolumn?", "  colorcolumn=")
   }
 
@@ -198,7 +198,7 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     assertFalse(EditorSettingsExternalizable.getInstance().isRightMarginShown)
     assertEmpty(getGlobalSoftMargins())
     assertTrue(fixture.editor.settings.isRightMarginShown)
-    assertEquals(listOf(10,20,30), fixture.editor.settings.softMargins)
+    assertEquals(listOf(10, 20, 30), fixture.editor.settings.softMargins)
 
     enterCommand("set colorcolumn=50")
     assertFalse(EditorSettingsExternalizable.getInstance().isRightMarginShown)
@@ -222,7 +222,7 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     assertFalse(EditorSettingsExternalizable.getInstance().isRightMarginShown)
     assertEmpty(getGlobalSoftMargins())
     assertTrue(fixture.editor.settings.isRightMarginShown)
-    assertEquals(listOf(10,20,30), fixture.editor.settings.softMargins)
+    assertEquals(listOf(10, 20, 30), fixture.editor.settings.softMargins)
 
     enterCommand("setlocal colorcolumn=50")
     assertFalse(EditorSettingsExternalizable.getInstance().isRightMarginShown)
@@ -367,8 +367,7 @@ class ColorColumnOptionMapperTest : VimTestCase() {
     val commonSettings = CodeStyle.getSettings(fixture.editor).getCommonSettings(language)
     if (language == null || commonSettings.language == Language.ANY) {
       CodeStyle.getSettings(fixture.editor).defaultSoftMargins = margins
-    }
-    else {
+    } else {
       CodeStyle.getSettings(fixture.editor).setSoftMargins(language, margins)
     }
     // Setting the value directly doesn't invalidate the cached property value. Not sure if there's a better way

@@ -239,14 +239,16 @@ public class ExTextField extends JTextField {
     // This gets called for ALL events, before the IDE starts to process key events for the action system. We can add a
     // dispatcher that checks that the plugin is enabled, checks that the component with the focus is ExTextField,
     // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
-    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
-                                        (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
+    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED
+                                        ? KeyEvent.KEY_TYPED
+                                        : (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
                                   (new Date()).getTime(), modifiers, keyCode, c);
 
     useHandleKeyFromEx = false;
     try {
       super.processKeyEvent(event);
-    } finally {
+    }
+    finally {
       useHandleKeyFromEx = true;
     }
   }
@@ -311,7 +313,8 @@ public class ExTextField extends JTextField {
   }
 
   private void resetCaret() {
-    if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
+    if (getCaretPosition() == super.getText().length() ||
+        currentActionPromptCharacterOffset == super.getText().length() - 1) {
       setNormalModeCaret();
     }
     else {
@@ -388,7 +391,7 @@ public class ExTextField extends JTextField {
       if (!isVisible()) return;
 
       // Take a copy of the graphics, so we can mess around with it without having to reset after
-      final Graphics2D g2d = (Graphics2D) g.create();
+      final Graphics2D g2d = (Graphics2D)g.create();
       try {
         final JTextComponent component = getComponent();
 
@@ -414,10 +417,12 @@ public class ExTextField extends JTextField {
         // when the caret has not yet been moved or changed
         final FontMetrics fm = component.getFontMetrics(component.getFont());
         if (!hasFocus) {
-          final float outlineThickness = (float) PaintUtil.alignToInt(1.0, g2d);
+          final float outlineThickness = (float)PaintUtil.alignToInt(1.0, g2d);
           final double caretWidth = getCaretWidth(fm, r.getX(), 100);
           final Area area = new Area(new Rectangle2D.Double(r.getX(), r.getY(), caretWidth, r.getHeight()));
-          area.subtract(new Area(new Rectangle2D.Double(r.getX() + outlineThickness, r.getY() + outlineThickness, caretWidth - (2 * outlineThickness), r.getHeight() - (2 * outlineThickness))));
+          area.subtract(new Area(new Rectangle2D.Double(r.getX() + outlineThickness, r.getY() + outlineThickness,
+                                                        caretWidth - (2 * outlineThickness),
+                                                        r.getHeight() - (2 * outlineThickness))));
           g2d.fill(area);
         }
         else {
@@ -516,7 +521,7 @@ public class ExTextField extends JTextField {
 
   @TestOnly
   public @NonNls String getCaretShape() {
-    CommandLineCaret caret = (CommandLineCaret) getCaret();
+    CommandLineCaret caret = (CommandLineCaret)getCaret();
     return String.format("%s %d", caret.mode, caret.thickness);
   }
 

@@ -13,7 +13,13 @@ interface VimCommandLineService {
 
   fun getActiveCommandLine(): VimCommandLine?
 
-  fun readInputAndProcess(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?, processing: (String) -> Unit)
+  fun readInputAndProcess(
+    vimEditor: VimEditor,
+    context: ExecutionContext,
+    prompt: String,
+    finishOn: Char?,
+    processing: (String) -> Unit,
+  )
 
   /**
    * Turns on the command line for the given editor
@@ -23,8 +29,19 @@ interface VimCommandLineService {
    * @param label    The label for the command line (i.e. :, /, or ?)
    * @param initialText The initial text for the entry
    */
-  fun createSearchPrompt(editor: VimEditor, context: ExecutionContext, label: String, initialText: String): VimCommandLine
-  fun createCommandPrompt(editor: VimEditor, context: ExecutionContext, count0: Int, initialText: String): VimCommandLine
+  fun createSearchPrompt(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    initialText: String,
+  ): VimCommandLine
+
+  fun createCommandPrompt(
+    editor: VimEditor,
+    context: ExecutionContext,
+    count0: Int,
+    initialText: String,
+  ): VimCommandLine
 
   fun fullReset()
 }

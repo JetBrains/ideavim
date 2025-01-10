@@ -39,7 +39,12 @@ class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return argument is Argument.Character && changeCharacter(editor, caret, operatorArguments.count1, argument.character)
+    return argument is Argument.Character && changeCharacter(
+      editor,
+      caret,
+      operatorArguments.count1,
+      argument.character
+    )
   }
 }
 

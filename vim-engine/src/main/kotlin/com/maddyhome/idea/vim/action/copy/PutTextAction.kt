@@ -50,7 +50,12 @@ sealed class PutTextBaseAction(
     }
   }
 
-  private fun getPutDataForCaret(editor: VimEditor, context: ExecutionContext, caret: ImmutableVimCaret, count: Int): PutData {
+  private fun getPutDataForCaret(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: ImmutableVimCaret,
+    count: Int,
+  ): PutData {
     val registerService = injector.registerGroup
     val registerChar = if (caret.editor.carets().size == 1) {
       registerService.currentRegister

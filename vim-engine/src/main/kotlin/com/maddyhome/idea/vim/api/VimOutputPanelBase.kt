@@ -32,6 +32,7 @@ abstract class VimOutputPanelBase : VimOutputPanel {
           else -> onBadKey()
         }
       }
+
       else -> onBadKey()
     }
   }

@@ -50,6 +50,7 @@ interface VimRegisterGroup {
     type: SelectionType,
     isDelete: Boolean,
   ): Boolean
+
   fun storeText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -73,8 +74,15 @@ interface VimRegisterGroup {
   // todo better tests
   @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.lang.String, com.maddyhome.idea.vim.state.mode.SelectionType)")
   fun storeText(register: Char, text: String, selectionType: SelectionType): Boolean
+
   @TestOnly
-  fun storeText(editor: VimEditor, context: ExecutionContext, register: Char, text: String, selectionType: SelectionType): Boolean
+  fun storeText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    register: Char,
+    text: String,
+    selectionType: SelectionType,
+  ): Boolean
 
   /**
    * Stores text, character wise, in the given special register
@@ -90,12 +98,15 @@ interface VimRegisterGroup {
    * preferable to yank from the fixture editor.
    */
   fun storeTextSpecial(register: Char, text: String): Boolean
+
   @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char)")
   fun getRegister(r: Char): Register?
   fun getRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register?
+
   @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegisters(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   fun getRegisters(): List<Register>
   fun getRegisters(editor: VimEditor, context: ExecutionContext): List<Register>
+
   @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#saveRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, com.maddyhome.idea.vim.register.Register)")
   fun saveRegister(r: Char, register: Register)
   fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register)
@@ -107,6 +118,7 @@ interface VimRegisterGroup {
   fun recordText(text: String)
   fun setKeys(register: Char, keys: List<KeyStroke>)
   fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType)
+
   @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#finishRecording(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
   fun finishRecording()
   fun finishRecording(editor: VimEditor, context: ExecutionContext)

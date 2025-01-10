@@ -18,8 +18,8 @@ abstract class VimJumpServiceBase : VimJumpService {
     val jumps = projectToJumps[projectId] ?: mutableListOf()
     projectToJumpSpot.putIfAbsent(projectId, -1)
     val index = jumps.size - 1 - (projectToJumpSpot[projectId]!! - count)
-    return jumps.getOrNull(index)?.also { 
-      projectToJumpSpot[projectId] = projectToJumpSpot[projectId]!! - count 
+    return jumps.getOrNull(index)?.also {
+      projectToJumpSpot[projectId] = projectToJumpSpot[projectId]!! - count
     }
   }
 

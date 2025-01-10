@@ -36,7 +36,8 @@ sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionH
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)?.toMotionOrError() ?: Motion.Error
+    return moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)?.toMotionOrError()
+      ?: Motion.Error
   }
 }
 

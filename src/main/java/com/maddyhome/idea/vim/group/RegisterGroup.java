@@ -33,8 +33,7 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
  * This group works with command associated with copying and pasting text
  */
 @State(name = "VimRegisterSettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
-})
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)})
 public class RegisterGroup extends VimRegisterGroupBase implements PersistentStateComponent<Element> {
 
   static {
@@ -146,9 +145,8 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
             final int modifiers = Integer.parseInt(keyElement.getAttributeValue("mods"));
             final char c = (char)Integer.parseInt(keyElement.getAttributeValue("char"));
             //noinspection MagicConstant
-            strokes.add(c == KeyEvent.CHAR_UNDEFINED ?
-                        KeyStroke.getKeyStroke(code, modifiers) :
-                        KeyStroke.getKeyStroke(c));
+            strokes.add(
+              c == KeyEvent.CHAR_UNDEFINED ? KeyStroke.getKeyStroke(code, modifiers) : KeyStroke.getKeyStroke(c));
           }
           register = new Register(key, type, strokes);
         }

@@ -28,9 +28,11 @@ internal object VimRegexTestUtils {
   const val VISUAL_START = "<vstart>"
   const val VISUAL_END = "<vend>"
   private const val MARK = "<mark.>"
-  fun MARK(mark: Char): CharSequence { return "<mark$mark>" }
+  fun MARK(mark: Char): CharSequence {
+    return "<mark$mark>"
+  }
 
-  fun mockEditorFromText(text: CharSequence) : VimEditor {
+  fun mockEditorFromText(text: CharSequence): VimEditor {
     val cleanText = getTextWithoutEditorTags(getTextWithoutRangeTags(text))
     val lines = cleanText.split("\n").map { it + "\n" }
 
@@ -51,7 +53,7 @@ internal object VimRegexTestUtils {
 
     val visualStart = textWithOnlyVisuals.indexOf(VISUAL_START)
     val visualEnd = if (visualStart >= 0) textWithOnlyVisuals.indexOf(VISUAL_END) - VISUAL_START.length
-                    else -1
+    else -1
 
     val marks = mutableMapOf<Char, BufferPosition>()
 
@@ -104,7 +106,11 @@ internal object VimRegexTestUtils {
     return editorMock
   }
 
-  fun mockCaret(caretOffset: Int, visualOffset: Pair<Int, Int> = Pair(-1, -1), marks: Map<Char, BufferPosition> = emptyMap()): VimCaret {
+  fun mockCaret(
+    caretOffset: Int,
+    visualOffset: Pair<Int, Int> = Pair(-1, -1),
+    marks: Map<Char, BufferPosition> = emptyMap(),
+  ): VimCaret {
     val caretMock = Mockito.mock<VimCaret>()
     whenever(caretMock.offset).thenReturn(caretOffset)
     whenever(caretMock.selectionStart).thenReturn(visualOffset.first)
@@ -191,7 +197,7 @@ internal object VimRegexTestUtils {
   }
 
   private fun mockEditorOffsetToBufferPosition(editor: VimEditor, lines: List<String>) {
-    whenever(editor.offsetToBufferPosition(Mockito.anyInt())).thenAnswer { invocation ->
+    whenever(editor.offsetToBufferPosition(anyInt())).thenAnswer { invocation ->
       val offset = invocation.arguments[0] as Int
       var lineCounter = 0
       var currentOffset = 0

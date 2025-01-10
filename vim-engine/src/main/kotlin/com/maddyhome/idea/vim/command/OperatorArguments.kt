@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
  * [VimEditor.mode] instead.
  */
 data class OperatorArguments
-
 @Deprecated(
   "Use overload without isOperatorPending. Value can be calculated from mode",
   replaceWith = ReplaceWith("OperatorArguments(count0, mode)"),

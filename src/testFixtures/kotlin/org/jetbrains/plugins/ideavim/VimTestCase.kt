@@ -207,8 +207,7 @@ abstract class VimNoWriteActionTestCase {
       RIGHT_MARGIN = IjOptions.textwidth.defaultValue.value
       WRAP_ON_TYPING = if (IjOptions.textwidth.defaultValue > 0) {
         CommonCodeStyleSettings.WrapOnTyping.WRAP.intValue
-      }
-      else {
+      } else {
         CommonCodeStyleSettings.WrapOnTyping.NO_WRAP.intValue
       }
     }
@@ -564,7 +563,8 @@ abstract class VimNoWriteActionTestCase {
   protected fun assertRegisterString(char: Char, expected: String?) {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    val actual = injector.registerGroup.getRegister(vimEditor, context, char)?.keys?.let(injector.parser::toPrintableString)
+    val actual =
+      injector.registerGroup.getRegister(vimEditor, context, char)?.keys?.let(injector.parser::toPrintableString)
     assertEquals(expected, actual, "Wrong register contents")
   }
 

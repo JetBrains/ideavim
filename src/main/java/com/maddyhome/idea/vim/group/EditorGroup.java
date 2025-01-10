@@ -156,7 +156,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   private static void repaintRelativeLineNumbers(final @NotNull Editor editor) {
     final EditorGutter gutter = editor.getGutter();
-    final EditorGutterComponentEx gutterComponent = gutter instanceof EditorGutterComponentEx ? (EditorGutterComponentEx) gutter : null;
+    final EditorGutterComponentEx gutterComponent =
+      gutter instanceof EditorGutterComponentEx ? (EditorGutterComponentEx)gutter : null;
     if (gutterComponent != null) {
       gutterComponent.repaint();
     }
@@ -251,18 +252,18 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   @Override
   public void notifyIdeaJoin(@NotNull VimEditor editor) {
-    notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject(), editor);
+    notifyIdeaJoin(((IjVimEditor)editor).getEditor().getProject(), editor);
   }
 
   @Override
   public void updateCaretsVisualAttributes(@NotNull VimEditor editor) {
-    Editor ijEditor = ((IjVimEditor) editor).getEditor();
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
     CaretVisualAttributesHelperKt.updateCaretsVisualAttributes(ijEditor);
   }
 
   @Override
   public void updateCaretsVisualPosition(@NotNull VimEditor editor) {
-    Editor ijEditor = ((IjVimEditor) editor).getEditor();
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
     CaretVisualAttributesHelperKt.updateCaretsVisualAttributes(ijEditor);
   }
 
@@ -309,26 +310,21 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   @Override
   public @NotNull Collection<VimEditor> getEditorsRaw() {
-    return getLocalEditors()
-      .map(IjVimEditor::new)
-      .collect(Collectors.toList());
+    return getLocalEditors().map(IjVimEditor::new).collect(Collectors.toList());
   }
 
   @Override
   public @NotNull Collection<VimEditor> getEditors() {
-    return getLocalEditors()
-      .filter(UserDataManager::getVimInitialised)
-      .map(IjVimEditor::new)
+    return getLocalEditors().filter(UserDataManager::getVimInitialised).map(IjVimEditor::new)
       .collect(Collectors.toList());
   }
 
   @Override
   public @NotNull Collection<VimEditor> getEditors(@NotNull VimDocument buffer) {
     final Document document = ((IjVimDocument)buffer).getDocument();
-    return getLocalEditors()
-      .filter(editor -> UserDataManager.getVimInitialised(editor) && editor.getDocument().equals(document))
-      .map(IjVimEditor::new)
-      .collect(Collectors.toList());
+    return getLocalEditors().filter(
+        editor -> UserDataManager.getVimInitialised(editor) && editor.getDocument().equals(document))
+      .map(IjVimEditor::new).collect(Collectors.toList());
   }
 
   private Stream<Editor> getLocalEditors() {

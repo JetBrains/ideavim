@@ -51,7 +51,11 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     Options.initialise()
   }
 
-  override fun initialiseLocalOptions(editor: VimEditor, sourceEditor: VimEditor?, scenario: LocalOptionInitialisationScenario) {
+  override fun initialiseLocalOptions(
+    editor: VimEditor,
+    sourceEditor: VimEditor?,
+    scenario: LocalOptionInitialisationScenario,
+  ) {
     // Called for all editors. Ensures that we eagerly initialise all local values, including the per-window "global"
     // values of local-to-window options. Note that global options are not eagerly initialised - the value is the
     // default value unless explicitly set.
@@ -71,11 +75,13 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     check(sourceEditor != null) { "sourceEditor must not be null for scenario: $scenario" }
     when (scenario) {
       LocalOptionInitialisationScenario.FALLBACK,
-      LocalOptionInitialisationScenario.CMD_LINE -> strategy.initialiseCloneCurrentState(sourceEditor, editor)
+      LocalOptionInitialisationScenario.CMD_LINE,
+        -> strategy.initialiseCloneCurrentState(sourceEditor, editor)
+
       LocalOptionInitialisationScenario.SPLIT -> strategy.initialiseForSplitCurrentWindow(sourceEditor, editor)
       LocalOptionInitialisationScenario.EDIT -> strategy.initialiseForEditingNewBuffer(sourceEditor, editor)
       LocalOptionInitialisationScenario.NEW -> strategy.initialiseForNewBufferInNewWindow(sourceEditor, editor)
-      else -> { }
+      else -> {}
     }
   }
 
@@ -105,13 +111,19 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     strategy.initialiseCloneCurrentState(sourceEditor, fallbackWindow)
   }
 
-  protected open fun <T : VimDataType> addOptionValueOverride(option: Option<T>, override: OptionValueOverride<T>): Unit =
+  protected open fun <T : VimDataType> addOptionValueOverride(
+    option: Option<T>,
+    override: OptionValueOverride<T>,
+  ): Unit =
     storage.addOptionValueOverride(option, override)
 
   override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionAccessScope): T =
     getOptionValueInternal(option, scope).value
 
-  protected open fun <T : VimDataType> getOptionValueInternal(option: Option<T>, scope: OptionAccessScope): OptionValue<T> =
+  protected open fun <T : VimDataType> getOptionValueInternal(
+    option: Option<T>,
+    scope: OptionAccessScope,
+  ): OptionValue<T> =
     storage.getOptionValue(option, scope)
 
   override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionAccessScope, value: T) {
@@ -137,10 +149,10 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun <T : VimDataType> resetToGlobalValue(option: Option<T>, scope: OptionAccessScope, editor: VimEditor) {
     val newValue: OptionValue<T> = if (scope is OptionAccessScope.LOCAL && option.declaredScope.isGlobalLocal()
-      && (option is NumberOption || option is ToggleOption)) {
+      && (option is NumberOption || option is ToggleOption)
+    ) {
       OptionValue.Default(option.unsetValue)
-    }
-    else {
+    } else {
       storage.getOptionValue(option, OptionAccessScope.GLOBAL(editor))
     }
     doSetOptionValue(option, scope, newValue)
@@ -157,10 +169,12 @@ abstract class VimOptionGroupBase : VimOptionGroup {
           parsedValuesCache.reset(option, scope.editor)
           listeners.onEffectiveValueChanged(option, scope.editor)
         }
+
         is OptionAccessScope.LOCAL -> {
           parsedValuesCache.reset(option, scope.editor)
           listeners.onLocalValueChanged(option, scope.editor)
         }
+
         is OptionAccessScope.GLOBAL -> {
           if (option.declaredScope == GLOBAL) {
             // Don't reset the parsed effective value if we change the global value of local options
@@ -221,7 +235,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun <T : VimDataType> addGlobalOptionChangeListener(
     option: Option<T>,
-    listener: GlobalOptionChangeListener
+    listener: GlobalOptionChangeListener,
   ) {
     check(option.declaredScope == GLOBAL)
     listeners.addGlobalOptionChangeListener(option.name, listener)
@@ -229,21 +243,21 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun <T : VimDataType> removeGlobalOptionChangeListener(
     option: Option<T>,
-    listener: GlobalOptionChangeListener
+    listener: GlobalOptionChangeListener,
   ) {
     listeners.removeGlobalOptionChangeListener(option.name, listener)
   }
 
   override fun <T : VimDataType> addEffectiveOptionValueChangeListener(
     option: Option<T>,
-    listener: EffectiveOptionValueChangeListener
+    listener: EffectiveOptionValueChangeListener,
   ) {
     listeners.addEffectiveOptionValueChangeListener(option.name, listener)
   }
 
   override fun <T : VimDataType> removeEffectiveOptionValueChangeListener(
     option: Option<T>,
-    listener: EffectiveOptionValueChangeListener
+    listener: EffectiveOptionValueChangeListener,
   ) {
     listeners.removeEffectiveOptionValueChangeListener(option.name, listener)
   }
@@ -405,8 +419,8 @@ interface LocalOptionValueOverride<T : VimDataType> : OptionValueOverride<T> {
  * Setting the global value of the Vim option does not modify the external setting at all - the global value is a
  * Vim-only value used to initialise new windows.
  */
-abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(protected val option: Option<T>)
-  : LocalOptionValueOverride<T> {
+abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(protected val option: Option<T>) :
+  LocalOptionValueOverride<T> {
 
   /**
    * True if the user can modify the local value of the external global-local setting.
@@ -438,10 +452,12 @@ abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(pr
       } else {
         OptionValue.Default(ideValue)
       }
+
       is OptionValue.External,
       is OptionValue.InitVimRc,
       is OptionValue.User,
-      null -> {
+      null,
+        -> {
         // If the stored value matches the IDE value, return the stored value. If it has changed, it's been changed
         // externally. Note that stored value might be external. IdeaVim will never set that, but can copy it when
         // initialising a new window
@@ -460,6 +476,7 @@ abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(pr
           doResetLocalExternalValueToGlobal(editor)
         }
       }
+
       is OptionValue.InitVimRc -> {
         // Externally mapped options typically set the equivalent IDE setting's local value, rather than the persistent
         // global value. However, this means that modifying the global IDE value does not update/override currently open
@@ -475,6 +492,7 @@ abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(pr
           doSetLocalExternalValue(editor, newValue.value)
         }
       }
+
       is OptionValue.External -> {
         // The new value has been explicitly set by the user through the IDE, rather than using Vim commands. The only
         // way to get an External instance is through the getter for this option, which means we know this was copied
@@ -486,6 +504,7 @@ abstract class LocalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>(pr
           doSetLocalExternalValue(editor, newValue.value)
         }
       }
+
       is OptionValue.User -> {
         // The user is explicitly setting a value, so update the IntelliJ value
         if (getEffectiveExternalValue(editor) != newValue.value) {
@@ -612,23 +631,24 @@ abstract class GlobalOptionToGlobalLocalExternalSettingMapper<T : VimDataType>
       // explicitly sets the IdeaVim option
       val ideValue = editor?.let { getEffectiveExternalValue(it) } ?: getGlobalExternalValue()
       OptionValue.Default(ideValue)
-    }
-    else {
+    } else {
       storedValue
     }
   }
 
-  final override fun setGlobalValue(storedValue: OptionValue<T>, newValue: OptionValue<T>, editor: VimEditor?): Boolean {
+  final override fun setGlobalValue(
+    storedValue: OptionValue<T>,
+    newValue: OptionValue<T>,
+    editor: VimEditor?,
+  ): Boolean {
     if (newValue is OptionValue.Default) {
       val globalValue = getGlobalValue(storedValue, null)
       injector.editorGroup.getEditors().forEach { resetLocalExternalValue(it, globalValue.value) }
-    }
-    else {
+    } else {
       val globalValue = getGlobalValue(storedValue, null)
       if (globalValue.value != newValue.value) {
         injector.editorGroup.getEditors().forEach { setLocalExternalValue(it, newValue.value) }
-      }
-      else {
+      } else {
         injector.editorGroup.getEditors().forEach { resetLocalExternalValue(it, globalValue.value) }
       }
     }
@@ -770,13 +790,11 @@ abstract class GlobalLocalOptionToGlobalLocalExternalSettingMapper<T : VimDataTy
         val storedGlobalValue = this.storedGlobalValue
         if (newValue.value == option.unsetValue && storedGlobalValue != null && storedGlobalValue !is OptionValue.Default) {
           doForAllAffectedEditors(option, editor) { setLocalExternalValue(it, storedGlobalValue.value) }
-        }
-        else {
+        } else {
           doForAllAffectedEditors(option, editor) { removeLocalExternalValue(it) }
         }
       }
-    }
-    else {
+    } else {
       // The new value isn't default. It's been explicitly set by the user, so we should update the local external
       // value. We expect it to be OptionValue.User, rather than OptionValue.External, because global-local options do
       // not initialise values from the current value. But even so, just set the local external value.
@@ -853,7 +871,7 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
    * When setting an option, the value is a Vim default value. When getting a default option, the value might come from
    * an IDE setting, but still uses the [Default] wrapper type.
    */
-  class Default<T : VimDataType>(override val value: T): OptionValue<T>(value)
+  class Default<T : VimDataType>(override val value: T) : OptionValue<T>(value)
 
   /**
    * The option has been set explicitly, by the user as part of the initial evaluation of `~/.ideavimrc`.
@@ -872,7 +890,7 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
    * evaluated in the context of the current window, and existing window/buffer options are not updated (as per Vim).
    * Therefore, any options set during this subsequent evaluation are considered to be [User].
    */
-  class InitVimRc<T : VimDataType>(override val value: T): OptionValue<T>(value)
+  class InitVimRc<T : VimDataType>(override val value: T) : OptionValue<T>(value)
 
   /**
    * The option value has been explicitly set by the user, by Vim commands
@@ -880,7 +898,7 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
    * The value has been set using the `:set` commands. When getting a value, this type is used if the value has been
    * explicitly set by the user and the corresponding IDE setting (if any) still has the same value.
    */
-  class User<T : VimDataType>(override val value: T): OptionValue<T>(value)
+  class User<T : VimDataType>(override val value: T) : OptionValue<T>(value)
 
   /**
    * The option value has been explicitly set by the user, but changed through the IDE
@@ -894,7 +912,7 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
    * case, only the local value of the IDE setting is considered. Changes to the IDE setting's global value do not
    * override the local value unless some other mechanism resets the IDE setting's local value.
    */
-  class External<T : VimDataType>(override val value: T): OptionValue<T>(value)
+  class External<T : VimDataType>(override val value: T) : OptionValue<T>(value)
 
   override fun equals(other: Any?): Boolean {
     // For equality, we don't care about how the value is set. We're only interested in the wrapped value.
@@ -919,7 +937,8 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
  */
 private class OptionStorage {
   private val globalValues = mutableMapOf<String, OptionValue<out VimDataType>>()
-  private val perWindowGlobalOptionsKey = Key<MutableMap<String, OptionValue<out VimDataType>>>("vimPerWindowGlobalOptions")
+  private val perWindowGlobalOptionsKey =
+    Key<MutableMap<String, OptionValue<out VimDataType>>>("vimPerWindowGlobalOptions")
   private val localOptionsKey = Key<MutableMap<String, OptionValue<out VimDataType>>>("vimLocalOptions")
   private val overrides = mutableMapOf<String, OptionValueOverride<out VimDataType>>()
 
@@ -959,10 +978,10 @@ private class OptionStorage {
     val sourceEditor = getScopeEditor(sourceScope)
     val targetEditor = getScopeEditor(targetScope)
     return if (sourceEditor != null && targetEditor != null
-      && getLocalOptionValueOverride(option)?.canInitialiseOptionFrom(sourceEditor, targetEditor) == false) {
+      && getLocalOptionValueOverride(option)?.canInitialiseOptionFrom(sourceEditor, targetEditor) == false
+    ) {
       OptionValue.Default(option.defaultValue)
-    }
-    else {
+    } else {
       getOptionValue(option, sourceScope)
     }
   }
@@ -994,6 +1013,7 @@ private class OptionStorage {
         getLocalValue(option, editor).takeUnless { it.value == option.unsetValue }
           ?: getGlobalValue(option, editor)
       }
+
       GLOBAL_OR_LOCAL_TO_WINDOW -> {
         getLocalValue(option, editor).takeUnless { it.value == option.unsetValue }
           ?: getGlobalValue(option, editor)
@@ -1005,11 +1025,14 @@ private class OptionStorage {
     val values = if (option.declaredScope == LOCAL_TO_WINDOW) {
       check(editor != null) { "Editor must be provided for local options" }
       getPerWindowGlobalOptionStorage(editor)
-    }
-    else {
+    } else {
       globalValues
     }
-    return getOverriddenGlobalValue(option, getStoredValue(values, option) ?: OptionValue.Default(option.defaultValue), editor)
+    return getOverriddenGlobalValue(
+      option,
+      getStoredValue(values, option) ?: OptionValue.Default(option.defaultValue),
+      editor
+    )
   }
 
   private fun <T : VimDataType> getLocalValue(option: Option<T>, editor: VimEditor): OptionValue<T> {
@@ -1056,17 +1079,24 @@ private class OptionStorage {
     return storedValue
   }
 
-  private fun <T : VimDataType> setEffectiveValue(option: Option<T>, editor: VimEditor, value: OptionValue<T>): Boolean {
+  private fun <T : VimDataType> setEffectiveValue(
+    option: Option<T>,
+    editor: VimEditor,
+    value: OptionValue<T>,
+  ): Boolean {
     return when (option.declaredScope) {
       GLOBAL -> setGlobalValue(option, editor, value)
       LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> setLocalValue(option, editor, value).also {
         setGlobalValue(option, editor, value)
       }
+
       GLOBAL_OR_LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_WINDOW -> {
         var changed = false
         if (getLocalValue(option, editor).value != option.unsetValue) {
-          changed = setLocalValue(option, editor,
-            if (option is NumberOption || option is ToggleOption) value else OptionValue.Default(option.unsetValue))
+          changed = setLocalValue(
+            option, editor,
+            if (option is NumberOption || option is ToggleOption) value else OptionValue.Default(option.unsetValue)
+          )
         }
         setGlobalValue(option, editor, value) || changed
       }
@@ -1077,8 +1107,7 @@ private class OptionStorage {
     val values = if (option.declaredScope == LOCAL_TO_WINDOW) {
       check(editor != null) { "Editor must be provided for local options" }
       getPerWindowGlobalOptionStorage(editor)
-    }
-    else {
+    } else {
       globalValues
     }
     getGlobalOptionValueOverride(option)?.let {
@@ -1094,9 +1123,12 @@ private class OptionStorage {
     return when (option.declaredScope) {
       GLOBAL -> setGlobalValue(option, editor, value)
       LOCAL_TO_BUFFER,
-      GLOBAL_OR_LOCAL_TO_BUFFER -> setLocalValue(getBufferLocalOptionStorage(editor), option, editor, value)
+      GLOBAL_OR_LOCAL_TO_BUFFER,
+        -> setLocalValue(getBufferLocalOptionStorage(editor), option, editor, value)
+
       LOCAL_TO_WINDOW,
-      GLOBAL_OR_LOCAL_TO_WINDOW -> setLocalValue(getWindowLocalOptionStorage(editor), option, editor, value)
+      GLOBAL_OR_LOCAL_TO_WINDOW,
+        -> setLocalValue(getWindowLocalOptionStorage(editor), option, editor, value)
     }
   }
 
@@ -1157,8 +1189,7 @@ private class OptionStorage {
   private fun <T : VimDataType> getEmergencyFallbackLocalValue(option: Option<T>, editor: VimEditor?): OptionValue<T> {
     return if (option.declaredScope.isGlobalLocal()) {
       OptionValue.Default(option.unsetValue)
-    }
-    else {
+    } else {
       getGlobalValue(option, editor)
     }
   }
@@ -1341,13 +1372,11 @@ private class OptionInitialisationStrategy(private val storage: OptionStorage) {
   ): OptionValue<VimDataType> {
     return if (option.isLocalNoGlobal) {
       OptionValue.Default(option.defaultValue)
-    }
-    else {
+    } else {
       storage.getOptionValueForInitialisation(option, sourceScope, targetScope)
     }
   }
 }
-
 
 
 private fun <T : VimDataType> OptionStorage.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
@@ -1388,7 +1417,9 @@ private class OptionListenersImpl(private val optionStorage: OptionStorage, priv
   fun onGlobalValueChanged(option: Option<out VimDataType>) {
     when (option.declaredScope) {
       GLOBAL -> onGlobalOptionChanged(option.name)
-      LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> { /* Setting global value of a local option. No need to notify anyone */ }
+      LOCAL_TO_BUFFER, LOCAL_TO_WINDOW -> { /* Setting global value of a local option. No need to notify anyone */
+      }
+
       GLOBAL_OR_LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_WINDOW -> onGlobalLocalOptionGlobalValueChanged(option)
     }
   }
@@ -1485,8 +1516,7 @@ private class OptionListenersImpl(private val optionStorage: OptionStorage, priv
 
     if (option.declaredScope == GLOBAL_OR_LOCAL_TO_WINDOW) {
       if (!optionStorage.isUnsetValue(option, editor)) affectedEditors.add(editor)
-    }
-    else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
+    } else if (option.declaredScope == GLOBAL_OR_LOCAL_TO_BUFFER) {
       affectedEditors.addAll(editorGroup.getEditors(editor.document).filter { !optionStorage.isUnsetValue(option, it) })
     }
 
@@ -1552,6 +1582,7 @@ private class ParsedValuesCache(
         check(editor != null) { "Editor must be supplied for local options" }
         storageService.getOrPutWindowData(editor, parsedEffectiveValueKey) { mutableMapOf() }
       }
+
       LOCAL_TO_BUFFER, GLOBAL_OR_LOCAL_TO_BUFFER -> {
         check(editor != null) { "Editor must be supplied for local options" }
         storageService.getOrPutBufferData(editor, parsedEffectiveValueKey) { mutableMapOf() }

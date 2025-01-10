@@ -22,7 +22,12 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 class MoveToPreviousWordAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
 
     val text = commandLine.actualText
@@ -31,6 +36,7 @@ class MoveToPreviousWordAction : VimActionHandler.SingleExecution() {
       is Motion.AbsoluteOffset -> {
         commandLine.caret.offset = motion.offset
       }
+
       else -> {}
     }
     return true

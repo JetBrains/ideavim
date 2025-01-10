@@ -48,13 +48,15 @@ sealed class VimSelection {
   companion object {
     fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor): VimSelection = when (type) {
       CHARACTER_WISE -> {
-        val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+        val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(CHARACTER_WISE))
         VimCharacterSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
       }
+
       LINE_WISE -> {
         val nativeSelection = lineToNativeSelection(editor, vimStart, vimEnd)
         VimLineSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
       }
+
       BLOCK_WISE -> VimBlockSelection(vimStart, vimEnd, editor, false)
     }
   }
@@ -152,8 +154,11 @@ class VimBlockSelection(
   override val editor: VimEditor,
   private val toLineEnd: Boolean,
 ) : VimSelection() {
-  override fun getNativeStartAndEnd(): Pair<Int, Int> = blockToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(
-    SelectionType.CHARACTER_WISE)).let {
+  override fun getNativeStartAndEnd(): Pair<Int, Int> = blockToNativeSelection(
+    editor, vimStart, vimEnd, Mode.VISUAL(
+      CHARACTER_WISE
+    )
+  ).let {
     editor.bufferPositionToOffset(it.first) to editor.bufferPositionToOffset(it.second)
   }
 
@@ -170,7 +175,12 @@ class VimBlockSelection(
   }
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
-    val (startPosition, endPosition) = blockToNativeSelection(editor, vimStart, vimEnd, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    val (startPosition, endPosition) = blockToNativeSelection(
+      editor,
+      vimStart,
+      vimEnd,
+      Mode.VISUAL(CHARACTER_WISE)
+    )
     val lineRange =
       if (startPosition.line > endPosition.line) endPosition.line..startPosition.line else startPosition.line..endPosition.line
     lineRange.map { line ->

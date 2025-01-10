@@ -215,7 +215,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     if (enabled) {
       VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOn();
-    } else {
+    }
+    else {
       VimInjectorKt.getInjector().getListenersNotifier().notifyPluginTurnedOff();
     }
 

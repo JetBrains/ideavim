@@ -37,20 +37,25 @@ data class SelectionInfo(var start: BufferPosition?, var end: BufferPosition?, v
   fun getSelectionRange(editor: VimEditor): TextRange? {
     val (sortedStart, sortedEnd) = startEndSorted ?: return null
     return when (selectionType) {
-      SelectionType.CHARACTER_WISE -> TextRange(editor.bufferPositionToOffset(sortedStart), editor.bufferPositionToOffset(sortedEnd) + 1)
+      SelectionType.CHARACTER_WISE -> TextRange(
+        editor.bufferPositionToOffset(sortedStart),
+        editor.bufferPositionToOffset(sortedEnd) + 1
+      )
+
       SelectionType.LINE_WISE -> {
         val startOffset = editor.getLineStartOffset(sortedStart.line)
         val endOffset = editor.getLineEndOffset(sortedEnd.line, true) + 1
         return TextRange(startOffset, endOffset)
       }
+
       SelectionType.BLOCK_WISE -> {
         val topLine = sortedStart.line
         val bottomLine = sortedEnd.line
         val leftColumn = min(sortedStart.column, sortedEnd.column)
         val rightColumn = max(sortedStart.column, sortedEnd.column)
 
-        val startOffsets  = (topLine .. bottomLine).map { editor.getOffset(it, leftColumn) }.toIntArray()
-        val endOffsets  = (topLine .. bottomLine).map { editor.getOffset(it, rightColumn) + 1 }.toIntArray()
+        val startOffsets = (topLine..bottomLine).map { editor.getOffset(it, leftColumn) }.toIntArray()
+        val endOffsets = (topLine..bottomLine).map { editor.getOffset(it, rightColumn) + 1 }.toIntArray()
         return TextRange(startOffsets, endOffsets)
       }
     }

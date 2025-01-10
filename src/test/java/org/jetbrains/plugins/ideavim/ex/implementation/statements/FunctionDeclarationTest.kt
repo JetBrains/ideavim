@@ -484,12 +484,14 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("1,4call F1()"))
     assertPluginError(false)
-    assertExOutput("""
+    assertExOutput(
+      """
       1:4
       1:4
       1:4
       1:4
-    """.trimIndent())
+    """.trimIndent()
+    )
     assertState(
       """
         -----

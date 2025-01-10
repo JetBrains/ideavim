@@ -28,11 +28,15 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
 
-@State(name = "VimJumpsSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
+@State(
+  name = "VimJumpsSettings",
+  storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
+)
 internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Element?> {
   companion object {
     private val logger = vimLogger<VimJumpServiceImpl>()
   }
+
   override var lastJumpTimeStamp: Long = 0
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
@@ -93,7 +97,7 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
     initInjector()
     if (!injector.globalIjOptions().unifyjumps) return
-    
+
     val jumpService = injector.jumpService
     if (!isChanged) {
       if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously, and
@@ -105,7 +109,7 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
   override fun recentPlaceRemoved(changePlace: PlaceInfo, isChanged: Boolean) {
     if (!injector.globalIjOptions().unifyjumps) return
-    
+
     val jumpService = injector.jumpService
     if (!isChanged) {
       if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously, and

@@ -45,6 +45,7 @@ enum class AssignmentOperator(val value: String) {
           AdditionHandler.performOperation(left!!, right)
         }
       }
+
       SUBTRACTION -> SubtractionHandler.performOperation(left!!, right)
       MULTIPLICATION -> MultiplicationHandler.performOperation(left!!, right)
       DIVISION -> DivisionHandler.performOperation(left!!, right)

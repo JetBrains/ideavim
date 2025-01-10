@@ -66,7 +66,8 @@ class EffectiveOptionChangeListenerTest : VimNoWriteActionTestCase() {
     super.setUp(testInfo)
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
-    manager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+    manager =
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     // Create a new editor that will represent a new buffer in a separate window. It will have default values
@@ -188,7 +189,11 @@ class EffectiveOptionChangeListenerTest : VimNoWriteActionTestCase() {
   @Test
   fun `test listener not called when global option set to current value at effective scope`() {
     val option = addOption(OptionDeclaredScope.GLOBAL)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim), VimString(defaultValue))
+    injector.optionGroup.setOptionValue(
+      option,
+      OptionAccessScope.EFFECTIVE(fixture.editor.vim),
+      VimString(defaultValue)
+    )
 
     assertNoNotifications()
   }
@@ -228,7 +233,11 @@ class EffectiveOptionChangeListenerTest : VimNoWriteActionTestCase() {
   @Test
   fun `test listener not called when local-to-buffer option set to current value at effective scope`() {
     val option = addOption(OptionDeclaredScope.LOCAL_TO_BUFFER)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(originalEditor.vim), VimString(defaultValue))
+    injector.optionGroup.setOptionValue(
+      option,
+      OptionAccessScope.EFFECTIVE(originalEditor.vim),
+      VimString(defaultValue)
+    )
 
     assertNoNotifications()
   }
@@ -268,7 +277,11 @@ class EffectiveOptionChangeListenerTest : VimNoWriteActionTestCase() {
   @Test
   fun `test listener not called when local-to-window option set to current value at effective scope`() {
     val option = addOption(OptionDeclaredScope.LOCAL_TO_WINDOW)
-    injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(originalEditor.vim), VimString(defaultValue))
+    injector.optionGroup.setOptionValue(
+      option,
+      OptionAccessScope.EFFECTIVE(originalEditor.vim),
+      VimString(defaultValue)
+    )
 
     assertNoNotifications()
   }

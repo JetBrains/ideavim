@@ -215,6 +215,7 @@ internal class NotificationService(private val project: Project?) {
           is KeyMapIssue.AddShortcut -> {
             appendLine("- ${it.key} key is not assigned to the ${it.action} action.<br/>")
           }
+
           is KeyMapIssue.RemoveShortcut -> {
             appendLine("- ${it.shortcut} key is incorrectly assigned to the ${it.action} action.<br/>")
           }
@@ -296,23 +297,25 @@ internal class NotificationService(private val project: Project?) {
         }
       } + "<small>See the ${ActionCenter.getToolwindowName()} tool window for previous IDs</small>"
 
-      notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).also {
-        it.whenExpired { notification = null }
-        it.addAction(StopTracking())
+      notification =
+        Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).also {
+          it.whenExpired { notification = null }
+          it.addAction(StopTracking())
 
-        if (id != null || possibleIDs?.size == 1) {
-          it.addAction(CopyActionId(id ?: possibleIDs?.get(0), project))
+          if (id != null || possibleIDs?.size == 1) {
+            it.addAction(CopyActionId(id ?: possibleIDs?.get(0), project))
+          }
+
+          it.notify(project)
         }
-
-        it.notify(project)
-      }
 
       if (id != null) {
         ActionTracker.Util.logTrackedAction(id)
       }
     }
 
-    class CopyActionId(val id: String?, val project: Project?) : DumbAwareAction(MessageHelper.message("action.copy.action.id.text")) {
+    class CopyActionId(val id: String?, val project: Project?) :
+      DumbAwareAction(MessageHelper.message("action.copy.action.id.text")) {
       override fun actionPerformed(e: AnActionEvent) {
         CopyPasteManager.getInstance().setContents(StringSelection(id ?: ""))
         if (id != null) {

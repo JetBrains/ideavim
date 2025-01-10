@@ -50,7 +50,8 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   ): Motion {
     val templateState = injector.templateManager.getTemplateState(editor)
     return if (templateState != null) {
-      injector.actionExecutor.executeAction(editor,
+      injector.actionExecutor.executeAction(
+        editor,
         name = injector.actionExecutor.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE,
         context = context
       )

@@ -17,7 +17,8 @@ import javax.swing.KeyStroke
 
 abstract class VimCaretBase : VimCaret
 
-open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : CaretRegisterStorage, VimRegisterGroupBase() {
+open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : CaretRegisterStorage,
+  VimRegisterGroupBase() {
   companion object {
     private const val ALLOWED_TO_STORE_REGISTERS = RegisterConstants.RECORDABLE_REGISTERS +
       RegisterConstants.SMALL_DELETION_REGISTER +
@@ -44,7 +45,13 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
     return storeText(editor, context, caret, range, type, isDelete)
   }
 
-  override fun storeText(editor: VimEditor, context: ExecutionContext, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
+  override fun storeText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    range: TextRange,
+    type: SelectionType,
+    isDelete: Boolean,
+  ): Boolean {
     val registerChar = if (caret.editor.carets().size == 1) currentRegister else getCurrentRegisterForMulticaret()
     if (caret.isPrimary) {
       val registerService = injector.registerGroup
@@ -58,7 +65,7 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
       return storeTextInternal(editor, context, range, text, type, registerChar, isDelete)
     }
   }
-  
+
   override fun getRegister(r: Char): Register? {
     val editorStub = injector.fallbackWindow
     val contextStub = injector.executionContextManager.getEditorExecutionContext(editorStub)
@@ -77,7 +84,7 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
     val contextStub = injector.executionContextManager.getEditorExecutionContext(editorStub)
     setKeys(editorStub, contextStub, register, keys)
   }
-  
+
   override fun setKeys(editor: VimEditor, context: ExecutionContext, register: Char, keys: List<KeyStroke>) {
     if (caret.isPrimary) {
       injector.registerGroup.setKeys(register, keys)
@@ -93,6 +100,7 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
     val contextStub = injector.executionContextManager.getEditorExecutionContext(editorStub)
     saveRegister(editorStub, contextStub, r, register)
   }
+
   override fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register) {
     if (caret.isPrimary) {
       injector.registerGroup.saveRegister(editor, context, r, register)

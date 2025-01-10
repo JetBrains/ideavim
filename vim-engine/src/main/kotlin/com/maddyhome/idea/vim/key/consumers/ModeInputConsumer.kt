@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
-class ModeInputConsumer: KeyConsumer {
+class ModeInputConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<ModeInputConsumer>()
   }
@@ -37,11 +37,13 @@ class ModeInputConsumer: KeyConsumer {
         val keyProcessed = injector.changeGroup.processKey(editor, key, keyProcessResultBuilder)
         keyProcessed
       }
+
       is Mode.SELECT -> {
         logger.trace("Process select")
         val keyProcessed = injector.changeGroup.processKeyInSelectMode(editor, key, keyProcessResultBuilder)
         keyProcessed
       }
+
       is Mode.CMD_LINE -> {
         val commandLine = injector.commandLine.getActiveCommandLine()
         if (commandLine != null) {
@@ -57,6 +59,7 @@ class ModeInputConsumer: KeyConsumer {
         }
         true
       }
+
       else -> {
         false
       }

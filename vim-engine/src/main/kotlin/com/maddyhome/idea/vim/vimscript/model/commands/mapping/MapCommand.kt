@@ -37,10 +37,15 @@ import javax.swing.KeyStroke
 data class MapCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     return if (executeCommand(editor)) ExecutionResult.Success else ExecutionResult.Error
   }
 
@@ -84,7 +89,14 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
     if (arguments.specialArguments.contains(EXPR)) {
       injector.statisticsService.setIfMapExprUsed(true)
       injector.keyGroup
-        .putKeyMapping(modes, arguments.fromKeys, mappingOwner, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
+        .putKeyMapping(
+          modes,
+          arguments.fromKeys,
+          mappingOwner,
+          arguments.toExpr,
+          arguments.secondArgument,
+          commandInfo.isRecursive
+        )
     } else {
       val mapping = transformOldActionSyntax(arguments.secondArgument)
       val toKeys = injector.parser.parseKeys(mapping)
@@ -209,7 +221,8 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
     }
     return fromKeys?.let {
       val toExpr = if (specialArguments.contains(EXPR)) {
-        injector.vimscriptParser.parseExpression(toKeysBuilder.toString().trim()) ?: throw ExException("E15: Invalid expression: ${toKeysBuilder.toString().trim()}")
+        injector.vimscriptParser.parseExpression(toKeysBuilder.toString().trim())
+          ?: throw ExException("E15: Invalid expression: ${toKeysBuilder.toString().trim()}")
       } else {
         SimpleExpression(toKeysBuilder.toString().trimStart())
       }

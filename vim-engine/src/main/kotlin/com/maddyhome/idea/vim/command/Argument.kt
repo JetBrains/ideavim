@@ -49,7 +49,7 @@ sealed class Argument {
   class Motion private constructor(val motion: EditorActionHandlerBase, val argument: Argument? = null) : Argument() {
     constructor(motion: MotionActionHandler, argument: Argument?) : this(motion as EditorActionHandlerBase, argument)
     constructor(motion: TextObjectActionHandler) : this(motion as EditorActionHandlerBase)
-    constructor(motion: ExternalActionHandler) : this (motion as EditorActionHandlerBase)
+    constructor(motion: ExternalActionHandler) : this(motion as EditorActionHandlerBase)
 
     fun getMotionType() = if (isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
 

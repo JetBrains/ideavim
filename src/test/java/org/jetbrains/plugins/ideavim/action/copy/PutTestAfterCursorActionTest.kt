@@ -88,7 +88,14 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    registerService.storeText(
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "A Discovery\n",
+      SelectionType.LINE_WISE,
+      false
+    )
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -161,7 +168,14 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    registerService.storeText(
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "Discovery",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
     typeText(injector.parser.parseKeys("vep"))
     val after = """
             A Discovery

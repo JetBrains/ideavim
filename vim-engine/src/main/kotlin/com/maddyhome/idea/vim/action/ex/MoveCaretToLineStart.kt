@@ -18,10 +18,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<C-B>", "<Home>"], modes = [Mode.CMD_LINE])
-class MoveCaretToLineStart : VimActionHandler.SingleExecution()  {
+class MoveCaretToLineStart : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
     commandLine.caret.offset = 0
     return true

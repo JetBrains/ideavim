@@ -43,6 +43,7 @@ interface ImmutableVimCaret {
 
   @RWLockLabel.Readonly
   val selectionStart: Int
+
   @RWLockLabel.Readonly
   val selectionEnd: Int
   val vimSelectionStart: Int
@@ -159,7 +160,13 @@ interface CaretRegisterStorage {
    */
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
-  fun storeText(editor: VimEditor, context: ExecutionContext, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
+  fun storeText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    range: TextRange,
+    type: SelectionType,
+    isDelete: Boolean,
+  ): Boolean
 
   /**
    * Gets text from caret's recordable register
@@ -172,7 +179,7 @@ interface CaretRegisterStorage {
   @Deprecated("Please use com.maddyhome.idea.vim.api.CaretRegisterStorage#setKeys(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.util.List<? extends javax.swing.KeyStroke>)")
   fun setKeys(register: Char, keys: List<KeyStroke>)
   fun setKeys(editor: VimEditor, context: ExecutionContext, register: Char, keys: List<KeyStroke>)
-  
+
   @Deprecated("Please use com.maddyhome.idea.vim.api.CaretRegisterStorage#saveRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, com.maddyhome.idea.vim.register.Register)")
   fun saveRegister(r: Char, register: Register)
   fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register)

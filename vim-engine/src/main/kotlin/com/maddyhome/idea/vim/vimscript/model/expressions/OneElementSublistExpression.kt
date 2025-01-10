@@ -36,7 +36,11 @@ data class OneElementSublistExpression(val index: Expression, val expression: Ex
       if (indexValue < 0) {
         return VimString("")
       }
-      return SublistExpression(SimpleExpression(indexValue), SimpleExpression(indexValue), SimpleExpression(expressionValue)).evaluate(editor, context, vimContext)
+      return SublistExpression(
+        SimpleExpression(indexValue),
+        SimpleExpression(indexValue),
+        SimpleExpression(expressionValue)
+      ).evaluate(editor, context, vimContext)
     }
   }
 }

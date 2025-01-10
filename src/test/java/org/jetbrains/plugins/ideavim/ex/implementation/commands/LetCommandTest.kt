@@ -141,9 +141,10 @@ class LetCommandTest : VimTestCase() {
       val localValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim))
       assertEquals(12, globalValue.value)
       assertEquals(12, localValue.value)
-      assertTrue(injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean())
-    }
-    finally {
+      assertTrue(
+        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean()
+      )
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -161,9 +162,10 @@ class LetCommandTest : VimTestCase() {
       val localValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim))
       assertEquals(0, globalValue.value)
       assertEquals(12, localValue.value)
-      assertTrue(injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean())
-    }
-    finally {
+      assertTrue(
+        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean()
+      )
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -184,8 +186,7 @@ class LetCommandTest : VimTestCase() {
       assertFalse(
         injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean()
       )
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }

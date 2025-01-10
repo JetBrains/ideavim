@@ -17,7 +17,14 @@ import com.maddyhome.idea.vim.handler.Motion
 interface VimMotionGroup {
 
   // Note that the following methods require the caret to access the intended vertical position, such as "end of line"
-  fun getHorizontalMotion(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowPastEnd: Boolean, allowWrap: Boolean = false): Motion
+  fun getHorizontalMotion(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    allowPastEnd: Boolean,
+    allowWrap: Boolean = false,
+  ): Motion
+
   fun getVerticalMotionOffset(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
 
 // TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
@@ -33,15 +40,32 @@ interface VimMotionGroup {
 
   // Move caret relative to current line
   fun moveCaretToRelativeLineStartSkipLeading(editor: VimEditor, caret: ImmutableVimCaret, linesOffset: Int): Int
-  fun moveCaretToRelativeLineEnd(editor: VimEditor, caret: ImmutableVimCaret, cntForward: Int, allowPastEnd: Boolean): Int
+  fun moveCaretToRelativeLineEnd(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    cntForward: Int,
+    allowPastEnd: Boolean,
+  ): Int
+
   fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: ImmutableVimCaret, linesOffset: Int): Int
 
   // Move caret to (IntelliJ visual) line relative to the bounds of the display (aka window)
   // (This describes what these public functions *currently* do, not what they are *supposed* to do)
   // TODO: These should move to the Vim logical line at the top/bottom/middle of the display
-  fun moveCaretToFirstDisplayLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, normalizeToScreen: Boolean): Int
+  fun moveCaretToFirstDisplayLine(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    normalizeToScreen: Boolean,
+  ): Int
+
   fun moveCaretToMiddleDisplayLine(editor: VimEditor, caret: ImmutableVimCaret): Int
-  fun moveCaretToLastDisplayLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, normalizeToScreen: Boolean): Int
+  fun moveCaretToLastDisplayLine(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    normalizeToScreen: Boolean,
+  ): Int
 
   // Move caret to buffer column
   fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion
@@ -84,7 +108,14 @@ interface VimMotionGroup {
    * @param editor      The editor that provides local to buffer option values
    * @return a [Motion] representing the offset to move to, or [Motion.Error] if not found
    */
-  fun findOffsetOfNextWord(text: CharSequence, textLength: Int = text.length, searchFrom: Int, count: Int, bigWord: Boolean, editor: VimEditor): Motion
+  fun findOffsetOfNextWord(
+    text: CharSequence,
+    textLength: Int = text.length,
+    searchFrom: Int,
+    count: Int,
+    bigWord: Boolean,
+    editor: VimEditor,
+  ): Motion
 
   // Next/previous matching character - f/F and t/T motions
   val lastFTCmd: TillCharacterMotionType
@@ -116,7 +147,13 @@ interface VimMotionGroup {
 
   fun repeatLastMatchChar(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
 
-  fun getMotionRange(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
+  fun getMotionRange(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): TextRange?
 
   // TODO: These aren't caret motions. Should be moved to VimWindowGroup?
   fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int

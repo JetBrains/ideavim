@@ -24,9 +24,19 @@ abstract class FunctionHandler {
   abstract val maximumNumberOfArguments: Int?
   var range: Range? = null
 
-  protected abstract fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
+  protected abstract fun doFunction(
+    argumentValues: List<Expression>,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType
 
-  fun executeFunction(arguments: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  fun executeFunction(
+    arguments: List<Expression>,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType {
     checkFunctionCall(arguments)
     val result = doFunction(arguments, editor, context, vimContext)
     range = null

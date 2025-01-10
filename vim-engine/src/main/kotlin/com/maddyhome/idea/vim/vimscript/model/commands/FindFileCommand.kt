@@ -23,9 +23,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class FindFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val arg = argument
     if (arg.isNotEmpty()) {
       val res = injector.file.openFile(arg, context)
@@ -36,7 +41,13 @@ data class FindFileCommand(val range: Range, val modifier: CommandModifier, val 
       return if (res) ExecutionResult.Success else ExecutionResult.Error
     }
 
-    injector.application.invokeLater { injector.actionExecutor.executeAction(editor, name = "GotoFile", context = context) }
+    injector.application.invokeLater {
+      injector.actionExecutor.executeAction(
+        editor,
+        name = "GotoFile",
+        context = context
+      )
+    }
 
     return ExecutionResult.Success
   }

@@ -15,18 +15,22 @@ import org.junit.jupiter.api.Test
 class DeleteLinesCommandTest : VimTestCase() {
   @Test
   fun `test delete command without range`() {
-    configureByText("""
+    configureByText(
+      """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
     enterCommand("d")
-    assertState("""
+    assertState(
+      """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       ${c}Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
@@ -128,7 +132,7 @@ class DeleteLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
   }
-  
+
   @Test
   fun `test delete command with missing end address in range`() {
     doTest(
@@ -431,8 +435,10 @@ class DeleteLinesCommandTest : VimTestCase() {
         |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
       """.trimMargin()
     )
-    assertRegister('a', "Morbi nec luctus tortor, id venenatis lacus.^J" +
-      "Nunc sit amet tellus vel purus cursus posuere et at purus.^J" +
-      "Ut id dapibus augue.^J")
+    assertRegister(
+      'a', "Morbi nec luctus tortor, id venenatis lacus.^J" +
+        "Nunc sit amet tellus vel purus cursus posuere et at purus.^J" +
+        "Ut id dapibus augue.^J"
+    )
   }
 }

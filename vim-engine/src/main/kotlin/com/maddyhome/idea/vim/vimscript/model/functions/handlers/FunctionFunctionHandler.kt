@@ -39,8 +39,9 @@ internal class FunctionFunctionHandler : FunctionHandler() {
       throw ExException("E129: Function name required")
     }
     val scopeAndName = arg1.value.extractScopeAndName()
-    val function = injector.functionService.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
-      ?: throw ExException("E700: Unknown function: ${if (scopeAndName.first != null) scopeAndName.first!!.c + ":" else ""}${scopeAndName.second}")
+    val function =
+      injector.functionService.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
+        ?: throw ExException("E700: Unknown function: ${if (scopeAndName.first != null) scopeAndName.first!!.c + ":" else ""}${scopeAndName.second}")
 
     var arglist: VimList? = null
     var dictionary: VimDictionary? = null

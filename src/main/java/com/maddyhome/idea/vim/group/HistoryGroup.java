@@ -28,8 +28,7 @@ import java.util.List;
 import static com.maddyhome.idea.vim.history.HistoryConstants.*;
 
 @State(name = "VimHistorySettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
-})
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)})
 public class HistoryGroup extends VimHistoryBase implements PersistentStateComponent<Element> {
 
   public void saveData(@NotNull Element element) {
@@ -108,7 +107,7 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
       return INPUT;
     }
     if (type instanceof VimHistory.Type.Custom) {
-      return ((Type.Custom) type).getId();
+      return ((Type.Custom)type).getId();
     }
     return "unreachable";
   }

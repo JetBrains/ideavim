@@ -22,7 +22,7 @@ internal class NFA private constructor(
   /**
    * The end state of the NFA
    */
-  internal var acceptState: NFAState
+  internal var acceptState: NFAState,
 ) {
 
   /**
@@ -81,7 +81,7 @@ internal class NFA private constructor(
     val newStart = NFAState()
     val newEnd = NFAState()
 
-    if (isGreedy){
+    if (isGreedy) {
       newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
       newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
 
@@ -116,8 +116,7 @@ internal class NFA private constructor(
     if (isGreedy) {
       newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
       newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
-    }
-    else {
+    } else {
       newStart.addTransition(NFATransition(EpsilonMatcher(), newEnd))
       newStart.addTransition(NFATransition(EpsilonMatcher(), startState))
     }
@@ -195,7 +194,7 @@ internal class NFA private constructor(
      *
      * @return The new NFA instance
      */
-    internal fun fromSingleState() : NFA {
+    internal fun fromSingleState(): NFA {
       val state = NFAState()
       return NFA(state, state)
     }
@@ -210,7 +209,7 @@ internal class NFA private constructor(
      * @param matcher The matcher used for the transition
      * @return The new NFA instance
      */
-    internal fun fromMatcher(matcher: Matcher) : NFA {
+    internal fun fromMatcher(matcher: Matcher): NFA {
       val startState = NFAState()
       val acceptState = NFAState()
 

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory
 import com.maddyhome.idea.vim.ui.widgets.mode.VimModeWidget
 import com.maddyhome.idea.vim.ui.widgets.mode.updateModeWidget
 
-internal class ModeWidgetListener: ModeChangeListener, EditorListener, VimWidgetListener({ updateModeWidget()}) {
+internal class ModeWidgetListener : ModeChangeListener, EditorListener, VimWidgetListener({ updateModeWidget() }) {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     val modeWidget = getWidget(editor) ?: return
     val editorMode = editor.mode

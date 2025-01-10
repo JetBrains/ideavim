@@ -127,6 +127,7 @@ sealed class Command(
           true,
         )
       }
+
       is SingleExecution -> result = processCommand(editor, context, operatorArguments)
     }
     return result
@@ -158,8 +159,7 @@ sealed class Command(
     // It would be nice to do this in the constructor, but argFlags is abstract, so we can't access it
     if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
       commandRange.defaultRange = "1"
-    }
-    else {
+    } else {
       commandRange.defaultRange = defaultRange
     }
   }
@@ -341,8 +341,7 @@ sealed class Command(
   fun getLineRangeSafe(editor: VimEditor): LineRange? {
     try {
       validate(editor)
-    }
-    catch (_: Throwable) {
+    } catch (_: Throwable) {
       return null
     }
     return getLineRange(editor)

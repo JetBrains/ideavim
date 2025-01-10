@@ -418,7 +418,10 @@ class ScrollOffOptionMapperTest : VimTestCase() {
     // set global value to default, but not resetting the local intellij value...
 
     assertCommandOutput("set scrolloff?", "  scrolloff=10")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=20") // Vim is default of 0, but we want to use global intellij value
+    assertCommandOutput(
+      "setglobal scrolloff?",
+      "  scrolloff=20"
+    ) // Vim is default of 0, but we want to use global intellij value
     assertCommandOutput("setlocal scrolloff?", "  scrolloff=10")
     assertEquals(0, fixture.editor.settings.verticalScrollOffset)
 

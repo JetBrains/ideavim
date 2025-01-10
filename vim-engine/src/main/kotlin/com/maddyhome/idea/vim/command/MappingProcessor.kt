@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.key.isPrefix
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
-object MappingProcessor: KeyConsumer {
+object MappingProcessor : KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()
 
@@ -106,11 +106,21 @@ object MappingProcessor: KeyConsumer {
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
-    processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext -> processUnfinishedMappingSequence(lambdaEditor, lambdaContext, lambdaKeyState) }
+    processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
+      processUnfinishedMappingSequence(
+        lambdaEditor,
+        lambdaContext,
+        lambdaKeyState
+      )
+    }
     return true
   }
 
-  private fun processUnfinishedMappingSequence(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
+  private fun processUnfinishedMappingSequence(
+    editor: VimEditor,
+    context: ExecutionContext,
+    keyState: KeyHandlerState,
+  ) {
     if (injector.options(editor).timeout) {
       log.trace("timeout is set. schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
@@ -188,7 +198,16 @@ object MappingProcessor: KeyConsumer {
       log.trace("Cannot find any mapping info for the sequence. Return false.")
       return false
     }
-    processBuilder.addExecutionStep { b, c, d -> processCompleteMappingSequence(key, b, c, d, mappingInfo, currentMappingInfo) }
+    processBuilder.addExecutionStep { b, c, d ->
+      processCompleteMappingSequence(
+        key,
+        b,
+        c,
+        d,
+        mappingInfo,
+        currentMappingInfo
+      )
+    }
     return true
   }
 
@@ -259,11 +278,17 @@ object MappingProcessor: KeyConsumer {
     //  After the user enters `I`, the caught `d` should be processed without mapping, and the rest of keys
     //  should be processed with mappings (to make I work)
     processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
-      processAbondonedMappingSequence(unhandledKeyStrokes, lambdaEditor, lambdaContext, lambdaKeyState) }
+      processAbondonedMappingSequence(unhandledKeyStrokes, lambdaEditor, lambdaContext, lambdaKeyState)
+    }
     return true
   }
 
-  private fun processAbondonedMappingSequence(unhandledKeyStrokes: List<KeyStroke>, editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
+  private fun processAbondonedMappingSequence(
+    unhandledKeyStrokes: List<KeyStroke>,
+    editor: VimEditor,
+    context: ExecutionContext,
+    keyState: KeyHandlerState,
+  ) {
     if (isPluginMapping(unhandledKeyStrokes)) {
       log.trace("This is a plugin mapping, process it")
       KeyHandler.getInstance().handleKey(
@@ -277,7 +302,14 @@ object MappingProcessor: KeyConsumer {
     } else {
       log.trace("Process abandoned keys.")
       KeyHandler.getInstance()
-        .handleKey(editor, unhandledKeyStrokes[0], context, allowKeyMappings = false, mappingCompleted = false, keyState)
+        .handleKey(
+          editor,
+          unhandledKeyStrokes[0],
+          context,
+          allowKeyMappings = false,
+          mappingCompleted = false,
+          keyState
+        )
       for (keyStroke in unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size)) {
         KeyHandler.getInstance()
           .handleKey(editor, keyStroke, context, allowKeyMappings = true, mappingCompleted = false, keyState)

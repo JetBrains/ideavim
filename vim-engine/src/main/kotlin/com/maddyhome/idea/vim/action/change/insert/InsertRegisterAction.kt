@@ -40,8 +40,9 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
       injector.commandLine.readInputAndProcess(editor, context, "=", finishOn = null) { input ->
         try {
           if (input.isNotEmpty()) {
-            val expression = injector.vimscriptParser.parseExpression(input)?.evaluate(editor, context, Script(listOf()))
-              ?: throw ExException("E15: Invalid expression: $input")
+            val expression =
+              injector.vimscriptParser.parseExpression(input)?.evaluate(editor, context, Script(listOf()))
+                ?: throw ExException("E15: Invalid expression: $input")
             val textToStore = expression.toInsertableString()
             injector.registerGroup.storeTextSpecial('=', textToStore)
           }
@@ -70,8 +71,13 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
 private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
   val register: Register? = injector.registerGroup.getRegister(editor, context, key)
   if (register != null) {
-    val textData = PutData.TextData(register.name, injector.clipboardManager.dumbCopiedText(register.text), SelectionType.CHARACTER_WISE)
-    val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)
+    val textData = PutData.TextData(
+      register.name,
+      injector.clipboardManager.dumbCopiedText(register.text),
+      SelectionType.CHARACTER_WISE
+    )
+    val putData =
+      PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)
     injector.put.putText(editor, context, putData)
     return true
   }

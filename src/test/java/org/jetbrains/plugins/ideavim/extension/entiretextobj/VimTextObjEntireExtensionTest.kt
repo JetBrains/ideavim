@@ -102,7 +102,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
   // |d| |ae|
   @VimBehaviorDiffers(
     originalVimAfter =
-    "\n  \n \n<caret>\n\n  \n \n",
+      "\n  \n \n<caret>\n\n  \n \n",
     description = "Our code changes the motion type to linewise, but it should not",
   )
   @Test

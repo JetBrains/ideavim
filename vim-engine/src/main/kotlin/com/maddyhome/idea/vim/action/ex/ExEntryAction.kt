@@ -24,7 +24,12 @@ class ExEntryAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX)
   override val type: Command.Type = Command.Type.MODE_CHANGE
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     if (editor.isOneLineMode()) return false
     injector.commandLine.createCommandPrompt(editor, context, cmd.rawCount, initialText = "")
     return true

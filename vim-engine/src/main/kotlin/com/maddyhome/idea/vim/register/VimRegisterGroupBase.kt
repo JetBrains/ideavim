@@ -89,6 +89,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
           PRIMARY_REGISTER // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
         }
       }
+
       "unnamed" in clipboardOptionValue -> PRIMARY_REGISTER
       else -> UNNAMED_REGISTER
     }
@@ -192,11 +193,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       end = t
     }
 
-    val copiedText = if (start != -1) { // FIXME: so, we had invalid ranges all the time?.. I've never handled such cases
-      injector.clipboardManager.collectCopiedText(editor, context, range, text)
-    } else {
-      injector.clipboardManager.dumbCopiedText(text)
-    }
+    val copiedText =
+      if (start != -1) { // FIXME: so, we had invalid ranges all the time?.. I've never handled such cases
+        injector.clipboardManager.collectCopiedText(editor, context, range, text)
+      } else {
+        injector.clipboardManager.dumbCopiedText(text)
+      }
     logger.debug { "Copy to '$lastRegisterChar' with copied text: $copiedText" }
     // If this is an uppercase register, we need to append the text to the corresponding lowercase register
     if (Character.isUpperCase(register)) {
@@ -280,9 +282,16 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     caret: ImmutableVimCaret,
     range: TextRange,
     type: SelectionType,
-    isDelete: Boolean
+    isDelete: Boolean,
   ): Boolean {
-    return storeText(editor, injector.executionContextManager.getEditorExecutionContext(editor), caret, range, type, isDelete)
+    return storeText(
+      editor,
+      injector.executionContextManager.getEditorExecutionContext(editor),
+      caret,
+      range,
+      type,
+      isDelete
+    )
   }
 
   /**
@@ -339,7 +348,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     if (READONLY_REGISTERS.indexOf(register) == -1 && register != LAST_SEARCH_REGISTER && register != UNNAMED_REGISTER) {
       return false
     }
-    myRegisters[register] = Register(register, injector.clipboardManager.dumbCopiedText(text), SelectionType.CHARACTER_WISE) // TODO why transferable data is not collected?
+    myRegisters[register] = Register(
+      register,
+      injector.clipboardManager.dumbCopiedText(text),
+      SelectionType.CHARACTER_WISE
+    ) // TODO why transferable data is not collected?
     logger.debug { "register '$register' contains: \"$text\"" }
     return true
   }
@@ -363,7 +376,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     context: ExecutionContext,
     register: Char,
     text: String,
-    selectionType: SelectionType
+    selectionType: SelectionType,
   ): Boolean {
     if (!WRITABLE_REGISTERS.contains(register)) {
       return false
@@ -373,7 +386,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     val newRegister = if (register.isUpperCase() && oldRegister != null) {
       oldRegister.addText(text)
     } else {
-      Register(register, injector.clipboardManager.dumbCopiedText(text), selectionType) // FIXME why don't we collect transferable data?
+      Register(
+        register,
+        injector.clipboardManager.dumbCopiedText(text),
+        selectionType
+      ) // FIXME why don't we collect transferable data?
     }
     saveRegister(editor, context, register, newRegister)
     if (register == '/') {
@@ -474,7 +491,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     if (Character.isUpperCase(myR)) {
       myR = Character.toLowerCase(myR)
     }
-    return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(editor, context, myR) else myRegisters[myR]
+    return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(
+      editor,
+      context,
+      myR
+    ) else myRegisters[myR]
   }
 
   @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegisters(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
@@ -512,6 +533,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
           }
           setSystemClipboardRegisterText(editor, context, register.copiedText)
         }
+
         PRIMARY_REGISTER -> {
           setSystemPrimaryRegisterText(editor, context, register.copiedText)
         }

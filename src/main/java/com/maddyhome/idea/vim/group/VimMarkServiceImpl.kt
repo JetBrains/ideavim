@@ -45,7 +45,10 @@ import java.util.*
 // todo sync vim jumps with ide jumps
 
 // todo exception after moving to global mark after deleting it via IDE (impossible to receive markChar)
-@State(name = "VimMarksSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
+@State(
+  name = "VimMarksSettings",
+  storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
+)
 internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
   private fun createOrGetSystemMark(ch: Char, line: Int, col: Int, editor: VimEditor): Mark? {
     val ijEditor = (editor as IjVimEditor).editor
@@ -71,7 +74,8 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     }
     element.addContent(globalMarksElement)
     val localMarksElement = Element("localmarks")
-    var files: List<LocalMarks<Char, Mark>> = filepathToLocalMarks.values.sortedWith(Comparator.comparing(LocalMarks<Char, Mark>::myTimestamp))
+    var files: List<LocalMarks<Char, Mark>> =
+      filepathToLocalMarks.values.sortedWith(Comparator.comparing(LocalMarks<Char, Mark>::myTimestamp))
     if (files.size > SAVE_MARK_COUNT) {
       files = files.subList(files.size - SAVE_MARK_COUNT, files.size)
     }
@@ -85,7 +89,12 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
         fileMarkElem.setAttribute("name", file)
         fileMarkElem.setAttribute("timestamp", java.lang.Long.toString(marks.myTimestamp.time))
         for (mark in marks.values) {
-          if (!Character.isUpperCase(mark.key) && injector.markService.isValidMark(mark.key, VimMarkService.Operation.SAVE, true)) {
+          if (!Character.isUpperCase(mark.key) && injector.markService.isValidMark(
+              mark.key,
+              VimMarkService.Operation.SAVE,
+              true
+            )
+          ) {
             val markElem = Element("mark")
             markElem.setAttribute("key", mark.key.toString())
             markElem.setAttribute("line", mark.line.toString())

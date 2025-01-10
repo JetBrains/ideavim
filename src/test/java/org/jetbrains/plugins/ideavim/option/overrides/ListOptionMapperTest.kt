@@ -172,8 +172,7 @@ class ListOptionMapperTest : VimTestCase() {
     try {
       injector.optionGroup.startInitVimRc()
       enterCommand("set list")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 
@@ -294,8 +293,7 @@ class ListOptionMapperTest : VimTestCase() {
     try {
       injector.optionGroup.startInitVimRc()
       enterCommand("set list")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 

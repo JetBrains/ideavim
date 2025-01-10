@@ -426,7 +426,10 @@ class SideScrollOffOptionMapperTest : VimTestCase() {
     // set global value to default, but not resetting the local intellij value...
 
     assertCommandOutput("set sidescrolloff?", "  sidescrolloff=10")
-    assertCommandOutput("setglobal sidescrolloff?", "  sidescrolloff=20") // Vim is default of 0, but we want to use global intellij value
+    assertCommandOutput(
+      "setglobal sidescrolloff?",
+      "  sidescrolloff=20"
+    ) // Vim is default of 0, but we want to use global intellij value
     assertCommandOutput("setlocal sidescrolloff?", "  sidescrolloff=10")
     assertEquals(0, fixture.editor.settings.horizontalScrollOffset)
 

@@ -34,14 +34,18 @@ private const val UNESCAPED_QUOTE = "\""
 data class DeleteMarksCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val processedArg = if (modifier == CommandModifier.BANG) {
       if (argument.isNotEmpty()) throw ExException("E474: Invalid argument")
       VimMarkConstants.DEL_FILE_MARKS
-    }
-    else {
+    } else {
       argument.replace(VIML_COMMENT, "")
         .replace(ESCAPED_QUOTE, UNESCAPED_QUOTE)
         .replace(TRAILING_SPACES, "")
@@ -54,7 +58,10 @@ data class DeleteMarksCommand(val range: Range, val modifier: CommandModifier, v
       if (index != -1) {
         val invalidIndex = if (processedArg[index] == '-') (index - 1).coerceAtLeast(0) else index
 
-        injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E475, processedArg.substring(invalidIndex)))
+        injector.messages.showStatusBarMessage(
+          editor,
+          injector.messages.message(Msg.E475, processedArg.substring(invalidIndex))
+        )
         return ExecutionResult.Error
       }
     }

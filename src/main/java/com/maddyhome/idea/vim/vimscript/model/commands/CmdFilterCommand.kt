@@ -29,12 +29,16 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :!"
  */
 @ExCommand(command = "!")
-internal data class CmdFilterCommand(val range: Range, val modifier: CommandModifier, val argument: String)
-  : Command.SingleExecution(range, modifier) {
+internal data class CmdFilterCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier) {
 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     logger.debug("execute")
     val command = buildString {
       var inBackslash = false
@@ -48,6 +52,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
             }
             append(last)
           }
+
           !inBackslash && c == '%' -> {
             val virtualFile = EditorHelper.getVirtualFile(editor.ij)
             if (virtualFile == null) {
@@ -60,6 +65,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
             }
             append(virtualFile.path)
           }
+
           else -> append(c)
         }
 

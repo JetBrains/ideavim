@@ -22,7 +22,12 @@ class InsertExitModeAction : VimActionHandler.SingleExecution() {
   // mode if both editor and document are writable.
   override val type: Command.Type = Command.Type.INSERT
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     editor.exitInsertMode(context)
     return true
   }

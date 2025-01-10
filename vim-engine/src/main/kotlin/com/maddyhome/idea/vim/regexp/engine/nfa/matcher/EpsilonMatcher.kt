@@ -20,10 +20,11 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 internal class EpsilonMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
+    index: Int,
+    groups:
     VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return MatcherResult.Success(0)
   }

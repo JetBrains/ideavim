@@ -25,7 +25,16 @@ import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 data class LambdaExpression(val args: List<String>, val expr: Expression) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimFuncref {
-    val function = FunctionDeclaration(null, getFunctionName(), args, listOf(), buildBody(), false, setOf(FunctionFlag.CLOSURE), true)
+    val function = FunctionDeclaration(
+      null,
+      getFunctionName(),
+      args,
+      listOf(),
+      buildBody(),
+      false,
+      setOf(FunctionFlag.CLOSURE),
+      true
+    )
     function.vimContext = vimContext
     return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), null, VimFuncref.Type.LAMBDA)
   }

@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.util.*
 
 @CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.CMD_LINE])
-class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution()  {
+class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution() {
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP, CommandFlags.FLAG_END_EX)
   override var motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -61,11 +61,31 @@ class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) :
   override val motionType: MotionType
     get() = throw RuntimeException("Parent motion type should be used, as only it is accessed by other code")
 
-  override fun getOffset(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
+  override fun getOffset(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
     if (argument !is Argument.ExString) return Motion.Error
     val offsetAndMotion = when (argument.label) {
-      '/' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, operatorArguments.count1, Direction.FORWARDS)
-      '?' -> injector.searchGroup.processSearchCommand(editor, argument.string, caret.offset, operatorArguments.count1, Direction.BACKWARDS)
+      '/' -> injector.searchGroup.processSearchCommand(
+        editor,
+        argument.string,
+        caret.offset,
+        operatorArguments.count1,
+        Direction.FORWARDS
+      )
+
+      '?' -> injector.searchGroup.processSearchCommand(
+        editor,
+        argument.string,
+        caret.offset,
+        operatorArguments.count1,
+        Direction.BACKWARDS
+      )
+
       else -> throw ExException("Unexpected search label ${argument.label}")
     }
     // Vim doesn't treat not finding something as an error, although it might report either an error or warning message
@@ -78,7 +98,12 @@ class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) :
 class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun getOffset(editor: VimEditor, context: ExecutionContext, argument: Argument?, operatorArguments: OperatorArguments): Motion {
+  override fun getOffset(
+    editor: VimEditor,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
     if (argument !is Argument.ExString) return Motion.Error
 
     try {

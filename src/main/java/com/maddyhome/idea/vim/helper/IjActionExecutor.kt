@@ -138,7 +138,7 @@ internal class IjActionExecutor : VimActionExecutor {
     val action = getAction(name, context)
     return action != null && executeAction(editor, IjNativeAction(action), context)
   }
-  
+
   private fun getAction(name: String, context: ExecutionContext): AnAction? {
     val actionManager = ActionManager.getInstance()
     val action = actionManager.getAction(name)

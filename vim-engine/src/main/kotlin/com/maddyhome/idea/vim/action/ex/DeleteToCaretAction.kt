@@ -18,10 +18,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<C-U>"], modes = [Mode.CMD_LINE])
-class DeleteToCaretAction  : VimActionHandler.SingleExecution()  {
+class DeleteToCaretAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
     val oldText = commandLine.actualText
     val newText = oldText.substring(commandLine.caret.offset)

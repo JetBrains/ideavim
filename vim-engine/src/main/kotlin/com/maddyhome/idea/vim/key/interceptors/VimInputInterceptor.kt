@@ -23,7 +23,7 @@ interface VimInputInterceptor<T> {
   fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
-    context: ExecutionContext
+    context: ExecutionContext,
   )
 
   /**
@@ -44,6 +44,6 @@ interface VimInputInterceptor<T> {
   fun executeInput(
     input: T,
     editor: VimEditor,
-    context: ExecutionContext
+    context: ExecutionContext,
   )
 }

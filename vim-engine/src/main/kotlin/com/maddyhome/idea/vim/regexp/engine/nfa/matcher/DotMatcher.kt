@@ -21,7 +21,7 @@ internal class DotMatcher(private val includeNewLine: Boolean) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (includeNewLine)
       if (index < editor.text().length) MatcherResult.Success(1)

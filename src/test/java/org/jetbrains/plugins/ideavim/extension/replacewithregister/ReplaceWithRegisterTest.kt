@@ -261,7 +261,14 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
     VimPlugin.getRegister()
-      .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      .storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        text rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
     typeText(injector.parser.parseKeys("grr"))
     assertState(
       """
@@ -430,7 +437,14 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
     VimPlugin.getRegister()
-      .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      .storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        text rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
     typeText(injector.parser.parseKeys("viw" + "gr"))
     assertState(
       """
@@ -502,7 +516,14 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     VimPlugin.getRegister()
-      .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      .storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        text rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
     typeText(injector.parser.parseKeys("V" + "gr"))
     assertState(
       """
@@ -540,11 +561,11 @@ class ReplaceWithRegisterTest : VimTestCase() {
   //  https://youtrack.jetbrains.com/issue/VIM-2881/ReplaceRegister-does-no-longer-worker-with-MultiCursor
   @Test
   fun `test multiple carets`() {
-  // Behaviour of pasting a full line with multiple carets is undefined in Vim and has different implementation in
-  // IdeaVim depending on if ideaput is specified in 'clipboard' or not
-  assertTrue(OptionConstants.clipboard_ideaput in optionsNoEditor().clipboard)
+    // Behaviour of pasting a full line with multiple carets is undefined in Vim and has different implementation in
+    // IdeaVim depending on if ideaput is specified in 'clipboard' or not
+    assertTrue(OptionConstants.clipboard_ideaput in optionsNoEditor().clipboard)
 
-  enableExtensions("multiple-cursors")
+    enableExtensions("multiple-cursors")
     val text = """
       ${c}copyMe
       selectMe
@@ -571,7 +592,8 @@ class ReplaceWithRegisterTest : VimTestCase() {
   fun `test replace in visual with clipboard unnamed`() {
     VimPlugin.getRegister().resetRegisters()
 
-    configureByText("""
+    configureByText(
+      """
       ${c}test
       copyMe
 
@@ -579,12 +601,14 @@ class ReplaceWithRegisterTest : VimTestCase() {
       selectMe
       selectMe
       selectMe
-    """.trimIndent())
+    """.trimIndent()
+    )
     enableExtensions("multiple-cursors")
     enterCommand("set clipboard+=unnamed")
 
     typeText(injector.parser.parseKeys("yiw" + "j" + "griw" + "jj" + "<A-n><A-n><A-n><A-n>" + "gr"))
-    assertState("""
+    assertState(
+      """
       test
       test
 
@@ -592,7 +616,8 @@ class ReplaceWithRegisterTest : VimTestCase() {
       test
       test
       test
-    """.trimIndent())
+    """.trimIndent()
+    )
 
     enterCommand("set clipboard&")
   }

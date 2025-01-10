@@ -50,7 +50,7 @@ interface Node<T>
 @Deprecated("Use KeyStrokeTrie and VimKeyGroup.getBuiltinCommandsTrie instead")
 data class CommandNode<T>(val actionHolder: T) : Node<T> {
   override fun toString(): String {
-    return "COMMAND NODE (${ actionHolder.toString() })"
+    return "COMMAND NODE (${actionHolder.toString()})"
   }
 }
 
@@ -62,8 +62,8 @@ data class CommandNode<T>(val actionHolder: T) : Node<T> {
  */
 @Suppress("DEPRECATION")
 @Deprecated("Use KeyStrokeTrie and VimKeyGroup.getBuiltinCommandsTrie instead")
-open class CommandPartNode<T> internal constructor(private val trieNode: KeyStrokeTrie.TrieNode<T>)
-  : Node<T>, AbstractMap<KeyStroke, Node<T>>() {
+open class CommandPartNode<T> internal constructor(private val trieNode: KeyStrokeTrie.TrieNode<T>) : Node<T>,
+  AbstractMap<KeyStroke, Node<T>>() {
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -88,8 +88,7 @@ open class CommandPartNode<T> internal constructor(private val trieNode: KeyStro
         trieNode.visit { key, value ->
           val node: Node<T> = if (value.data == null) {
             CommandPartNode<T>(value)
-          }
-          else {
+          } else {
             CommandNode(value.data!!)
           }
           put(key, node)

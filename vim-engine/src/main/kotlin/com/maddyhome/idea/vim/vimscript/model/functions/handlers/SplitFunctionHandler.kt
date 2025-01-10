@@ -24,12 +24,18 @@ internal class SplitFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 3
 
-  override fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  override fun doFunction(
+    argumentValues: List<Expression>,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType {
     val text = argumentValues[0].evaluate(editor, context, vimContext).asString()
     val delimiter = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: "\\s\\+"
     val keepEmpty = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.asBoolean() ?: false
 
-    val delimiters: List<Pair<Int, Int>> = injector.regexpService.getAllMatches(text, delimiter) + Pair(text.length, text.length)
+    val delimiters: List<Pair<Int, Int>> =
+      injector.regexpService.getAllMatches(text, delimiter) + Pair(text.length, text.length)
     val result = mutableListOf<String>()
     var startIndex = 0
     for (del in delimiters) {

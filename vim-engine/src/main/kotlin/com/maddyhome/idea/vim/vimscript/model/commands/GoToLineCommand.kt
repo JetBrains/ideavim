@@ -23,7 +23,8 @@ import java.lang.Integer.min
 data class GoToLineCommand(val range: Range) :
   Command.ForEachCaret(range, CommandModifier.NONE) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(
     editor: VimEditor,

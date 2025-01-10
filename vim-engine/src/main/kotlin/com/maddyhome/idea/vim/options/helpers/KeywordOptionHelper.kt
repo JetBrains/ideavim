@@ -50,7 +50,8 @@ object KeywordOptionHelper {
     // 'iskeyword' is a local-to-buffer option, but we're not passed an editor. We have to use the global value. We also
     // have to use the fallback window to avoid any asserts about accessing a non-global option as a global option.
     // This is not ideal and should not be replicated in non-deprecated code
-    val isKeyword = injector.optionGroup.getOptionValue(Options.iskeyword, OptionAccessScope.GLOBAL(injector.fallbackWindow)).value
+    val isKeyword =
+      injector.optionGroup.getOptionValue(Options.iskeyword, OptionAccessScope.GLOBAL(injector.fallbackWindow)).value
     val specs = valuesToValidatedAndReversedSpecs(parseValues(isKeyword)) ?: emptyList()
     return specs.map {
       it.initializeValues()

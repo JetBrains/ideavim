@@ -121,26 +121,26 @@ class ModeWidgetPopup : AnAction() {
       return ModeColors(
         "widget_mode_is_full_customization$keyPostfix",
         "widget_mode_theme$keyPostfix",
-         "widget_mode_normal_background$keyPostfix",
-         "widget_mode_normal_foreground$keyPostfix",
-         "widget_mode_insert_background$keyPostfix",
-         "widget_mode_insert_foreground$keyPostfix",
-         "widget_mode_replace_background$keyPostfix",
-         "widget_mode_replace_foreground$keyPostfix",
-         "widget_mode_command_background$keyPostfix",
-         "widget_mode_command_foreground$keyPostfix",
-         "widget_mode_visual_background$keyPostfix",
-         "widget_mode_visual_foreground$keyPostfix",
-         "widget_mode_visual_line_background$keyPostfix",
-         "widget_mode_visual_line_foreground$keyPostfix",
-         "widget_mode_visual_block_background$keyPostfix",
-         "widget_mode_visual_block_foreground$keyPostfix",
-         "widget_mode_select_background$keyPostfix",
-         "widget_mode_select_foreground$keyPostfix",
-         "widget_mode_select_line_background$keyPostfix",
-         "widget_mode_select_line_foreground$keyPostfix",
-         "widget_mode_select_block_background$keyPostfix",
-         "widget_mode_select_block_foreground$keyPostfix",
+        "widget_mode_normal_background$keyPostfix",
+        "widget_mode_normal_foreground$keyPostfix",
+        "widget_mode_insert_background$keyPostfix",
+        "widget_mode_insert_foreground$keyPostfix",
+        "widget_mode_replace_background$keyPostfix",
+        "widget_mode_replace_foreground$keyPostfix",
+        "widget_mode_command_background$keyPostfix",
+        "widget_mode_command_foreground$keyPostfix",
+        "widget_mode_visual_background$keyPostfix",
+        "widget_mode_visual_foreground$keyPostfix",
+        "widget_mode_visual_line_background$keyPostfix",
+        "widget_mode_visual_line_foreground$keyPostfix",
+        "widget_mode_visual_block_background$keyPostfix",
+        "widget_mode_visual_block_foreground$keyPostfix",
+        "widget_mode_select_background$keyPostfix",
+        "widget_mode_select_foreground$keyPostfix",
+        "widget_mode_select_line_background$keyPostfix",
+        "widget_mode_select_line_foreground$keyPostfix",
+        "widget_mode_select_block_background$keyPostfix",
+        "widget_mode_select_block_foreground$keyPostfix",
       )
     }
 
@@ -148,14 +148,20 @@ class ModeWidgetPopup : AnAction() {
       val panel = panel {
         lateinit var advancedSettings: Cell<JBCheckBox>
         row {
-          advancedSettings = checkBox(MessageHelper.getMessage("widget.mode.popup.field.advanced.settings")).bindSelected(modeColors::isFullCustomization)
+          advancedSettings =
+            checkBox(MessageHelper.getMessage("widget.mode.popup.field.advanced.settings")).bindSelected(modeColors::isFullCustomization)
         }
         group {
           row {
             label(MessageHelper.getMessage("widget.mode.popup.field.theme"))
             comboBox(ModeWidgetTheme.entries).bindItem(modeColors::theme.toNullableProperty())
           }
-          row { browserLink("Suggest your theme", "https://youtrack.jetbrains.com/issue/VIM-1377/Normal-mode-needs-to-be-more-obvious") }
+          row {
+            browserLink(
+              "Suggest your theme",
+              "https://youtrack.jetbrains.com/issue/VIM-1377/Normal-mode-needs-to-be-more-obvious"
+            )
+          }
         }.topGap(TopGap.NONE).visibleIf(!advancedSettings.selected)
         group(MessageHelper.getMessage("widget.mode.popup.group.title.full.customization")) {
           row { text(MessageHelper.getMessage("widget.mode.popup.color.instruction")) }
@@ -279,7 +285,8 @@ class ModeWidgetPopup : AnAction() {
     }
 
     private fun JComponent.addScrollPane(): JComponent {
-      val scrollPane = JBScrollPane(this, JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
+      val scrollPane =
+        JBScrollPane(this, JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
       scrollPane.border = BorderFactory.createEmptyBorder()
       return scrollPane
     }
@@ -317,7 +324,7 @@ class ModeWidgetPopup : AnAction() {
     var selectBlockBg: String by VimScopeStringVariable(selectBlockBgKey)
     var selectBlockFg: String by VimScopeStringVariable(selectBlockFgKey)
 
-    private class VimScopeBooleanVariable(private var key: String): ReadWriteProperty<ModeColors, Boolean> {
+    private class VimScopeBooleanVariable(private var key: String) : ReadWriteProperty<ModeColors, Boolean> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): Boolean {
         return injector.variableService.getVimVariable(key)?.asBoolean() ?: false
       }
@@ -327,7 +334,7 @@ class ModeWidgetPopup : AnAction() {
       }
     }
 
-    private class VimScopeStringVariable(private var key: String): ReadWriteProperty<ModeColors, String> {
+    private class VimScopeStringVariable(private var key: String) : ReadWriteProperty<ModeColors, String> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): String {
         return injector.variableService.getVimVariable(key)?.asString() ?: ""
       }
@@ -337,9 +344,10 @@ class ModeWidgetPopup : AnAction() {
       }
     }
 
-    private class VimScopeThemeVariable(private var key: String): ReadWriteProperty<ModeColors, ModeWidgetTheme> {
+    private class VimScopeThemeVariable(private var key: String) : ReadWriteProperty<ModeColors, ModeWidgetTheme> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): ModeWidgetTheme {
-        val themeString = injector.variableService.getVimVariable(key)?.asString() ?: return ModeWidgetTheme.getDefaultTheme()
+        val themeString =
+          injector.variableService.getVimVariable(key)?.asString() ?: return ModeWidgetTheme.getDefaultTheme()
         return ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
       }
 

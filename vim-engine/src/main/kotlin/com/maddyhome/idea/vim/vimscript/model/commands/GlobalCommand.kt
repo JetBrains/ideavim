@@ -37,9 +37,14 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     defaultRange = "%"
   }
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     editor.removeSecondaryCarets()
     val caret = editor.currentCaret()
@@ -81,7 +86,12 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     if (globalBusy) {
       val match = regex.findInLine(editor, editor.currentCaret().getLine(), 0, options)
       if (match is VimMatchResult.Success == !invert) {
-        globalExecuteOne(editor, context, editor.getLineStartOffset(editor.currentCaret().getLine()), globalCommandArguments.command)
+        globalExecuteOne(
+          editor,
+          context,
+          editor.getLineStartOffset(editor.currentCaret().getLine()),
+          globalCommandArguments.command
+        )
       }
     } else {
       val line1 = range.startLine
@@ -97,22 +107,41 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
       )
       val matchesLines = matches.map { it.getLine(editor) }.toSet()
       val linesForGlobalCommand = if (invert) {
-        ((line1 .. line2).toSet() - matchesLines).toList().sorted()
+        ((line1..line2).toSet() - matchesLines).toList().sorted()
       } else {
         matchesLines.toList().sorted()
       }
-      val marks = linesForGlobalCommand.map { injector.engineEditorHelper.createRangeMarker(editor, editor.getLineStartOffset(it), editor.getLineStartOffset(it)) }
+      val marks = linesForGlobalCommand.map {
+        injector.engineEditorHelper.createRangeMarker(
+          editor,
+          editor.getLineStartOffset(it),
+          editor.getLineStartOffset(it)
+        )
+      }
 
       if (gotInt) {
         messages.showStatusBarMessage(null, messages.message("e_interr"))
       } else if (marks.isEmpty()) {
         if (invert) {
-          messages.showStatusBarMessage(null, messages.message("global.command.not.found.v", globalCommandArguments.pattern.toString()))
+          messages.showStatusBarMessage(
+            null,
+            messages.message("global.command.not.found.v", globalCommandArguments.pattern.toString())
+          )
         } else {
-          messages.showStatusBarMessage(null, messages.message("global.command.not.found.g", globalCommandArguments.pattern.toString()))
+          messages.showStatusBarMessage(
+            null,
+            messages.message("global.command.not.found.g", globalCommandArguments.pattern.toString())
+          )
         }
       } else {
-        globalExe(editor, context, linesForGlobalCommand, marks, globalCommandArguments.command, getOriginalCommandString())
+        globalExe(
+          editor,
+          context,
+          linesForGlobalCommand,
+          marks,
+          globalCommandArguments.command,
+          getOriginalCommandString()
+        )
       }
     }
     injector.searchGroup.updateSearchHighlightsAfterGlobalCommand()
@@ -128,7 +157,14 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     return editor.offsetToBufferPosition(range.startOffset).line
   }
 
-  private fun globalExe(editor: VimEditor, context: ExecutionContext, lines: List<Int>, marks: List<VimRangeMarker>, cmd: String, originalCommandString: String) {
+  private fun globalExe(
+    editor: VimEditor,
+    context: ExecutionContext,
+    lines: List<Int>,
+    marks: List<VimRangeMarker>,
+    cmd: String,
+    originalCommandString: String,
+  ) {
     globalBusy = true
     try {
       if (cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
@@ -142,7 +178,14 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
           mark.dispose()
           if (!isValid) continue
           editor.currentCaret().moveToOffset(startOffset)
-          injector.vimscriptExecutor.execute(cmd, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
+          injector.vimscriptExecutor.execute(
+            cmd,
+            editor,
+            context,
+            skipHistory = true,
+            indicateErrors = true,
+            this.vimContext
+          )
           // TODO: 26.05.2021 break check
         }
       }
@@ -158,9 +201,23 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     // TODO: 26.05.2021 What about folds?
     editor.currentCaret().moveToOffset(lineStartOffset)
     if (cmd.isNullOrEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
-      injector.vimscriptExecutor.execute("p", editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
+      injector.vimscriptExecutor.execute(
+        "p",
+        editor,
+        context,
+        skipHistory = true,
+        indicateErrors = true,
+        this.vimContext
+      )
     } else {
-      injector.vimscriptExecutor.execute(cmd, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
+      injector.vimscriptExecutor.execute(
+        cmd,
+        editor,
+        context,
+        skipHistory = true,
+        indicateErrors = true,
+        this.vimContext
+      )
     }
   }
 

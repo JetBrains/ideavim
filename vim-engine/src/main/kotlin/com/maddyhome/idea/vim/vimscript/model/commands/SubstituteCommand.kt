@@ -23,13 +23,27 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class SubstituteCommand(val range: Range, val argument: String, val command: String) :
   Command.SingleExecution(range, CommandModifier.NONE, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     var result = true
     for (caret in editor.nativeCarets()) {
       val lineRange = getLineRange(editor, caret)
-      if (!injector.searchGroup.processSubstituteCommand(editor, caret, context, lineRange, command, argument, this.vimContext)) {
+      if (!injector.searchGroup.processSubstituteCommand(
+          editor,
+          caret,
+          context,
+          lineRange,
+          command,
+          argument,
+          this.vimContext
+        )
+      ) {
         result = false
       }
     }

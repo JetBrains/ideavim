@@ -318,11 +318,13 @@ internal class MotionGroup : VimMotionGroupBase() {
                 vimEditor.exitVisualMode()
                 KeyHandler.getInstance().reset(vimEditor)
               }
+
               is Mode.CMD_LINE -> {
                 val commandLine = injector.commandLine.getActiveCommandLine() ?: return
                 commandLine.close(refocusOwningEditor = false, resetCaret = false)
                 injector.outputPanel.getCurrentOutputPanel()?.close()
               }
+
               else -> {}
             }
           }

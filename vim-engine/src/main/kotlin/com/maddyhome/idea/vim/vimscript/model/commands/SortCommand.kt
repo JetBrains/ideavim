@@ -29,10 +29,15 @@ import java.util.*
 data class SortCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val sortOption = parseSortOption(argument)
     val lineComparator = LineComparator(sortOption.ignoreCase, sortOption.numeric, sortOption.reverse)
     var worked = true
@@ -73,7 +78,7 @@ data class SortCommand(val range: Range, val modifier: CommandModifier, val argu
   private fun parseSortOption(arg: String): SortOption {
     val patternRange = extractPattern(arg)
     val pattern = patternRange?.let { arg.substring(it) }
-    val flags = patternRange?.let { arg.removeRange(patternRange)} ?: arg
+    val flags = patternRange?.let { arg.removeRange(patternRange) } ?: arg
     return SortOption(
       reverse = modifier == CommandModifier.BANG,
       ignoreCase = "i" in flags,
@@ -136,5 +141,5 @@ data class SortOption(
   val reverse: Boolean,
   val unique: Boolean,
   val sortOnPattern: Boolean,
-  val pattern: String? = null
+  val pattern: String? = null,
 )

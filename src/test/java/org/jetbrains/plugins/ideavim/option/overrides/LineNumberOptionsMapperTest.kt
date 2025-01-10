@@ -291,8 +291,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
       // This is the same value as the global IDE setting. That's ok. We just want to explicitly set the Vim option
       enterCommand("set number")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 
@@ -311,8 +310,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     try {
       injector.optionGroup.startInitVimRc()
       enterCommand("set relativenumber")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 
@@ -525,8 +523,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     try {
       injector.optionGroup.startInitVimRc()
       enterCommand("set number")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 
@@ -548,8 +545,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     try {
       injector.optionGroup.startInitVimRc()
       enterCommand("set relativenumber")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 

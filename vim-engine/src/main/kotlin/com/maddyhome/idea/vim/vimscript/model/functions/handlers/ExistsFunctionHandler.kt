@@ -38,9 +38,11 @@ internal class ExistsFunctionHandler : FunctionHandler() {
       is OptionExpression -> {
         injector.optionGroup.getOption(parsedExpression.optionName) != null
       }
+
       is Variable -> {
         injector.variableService.getNullableVariableValue(parsedExpression, editor, context, vimContext) != null
       }
+
       else -> throw ExException("exists function is not fully implemented")
     }
     return if (result) VimInt.ONE else VimInt.ZERO

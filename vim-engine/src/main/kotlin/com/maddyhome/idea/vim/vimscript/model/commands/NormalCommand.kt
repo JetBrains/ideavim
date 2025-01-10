@@ -33,7 +33,11 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
     Flag.SAVE_VISUAL,
   )
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val useMappings = modifier != CommandModifier.BANG
 
     val rangeUsed = range.size() != 0
@@ -41,11 +45,15 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
       is Mode.VISUAL -> {
         editor.exitVisualMode()
         if (!rangeUsed) {
-          val selectionStart = injector.markService.getMark(editor.primaryCaret(), VimMarkService.SELECTION_START_MARK)!!
+          val selectionStart =
+            injector.markService.getMark(editor.primaryCaret(), VimMarkService.SELECTION_START_MARK)!!
           editor.currentCaret().moveToBufferPosition(BufferPosition(selectionStart.line, selectionStart.col))
         }
       }
-      is Mode.CMD_LINE -> injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
+
+      is Mode.CMD_LINE -> injector.commandLine.getActiveCommandLine()
+        ?.close(refocusOwningEditor = true, resetCaret = false)
+
       Mode.INSERT, Mode.REPLACE -> editor.exitInsertMode(context)
       is Mode.SELECT -> editor.exitSelectModeNative(false)
       is Mode.OP_PENDING, is Mode.NORMAL -> Unit

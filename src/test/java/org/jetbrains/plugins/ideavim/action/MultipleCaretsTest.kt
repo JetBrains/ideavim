@@ -2181,7 +2181,14 @@ rtyfg${c}hzxc"""
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     injector.registerGroup.storeText(vimEditor, context, '*', "fgh")
     VimPlugin.getRegister()
-      .storeText(IjVimEditor(editor), context, editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      .storeText(
+        IjVimEditor(editor),
+        context,
+        editor.vim.primaryCaret(),
+        TextRange(16, 19),
+        SelectionType.CHARACTER_WISE,
+        false
+      )
     typeText(injector.parser.parseKeys("\"*P"))
     val after = "fg${c}hqfg${c}hwe asd zxc rty fg${c}hfgh vbn"
     assertState(after)

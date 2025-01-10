@@ -48,8 +48,7 @@ internal fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset = if (searchRange != null && searchRange.startLine < editor.document.lineCount) {
     editor.vim.getLineStartOffset(searchRange.startLine)
-  }
-  else {
+  } else {
     caretOffset
   }
   val showHighlights = injector.options(editor.vim).hlsearch
@@ -218,8 +217,7 @@ private fun findClosestMatch(
   }
   val closestIndex = if (forwards) {
     sortedResults.indexOfFirst { it.startOffset > initialOffset }
-  }
-  else {
+  } else {
     sortedResults.indexOfFirst { it.startOffset < initialOffset }
   }
 
@@ -235,7 +233,12 @@ private fun findClosestMatch(
   return sortedResults[nextIndex % results.size].startOffset
 }
 
-internal fun highlightSearchResults(editor: Editor, pattern: String, results: List<TextRange>, currentMatchOffset: Int) {
+internal fun highlightSearchResults(
+  editor: Editor,
+  pattern: String,
+  results: List<TextRange>,
+  currentMatchOffset: Int,
+) {
   var highlighters = editor.vimLastHighlighters
   if (highlighters == null) {
     highlighters = mutableListOf()

@@ -30,7 +30,16 @@ class TernaryExpressionTests {
 
   @ParameterizedTest
   @MethodSource("arg8")
-  fun `simple expression`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String, sp6: String, sp7: String, sp8: String) {
+  fun `simple expression`(
+    sp1: String,
+    sp2: String,
+    sp3: String,
+    sp4: String,
+    sp5: String,
+    sp6: String,
+    sp7: String,
+    sp8: String,
+  ) {
     val expression = VimscriptParser.parseExpression("1$sp1?$sp2'2'$sp3:3")
     assertTrue(expression is TernaryExpression)
     assertEquals(SimpleExpression(1), expression.condition)

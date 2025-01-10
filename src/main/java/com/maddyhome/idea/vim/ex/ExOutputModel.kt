@@ -127,8 +127,7 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
   override fun close() {
     if (!ApplicationManager.getApplication().isUnitTestMode) {
       editor?.let { ExOutputPanel.getInstance(it).close() }
-    }
-    else {
+    } else {
       isActiveInTestMode = false
     }
   }

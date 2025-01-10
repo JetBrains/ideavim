@@ -27,7 +27,12 @@ class LeaveCommandLineAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_END_EX)
   override val type: Command.Type = Command.Type.MODE_CHANGE
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val argument = cmd.argument as? Argument.ExString ?: return true
     val historyType = VimHistory.Type.getTypeByLabel(argument.label.toString())
     injector.historyGroup.addEntry(historyType, argument.string)

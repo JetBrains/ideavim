@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class DigraphSequence: Cloneable {
+class DigraphSequence : Cloneable {
   private var digraphState = DIG_STATE_PENDING
   private var digraphChar = 0.toChar()
   private lateinit var codeChars: CharArray
@@ -59,6 +59,7 @@ class DigraphSequence: Cloneable {
         }
         DigraphResult.Unhandled
       }
+
       DIG_STATE_BACK_SPACE -> {
         logger.debug("DIG_STATE_BACK_SPACE")
         digraphState = DIG_STATE_PENDING
@@ -69,6 +70,7 @@ class DigraphSequence: Cloneable {
         }
         DigraphResult.Unhandled
       }
+
       DIG_STATE_DIG_ONE -> {
         logger.debug("DIG_STATE_DIG_ONE")
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
@@ -79,6 +81,7 @@ class DigraphSequence: Cloneable {
         digraphState = DIG_STATE_PENDING
         DigraphResult.Bad
       }
+
       DIG_STATE_DIG_TWO -> {
         logger.debug("DIG_STATE_DIG_TWO")
         digraphState = DIG_STATE_PENDING
@@ -88,6 +91,7 @@ class DigraphSequence: Cloneable {
         }
         DigraphResult.Bad
       }
+
       DIG_STATE_CODE_START -> {
         logger.debug("DIG_STATE_CODE_START")
         when (key.keyChar) {
@@ -98,6 +102,7 @@ class DigraphSequence: Cloneable {
             logger.debug("Octal")
             DigraphResult.HandledLiteral
           }
+
           'x', 'X' -> {
             codeMax = 2
             digraphState = DIG_STATE_CODE_CHAR
@@ -105,6 +110,7 @@ class DigraphSequence: Cloneable {
             logger.debug("hex2")
             DigraphResult.HandledLiteral
           }
+
           'u' -> {
             codeMax = 4
             digraphState = DIG_STATE_CODE_CHAR
@@ -112,6 +118,7 @@ class DigraphSequence: Cloneable {
             logger.debug("hex4")
             DigraphResult.HandledLiteral
           }
+
           'U' -> {
             codeMax = 8
             digraphState = DIG_STATE_CODE_CHAR
@@ -119,6 +126,7 @@ class DigraphSequence: Cloneable {
             logger.debug("hex8")
             DigraphResult.HandledLiteral
           }
+
           '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
             codeMax = 3
             digraphState = DIG_STATE_CODE_CHAR
@@ -127,6 +135,7 @@ class DigraphSequence: Cloneable {
             logger.debug("decimal")
             DigraphResult.HandledLiteral
           }
+
           else -> {
             if (key.keyCode == KeyEvent.VK_TAB) {
               val code = KeyStroke.getKeyStroke('\t')
@@ -143,6 +152,7 @@ class DigraphSequence: Cloneable {
           }
         }
       }
+
       DIG_STATE_CODE_CHAR -> {
         logger.debug("DIG_STATE_CODE_CHAR")
         var valid = false
@@ -150,9 +160,11 @@ class DigraphSequence: Cloneable {
           10 -> if (key.keyChar in '0'..'9') {
             valid = true
           }
+
           8 -> if (key.keyChar in '0'..'7') {
             valid = true
           }
+
           16 -> if (key.keyChar in '0'..'9' || key.keyChar in 'a'..'f' || key.keyChar in 'A'..'F') {
             valid = true
           }
@@ -191,6 +203,7 @@ class DigraphSequence: Cloneable {
         }
         DigraphResult.Bad
       }
+
       else -> DigraphResult.Bad
     }
   }
@@ -234,7 +247,7 @@ class DigraphSequence: Cloneable {
     if (codeType != other.codeType) return false
     if (codeMax != other.codeMax) return false
 
-    if(::codeChars.isInitialized && other::codeChars.isInitialized) {
+    if (::codeChars.isInitialized && other::codeChars.isInitialized) {
       if (!codeChars.contentEquals(other.codeChars)) return false
     } else if (::codeChars.isInitialized != other::codeChars.isInitialized) {
       return false

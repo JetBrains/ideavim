@@ -67,7 +67,7 @@ abstract class SetCommandBase(range: Range, modifier: CommandModifier, argument:
   override fun processCommand(
     editor: VimEditor,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     parseOptionLine(editor, context, commandModifier, commandArgument, getScope(editor))
     return ExecutionResult.Success
@@ -106,7 +106,7 @@ fun parseOptionLine(
   context: ExecutionContext,
   commandModifier: CommandModifier,
   argument: String,
-  scope: OptionAccessScope
+  scope: OptionAccessScope,
 ) {
   val optionGroup = injector.optionGroup
 
@@ -116,11 +116,17 @@ fun parseOptionLine(
     argument.isEmpty() -> {
       // No arguments mean we show only changed values
       val changedOptions = optionGroup.getAllOptions()
-        .filter { !optionGroup.isDefaultValue(it, scope) && (!it.isHidden || (injector.application.isInternal() && !injector.application.isUnitTest())) }
+        .filter {
+          !optionGroup.isDefaultValue(
+            it,
+            scope
+          ) && (!it.isHidden || (injector.application.isInternal() && !injector.application.isUnitTest()))
+        }
         .map { Pair(it.name, it.name) }
       showOptions(editor, context, changedOptions, scope, true, columnFormat)
       return
     }
+
     argument == "all" -> {
       val options = optionGroup.getAllOptions()
         .filter { !it.isHidden || (injector.application.isInternal() && !injector.application.isUnitTest()) }
@@ -128,6 +134,7 @@ fun parseOptionLine(
       showOptions(editor, context, options, scope, true, columnFormat)
       return
     }
+
     argument == "all&" -> {
       // Note that `all&` resets all options in the current editor at local and global scope. This includes global,
       // global-local and local-to-buffer options, which will affect other windows. It does not affect the local values
@@ -157,7 +164,11 @@ fun parseOptionLine(
       when {
         token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
         token.startsWith("no") -> optionGroup.unsetToggleOption(getValidToggleOption(token.substring(2), token), scope)
-        token.startsWith("inv") -> optionGroup.invertToggleOption(getValidToggleOption(token.substring(3), token), scope)
+        token.startsWith("inv") -> optionGroup.invertToggleOption(
+          getValidToggleOption(token.substring(3), token),
+          scope
+        )
+
         token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
         token.endsWith("&") -> optionGroup.resetToDefaultValue(getValidOption(token.dropLast(1), token), scope)
         token.endsWith("<") -> optionGroup.resetToGlobalValue(getValidOption(token.dropLast(1), token), scope, editor)
@@ -173,8 +184,7 @@ fun parseOptionLine(
           }
         }
       }
-    }
-    else {
+    } else {
       // This must be one of =, :, +=, -=, or ^=
       val eq = token.indexOf('=')
       val colon = token.indexOf(':')
@@ -196,8 +206,7 @@ fun parseOptionLine(
           else -> value
         } ?: throw exExceptionMessage("E474", token)
         optionGroup.setOptionValue(option, scope, newValue)
-      }
-      else {
+      } else {
         // We're either missing the equals sign, the colon, or the option name itself
         error = Msg.unkopt
       }
@@ -229,7 +238,7 @@ private fun showOptions(
   nameAndToken: Collection<Pair<String, String>>,
   scope: OptionAccessScope,
   showIntro: Boolean,
-  columnFormat: Boolean
+  columnFormat: Boolean,
 ) {
   val optionService = injector.optionGroup
   val optionsToShow = mutableListOf<Option<VimDataType>>()

@@ -181,7 +181,8 @@ internal class PutGroup : VimPutBase() {
     val firstItemBefore = allContentsBefore.firstOrNull()
     logger.debug { "Copied text: ${text.copiedText}" }
     val (textContent, transferableData) = text.copiedText as IjVimCopiedText
-    val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(textContent, textContent, transferableData) as TextBlockTransferable
+    val origContent: TextBlockTransferable =
+      injector.clipboardManager.setClipboardText(textContent, textContent, transferableData) as TextBlockTransferable
     val allContentsAfter = CopyPasteManager.getInstance().allContents
     val sizeAfterInsert = allContentsAfter.size
     try {

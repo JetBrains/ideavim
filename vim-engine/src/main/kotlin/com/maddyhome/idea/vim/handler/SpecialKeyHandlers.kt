@@ -35,7 +35,12 @@ import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
  * Handler is called once for all carets
  */
 abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret() {
-  final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  final override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     error("This method should not be executed")
   }
 
@@ -81,7 +86,8 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: Boolean) : VimActionHandler.ConditionalMulticaret() {
+abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: Boolean) :
+  VimActionHandler.ConditionalMulticaret() {
 
   override fun runAsMulticaret(
     editor: VimEditor,
@@ -142,7 +148,12 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
     return true
   }
 
-  final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  final override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     motionWithoutKeyModel(editor, context, cmd)
     return true
   }

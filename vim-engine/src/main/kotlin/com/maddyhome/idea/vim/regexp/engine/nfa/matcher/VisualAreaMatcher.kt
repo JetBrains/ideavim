@@ -19,10 +19,11 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 internal class VisualAreaMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
+    index: Int,
+    groups:
     VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     val newPossibleCursors = if (editor.inVisualMode) {
       possibleCursors.filter { it.hasSelection() && index >= it.selectionStart && index < it.selectionEnd }

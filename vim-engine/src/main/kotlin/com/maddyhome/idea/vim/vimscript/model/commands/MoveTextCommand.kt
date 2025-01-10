@@ -41,10 +41,15 @@ import kotlin.math.min
 data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val caretCount = editor.nativeCarets().size
     if (caretCount > 1) {
       throw ExException("Move command supported only for one caret at the moment")
@@ -94,7 +99,15 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
       caret.moveToOffset(0)
       PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
     } else {
-      PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)
+      PutData(
+        textData,
+        null,
+        1,
+        insertTextBeforeCaret = false,
+        rawIndent = true,
+        caretAfterInsertedText = false,
+        putToLine = line
+      )
     }
     injector.put.putTextForCaret(editor, caret, context, putData)
 

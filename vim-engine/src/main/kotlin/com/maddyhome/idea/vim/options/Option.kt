@@ -49,7 +49,8 @@ abstract class Option<T : VimDataType>(
   defaultValue: T,
   val unsetValue: T,
   val isLocalNoGlobal: Boolean = false,
-  val isHidden: Boolean = false) {
+  val isHidden: Boolean = false,
+) {
   private var defaultValueField = defaultValue
 
   open val defaultValue: T
@@ -89,7 +90,7 @@ open class StringOption(
   defaultValue: VimString,
   unsetValue: VimString = VimString.EMPTY,
   val boundedValues: Collection<String>? = null,
-  isLocalNoGlobal: Boolean = false
+  isLocalNoGlobal: Boolean = false,
 ) : Option<VimString>(name, declaredScope, abbrev, defaultValue, unsetValue, isLocalNoGlobal = isLocalNoGlobal) {
 
   constructor(
@@ -98,8 +99,15 @@ open class StringOption(
     abbrev: String,
     defaultValue: String,
     boundedValues: Collection<String>? = null,
-    isLocalNoGlobal: Boolean = false
-  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues = boundedValues, isLocalNoGlobal = isLocalNoGlobal)
+    isLocalNoGlobal: Boolean = false,
+  ) : this(
+    name,
+    declaredScope,
+    abbrev,
+    VimString(defaultValue),
+    boundedValues = boundedValues,
+    isLocalNoGlobal = isLocalNoGlobal
+  )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -228,11 +236,17 @@ open class NumberOption(
   declaredScope: OptionDeclaredScope,
   abbrev: String,
   defaultValue: VimInt,
-  unsetValue: VimInt = VimInt.MINUS_ONE
+  unsetValue: VimInt = VimInt.MINUS_ONE,
 ) :
   Option<VimInt>(name, declaredScope, abbrev, defaultValue, unsetValue) {
 
-  constructor(name: String, declaredScope: OptionDeclaredScope, abbrev: String, defaultValue: Int, unsetValue: Int = -1) : this(
+  constructor(
+    name: String,
+    declaredScope: OptionDeclaredScope,
+    abbrev: String,
+    defaultValue: Int,
+    unsetValue: Int = -1,
+  ) : this(
     name,
     declaredScope,
     abbrev,

@@ -21,12 +21,17 @@ import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
 @ExCommand(command = "mapc[lear],nmapc[lear],vmapc[lear],xmapc[lear],smapc[lear],omapc[lear],imapc[lear],lmapc[lear],cmapc[lear]")
-data class MapClearCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String)
-  : Command.SingleExecution(range, modifier, argument) {
+data class MapClearCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     return if (executeCommand()) ExecutionResult.Success else ExecutionResult.Error
   }
 

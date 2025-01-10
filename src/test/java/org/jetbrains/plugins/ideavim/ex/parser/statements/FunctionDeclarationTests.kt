@@ -47,7 +47,8 @@ class FunctionDeclarationTests : VimTestCase() {
     fun spaces5(): List<Arguments> = productForArguments(spaces, spaces, spaces, spaces, spaces)
 
     @JvmStatic
-    fun spaces9(): List<Arguments> = productForArguments(spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces)
+    fun spaces9(): List<Arguments> =
+      productForArguments(spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces)
 
     @JvmStatic
     fun function(): List<Arguments> = productForArguments(functionAlias, endfunctionAlias, spaces, spaces)

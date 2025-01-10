@@ -596,7 +596,7 @@ class MatchitHtmlTest : VimTestCase() {
       HtmlFileType.INSTANCE,
     )
   }
-  
+
   @Test
   fun `test jump from whitespace before comment angle bracket to closing bracket`() {
     doTest(

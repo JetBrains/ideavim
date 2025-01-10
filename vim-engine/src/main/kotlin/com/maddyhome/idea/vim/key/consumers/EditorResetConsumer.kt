@@ -37,7 +37,14 @@ class EditorResetConsumer : KeyConsumer {
   ): Boolean {
     logger.trace { "Entered EditorResetConsumer" }
     if (!isEditorReset(key, editor)) return false
-    keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext -> handleEditorReset(lambdaEditor, key, lambdaKeyState, lambdaContext) }
+    keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
+      handleEditorReset(
+        lambdaEditor,
+        key,
+        lambdaKeyState,
+        lambdaContext
+      )
+    }
     return true
   }
 
@@ -64,8 +71,7 @@ class EditorResetConsumer : KeyConsumer {
         val mode = editor.mode
         if (mode is Mode.NORMAL && (mode.isInsertPending || mode.isReplacePending)) {
           editor.mode = mode.returnTo
-        }
-        else {
+        } else {
           var indicateError = true
           if (key.keyCode == KeyEvent.VK_ESCAPE) {
             val executed = arrayOf<Boolean?>(null)

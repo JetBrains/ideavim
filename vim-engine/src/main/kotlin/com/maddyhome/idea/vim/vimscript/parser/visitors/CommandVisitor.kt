@@ -196,7 +196,13 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return createCommandByCommandContext(ranges, commandName, modifier, argument, ctx)
   }
 
-  private fun createCommandByCommandContext(range: Range, commandName: String, modifier: CommandModifier, argument: String, ctx: ParserRuleContext): Command {
+  private fun createCommandByCommandContext(
+    range: Range,
+    commandName: String,
+    modifier: CommandModifier,
+    argument: String,
+    ctx: ParserRuleContext,
+  ): Command {
     val command = when (getCommandByName(commandName)) {
       MapCommand::class -> MapCommand(range, commandName, modifier, argument)
       MapClearCommand::class -> MapClearCommand(range, commandName, modifier, argument)
@@ -209,6 +215,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
           GlobalCommand(range, modifier, argument, inverse)
         }
       }
+
       SplitCommand::class -> {
         if (commandName.startsWith("v")) {
           SplitCommand(range, argument, SplitType.VERTICAL)
@@ -216,6 +223,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
           SplitCommand(range, argument, SplitType.HORIZONTAL)
         }
       }
+
       SubstituteCommand::class -> SubstituteCommand(range, argument, commandName)
       else -> getCommandByName(commandName).primaryConstructor!!.call(range, modifier, argument)
     }
@@ -254,7 +262,13 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
-    val command = injector.vimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(Range(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = injector.vimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(
+      Range(),
+      SimpleExpression(0),
+      AssignmentOperator.ASSIGNMENT,
+      SimpleExpression(0),
+      false
+    )
     command.rangeInScript = ctx.getTextRange()
     return command
   }
@@ -266,7 +280,20 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
 
     val alphabeticPart = name.split(Regex("\\P{Alpha}"))[0]
-    if (setOf("s", "su", "sub", "subs", "subst", "substi", "substit", "substitu", "substitut", "substitut", "substitute").contains(alphabeticPart)) {
+    if (setOf(
+        "s",
+        "su",
+        "sub",
+        "subs",
+        "subst",
+        "substi",
+        "substit",
+        "substitu",
+        "substitut",
+        "substitut",
+        "substitute"
+      ).contains(alphabeticPart)
+    ) {
       val command = SubstituteCommand(range, name.replaceFirst(alphabeticPart, "") + argument, alphabeticPart)
       command.rangeInScript = ctx.getTextRange()
       return command

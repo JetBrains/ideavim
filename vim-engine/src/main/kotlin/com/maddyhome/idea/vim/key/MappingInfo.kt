@@ -69,6 +69,7 @@ sealed class MappingInfo(
         val keyCodeDiff = key1.keyCode - key2.keyCode
         if (keyCodeDiff != 0) keyCodeDiff else key1.modifiers - key2.modifiers
       }
+
       c1 == KeyEvent.CHAR_UNDEFINED -> -1
       c2 == KeyEvent.CHAR_UNDEFINED -> 1
       else -> c1 - c2

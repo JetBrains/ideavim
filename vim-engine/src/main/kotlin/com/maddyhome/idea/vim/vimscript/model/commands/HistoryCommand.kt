@@ -25,12 +25,17 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :history"
  */
 @ExCommand(command = "his[tory]")
-data class HistoryCommand(val range: Range, val modifier: CommandModifier, val argument: String)
-  : Command.SingleExecution(range, modifier, argument) {
+data class HistoryCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     logger.debug("execute")
 
     var arg = argument.trim().ifEmpty { "cmd" }

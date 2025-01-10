@@ -19,20 +19,24 @@ class CallCommandTest : VimTestCase() {
         d
       endfunction
     """.trimIndent()
-    configureByText("""
+    configureByText(
+      """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
     executeVimscript(function)
 
     enterCommand("call DeleteLine()")
 
-    assertState("""
+    assertState(
+      """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       ${c}Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 }

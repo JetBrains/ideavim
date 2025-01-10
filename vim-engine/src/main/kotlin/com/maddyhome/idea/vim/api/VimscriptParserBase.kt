@@ -27,7 +27,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 
-abstract class VimscriptParserBase: com.maddyhome.idea.vim.api.VimscriptParser {
+abstract class VimscriptParserBase : com.maddyhome.idea.vim.api.VimscriptParser {
   private companion object {
     private const val MAX_NUMBER_OF_TRIES = 5
   }

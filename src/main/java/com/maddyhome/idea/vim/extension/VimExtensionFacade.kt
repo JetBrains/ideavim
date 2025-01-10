@@ -69,7 +69,8 @@ object VimExtensionFacade {
 
 
   @JvmStatic
-  @Deprecated("Use VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)",
+  @Deprecated(
+    "Use VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)",
     ReplaceWith(
       "VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)",
       "com.maddyhome.idea.vim.VimPlugin"
@@ -189,12 +190,18 @@ object VimExtensionFacade {
   /** Get the current contents of the given register similar to 'getreg()'. */
   @JvmStatic
   fun getRegister(editor: VimEditor, register: Char): List<KeyStroke>? {
-    val reg = VimPlugin.getRegister().getRegister(editor, injector.executionContextManager.getEditorExecutionContext(editor), register) ?: return null
+    val reg = VimPlugin.getRegister()
+      .getRegister(editor, injector.executionContextManager.getEditorExecutionContext(editor), register) ?: return null
     return reg.keys
   }
 
   @JvmStatic
-  fun getRegisterForCaret(editor: VimEditor, context: ExecutionContext, register: Char, caret: VimCaret): List<KeyStroke>? {
+  fun getRegisterForCaret(
+    editor: VimEditor,
+    context: ExecutionContext,
+    register: Char,
+    caret: VimCaret,
+  ): List<KeyStroke>? {
     val reg = caret.registerStorage.getRegister(editor, context, register) ?: return null
     return reg.keys
   }
@@ -225,7 +232,7 @@ object VimExtensionFacade {
     defaultArgs: List<Pair<String, Expression>>,
     hasOptionalArguments: Boolean,
     flags: EnumSet<FunctionFlag>,
-    function: ScriptFunction
+    function: ScriptFunction,
   ) {
     var functionDeclaration: FunctionDeclaration? = null
     val body = listOf(object : Executable {
@@ -255,8 +262,7 @@ object VimExtensionFacade {
 }
 
 fun VimExtensionFacade.exportOperatorFunction(name: String, function: OperatorFunction) {
-  exportScriptFunction(null, name, listOf("type"), emptyList(), false, noneOfEnum()) {
-    editor, context, args ->
+  exportScriptFunction(null, name, listOf("type"), emptyList(), false, noneOfEnum()) { editor, context, args ->
 
     val type = args["type"]?.asString()
     val selectionType = when (type) {
@@ -268,8 +274,7 @@ fun VimExtensionFacade.exportOperatorFunction(name: String, function: OperatorFu
 
     if (function.apply(editor, context, selectionType)) {
       ExecutionResult.Success
-    }
-    else {
+    } else {
       ExecutionResult.Error
     }
   }

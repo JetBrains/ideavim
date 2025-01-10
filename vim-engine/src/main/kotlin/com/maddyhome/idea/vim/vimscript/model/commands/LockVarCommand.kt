@@ -26,10 +26,15 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 class LockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val variableAndDepth = parseVariableAndDepth(modifier, argument)
     injector.variableService.lockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, vimContext)
     return ExecutionResult.Success
@@ -43,12 +48,23 @@ class LockVarCommand(val range: Range, val modifier: CommandModifier, val argume
 class UnlockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // todo doesn't throw proper vim exceptions in case of wrong arguments
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val variableAndDepth = parseVariableAndDepth(modifier, argument)
-    injector.variableService.unlockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, vimContext)
+    injector.variableService.unlockVariable(
+      variableAndDepth.first,
+      variableAndDepth.second,
+      editor,
+      context,
+      vimContext
+    )
     return ExecutionResult.Success
   }
 }
@@ -63,6 +79,7 @@ private fun parseVariableAndDepth(modifier: CommandModifier, argument: String): 
       depth = args[0].toIntOrNull() ?: 2
       variable = args[1]
     }
+
     else -> throw ExException("Unknown error during lockvar command execution")
   }
   return Pair(parseVariable(variable), depth)

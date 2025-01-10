@@ -37,7 +37,7 @@ abstract class MotionRightBaseAction() : MotionActionHandler.ForEachCaret() {
     return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd(editor), allowWrap)
   }
 
-  protected open fun allowPastEnd(editor: VimEditor)  = editor.usesVirtualSpace || editor.isEndAllowed
+  protected open fun allowPastEnd(editor: VimEditor) = editor.usesVirtualSpace || editor.isEndAllowed
 }
 
 @CommandOrMotion(keys = ["l"], modes = [Mode.NORMAL, Mode.VISUAL])

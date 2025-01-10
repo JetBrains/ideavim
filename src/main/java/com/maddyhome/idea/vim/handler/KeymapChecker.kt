@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import javax.swing.KeyStroke
 
 // We use alarm with delay to avoid many notifications in case many events are fired at the same time
-internal val keyCheckRequests = MutableSharedFlow<Unit>(replay=1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+internal val keyCheckRequests = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 /**
  * This checker verifies that the keymap has a correct configuration that is required for IdeaVim plugin
@@ -152,5 +152,5 @@ internal sealed interface KeyMapIssue {
     val action: String,
     val actionId: String,
     val shortcut: Shortcut,
-  ): KeyMapIssue
+  ) : KeyMapIssue
 }

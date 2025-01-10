@@ -22,8 +22,13 @@ data class KeyHandlerState(
   val digraphSequence: DigraphSequence,
   val editorCommandBuilder: CommandBuilder,
   var commandLineCommandBuilder: CommandBuilder?,
-): Cloneable {
-  constructor() : this(MappingState(), DigraphSequence(), CommandBuilder(injector.keyGroup.getBuiltinCommandsTrie(MappingMode.NORMAL)), null)
+) : Cloneable {
+  constructor() : this(
+    MappingState(),
+    DigraphSequence(),
+    CommandBuilder(injector.keyGroup.getBuiltinCommandsTrie(MappingMode.NORMAL)),
+    null
+  )
 
   companion object {
     private val logger = vimLogger<KeyHandlerState>()
@@ -57,8 +62,10 @@ data class KeyHandlerState(
     // argument with the search string. The command has a count of `6`. And a command such as `3:p` becomes an action to
     // process Ex entry with an argument of `.,.+2p` and a count of 3. The count is ignored by this action.
     // Note that we use the calculated count. In Vim, `2"a3"b:` transforms to `:.,.+5`, which is the same behaviour
-    commandLineCommandBuilder = CommandBuilder(injector.keyGroup.getBuiltinCommandsTrie(MappingMode.CMD_LINE),
-      editorCommandBuilder.calculateCount0Snapshot())
+    commandLineCommandBuilder = CommandBuilder(
+      injector.keyGroup.getBuiltinCommandsTrie(MappingMode.CMD_LINE),
+      editorCommandBuilder.calculateCount0Snapshot()
+    )
   }
 
   fun leaveCommandLine() {

@@ -83,7 +83,10 @@ fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
   }
 }
 
-internal fun <T, S, V> Collection<T>.cartesianProduct(other: Iterable<S>, transformer: (first: T, second: S) -> V): List<V> {
+internal fun <T, S, V> Collection<T>.cartesianProduct(
+  other: Iterable<S>,
+  transformer: (first: T, second: S) -> V,
+): List<V> {
   return this.flatMap { first -> other.map { second -> transformer.invoke(first, second) } }
 }
 

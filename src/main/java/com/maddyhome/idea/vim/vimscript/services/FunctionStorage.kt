@@ -14,5 +14,6 @@ import com.maddyhome.idea.vim.vimscript.model.functions.IntellijFunctionProvider
 import com.maddyhome.idea.vim.vimscript.model.functions.VimscriptFunctionProvider
 
 internal class FunctionStorage : VimScriptFunctionServiceBase() {
-  override val functionProviders: List<VimscriptFunctionProvider> = listOf(EngineFunctionProvider, IntellijFunctionProvider)
+  override val functionProviders: List<VimscriptFunctionProvider> =
+    listOf(EngineFunctionProvider, IntellijFunctionProvider)
 }

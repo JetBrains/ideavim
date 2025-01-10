@@ -114,7 +114,7 @@ class VimExchangeExtensionTest : VimTestCase() {
   // |cxx|
   @VimBehaviorDiffers(
     originalVimAfter =
-    """The quick
+      """The quick
        catch over
        ${c}brown fox
        the lazy dog
@@ -142,7 +142,7 @@ class VimExchangeExtensionTest : VimTestCase() {
   // |cxx|
   @VimBehaviorDiffers(
     originalVimAfter =
-    """The quick
+      """The quick
        catch over
        ${c}brown fox
        the lazy dog
@@ -195,7 +195,7 @@ class VimExchangeExtensionTest : VimTestCase() {
 
   @VimBehaviorDiffers(
     originalVimAfter =
-    """
+      """
          catch over
          the lazy dog
          ${c}The quick

@@ -30,10 +30,12 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     enterCommand("y")
-    assertRegisterString(RegisterConstants.UNNAMED_REGISTER,
+    assertRegisterString(
+      RegisterConstants.UNNAMED_REGISTER,
       """
         |Morbi nec luctus tortor, id venenatis lacus.
-        |""".trimMargin())
+        |""".trimMargin()
+    )
   }
 
   @Test
@@ -72,7 +74,8 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     enterCommand("4y")
-    assertRegisterString(RegisterConstants.UNNAMED_REGISTER,
+    assertRegisterString(
+      RegisterConstants.UNNAMED_REGISTER,
       """
         |Ut id dapibus augue.
         |""".trimMargin()
@@ -92,7 +95,8 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     typeText(commandToKeys("3,4y"))
-    assertRegisterString(RegisterConstants.UNNAMED_REGISTER,
+    assertRegisterString(
+      RegisterConstants.UNNAMED_REGISTER,
       """
         |Nunc sit amet tellus vel purus cursus posuere et at purus.
         |Ut id dapibus augue.
@@ -144,10 +148,12 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     enterCommand("y a")
-    assertRegisterString('a',
+    assertRegisterString(
+      'a',
       """
         |Morbi nec luctus tortor, id venenatis lacus.
-        |""".trimMargin())
+        |""".trimMargin()
+    )
   }
 
   @Test
@@ -164,11 +170,13 @@ class YankLinesCommandTest : VimTestCase() {
     )
     typeText("\"ayy")
     enterCommand("y A")
-    assertRegisterString('a',
+    assertRegisterString(
+      'a',
       """
         |Morbi nec luctus tortor, id venenatis lacus.
         |Morbi nec luctus tortor, id venenatis lacus.
-        |""".trimMargin())
+        |""".trimMargin()
+    )
   }
 
   @Test
@@ -218,12 +226,14 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     enterCommand("y 3")
-    assertRegisterString(RegisterConstants.UNNAMED_REGISTER,
+    assertRegisterString(
+      RegisterConstants.UNNAMED_REGISTER,
       """
         |Morbi nec luctus tortor, id venenatis lacus.
         |Nunc sit amet tellus vel purus cursus posuere et at purus.
         |Ut id dapibus augue.
-        |""".trimMargin())
+        |""".trimMargin()
+    )
   }
 
   @Test
@@ -256,12 +266,14 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     enterCommand("2,3y 3")
-    assertRegisterString(RegisterConstants.UNNAMED_REGISTER,
+    assertRegisterString(
+      RegisterConstants.UNNAMED_REGISTER,
       """
         |Nunc sit amet tellus vel purus cursus posuere et at purus.
         |Ut id dapibus augue.
         |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-        |""".trimMargin())
+        |""".trimMargin()
+    )
   }
 
   @Test
@@ -277,12 +289,14 @@ class YankLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
     enterCommand("y c 3")
-    assertRegisterString('c',
+    assertRegisterString(
+      'c',
       """
         |Morbi nec luctus tortor, id venenatis lacus.
         |Nunc sit amet tellus vel purus cursus posuere et at purus.
         |Ut id dapibus augue.
-        |""".trimMargin())
+        |""".trimMargin()
+    )
   }
 
   @Test
@@ -299,12 +313,14 @@ class YankLinesCommandTest : VimTestCase() {
     )
     typeText("vjj")
     enterCommand("y")
-    assertRegisterString(RegisterConstants.UNNAMED_REGISTER,
+    assertRegisterString(
+      RegisterConstants.UNNAMED_REGISTER,
       """
         |Nunc sit amet tellus vel purus cursus posuere et at purus.
         |Ut id dapibus augue.
         |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-        |""".trimMargin())
+        |""".trimMargin()
+    )
   }
 
   @Test

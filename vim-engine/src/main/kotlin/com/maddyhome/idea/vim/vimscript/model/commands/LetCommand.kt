@@ -55,10 +55,16 @@ data class LetCommand(
   private companion object {
     private val logger = vimLogger<LetCommand>()
   }
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     if (!isSyntaxSupported) return ExecutionResult.Error
     when (variable) {
       is Variable -> {
@@ -69,7 +75,15 @@ data class LetCommand(
         }
 
         if (isReadOnlyVariable(variable, editor, context)) {
-          throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, vimContext)}\"")
+          throw ExException(
+            "E46: Cannot change read-only variable \"${
+              variable.toString(
+                editor,
+                context,
+                vimContext
+              )
+            }\""
+          )
         }
 
         val leftValue = injector.variableService.getNullableVariableValue(variable, editor, context, vimContext)
@@ -77,7 +91,13 @@ data class LetCommand(
           throw ExException("E741: Value is locked: ${variable.toString(editor, context, vimContext)}")
         }
         val rightValue = expression.evaluate(editor, context, vimContext)
-        injector.variableService.storeVariable(variable, operator.getNewValue(leftValue, rightValue), editor, context, this)
+        injector.variableService.storeVariable(
+          variable,
+          operator.getNewValue(leftValue, rightValue),
+          editor,
+          context,
+          this
+        )
       }
 
       is OneElementSublistExpression -> {
@@ -110,6 +130,7 @@ data class LetCommand(
             }
             containerValue.dictionary[dictKey] = valueToStore
           }
+
           is VimList -> {
             // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
             // vim throws the same error as the asString() method
@@ -120,8 +141,10 @@ data class LetCommand(
             if (containerValue.values[index].isLocked) {
               throw ExException("E741: Value is locked: ${variable.originalString}")
             }
-            containerValue.values[index] = operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext))
+            containerValue.values[index] =
+              operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext))
           }
+
           is VimBlob -> TODO()
           else -> throw ExException("E689: Can only index a List, Dictionary or Blob")
         }
@@ -129,7 +152,8 @@ data class LetCommand(
 
       is SublistExpression -> {
         if (variable.expression is Variable) {
-          val variableValue = injector.variableService.getNonNullVariableValue(variable.expression, editor, context, this)
+          val variableValue =
+            injector.variableService.getNonNullVariableValue(variable.expression, editor, context, this)
           if (variableValue is VimList) {
             // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
             // vim throws the same error as the asString() method
@@ -183,8 +207,18 @@ data class LetCommand(
             ?: throw exExceptionMessage("E518", variable.originalString)
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
-            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.GLOBAL(editor), newValue)
-            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionAccessScope.LOCAL(editor), newValue)
+            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(
+              option,
+              OptionAccessScope.GLOBAL(editor),
+              newValue
+            )
+
+            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(
+              option,
+              OptionAccessScope.LOCAL(editor),
+              newValue
+            )
+
             null -> injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(editor), newValue)
             else -> throw ExException("Invalid option scope")
           }
@@ -197,7 +231,12 @@ data class LetCommand(
 
       is Register -> {
         if (RegisterConstants.WRITABLE_REGISTERS.contains(variable.char)) {
-          val result = injector.registerGroup.storeText(editor, context, variable.char, expression.evaluate(editor, context, vimContext).asString())
+          val result = injector.registerGroup.storeText(
+            editor,
+            context,
+            variable.char,
+            expression.evaluate(editor, context, vimContext).asString()
+          )
           if (!result) {
             logger.error(
               """
@@ -232,7 +271,12 @@ data class LetCommand(
 
   private fun isReadOnlyVariable(variable: Variable, editor: VimEditor, context: ExecutionContext): Boolean {
     if (variable.scope == Scope.FUNCTION_VARIABLE) return true
-    if (variable.scope == null && variable.name.evaluate(editor, context, vimContext).value == "self" && isInsideDictionaryFunction()) return true
+    if (variable.scope == null && variable.name.evaluate(
+        editor,
+        context,
+        vimContext
+      ).value == "self" && isInsideDictionaryFunction()
+    ) return true
     return false
   }
 

@@ -19,23 +19,30 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<C-W>"], modes = [Mode.CMD_LINE])
-class DeletePrevWordAction : VimActionHandler.SingleExecution()  {
+class DeletePrevWordAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
 
     val caretOffset = commandLine.caret.offset
     if (caretOffset == 0) return true
 
     val oldText = commandLine.actualText
-    val motion = injector.motion.findOffsetOfNextWord(oldText, oldText.length, commandLine.caret.offset, -1, true, editor)
+    val motion =
+      injector.motion.findOffsetOfNextWord(oldText, oldText.length, commandLine.caret.offset, -1, true, editor)
     when (motion) {
       is Motion.AbsoluteOffset -> {
         val newText = oldText.substring(0, motion.offset) + oldText.substring(caretOffset)
         commandLine.caret.offset = motion.offset
         commandLine.setText(newText)
       }
+
       else -> {}
     }
 

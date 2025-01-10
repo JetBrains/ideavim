@@ -12,5 +12,10 @@ import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 
 interface VimModalInputService {
   fun getCurrentModalInput(): VimModalInput?
-  fun create(editor: VimEditor, context: ExecutionContext, label: String, inputInterceptor: VimInputInterceptor<*>): VimModalInput
+  fun create(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    inputInterceptor: VimInputInterceptor<*>,
+  ): VimModalInput
 }

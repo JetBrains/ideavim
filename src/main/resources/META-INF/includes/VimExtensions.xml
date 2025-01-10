@@ -99,7 +99,8 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.paragraphmotion.ParagraphMotion" name="vim-paragraph-motion">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.paragraphmotion.ParagraphMotion"
+                  name="vim-paragraph-motion">
       <aliases>
         <alias name="https://github.com/dbakker/vim-paragraph-motion"/>
         <alias name="dbakker/vim-paragraph-motion"/>

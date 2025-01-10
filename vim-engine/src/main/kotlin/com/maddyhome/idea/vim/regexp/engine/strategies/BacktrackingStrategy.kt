@@ -32,7 +32,15 @@ internal class BacktrackingStrategy : SimulationStrategy {
 
   override fun simulate(nfa: NFA, editor: VimEditor, startIndex: Int, isCaseInsensitive: Boolean): SimulationResult {
     groups.clear()
-    if (simulate(editor, startIndex, nfa.startState, nfa.acceptState, isCaseInsensitive, editor.carets().toMutableList()).simulationResult) {
+    if (simulate(
+        editor,
+        startIndex,
+        nfa.startState,
+        nfa.acceptState,
+        isCaseInsensitive,
+        editor.carets().toMutableList()
+      ).simulationResult
+    ) {
       return SimulationResult.Complete(
         groups.get(0)?.let {
           VimMatchResult.Success(
@@ -66,7 +74,7 @@ internal class BacktrackingStrategy : SimulationStrategy {
     targetState: NFAState,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
-    maxIndex: Int = editor.text().length
+    maxIndex: Int = editor.text().length,
   ): NFASimulationResult {
     val stack = mutableListOf<SimulationStackFrame>()
     stack.add(SimulationStackFrame(index, state, NfaStateList.empty))
@@ -78,18 +86,29 @@ internal class BacktrackingStrategy : SimulationStrategy {
       if (currFrame.currentState === targetState) return NFASimulationResult(true, currFrame.currentIndex)
       currFrame.currentState.assertion?.let {
         val assertionResult = handleAssertion(editor, currFrame.currentIndex, isCaseInsensitive, it, possibleCursors)
-        if (assertionResult.simulationResult) stack.add(SimulationStackFrame(assertionResult.index, currFrame.currentState.assertion!!.jumpTo, NfaStateList.empty))
+        if (assertionResult.simulationResult) stack.add(
+          SimulationStackFrame(
+            assertionResult.index,
+            currFrame.currentState.assertion!!.jumpTo,
+            NfaStateList.empty
+          )
+        )
       }
 
 
       for (i in currFrame.currentState.transitions.lastIndex downTo 0) {
         val transition = currFrame.currentState.transitions[i]
-        val transitionMatcherResult = transition.matcher.matches(editor, currFrame.currentIndex, groups, isCaseInsensitive, possibleCursors)
+        val transitionMatcherResult =
+          transition.matcher.matches(editor, currFrame.currentIndex, groups, isCaseInsensitive, possibleCursors)
         if (transitionMatcherResult !is MatcherResult.Success) continue
         val destState = transition.destState
         if (transitionMatcherResult.consumed == 0 && currFrame.epsilonVisited.contains(destState)) continue
         val nextIndex = currFrame.currentIndex + transitionMatcherResult.consumed
-        val epsilonVisitedCopy = if (transitionMatcherResult.consumed == 0 && !currFrame.epsilonVisited.contains(destState)) NfaStateList(currFrame.currentState, currFrame.epsilonVisited) else NfaStateList.empty
+        val epsilonVisitedCopy =
+          if (transitionMatcherResult.consumed == 0 && !currFrame.epsilonVisited.contains(destState)) NfaStateList(
+            currFrame.currentState,
+            currFrame.epsilonVisited
+          ) else NfaStateList.empty
         stack.add(SimulationStackFrame(nextIndex, destState, epsilonVisitedCopy))
       }
     }
@@ -113,9 +132,15 @@ internal class BacktrackingStrategy : SimulationStrategy {
     currentIndex: Int,
     isCaseInsensitive: Boolean,
     assertion: NFAAssertion,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): NFASimulationResult {
-    return if (assertion.isAhead) handleAheadAssertion(editor, currentIndex, isCaseInsensitive, assertion, possibleCursors)
+    return if (assertion.isAhead) handleAheadAssertion(
+      editor,
+      currentIndex,
+      isCaseInsensitive,
+      assertion,
+      possibleCursors
+    )
     else handleBehindAssertion(editor, currentIndex, isCaseInsensitive, assertion, possibleCursors)
   }
 
@@ -136,9 +161,10 @@ internal class BacktrackingStrategy : SimulationStrategy {
     currentIndex: Int,
     isCaseInsensitive: Boolean,
     assertion: NFAAssertion,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): NFASimulationResult {
-    val assertionResult = simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive, possibleCursors)
+    val assertionResult =
+      simulate(editor, currentIndex, assertion.startState, assertion.endState, isCaseInsensitive, possibleCursors)
     if (assertionResult.simulationResult != assertion.isPositive) {
       return NFASimulationResult(false, currentIndex)
     }
@@ -168,7 +194,7 @@ internal class BacktrackingStrategy : SimulationStrategy {
     currentIndex: Int,
     isCaseInsensitive: Boolean,
     assertion: NFAAssertion,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): NFASimulationResult {
     var lookBehindStartIndex = currentIndex - 1
     val minIndex = if (assertion.limit == 0) 0 else max(0, currentIndex - assertion.limit)
@@ -177,7 +203,15 @@ internal class BacktrackingStrategy : SimulationStrategy {
       // the lookbehind is allowed to look back as far as to the start of the previous line
       if (editor.text()[lookBehindStartIndex] == '\n') seenNewLine = true
 
-      val result = simulate(editor, lookBehindStartIndex, assertion.startState, assertion.endState, isCaseInsensitive, possibleCursors, maxIndex = currentIndex)
+      val result = simulate(
+        editor,
+        lookBehindStartIndex,
+        assertion.startState,
+        assertion.endState,
+        isCaseInsensitive,
+        possibleCursors,
+        maxIndex = currentIndex
+      )
       // found a match that ends before the "currentIndex"
       if (result.simulationResult && result.index == currentIndex) {
         return if (assertion.isPositive) NFASimulationResult(
@@ -218,7 +252,7 @@ private data class NFASimulationResult(
   /**
    * The index of the input editor text at which the simulation stopped
    */
-  val index: Int
+  val index: Int,
 )
 
 private data class SimulationStackFrame(

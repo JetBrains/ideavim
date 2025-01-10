@@ -35,7 +35,8 @@ class WrapOptionMapperTest : VimTestCase() {
     super.setUp(testInfo)
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
-    manager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+    manager =
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     configureByText("\n")
@@ -177,8 +178,7 @@ class WrapOptionMapperTest : VimTestCase() {
     try {
       injector.optionGroup.startInitVimRc()
       enterCommand("set nowrap")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 
@@ -295,8 +295,7 @@ class WrapOptionMapperTest : VimTestCase() {
     try {
       injector.optionGroup.startInitVimRc()
       enterCommand("set nowrap")
-    }
-    finally {
+    } finally {
       injector.optionGroup.endInitVimRc()
     }
 

@@ -21,7 +21,12 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 internal class InsertBackspaceAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
-  override fun execute( editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments, ): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     if (editor.insertMode) {
       injector.changeGroup.processBackspace(editor, context)
     } else {

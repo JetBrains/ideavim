@@ -26,7 +26,7 @@ sealed class VimMatchResult {
   data class Success(
     val range: TextRange,
     val value: String,
-    val groups: VimMatchGroupCollection
+    val groups: VimMatchGroupCollection,
   ) : VimMatchResult()
 
   /**
@@ -35,6 +35,6 @@ sealed class VimMatchResult {
    * @param errorCode Code of the error that caused matching to fail
    */
   data class Failure(
-    val errorCode: VimRegexErrors
+    val errorCode: VimRegexErrors,
   ) : VimMatchResult()
 }

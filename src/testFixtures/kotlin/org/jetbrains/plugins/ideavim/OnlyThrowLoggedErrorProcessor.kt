@@ -31,7 +31,7 @@ object OnlyThrowLoggedErrorProcessor : LoggedErrorProcessor() {
 /**
  * Asserts that [T] was thrown via `LOG.error("message", e)` call where `e` has a type of [T].
  */
-inline fun <reified T: Throwable> assertThrowsLogError(crossinline action: () -> Unit): T {
+inline fun <reified T : Throwable> assertThrowsLogError(crossinline action: () -> Unit): T {
   val exception = assertThrows<TestLoggerAssertionError> {
     LoggedErrorProcessor.executeWith<Throwable>(OnlyThrowLoggedErrorProcessor) {
       action()

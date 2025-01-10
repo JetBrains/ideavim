@@ -41,8 +41,7 @@ internal class IjVimMessages : VimMessagesBase() {
     val project = editor?.ij?.project
     if (project != null) {
       setStatusBarMessage(project, message)
-    }
-    else {
+    } else {
       // TODO: We really shouldn't set the status bar text for other projects. That's rude.
       ProjectManager.getInstance().openProjects.forEach {
         setStatusBarMessage(it, message)

@@ -24,7 +24,12 @@ class SearchEntryFwdAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.MODE_CHANGE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun execute( editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     startSearchCommand('/', editor, context)
     return true
   }
@@ -35,7 +40,12 @@ class SearchEntryRevAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.MODE_CHANGE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_START_EX, CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     startSearchCommand('?', editor, context)
     return true
   }

@@ -1014,14 +1014,16 @@ class MapCommandTest : VimTestCase() {
     )
     enterCommand("map <Enter> <Action>(EditorSelectWord)")
     typeText("<Enter>")
-    assertState("""
+    assertState(
+      """
      Lorem Ipsum
 
      Lorem ipsum dolor sit amet,
      ${s}${c}consectetur${se} adipiscing elit
      Sed in orci mauris.
      Cras id tellus in ex imperdiet egestas. 
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @TestFor(issues = ["VIM-2929"])

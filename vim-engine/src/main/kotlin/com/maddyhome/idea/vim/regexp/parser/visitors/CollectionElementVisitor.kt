@@ -31,56 +31,56 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
   }
 
   override fun visitAlnumClass(ctx: RegexParser.AlnumClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isLetterOrDigit()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isLetterOrDigit() }, false)
   }
 
   override fun visitAlphaClass(ctx: RegexParser.AlphaClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isLetter()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isLetter() }, false)
   }
 
   override fun visitBlankClass(ctx: RegexParser.BlankClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{" \t".contains(it)}, false)
+    return Pair(CollectionElement.CharacterClassExpression { " \t".contains(it) }, false)
   }
 
   override fun visitCntrlClass(ctx: RegexParser.CntrlClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isISOControl()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isISOControl() }, false)
   }
 
   override fun visitDigitClass(ctx: RegexParser.DigitClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isDigit()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isDigit() }, false)
   }
 
   override fun visitGraphClass(ctx: RegexParser.GraphClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it in '!'..'~'}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it in '!'..'~' }, false)
   }
 
   override fun visitLowerClass(ctx: RegexParser.LowerClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isLowerCase()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isLowerCase() }, false)
   }
 
   override fun visitPrintClass(ctx: RegexParser.PrintClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{!it.isISOControl()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { !it.isISOControl() }, false)
   }
 
   override fun visitPunctClass(ctx: RegexParser.PunctClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{
+    return Pair(CollectionElement.CharacterClassExpression {
       it in '!'..'/' ||
-      it in ':'..'@' ||
-      it in '['..'`' ||
-      it in '{'..'~'
+        it in ':'..'@' ||
+        it in '['..'`' ||
+        it in '{'..'~'
     }, false)
   }
 
   override fun visitSpaceClass(ctx: RegexParser.SpaceClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isWhitespace()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isWhitespace() }, false)
   }
 
   override fun visitUpperClass(ctx: RegexParser.UpperClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isUpperCase()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isUpperCase() }, false)
   }
 
   override fun visitXdigitClass(ctx: RegexParser.XdigitClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{
+    return Pair(CollectionElement.CharacterClassExpression {
       it in '0'..'9' ||
         it in 'a'..'f' ||
         it in 'A'..'F'
@@ -88,35 +88,35 @@ internal class CollectionElementVisitor : RegexParserBaseVisitor<Pair<Collection
   }
 
   override fun visitReturnClass(ctx: RegexParser.ReturnClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it == '\r'}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it == '\r' }, false)
   }
 
   override fun visitTab(ctx: RegexParser.TabContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it == '\t'}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it == '\t' }, false)
   }
 
   override fun visitEsc(ctx: RegexParser.EscContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it == ''}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it == '' }, false)
   }
 
   override fun visitBackspaceClass(ctx: RegexParser.BackspaceClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it == '\b'}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it == '\b' }, false)
   }
 
   override fun visitIdentClass(ctx: RegexParser.IdentClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isJavaIdentifierPart()}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isJavaIdentifierPart() }, false)
   }
 
   override fun visitKeywordClass(ctx: RegexParser.KeywordClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isLetterOrDigit() || it == '_'}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isLetterOrDigit() || it == '_' }, false)
   }
 
   override fun visitFnameClass(ctx: RegexParser.FnameClassContext?): Pair<CollectionElement, Boolean> {
-    return Pair(CollectionElement.CharacterClassExpression{it.isLetter() || "_/.-+,#$%~=".contains(it)}, false)
+    return Pair(CollectionElement.CharacterClassExpression { it.isLetter() || "_/.-+,#$%~=".contains(it) }, false)
   }
 
-  private fun cleanLiteralChar(str: String) : Pair<Char, Boolean> {
-    return  if (str.length > 2 && str[0] == '\\' && str[1] == 'd') Pair(Char(str.substring(2).toInt()), false)
+  private fun cleanLiteralChar(str: String): Pair<Char, Boolean> {
+    return if (str.length > 2 && str[0] == '\\' && str[1] == 'd') Pair(Char(str.substring(2).toInt()), false)
     else if (str.length > 2 && str[0] == '\\' && str[1] == 'o') Pair(Char(str.substring(2).toInt(8)), false)
     else if (str.length > 2 && str[0] == '\\' && str[1] == 'x') Pair(Char(str.substring(2).toInt(16)), false)
     else if (str.length > 2 && str[0] == '\\' && str[1] == 'u') Pair(Char(str.substring(2).toInt(16)), false)

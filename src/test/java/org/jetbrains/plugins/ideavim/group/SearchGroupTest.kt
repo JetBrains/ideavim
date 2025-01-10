@@ -636,7 +636,8 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("3", "/", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -649,7 +650,7 @@ class SearchGroupTest : VimTestCase() {
         ‷one‴
         two
       """.trimIndent()
-      )
+    )
     assertPosition(8, 0)
   }
 
@@ -671,7 +672,8 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("12", "/", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -708,7 +710,8 @@ class SearchGroupTest : VimTestCase() {
     typeText("12", "/", "one") // No enter
 
     // No current match highlight
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -732,8 +735,10 @@ class SearchGroupTest : VimTestCase() {
     configureByText("lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum lorem 6 ipsum lorem 7 ipsum")
     enterCommand("set hlsearch incsearch")
     typeText("2d", "3/ipsum") // No enter
-    assertSearchHighlights("ipsum",
-      "lorem 1 «ipsum» lorem 2 «ipsum» lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 ‷ipsum‴ lorem 7 «ipsum»")
+    assertSearchHighlights(
+      "ipsum",
+      "lorem 1 «ipsum» lorem 2 «ipsum» lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 ‷ipsum‴ lorem 7 «ipsum»"
+    )
   }
 
   @Test
@@ -818,7 +823,8 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("3", "?", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -853,7 +859,8 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("12", "?", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -890,7 +897,8 @@ class SearchGroupTest : VimTestCase() {
     typeText("12", "?", "one") // No enter
 
     // No current match highlight
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -914,8 +922,10 @@ class SearchGroupTest : VimTestCase() {
     configureByText("lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum lorem 6 ipsum lorem 7 ipsu${c}m")
     enterCommand("set hlsearch incsearch")
     typeText("2d", "3?ipsum") // No enter
-    assertSearchHighlights("ipsum",
-      "lorem 1 «ipsum» lorem 2 ‷ipsum‴ lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 «ipsum» lorem 7 «ipsum»")
+    assertSearchHighlights(
+      "ipsum",
+      "lorem 1 «ipsum» lorem 2 ‷ipsum‴ lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 «ipsum» lorem 7 «ipsum»"
+    )
   }
 
   // |i_CTRL-K|
@@ -929,24 +939,28 @@ class SearchGroupTest : VimTestCase() {
 
   @Test
   fun `test search beginning of file atom`() {
-    configureByText("""
+    configureByText(
+      """
       one
       ${c}two
       one
       two
-    """.trimIndent())
+    """.trimIndent()
+    )
     enterSearch("""\%^one""")
     assertPosition(0, 0)
   }
 
   @Test
   fun `test search beginning of file atom with old regex engine`() {
-    configureByText("""
+    configureByText(
+      """
       one
       ${c}two
       one
       two
-    """.trimIndent())
+    """.trimIndent()
+    )
     enterCommand("set nousenewregex")
     enterSearch("""\%^""")
     assertPosition(0, 0)
@@ -954,24 +968,28 @@ class SearchGroupTest : VimTestCase() {
 
   @Test
   fun `test search end of file atom`() {
-    configureByText("""
+    configureByText(
+      """
       one
       two
       one
       two
-    """.trimIndent())
+    """.trimIndent()
+    )
     enterSearch("""two\%$""")
     assertPosition(3, 0)
   }
 
   @Test
   fun `test search end of file atom with old regex engine`() {
-    configureByText("""
+    configureByText(
+      """
       one
       two
       one
       two
-    """.trimIndent())
+    """.trimIndent()
+    )
     enterCommand("set nousenewregex")
     enterSearch("""two\%$""")
     assertPosition(3, 0)

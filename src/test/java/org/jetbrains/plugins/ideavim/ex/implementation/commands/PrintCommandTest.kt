@@ -64,7 +64,8 @@ class PrintCommandTest : VimTestCase() {
       |    Cras id tellus in ex imperdiet egestas.
       """.trimMargin()
     )
-    assertExOutput("""
+    assertExOutput(
+      """
       |
       |    Lorem ipsum dolor sit amet,
       |    consectetur adipiscing elit
@@ -79,7 +80,8 @@ class PrintCommandTest : VimTestCase() {
     val editor = fixture.editor.vim
     injector.options(editor).number = true
     typeText(commandToKeys("2,5p"))
-    assertExOutput("""
+    assertExOutput(
+      """
       |2 
       |3     Lorem ipsum dolor sit amet,
       |4     consectetur adipiscing elit
@@ -103,7 +105,8 @@ class PrintCommandTest : VimTestCase() {
       |    Cras id tellus in ex imperdiet egestas.
       """.trimMargin()
     )
-    assertExOutput("""
+    assertExOutput(
+      """
       |    Lorem Ipsum
       |
       |    Lorem ipsum dolor sit amet,
@@ -144,7 +147,8 @@ class PrintCommandTest : VimTestCase() {
       |    ${c}Cras id tellus in ex imperdiet egestas.
       """.trimMargin()
     )
-    assertExOutput("""
+    assertExOutput(
+      """
       |    Lorem ipsum dolor sit amet,
       |    consectetur adipiscing elit
       |    Sed in orci mauris.

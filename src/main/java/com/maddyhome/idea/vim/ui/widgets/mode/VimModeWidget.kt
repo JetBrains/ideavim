@@ -161,7 +161,7 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
     return fileEditorManager.selectedTextEditor
   }
 
-  private class JBLabelWiderThan(private val words: Collection<String>): JBLabel("", CENTER) {
+  private class JBLabelWiderThan(private val words: Collection<String>) : JBLabel("", CENTER) {
     private val wordWidth: Int
       get() {
         val fontMetrics = getFontMetrics(font)

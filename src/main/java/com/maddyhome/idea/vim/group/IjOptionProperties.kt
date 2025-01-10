@@ -42,7 +42,7 @@ open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(sco
  *
  * As a convenience, this class also provides access to the IntelliJ specific global options, via inheritance.
  */
-class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE): GlobalIjOptions(scope) {
+class EffectiveIjOptions(scope: OptionAccessScope.EFFECTIVE) : GlobalIjOptions(scope) {
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
   var breakindent: Boolean by optionProperty(IjOptions.breakindent)
   val colorcolumn: StringListOptionValue by optionProperty(IjOptions.colorcolumn)

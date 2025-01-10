@@ -24,23 +24,23 @@ interface VimJumpService {
    * and messes up our jump list
    */
   var lastJumpTimeStamp: Long
-  
+
   fun getJump(projectId: String, count: Int): Jump?
   fun getJumps(projectId: String): List<Jump>
   fun getJumpSpot(projectId: String): Int
-  
+
   fun addJump(projectId: String, jump: Jump, reset: Boolean)
   fun saveJumpLocation(editor: VimEditor)
-  
+
   fun removeJump(projectId: String, jump: Jump)
   fun dropLastJump(projectId: String)
   fun clearJumps(projectId: String)
-  
+
   fun updateJumpsFromInsert(projectId: String, startOffset: Int, length: Int)
   fun updateJumpsFromDelete(projectId: String, startOffset: Int, length: Int)
-  
+
   fun includeCurrentCommandAsNavigation(editor: VimEditor)
-  
+
   @TestOnly
   fun resetJumps()
 }
@@ -57,9 +57,11 @@ fun VimJumpService.addJump(editor: VimEditor, reset: Boolean) {
 fun VimJumpService.getJump(editor: VimEditor, count: Int): Jump? {
   return getJump(editor.projectId, count)
 }
+
 fun VimJumpService.getJumps(editor: VimEditor): List<Jump> {
   return getJumps(editor.projectId)
 }
+
 fun VimJumpService.getJumpSpot(editor: VimEditor): Int {
   return getJumpSpot(editor.projectId)
 }
@@ -71,6 +73,7 @@ fun VimJumpService.addJump(editor: VimEditor, jump: Jump, reset: Boolean) {
 fun VimJumpService.removeJump(editor: VimEditor, jump: Jump) {
   return removeJump(editor.projectId, jump)
 }
+
 fun VimJumpService.dropLastJump(editor: VimEditor) {
   return dropLastJump(editor.projectId)
 }
@@ -78,6 +81,7 @@ fun VimJumpService.dropLastJump(editor: VimEditor) {
 fun VimJumpService.updateJumpsFromInsert(editor: VimEditor, startOffset: Int, length: Int) {
   return updateJumpsFromInsert(editor.projectId, startOffset, length)
 }
+
 fun VimJumpService.updateJumpsFromDelete(editor: VimEditor, startOffset: Int, length: Int) {
   return updateJumpsFromDelete(editor.projectId, startOffset, length)
 }

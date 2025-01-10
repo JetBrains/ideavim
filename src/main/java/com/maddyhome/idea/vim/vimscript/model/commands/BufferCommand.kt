@@ -32,7 +32,11 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
 
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val overrideModified = modifier == CommandModifier.BANG
     val buffer = argument.trim()
     var result = true
@@ -55,6 +59,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
             VimPlugin.showMessage(MessageHelper.message("no.matching.buffer.for.0", buffer))
             result = false
           }
+
           1 -> {
             if (EditorHelper.hasUnsavedChanges(editor.ij) && !overrideModified) {
               VimPlugin.showMessage(MessageHelper.message("no.write.since.last.change.add.to.override"))
@@ -63,6 +68,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
               VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context)
             }
           }
+
           else -> {
             VimPlugin.showMessage(MessageHelper.message("more.than.one.match.for.0", buffer))
             result = false

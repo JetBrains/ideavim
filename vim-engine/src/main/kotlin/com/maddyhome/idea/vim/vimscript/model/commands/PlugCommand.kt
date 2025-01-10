@@ -20,12 +20,17 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * This handler is created to support `Plug` command from vim-plug and `Plugin` command from vundle.
  */
 @ExCommand(command = "Plug[in]")
-data class PlugCommand(val range: Range, val modifier: CommandModifier, val argument: String)
-  : Command.SingleExecution(range, modifier, argument) {
+data class PlugCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val argument = argument
     val firstChar = argument[0]
     if (firstChar != '"' && firstChar != '\'') return ExecutionResult.Error
@@ -35,7 +40,11 @@ data class PlugCommand(val range: Range, val modifier: CommandModifier, val argu
       return ExecutionResult.Error
     }
 
-    injector.statisticsService.addExtensionEnabledWithPlug(injector.extensionRegistrator.getExtensionNameByAlias(pluginAlias) ?: "unknown extension")
+    injector.statisticsService.addExtensionEnabledWithPlug(
+      injector.extensionRegistrator.getExtensionNameByAlias(
+        pluginAlias
+      ) ?: "unknown extension"
+    )
     return ExecutionResult.Success
   }
 }

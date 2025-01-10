@@ -16,15 +16,21 @@ import javax.swing.KeyStroke
 
 // TODO should we prefer keys over text, as they are more informative?
 // TODO e.g.  could be both <Esc> and <C-[> after trying to restore original keys
-data class Register(val name: Char,
-                    val copiedText: VimCopiedText,
-                    val type: SelectionType,
+data class Register(
+  val name: Char,
+  val copiedText: VimCopiedText,
+  val type: SelectionType,
 ) {
   val text = copiedText.text
   val keys get() = injector.parser.stringToKeys(copiedText.text)
-  val printableString: String = EngineStringHelper.toPrintableCharacters(keys) // should be the same as [text], but we can't render control notation properly
+  val printableString: String =
+    EngineStringHelper.toPrintableCharacters(keys) // should be the same as [text], but we can't render control notation properly
 
-  constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) : this(name, injector.clipboardManager.dumbCopiedText(injector.parser.toPrintableString(keys)), type)
+  constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) : this(
+    name,
+    injector.clipboardManager.dumbCopiedText(injector.parser.toPrintableString(keys)),
+    type
+  )
 //  constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out Any>) : this(name, text, type, transferableData)
 
   override fun toString(): String = "@$name = $printableString"

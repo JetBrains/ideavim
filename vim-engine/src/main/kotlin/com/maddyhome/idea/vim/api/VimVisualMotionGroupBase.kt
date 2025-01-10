@@ -74,7 +74,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     count: Int,
     rawCount: Int,
     selectionType: SelectionType,
-    returnTo: Mode?
+    returnTo: Mode?,
   ): Boolean {
     if (!editor.inVisualMode) {
       if (rawCount > 0) {
@@ -124,8 +124,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       val previouslyExclusive = exclusiveSelection
       enterSelectMode(editor, mode.selectionType)
       adjustCaretsForSelectionPolicy(editor, previouslyExclusive)
-    }
-    else if (mode is Mode.SELECT) {
+    } else if (mode is Mode.SELECT) {
       val previouslyExclusive = true  // IdeaVim treats Select as always exclusive
       enterVisualMode(editor, mode.selectionType)
       adjustCaretsForSelectionPolicy(editor, previouslyExclusive)
@@ -164,8 +163,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
             it.moveToInlayAwareOffset(it.selectionEnd) // Caret is on the selection end, move to after
           }
         }
-      }
-      else if (!isSelectionExclusive && previouslyExclusive) {
+      } else if (!isSelectionExclusive && previouslyExclusive) {
         // Exclusive -> inclusive
         editor.nativeCarets().forEach {
           // If caret offset matches the exclusive selection end offset, then it's positioned after the selection, so
@@ -196,8 +194,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       val previouslyExclusive = true  // Select is always exclusive
       editor.mode = Mode.VISUAL(mode.selectionType, returnTo = mode)
       adjustCaretsForSelectionPolicy(editor, previouslyExclusive)
-    }
-    else if (mode is Mode.VISUAL && mode.isSelectPending) {
+    } else if (mode is Mode.VISUAL && mode.isSelectPending) {
       // We can use toggleSelectVisual because we're replacing the "pushed" Visual mode with a simple Select, which is
       // the same as when we toggle from Visual to Select
       toggleSelectVisual(editor)

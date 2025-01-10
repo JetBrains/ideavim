@@ -30,7 +30,8 @@ class VimListenersTest : VimTestCase() {
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
 
-    val manager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+    val manager =
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     VimListenerTestObject.disposedCounter = 0
@@ -55,8 +56,7 @@ class VimListenersTest : VimTestCase() {
     try {
       VimPlugin.setEnabled(false)
       assertEquals(1, VimListenerTestObject.disposedCounter)
-    }
-    finally {
+    } finally {
       VimPlugin.setEnabled(true)
     }
   }
@@ -83,8 +83,7 @@ class VimListenersTest : VimTestCase() {
       fileManager.closeFile(fixture.editor.virtualFile)
 
       assertEquals(1, VimListenerTestObject.disposedCounter)
-    }
-    finally {
+    } finally {
       VimPlugin.setEnabled(true)
     }
   }

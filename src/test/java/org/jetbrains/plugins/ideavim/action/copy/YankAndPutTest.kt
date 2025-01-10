@@ -64,7 +64,12 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamedplus + "," + OptionConstants.clipboard_ideaput]))
+  @OptionTest(
+    VimOption(
+      TestOptionConstants.clipboard,
+      limitedValues = [OptionConstants.clipboard_unnamedplus + "," + OptionConstants.clipboard_ideaput]
+    )
+  )
   fun `test yank to number register with unnamedplus and ideaput`() {
     val before = """
             I ${c}found it in a legendary land
@@ -86,7 +91,12 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]))
+  @OptionTest(
+    VimOption(
+      TestOptionConstants.clipboard,
+      limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]
+    )
+  )
   @TestWithoutPrimaryClipboard
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """

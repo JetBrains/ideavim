@@ -52,5 +52,11 @@ interface VimYankGroup {
    */
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean
-  fun yankRange(editor: VimEditor, context: ExecutionContext, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean
+  fun yankRange(
+    editor: VimEditor,
+    context: ExecutionContext,
+    range: TextRange?,
+    type: SelectionType,
+    moveCursor: Boolean,
+  ): Boolean
 }

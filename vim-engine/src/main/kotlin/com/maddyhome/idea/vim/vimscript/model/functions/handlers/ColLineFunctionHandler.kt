@@ -72,7 +72,11 @@ private fun currentCol(editor: VimEditor): VimInt {
 
 // Analog of var2fpos function
 // Translate variable to position
-private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarForLine: Boolean): Pair<VimInt, VimInt>? {
+private fun variableToPosition(
+  editor: VimEditor,
+  variable: VimDataType,
+  dollarForLine: Boolean,
+): Pair<VimInt, VimInt>? {
   if (variable is VimList) {
     if (variable.values.size < 2) return null
 

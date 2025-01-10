@@ -34,7 +34,14 @@ class IdeaPutNotificationsTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    registerService.storeText(
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "legendary",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
     typeText(injector.parser.parseKeys("p"))
 
     val notification = notifications().last()
@@ -55,7 +62,14 @@ class IdeaPutNotificationsTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    registerService.storeText(
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "legendary",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
     typeText(injector.parser.parseKeys("p"))
 
     val notifications = notifications()
@@ -74,7 +88,14 @@ class IdeaPutNotificationsTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    registerService.storeText(
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "legendary",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
     typeText(injector.parser.parseKeys("p"))
 
     val notifications = EventLog.getLogModel(fixture.project).notifications

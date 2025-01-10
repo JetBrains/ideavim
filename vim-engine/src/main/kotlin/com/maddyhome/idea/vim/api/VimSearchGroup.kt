@@ -123,7 +123,13 @@ interface VimSearchGroup {
    * @return            Pair containing the offset to the next occurrence of the pattern, and the [MotionType] based on
    *                    the search offset. The value will be `null` if no result is found.
    */
-  fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, count1: Int, dir: Direction): Pair<Int, MotionType>?
+  fun processSearchCommand(
+    editor: VimEditor,
+    command: String,
+    startOffset: Int,
+    count1: Int,
+    dir: Direction,
+  ): Pair<Int, MotionType>?
 
   /**
    * Search for the word under the given caret
@@ -150,7 +156,7 @@ interface VimSearchGroup {
   fun findEndOfPattern(
     command: String,
     delimiter: Char,
-    startIndex: Int = 0
+    startIndex: Int = 0,
   ): Int
 
   /**

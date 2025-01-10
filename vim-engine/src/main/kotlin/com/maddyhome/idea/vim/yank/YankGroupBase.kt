@@ -141,7 +141,8 @@ open class YankGroupBase : VimYankGroup {
     val caretToRange = HashMap<ImmutableVimCaret, TextRange>(caretCount)
     for (caret in editor.nativeCarets()) {
       val start = injector.motion.moveCaretToCurrentLineStart(editor, caret)
-      val end = min(injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
+      val end =
+        min(injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
 
       if (end == -1) continue
 
@@ -167,7 +168,13 @@ open class YankGroupBase : VimYankGroup {
    * @param type   The type of yank
    * @return true if able to yank the range, false if not
    */
-  override fun yankRange(editor: VimEditor, context: ExecutionContext, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
+  override fun yankRange(
+    editor: VimEditor,
+    context: ExecutionContext,
+    range: TextRange?,
+    type: SelectionType,
+    moveCursor: Boolean,
+  ): Boolean {
     range ?: return false
     val caretToRange = HashMap<ImmutableVimCaret, TextRange>()
 

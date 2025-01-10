@@ -56,7 +56,13 @@ interface VimVisualMotionGroup {
    * * If visual mode is enabled, but [selectionType] differs, update visual according to new [selectionType]
    * * If visual mode is enabled with the same [selectionType], disable it
    */
-  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, selectionType: SelectionType, returnTo: Mode? = null): Boolean
+  fun toggleVisual(
+    editor: VimEditor,
+    count: Int,
+    rawCount: Int,
+    selectionType: SelectionType,
+    returnTo: Mode? = null,
+  ): Boolean
 
   /**
    * Toggles between Select and Visual modes

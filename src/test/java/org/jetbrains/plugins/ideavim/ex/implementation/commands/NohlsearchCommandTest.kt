@@ -14,7 +14,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
-class NohlsearchCommandTest: VimTestCase() {
+class NohlsearchCommandTest : VimTestCase() {
   @Test
   fun `command parsing`() {
     val command = injector.vimscriptParser.parseCommand("nohlsearch")

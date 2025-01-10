@@ -29,7 +29,11 @@ internal data class ActionListCommand(val range: Range, val modifier: CommandMod
 
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val lineSeparator = "\n"
     val searchPattern = argument.trim().lowercase(Locale.getDefault()).split("*")
     val actionManager = ActionManager.getInstance()

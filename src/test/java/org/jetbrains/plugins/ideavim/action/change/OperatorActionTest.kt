@@ -29,77 +29,93 @@ class OperatorActionTest : VimTestCase() {
 
   @Test
   fun `test operator action with function name`() {
-    doTest("gxe",
+    doTest(
+      "gxe",
       "lorem ipsum dolor sit amet",
       "xxxxx ipsum dolor sit amet"
-      ) {
-      executeVimscript("""function! Redact(type)
+    ) {
+      executeVimscript(
+        """function! Redact(type)
         |  execute "normal `[v`]rx"
         |endfunction
-      """.trimMargin())
+      """.trimMargin()
+      )
       enterCommand("noremap gx :set opfunc=Redact<CR>g@")
     }
   }
 
   @Test
   fun `test operator action with character wise motion`() {
-    doTest("gxe",
+    doTest(
+      "gxe",
       "lorem ipsum dolor sit amet",
       "charlorem ipsum dolor sit amet"
     ) {
-      executeVimscript("""function! Redact(type)
+      executeVimscript(
+        """function! Redact(type)
         |  execute "normal i" . a:type
         |endfunction
-      """.trimMargin())
+      """.trimMargin()
+      )
       enterCommand("noremap gx :set opfunc=Redact<CR>g@")
     }
   }
 
   @Test
   fun `test operator action with linewise motion`() {
-    doTest("Vgx",
+    doTest(
+      "Vgx",
       "lorem ipsum dolor sit amet",
       "linelorem ipsum dolor sit amet"
     ) {
-      executeVimscript("""function! Redact(type)
+      executeVimscript(
+        """function! Redact(type)
         |  execute "normal i" . a:type
         |endfunction
-      """.trimMargin())
+      """.trimMargin()
+      )
       enterCommand("noremap gx <Esc>:set opfunc=Redact<CR>gvg@")
     }
   }
 
   @Test
   fun `test operator action with blockwise motion`() {
-    doTest("<C-V>gx",
+    doTest(
+      "<C-V>gx",
       "lorem ipsum dolor sit amet",
       "blocklorem ipsum dolor sit amet"
     ) {
-      executeVimscript("""function! Redact(type)
+      executeVimscript(
+        """function! Redact(type)
         |  execute "normal i" . a:type
         |endfunction
-      """.trimMargin())
+      """.trimMargin()
+      )
       enterCommand("noremap gx <Esc>:set opfunc=Redact<CR>gvg@")
     }
   }
 
   @Test
   fun `test operator action with function`() {
-    doTest("gxe",
+    doTest(
+      "gxe",
       "lorem ipsum dolor sit amet",
       "xxxxx ipsum dolor sit amet"
     ) {
-      executeVimscript("""function! Redact(type)
+      executeVimscript(
+        """function! Redact(type)
         |  execute "normal `[v`]rx"
         |endfunction
-      """.trimMargin())
+      """.trimMargin()
+      )
       enterCommand("noremap gx :set opfunc=function('Redact')<CR>g@")
     }
   }
 
   @Test
   fun `test operator action throws error with unknown function`() {
-    doTest("gxe",
+    doTest(
+      "gxe",
       "lorem ipsum dolor sit amet",
       "lorem ipsum dolor sit amet"
     ) {
@@ -110,21 +126,25 @@ class OperatorActionTest : VimTestCase() {
 
   @Test
   fun `test operator function with funcref`() {
-    doTest("gxe",
+    doTest(
+      "gxe",
       "lorem ipsum dolor sit amet",
       "xxxxx ipsum dolor sit amet"
     ) {
-      executeVimscript("""function! Redact(type)
+      executeVimscript(
+        """function! Redact(type)
         |  execute "normal `[v`]rx"
         |endfunction
-      """.trimMargin())
+      """.trimMargin()
+      )
       enterCommand("noremap gx :set opfunc=funcref('Redact')<CR>g@")
     }
   }
 
   @Test
   fun `test operator action throws error with unknown function ref`() {
-    doTest("gxe",
+    doTest(
+      "gxe",
       "lorem ipsum dolor sit amet",
       "lorem ipsum dolor sit amet"
     ) {
@@ -140,7 +160,8 @@ class OperatorActionTest : VimTestCase() {
   // The map command is properly handled - the `<CR>g@` is correctly understood, and the full lambda is passed to the
   // parser, but the parser does not fully handle the text
   fun `test operator function with lambda`() {
-    doTest("gxe",
+    doTest(
+      "gxe",
       "lorem ipsum dolor sit amet",
       "lorem ipsum dolor sit amet"
     ) {

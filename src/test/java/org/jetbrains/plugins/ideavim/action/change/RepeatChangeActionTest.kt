@@ -351,7 +351,8 @@ class RepeatChangeActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-481"])
   fun `test dot after overwrite mode`() {
-    configureByText("""
+    configureByText(
+      """
     /**
      * @param array ${'$'}arr_footers
      * @param array ${'$'}arr_totals_data
@@ -361,9 +362,11 @@ class RepeatChangeActionTest : VimTestCase() {
      *
      * @return array
      */
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("Rarray<C-[>", "jgell.")
-    assertState("""
+    assertState(
+      """
     /**
      * @param array ${'$'}arr_footers
      * @param array ${'$'}arr_totals_data
@@ -373,6 +376,7 @@ class RepeatChangeActionTest : VimTestCase() {
      *
      * @return array
      */
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 }

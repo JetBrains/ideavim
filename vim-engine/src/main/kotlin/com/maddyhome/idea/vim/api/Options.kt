@@ -106,8 +106,10 @@ object Options {
   val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
   val gdefault: ToggleOption = addOption(ToggleOption("gdefault", GLOBAL, "gd", false))
   val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", GLOBAL, "hi", 50))
+
   @JvmField
   val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
+
   @JvmField
   val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
   val incsearch: ToggleOption = addOption(ToggleOption("incsearch", GLOBAL, "is", false))
@@ -132,6 +134,7 @@ object Options {
   val nrformats: StringListOption = addOption(
     StringListOption("nrformats", LOCAL_TO_BUFFER, "nf", "hex", setOf("octal", "hex", "alpha"))
   )
+
   // TODO add listener/interface for number option in to vim-engine
   val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
   val scroll: NumberOption = addOption(NumberOption("scroll", LOCAL_TO_WINDOW, "scr", 0))
@@ -178,6 +181,7 @@ object Options {
   val sidescrolloff: NumberOption = addOption(
     NumberOption("sidescrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "siso", 0)
   )
+
   @JvmField
   val smartcase: ToggleOption = addOption(ToggleOption("smartcase", GLOBAL, "scs", false))
   val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
@@ -219,7 +223,8 @@ object Options {
       "o:hor50-Cursor," +
       "i-ci:ver25-Cursor/lCursor," +
       "r-cr:hor20-Cursor/lCursor," +
-      "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175") {
+      "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175"
+  ) {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       val valueAsString = (value as VimString).value
@@ -347,8 +352,10 @@ object Options {
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
 
   // Temporary feature flags for work-in-progress behaviour, diagnostic switches, etc. Hidden from the output of `:set all`
-  val ideastrictmode: ToggleOption = addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))
-  val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false, isHidden = true))
+  val ideastrictmode: ToggleOption =
+    addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))
+  val ideatracetime: ToggleOption =
+    addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false, isHidden = true))
 }
 
 private class MultikeyMap(vararg entries: Option<VimDataType>) {

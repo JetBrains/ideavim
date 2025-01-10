@@ -60,7 +60,7 @@ class VimRegexTest {
 
     private fun doTest(
       text: CharSequence,
-      pattern: String, expectedResult : Boolean
+      pattern: String, expectedResult: Boolean,
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -139,7 +139,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: EnumSet<VimRegexOptions> = noneOfEnum()
+      options: EnumSet<VimRegexOptions> = noneOfEnum(),
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -154,7 +154,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: EnumSet<VimRegexOptions> = noneOfEnum()
+      options: EnumSet<VimRegexOptions> = noneOfEnum(),
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -217,7 +217,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: EnumSet<VimRegexOptions> = noneOfEnum()
+      options: EnumSet<VimRegexOptions> = noneOfEnum(),
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -232,7 +232,7 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: EnumSet<VimRegexOptions> = noneOfEnum()
+      options: EnumSet<VimRegexOptions> = noneOfEnum(),
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -325,15 +325,15 @@ class VimRegexTest {
       text: CharSequence,
       pattern: String,
       startIndex: Int = 0,
-      options: EnumSet<VimRegexOptions> = enumSetOf()
+      options: EnumSet<VimRegexOptions> = enumSetOf(),
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
-      val matchResults = regex.findAll(editor, startIndex, options=options)
+      val matchResults = regex.findAll(editor, startIndex, options = options)
       assertEquals(
         getMatchRanges(text).toSet(), matchResults
-        .map { it.range }
-        .toSet()
+          .map { it.range }
+          .toSet()
       )
     }
   }
@@ -375,8 +375,8 @@ class VimRegexTest {
     private fun doTest(
       text: CharSequence,
       pattern: String,
-      index: Int
-      ) {
+      index: Int,
+    ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
       val matchResult = regex.matchAt(editor, index)
@@ -389,7 +389,7 @@ class VimRegexTest {
     private fun assertFailure(
       text: CharSequence,
       pattern: String,
-      index: Int
+      index: Int,
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
@@ -433,7 +433,8 @@ class VimRegexTest {
 
     private fun doTest(
       text: CharSequence,
-      pattern: String) {
+      pattern: String,
+    ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)
       val matchResult = regex.matchEntire(editor)
@@ -445,7 +446,7 @@ class VimRegexTest {
 
     private fun assertFailure(
       text: CharSequence,
-      pattern: String
+      pattern: String,
     ) {
       val editor = mockEditorFromText(text)
       val regex = VimRegex(pattern)

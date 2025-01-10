@@ -45,7 +45,8 @@ class DeleteCommandConsumer : KeyConsumer {
 
     val commandBuilder = keyState.commandBuilder
     if ((mode is Mode.NORMAL || mode is Mode.VISUAL || mode is Mode.OP_PENDING)
-      && commandBuilder.isExpectingCount && commandBuilder.hasCountCharacters()) {
+      && commandBuilder.isExpectingCount && commandBuilder.hasCountCharacters()
+    ) {
       logger.debug("Deleting a count character")
       return true
     }

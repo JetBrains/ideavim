@@ -25,18 +25,28 @@ internal class ImplicitDFAStrategy : SimulationStrategy {
     val groups = VimMatchGroupCollection()
 
     for (index in startIndex..editor.text().length) {
-      val epsilonClosures = currentStates.flatMap { state -> epsilonClosure(editor, index, isCaseInsensitive, groups, possibleCursors, state) }
+      val epsilonClosures = currentStates.flatMap { state ->
+        epsilonClosure(
+          editor,
+          index,
+          isCaseInsensitive,
+          groups,
+          possibleCursors,
+          state
+        )
+      }
       val nextStates = mutableListOf<NFAState>()
       for (state in epsilonClosures) {
 
         // if there is anything that the algorithm can't deal with, we can't know for sure whether there is a match or not
         if (state.assertion != null ||
-            state.hasLazyMulti ||
-            state.transitions.any { it.matcher is BackreferenceMatcher }) return SimulationResult.Incomplete
+          state.hasLazyMulti ||
+          state.transitions.any { it.matcher is BackreferenceMatcher }
+        ) return SimulationResult.Incomplete
 
         nextStates.addAll(state.transitions.filter {
           !it.matcher.isEpsilon() &&
-          it.matcher.matches(editor, index, groups, isCaseInsensitive, possibleCursors) is MatcherResult.Success
+            it.matcher.matches(editor, index, groups, isCaseInsensitive, possibleCursors) is MatcherResult.Success
         }.map { it.destState })
       }
       if (nextStates.isEmpty()) break
@@ -48,15 +58,40 @@ internal class ImplicitDFAStrategy : SimulationStrategy {
     return SimulationResult.Complete(VimMatchResult.Failure(VimRegexErrors.E486))
   }
 
-  private fun epsilonClosure(editor: VimEditor, index: Int, isCaseInsensitive: Boolean, groups: VimMatchGroupCollection, possibleCursors: MutableList<VimCaret>, state: NFAState, visited: MutableSet<NFAState> = mutableSetOf()): List<NFAState> {
+  private fun epsilonClosure(
+    editor: VimEditor,
+    index: Int,
+    isCaseInsensitive: Boolean,
+    groups: VimMatchGroupCollection,
+    possibleCursors: MutableList<VimCaret>,
+    state: NFAState,
+    visited: MutableSet<NFAState> = mutableSetOf(),
+  ): List<NFAState> {
     updateCaptureGroups(editor, index, state, groups)
     if (!state.transitions.any { it.matcher.isEpsilon() }) return listOf(state)
 
     val result = mutableListOf<NFAState>()
     for (transition in state.transitions.filter { it.matcher.isEpsilon() }) {
-      if (visited.contains(transition.destState) || transition.matcher.matches(editor, index, groups, isCaseInsensitive, possibleCursors) is MatcherResult.Failure) continue
+      if (visited.contains(transition.destState) || transition.matcher.matches(
+          editor,
+          index,
+          groups,
+          isCaseInsensitive,
+          possibleCursors
+        ) is MatcherResult.Failure
+      ) continue
       visited.add(transition.destState)
-      result.addAll(epsilonClosure(editor, index, isCaseInsensitive, groups, possibleCursors, transition.destState, visited))
+      result.addAll(
+        epsilonClosure(
+          editor,
+          index,
+          isCaseInsensitive,
+          groups,
+          possibleCursors,
+          transition.destState,
+          visited
+        )
+      )
     }
     return result
   }

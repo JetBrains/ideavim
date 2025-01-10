@@ -14,7 +14,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings.IndentOptions
 import com.maddyhome.idea.vim.api.VimIndentConfig
 
-internal class IndentConfig private constructor(indentOptions: IndentOptions): VimIndentConfig {
+internal class IndentConfig private constructor(indentOptions: IndentOptions) : VimIndentConfig {
   private val indentSize = indentOptions.INDENT_SIZE
   private val tabSize = indentOptions.TAB_SIZE
   private val isUseTabs = indentOptions.USE_TAB_CHARACTER

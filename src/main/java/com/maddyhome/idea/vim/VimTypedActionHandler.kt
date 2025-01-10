@@ -44,7 +44,12 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
     LOG.trace("Before execute for typed action")
     if (editor.isIdeaVimDisabledHere) {
       LOG.trace("IdeaVim disabled here, finish")
-      (KeyHandlerKeeper.getInstance().originalHandler as? TypedActionHandlerEx)?.beforeExecute(editor, charTyped, context, plan)
+      (KeyHandlerKeeper.getInstance().originalHandler as? TypedActionHandlerEx)?.beforeExecute(
+        editor,
+        charTyped,
+        context,
+        plan
+      )
       return
     }
 

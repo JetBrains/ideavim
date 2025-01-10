@@ -41,7 +41,8 @@ sealed class PutVisualTextBaseAction(
   ): Boolean {
     if (caretsAndSelections.isEmpty()) return false
     val count = cmd.count
-    val caretToPutData = editor.sortedCarets().associateWith { getPutDataForCaret(editor, context, it, caretsAndSelections[it], count) }
+    val caretToPutData =
+      editor.sortedCarets().associateWith { getPutDataForCaret(editor, context, it, caretsAndSelections[it], count) }
     injector.registerGroup.resetRegister()
     var result = true
     injector.application.runWriteAction {
@@ -52,7 +53,13 @@ sealed class PutVisualTextBaseAction(
     return result
   }
 
-  private fun getPutDataForCaret(editor: VimEditor, context: ExecutionContext, caret: VimCaret, selection: VimSelection?, count: Int): PutData {
+  private fun getPutDataForCaret(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: VimCaret,
+    selection: VimSelection?,
+    count: Int,
+  ): PutData {
     val lastRegisterChar = injector.registerGroup.lastRegisterChar
     val register = caret.registerStorage.getRegister(editor, context, lastRegisterChar)
     val textData = register?.let { PutData.TextData(register) }
@@ -62,7 +69,12 @@ sealed class PutVisualTextBaseAction(
 }
 
 @CommandOrMotion(keys = ["P"], modes = [Mode.VISUAL])
-class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false, modifyRegister = false)
+class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(
+  insertTextBeforeCaret = true,
+  indent = true,
+  caretAfterInsertedText = false,
+  modifyRegister = false
+)
 
 @CommandOrMotion(keys = ["p"], modes = [Mode.VISUAL])
 class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)

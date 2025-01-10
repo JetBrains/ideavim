@@ -19,7 +19,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 data class Register(val char: Char) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
-    val register = injector.registerGroup.getRegister(editor, context, char) ?: throw ExException("Register is not supported yet")
+    val register =
+      injector.registerGroup.getRegister(editor, context, char) ?: throw ExException("Register is not supported yet")
     return VimString(injector.parser.toPrintableString(register.keys))
   }
 }

@@ -29,7 +29,12 @@ class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_IGNORE_SCROLL_JUMP)
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     return injector.scroll.scrollFullPage(editor, editor.primaryCaret(), -cmd.count)
   }
 }
@@ -40,7 +45,12 @@ class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_IGNORE_SCROLL_JUMP, FLAG_CLEAR_STROKES)
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     return injector.scroll.scrollFullPage(editor, editor.primaryCaret(), -cmd.count)
   }
 }

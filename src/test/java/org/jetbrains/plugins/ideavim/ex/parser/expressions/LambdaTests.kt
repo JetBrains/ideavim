@@ -48,9 +48,13 @@ class LambdaTests {
   @ParameterizedTest
   @MethodSource("arg6")
   fun `lambda with multiple args test`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String, sp6: String) {
-    val lambdaExpression = VimscriptParser.parseExpression("{${sp1}a$sp2,${sp3}b$sp4->${sp5}a+b$sp6}") as LambdaExpression
+    val lambdaExpression =
+      VimscriptParser.parseExpression("{${sp1}a$sp2,${sp3}b$sp4->${sp5}a+b$sp6}") as LambdaExpression
     assertEquals(listOf("a", "b"), lambdaExpression.args)
-    assertEquals(BinExpression(Variable(null, "a"), Variable(null, "b"), BinaryOperator.ADDITION), lambdaExpression.expr)
+    assertEquals(
+      BinExpression(Variable(null, "a"), Variable(null, "b"), BinaryOperator.ADDITION),
+      lambdaExpression.expr
+    )
   }
 
   @Test
@@ -64,7 +68,8 @@ class LambdaTests {
   @ParameterizedTest
   @MethodSource("arg4")
   fun `lambda function call with multiple args test`(sp1: String, sp2: String, sp3: String, sp4: String) {
-    val functionCall = VimscriptParser.parseExpression("{->'error'}(${sp1}a$sp2,${sp3}b$sp4)") as LambdaFunctionCallExpression
+    val functionCall =
+      VimscriptParser.parseExpression("{->'error'}(${sp1}a$sp2,${sp3}b$sp4)") as LambdaFunctionCallExpression
     assertEquals(2, functionCall.arguments.size)
     assertEquals(listOf(Variable(null, "a"), Variable(null, "b")), functionCall.arguments)
     assertEquals(0, functionCall.lambda.args.size)

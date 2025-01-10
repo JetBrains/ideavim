@@ -64,7 +64,13 @@ data class VimFuncref(
     throw ExException("E703: using Funcref as a Number")
   }
 
-  fun execute(name: String, args: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  fun execute(
+    name: String,
+    args: List<Expression>,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType {
     if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
       if (dictionary == null) {
         throw ExException("E725: Calling dict function without Dictionary: $name")

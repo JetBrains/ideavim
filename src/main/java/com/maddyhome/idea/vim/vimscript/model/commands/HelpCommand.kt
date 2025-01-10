@@ -29,7 +29,11 @@ internal data class HelpCommand(val range: Range, val modifier: CommandModifier,
 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     BrowserUtil.browse(helpTopicUrl(argument))
     return ExecutionResult.Success
   }

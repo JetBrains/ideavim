@@ -44,6 +44,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
             throw ExException("E130: Unknown function: ${scope.c}:$name")
           }
         }
+
         Scope.SCRIPT_VARIABLE -> {
           if (vimContext.getFirstParentContext() !is Script) {
             throw ExException("E81: Using <SID> not in a script context")
@@ -56,6 +57,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
             throw ExException("E130: Unknown function: ${scope.c}:$name")
           }
         }
+
         else -> throw ExException("E130: Unknown function: ${scope.c}:$name")
       }
     }
@@ -84,6 +86,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
           globalFunctions[declaration.name] = declaration
         }
       }
+
       Scope.SCRIPT_VARIABLE -> {
         if (declaration.getFirstParentContext() !is Script) {
           throw ExException("E81: Using <SID> not in a script context")
@@ -95,6 +98,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
           storeScriptFunction(declaration)
         }
       }
+
       else -> throw ExException("E884: Function name cannot contain a colon: ${scope.c}:${declaration.name}")
     }
   }
@@ -131,6 +135,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
           else -> throw RuntimeException("Unknown parent context")
         }
       }
+
       else -> null
     }
   }

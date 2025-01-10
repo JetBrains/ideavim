@@ -34,7 +34,7 @@ public class ExDocument extends PlainDocument {
   void toggleInsertReplace() {
     VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
     if (commandLine != null) {
-      ((ExEntryPanel) commandLine).isReplaceMode = !((ExEntryPanel)commandLine).isReplaceMode;
+      ((ExEntryPanel)commandLine).isReplaceMode = !((ExEntryPanel)commandLine).isReplaceMode;
     }
     overwrite = !overwrite;
   }

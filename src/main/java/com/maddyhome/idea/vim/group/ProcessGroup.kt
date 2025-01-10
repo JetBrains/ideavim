@@ -37,7 +37,7 @@ class ProcessGroup : VimProcessGroupBase() {
     editor: VimEditor,
     command: String,
     input: CharSequence?,
-    currentDirectoryPath: String?
+    currentDirectoryPath: String?,
   ): String? {
     // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
     // redirect to temp files ('shellredir' and 'shelltemp') or use pipes. We don't support 'shellquote', because we're

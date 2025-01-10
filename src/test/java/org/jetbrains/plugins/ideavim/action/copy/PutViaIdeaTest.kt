@@ -58,7 +58,14 @@ class PutViaIdeaTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    registerService.storeText(
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "legendary",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
 
     typeText("ppp")
     val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
@@ -79,13 +86,13 @@ class PutViaIdeaTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
     registerService.storeText(
-        vimEditor,
-        context,
-        vimEditor.primaryCaret(),
-        before rangeOf "legendary$randomUUID",
-        SelectionType.CHARACTER_WISE,
-        false,
-      )
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "legendary$randomUUID",
+      SelectionType.CHARACTER_WISE,
+      false,
+    )
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
     typeText("ve", "p")

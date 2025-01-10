@@ -26,9 +26,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val carets = editor.sortedCarets()
     for (caret in carets) {
       val range = getLineRange(editor, caret).toTextRange(editor)
@@ -54,8 +59,7 @@ data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val 
           rawIndent = true,
           caretAfterInsertedText = false,
         )
-      }
-      else {
+      } else {
         PutData(
           textData,
           null,

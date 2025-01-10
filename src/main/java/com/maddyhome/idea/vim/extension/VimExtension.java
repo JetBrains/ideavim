@@ -40,7 +40,7 @@ public interface VimExtension {
    * let g:exchange_no_mappings=1
    * ```
    * Here the user will expect that the exchange plugin won't have default mappings. However, if we load vim-exchange
-   *    immediately, this variable won't be initialized at the moment of plugin initialization.
+   * immediately, this variable won't be initialized at the moment of plugin initialization.
    * <p>
    * There is also a tricky case for mappings override:
    * ```
@@ -48,8 +48,8 @@ public interface VimExtension {
    * map X <Plug>(ExchangeLine)
    * ```
    * For this case, a plugin with a good implementation detects that there is already a defined mapping for
-   *   `<Plug>(ExchangeLine)` and doesn't register the default cxx mapping. However, such detection requires the mapping
-   *   to be defined before the plugin initialization.
+   * `<Plug>(ExchangeLine)` and doesn't register the default cxx mapping. However, such detection requires the mapping
+   * to be defined before the plugin initialization.
    */
   void init();
 

@@ -22,7 +22,7 @@ internal class EndOfFileMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (index == editor.text().length) MatcherResult.Success(0) else MatcherResult.Failure
   }

@@ -241,7 +241,8 @@ class VimHighlightedYankTest : VimTestCase() {
       typeText("yy")
 
       assertTrue(
-        VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_foreground_color"),
+        VimPlugin.getMessage()
+          .contains("highlightedyank: Invalid value of g:highlightedyank_highlight_foreground_color"),
         color,
       )
       // Should not set a foreground color when there's an error

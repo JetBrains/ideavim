@@ -20,10 +20,11 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 internal class PredicateMatcher(val predicate: (Char) -> Boolean) : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
+    index: Int,
+    groups:
     VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (index < editor.text().length && predicate(editor.text()[index])) MatcherResult.Success(1)
     else MatcherResult.Failure
@@ -42,10 +43,11 @@ internal class PredicateMatcher(val predicate: (Char) -> Boolean) : Matcher {
 internal class EditorAwarePredicateMatcher(val predicate: (VimEditor, Char) -> Boolean) : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
+    index: Int,
+    groups:
     VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (index < editor.text().length && predicate(editor, editor.text()[index])) MatcherResult.Success(1)
     else MatcherResult.Failure

@@ -23,10 +23,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :delete"
  */
 @ExCommand(command = "d[elete]")
-data class DeleteLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String)
-  : Command.ForEachCaret(range, modifier, argument) {
+data class DeleteLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+  Command.ForEachCaret(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun processCommand(
     editor: VimEditor,

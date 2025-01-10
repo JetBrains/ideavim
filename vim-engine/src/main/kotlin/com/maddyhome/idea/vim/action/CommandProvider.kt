@@ -36,7 +36,7 @@ interface CommandProvider {
         val keys = it.value.map { bean -> injector.parser.parseKeys(bean.keys) }.toSet()
         val modes = it.value.first().modes.map { mode -> MappingMode.parseModeChar(mode) }.toSet()
         LazyVimCommand(keys, modes, it.key, classLoader)
-    }
+      }
   }
 
   private fun getFile(): InputStream {

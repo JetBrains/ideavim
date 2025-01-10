@@ -37,7 +37,12 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 
 // todo make it multicaret
-private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, motionType: SelectionType): Boolean {
+private fun doOperatorAction(
+  editor: VimEditor,
+  context: ExecutionContext,
+  textRange: TextRange,
+  motionType: SelectionType,
+): Boolean {
   val func = injector.globalOptions().operatorfunc
   if (func.isEmpty()) {
     VimPlugin.showMessage(MessageHelper.message("E774"))
@@ -61,8 +66,7 @@ private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textR
         // Get the argument for function('...') or funcref('...') for the error message
         val functionName = if (expression is FunctionCallExpression && expression.arguments.isNotEmpty()) {
           expression.arguments[0].evaluate(editor, context, scriptContext).toString()
-        }
-        else {
+        } else {
           func
         }
 
@@ -100,7 +104,12 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val argument = cmd.argument as? Argument.Motion ?: return false
     if (!editor.inRepeatMode) {
       argumentCaptured = argument

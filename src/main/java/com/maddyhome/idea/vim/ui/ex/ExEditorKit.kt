@@ -49,7 +49,9 @@ internal object ExEditorKit : DefaultEditorKit() {
         val c = key.keyChar
         if (c.code > 0) {
           if (target.useHandleKeyFromEx) {
-            val panel = ((injector.commandLine.getActiveCommandLine() as? ExEntryPanel) ?: (injector.modalInput.getCurrentModalInput() as? WrappedAsModalInputExEntryPanel)?.exEntryPanel) ?: return
+            val panel = ((injector.commandLine.getActiveCommandLine() as? ExEntryPanel)
+              ?: (injector.modalInput.getCurrentModalInput() as? WrappedAsModalInputExEntryPanel)?.exEntryPanel)
+              ?: return
             val entry = panel.entry
             val editor = entry.editor
             val keyHandler = KeyHandler.getInstance()

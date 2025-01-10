@@ -117,7 +117,8 @@ class DigraphsCommandTest : VimTestCase() {
     // * `LF` is represented by `^@` in Vim, although it's output as a LF. Weird Vim NL/null handling
     // * Additional Unicode control characters to ensure that RTL doesn't affect the rest of the line. We add the RLI
     //   RIGHT_TO_LEFT_ISOLATE code to start an isolated run of RTL chars, then POP_DIRECTIONAL_ISOLATE to restore
-    assertCommandOutput("digraphs",
+    assertCommandOutput(
+      "digraphs",
       """
         |NU ^@  10    SH ^A   1    SX ^B   2    EX ^C   3    ET ^D   4    EQ ^E   5
         |AK ^F   6    BL ^G   7    BS ^H   8    HT ^I   9    LF ^J  10    VT ^K  11
@@ -347,12 +348,14 @@ class DigraphsCommandTest : VimTestCase() {
         |2c ㈡  12833  3c ㈢  12834  4c ㈣  12835  5c ㈤  12836  6c ㈥  12837  7c ㈦  12838
         |8c ㈧  12839  9c ㈨  12840  ff ﬀ  64256  fi ﬁ  64257  fl ﬂ  64258  ft ﬅ  64261
         |st ﬆ  64262
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @Test
   fun `test digraph output with headers`() {
-    assertCommandOutput("digraphs!",
+    assertCommandOutput(
+      "digraphs!",
       """
         |NU ^@  10    SH ^A   1    SX ^B   2    EX ^C   3    ET ^D   4    EQ ^E   5
         |AK ^F   6    BL ^G   7    BS ^H   8    HT ^I   9    LF ^J  10    VT ^K  11
@@ -620,13 +623,15 @@ class DigraphsCommandTest : VimTestCase() {
         |1c ㈠  12832  2c ㈡  12833  3c ㈢  12834  4c ㈣  12835  5c ㈤  12836  6c ㈥  12837
         |7c ㈦  12838  8c ㈧  12839  9c ㈨  12840  ff ﬀ  64256  fi ﬁ  64257  fl ﬂ  64258
         |ft ﬅ  64261  st ﬆ  64262
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @Test
   fun `test digraph output with custom digraphs output in entered order`() {
     enterCommand("digraphs (0 9450 (2 9313 (1 9312")
-    assertCommandOutput("digraphs",
+    assertCommandOutput(
+      "digraphs",
       """
         |NU ^@  10    SH ^A   1    SX ^B   2    EX ^C   3    ET ^D   4    EQ ^E   5
         |AK ^F   6    BL ^G   7    BS ^H   8    HT ^I   9    LF ^J  10    VT ^K  11
@@ -856,13 +861,15 @@ class DigraphsCommandTest : VimTestCase() {
         |2c ㈡  12833  3c ㈢  12834  4c ㈣  12835  5c ㈤  12836  6c ㈥  12837  7c ㈦  12838
         |8c ㈧  12839  9c ㈨  12840  ff ﬀ  64256  fi ﬁ  64257  fl ﬂ  64258  ft ﬅ  64261
         |st ﬆ  64262  (0 ⓪  9450   (2 ②  9313   (1 ①  9312
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @Test
   fun `test digraph output with headers and custom digraphs`() {
     enterCommand("digraphs (0 9450 (2 9313 (1 9312")
-    assertCommandOutput("digraphs!",
+    assertCommandOutput(
+      "digraphs!",
       """
         |NU ^@  10    SH ^A   1    SX ^B   2    EX ^C   3    ET ^D   4    EQ ^E   5
         |AK ^F   6    BL ^G   7    BS ^H   8    HT ^I   9    LF ^J  10    VT ^K  11
@@ -1132,6 +1139,7 @@ class DigraphsCommandTest : VimTestCase() {
         |ft ﬅ  64261  st ﬆ  64262
         |Custom
         |(0 ⓪  9450   (2 ②  9313   (1 ①  9312
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 }

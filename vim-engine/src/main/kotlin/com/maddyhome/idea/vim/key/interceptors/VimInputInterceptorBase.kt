@@ -18,7 +18,7 @@ abstract class VimInputInterceptorBase<T> : VimInputInterceptor<T> {
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
-    context: ExecutionContext
+    context: ExecutionContext,
   ) {
     val completeInput = buildInput(key) ?: return
     executeInput(completeInput, editor, context)

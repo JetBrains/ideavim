@@ -25,8 +25,7 @@ object StrictMode {
   fun fail(message: String) {
     if (injector.globalOptions().ideastrictmode) {
       error(message)
-    }
-    else {
+    } else {
       LOG.error(message)
     }
   }

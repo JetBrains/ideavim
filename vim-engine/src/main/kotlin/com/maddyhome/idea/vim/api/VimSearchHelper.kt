@@ -60,13 +60,13 @@ interface VimSearchHelper {
    */
   fun findPreviousCamelStart(chars: CharSequence, endIndex: Int, count: Int): Int?
 
-/**
+  /**
    * @param chars         the char sequence to search in
    * @param startIndex    the start index (inclusive)
    * @param count         search for the count-th occurrence
    * @return offset of next camelCase or snake_case word start or null if nothing was found
    */
-fun findNextCamelEnd(chars: CharSequence, startIndex: Int, count: Int): Int?
+  fun findNextCamelEnd(chars: CharSequence, startIndex: Int, count: Int): Int?
 
   /**
    * @param chars         the char sequence to search in
@@ -121,7 +121,15 @@ fun findNextCamelEnd(chars: CharSequence, startIndex: Int, count: Int): Int?
    * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
    * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
    */
-  fun findNextWord(text: CharSequence, textLength: Int, editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
+  fun findNextWord(
+    text: CharSequence,
+    textLength: Int,
+    editor: VimEditor,
+    searchFrom: Int,
+    count: Int,
+    bigWord: Boolean,
+    spaceWords: Boolean,
+  ): Int
 
   /**
    * Find the end offset of the next word in the editor's document, from the given starting point
@@ -148,7 +156,15 @@ fun findNextCamelEnd(chars: CharSequence, startIndex: Int, count: Int): Int?
    * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
    * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
    */
-  fun findNextWordEnd(text: CharSequence, textLength: Int, editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
+  fun findNextWordEnd(
+    text: CharSequence,
+    textLength: Int,
+    editor: VimEditor,
+    searchFrom: Int,
+    count: Int,
+    bigWord: Boolean,
+    spaceWords: Boolean,
+  ): Int
 
   /**
    * Find text matching the given pattern.
@@ -185,7 +201,7 @@ fun findNextCamelEnd(chars: CharSequence, startIndex: Int, count: Int): Int?
     pattern: String,
     startLine: Int,
     endLine: Int,
-    ignoreCase: Boolean
+    ignoreCase: Boolean,
   ): List<TextRange>
 
   fun findNextCharacterOnLine(

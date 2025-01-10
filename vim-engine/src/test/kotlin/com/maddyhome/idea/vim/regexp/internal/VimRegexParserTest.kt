@@ -69,6 +69,7 @@ class VimRegexParserTest {
   fun `test collection 0 to 9`() {
     assertSuccess("[0-9]")
   }
+
   @Test
   fun `test collection single element`() {
     assertSuccess("[f]")

@@ -205,6 +205,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         ShortcutOwner.VIM -> {
           return ActionEnableStatus.yes("Owner is vim", LogLevel.DEBUG)
         }
+
         ShortcutOwner.IDE -> {
           if (!isShortcutConflict(keyStroke)) {
             ActionEnableStatus.yes("Owner is IDE, but no actionve shortcut conflict", LogLevel.DEBUG)
@@ -212,6 +213,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
             ActionEnableStatus.no("Owner is IDE", LogLevel.DEBUG)
           }
         }
+
         else -> {
           if (isShortcutConflict(keyStroke)) {
             savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
@@ -224,7 +226,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportDialog = injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
+    val ideaVimSupportDialog =
+      injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.vim.mode.inNormalMode ||
       ideaVimSupportDialog && !editor.vim.mode.inNormalMode

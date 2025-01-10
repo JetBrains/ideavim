@@ -287,9 +287,11 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput("""
+    assertExOutput(
+      """
       g/found
-      I found it in a legendary land""".trimIndent())
+      I found it in a legendary land""".trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -300,11 +302,13 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput("""
+    assertExOutput(
+      """
       |g/it
       |I found it in a legendary land
       |where it was settled on some sodden sand
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -314,11 +318,13 @@ class GlobalCommandTest : VimTestCase() {
     val editor = fixture.editor.vim
     injector.options(editor).number = true
     typeText(commandToKeys(":g/it"))
-    assertExOutput("""
+    assertExOutput(
+      """
       |g/it
       |3 I found it in a legendary land
       |5 where it was settled on some sodden sand
-      """.trimMargin())
+      """.trimMargin()
+    )
     injector.options(editor).number = false
   }
 
@@ -330,9 +336,11 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput("""
+    assertExOutput(
+      """
       g/found/
-      I found it in a legendary land""".trimIndent())
+      I found it in a legendary land""".trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -342,9 +350,11 @@ class GlobalCommandTest : VimTestCase() {
     val editor = fixture.editor.vim
     injector.options(editor).number = true
     typeText(commandToKeys(":g/found/"))
-    assertExOutput("""
+    assertExOutput(
+      """
       g/found/
-      3 I found it in a legendary land""".trimIndent())
+      3 I found it in a legendary land""".trimIndent()
+    )
     injector.options(editor).number = false
   }
 

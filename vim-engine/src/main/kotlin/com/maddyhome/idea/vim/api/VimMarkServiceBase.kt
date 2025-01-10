@@ -128,7 +128,8 @@ abstract class VimMarkServiceBase : VimMarkService {
     } else {
       caret.markStorage.getMarks().values.toSet()
     }
-    return (marks + getLocalMark(caret, SELECTION_START_MARK) + getLocalMark(caret, SELECTION_END_MARK)).filterNotNull().toSet()
+    return (marks + getLocalMark(caret, SELECTION_START_MARK) + getLocalMark(caret, SELECTION_END_MARK)).filterNotNull()
+      .toSet()
   }
 
   override fun getAllMarksForFile(editor: VimEditor): List<Pair<ImmutableVimCaret?, Set<Mark>>> {
@@ -189,6 +190,7 @@ abstract class VimMarkServiceBase : VimMarkService {
           caret.markStorage.setMark(mark)
         }
       }
+
       else -> return false
     }
     return true
@@ -288,13 +290,15 @@ abstract class VimMarkServiceBase : VimMarkService {
   private fun removeSelectionStartMark(caret: ImmutableVimCaret) {
     val selectionInfo = caret.lastSelectionInfo
     val startPosition = selectionInfo.start
-    if (startPosition != null) caret.lastSelectionInfo = SelectionInfo(null, selectionInfo.end, selectionInfo.selectionType)
+    if (startPosition != null) caret.lastSelectionInfo =
+      SelectionInfo(null, selectionInfo.end, selectionInfo.selectionType)
   }
 
   private fun removeSelectionEndMark(caret: ImmutableVimCaret) {
     val selectionInfo = caret.lastSelectionInfo
     val endPosition = selectionInfo.end
-    if (endPosition != null) caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, null, selectionInfo.selectionType)
+    if (endPosition != null) caret.lastSelectionInfo =
+      SelectionInfo(selectionInfo.start, null, selectionInfo.selectionType)
   }
 
   override fun removeGlobalMark(char: Char) {
@@ -424,6 +428,7 @@ abstract class VimMarkServiceBase : VimMarkService {
       VimMarkService.Operation.GET -> {
         char.isLocalMark() || char.isGlobalMark()
       }
+
       VimMarkService.Operation.SET -> {
         (
           LOWERCASE_MARKS +
@@ -436,6 +441,7 @@ abstract class VimMarkServiceBase : VimMarkService {
           ).contains(char) ||
           (isCaretPrimary && (UPPERCASE_MARKS + NUMBERED_MARKS).contains(char))
       }
+
       VimMarkService.Operation.REMOVE -> {
         (
           LOWERCASE_MARKS +
@@ -447,6 +453,7 @@ abstract class VimMarkServiceBase : VimMarkService {
           ).contains(char) ||
           (isCaretPrimary && (UPPERCASE_MARKS + NUMBERED_MARKS).contains(char))
       }
+
       VimMarkService.Operation.SAVE -> {
         isCaretPrimary &&
           (
@@ -510,7 +517,9 @@ abstract class VimMarkServiceBase : VimMarkService {
       SENTENCE_END_MARK -> 1
       else -> throw IllegalArgumentException("Invalid sentence mark char")
     }
-    var offset = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true) ?: return null
+    var offset =
+      injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true)
+        ?: return null
     offset = editor.normalizeOffset(offset, false)
     val lp = editor.offsetToBufferPosition(offset)
     val protocol = virtualFile.protocol
@@ -553,12 +562,14 @@ abstract class VimMarkServiceBase : VimMarkService {
 
   private fun setSelectionStartMark(caret: ImmutableVimCaret, offset: Int) {
     val selectionInfo = caret.lastSelectionInfo
-    caret.lastSelectionInfo = SelectionInfo(caret.editor.offsetToBufferPosition(offset), selectionInfo.end, selectionInfo.selectionType)
+    caret.lastSelectionInfo =
+      SelectionInfo(caret.editor.offsetToBufferPosition(offset), selectionInfo.end, selectionInfo.selectionType)
   }
 
   private fun setSelectionEndMark(caret: ImmutableVimCaret, offset: Int) {
     val selectionInfo = caret.lastSelectionInfo
-    caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, caret.editor.offsetToBufferPosition(offset), selectionInfo.selectionType)
+    caret.lastSelectionInfo =
+      SelectionInfo(selectionInfo.start, caret.editor.offsetToBufferPosition(offset), selectionInfo.selectionType)
   }
 
   private fun createMark(caret: ImmutableVimCaret, char: Char, offset: Int): Mark? {

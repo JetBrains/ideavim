@@ -36,7 +36,12 @@ internal object VimRegexEngine {
    * strategy; if this strategy is powerful enough to determine if there is a match, return that match. If it isn't
    * powerful enough, use the next (more powerful) strategy.
    */
-  internal fun simulate(nfa: NFA, editor: VimEditor, startIndex: Int = 0, isCaseInsensitive: Boolean = false): VimMatchResult {
+  internal fun simulate(
+    nfa: NFA,
+    editor: VimEditor,
+    startIndex: Int = 0,
+    isCaseInsensitive: Boolean = false,
+  ): VimMatchResult {
     for (strategy in strategies) {
       val result = strategy.simulate(nfa, editor, startIndex, isCaseInsensitive)
       if (result is SimulationResult.Complete) return result.matchResult

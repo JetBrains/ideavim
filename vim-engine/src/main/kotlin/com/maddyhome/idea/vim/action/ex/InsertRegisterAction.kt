@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
-class InsertRegisterAction: VimActionHandler.SingleExecution() {
+class InsertRegisterAction : VimActionHandler.SingleExecution() {
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
@@ -32,7 +32,12 @@ class InsertRegisterAction: VimActionHandler.SingleExecution() {
     cmdLine.setPromptCharacter('"')
   }
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val cmdLine = injector.commandLine.getActiveCommandLine() ?: return false
     cmdLine.clearCurrentAction()
 
@@ -40,7 +45,7 @@ class InsertRegisterAction: VimActionHandler.SingleExecution() {
 
     val argument = cmd.argument as? Argument.Character ?: return false
     val keyStroke = KeyStroke.getKeyStroke(argument.character)
-    val pasteContent = if ((keyStroke.modifiers and KeyEvent.CTRL_DOWN_MASK) == 0)  {
+    val pasteContent = if ((keyStroke.modifiers and KeyEvent.CTRL_DOWN_MASK) == 0) {
       injector.registerGroup.getRegister(editor, context, keyStroke.keyChar)?.text
     } else {
       throw ExException("Not yet implemented")

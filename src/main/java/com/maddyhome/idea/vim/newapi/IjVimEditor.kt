@@ -386,7 +386,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
   }
 
   override fun extractProtocol(): String? {
-    return EditorHelper.getVirtualFile(editor)?.getUrl()?.let { VirtualFileManager.extractProtocol(it) }
+    return EditorHelper.getVirtualFile(editor)?.url?.let { VirtualFileManager.extractProtocol(it) }
   }
 
   override val projectId = editor.project?.let { injector.file.getProjectId(it) } ?: DEFAULT_PROJECT_ID
@@ -536,7 +536,7 @@ val VimEditor.ij: Editor
 val com.intellij.openapi.util.TextRange.vim: TextRange
   get() = TextRange(this.startOffset, this.endOffset)
 
-internal class InsertTimeRecorder: ModeChangeListener {
+internal class InsertTimeRecorder : ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     editor as IjVimEditor
     if (oldMode == Mode.INSERT) {

@@ -6,6 +6,7 @@
   - https://opensource.org/licenses/MIT.
   -->
 
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 40 40" fill-opacity="0" stroke="#6E6E6E" stroke-width="3">
-    <path d="M 28.019 4 L 15.988 24.119 L 15.988 4 L 4 4 L 4 36 L 17.953 36 L 36 4z"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 40 40" fill-opacity="0" stroke="#6E6E6E"
+     stroke-width="3">
+  <path d="M 28.019 4 L 15.988 24.119 L 15.988 4 L 4 4 L 4 36 L 17.953 36 L 36 4z"/>
 </svg>

@@ -24,5 +24,5 @@ internal class VimRegexParserErrorStrategy : DefaultErrorStrategy() {
     throw VimRegexParserException(VimRegexErrors.E383)
   }
 
-  override fun sync(recognizer: Parser?) { }
+  override fun sync(recognizer: Parser?) {}
 }

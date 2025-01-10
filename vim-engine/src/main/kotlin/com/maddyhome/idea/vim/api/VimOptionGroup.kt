@@ -221,7 +221,7 @@ interface VimOptionGroup {
    */
   fun <T : VimDataType> removeEffectiveOptionValueChangeListener(
     option: Option<T>,
-    listener: EffectiveOptionValueChangeListener
+    listener: EffectiveOptionValueChangeListener,
   )
 
   /**
@@ -246,10 +246,10 @@ interface VimOptionGroup {
 /**
  * Checks if option is set to its default value
  */
-fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionAccessScope): Boolean =
+fun <T : VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionAccessScope): Boolean =
   getOptionValue(option, scope) == option.defaultValue
 
-fun <T: VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
+fun <T : VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: VimEditor): Boolean {
   check(option.declaredScope.isGlobalLocal())
   return getOptionValue(option, OptionAccessScope.LOCAL(editor)) == option.unsetValue
 }

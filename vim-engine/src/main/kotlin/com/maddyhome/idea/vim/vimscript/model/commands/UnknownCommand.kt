@@ -25,17 +25,27 @@ import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.
  */
 data class UnknownCommand(val range: Range, val name: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   private object Constants {
     const val MAX_RECURSION = 100
   }
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     return processPossiblyAliasCommand("$name $argument", editor, context, MAX_RECURSION)
   }
 
-  private fun processPossiblyAliasCommand(name: String, editor: VimEditor, context: ExecutionContext, aliasCountdown: Int): ExecutionResult {
+  private fun processPossiblyAliasCommand(
+    name: String,
+    editor: VimEditor,
+    context: ExecutionContext,
+    aliasCountdown: Int,
+  ): ExecutionResult {
     if (injector.commandGroup.isAlias(name)) {
       if (aliasCountdown > 0) {
         val commandAlias = injector.commandGroup.getAliasCommand(name, 1)
@@ -45,7 +55,8 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
               val message = injector.messages.message(Msg.NOT_EX_CMD, name)
               throw InvalidCommandException(message, null)
             }
-            val parsedCommand = injector.vimscriptParser.parseCommand(commandAlias.command) ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
+            val parsedCommand = injector.vimscriptParser.parseCommand(commandAlias.command)
+              ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
             return if (parsedCommand is UnknownCommand) {
               processPossiblyAliasCommand(commandAlias.command, editor, context, aliasCountdown - 1)
             } else {
@@ -54,13 +65,17 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
               ExecutionResult.Success
             }
           }
+
           is GoalCommand.Call -> {
             commandAlias.handler.execute(name, range, editor, context)
             return ExecutionResult.Success
           }
         }
       } else {
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("recursion.detected.maximum.alias.depth.reached"))
+        injector.messages.showStatusBarMessage(
+          editor,
+          injector.messages.message("recursion.detected.maximum.alias.depth.reached")
+        )
         injector.messages.indicateError()
         return ExecutionResult.Error
       }

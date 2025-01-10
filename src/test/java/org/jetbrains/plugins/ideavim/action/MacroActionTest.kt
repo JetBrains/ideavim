@@ -159,14 +159,16 @@ class MacroActionTest : VimTestCase() {
     )
 
     assertRegister('b', "6@a")
-    assertState("""
+    assertState(
+      """
             Lorem Ipsum
 
             Lorem ipsum dolor ${c}sit amet,
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
@@ -191,14 +193,16 @@ class MacroActionTest : VimTestCase() {
 
     assertRegister('b', "3@a")
     assertRegister('c', "2@b")
-    assertState("""
+    assertState(
+      """
             Lorem Ipsum
 
             Lorem ipsum dolor ${c}sit amet,
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test

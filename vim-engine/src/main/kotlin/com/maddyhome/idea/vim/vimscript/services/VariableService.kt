@@ -33,7 +33,13 @@ interface VariableService {
    * @param vimContext vim context
    * @throws ExException("The 'v:' scope is not implemented yet :(")
    */
-  fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+  fun storeVariable(
+    variable: Variable,
+    value: VimDataType,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  )
 
   /**
    * Get global scope variable value.
@@ -58,7 +64,12 @@ interface VariableService {
    * @param vimContext vim context
    * @throws ExException("The 'v:' scope is not implemented yet :(")
    */
-  fun getNullableVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType?
+  fun getNullableVariableValue(
+    variable: Variable,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType?
 
   /**
    * Gets variable value.
@@ -71,7 +82,12 @@ interface VariableService {
    * @throws ExException("The 'v:' scope is not implemented yet :(")
    * @throws ExException("E121: Undefined variable: ${scope}:${name}")
    */
-  fun getNonNullVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
+  fun getNonNullVariableValue(
+    variable: Variable,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType
 
   /**
    * Checks if the variable locked.
@@ -84,7 +100,12 @@ interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    */
-  fun isVariableLocked(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): Boolean
+  fun isVariableLocked(
+    variable: Variable,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): Boolean
 
   /**
    * Locks variable.
@@ -96,7 +117,13 @@ interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    */
-  fun lockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+  fun lockVariable(
+    variable: Variable,
+    depth: Int,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  )
 
   /**
    * Unlocks variable.
@@ -108,7 +135,13 @@ interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    */
-  fun unlockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+  fun unlockVariable(
+    variable: Variable,
+    depth: Int,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  )
 
   fun getGlobalVariables(): Map<String, VimDataType>
 
@@ -120,6 +153,7 @@ interface VariableService {
 
   @Internal
   fun getVimVariable(name: String): VimDataType?
+
   @Internal
   fun storeVimVariable(name: String, value: VimDataType)
 }

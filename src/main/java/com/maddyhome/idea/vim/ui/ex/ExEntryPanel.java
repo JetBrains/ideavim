@@ -88,11 +88,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     add(entry);
 
     // This does not need to be unregistered, it's registered as a custom UI property on this
-    EventFacade.getInstance().registerCustomShortcutSet(
-      VimShortcutKeyAction.getInstance(),
-      toShortcutSet(((VimKeyGroupBase) injector.getKeyGroup()).getRequiredShortcutKeys()),
-      entry
-    );
+    EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(
+      ((VimKeyGroupBase)injector.getKeyGroup()).getRequiredShortcutKeys()), entry);
     new ExShortcutKeyAction(this).registerCustomShortcutSet();
 
     updateUI();
@@ -148,7 +145,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   public void setEditor(@Nullable Editor editor) {
     if (editor == null) {
       weakEditor = null;
-    } else {
+    }
+    else {
       weakEditor = new WeakReference<>(editor);
     }
   }
@@ -331,9 +329,9 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
             searchText = argument.substring(1);
           }
           if (!searchText.isEmpty()) {
-          searchRange = command.getLineRangeSafe(new IjVimEditor(editor));
-        }
-        if (searchText.isEmpty() || searchRange == null) {
+            searchRange = command.getLineRangeSafe(new IjVimEditor(editor));
+          }
+          if (searchText.isEmpty() || searchRange == null) {
             // Reset back to the original search highlights after deleting a search from a substitution command.Or if
             // there is no search range (because the user entered an invalid range, e.g. mark not set).
             // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
@@ -385,7 +383,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
           return exCommand;
         }
       }
-      catch(Exception e) {
+      catch (Exception e) {
         logger.warn("Cannot parse command for incsearch", e);
       }
 
@@ -533,7 +531,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   @Override
   public @NotNull VimCommandLineCaret getCaret() {
-    return (VimCommandLineCaret) entry.getCaret();
+    return (VimCommandLineCaret)entry.getCaret();
   }
 
   @Override

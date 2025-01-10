@@ -17,9 +17,20 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
     return !editor.isOneLineMode()
   }
 
-  abstract fun createPanel(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
+  abstract fun createPanel(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    initText: String,
+  ): VimCommandLine
 
-  private fun createCommandLinePrompt(editor: VimEditor, context: ExecutionContext, removeSelections: Boolean, label: String, initialText: String): VimCommandLine {
+  private fun createCommandLinePrompt(
+    editor: VimEditor,
+    context: ExecutionContext,
+    removeSelections: Boolean,
+    label: String,
+    initialText: String,
+  ): VimCommandLine {
     if (!isCommandLineSupported(editor)) throw ExException("Command line is not allowed in one line editors")
 
     val currentMode = editor.mode
@@ -41,11 +52,21 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
     return createPanel(editor, context, label, initialText)
   }
 
-  override fun createSearchPrompt(editor: VimEditor, context: ExecutionContext, label: String, initialText: String): VimCommandLine {
+  override fun createSearchPrompt(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    initialText: String,
+  ): VimCommandLine {
     return createCommandLinePrompt(editor, context, removeSelections = false, label, initialText)
   }
 
-  override fun createCommandPrompt(editor: VimEditor, context: ExecutionContext, count0: Int, initialText: String): VimCommandLine {
+  override fun createCommandPrompt(
+    editor: VimEditor,
+    context: ExecutionContext,
+    count0: Int,
+    initialText: String,
+  ): VimCommandLine {
     val rangeText = getRange(editor, count0)
     return createCommandLinePrompt(editor, context, removeSelections = true, label = ":", rangeText + initialText)
   }

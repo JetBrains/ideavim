@@ -36,19 +36,21 @@ class CommandState(private val machine: VimStateMachine) {
       }
     }
 
-  @get:Deprecated("Use `KeyHandler.keyHandlerState.commandBuilder", ReplaceWith(
-    "KeyHandler.getInstance().keyHandlerState.commandBuilder",
-    "com.maddyhome.idea.vim.KeyHandler"
-  )
+  @get:Deprecated(
+    "Use `KeyHandler.keyHandlerState.commandBuilder", ReplaceWith(
+      "KeyHandler.getInstance().keyHandlerState.commandBuilder",
+      "com.maddyhome.idea.vim.KeyHandler"
+    )
   )
   @get:ApiStatus.ScheduledForRemoval
   val commandBuilder: CommandBuilder
     get() = KeyHandler.getInstance().keyHandlerState.commandBuilder
 
-  @Deprecated("Use `KeyHandler.keyHandlerState.mappingState", ReplaceWith(
-    "KeyHandler.getInstance().keyHandlerState.mappingState",
-    "com.maddyhome.idea.vim.KeyHandler"
-  )
+  @Deprecated(
+    "Use `KeyHandler.keyHandlerState.mappingState", ReplaceWith(
+      "KeyHandler.getInstance().keyHandlerState.mappingState",
+      "com.maddyhome.idea.vim.KeyHandler"
+    )
   )
   val mappingState: MappingState
     get() = KeyHandler.getInstance().keyHandlerState.mappingState

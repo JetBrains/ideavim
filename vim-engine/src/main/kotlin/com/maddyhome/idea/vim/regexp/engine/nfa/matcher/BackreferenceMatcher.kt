@@ -23,19 +23,20 @@ internal class BackreferenceMatcher(private val groupNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     if (groups.get(groupNumber) == null) {
       // TODO: throw illegal backreference error
       return MatcherResult.Failure
     }
     val capturedString = if (isCaseInsensitive) groups.get(groupNumber)!!.value.lowercase()
-                         else groups.get(groupNumber)!!.value
+    else groups.get(groupNumber)!!.value
 
     if (editor.text().length - index < capturedString.length) return MatcherResult.Failure
 
-    val editorString = if (isCaseInsensitive) editor.text().substring(index until index + capturedString.length).lowercase()
-                       else editor.text().substring(index until index + capturedString.length)
+    val editorString =
+      if (isCaseInsensitive) editor.text().substring(index until index + capturedString.length).lowercase()
+      else editor.text().substring(index until index + capturedString.length)
 
     return if (capturedString == editorString)
       MatcherResult.Success(capturedString.length)

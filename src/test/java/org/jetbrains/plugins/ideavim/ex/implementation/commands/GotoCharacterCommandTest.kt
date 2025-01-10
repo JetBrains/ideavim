@@ -45,19 +45,23 @@ class GotoCharacterCommandTest : VimTestCase() {
 
   @Test
   fun `go to 10th character`() {
-    configureByText("""
+    configureByText(
+      """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
     enterCommand("goto 10")
-    assertState("""
+    assertState(
+      """
       Lorem ips${c}um dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test

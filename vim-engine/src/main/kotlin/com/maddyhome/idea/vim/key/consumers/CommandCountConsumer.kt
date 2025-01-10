@@ -46,7 +46,8 @@ class CommandCountConsumer : KeyConsumer {
     // Make sure to avoid handling '0' as the start of a count.
     if (Character.isDigit(chKey) && !(chKey == '0' && !commandBuilder.hasCountCharacters())
       && (editorState.mode is Mode.NORMAL || editorState.mode is Mode.VISUAL || editorState.mode is Mode.OP_PENDING)
-      && commandBuilder.isExpectingCount) {
+      && commandBuilder.isExpectingCount
+    ) {
       logger.debug("This is a command count key")
       return true
     }

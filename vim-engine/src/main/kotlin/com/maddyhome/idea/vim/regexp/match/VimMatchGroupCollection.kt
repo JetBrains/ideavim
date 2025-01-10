@@ -22,7 +22,7 @@ class VimMatchGroupCollection(
    */
   override val size: Int = 10,
 
-) : Collection<VimMatchGroup> {
+  ) : Collection<VimMatchGroup> {
   /**
    * Store the capture groups
    */

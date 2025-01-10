@@ -34,7 +34,7 @@ class ChangeMotionAction : ChangeInInsertSequenceAction(), DuplicableOperatorAct
     caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     return argument != null && injector.changeGroup.changeMotion(
       editor,

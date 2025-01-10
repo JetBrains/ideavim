@@ -343,24 +343,32 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-3294"])
   fun `test matching with braces inside of string`() {
-    configureByText("""
+    configureByText(
+      """
 $c("("")")
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("%")
-    assertState("""
+    assertState(
+      """
 ("("")"$c)
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   @TestFor(issues = ["VIM-3294"])
   fun `test matching with braces inside of string 2`() {
-    configureByText("""
+    configureByText(
+      """
 ("("")"$c)
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("%")
-    assertState("""
+    assertState(
+      """
 $c("("")")
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 }

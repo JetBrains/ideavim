@@ -22,5 +22,5 @@ class VimMatchGroup(
   /**
    * The string value of the match found
    */
-  val value: String
+  val value: String,
 )

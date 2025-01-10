@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.history
 interface VimHistory {
   @Deprecated("Please use fun addEntry(type: Type, text: String)")
   fun addEntry(key: String, text: String)
+
   @Deprecated("Please use fun getEntries(type: Type, text: String)")
   fun getEntries(key: String, first: Int, last: Int): List<HistoryEntry>
 

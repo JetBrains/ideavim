@@ -90,7 +90,8 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
-  ) {}
+  ) {
+  }
 
   fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
@@ -124,7 +125,12 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     }
   }
 
-  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
+  private fun doExecute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ) {
     if (!injector.enabler.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
@@ -139,13 +145,13 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
       injector.messages.indicateError()
     }
   }
-  
+
   private fun updateUndoKey(editor: VimEditor, command: Command) {
     val undo = (injector.undo as? VimKeyBasedUndoService) ?: return
-    
+
     if (editor.mode == Mode.INSERT) return // typing handles undo on its own
     if (command.flags.contains(CommandFlags.FLAG_UNDO_AWARE)) return
-    
+
     if (command.type == Command.Type.MOTION || command.type == Command.Type.MODE_CHANGE) {
       undo.setMergeUndoKey()
     } else {
@@ -164,7 +170,8 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   companion object {
     private val logger = vimLogger<EditorActionHandlerBase>()
 
-    fun parseKeysSet(keyStrings: List<String>): Set<List<KeyStroke>> = keyStrings.map { injector.parser.parseKeys(it) }.toSet()
+    fun parseKeysSet(keyStrings: List<String>): Set<List<KeyStroke>> =
+      keyStrings.map { injector.parser.parseKeys(it) }.toSet()
 
     @JvmStatic
     fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {

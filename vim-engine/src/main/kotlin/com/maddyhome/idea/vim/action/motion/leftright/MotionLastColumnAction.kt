@@ -27,8 +27,8 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import java.util.*
 
-abstract class MotionLastColumnBaseAction(private val isMotionForOperator: Boolean = false)
-  : MotionActionHandler.ForEachCaret() {
+abstract class MotionLastColumnBaseAction(private val isMotionForOperator: Boolean = false) :
+  MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.INCLUSIVE
 

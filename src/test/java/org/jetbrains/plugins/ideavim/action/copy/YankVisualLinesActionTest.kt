@@ -38,7 +38,8 @@ class YankVisualLinesActionTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    val savedText = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
+    val savedText =
+      registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
     kotlin.test.assertEquals(yankedTest, savedText)
   }
 
@@ -69,7 +70,8 @@ class YankVisualLinesActionTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    val savedText = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
+    val savedText =
+      registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
     kotlin.test.assertEquals(yankedTest, savedText)
   }
 
@@ -93,7 +95,8 @@ class YankVisualLinesActionTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    val savedText = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
+    val savedText =
+      registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
     kotlin.test.assertEquals(yankedTest, savedText)
   }
 }

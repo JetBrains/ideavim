@@ -16,7 +16,7 @@ import java.awt.event.ActionListener
 import javax.swing.KeyStroke
 import javax.swing.Timer
 
-class MappingState: Cloneable {
+class MappingState : Cloneable {
   // Map command depth. 0 - if it is not a map command. 1 - regular map command. 2+ - nested map commands
   private var mapDepth = 0
 
@@ -39,7 +39,7 @@ class MappingState: Cloneable {
   // Let's avoid creating temporary wrapper lists when we could use this list directly
   val keys: Iterable<KeyStroke>
     get() = keyList
-  
+
   val hasKeys
     get() = keyList.isNotEmpty()
 
@@ -109,7 +109,7 @@ class MappingState: Cloneable {
   }
 
   override fun toString(): String {
-    return "Map depth = $mapDepth, keys = ${ injector.parser.toKeyNotation(keys.toList()) }"
+    return "Map depth = $mapDepth, keys = ${injector.parser.toKeyNotation(keys.toList())}"
   }
 
   companion object {

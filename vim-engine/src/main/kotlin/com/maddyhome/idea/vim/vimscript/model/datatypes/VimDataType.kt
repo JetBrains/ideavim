@@ -41,6 +41,7 @@ abstract class VimDataType {
       is VimList -> {
         this.values.joinToString(separator = "") { it.toString() + "\n" }
       }
+
       is VimDictionary -> this.asString()
       else -> this.toString()
     }

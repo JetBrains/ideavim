@@ -209,17 +209,20 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         append(EngineStringHelper.toPrintableCharacter('\u0000'))
         0
       }
+
       printable.length == 1 && isRightToLeft(char) -> {
         append('\u2067')  // RIGHT_TO_LEFT_ISOLATE - set RTL and isolate following content from the surrounding text
         append(printable)
         append('\u2069')  // POP_DIRECTIONAL_ISOLATE - close the isolation range and return to LTR
         2
       }
+
       printable.length == 1 && isCombiningCharacter(char) -> {
         append(' ') // Give the combining character something to combine with
         append(printable)
         1
       }
+
       else -> {
         append(printable)
         0

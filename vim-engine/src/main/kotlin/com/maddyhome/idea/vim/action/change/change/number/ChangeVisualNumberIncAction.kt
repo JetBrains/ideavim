@@ -29,7 +29,13 @@ sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOpe
     range: VimSelection,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.changeGroup.changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)
+    return injector.changeGroup.changeNumberVisualMode(
+      editor,
+      caret,
+      range.toVimTextRange(false),
+      inc * cmd.count,
+      avalanche
+    )
   }
 }
 

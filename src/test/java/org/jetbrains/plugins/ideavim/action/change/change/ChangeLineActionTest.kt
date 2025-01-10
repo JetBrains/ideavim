@@ -41,7 +41,7 @@ class ChangeLineActionTest : VimTestCase() {
             Lorem ipsum dolor sit amet,
             $c
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -59,7 +59,7 @@ Mode.INSERT,
             $c
             
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -75,7 +75,7 @@ Mode.INSERT,
             Lorem ipsum dolor sit amet,
             $c
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -93,7 +93,7 @@ Mode.INSERT,
             $c
             
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -109,7 +109,7 @@ Mode.INSERT,
             $c
             consectetur adipiscing elit
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -127,7 +127,7 @@ Mode.INSERT,
             $c
             
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -145,7 +145,7 @@ Mode.INSERT,
             consectetur adipiscing elit
             $c
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -183,7 +183,7 @@ Mode.INSERT,
             that priceless mote now dimpling the convex
             and limpid teardrop on a lighted slide.
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 }

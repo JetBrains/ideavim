@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
 @Service
-class IjVimPsiService: VimPsiService {
+class IjVimPsiService : VimPsiService {
   override fun getCommentAtPos(editor: VimEditor, pos: Int): Pair<TextRange, Pair<String, String>?>? {
     val psiFile = PsiHelper.getFile(editor.ij) ?: return null
     val psiElement = psiFile.findElementAt(pos) ?: return null

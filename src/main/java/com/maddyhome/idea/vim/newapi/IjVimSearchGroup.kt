@@ -277,7 +277,11 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
           }
         }
 
-        (injector.searchGroup as VimSearchGroupBase).highlightSearchLines(editor.vim, startPosition.line, endPosition.line)
+        (injector.searchGroup as VimSearchGroupBase).highlightSearchLines(
+          editor.vim,
+          startPosition.line,
+          endPosition.line
+        )
 
         if (logger.isDebug()) {
           existingHighlighters = editor.vimLastHighlighters!!

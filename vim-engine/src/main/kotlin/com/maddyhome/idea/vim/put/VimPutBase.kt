@@ -92,7 +92,13 @@ abstract class VimPutBase : VimPut {
   }
 
   @RWLockLabel.SelfSynchronized
-  private fun deleteSelectedText(editor: VimEditor, context: ExecutionContext, caret: VimCaret, data: PutData, saveToRegister: Boolean): VimCaret? {
+  private fun deleteSelectedText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: VimCaret,
+    data: PutData,
+    saveToRegister: Boolean,
+  ): VimCaret? {
     if (data.visualSelection == null) return null
     if (!caret.isValid) return null
 
@@ -164,6 +170,7 @@ abstract class VimPutBase : VimPut {
         SelectionType.LINE_WISE -> if (caretAfterInsertedText) "postEndOffset" else "startOffset"
         else -> if (caretAfterInsertedText) "preLineEndOfEndOffset" else "startOffset"
       }
+
       SelectionType.LINE_WISE -> if (caretAfterInsertedText) "postEndOffset" else "startOffsetSkipLeading"
       SelectionType.CHARACTER_WISE -> when (modeInEditor) {
         SelectionType.LINE_WISE -> if (caretAfterInsertedText) "postEndOffset" else "startOffset"
@@ -178,6 +185,7 @@ abstract class VimPutBase : VimPut {
         val updated = caret.moveToOffset(startOffset)
         updated.moveToOffset(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, updated))
       }
+
       "postEndOffset" -> caret.moveToOffset(endOffset + 1)
       "preLineEndOfEndOffset" -> {
         var rightestPosition = editor.getLineEndForOffset(endOffset - 1)
@@ -185,6 +193,7 @@ abstract class VimPutBase : VimPut {
         val pos = min(endOffset, rightestPosition)
         caret.moveToOffset(pos)
       }
+
       else -> error("Unexpected mode")
     }
   }
@@ -366,6 +375,7 @@ abstract class VimPutBase : VimPut {
         indent,
         cursorAfter,
       )
+
       SelectionType.LINE_WISE -> putTextLinewise(
         editor,
         caret,
@@ -378,6 +388,7 @@ abstract class VimPutBase : VimPut {
         indent,
         cursorAfter,
       )
+
       else -> putTextBlockwise(editor, caret, context, text, type, mode, startOffset, count, indent, cursorAfter)
     }
   }
@@ -398,6 +409,7 @@ abstract class VimPutBase : VimPut {
           application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret, vimCaret.offset, "\n") }
           listOf(vimCaret.offset + 1)
         }
+
         visualSelection.typeInEditor.isBlock -> {
           val firstSelectedLine = additionalData["firstSelectedLine"] as Int
           val selectedLines = additionalData["selectedLines"] as Int
@@ -413,8 +425,10 @@ abstract class VimPutBase : VimPut {
                 listOf(pos + 1)
               }
             }
+
             SelectionType.CHARACTER_WISE -> (firstSelectedLine + selectedLines downTo firstSelectedLine)
               .map { vimEditor.bufferPositionToOffset(BufferPosition(it, startColumnOfSelection)) }
+
             SelectionType.BLOCK_WISE -> listOf(
               vimEditor.bufferPositionToOffset(
                 BufferPosition(
@@ -425,19 +439,23 @@ abstract class VimPutBase : VimPut {
             )
           }
         }
+
         visualSelection.typeInEditor.isLine -> {
           val lastChar = if (vimEditor.fileSize() > 0) {
             vimEditor.getText(TextRange(vimEditor.fileSize().toInt() - 1, vimEditor.fileSize().toInt()))[0]
           } else {
             null
           }
-          if (vimCaret.offset == vimEditor.fileSize().toInt() && vimEditor.fileSize().toInt() != 0 && lastChar != '\n') {
+          if (vimCaret.offset == vimEditor.fileSize().toInt() && vimEditor.fileSize()
+              .toInt() != 0 && lastChar != '\n'
+          ) {
             application.runWriteAction { (vimEditor as MutableVimEditor).insertText(vimCaret, vimCaret.offset, "\n") }
             listOf(vimCaret.offset + 1)
           } else {
             listOf(vimCaret.offset)
           }
         }
+
         else -> listOf(vimCaret.offset)
       }
     } else {
@@ -464,6 +482,7 @@ abstract class VimPutBase : VimPut {
             startOffset++
           }
         }
+
         else -> {
           startOffset = vimCaret.offset
           if (!vimEditor.isLineEmpty(line, false)) {
@@ -512,7 +531,14 @@ abstract class VimPutBase : VimPut {
   }
 
   @RWLockLabel.SelfSynchronized
-  override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean, modifyRegister: Boolean): Boolean {
+  override fun putTextForCaret(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    data: PutData,
+    updateVisualMarks: Boolean,
+    modifyRegister: Boolean,
+  ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     var currentCaret = caret
     data.visualSelection?.let {

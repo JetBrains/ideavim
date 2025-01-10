@@ -25,9 +25,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class PrintCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     editor.removeSecondaryCarets()
     val caret = editor.currentCaret()
     val lineRange = getLineRangeWithCount(editor, caret)
@@ -36,7 +41,7 @@ data class PrintCommand(val range: Range, val modifier: CommandModifier, val arg
     val offset = injector.motion.moveCaretToLineStartSkipLeading(editor, lineRange.endLine)
     caret.moveToOffset(offset)
 
-    injector.outputPanel.output(editor, context, getText(editor, (lineRange.startLine .. lineRange.endLine).toList()))
+    injector.outputPanel.output(editor, context, getText(editor, (lineRange.startLine..lineRange.endLine).toList()))
     return ExecutionResult.Success
   }
 

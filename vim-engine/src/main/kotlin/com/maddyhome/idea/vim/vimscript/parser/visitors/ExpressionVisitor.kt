@@ -120,25 +120,38 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator2().text
-    val result = if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
-      val index = SimpleExpression(ctx.expr(1).text)
-      OneElementSublistExpression(index, left)
-    } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
-        ctx.expr(1).text,
-      )
-    ) {
-      val postfix = "-" + ctx.expr(1).text
-      val newIndex = SimpleExpression((left.index as SimpleExpression).data.asString() + postfix)
-      OneElementSublistExpression(newIndex, left.expression)
-    } else if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && right is OneElementSublistExpression && matchesLiteralDictionaryKey(right.expression.originalString)) {
-      OneElementSublistExpression(right.index, OneElementSublistExpression(SimpleExpression(right.expression.originalString), left))
-    } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(left)) {
-      val index = right.functionName
-      FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
-    } else {
-      val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-      BinExpression(left, right, operator)
-    }
+    val result =
+      if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(
+          ctx.expr(1).text
+        )
+      ) {
+        val index = SimpleExpression(ctx.expr(1).text)
+        OneElementSublistExpression(index, left)
+      } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
+          ctx.expr(1).text,
+        )
+      ) {
+        val postfix = "-" + ctx.expr(1).text
+        val newIndex = SimpleExpression((left.index as SimpleExpression).data.asString() + postfix)
+        OneElementSublistExpression(newIndex, left.expression)
+      } else if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && right is OneElementSublistExpression && matchesLiteralDictionaryKey(
+          right.expression.originalString
+        )
+      ) {
+        OneElementSublistExpression(
+          right.index,
+          OneElementSublistExpression(SimpleExpression(right.expression.originalString), left)
+        )
+      } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(
+          left
+        )
+      ) {
+        val index = right.functionName
+        FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
+      } else {
+        val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
+        BinExpression(left, right, operator)
+      }
     result.originalString = ctx.text
     return result
   }

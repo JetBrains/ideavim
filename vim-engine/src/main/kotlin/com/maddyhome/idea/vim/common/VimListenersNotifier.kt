@@ -53,7 +53,7 @@ class VimListenersNotifier {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     macroRecordingListeners.forEach { it.recordingStarted() }
   }
-  
+
   fun notifyMacroRecordingFinished() {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     macroRecordingListeners.forEach { it.recordingFinished() }

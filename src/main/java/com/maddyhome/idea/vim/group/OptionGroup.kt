@@ -66,7 +66,7 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-internal interface IjVimOptionGroup: VimOptionGroup {
+internal interface IjVimOptionGroup : VimOptionGroup {
   /**
    * Return an accessor for options that only have a global value
    */
@@ -151,7 +151,7 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOpt
   override fun <T : VimDataType> setOptionValueInternal(
     option: Option<T>,
     scope: OptionAccessScope,
-    value: OptionValue<T>
+    value: OptionValue<T>,
   ) {
     super.setOptionValueInternal(option, scope, value)
   }
@@ -391,7 +391,6 @@ private abstract class GlobalLocalOptionToGlobalLocalIdeaSettingMapper<T : VimDa
 }
 
 
-
 /**
  * Maps the `'bomb'` local-to-buffer Vim option to the file's current byte order mark
  *
@@ -425,7 +424,8 @@ private class BombOptionMapper : LocalOptionValueOverride<VimInt> {
     // Use IntelliJ's own actions to modify the BOM. This will change the BOM stored in the virtual file, update the
     // file contents and save it
     val actionId = if (hasBom) "RemoveBom" else "AddBom"
-    val action = injector.actionExecutor.getAction(actionId) ?: throw ExException("Cannot find native action: $actionId")
+    val action =
+      injector.actionExecutor.getAction(actionId) ?: throw ExException("Cannot find native action: $actionId")
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
     injector.actionExecutor.executeAction(editor, action, context)
     return true
@@ -463,8 +463,8 @@ private class BreakIndentOptionMapper(
  *
  * TODO: This is a code style setting - how can we react to changes?
  */
-private class ColorColumnOptionValueProvider(private val colorColumnOption: StringListOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimString>(colorColumnOption) {
+private class ColorColumnOptionValueProvider(private val colorColumnOption: StringListOption) :
+  LocalOptionToGlobalLocalExternalSettingMapper<VimString>(colorColumnOption) {
 
   // The IntelliJ setting is in practice global, from the user's perspective
   override val canUserModifyExternalLocalValue: Boolean = false
@@ -510,8 +510,7 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
     // Given an empty string, hide the margin.
     if (value == VimString.EMPTY) {
       editor.ij.settings.isRightMarginShown = false
-    }
-    else {
+    } else {
       editor.ij.settings.isRightMarginShown = true
 
       val softMargins = mutableListOf<Int>()
@@ -524,8 +523,7 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
           // We could perhaps add a property change listener from editor settings state?
           // (editor.ij as EditorImpl).state.addPropertyChangeListener(...)
           // (editor.ij.settings as SettingsImpl).getState().addPropertyChangeListener(...)
-        }
-        else {
+        } else {
           it.toIntOrNull()?.let(softMargins::add)
         }
       }
@@ -559,8 +557,8 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
  *
  * Note that there isn't a global IntelliJ setting for this option.
  */
-private class CursorLineOptionMapper(cursorLineOption: ToggleOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(cursorLineOption) {
+private class CursorLineOptionMapper(cursorLineOption: ToggleOption) :
+  LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(cursorLineOption) {
 
   // The IntelliJ setting is in practice global, from the user's perspective
   override val canUserModifyExternalLocalValue: Boolean = false
@@ -667,7 +665,12 @@ private class FileEncodingOptionMapper : LocalOptionValueOverride<VimString> {
     }
   }
 
-  private fun isSafeToReloadIn(virtualFile: VirtualFile, text: CharSequence, bytes: ByteArray, charset: Charset): Magic8 {
+  private fun isSafeToReloadIn(
+    virtualFile: VirtualFile,
+    text: CharSequence,
+    bytes: ByteArray,
+    charset: Charset,
+  ): Magic8 {
     val bom = virtualFile.bom
     if (bom != null && !CharsetToolkit.canHaveBom(charset, bom)) return Magic8.NO_WAY
 
@@ -680,11 +683,9 @@ private class FileEncodingOptionMapper : LocalOptionValueOverride<VimString> {
 
     var bytesToSave = try {
       StringUtil.convertLineSeparators(loaded, separator).toByteArray(charset)
-    }
-    catch (e: UnsupportedOperationException) {
+    } catch (e: UnsupportedOperationException) {
       return Magic8.NO_WAY
-    }
-    catch (e: NullPointerException) {
+    } catch (e: NullPointerException) {
       return Magic8.NO_WAY
     }
     if (bom != null && !ArrayUtil.startsWith(bytesToSave, bom)) {
@@ -718,12 +719,14 @@ private class FileFormatOptionMapper : LocalOptionValueOverride<VimString> {
     // We should have a virtual file for most scenarios, e.g., scratch files, commit message dialog, etc.
     // The fallback window (TextComponentEditorImpl) does not have a virtual file
     val separator = editor.ij.virtualFile?.let { LoadTextUtil.detectLineSeparator(it, false) }
-    val value = VimString(when (separator) {
-      LineSeparator.LF.separatorString -> "unix"
-      LineSeparator.CR.separatorString -> "mac"
-      LineSeparator.CRLF.separatorString -> "dos"
-      else -> if (injector.systemInfoService.isWindows) "dos" else "unix"
-    })
+    val value = VimString(
+      when (separator) {
+        LineSeparator.LF.separatorString -> "unix"
+        LineSeparator.CR.separatorString -> "mac"
+        LineSeparator.CRLF.separatorString -> "dos"
+        else -> if (injector.systemInfoService.isWindows) "dos" else "unix"
+      }
+    )
 
     // There is no difference between user/external/default - the file is always just one format
     return OptionValue.User(value)
@@ -762,8 +765,8 @@ private class FileFormatOptionMapper : LocalOptionValueOverride<VimString> {
 /**
  * Maps the `'list'` local-to-window Vim option to the IntelliJ global-local whitespace setting
  */
-private class ListOptionMapper(listOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor)
-  : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(listOption, internalOptionValueAccessor) {
+private class ListOptionMapper(listOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor) :
+  LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(listOption, internalOptionValueAccessor) {
 
   override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_IS_WHITESPACES_SHOWN
 
@@ -787,8 +790,8 @@ private class ListOptionMapper(listOption: ToggleOption, internalOptionValueAcce
  *
  * Note that this must work with `'relativenumber'` to correctly handle the hybrid modes.
  */
-private class NumberOptionMapper(numberOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor)
-  : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(numberOption, internalOptionValueAccessor) {
+private class NumberOptionMapper(numberOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor) :
+  LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(numberOption, internalOptionValueAccessor) {
 
   // This is a global-local setting, and can be modified by the user via _View | Active Editor | Show Line Numbers_
   override val canUserModifyExternalLocalValue: Boolean = true
@@ -808,13 +811,11 @@ private class NumberOptionMapper(numberOption: ToggleOption, internalOptionValue
         if (isShowingRelativeLineNumbers(editor.ij.settings.lineNumerationType)) {
           editor.ij.settings.lineNumerationType = LineNumerationType.HYBRID
         }
-      }
-      else {
+      } else {
         editor.ij.settings.isLineNumbersShown = true
         editor.ij.settings.lineNumerationType = LineNumerationType.ABSOLUTE
       }
-    }
-    else {
+    } else {
       // Turn off 'number'. Hide lines if 'relativenumber' is not set, else switch to relative
       if (editor.ij.settings.isLineNumbersShown) {
         if (isShowingRelativeLineNumbers(editor.ij.settings.lineNumerationType)) {
@@ -828,7 +829,8 @@ private class NumberOptionMapper(numberOption: ToggleOption, internalOptionValue
 
   override fun onGlobalIdeaValueChanged(propertyName: String) {
     if (propertyName == EditorSettingsExternalizable.PropNames.PROP_ARE_LINE_NUMBERS_SHOWN
-      || propertyName == EditorSettingsExternalizable.PropNames.PROP_LINE_NUMERATION) {
+      || propertyName == EditorSettingsExternalizable.PropNames.PROP_LINE_NUMERATION
+    ) {
       doOnGlobalIdeaValueChanged()
     }
   }
@@ -863,13 +865,11 @@ private class RelativeNumberOptionMapper(
         if (isShowingAbsoluteLineNumbers(editor.ij.settings.lineNumerationType)) {
           editor.ij.settings.lineNumerationType = LineNumerationType.HYBRID
         }
-      }
-      else {
+      } else {
         editor.ij.settings.isLineNumbersShown = true
         editor.ij.settings.lineNumerationType = LineNumerationType.RELATIVE
       }
-    }
-    else {
+    } else {
       // Turn off 'relativenumber'. Hide lines if 'number' is not set, else switch to relative
       if (editor.ij.settings.isLineNumbersShown) {
         if (isShowingAbsoluteLineNumbers(editor.ij.settings.lineNumerationType)) {
@@ -883,7 +883,8 @@ private class RelativeNumberOptionMapper(
 
   override fun onGlobalIdeaValueChanged(propertyName: String) {
     if (propertyName == EditorSettingsExternalizable.PropNames.PROP_ARE_LINE_NUMBERS_SHOWN
-      || propertyName == EditorSettingsExternalizable.PropNames.PROP_LINE_NUMERATION) {
+      || propertyName == EditorSettingsExternalizable.PropNames.PROP_LINE_NUMERATION
+    ) {
       doOnGlobalIdeaValueChanged()
     }
   }
@@ -914,8 +915,8 @@ private fun isShowingRelativeLineNumbers(lineNumerationType: LineNumerationType)
  * We can also clear the overridden IDE setting value by setting it to `-1`. So when the user resets the Vim option to
  * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
  */
-private class ScrollJumpOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor)
-  : GlobalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
+private class ScrollJumpOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor) :
+  GlobalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
 
   override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_VERTICAL_SCROLL_JUMP
 
@@ -949,8 +950,8 @@ private class ScrollJumpOptionMapper(option: NumberOption, internalOptionValueAc
  * We can also clear the overridden IDE setting value by setting it to `-1`. So when the user resets the Vim option to
  * defaults, it will again map to the global IDE value. It's a shame not all IDE settings do this.
  */
-private class SideScrollOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor)
-  : GlobalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
+private class SideScrollOptionMapper(option: NumberOption, internalOptionValueAccessor: InternalOptionValueAccessor) :
+  GlobalOptionToGlobalLocalIdeaSettingMapper<VimInt>(option, internalOptionValueAccessor) {
 
   override val ideaPropertyName: String = EditorSettingsExternalizable.PropNames.PROP_HORIZONTAL_SCROLL_JUMP
 
@@ -1140,8 +1141,8 @@ private abstract class OneWayGlobalLocalOptionToGlobalLocalIdeaSettingMapper<T :
  * (window) overrides. The [LocalOptionToGlobalLocalExternalSettingMapper] base class will handle this by calling
  * [setLocalExternalValue] for all open editors for the changed buffer.
  */
-private class TextWidthOptionMapper(textWidthOption: NumberOption)
-  : LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(textWidthOption) {
+private class TextWidthOptionMapper(textWidthOption: NumberOption) :
+  LocalOptionToGlobalLocalExternalSettingMapper<VimInt>(textWidthOption) {
 
   // The IntelliJ setting is in practice global, from the user's perspective
   override val canUserModifyExternalLocalValue: Boolean = false
@@ -1168,8 +1169,7 @@ private class TextWidthOptionMapper(textWidthOption: NumberOption)
     val project = ijEditor.project ?: ProjectManager.getInstance().defaultProject
     return if (ijEditor.settings.isWrapWhenTypingReachesRightMargin(project)) {
       ijEditor.settings.getRightMargin(ijEditor.project).asVimInt()
-    }
-    else {
+    } else {
       VimInt.ZERO
     }
   }
@@ -1215,8 +1215,8 @@ private class TextWidthOptionMapper(textWidthOption: NumberOption)
 /**
  * Maps the `'wrap'` Vim option to the IntelliJ soft wrap settings
  */
-private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor)
-  : LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(wrapOption, internalOptionValueAccessor) {
+private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAccessor: InternalOptionValueAccessor) :
+  LocalOptionToGlobalLocalIdeaSettingMapper<VimInt>(wrapOption, internalOptionValueAccessor) {
 
   // This is a global-local setting, and can be modified by the user via _View | Active Editor | Soft-Wrap_
   override val canUserModifyExternalLocalValue: Boolean = true
@@ -1245,7 +1245,9 @@ private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAcce
     fun editorKindToSoftWrapAppliancesPlace(kind: EditorKind) = when (kind) {
       EditorKind.UNTYPED,
       EditorKind.DIFF,
-      EditorKind.MAIN_EDITOR -> SoftWrapAppliancePlaces.MAIN_EDITOR
+      EditorKind.MAIN_EDITOR,
+        -> SoftWrapAppliancePlaces.MAIN_EDITOR
+
       EditorKind.CONSOLE -> SoftWrapAppliancePlaces.CONSOLE
       // Treat PREVIEW as a kind of MAIN_EDITOR instead of SWAP.PREVIEW. There are fewer noticeable differences
       EditorKind.PREVIEW -> SoftWrapAppliancePlaces.MAIN_EDITOR
@@ -1261,7 +1263,9 @@ private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAcce
     val softWrapAppliancePlace = when (editor.ij.editorKind) {
       EditorKind.UNTYPED,
       EditorKind.DIFF,
-      EditorKind.MAIN_EDITOR -> SoftWrapAppliancePlaces.MAIN_EDITOR
+      EditorKind.MAIN_EDITOR,
+        -> SoftWrapAppliancePlaces.MAIN_EDITOR
+
       EditorKind.CONSOLE -> SoftWrapAppliancePlaces.CONSOLE
       EditorKind.PREVIEW -> SoftWrapAppliancePlaces.PREVIEW
     }
@@ -1304,7 +1308,8 @@ private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAcce
 
   override fun onGlobalIdeaValueChanged(propertyName: String) {
     if (propertyName == EditorSettingsExternalizable.PropNames.PROP_USE_SOFT_WRAPS
-      || propertyName == EditorSettingsExternalizable.PropNames.PROP_SOFT_WRAP_FILE_MASKS) {
+      || propertyName == EditorSettingsExternalizable.PropNames.PROP_SOFT_WRAP_FILE_MASKS
+    ) {
       doOnGlobalIdeaValueChanged()
     }
   }
@@ -1331,8 +1336,10 @@ class IjOptionConstants {
     const val ideawrite_file: String = "file"
 
     val ideaStatusIconValues: Set<String> = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
-    val ideaRefactorModeValues: Set<String> = setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)
+    val ideaRefactorModeValues: Set<String> =
+      setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)
     val ideaWriteValues: Set<String> = setOf(ideawrite_all, ideawrite_file)
-    val ideavimsupportValues: Set<String> = setOf(ideavimsupport_dialog, ideavimsupport_singleline, ideavimsupport_dialoglegacy)
+    val ideavimsupportValues: Set<String> =
+      setOf(ideavimsupport_dialog, ideavimsupport_singleline, ideavimsupport_dialoglegacy)
   }
 }

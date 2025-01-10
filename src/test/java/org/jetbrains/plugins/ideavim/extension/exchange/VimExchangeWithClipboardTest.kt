@@ -119,7 +119,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter =
-    """The quick
+      """The quick
        catch over
        ${c}brown fox
        the lazy dog
@@ -147,7 +147,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter =
-    """The quick
+      """The quick
        catch over
        ${c}brown fox
        the lazy dog
@@ -200,7 +200,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter =
-    """
+      """
          catch over
          the lazy dog
          ${c}The quick

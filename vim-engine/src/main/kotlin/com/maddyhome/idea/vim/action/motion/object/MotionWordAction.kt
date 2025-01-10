@@ -18,7 +18,10 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.state.mode.Mode
 
-@CommandOrMotion(keys = ["iW"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["iW"],
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+)
 class MotionInnerBigWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
@@ -34,7 +37,10 @@ class MotionInnerBigWordAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["aW"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["aW"],
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+)
 class MotionOuterBigWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
@@ -50,7 +56,10 @@ class MotionOuterBigWordAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["iw"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["iw"],
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+)
 class MotionInnerWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
@@ -66,7 +75,10 @@ class MotionInnerWordAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["aw"], modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["aw"],
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+)
 class MotionOuterWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE

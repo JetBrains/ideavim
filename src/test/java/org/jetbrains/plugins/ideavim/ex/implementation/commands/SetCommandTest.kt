@@ -70,14 +70,23 @@ class SetCommandTest : VimTestCase() {
   @Test
   fun `test toggle option as a number`() {
     enterCommand("set digraph&")   // Local to window. Reset local + per-window "global" value to default: nodigraph
-    assertEquals(0, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertEquals(0,
+      injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble()
+        .toInt()
+    )
     assertCommandOutput("set digraph?", "nodigraph")
 
     // Should have the same effect as `:set` (although `:set` doesn't allow assigning a number to a boolean)
     // I.e. this sets the local value and the per-window "global" value
     enterCommand("let &dg=1000")
-    assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble().toInt())
-    assertEquals(1000, injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble().toInt())
+    assertEquals(1000,
+      injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.GLOBAL(fixture.editor.vim)).asDouble()
+        .toInt()
+    )
+    assertEquals(1000,
+      injector.optionGroup.getOptionValue(Options.digraph, OptionAccessScope.LOCAL(fixture.editor.vim)).asDouble()
+        .toInt()
+    )
     assertCommandOutput("set digraph?", "  digraph")
   }
 
@@ -156,19 +165,22 @@ class SetCommandTest : VimTestCase() {
     enterCommand("set number relativenumber scrolloff nrformats")
     assertExOutput("  nrformats=hex       scrolloff=0")
     injector.outputPanel.getCurrentOutputPanel()?.close()
-    assertCommandOutput("set",
+    assertCommandOutput(
+      "set",
       """
         |--- Options ---
         |  number              relativenumber
         |  fileencoding=utf-8
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @Test
   fun `test show all effective option values`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput("set all",
+    assertCommandOutput(
+      "set all",
       """
         |--- Options ---
         |noargtextobj          ideamarks           scroll=0          nosurround
@@ -202,12 +214,14 @@ class SetCommandTest : VimTestCase() {
         |  shell=/dummy/path/to/bash
         |novim-paragraph-motion
         |  viminfo='100,<50,s10,h
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @Test
   fun `test show named options`() {
-    assertCommandOutput("set number? relativenumber? scrolloff? nrformats?", """
+    assertCommandOutput(
+      "set number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex     nonumber            norelativenumber      scrolloff=0
       """.trimMargin()
     )
@@ -223,7 +237,8 @@ class SetCommandTest : VimTestCase() {
     enterCommand("set number relativenumber scrolloff nrformats")
     assertExOutput("  nrformats=hex       scrolloff=0")
     injector.outputPanel.getCurrentOutputPanel()?.close()
-    assertCommandOutput("set!",
+    assertCommandOutput(
+      "set!",
       """
       |--- Options ---
       |  fileencoding=utf-8
@@ -237,7 +252,8 @@ class SetCommandTest : VimTestCase() {
   fun `test show all option values in single column`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput("set! all", """
+    assertCommandOutput(
+      "set! all", """
       |--- Options ---
       |noargtextobj
       |nobomb
@@ -318,7 +334,8 @@ class SetCommandTest : VimTestCase() {
 
   @Test
   fun `test show named options in single column`() {
-    assertCommandOutput("set! number? relativenumber? scrolloff? nrformats?", """
+    assertCommandOutput(
+      "set! number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex
       |nonumber
       |norelativenumber

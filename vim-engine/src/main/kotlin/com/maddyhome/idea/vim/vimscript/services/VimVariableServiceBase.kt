@@ -52,17 +52,34 @@ abstract class VimVariableServiceBase : VariableService {
     }
   }
 
-  override fun isVariableLocked(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): Boolean {
+  override fun isVariableLocked(
+    variable: Variable,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): Boolean {
     return getNullableVariableValue(variable, editor, context, vimContext)?.isLocked ?: false
   }
 
-  override fun lockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
+  override fun lockVariable(
+    variable: Variable,
+    depth: Int,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ) {
     val value = getNullableVariableValue(variable, editor, context, vimContext) ?: return
     value.lockOwner = variable
     value.lockVar(depth)
   }
 
-  override fun unlockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
+  override fun unlockVariable(
+    variable: Variable,
+    depth: Int,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ) {
     val value = getNullableVariableValue(variable, editor, context, vimContext) ?: return
     value.unlockVar(depth)
   }
@@ -71,7 +88,13 @@ abstract class VimVariableServiceBase : VariableService {
     return globalVariables
   }
 
-  override fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
+  override fun storeVariable(
+    variable: Variable,
+    value: VimDataType,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ) {
     val scope = variable.scope ?: getDefaultVariableScope(vimContext)
     val name = variable.name.evaluate(editor, context, vimContext).value
     when (scope) {
@@ -86,7 +109,12 @@ abstract class VimVariableServiceBase : VariableService {
     }
   }
 
-  override fun getNullableVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType? {
+  override fun getNullableVariableValue(
+    variable: Variable,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType? {
     val scope = variable.scope ?: getDefaultVariableScope(vimContext)
     val name = variable.name.evaluate(editor, context, vimContext).value
     return when (scope) {
@@ -101,7 +129,12 @@ abstract class VimVariableServiceBase : VariableService {
     }
   }
 
-  override fun getNonNullVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  override fun getNonNullVariableValue(
+    variable: Variable,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType {
     return getNullableVariableValue(variable, editor, context, vimContext)
       ?: throw ExException(
         "E121: Undefined variable: " +
@@ -174,19 +207,29 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   @Suppress("SpellCheckingInspection")
-  protected open fun getVimVariable(name: String, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType? {
+  protected open fun getVimVariable(
+    name: String,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType? {
     // Note that the v:count variables might be incorrect in scenarios other than mappings, when there is a command in
     // progress. However, I've only seen it used inside mappings, so don't know
     return when (name) {
       "count" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot())
-      "count1" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1))
+      "count1" -> VimInt(
+        KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1)
+      )
+
       "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
       "hlsearch" -> {
         HighLightVariable().evaluate(name, editor, context, vimContext)
       }
+
       "register" -> {
-         RegisterVariable().evaluate(name, editor, context, vimContext)
+        RegisterVariable().evaluate(name, editor, context, vimContext)
       }
+
       else -> throw ExException("The 'v:${name}' variable is not implemented yet")
     }
   }
@@ -237,7 +280,13 @@ abstract class VimVariableServiceBase : VariableService {
     getBufferVariables(editor)[name] = value
   }
 
-  protected open fun storeVimVariable(name: String, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
+  protected open fun storeVimVariable(
+    name: String,
+    value: VimDataType,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ) {
     throw ExException("The 'v:' scope is not implemented yet :(")
   }
 

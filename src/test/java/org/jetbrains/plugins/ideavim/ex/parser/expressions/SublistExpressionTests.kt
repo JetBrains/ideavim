@@ -87,7 +87,14 @@ class SublistExpressionTests {
 
   @ParameterizedTest
   @MethodSource("args6")
-  fun `sublist with non int expressions in ranges`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String, sp6: String) {
+  fun `sublist with non int expressions in ranges`(
+    sp1: String,
+    sp2: String,
+    sp3: String,
+    sp4: String,
+    sp5: String,
+    sp6: String,
+  ) {
     val ex = VimscriptParser.parseExpression("[1, 2, 3, 4, 5, 6][${sp1}1$sp2+${sp3}5$sp4:$sp5'asd'$sp6]")
     assertTrue(ex is SublistExpression)
     assertEquals(

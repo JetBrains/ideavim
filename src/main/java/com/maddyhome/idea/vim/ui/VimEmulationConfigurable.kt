@@ -120,7 +120,7 @@ internal class VimEmulationConfigurable : Configurable {
         }
       }
 
-      return rowsToChange;
+      return rowsToChange
     }
 
     fun addHelpLine(model: VimShortcutConflictsTable.Model) {

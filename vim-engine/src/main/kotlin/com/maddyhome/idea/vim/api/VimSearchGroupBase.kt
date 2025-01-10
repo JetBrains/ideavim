@@ -131,7 +131,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     editor: VimEditor,
     startOffset: Int,
     endOffset: Int,
-  ) : SearchHighlight
+  ): SearchHighlight
 
   /**
    * Saves the latest matched string, for Vimscript purposes.
@@ -298,7 +298,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
   ): TextRange? {
     // Backward search returns wrong end offset for some cases. That's why we should perform additional forward search
     val searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS)
-    val foundBackward = injector.searchHelper.findPattern(editor, getLastUsedPattern(), offset, count, searchOptions) ?: return null
+    val foundBackward =
+      injector.searchHelper.findPattern(editor, getLastUsedPattern(), offset, count, searchOptions) ?: return null
     var startOffset = foundBackward.startOffset - 1
     if (startOffset < 0) startOffset = editor.fileSize().toInt()
     searchOptions.remove(SearchOptions.BACKWARDS)
@@ -462,7 +463,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
       // collection start found, ignore until end of collection
       if (magic && command[i] == '[' ||
-        !magic && command[i] == '\\' && i + 1 < command.length && command[i + 1] == '[') {
+        !magic && command[i] == '\\' && i + 1 < command.length && command[i + 1] == '['
+      ) {
 
         i = findEndOfCollection(command, i)
         // skip escaped char
@@ -533,7 +535,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
   private fun findEndOfCollection(
     command: String,
-    startIndex: Int
+    startIndex: Int,
   ): Int {
     var i = startIndex
     while (i < command.length - 1) {
@@ -541,9 +543,10 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       if (command[i] == ']') break
 
       // skip escaped char
-      if (command[i] == '\\' && i + 1 <  command.length) i++
+      if (command[i] == '\\' && i + 1 < command.length) i++
       // skip character class
-      else if (i + 1 < command.length && command[i] == '[' && command[i + 1] < ':') i = findEndOfCharacterClass(command, i + 2)
+      else if (i + 1 < command.length && command[i] == '[' && command[i + 1] < ':') i =
+        findEndOfCharacterClass(command, i + 2)
 
       i++
     }
@@ -552,11 +555,15 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
   private fun findEndOfCharacterClass(
     command: String,
-    startIndex: Int
+    startIndex: Int,
   ): Int {
     for (charClass in CLASS_NAMES) {
-      if (startIndex + charClass.length < command.length && command.substring(startIndex, startIndex + charClass.length) == charClass)
-        // char class found, skip to end of it
+      if (startIndex + charClass.length < command.length && command.substring(
+          startIndex,
+          startIndex + charClass.length
+        ) == charClass
+      )
+      // char class found, skip to end of it
         return startIndex + charClass.length - 1
     }
     // there wasn't any valid character class
@@ -665,9 +672,34 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     updateSearchHighlights(true)
 
     if (!doAsk) {
-      performSubstituteInLines(editor, caret, context, parent, regex, pattern, oldLastSubstituteString, line1, line2, 0, hasExpression, substituteString, exceptions, options)
+      performSubstituteInLines(
+        editor,
+        caret,
+        context,
+        parent,
+        regex,
+        pattern,
+        oldLastSubstituteString,
+        line1,
+        line2,
+        0,
+        hasExpression,
+        substituteString,
+        exceptions,
+        options
+      )
     } else {
-      val lineToNextSubstitute = getNextSubstitute(editor, regex, oldLastSubstituteString, line1, line2, 0, hasExpression, substituteString, options)
+      val lineToNextSubstitute = getNextSubstitute(
+        editor,
+        regex,
+        oldLastSubstituteString,
+        line1,
+        line2,
+        0,
+        hasExpression,
+        substituteString,
+        options
+      )
       if (lineToNextSubstitute == null) {
         injector.messages.indicateError()
         injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
@@ -700,11 +732,12 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     column: Int,
     hasExpression: Boolean,
     substituteString: String,
-    options: EnumSet<VimRegexOptions>
+    options: EnumSet<VimRegexOptions>,
   ): Pair<Int, Pair<VimMatchResult.Success, String>>? {
     for (line in startLine..endLine) {
       val col = if (line == startLine) column else 0
-      val result = regex.substitute(editor, substituteString, oldLastSubstituteString, line, col, hasExpression, options)
+      val result =
+        regex.substitute(editor, substituteString, oldLastSubstituteString, line, col, hasExpression, options)
       if (result != null) return line to result
     }
     return null
@@ -719,10 +752,11 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     column: Int,
     hasExpression: Boolean,
     substituteString: String,
-    options: EnumSet<VimRegexOptions>
+    options: EnumSet<VimRegexOptions>,
   ): SubstitutePreparationResult {
-    val substituteResult = regex.substitute(editor, substituteString, oldLastSubstituteString, line, column, hasExpression, options)
-      ?: return SubstitutePreparationResult.Skip(line + 1, 0)
+    val substituteResult =
+      regex.substitute(editor, substituteString, oldLastSubstituteString, line, column, hasExpression, options)
+        ?: return SubstitutePreparationResult.Skip(line + 1, 0)
     val matchRange = substituteResult.first.range
     val match = substituteResult.second
 
@@ -732,7 +766,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
   private sealed interface SubstitutePreparationResult {
     data class Skip(val newLine: Int, val newColumn: Int) : SubstitutePreparationResult
-    data class Prepared(val match: String, val matchRange: TextRange, val newEndLine: Int, val doReplace: Boolean, val gotQuit: Boolean): SubstitutePreparationResult
+    data class Prepared(
+      val match: String,
+      val matchRange: TextRange,
+      val newEndLine: Int,
+      val doReplace: Boolean,
+      val gotQuit: Boolean,
+    ) : SubstitutePreparationResult
   }
 
   private fun performSubstituteInLines(
@@ -756,7 +796,17 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     var line2 = endLine
     var lastMatchLine = -1
     while (line <= line2) {
-      val preparationResult = prepareToSubstituteWithoutAsk(editor, regex, oldLastSubstituteString, line, line2, column, hasExpression, substituteString, options)
+      val preparationResult = prepareToSubstituteWithoutAsk(
+        editor,
+        regex,
+        oldLastSubstituteString,
+        line,
+        line2,
+        column,
+        hasExpression,
+        substituteString,
+        options
+      )
       if (preparationResult is SubstitutePreparationResult.Skip) {
         line = preparationResult.newLine
         column = preparationResult.newColumn
@@ -765,7 +815,20 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       preparationResult as SubstitutePreparationResult.Prepared
       lastMatchLine = line
 
-      val replaceResult = performReplace(editor, caret, context, parent, preparationResult.match, preparationResult.matchRange, preparationResult.doReplace, line, preparationResult.newEndLine, hasExpression, substituteString, exceptions)
+      val replaceResult = performReplace(
+        editor,
+        caret,
+        context,
+        parent,
+        preparationResult.match,
+        preparationResult.matchRange,
+        preparationResult.doReplace,
+        line,
+        preparationResult.newEndLine,
+        hasExpression,
+        substituteString,
+        exceptions
+      )
       line = replaceResult.line
       column = replaceResult.column
       line2 = replaceResult.endLine
@@ -789,7 +852,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
   ): ReplaceResult {
     caret.moveToOffset(matchRange.startOffset)
     setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
-    val finalMatch = if (hasExpression) evaluateExpression(substituteString.substring(2), editor, context, parent, exceptions) else match
+    val finalMatch = if (hasExpression) evaluateExpression(
+      substituteString.substring(2),
+      editor,
+      context,
+      parent,
+      exceptions
+    ) else match
 
     val newColumn: Int
     var newLine = line
@@ -830,7 +899,14 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
   private data class ReplaceResult(val line: Int, val column: Int, val endLine: Int)
 
-  private fun postSubstitute(editor: VimEditor, caret: VimCaret, pattern: String, gotQuit: Boolean, lastMatchLine: Int, exceptions: List<ExException>) {
+  private fun postSubstitute(
+    editor: VimEditor,
+    caret: VimCaret,
+    pattern: String,
+    gotQuit: Boolean,
+    lastMatchLine: Int,
+    exceptions: List<ExException>,
+  ) {
     if (!gotQuit) {
       if (lastMatchLine != -1) {
         caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
@@ -865,7 +941,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     val options: EnumSet<VimRegexOptions>,
     var lastMatchLine: Int,
     val exceptions: MutableList<ExException>,
-  ): VimInputInterceptorBase<ReplaceConfirmationChoice>() {
+  ) : VimInputInterceptorBase<ReplaceConfirmationChoice>() {
     private val modalInput: VimModalInput
       get() = injector.modalInput.getCurrentModalInput()!!
     private var gotQuit = false
@@ -895,14 +971,31 @@ abstract class VimSearchGroupBase : VimSearchGroup {
           ReplaceConfirmationChoice.SKIP -> doReplace = false
           ReplaceConfirmationChoice.SUBSTITUTE_ALL -> {
             doAsk = false
-            performSubstituteInLines(editor, caret, context, parent, regex, pattern, oldLastSubstituteString, line, endLine, column, hasExpression, substituteString, exceptions, options)
+            performSubstituteInLines(
+              editor,
+              caret,
+              context,
+              parent,
+              regex,
+              pattern,
+              oldLastSubstituteString,
+              line,
+              endLine,
+              column,
+              hasExpression,
+              substituteString,
+              exceptions,
+              options
+            )
             closeModalInputPrompt()
             return@runWriteCommand
           }
+
           ReplaceConfirmationChoice.QUIT -> {
             doReplace = false
             gotQuit = true
           }
+
           ReplaceConfirmationChoice.SUBSTITUTE_LAST -> {
             doAll = false
             endLine = line
@@ -910,7 +1003,20 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         }
         lastMatchLine = line
 
-        val replaceResult = performReplace(editor, caret, context, parent, match, matchRange, doReplace, line, endLine, hasExpression, substituteString, exceptions)
+        val replaceResult = performReplace(
+          editor,
+          caret,
+          context,
+          parent,
+          match,
+          matchRange,
+          doReplace,
+          line,
+          endLine,
+          hasExpression,
+          substituteString,
+          exceptions
+        )
         line = replaceResult.line
         endLine = replaceResult.endLine
         column = replaceResult.column
@@ -925,7 +1031,17 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         return
       }
 
-      val lineToNextSubstitute = getNextSubstitute(editor, regex, oldLastSubstituteString, line, endLine, column, hasExpression, substituteString, options)
+      val lineToNextSubstitute = getNextSubstitute(
+        editor,
+        regex,
+        oldLastSubstituteString,
+        line,
+        endLine,
+        column,
+        hasExpression,
+        substituteString,
+        options
+      )
       if (lineToNextSubstitute == null) {
         afterAllSubstitutes()
       } else {
@@ -933,22 +1049,22 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         caret.moveToOffset(matchRange.startOffset)
         val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
         modalInput.inputInterceptor = SubstituteWithAskInputInterceptor(
-            editor,
-            caret,
-            lineToNextSubstitute.second,
-            highlight,
-            lineToNextSubstitute.first,
-            column,
-            parent,
-            pattern,
-            regex,
-            oldLastSubstituteString,
-            endLine,
-            hasExpression,
-            substituteString,
-            options,
-            lastMatchLine,
-            exceptions,
+          editor,
+          caret,
+          lineToNextSubstitute.second,
+          highlight,
+          lineToNextSubstitute.first,
+          column,
+          parent,
+          pattern,
+          regex,
+          oldLastSubstituteString,
+          endLine,
+          hasExpression,
+          substituteString,
+          options,
+          lastMatchLine,
+          exceptions,
         )
       }
     }
@@ -959,7 +1075,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     }
   }
 
-  private fun evaluateExpression(exprString: String, editor: VimEditor, context: ExecutionContext, parent: VimLContext, exceptions: MutableList<ExException>): String {
+  private fun evaluateExpression(
+    exprString: String,
+    editor: VimEditor,
+    context: ExecutionContext,
+    parent: VimLContext,
+    exceptions: MutableList<ExException>,
+  ): String {
     val expression = injector.vimscriptParser.parseExpression(exprString)
     return if (expression == null) {
       exceptions.add(ExException("E15: Invalid expression: $exprString"))
@@ -978,7 +1100,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     editor: VimEditor,
     range: LineRange,
     excmd: String,
-    exarg: String
+    exarg: String,
   ): SubstituteCommandArguments? {
     var patternType = if ("~" == excmd) {
       // use last used regexp
@@ -992,7 +1114,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     val delimiter: Char
     var trailingOptionsStartIndex = 0
     // new pattern and substitution
-    if (excmd[0] == 's' && exarg.isNotEmpty() && !exarg.first().isWhitespace() && !"0123456789cegriIp|\"".contains(exarg.first())) {
+    if (excmd[0] == 's' && exarg.isNotEmpty() && !exarg.first()
+        .isWhitespace() && !"0123456789cegriIp|\"".contains(exarg.first())
+    ) {
       // don't accept alphanumeric for separator
       if (exarg.first().isLetter()) {
         injector.messages.showStatusBarMessage(null, "E146: Regular expressions can't be delimited by letters")
@@ -1036,8 +1160,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         if (exarg[i] == delimiter) {
           substituteStringEndIndex = i
           break
-        }
-        else if (exarg[i] == '\\' && (i + 1) < exarg.length) {
+        } else if (exarg[i] == '\\' && (i + 1) < exarg.length) {
           i++
         }
         i++
@@ -1145,6 +1268,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
           pattern = lastSubstitutePattern
           "E35: No previous regular expression"
         }
+
         else -> null
       }
 
@@ -1322,7 +1446,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     }
 
     // Uses last pattern. We know this is always set before being called
-    val range = injector.searchHelper.findPattern(editor, pattern, startOffsetMutable, count, searchOptions) ?: return null
+    val range =
+      injector.searchHelper.findPattern(editor, pattern, startOffsetMutable, count, searchOptions) ?: return null
 
     var res = range.startOffset
     if (offsetIsLineOffset) {

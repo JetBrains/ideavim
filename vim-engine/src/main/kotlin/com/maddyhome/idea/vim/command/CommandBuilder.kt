@@ -28,7 +28,7 @@ class CommandBuilder private constructor(
   private var keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>,
   private val counts: MutableList<Int>,
   private val typedKeyStrokes: MutableList<KeyStroke>,
-  private val commandKeyStrokes: MutableList<KeyStroke>
+  private val commandKeyStrokes: MutableList<KeyStroke>,
 ) : Cloneable {
 
   constructor(keyStrokeTrie: KeyStrokeTrie<LazyVimCommand>, initialUncommittedRawCount: Int = 0)
@@ -209,8 +209,7 @@ class CommandBuilder private constructor(
 
     if (this.action == null) {
       this.action = action
-    }
-    else {
+    } else {
       StrictMode.assert(argument == null, "Command builder already has an action and a fully populated argument")
       argument = when (action) {
         is MotionActionHandler -> Argument.Motion(action, null)
@@ -276,11 +275,11 @@ class CommandBuilder private constructor(
 
     val command = node.data
     if (command == null) {
-      logger.trace { "Found unfinished key sequence for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}"}
+      logger.trace { "Found unfinished key sequence for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}" }
       return true
     }
 
-    logger.trace { "Found command for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}"}
+    logger.trace { "Found command for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}" }
     commandKeyStrokes.clear()
     processor(command.instance)
     return true
@@ -416,7 +415,7 @@ class CommandBuilder private constructor(
 
   override fun toString(): String {
     return "Command state = $commandState, " +
-      "key list = ${ injector.parser.toKeyNotation(typedKeyStrokes) }, " +
+      "key list = ${injector.parser.toKeyNotation(typedKeyStrokes)}, " +
       "selected register = $selectedRegister, " +
       "counts = $counts, " +
       "action = $action, " +

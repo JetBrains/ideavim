@@ -68,7 +68,8 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   private fun getActionNameFromActionMapping(keys: List<KeyStroke>): String? {
     if (keys.size > 3
       && keys[0].keyCode == injector.parser.actionKeyStroke.keyCode
-      && keys[1].keyChar == '(' && keys.last().keyChar == ')') {
+      && keys[1].keyChar == '(' && keys.last().keyChar == ')'
+    ) {
       return buildString {
         for (i in 2 until keys.size - 1) {
           append(keys[i].keyChar)

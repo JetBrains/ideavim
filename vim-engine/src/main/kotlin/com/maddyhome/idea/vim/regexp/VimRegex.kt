@@ -101,7 +101,7 @@ class VimRegex(pattern: String) {
    */
   fun containsMatchIn(
     editor: VimEditor,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): Boolean {
     for (line in 0 until editor.lineCount()) {
       val result = simulateNonExactNFA(editor, editor.getLineStartOffset(line), options)
@@ -116,7 +116,7 @@ class VimRegex(pattern: String) {
 
   internal fun containsMatchIn(
     text: String,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): Boolean {
     return containsMatchIn(VimEditorWrapper(text), options)
   }
@@ -134,15 +134,15 @@ class VimRegex(pattern: String) {
   fun findNext(
     editor: VimEditor,
     startIndex: Int = 0,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     /*
     if the startIndex is at the end of a line, start searching at the next position,
     to avoid the cursor getting stuck at line ends
     */
     val newStartIndex =
-     if (startIndex + 1 == editor.getLineEndOffset(editor.offsetToBufferPosition(startIndex).line)) startIndex + 1
-     else startIndex
+      if (startIndex + 1 == editor.getLineEndOffset(editor.offsetToBufferPosition(startIndex).line)) startIndex + 1
+      else startIndex
 
     val lineStartIndex = editor.getLineStartOffset(editor.offsetToBufferPosition(newStartIndex).line)
     var index = lineStartIndex
@@ -153,13 +153,11 @@ class VimRegex(pattern: String) {
           if (result.range.startOffset > newStartIndex) {
             // The match comes after the startIndex, return it
             return result
-          }
-          else if (result.range.startOffset == startIndex && options.contains(VimRegexOptions.CAN_MATCH_START_LOCATION)) {
+          } else if (result.range.startOffset == startIndex && options.contains(VimRegexOptions.CAN_MATCH_START_LOCATION)) {
             // Accept a match at the current location. This means either we want to use the end position of a match, so
             // the current location is valid, or we've wrapped, and there's a match at index == 0.
             return result
-          }
-          else {
+          } else {
             // There is a match but starts before the startIndex, try again starting from the end of this match
             result.range.endOffset + if (result.range.startOffset == result.range.endOffset) 1 else 0
           }
@@ -179,7 +177,7 @@ class VimRegex(pattern: String) {
   internal fun findNext(
     text: String,
     startIndex: Int = 0,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     return findNext(VimEditorWrapper(text), startIndex, options)
   }
@@ -197,18 +195,18 @@ class VimRegex(pattern: String) {
   fun findPrevious(
     editor: VimEditor,
     startIndex: Int = 0,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     val startLine = editor.offsetToBufferPosition(startIndex).line
     val result = findLastMatchInLine(editor, startLine, startIndex - 1, options)
     if (result is VimMatchResult.Success && result.range.startOffset < startIndex) {
-        // there is a match at this line that starts before the startIndex
-        return result
+      // there is a match at this line that starts before the startIndex
+      return result
     } else {
       // try searching in previous lines, line by line until the start of the buffer
       for (currentLine in startLine - 1 downTo 0) {
-          val previous = findLastMatchInLine(editor, currentLine, options=options)
-          if (previous is VimMatchResult.Success) return previous
+        val previous = findLastMatchInLine(editor, currentLine, options = options)
+        if (previous is VimMatchResult.Success) return previous
       }
       // there are no matches in the entire file
       return VimMatchResult.Failure(VimRegexErrors.E486)
@@ -218,7 +216,7 @@ class VimRegex(pattern: String) {
   internal fun findPrevious(
     text: String,
     startIndex: Int = 0,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     return findPrevious(VimEditorWrapper(text), startIndex, options)
   }
@@ -236,7 +234,7 @@ class VimRegex(pattern: String) {
     editor: VimEditor,
     line: Int,
     maxIndex: Int = editor.getLineEndOffset(line),
-    options: EnumSet<VimRegexOptions>
+    options: EnumSet<VimRegexOptions>,
   ): VimMatchResult {
     var index = editor.getLineStartOffset(line)
     var prevResult: VimMatchResult = VimMatchResult.Failure(VimRegexErrors.E486)
@@ -252,7 +250,8 @@ class VimRegex(pattern: String) {
 
           // match found, try to find more after it
           prevResult = result
-          index = if (result.range.startOffset == result.range.endOffset) result.range.endOffset + 1 else result.range.endOffset
+          index =
+            if (result.range.startOffset == result.range.endOffset) result.range.endOffset + 1 else result.range.endOffset
         }
       }
     }
@@ -273,7 +272,7 @@ class VimRegex(pattern: String) {
     editor: VimEditor,
     startIndex: Int = 0,
     maxIndex: Int = editor.text().length,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): List<VimMatchResult.Success> {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
@@ -307,7 +306,7 @@ class VimRegex(pattern: String) {
     text: String,
     startIndex: Int = 0,
     maxIndex: Int = text.length,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): List<VimMatchResult.Success> {
     return findAll(VimEditorWrapper(text), startIndex, maxIndex, options)
   }
@@ -323,7 +322,7 @@ class VimRegex(pattern: String) {
     editor: VimEditor,
     line: Int,
     column: Int = 0,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     return simulateNonExactNFA(editor, editor.getLineStartOffset(line) + column, options)
   }
@@ -332,7 +331,7 @@ class VimRegex(pattern: String) {
     text: String,
     line: Int,
     column: Int = 0,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     return findInLine(VimEditorWrapper(text), line, column, options)
   }
@@ -357,12 +356,15 @@ class VimRegex(pattern: String) {
     line: Int,
     column: Int = 0,
     takeLiterally: Boolean = false,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): Pair<VimMatchResult.Success, String>? {
     val match = findInLine(editor, line, column, options)
     return when (match) {
       is VimMatchResult.Failure -> null
-      is VimMatchResult.Success -> Pair(match, if (takeLiterally) substituteString else buildSubstituteString(match, substituteString, lastSubstituteString))
+      is VimMatchResult.Success -> Pair(
+        match,
+        if (takeLiterally) substituteString else buildSubstituteString(match, substituteString, lastSubstituteString)
+      )
     }
   }
 
@@ -370,7 +372,7 @@ class VimRegex(pattern: String) {
     matchResult: VimMatchResult.Success,
     substituteString: String,
     lastSubstituteString: String,
-    magic: Boolean = true
+    magic: Boolean = true,
   ): String {
     val result = StringBuilder()
     var caseSettings: SubstituteCase = SubstituteCase.DEFAULT
@@ -431,7 +433,7 @@ class VimRegex(pattern: String) {
 
   private fun buildLiteralChar(
     char: Char,
-    caseSettings: SubstituteCase
+    caseSettings: SubstituteCase,
   ): Pair<Char, SubstituteCase> {
     return when (caseSettings) {
       SubstituteCase.DEFAULT -> Pair(char, caseSettings)
@@ -462,7 +464,7 @@ class VimRegex(pattern: String) {
   fun matchAt(
     editor: VimEditor,
     index: Int,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     return simulateNFA(editor, index, options)
   }
@@ -470,7 +472,7 @@ class VimRegex(pattern: String) {
   internal fun matchAt(
     text: String,
     index: Int,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     return matchAt(VimEditorWrapper(text), index, options)
   }
@@ -484,9 +486,9 @@ class VimRegex(pattern: String) {
    */
   fun matchEntire(
     editor: VimEditor,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
-    val result = simulateNFA(editor, options=options)
+    val result = simulateNFA(editor, options = options)
     return when (result) {
       is VimMatchResult.Failure -> result
       is VimMatchResult.Success -> {
@@ -498,7 +500,7 @@ class VimRegex(pattern: String) {
 
   internal fun matchEntire(
     text: String,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): VimMatchResult {
     return matchEntire(VimEditorWrapper(text), options)
   }
@@ -512,9 +514,9 @@ class VimRegex(pattern: String) {
    */
   fun matches(
     editor: VimEditor,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): Boolean {
-    val result = simulateNFA(editor, options=options)
+    val result = simulateNFA(editor, options = options)
     return when (result) {
       is VimMatchResult.Failure -> false
       is VimMatchResult.Success -> result.range.endOffset == editor.text().length
@@ -523,7 +525,7 @@ class VimRegex(pattern: String) {
 
   fun matches(
     text: String,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): Boolean {
     return matches(VimEditorWrapper(text), options)
   }
@@ -539,7 +541,7 @@ class VimRegex(pattern: String) {
   fun matchesAt(
     editor: VimEditor,
     index: Int,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): Boolean {
     return when (simulateNFA(editor, index, options)) {
       is VimMatchResult.Success -> true
@@ -550,7 +552,7 @@ class VimRegex(pattern: String) {
   internal fun matchesAt(
     text: String,
     index: Int,
-    options: EnumSet<VimRegexOptions> = noneOfEnum()
+    options: EnumSet<VimRegexOptions> = noneOfEnum(),
   ): Boolean {
     return matchesAt(VimEditorWrapper(text), index, options)
   }
@@ -577,7 +579,11 @@ class VimRegex(pattern: String) {
    *
    * @return The resulting match result
    */
-  private fun simulateNonExactNFA(editor: VimEditor, index: Int = 0, options: EnumSet<VimRegexOptions>): VimMatchResult {
+  private fun simulateNonExactNFA(
+    editor: VimEditor,
+    index: Int = 0,
+    options: EnumSet<VimRegexOptions>,
+  ): VimMatchResult {
     return VimRegexEngine.simulate(nonExactNFA, editor, index, shouldIgnoreCase(options))
   }
 
@@ -589,11 +595,13 @@ class VimRegex(pattern: String) {
     return when (caseSensitivitySettings) {
       CaseSensitivitySettings.NO_IGNORE_CASE -> false
       CaseSensitivitySettings.IGNORE_CASE -> true
-      CaseSensitivitySettings.DEFAULT -> options.contains(VimRegexOptions.IGNORE_CASE) && !(options.contains(VimRegexOptions.SMART_CASE) && hasUpperCase)
+      CaseSensitivitySettings.DEFAULT -> options.contains(VimRegexOptions.IGNORE_CASE) && !(options.contains(
+        VimRegexOptions.SMART_CASE
+      ) && hasUpperCase)
     }
   }
 
-  private class VimEditorWrapper(private val text: String): VimEditorBase() {
+  private class VimEditorWrapper(private val text: String) : VimEditorBase() {
     override fun updateMode(mode: Mode) {
       TODO("Not yet implemented")
     }

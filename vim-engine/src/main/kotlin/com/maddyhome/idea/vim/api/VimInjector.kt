@@ -193,7 +193,7 @@ interface VimInjector {
    * Please use vimLogger() function
    */
   fun <T : Any> getLogger(clazz: Class<T>): VimLogger
-  
+
   val listenersNotifier: VimListenersNotifier
 
   val redrawService: VimRedrawService

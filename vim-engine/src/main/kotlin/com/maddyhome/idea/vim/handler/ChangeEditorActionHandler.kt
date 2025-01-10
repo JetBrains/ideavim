@@ -106,9 +106,11 @@ sealed class ChangeEditorActionHandler(runForEachCaret: Boolean) : EditorActionH
             worked[0] = false
           }
         }
+
         is SingleExecution -> {
           worked[0] = execute(editor, context, cmd.argument, operatorArguments)
         }
+
         is ConditionalSingleExecution -> {
           // The handler is registered as multicaret run. So, if we want to execute the handler once, we call
           //   it only on main caret iteration.

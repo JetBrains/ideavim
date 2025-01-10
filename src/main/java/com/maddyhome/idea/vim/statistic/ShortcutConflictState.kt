@@ -29,7 +29,13 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
     val metrics = mutableSetOf<MetricEvent>()
     keyStrokes.forEach { keystroke ->
       getHandlersForShortcut(keystroke)
-        .filter { !setOf(HandledModes.INSERT_UNDEFINED, HandledModes.NORMAL_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED).contains(it) }
+        .filter {
+          !setOf(
+            HandledModes.INSERT_UNDEFINED,
+            HandledModes.NORMAL_UNDEFINED,
+            HandledModes.VISUAL_AND_SELECT_UNDEFINED
+          ).contains(it)
+        }
         .forEach { mode ->
           metrics += HANDLER.metric(keystroke.toReadableString(), mode)
         }
@@ -38,14 +44,32 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
   }
 
   private fun getHandlersForShortcut(shortcut: KeyStroke): List<HandledModes> {
-    val modes = VimPlugin.getKey().shortcutConflicts[shortcut] ?: return listOf(HandledModes.NORMAL_UNDEFINED, HandledModes.INSERT_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED)
+    val modes = VimPlugin.getKey().shortcutConflicts[shortcut] ?: return listOf(
+      HandledModes.NORMAL_UNDEFINED,
+      HandledModes.INSERT_UNDEFINED,
+      HandledModes.VISUAL_AND_SELECT_UNDEFINED
+    )
 
     return when (modes) {
       is ShortcutOwnerInfo.AllModes -> {
         when (modes.owner) {
-          ShortcutOwner.IDE -> listOf(HandledModes.NORMAL_IDE, HandledModes.INSERT_IDE, HandledModes.VISUAL_AND_SELECT_IDE)
-          ShortcutOwner.VIM -> listOf(HandledModes.NORMAL_VIM, HandledModes.INSERT_VIM, HandledModes.VISUAL_AND_SELECT_VIM)
-          ShortcutOwner.UNDEFINED -> listOf(HandledModes.NORMAL_UNDEFINED, HandledModes.INSERT_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED)
+          ShortcutOwner.IDE -> listOf(
+            HandledModes.NORMAL_IDE,
+            HandledModes.INSERT_IDE,
+            HandledModes.VISUAL_AND_SELECT_IDE
+          )
+
+          ShortcutOwner.VIM -> listOf(
+            HandledModes.NORMAL_VIM,
+            HandledModes.INSERT_VIM,
+            HandledModes.VISUAL_AND_SELECT_VIM
+          )
+
+          ShortcutOwner.UNDEFINED -> listOf(
+            HandledModes.NORMAL_UNDEFINED,
+            HandledModes.INSERT_UNDEFINED,
+            HandledModes.VISUAL_AND_SELECT_UNDEFINED
+          )
         }
       }
 

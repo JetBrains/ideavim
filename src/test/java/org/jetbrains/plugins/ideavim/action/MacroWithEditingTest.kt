@@ -45,7 +45,10 @@ class MacroWithEditingTest : VimTestCase() {
     typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "\u0001")
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    kotlin.test.assertEquals(injector.parser.parseKeys("<C-A>"), injector.registerGroup.getRegister(vimEditor, context, 'w')!!.keys)
+    kotlin.test.assertEquals(
+      injector.parser.parseKeys("<C-A>"),
+      injector.registerGroup.getRegister(vimEditor, context, 'w')!!.keys
+    )
     setText("1")
     typeText(injector.parser.parseKeys("@w"))
     waitAndAssert {

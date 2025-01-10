@@ -43,16 +43,19 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
         statement.rangeInScript = ctx.getTextRange()
         statement
       }
+
       ctx.continueStatement() != null -> {
         val statement = ContinueStatement()
         statement.rangeInScript = ctx.getTextRange()
         statement
       }
+
       ctx.finishStatement() != null -> {
         val statement = FinishStatement()
         statement.rangeInScript = ctx.getTextRange()
         statement
       }
+
       ctx.returnStatement() != null -> visitReturnStatement(ctx.returnStatement())
       ctx.ifStatement() != null -> visitIfStatement(ctx.ifStatement())
       ctx.forLoop() != null -> visitForLoop(ctx.forLoop())
@@ -100,13 +103,34 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     }
     val definition = if (ctx.functionName() != null) {
       val functionName = ctx.functionName().text
-      FunctionDeclaration(functionScope, functionName, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
+      FunctionDeclaration(
+        functionScope,
+        functionName,
+        args,
+        defaultArgs,
+        body,
+        replaceExisting,
+        flags.filterNotNull().toSet(),
+        hasOptionalArguments
+      )
     } else {
-      var sublistExpression = OneElementSublistExpression(SimpleExpression(ctx.literalDictionaryKey(1).text), Variable(functionScope, ctx.literalDictionaryKey(0).text))
+      var sublistExpression = OneElementSublistExpression(
+        SimpleExpression(ctx.literalDictionaryKey(1).text),
+        Variable(functionScope, ctx.literalDictionaryKey(0).text)
+      )
       for (i in 2 until ctx.literalDictionaryKey().size) {
-        sublistExpression = OneElementSublistExpression(SimpleExpression(ctx.literalDictionaryKey(i).text), sublistExpression)
+        sublistExpression =
+          OneElementSublistExpression(SimpleExpression(ctx.literalDictionaryKey(i).text), sublistExpression)
       }
-      AnonymousFunctionDeclaration(sublistExpression, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
+      AnonymousFunctionDeclaration(
+        sublistExpression,
+        args,
+        defaultArgs,
+        body,
+        replaceExisting,
+        flags.filterNotNull().toSet(),
+        hasOptionalArguments
+      )
     }
     definition.rangeInScript = ctx.getTextRange()
     return definition
@@ -117,7 +141,9 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     tryBlock.rangeInScript = ctx.tryBlock().getTextRange()
     val catchBlocks: MutableList<CatchBlock> = mutableListOf()
     for (catchBlock in ctx.catchBlock()) {
-      val cb = CatchBlock(catchBlock.pattern()?.patternBody()?.text ?: ".", catchBlock.blockMember().mapNotNull { visitBlockMember(it) })
+      val cb = CatchBlock(
+        catchBlock.pattern()?.patternBody()?.text ?: ".",
+        catchBlock.blockMember().mapNotNull { visitBlockMember(it) })
       catchBlocks.add(cb)
       cb.rangeInScript = catchBlock.getTextRange()
     }

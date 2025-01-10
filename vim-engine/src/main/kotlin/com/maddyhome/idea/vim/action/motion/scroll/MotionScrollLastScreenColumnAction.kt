@@ -20,7 +20,12 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 class MotionScrollLastScreenColumnAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     return injector.scroll.scrollCaretColumnToDisplayRightEdge(editor)
   }
 }

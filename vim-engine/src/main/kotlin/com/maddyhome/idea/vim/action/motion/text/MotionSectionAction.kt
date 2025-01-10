@@ -37,7 +37,8 @@ class MotionSectionForwardEndAction : MotionSectionAction('}', Direction.FORWARD
 @CommandOrMotion(keys = ["]]"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 class MotionSectionForwardStartAction : MotionSectionAction('{', Direction.FORWARDS)
 
-sealed class MotionSectionAction(private val charType: Char, val direction: Direction) : MotionActionHandler.ForEachCaret() {
+sealed class MotionSectionAction(private val charType: Char, val direction: Direction) :
+  MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -59,7 +60,13 @@ sealed class MotionSectionAction(private val charType: Char, val direction: Dire
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-private fun getCaretToSectionMotion(editor: VimEditor, caret: ImmutableVimCaret, type: Char, dir: Int, count: Int): Int {
+private fun getCaretToSectionMotion(
+  editor: VimEditor,
+  caret: ImmutableVimCaret,
+  type: Char,
+  dir: Int,
+  count: Int,
+): Int {
   return if (caret.offset == 0 && count < 0 || caret.offset >= editor.fileSize() - 1 && count > 0) {
     -1
   } else {

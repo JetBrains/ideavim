@@ -22,7 +22,7 @@ internal class CharacterMatcher(val char: Char) : Matcher {
     groups:
     VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     // Special case. Vim always has at least one line in a buffer, so always matches newline with the end of the buffer.
     // You can see this in action by opening a new (empty) file and typing `:%s/\n/foo\r/`. Suddenly, your empty file

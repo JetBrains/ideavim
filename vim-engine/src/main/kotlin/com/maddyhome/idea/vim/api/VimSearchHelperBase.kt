@@ -149,7 +149,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val dir = if (searchOptions!!.contains(SearchOptions.BACKWARDS)) Direction.BACKWARDS else Direction.FORWARDS
 
     val options = enumSetOf<VimRegexOptions>()
-    if (injector.globalOptions().smartcase && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(VimRegexOptions.SMART_CASE)
+    if (injector.globalOptions().smartcase && !searchOptions.contains(SearchOptions.IGNORE_SMARTCASE)) options.add(
+      VimRegexOptions.SMART_CASE
+    )
     if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
     if (searchOptions.contains(SearchOptions.WANT_ENDPOS)) {
       // When we want to get the end position of a search match, we can match at the current location. Having these as
@@ -196,8 +198,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       result =
         if (dir === Direction.FORWARDS) {
           findNextWithWrapscan(editor, regex, nextOffset, options, wrap, showMessages)
-        }
-        else {
+        } else {
           findPreviousWithWrapscan(editor, regex, nextOffset, options, wrap, showMessages)
         }
       if (result is VimMatchResult.Failure) {
@@ -206,8 +207,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           if (dir === Direction.FORWARDS) {
             // E385: Search hit BOTTOM without match for: {0}
             injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E385, pattern))
-          }
-          else {
+          } else {
             // E385: Search hit TOP without match for: {0}
             injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E384, pattern))
           }
@@ -225,7 +225,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     startIndex: Int,
     options: EnumSet<VimRegexOptions>,
     wrapscan: Boolean,
-    showMessages: Boolean
+    showMessages: Boolean,
   ): VimMatchResult {
     val result = regex.findNext(editor, startIndex, options)
     if (result is VimMatchResult.Failure && wrapscan) {
@@ -275,12 +275,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       injector.messages.showStatusBarMessage(editor, e.message)
       return emptyList()
     }
-      return regex.findAll(
-        editor,
-        editor.getLineStartOffset(startLine),
-        editor.getLineEndOffset(if (endLine == -1) editor.lineCount() - 1 else endLine) + 1,
-        options
-      ).map { it.range }
+    return regex.findAll(
+      editor,
+      editor.getLineStartOffset(startLine),
+      editor.getLineEndOffset(if (endLine == -1) editor.lineCount() - 1 else endLine) + 1,
+      options
+    ).map { it.range }
   }
 
   private fun doFindNext(
@@ -549,7 +549,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return null
   }
 
-  override fun findBlockQuoteInLineRange(editor: VimEditor, caret: ImmutableVimCaret, quote: Char, isOuter: Boolean): TextRange? {
+  override fun findBlockQuoteInLineRange(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    quote: Char,
+    isOuter: Boolean,
+  ): TextRange? {
     var leftQuote: Int
     var rightQuote: Int
 
@@ -575,7 +580,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   /**
    * @param endOffset         right search border, it is not included in search
    */
-  private fun CharSequence.occurrencesBeforeOffset(char: Char, endOffset: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int {
+  private fun CharSequence.occurrencesBeforeOffset(
+    char: Char,
+    endOffset: Int,
+    currentLineOnly: Boolean,
+    searchEscaped: Boolean = false,
+  ): Int {
     var counter = 0
     var i = endOffset
     while (i > 0 && this[i + Direction.BACKWARDS.toInt()] != '\n') {
@@ -593,7 +603,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    *
    * @return the closest to [startIndex] position of [char], or null if no [char] was found
    */
-  private fun CharSequence.indexOfNext(char: Char, startIndex: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int? {
+  private fun CharSequence.indexOfNext(
+    char: Char,
+    startIndex: Int,
+    currentLineOnly: Boolean,
+    searchEscaped: Boolean = false,
+  ): Int? {
     return findCharacterPosition(this, char, startIndex, Direction.FORWARDS, currentLineOnly, searchEscaped)
   }
 
@@ -605,7 +620,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    *
    * @return the closest to [endIndex] position of [char], or null if no [char] was found
    */
-  private fun CharSequence.indexOfPrevious(char: Char, endIndex: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int? {
+  private fun CharSequence.indexOfPrevious(
+    char: Char,
+    endIndex: Int,
+    currentLineOnly: Boolean,
+    searchEscaped: Boolean = false,
+  ): Int? {
     if (endIndex == 0 || (currentLineOnly && this[endIndex - 1] == '\n')) return null
     return findCharacterPosition(this, char, endIndex - 1, Direction.BACKWARDS, currentLineOnly, searchEscaped)
   }
@@ -621,7 +641,14 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    *
    * @return index of the closest char found (null if nothing was found)
    */
-  private fun findCharacterPosition(charSequence: CharSequence, char: Char, startIndex: Int, direction: Direction, currentLineOnly: Boolean, searchEscaped: Boolean): Int? {
+  private fun findCharacterPosition(
+    charSequence: CharSequence,
+    char: Char,
+    startIndex: Int,
+    direction: Direction,
+    currentLineOnly: Boolean,
+    searchEscaped: Boolean,
+  ): Int? {
     var pos = startIndex
     while (pos >= 0 && pos < charSequence.length && (!currentLineOnly || charSequence[pos] != '\n')) {
       if (charSequence[pos] == char && (pos == 0 || searchEscaped || isQuoteWithoutEscape(charSequence, pos, char))) {
@@ -803,7 +830,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     dir: Direction,
     countCurrent: Boolean,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
-    if ((dir == Direction.BACKWARDS && start <= 0) || (dir == Direction.FORWARDS && start >= editor.fileSize().toInt())) {
+    if ((dir == Direction.BACKWARDS && start <= 0) || (dir == Direction.FORWARDS && start >= editor.fileSize()
+        .toInt())
+    ) {
       return null
     }
 
@@ -937,7 +966,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     var count = count
     val dir = if (count > 0) Direction.FORWARDS else Direction.BACKWARDS
     count = Math.abs(count)
-    val total = count
+    count
     val toggle = !isOuter
     var findend = dir == Direction.BACKWARDS
     // Even = start, odd = end
@@ -1075,7 +1104,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   }
 
   @Contract(pure = true)
-  override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
+  override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): @Range(
+    from = 0,
+    to = Int.MAX_VALUE.toLong()
+  ) Int? {
     val line: Int = findNextParagraphLine(editor, caret.getBufferPosition().line, count, allowBlanks) ?: return null
     val lineCount: Int = editor.nativeLineCount()
     return if (line == lineCount - 1) {
@@ -1094,7 +1126,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    * @return next paragraph offset
    */
   @Contract(pure = true)
-  private fun findNextParagraph(editor: VimEditor, startLine: Int, direction: Direction, allowBlanks: Boolean): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+  private fun findNextParagraph(editor: VimEditor, startLine: Int, direction: Direction, allowBlanks: Boolean): @Range(
+    from = 0,
+    to = Int.MAX_VALUE.toLong()
+  ) Int {
     val line: Int? = findNextParagraphLine(editor, startLine, direction, allowBlanks)
     return if (line == null) {
       if (direction == Direction.FORWARDS) editor.fileSize().toInt() - 1 else 0
@@ -1104,14 +1139,21 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   }
 
   @Contract(pure = true)
-  override fun findParagraphRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
+  override fun findParagraphRange(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange? {
     val line: Int = caret.getBufferPosition().line
 
     if (logger.isDebug()) {
       logger.debug("Starting paragraph range search on line $line")
     }
 
-    val rangeInfo = (if (isOuter) findOuterParagraphRange(editor, line, count) else findInnerParagraphRange(editor, line, count)) ?: return null
+    val rangeInfo =
+      (if (isOuter) findOuterParagraphRange(editor, line, count) else findInnerParagraphRange(editor, line, count))
+        ?: return null
     val startLine: Int = rangeInfo.first
     val endLine: Int = rangeInfo.second
 
@@ -1154,10 +1196,15 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       expandEnd = editor.isLineEmpty(endLine, true)
     }
     if (expandStart) {
-      startLine = if (editor.isLineEmpty(startLine, true)) findLastEmptyLine(editor, startLine, Direction.BACKWARDS) else startLine
+      startLine = if (editor.isLineEmpty(startLine, true)) findLastEmptyLine(
+        editor,
+        startLine,
+        Direction.BACKWARDS
+      ) else startLine
     }
     if (expandEnd) {
-      endLine = if (editor.isLineEmpty(endLine, true)) findLastEmptyLine(editor, endLine, Direction.FORWARDS) else endLine
+      endLine =
+        if (editor.isLineEmpty(endLine, true)) findLastEmptyLine(editor, endLine, Direction.FORWARDS) else endLine
     }
     return Pair(startLine, endLine)
   }
@@ -1196,7 +1243,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       }
       which++
     }
-    startLine = if (editor.isLineEmpty(startLine, true)) findLastEmptyLine(editor, startLine, Direction.BACKWARDS) else startLine
+    startLine =
+      if (editor.isLineEmpty(startLine, true)) findLastEmptyLine(editor, startLine, Direction.BACKWARDS) else startLine
     endLine = if (editor.isLineEmpty(endLine, true)) findLastEmptyLine(editor, endLine, Direction.FORWARDS) else endLine
     return Pair(startLine, endLine)
   }
@@ -1206,7 +1254,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    * or last empty line in the group of empty lines, depending on the specified direction
    */
   @Contract(pure = true)
-  private fun findLastEmptyLine(editor: VimEditor, line: Int, direction: Direction): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+  private fun findLastEmptyLine(editor: VimEditor, line: Int, direction: Direction): @Range(
+    from = 0,
+    to = Int.MAX_VALUE.toLong()
+  ) Int {
     if (!editor.isLineEmpty(line, true)) {
       logger.error("Method findLastEmptyLine was called for non-empty line")
       return line
@@ -1229,7 +1280,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    * @return next paragraph bound line if there is any
    */
   @Contract(pure = true)
-  private fun findNextParagraphLine(editor: VimEditor, startLine: Int, count: Int, allowBlanks: Boolean): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
+  private fun findNextParagraphLine(
+    editor: VimEditor,
+    startLine: Int,
+    count: Int,
+    allowBlanks: Boolean,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
     var line: Int? = startLine
     val lineCount: Int = editor.lineCount()
     val direction = if (count > 0) Direction.FORWARDS else Direction.BACKWARDS
@@ -1256,7 +1312,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    * @return next empty line if there is any
    */
   @Contract(pure = true)
-  private fun findNextParagraphLine(editor: VimEditor, startLine: Int, direction: Direction, allowBlanks: Boolean): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
+  private fun findNextParagraphLine(
+    editor: VimEditor,
+    startLine: Int,
+    direction: Direction,
+    allowBlanks: Boolean,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
     var line = skipEmptyLines(editor, startLine, direction, allowBlanks)
     while (line in 0 until editor.nativeLineCount()) {
       if (editor.isLineEmpty(line, allowBlanks)) return line
@@ -1275,7 +1336,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
    * If there is no such line, the [editor.nativeLineCount()] is returned for Forwards direction and -1 for Backwards
    */
   @Contract(pure = true)
-  private fun skipEmptyLines(editor: VimEditor, startLine: Int, direction: Direction, allowBlanks: Boolean): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+  private fun skipEmptyLines(
+    editor: VimEditor,
+    startLine: Int,
+    direction: Direction,
+    allowBlanks: Boolean,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     var i = startLine
     while (i in 0 until editor.nativeLineCount()) {
       if (!editor.isLineEmpty(i, allowBlanks)) break
@@ -1431,7 +1497,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return TextRange(start, end + 1)
   }
 
-  override fun findBlockTagRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
+  override fun findBlockTagRange(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange? {
     var counter = count
     var isOuterVariable = isOuter
     val position: Int = caret.offset

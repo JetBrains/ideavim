@@ -113,6 +113,7 @@ abstract class VimStringParserBase : VimStringParser {
             state = KeyParserState.SPECIAL
             specialKeyBuilder.clear()
           }
+
           else -> {
             val stroke: KeyStroke = if (c == '\t' || c == '\n') {
               KeyStroke.getKeyStroke(c.code, 0)

@@ -41,7 +41,8 @@ class TryCatchTests : VimTestCase() {
     val endtryNames = listOf("endt", "endtr", "endtry")
 
     @JvmStatic
-    fun combinations(): List<Arguments> = productForArguments(tryNames, catchNames, finallyNames, endtryNames, spaces, spaces, spaces, spaces)
+    fun combinations(): List<Arguments> =
+      productForArguments(tryNames, catchNames, finallyNames, endtryNames, spaces, spaces, spaces, spaces)
   }
 
   @ParameterizedTest

@@ -22,12 +22,13 @@ internal class EndOfWordMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     if (index > editor.text().length || index == 0) return MatcherResult.Failure
 
-    val isKeywordAtIndex =  editor.text().getOrNull(index)?.let { KeywordOptionHelper.isKeyword(editor, it) } ?: false
-    val isKeywordBeforeIndex = editor.text().getOrNull(index - 1)?.let { KeywordOptionHelper.isKeyword(editor, it) } ?: false
+    val isKeywordAtIndex = editor.text().getOrNull(index)?.let { KeywordOptionHelper.isKeyword(editor, it) } ?: false
+    val isKeywordBeforeIndex =
+      editor.text().getOrNull(index - 1)?.let { KeywordOptionHelper.isKeyword(editor, it) } ?: false
 
     return if (isKeywordBeforeIndex && !isKeywordAtIndex) MatcherResult.Success(0) else MatcherResult.Failure
   }

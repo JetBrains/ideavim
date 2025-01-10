@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class CharArgumentConsumer: KeyConsumer {
+class CharArgumentConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CharArgumentConsumer>()
   }
@@ -46,7 +46,11 @@ class CharArgumentConsumer: KeyConsumer {
     return expectingCharArgument
   }
 
-  private fun handleCharArgument(key: KeyStroke, chKey: Char, processBuilder: KeyProcessResult.KeyProcessResultBuilder) {
+  private fun handleCharArgument(
+    key: KeyStroke,
+    chKey: Char,
+    processBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ) {
     var mutableChKey = chKey
     logger.trace("Handling char argument")
     // We are expecting a character argument - is this a regular character the user typed?

@@ -24,7 +24,7 @@ abstract class ChangeInInsertSequenceAction : ChangeEditorActionHandler.ForEachC
     caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     // We start an insert sequence before entering the insert mode to unify future world deletion with future typing into a single undo step
     val undo = injector.undo
@@ -44,6 +44,6 @@ abstract class ChangeInInsertSequenceAction : ChangeEditorActionHandler.ForEachC
     caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean
 }

@@ -151,8 +151,7 @@ class SetglobalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "notest")
       assertCommandOutput("setlocal test?", "notest")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -173,8 +172,7 @@ class SetglobalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "  test")
       assertCommandOutput("setlocal test?", "notest")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -269,8 +267,7 @@ class SetglobalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "  test=10")
       assertCommandOutput("setlocal test?", "  test=30")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -291,8 +288,7 @@ class SetglobalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "  test=20")
       assertCommandOutput("setlocal test?", "  test=30")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -379,8 +375,7 @@ class SetglobalCommandTest : VimTestCase() {
       enterCommand("setglobal test&")
 
       assertCommandOutput("setglobal test?", "  test=testValue")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -398,8 +393,7 @@ class SetglobalCommandTest : VimTestCase() {
       enterCommand("setglobal test<")
 
       assertCommandOutput("setglobal test?", "  test=globalValue")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -413,7 +407,8 @@ class SetglobalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified global option values`() {
-    assertCommandOutput("setglobal", """
+    assertCommandOutput(
+      "setglobal", """
       |--- Global option values ---
       """.trimMargin()
     )
@@ -422,7 +417,8 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test show all modified global option values 2`() {
     enterCommand("setglobal number relativenumber scrolloff=10 nrformats=alpha,hex,octal sidescrolloff=10")
-    assertCommandOutput("setglobal", """
+    assertCommandOutput(
+      "setglobal", """
       |--- Global option values ---
       |  number              relativenumber      scrolloff=10        sidescrolloff=10
       |  nrformats=alpha,hex,octal
@@ -433,7 +429,8 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test show all global option values`() {
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput("setglobal all", """
+    assertCommandOutput(
+      "setglobal all", """
       |--- Global option values ---
       |noargtextobj          ideamarks           scrolljump=1      notextobj-indent
       |nobomb                ideawrite=all       scrolloff=0         textwidth=0
@@ -472,7 +469,8 @@ class SetglobalCommandTest : VimTestCase() {
 
   @Test
   fun `test show named options`() {
-    assertCommandOutput("setglobal number? relativenumber? scrolloff? nrformats?", """
+    assertCommandOutput(
+      "setglobal number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex     nonumber            norelativenumber      scrolloff=0
       """.trimMargin()
     )
@@ -480,7 +478,8 @@ class SetglobalCommandTest : VimTestCase() {
 
   @Test
   fun `test show all modified global option values in single column`() {
-    assertCommandOutput("setglobal!", """
+    assertCommandOutput(
+      "setglobal!", """
       |--- Global option values ---
       """.trimMargin()
     )
@@ -489,7 +488,8 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test show all modified global option values in single column 2`() {
     enterCommand("setglobal number relativenumber scrolloff=10 nrformats=alpha,hex,octal sidescrolloff=10")
-    assertCommandOutput("setglobal!", """
+    assertCommandOutput(
+      "setglobal!", """
       |--- Global option values ---
       |  nrformats=alpha,hex,octal
       |  number
@@ -503,7 +503,8 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test show all global option values in single column`() {
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput("setglobal! all", """
+    assertCommandOutput(
+      "setglobal! all", """
       |--- Global option values ---
       |noargtextobj
       |nobomb
@@ -584,7 +585,8 @@ class SetglobalCommandTest : VimTestCase() {
 
   @Test
   fun `test show named options in single column`() {
-    assertCommandOutput("setglobal! number? relativenumber? scrolloff? nrformats?", """
+    assertCommandOutput(
+      "setglobal! number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex
       |nonumber
       |norelativenumber

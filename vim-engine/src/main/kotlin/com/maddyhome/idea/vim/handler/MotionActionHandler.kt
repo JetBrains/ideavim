@@ -100,7 +100,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
-      operatorArguments: OperatorArguments
+      operatorArguments: OperatorArguments,
     ) {
       super.postExecute(editor, context, cmd, operatorArguments)
     }
@@ -157,12 +157,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           is Motion.NoMotion -> Unit
         }
       }
+
       is ForEachCaret -> run {
         when {
           blockSelectionActive || editor.carets().size == 1 -> {
             val primaryCaret = editor.primaryCaret()
             handler.doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
           }
+
           else -> {
             try {
               editor.addCaretListener(CaretMergingWatcher)
@@ -181,6 +183,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           }
         }
       }
+
       is AmbiguousExecution -> throw RuntimeException("Ambiguous handler cannot hold another ambiguous handler")
     }
 
@@ -279,7 +282,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     editor: VimEditor,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ) {
     // If we're in single-execution Visual mode, return to Select. See `:help v_CTRL-O`
     if ((editor.mode as? Mode.VISUAL)?.isSelectPending == true) {

@@ -146,7 +146,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|ere it was settled on some sodden sand[additional Chars]
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    val after = """
+    """
             A Discovery
 
             I |${s}found it in a legendary lan${c}d${se}
@@ -172,7 +172,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|ere it was settled on some sodden sand[additional Chars]
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    val after = """
+    """
             A Discovery
 
             I |${s}found it in a legendary lan${c}d${se}

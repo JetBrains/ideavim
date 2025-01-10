@@ -197,4 +197,5 @@ private fun skip(iterator: IntIterator, n: Int) {
 class CountPosition(val count: Int, val position: Int)
 
 private val logger = logger<SearchLogger>()
+
 private class SearchLogger

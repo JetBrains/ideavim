@@ -19,10 +19,11 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 internal class CursorMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
+    index: Int,
+    groups:
     VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (possibleCursors.map { it.offset }.contains(index)) {
       // now the only cursors possible are the ones at this index

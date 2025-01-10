@@ -28,9 +28,18 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import org.jdom.Element
 
-@State(name = "VimVariables", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
+@State(
+  name = "VimVariables",
+  storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
+)
 internal class IjVariableService : VimVariableServiceBase(), PersistentStateComponent<Element?> {
-  override fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
+  override fun storeVariable(
+    variable: Variable,
+    value: VimDataType,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ) {
     super.storeVariable(variable, value, editor, context, vimContext)
 
     val scope = variable.scope ?: getDefaultVariableScope(vimContext)
@@ -92,6 +101,7 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
         "string" -> {
           vimVariables[variableElement.getAttributeValue("key")] = VimString(variableElement.getAttributeValue("value"))
         }
+
         "int" -> {
           vimVariables[variableElement.getAttributeValue("key")] = VimInt(variableElement.getAttributeValue("value"))
         }

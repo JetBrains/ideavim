@@ -39,7 +39,7 @@ data class PutData(
     val copiedText: VimCopiedText,
     val typeInRegister: SelectionType,
   ) {
-    constructor(register: Register): this(register.name, register.copiedText, register.type)
+    constructor(register: Register) : this(register.name, register.copiedText, register.type)
 
     val rawText = copiedText.text // TODO do not call it raw text...
   }

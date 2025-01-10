@@ -24,10 +24,22 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 data class ExecuteCommand(val range: Range, val expressions: List<Expression>) :
   Command.SingleExecution(range, CommandModifier.NONE) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val command = expressions.joinToString(separator = " ") { it.evaluate(editor, context, this).asString() }
-    return injector.vimscriptExecutor.execute(command, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
+    return injector.vimscriptExecutor.execute(
+      command,
+      editor,
+      context,
+      skipHistory = true,
+      indicateErrors = true,
+      this.vimContext
+    )
   }
 }

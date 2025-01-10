@@ -259,7 +259,8 @@ public class ExOutputPanel extends JPanel {
 
   public boolean isAtEnd() {
     int val = myScrollPane.getVerticalScrollBar().getValue();
-    return val >= myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount();
+    return val >=
+           myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount();
   }
 
   private void positionPanel() {
@@ -316,8 +317,10 @@ public class ExOutputPanel extends JPanel {
                     KeyHandler.getInstance().getKeyStack().dump());
         }
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
-        ExecutionContext context = injector.getExecutionContextManager().getEditorExecutionContext(new IjVimEditor(myEditor));
-        injector.getApplication().runWriteAction(() -> { VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
+        ExecutionContext context =
+          injector.getExecutionContextManager().getEditorExecutionContext(new IjVimEditor(myEditor));
+        injector.getApplication().runWriteAction(() -> {
+          VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
           return null;
         });
       }
@@ -342,7 +345,9 @@ public class ExOutputPanel extends JPanel {
       int keyCode = e.getKeyCode();
       Character keyChar = e.getKeyChar();
       int modifiers = e.getModifiersEx();
-      KeyStroke keyStroke = (keyChar == KeyEvent.CHAR_UNDEFINED) ? KeyStroke.getKeyStroke(keyCode, modifiers) : KeyStroke.getKeyStroke(keyChar, modifiers);
+      KeyStroke keyStroke = (keyChar == KeyEvent.CHAR_UNDEFINED)
+                            ? KeyStroke.getKeyStroke(keyCode, modifiers)
+                            : KeyStroke.getKeyStroke(keyChar, modifiers);
       currentPanel.handleKey(keyStroke);
     }
   }

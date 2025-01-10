@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 
 
 // We use alarm with delay to avoid many actions in case many events are fired at the same time
-internal val correctorRequester = MutableSharedFlow<Unit>(replay=1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+internal val correctorRequester = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 private val LOG = logger<CopilotKeymapCorrector>()
 
@@ -106,8 +106,7 @@ private fun correctCopilotKeymap() {
     keymap.removeShortcut("copilot.disposeInlays", escapeShortcut)
     copilotHideActionMap[keymap.name] = Unit
     LOG.info("Remove copilot escape shortcut from keymap ${keymap.name}")
-  }
-  else {
+  } else {
     copilotHideActionMap.forEach { (name, _) ->
       val keymap = KeymapManagerEx.getInstanceEx().getKeymap(name) ?: return@forEach
       val currentShortcuts = keymap.getShortcuts("copilot.disposeInlays")

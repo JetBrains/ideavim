@@ -9,7 +9,7 @@ package com.maddyhome.idea.vim.common
 
 import javax.swing.KeyStroke
 
-sealed class DigraphResult private constructor(
+sealed class DigraphResult(
   val stroke: KeyStroke? = null,
   val promptCharacter: Char = 0.toChar(),
 ) {

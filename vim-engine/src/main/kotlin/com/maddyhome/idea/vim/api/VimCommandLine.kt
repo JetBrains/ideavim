@@ -86,13 +86,15 @@ interface VimCommandLine {
   fun setPromptCharacter(char: Char) {
     val stringBuilder = StringBuilder(actualText)
 
-    val offset = promptCharacterOffset ?: caret.offset // TODO is there a case where caret is not at the [promptCharacterOffset]?
+    val offset =
+      promptCharacterOffset ?: caret.offset // TODO is there a case where caret is not at the [promptCharacterOffset]?
     promptCharacterOffset = offset
     stringBuilder.insert(offset, char)
     setText(stringBuilder.toString())
 
     caret.offset = offset
   }
+
   fun clearPromptCharacter() {
     if (promptCharacterOffset == null) return
 

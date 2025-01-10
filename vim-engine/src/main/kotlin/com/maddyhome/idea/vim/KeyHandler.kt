@@ -44,7 +44,19 @@ import javax.swing.KeyStroke
 // 1. avoid using handleKeyRecursionCount & shouldRecord
 // 2. maybe we can live without allowKeyMappings: Boolean & mappingCompleted: Boolean
 class KeyHandler {
-  private val keyConsumers: List<KeyConsumer> = listOf(ModalInputConsumer(), MappingProcessor, CommandCountConsumer(), DeleteCommandConsumer(), EditorResetConsumer(), CharArgumentConsumer(), RegisterConsumer(), DigraphConsumer(), CommandConsumer(), SelectRegisterConsumer(), ModeInputConsumer())
+  private val keyConsumers: List<KeyConsumer> = listOf(
+    ModalInputConsumer(),
+    MappingProcessor,
+    CommandCountConsumer(),
+    DeleteCommandConsumer(),
+    EditorResetConsumer(),
+    CharArgumentConsumer(),
+    RegisterConsumer(),
+    DigraphConsumer(),
+    CommandConsumer(),
+    SelectRegisterConsumer(),
+    ModeInputConsumer()
+  )
   private var handleKeyRecursionCount = 0
 
   // KeyHandlerState requires injector.keyGroup to be initialized and that's why we don't create it immediately and have this here
@@ -88,7 +100,13 @@ class KeyHandler {
     mappingCompleted: Boolean,
     keyState: KeyHandlerState,
   ) {
-    val result = processKey(key, editor, allowKeyMappings, mappingCompleted, KeyProcessResult.SynchronousKeyProcessBuilder(keyState))
+    val result = processKey(
+      key,
+      editor,
+      allowKeyMappings,
+      mappingCompleted,
+      KeyProcessResult.SynchronousKeyProcessBuilder(keyState)
+    )
     if (result is KeyProcessResult.Executable) {
       result.execute(editor, context)
     }
@@ -373,7 +391,7 @@ sealed interface KeyProcessResult {
   /**
    * Key input that is not recognized by IdeaVim and should be passed to IDE.
    */
-  object Unknown: KeyProcessResult
+  object Unknown : KeyProcessResult
 
   /**
    * Key input that is recognized by IdeaVim and can be executed.
@@ -387,7 +405,7 @@ sealed interface KeyProcessResult {
     private val originalState: KeyHandlerState,
     private val preProcessState: KeyHandlerState,
     private val processing: KeyProcessing,
-  ): KeyProcessResult {
+  ) : KeyProcessResult {
 
     companion object {
       private val logger = vimLogger<KeyProcessResult>()
@@ -434,7 +452,7 @@ sealed interface KeyProcessResult {
   // Works with existing state and modifies it during execution
   // It's the way IdeaVim worked for the long time and for this class we do not create
   // unnecessary objects and assume that the code will be executed immediately
-  class SynchronousKeyProcessBuilder(override val state: KeyHandlerState): KeyProcessResultBuilder() {
+  class SynchronousKeyProcessBuilder(override val state: KeyHandlerState) : KeyProcessResultBuilder() {
     override fun build(): KeyProcessResult {
       return Executable(state, state) { keyHandlerState, vimEditor, executionContext ->
         try {
@@ -450,7 +468,7 @@ sealed interface KeyProcessResult {
 
   // Works with a clone of current state, nothing is modified during the builder work (key processing)
   // The new state will be applied later, when we run Executable.execute() (it may not be run at all)
-  class AsyncKeyProcessBuilder(originalState: KeyHandlerState): KeyProcessResultBuilder() {
+  class AsyncKeyProcessBuilder(originalState: KeyHandlerState) : KeyProcessResultBuilder() {
     private val originalState: KeyHandlerState = KeyHandler.getInstance().keyHandlerState
     override val state: KeyHandlerState = originalState.clone()
 

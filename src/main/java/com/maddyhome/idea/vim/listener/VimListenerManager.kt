@@ -197,7 +197,10 @@ internal object VimListenerManager {
 
       val optionGroup = VimPlugin.getOptionGroup()
       optionGroup.addEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addEffectiveOptionValueChangeListener(IjOptions.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addEffectiveOptionValueChangeListener(
+        IjOptions.relativenumber,
+        EditorGroup.NumberChangeListener.INSTANCE
+      )
       optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
@@ -209,8 +212,10 @@ internal object VimListenerManager {
       macroWidgetOptionListener.onGlobalOptionChanged()
 
       // Listen for and initialise new editors
-      EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
-      val busConnection = ApplicationManager.getApplication().messageBus.connect(VimPlugin.getInstance().onOffDisposable)
+      EventFacade.getInstance()
+        .addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
+      val busConnection =
+        ApplicationManager.getApplication().messageBus.connect(VimPlugin.getInstance().onOffDisposable)
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
     }
 
@@ -219,7 +224,10 @@ internal object VimListenerManager {
 
       val optionGroup = VimPlugin.getOptionGroup()
       optionGroup.removeEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeEffectiveOptionValueChangeListener(IjOptions.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeEffectiveOptionValueChangeListener(
+        IjOptions.relativenumber,
+        EditorGroup.NumberChangeListener.INSTANCE
+      )
       optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
@@ -227,7 +235,7 @@ internal object VimListenerManager {
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
     }
   }
-  
+
   object EditorListeners {
     fun addAll() {
       val initialisedEditors = mutableSetOf<Editor>()
@@ -327,8 +335,7 @@ internal object VimListenerManager {
       val editorDisposable = editor.removeUserData(editorListenersDisposableKey)
       if (editorDisposable != null) {
         Disposer.dispose(editorDisposable)
-      }
-      else {
+      } else {
         // We definitely do not expect this to happen
         StrictMode.fail("Editor doesn't have disposable attached. $editor")
       }
@@ -447,8 +454,7 @@ internal object VimListenerManager {
         }
         EditorListeners.add(event.editor, openingEditor?.vim ?: injector.fallbackWindow, scenario)
         firstEditorInitialised = true
-      }
-      else {
+      } else {
         // We've got a virtual file, so FileOpenedSyncListener will be called. Save data
         val project = openingEditor.project ?: return
         val virtualFile = openingEditor.virtualFile ?: return
@@ -461,15 +467,18 @@ internal object VimListenerManager {
         // If the user has enabled "Open declaration source in the same tab", the opening editor will be replaced as
         // long as it's not pinned, and it's not modified, and we're in the same split
         val canBeReused = UISettings.getInstance().reuseNotModifiedTabs &&
-                (manager.getComposite(virtualFile) as? EditorComposite)?.let { composite ->
-                  !composite.isPinned && !composite.isModified
-                } ?: false
+          (manager.getComposite(virtualFile) as? EditorComposite)?.let { composite ->
+            !composite.isPinned && !composite.isModified
+          } ?: false
 
         // Keep a track of the owner of the opening editor, so we can compare later, potentially after the opening
         // editor has been closed. This is nullable, but should always have a value
         val owningEditorWindow = getOwningEditorWindow(openingEditor)
 
-        event.editor.putUserData(openingEditorKey, OpeningEditor(openingEditor, owningEditorWindow, isPreview, canBeReused))
+        event.editor.putUserData(
+          openingEditorKey,
+          OpeningEditor(openingEditor, owningEditorWindow, isPreview, canBeReused)
+        )
       }
 
       VimStandalonePluginUpdateChecker.getInstance().pluginUsed()
@@ -525,7 +534,7 @@ internal object VimListenerManager {
           // Sometimes the platform will not reuse a tab when you expect it to, e.g. when reuse tabs is enabled and
           // navigating to derived class. We'll confirm our heuristics by checking to see if the editor is still around
           val openingEditorIsClosed = editor.project?.let { p ->
-            FileEditorManagerEx.getInstanceEx(p).allEditors.filterIsInstance(TextEditor::class.java).all { textEditor ->
+            FileEditorManagerEx.getInstanceEx(p).allEditors.filterIsInstance<TextEditor>().all { textEditor ->
               textEditor.editor != openingEditor?.editor
             }
           } ?: false
@@ -547,7 +556,7 @@ internal object VimListenerManager {
     private fun getOwningEditorWindow(editor: Editor) = editor.project?.let { p ->
       FileEditorManagerEx.getInstanceEx(p).windows.find { editorWindow ->
         editorWindow.allComposites.any { composite ->
-          composite.allEditors.filterIsInstance(TextEditor::class.java).any { it.editor == editor }
+          composite.allEditors.filterIsInstance<TextEditor>().any { it.editor == editor }
         }
       }
     }
@@ -584,7 +593,8 @@ internal object VimListenerManager {
 
       // TODO: It is very confusing that this logic is split between EditorSelectionHandler and EditorMouseHandler
       if (MouseEventsDataHolder.dragEventCount < MouseEventsDataHolder.allowedSkippedDragEvents
-        && lineStart != lineEnd && startOffset == caretOffset) {
+        && lineStart != lineEnd && startOffset == caretOffset
+      ) {
         if (lineEnd == endOffset - 1) {
           // When starting on an empty line and dragging vertically upwards onto
           // another line, the selection should include the entirety of the empty line

@@ -21,7 +21,7 @@ internal class EndOfLineMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (index == editor.text().length || editor.text()[index] == '\n') MatcherResult.Success(0)
     else MatcherResult.Failure

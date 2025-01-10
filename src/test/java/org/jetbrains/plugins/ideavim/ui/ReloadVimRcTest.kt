@@ -50,12 +50,12 @@ class ReloadVimRcTest : VimTestCase() {
   @Disabled
   fun `test equalTo with whitespaces`() {
     val s = " " // Just to see whitespaces in the following code
-    val origFile = """
+    """
       map x y
       set myPlugin
       map z t
     """.trimIndent()
-    val changedFile = """
+    """
       map x y
       set myPlugin$s$s$s$s$s$s
 

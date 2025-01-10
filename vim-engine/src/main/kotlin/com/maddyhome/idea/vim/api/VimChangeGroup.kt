@@ -33,7 +33,12 @@ interface VimChangeGroup {
 
   fun insertAfterLineEnd(editor: VimEditor, context: ExecutionContext)
 
-  fun insertPreviousInsert(editor: VimEditor, context: ExecutionContext, exit: Boolean, operatorArguments: OperatorArguments)
+  fun insertPreviousInsert(
+    editor: VimEditor,
+    context: ExecutionContext,
+    exit: Boolean,
+    operatorArguments: OperatorArguments,
+  )
 
   fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode)
 
@@ -63,7 +68,14 @@ interface VimChangeGroup {
   fun processCommand(editor: VimEditor, cmd: Command)
 
   @Deprecated("Please use the same method, but with ExecutionContext")
-  fun deleteCharacter(editor: VimEditor, caret: VimCaret, count: Int, isChange: Boolean, operatorArguments: OperatorArguments): Boolean
+  fun deleteCharacter(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments,
+  ): Boolean
+
   fun deleteCharacter(
     editor: VimEditor,
     context: ExecutionContext,
@@ -77,7 +89,13 @@ interface VimChangeGroup {
 
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
-  fun deleteEndOfLine(editor: VimEditor, context: ExecutionContext, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun deleteEndOfLine(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: VimCaret,
+    count: Int,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun deleteJoinLines(editor: VimEditor, caret: VimCaret, count: Int, spaces: Boolean): Boolean
@@ -89,16 +107,37 @@ interface VimChangeGroup {
     spaces: Boolean,
   ): Boolean
 
-  fun processKey(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
+  fun processKey(
+    editor: VimEditor,
+    key: KeyStroke,
+    processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean
 
-  fun processKeyInSelectMode(editor: VimEditor, key: KeyStroke, processResultBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean
+  fun processKeyInSelectMode(
+    editor: VimEditor,
+    key: KeyStroke,
+    processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean
 
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
-  fun deleteLine(editor: VimEditor, context: ExecutionContext, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun deleteLine(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: VimCaret,
+    count: Int,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
   @Deprecated("Please use the same method, but with ExecutionContext")
-  fun deleteJoinRange(editor: VimEditor, caret: VimCaret, range: TextRange, spaces: Boolean, operatorArguments: OperatorArguments): Boolean
+  fun deleteJoinRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: TextRange,
+    spaces: Boolean,
+    operatorArguments: OperatorArguments,
+  ): Boolean
+
   fun deleteJoinRange(
     editor: VimEditor,
     context: ExecutionContext,
@@ -110,12 +149,32 @@ interface VimChangeGroup {
 
   fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean
 
-  fun joinViaIdeaBySelections(editor: VimEditor, context: ExecutionContext, caretsAndSelections: Map<VimCaret, VimSelection>)
+  fun joinViaIdeaBySelections(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caretsAndSelections: Map<VimCaret, VimSelection>,
+  )
 
-  fun getDeleteRangeAndType(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
+  fun getDeleteRangeAndType(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments,
+  ): Pair<TextRange, SelectionType>?
 
   @Deprecated("Please use the same method, but with ExecutionContext")
-  fun deleteRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType?, isChange: Boolean, operatorArguments: OperatorArguments, saveToRegister: Boolean = true): Boolean
+  fun deleteRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: TextRange,
+    type: SelectionType?,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments,
+    saveToRegister: Boolean = true,
+  ): Boolean
+
   fun deleteRange(
     editor: VimEditor,
     context: ExecutionContext,
@@ -125,13 +184,25 @@ interface VimChangeGroup {
     isChange: Boolean,
     saveToRegister: Boolean = true,
   ): Boolean
+
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
-  fun changeCharacters(editor: VimEditor, context: ExecutionContext, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
+  fun changeCharacters(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: VimCaret,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
   @Deprecated("Please use the same method, but with ExecutionContext")
   fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
-  fun changeEndOfLine(editor: VimEditor, context: ExecutionContext, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
+  fun changeEndOfLine(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: VimCaret,
+    count: Int,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
   /**
    * Delete the text covered by the motion command argument and enter insert mode
@@ -142,7 +213,13 @@ interface VimChangeGroup {
    * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
-  fun changeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  fun changeMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
   fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean
 
@@ -156,13 +233,32 @@ interface VimChangeGroup {
     context: ExecutionContext,
   ): Boolean
 
-  fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: ChangeCaseType, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  fun changeCaseMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext?,
+    type: ChangeCaseType,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
-  fun reformatCodeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
+  fun reformatCodeMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
   fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection)
 
-  fun autoIndentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments)
+  fun autoIndentMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  )
 
   fun autoIndentRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, range: TextRange)
 
@@ -179,7 +275,14 @@ interface VimChangeGroup {
 
   fun insertText(editor: VimEditor, caret: VimCaret, str: String): VimCaret
 
-  fun indentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, dir: Int, operatorArguments: OperatorArguments)
+  fun indentMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    dir: Int,
+    operatorArguments: OperatorArguments,
+  )
 
   fun indentRange(
     editor: VimEditor,
@@ -191,11 +294,23 @@ interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   )
 
-  fun changeNumberVisualMode(editor: VimEditor, caret: VimCaret, selectedRange: TextRange, count: Int, avalanche: Boolean): Boolean
+  fun changeNumberVisualMode(
+    editor: VimEditor,
+    caret: VimCaret,
+    selectedRange: TextRange,
+    count: Int,
+    avalanche: Boolean,
+  ): Boolean
 
   fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean
 
-  fun sortRange(editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>, sortOptions: SortOption): Boolean
+  fun sortRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: LineRange,
+    lineComparator: Comparator<String>,
+    sortOptions: SortOption,
+  ): Boolean
 
   fun reset()
 

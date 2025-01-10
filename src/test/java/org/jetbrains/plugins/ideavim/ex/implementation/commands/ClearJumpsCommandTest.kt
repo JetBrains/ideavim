@@ -92,9 +92,11 @@ class ClearJumpsCommandTest : VimTestCase() {
     enterCommand("clearju")
 
     enterCommand("jumps")
-    assertExOutput("""
+    assertExOutput(
+      """
       | jump line  col file/text
       |>
-    """.trimMargin())
+    """.trimMargin()
+    )
   }
 }

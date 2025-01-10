@@ -58,8 +58,10 @@ class WidgetState : ApplicationUsagesCollector() {
     private val GROUP = EventLogGroup("vim.widget", 1, "FUS")
 
     private val IS_MODE_WIDGET_SHOWN = EventFields.Boolean("is-mode-widget-shown")
-    private val MODE_WIDGET_THEME_LIGHT = EventFields.String("mode-widget-theme-light", listOf("TERM", "COLORLESS", "ADVANCED CUSTOMIZATION"))
-    private val MODE_WIDGET_THEME_DARK = EventFields.String("mode-widget-theme-dark", listOf("TERM", "COLORLESS", "ADVANCED CUSTOMIZATION"))
+    private val MODE_WIDGET_THEME_LIGHT =
+      EventFields.String("mode-widget-theme-light", listOf("TERM", "COLORLESS", "ADVANCED CUSTOMIZATION"))
+    private val MODE_WIDGET_THEME_DARK =
+      EventFields.String("mode-widget-theme-dark", listOf("TERM", "COLORLESS", "ADVANCED CUSTOMIZATION"))
 
     private val WIDGET: VarargEventId = GROUP.registerVarargEvent(
       "vim.widget",

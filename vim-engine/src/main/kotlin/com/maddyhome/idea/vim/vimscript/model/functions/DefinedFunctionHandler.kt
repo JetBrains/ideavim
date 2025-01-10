@@ -38,7 +38,12 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     name = function.name
   }
 
-  override fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  override fun doFunction(
+    argumentValues: List<Expression>,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType {
     var returnValue: VimDataType? = null
     val exceptionsCaught = mutableListOf<ExException>()
     val isRangeGiven = (range?.size() ?: 0) > 0
@@ -51,11 +56,26 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     initializeFunctionVariables(argumentValues, editor, context, vimContext)
 
     if (function.flags.contains(FunctionFlag.RANGE)) {
-      val line = (injector.variableService.getNonNullVariableValue(Variable(Scope.FUNCTION_VARIABLE, "firstline"), editor, context, function) as VimInt).value
+      val line = (injector.variableService.getNonNullVariableValue(
+        Variable(Scope.FUNCTION_VARIABLE, "firstline"),
+        editor,
+        context,
+        function
+      ) as VimInt).value
       returnValue = executeBodyForLine(line, isRangeGiven, exceptionsCaught, editor, context)
     } else {
-      val firstLine = (injector.variableService.getNonNullVariableValue(Variable(Scope.FUNCTION_VARIABLE, "firstline"), editor, context, function) as VimInt).value
-      val lastLine = (injector.variableService.getNonNullVariableValue(Variable(Scope.FUNCTION_VARIABLE, "lastline"), editor, context, function) as VimInt).value
+      val firstLine = (injector.variableService.getNonNullVariableValue(
+        Variable(Scope.FUNCTION_VARIABLE, "firstline"),
+        editor,
+        context,
+        function
+      ) as VimInt).value
+      val lastLine = (injector.variableService.getNonNullVariableValue(
+        Variable(Scope.FUNCTION_VARIABLE, "lastline"),
+        editor,
+        context,
+        function
+      ) as VimInt).value
       for (line in firstLine..lastLine) {
         returnValue = executeBodyForLine(line, isRangeGiven, exceptionsCaught, editor, context)
       }
@@ -68,7 +88,13 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     return returnValue ?: VimInt(0)
   }
 
-  private fun executeBodyForLine(line: Int, isRangeGiven: Boolean, exceptionsCaught: MutableList<ExException>, editor: VimEditor, context: ExecutionContext): VimDataType? {
+  private fun executeBodyForLine(
+    line: Int,
+    isRangeGiven: Boolean,
+    exceptionsCaught: MutableList<ExException>,
+    editor: VimEditor,
+    context: ExecutionContext,
+  ): VimDataType? {
     var returnValue: VimDataType? = null
     if (isRangeGiven) {
       editor.currentCaret().moveToBufferPosition(BufferPosition(line - 1, 0))
@@ -103,6 +129,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
               returnValue = result.value
               break
             }
+
             is ExecutionResult.Success -> {}
           }
         } catch (e: ExException) {
@@ -118,7 +145,12 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     return returnValue
   }
 
-  private fun initializeFunctionVariables(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, functionCallContext: VimLContext) {
+  private fun initializeFunctionVariables(
+    argumentValues: List<Expression>,
+    editor: VimEditor,
+    context: ExecutionContext,
+    functionCallContext: VimLContext,
+  ) {
     // non-optional function arguments
     for ((index, name) in function.args.withIndex()) {
       injector.variableService.storeVariable(
@@ -131,7 +163,8 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     }
     // optional function arguments with default values
     for (index in 0 until function.defaultArgs.size) {
-      val expressionToStore = if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
+      val expressionToStore =
+        if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
       injector.variableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
         expressionToStore.evaluate(editor, context, functionCallContext),

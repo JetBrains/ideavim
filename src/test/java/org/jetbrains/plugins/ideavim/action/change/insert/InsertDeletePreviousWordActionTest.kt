@@ -42,7 +42,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             I ${c} it in a legendary land
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -56,7 +56,7 @@ Mode.INSERT,
       """
             I ${c} in a legendary land
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -72,7 +72,7 @@ Mode.INSERT,
       """
             Lorem Ipsum${c} found it in a legendary land
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -102,7 +102,7 @@ Mode.INSERT,
                   legendary
                ${c}
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -113,7 +113,7 @@ Mode.INSERT,
       listOf("a", "<C-W>"),
       "this is a sentence<caret>.\n",
       "this is a sentence<caret>\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -124,7 +124,7 @@ Mode.INSERT,
       listOf("A", "<C-W>"),
       "<caret>this is a sentence\n",
       "this is a <caret>\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 
@@ -135,7 +135,7 @@ Mode.INSERT,
       listOf("A", "<C-W>"),
       "<caret>\$variable\n",
       "$<caret>\n",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 

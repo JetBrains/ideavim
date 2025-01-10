@@ -186,12 +186,24 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
-  @Deprecated(message = "Please use listenersNotifier", replaceWith = ReplaceWith("injector.listenersNotifier.modeChangeListeners.add", imports = ["import com.maddyhome.idea.vim.api.injector"]))
+  @Deprecated(
+    message = "Please use listenersNotifier",
+    replaceWith = ReplaceWith(
+      "injector.listenersNotifier.modeChangeListeners.add",
+      imports = ["import com.maddyhome.idea.vim.api.injector"]
+    )
+  )
   fun addInsertListener(listener: VimInsertListener) {
     injector.listenersNotifier.modeChangeListeners.add(listener)
   }
 
-  @Deprecated(message = "Please use listenersNotifier", replaceWith = ReplaceWith("injector.listenersNotifier.modeChangeListeners.remove", imports = ["import com.maddyhome.idea.vim.api.injector"]))
+  @Deprecated(
+    message = "Please use listenersNotifier",
+    replaceWith = ReplaceWith(
+      "injector.listenersNotifier.modeChangeListeners.remove",
+      imports = ["import com.maddyhome.idea.vim.api.injector"]
+    )
+  )
   fun removeInsertListener(listener: VimInsertListener) {
     injector.listenersNotifier.modeChangeListeners.remove(listener)
   }

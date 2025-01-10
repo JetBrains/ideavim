@@ -64,7 +64,11 @@ internal class IjClipboardManager : VimClipboardManager {
 
   override fun setClipboardContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean {
     require(textData is IjVimCopiedText)
-    return handleTextSetting(textData.text, textData.text, textData.transferableData) { content -> setContents(content) } != null
+    return handleTextSetting(
+      textData.text,
+      textData.text,
+      textData.transferableData
+    ) { content -> setContents(content) } != null
   }
 
   // TODO prefer methods with ranges, because they collect and preprocess for us
@@ -129,7 +133,12 @@ internal class IjClipboardManager : VimClipboardManager {
     }
   }
 
-  override fun collectCopiedText(editor: VimEditor, context: ExecutionContext, range: TextRange, text: String): VimCopiedText {
+  override fun collectCopiedText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    range: TextRange,
+    text: String,
+  ): VimCopiedText {
     val transferableData = getTransferableData(editor, range)
     val preprocessedText = preprocessText(editor, range, text, transferableData)
     return IjVimCopiedText(preprocessedText, transferableData)
@@ -140,7 +149,12 @@ internal class IjClipboardManager : VimClipboardManager {
   }
 
   @Suppress("UNCHECKED_CAST")
-  private fun handleTextSetting(text: String, rawText: String, transferableData: List<Any>, setContent: (TextBlockTransferable) -> Unit?): Transferable? {
+  private fun handleTextSetting(
+    text: String,
+    rawText: String,
+    transferableData: List<Any>,
+    setContent: (TextBlockTransferable) -> Unit?,
+  ): Transferable? {
     val mutableTransferableData = (transferableData as List<TextBlockTransferableData>).toMutableList()
     try {
       val s = TextBlockTransferable.convertLineSeparators(text, "\n", mutableTransferableData)
@@ -182,7 +196,12 @@ internal class IjClipboardManager : VimClipboardManager {
         }
       }
     }
-    transferableData.add(CaretStateTransferableData(intArrayOf(0), intArrayOf(textRange.endOffset - textRange.startOffset)))
+    transferableData.add(
+      CaretStateTransferableData(
+        intArrayOf(0),
+        intArrayOf(textRange.endOffset - textRange.startOffset)
+      )
+    )
 
     // These data provided by {@link com.intellij.openapi.editor.richcopy.TextWithMarkupProcessor} doesn't work with
     //   IdeaVim and I don't see a way to fix it
@@ -241,6 +260,6 @@ internal class IjClipboardManager : VimClipboardManager {
   }
 }
 
-data class IjVimCopiedText(override val text: String, val transferableData: List<Any>): VimCopiedText {
+data class IjVimCopiedText(override val text: String, val transferableData: List<Any>) : VimCopiedText {
   override fun updateText(newText: String): VimCopiedText = IjVimCopiedText(newText, transferableData)
 }

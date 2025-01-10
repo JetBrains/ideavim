@@ -50,7 +50,12 @@ class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
     KeyHandler.getInstance().setPromptCharacterEx(result.promptCharacter)
   }
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     // The converted literal character has been captured as an argument, push it back through key handler
     val argument = cmd.argument as? Argument.Character ?: return false
     val keyStroke = KeyStroke.getKeyStroke(argument.character)

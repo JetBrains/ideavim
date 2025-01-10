@@ -42,7 +42,11 @@ internal data class BufferListCommand(val range: Range, val modifier: CommandMod
     val SUPPORTED_FILTERS = setOf('+', '=', 'a', '%', '#')
   }
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     val arg = argument.trim()
     val filter = pruneUnsupportedFilters(arg)
     val bufferList = getBufferList(context, filter)

@@ -53,7 +53,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
       Lists.newArrayList("cia"),
       "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
       "function(int arg1,    <caret>)",
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 

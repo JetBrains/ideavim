@@ -16,20 +16,24 @@ import org.junit.jupiter.api.Test
 class CopyCommandTest : VimTestCase() {
   @Test
   fun `test duplicate line below`() {
-    configureByText("""
+    configureByText(
+      """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non ${c}scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
     enterCommand("copy .")
-    assertState("""
+    assertState(
+      """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas efficitur nec odio vel malesuada.
       Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       ${c}Nunc tincidunt viverra ligula non scelerisque. Aliquam erat volutpat. Praesent in fermentum orci. 
       Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor. Aliquam felis neque, varius eu 
       accumsan vitae, facilisis ac nulla.
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @VimBehaviorDiffers(

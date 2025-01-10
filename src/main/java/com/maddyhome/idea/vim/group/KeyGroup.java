@@ -49,7 +49,7 @@ import static java.util.stream.Collectors.toList;
  * @author vlan
  */
 @State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
-public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponent<Element>{
+public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponent<Element> {
   public static final @NonNls String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
   private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
   private static final @NonNls String OWNER_ATTRIBUTE = "owner";
@@ -303,8 +303,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   @Override
   public @NotNull List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull KeyStroke keyStroke) {
-    return getActions(((IjVimEditor)editor).getEditor().getComponent(), keyStroke).stream()
-      .map(IjNativeAction::new).collect(toList());
+    return getActions(((IjVimEditor)editor).getEditor().getComponent(), keyStroke).stream().map(IjNativeAction::new)
+      .collect(toList());
   }
 
   private static @NotNull List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
@@ -355,21 +355,26 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   @Override
-  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull List<? extends KeyStroke> prefix, @NotNull VimEditor editor) {
+  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes,
+                                 @NotNull List<? extends KeyStroke> prefix,
+                                 @NotNull VimEditor editor) {
     List<Pair<Set<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes, prefix);
 
     final StringBuilder builder = new StringBuilder();
     for (Pair<Set<MappingMode>, MappingInfo> row : rows) {
       MappingInfo mappingInfo = row.getSecond();
       builder.append(StringsKt.padEnd(getModesStringCode(row.getFirst()), 3, ' '));
-      builder.append(StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()) + " ", 12, ' '));
+      builder.append(
+        StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()) + " ", 12,
+                         ' '));
       builder.append(mappingInfo.isRecursive() ? " " : "*");  // Or `&` if script-local mappings being recursive
       builder.append(" ");  // Should be `@` if it's a buffer-local mapping
       builder.append(mappingInfo.getPresentableString());
       builder.append("\n");
     }
 
-    VimOutputPanel outputPanel = injector.getOutputPanel().getOrCreate(editor, injector.getExecutionContextManager().getEditorExecutionContext(editor));
+    VimOutputPanel outputPanel = injector.getOutputPanel()
+      .getOrCreate(editor, injector.getExecutionContextManager().getEditorExecutionContext(editor));
     outputPanel.addText(builder.toString(), true);
     outputPanel.show();
     return true;

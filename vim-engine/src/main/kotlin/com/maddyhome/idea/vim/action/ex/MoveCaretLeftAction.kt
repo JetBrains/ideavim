@@ -19,10 +19,15 @@ import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<Left>"], modes = [Mode.CMD_LINE])
-class MoveCaretLeftAction : VimActionHandler.SingleExecution()  {
+class MoveCaretLeftAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
     val caret = commandLine.caret
 

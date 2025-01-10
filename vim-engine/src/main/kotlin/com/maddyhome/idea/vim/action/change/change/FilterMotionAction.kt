@@ -29,7 +29,12 @@ class FilterVisualLinesAction : VimActionHandler.SingleExecution(), FilterComman
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     // Start ex entry with the initial text set to the calculated range and `!`
     startFilterCommand(editor, context, cmd.rawCount)
     return true
@@ -49,7 +54,12 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), FilterCommand, Du
   override val argumentType: Argument.Type = Argument.Type.MOTION
   override val duplicateWith: Char = '!'
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val argument = cmd.argument ?: return false
     val range = injector.motion.getMotionRange(editor, editor.primaryCaret(), context, argument, operatorArguments)
       ?: return false

@@ -372,23 +372,113 @@ private class TestExtension : VimExtension {
       MoveBackwards(),
       false,
     )
-    putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
-    putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>TestMotion"), owner, MoveLinewiseInNormal(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>TestMissing"), owner, MoveLinewiseInNormal(), false)
-    putExtensionHandlerMapping(MappingMode.NO, injector.parser.parseKeys("<Plug>TestDelayed"), owner, DelayedAction(), false)
-    putExtensionHandlerMapping(MappingMode.NO, injector.parser.parseKeys("<Plug>TestIncorrectDelayed"), owner, DelayedIncorrectAction(), false)
+    putExtensionHandlerMapping(
+      MappingMode.O,
+      injector.parser.parseKeys("<Plug>TestExtensionCharacter"),
+      owner,
+      Move(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.O,
+      injector.parser.parseKeys("<Plug>TestExtensionLinewise"),
+      owner,
+      MoveLinewise(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>TestMotion"),
+      owner,
+      MoveLinewiseInNormal(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>TestMissing"),
+      owner,
+      MoveLinewiseInNormal(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.NO,
+      injector.parser.parseKeys("<Plug>TestDelayed"),
+      owner,
+      DelayedAction(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.NO,
+      injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),
+      owner,
+      DelayedIncorrectAction(),
+      false
+    )
 
-    putKeyMapping(MappingMode.O, injector.parser.parseKeys("U"), owner, injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
-    putKeyMapping(MappingMode.O, injector.parser.parseKeys("P"), owner, injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
-    putKeyMapping(MappingMode.O, injector.parser.parseKeys("I"), owner, injector.parser.parseKeys("<Plug>TestExtensionCharacter"), true)
-    putKeyMapping(MappingMode.O, injector.parser.parseKeys("O"), owner, injector.parser.parseKeys("<Plug>TestExtensionLinewise"), true)
-    putKeyMapping(MappingMode.N, injector.parser.parseKeys("Q"), owner, injector.parser.parseKeys("<Plug>TestMotion"), true)
-    putKeyMapping(MappingMode.NO, injector.parser.parseKeys("R"), owner, injector.parser.parseKeys("<Plug>TestDelayed"), true)
-    putKeyMapping(MappingMode.NO, injector.parser.parseKeys("E"), owner, injector.parser.parseKeys("<Plug>TestIncorrectDelayed"), true)
+    putKeyMapping(
+      MappingMode.O,
+      injector.parser.parseKeys("U"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.O,
+      injector.parser.parseKeys("P"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.O,
+      injector.parser.parseKeys("I"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestExtensionCharacter"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.O,
+      injector.parser.parseKeys("O"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestExtensionLinewise"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("Q"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestMotion"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.NO,
+      injector.parser.parseKeys("R"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestDelayed"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.NO,
+      injector.parser.parseKeys("E"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),
+      true
+    )
 
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("Z"), owner, injector.parser.parseKeys("<Plug>TestMissing"), true)
-    putKeyMappingIfMissing(MappingMode.I, injector.parser.parseKeys("L"), owner, injector.parser.parseKeys("<Plug>TestMissing"), true)
+    putKeyMappingIfMissing(
+      MappingMode.N,
+      injector.parser.parseKeys("Z"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestMissing"),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.I,
+      injector.parser.parseKeys("L"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestMissing"),
+      true
+    )
   }
 
   override fun dispose() {

@@ -100,11 +100,26 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return findOffsetOfNextWord(editor.text(), editor.fileSize().toInt(), searchFrom, count, bigWord, editor)
   }
 
-  override fun findOffsetOfNextWord(text: CharSequence, textLength: Int, searchFrom: Int, count: Int, bigWord: Boolean, editor: VimEditor): Motion {
+  override fun findOffsetOfNextWord(
+    text: CharSequence,
+    textLength: Int,
+    searchFrom: Int,
+    count: Int,
+    bigWord: Boolean,
+    editor: VimEditor,
+  ): Motion {
     if ((searchFrom == 0 && count < 0) || (searchFrom >= textLength - 1 && count > 0)) {
       return Motion.Error
     }
-    return (injector.searchHelper.findNextWord(text, textLength, editor, searchFrom, count, bigWord, false)).toMotionOrError()
+    return (injector.searchHelper.findNextWord(
+      text,
+      textLength,
+      editor,
+      searchFrom,
+      count,
+      bigWord,
+      false
+    )).toMotionOrError()
   }
 
   override fun getHorizontalMotion(
@@ -155,7 +170,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
    */
-  override fun moveCaretToBeforeNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int {
+  override fun moveCaretToBeforeNextCharacterOnLine(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    ch: Char,
+  ): Int {
     val pos = injector.searchHelper.findNextCharacterOnLine(editor, caret, count, ch)
 
     return if (pos >= 0) {
@@ -210,7 +230,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
   }
 
-  override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: ImmutableVimCaret, linesOffset: Int): Int {
+  override fun moveCaretToRelativeLineEndSkipTrailing(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    linesOffset: Int,
+  ): Int {
     val line = editor.visualLineToBufferLine(
       editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset),
     )
@@ -344,8 +368,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       }
 
       is TextObjectActionHandler -> {
-        val range: TextRange = action.getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0)
-          ?: return null
+        val range: TextRange =
+          action.getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0)
+            ?: return null
         start = range.startOffset
         end = range.endOffset
         if (argument.isLinewiseMotion()) end--
@@ -431,7 +456,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     return moveCaretToLineWithStartOfLineOption(
       editor,
-      editor.normalizeLine((editor.lineCount() * count.coerceIn(0, 100) + 99) / 100 - 1), // TODO why do we have this 99? (It is there since 2003)
+      editor.normalizeLine(
+        (editor.lineCount() * count.coerceIn(
+          0,
+          100
+        ) + 99) / 100 - 1
+      ), // TODO why do we have this 99? (It is there since 2003)
       caret,
     )
   }

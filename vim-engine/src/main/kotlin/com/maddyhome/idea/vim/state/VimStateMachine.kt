@@ -38,7 +38,10 @@ interface VimStateMachine {
   fun reset()
 
   companion object {
-    @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("injector.vimState", imports = ["com.maddyhome.idea.vim.api.injector"]))
+    @Deprecated(
+      "Please use VimInjector.vimState",
+      replaceWith = ReplaceWith("injector.vimState", imports = ["com.maddyhome.idea.vim.api.injector"])
+    )
     fun getInstance(editor: Any?): VimStateMachine {
       return injector.vimState
     }

@@ -51,6 +51,7 @@ object GuiCursorOptionHelper {
             throw exExceptionMessage("E549", token)
           }
         }
+
         it.startsWith("hor") -> {
           type = GuiCursorType.HOR
           thickness = it.slice(3 until it.length).toIntOrNull() ?: throw exExceptionMessage("E548", token)
@@ -58,15 +59,18 @@ object GuiCursorOptionHelper {
             throw exExceptionMessage("E549", token)
           }
         }
+
         it.startsWith("blink") -> {
           // We don't do anything with blink...
           blinkModes.add(it)
         }
+
         it.contains('/') -> {
           val i = it.indexOf('/')
           highlightGroup = it.slice(0 until i)
           lmapHighlightGroup = it.slice(i + 1 until it.length)
         }
+
         else -> highlightGroup = it
       }
     }
@@ -212,7 +216,8 @@ data class GuiCursorAttributes(
   val blinkModes: List<String>,
 ) {
   companion object {
-    val DEFAULT: GuiCursorAttributes = GuiCursorAttributes(GuiCursorType.BLOCK,
+    val DEFAULT: GuiCursorAttributes = GuiCursorAttributes(
+      GuiCursorType.BLOCK,
       thickness = 0,
       highlightGroup = "",
       lmapHighlightGroup = "",

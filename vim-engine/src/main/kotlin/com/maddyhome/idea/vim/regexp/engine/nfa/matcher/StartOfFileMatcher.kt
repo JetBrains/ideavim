@@ -15,13 +15,13 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 /**
  * Matcher used to check if index is at the start of a file.
  */
-internal class StartOfFileMatcher : Matcher{
+internal class StartOfFileMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (index == 0) MatcherResult.Success(0) else MatcherResult.Failure
   }

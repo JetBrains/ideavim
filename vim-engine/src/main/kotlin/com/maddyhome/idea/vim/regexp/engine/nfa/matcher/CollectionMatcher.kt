@@ -27,14 +27,15 @@ internal class CollectionMatcher(
   private val charClasses: List<(Char) -> Boolean> = emptyList(),
   private val isNegated: Boolean = false,
   private val includesEOL: Boolean = false,
-  private val forceNoIgnoreCase: Boolean = false
+  private val forceNoIgnoreCase: Boolean = false,
 ) : Matcher {
   override fun matches(
     editor: VimEditor,
-    index: Int, groups:
+    index: Int,
+    groups:
     VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
 
@@ -42,8 +43,14 @@ internal class CollectionMatcher(
     if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
 
     val char = editor.text()[index]
-    val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }.contains(char.lowercaseChar()) || ranges.any { it.inRange(char, true) } || charClasses.any { it(char.lowercaseChar()) || it(char.uppercaseChar()) }) == !isNegated
-                 else (chars.contains(char) || ranges.any { it.inRange(char) } || charClasses.any { it(char) }) == !isNegated
+    val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }
+      .contains(char.lowercaseChar()) || ranges.any {
+      it.inRange(
+        char,
+        true
+      )
+    } || charClasses.any { it(char.lowercaseChar()) || it(char.uppercaseChar()) }) == !isNegated
+    else (chars.contains(char) || ranges.any { it.inRange(char) } || charClasses.any { it(char) }) == !isNegated
     return if (result) MatcherResult.Success(1)
     else MatcherResult.Failure
   }
@@ -69,7 +76,7 @@ internal data class CollectionRange(val start: Char, val end: Char) {
    *
    * @return whether char is inside the range
    */
-  internal fun inRange(char: Char, isCaseInsensitive: Boolean = false) : Boolean {
+  internal fun inRange(char: Char, isCaseInsensitive: Boolean = false): Boolean {
     return if (isCaseInsensitive) char.lowercaseChar().code in start.lowercaseChar().code..end.lowercaseChar().code
     else char.code in start.code..end.code
   }

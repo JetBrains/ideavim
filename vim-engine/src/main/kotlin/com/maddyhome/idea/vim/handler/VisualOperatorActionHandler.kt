@@ -130,6 +130,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       is SingleExecution -> {
         res[0] = executeForAllCarets(editor, context, cmd, selections, operatorArguments)
       }
+
       is ForEachCaret -> {
         logger.debug("Calling 'before execution'")
         if (!beforeExecution(editor, context, cmd, selections)) {
@@ -148,6 +149,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
               selections.values.first(),
               operatorArguments,
             )
+
           else -> editor.forEachNativeCaret(
             { currentCaret ->
               val range = selections.getValue(currentCaret)
@@ -197,6 +199,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           carets.toMap()
         }
       }
+
       this.inBlockSelection -> {
         val primaryCaret = primaryCaret()
         mapOf(
@@ -208,6 +211,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           ),
         )
       }
+
       else -> this.nativeCarets().associateWith { caret ->
         val mode = this.mode
         VimSimpleSelection.createWithNative(

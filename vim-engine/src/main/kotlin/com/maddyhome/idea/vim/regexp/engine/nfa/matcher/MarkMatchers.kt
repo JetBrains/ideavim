@@ -13,7 +13,13 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.regexp.match.VimMatchGroupCollection
 
 internal abstract class BaseMarkMatcher(val mark: Char) : Matcher {
-  override fun matches(editor: VimEditor, index: Int, groups: VimMatchGroupCollection, isCaseInsensitive: Boolean, possibleCursors: MutableList<VimCaret>): MatcherResult {
+  override fun matches(
+    editor: VimEditor,
+    index: Int,
+    groups: VimMatchGroupCollection,
+    isCaseInsensitive: Boolean,
+    possibleCursors: MutableList<VimCaret>,
+  ): MatcherResult {
     val newPossibleCursors = possibleCursors.filter { matchesCondition(index, it) }
     return if (newPossibleCursors.isNotEmpty()) {
       possibleCursors.clear()
@@ -21,6 +27,7 @@ internal abstract class BaseMarkMatcher(val mark: Char) : Matcher {
       MatcherResult.Success(0)
     } else MatcherResult.Failure
   }
+
   override fun isEpsilon(): Boolean = true
 
   abstract fun matchesCondition(index: Int, caret: VimCaret): Boolean
@@ -32,9 +39,11 @@ internal class AtMarkMatcher(mark: Char) : BaseMarkMatcher(mark) {
 }
 
 internal class BeforeMarkMatcher(mark: Char) : BaseMarkMatcher(mark) {
-  override fun matchesCondition(index: Int, caret: VimCaret): Boolean = getMarkOffset(caret)?.let { index < it } ?: false
+  override fun matchesCondition(index: Int, caret: VimCaret): Boolean =
+    getMarkOffset(caret)?.let { index < it } ?: false
 }
 
 internal class AfterMarkMatcher(mark: Char) : BaseMarkMatcher(mark) {
-  override fun matchesCondition(index: Int, caret: VimCaret): Boolean = getMarkOffset(caret)?.let { index > it } ?: false
+  override fun matchesCondition(index: Int, caret: VimCaret): Boolean =
+    getMarkOffset(caret)?.let { index > it } ?: false
 }

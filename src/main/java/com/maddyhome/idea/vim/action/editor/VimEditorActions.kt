@@ -38,7 +38,7 @@ internal class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CA
     editor: VimEditor,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val undo = injector.undo
     when (undo) {
@@ -67,7 +67,7 @@ internal class VimEditorUp : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARE
     editor: VimEditor,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val undo = injector.undo
     when (undo) {
@@ -85,7 +85,12 @@ internal class VimEditorUp : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARE
 internal class VimQuickJavaDoc : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     injector.actionExecutor.executeAction(editor, IdeActions.ACTION_QUICK_JAVADOC, context)
     return true
   }

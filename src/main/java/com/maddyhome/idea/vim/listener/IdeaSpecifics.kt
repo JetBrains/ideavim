@@ -72,7 +72,8 @@ internal object IdeaSpecifics {
       val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
       if (!isVimAction && injector.globalIjOptions().trackactionids) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
-          val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
+          val id: String? =
+            ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
           val candidates = if (id == null) {
             // Some actions are specific to the component they're registered for, and are copies of a global action,
             // reusing the action ID and shortcuts (e.g. `NextTab` is different for editor tabs and tool window tabs).
@@ -83,8 +84,7 @@ internal object IdeaSpecifics {
             // action. Note that we might return duplicate IDs because the keymap might have multiple shortcuts mapped
             // to the same action. The notifier will handle de-duplication and sorting as a presentation detail.
             action.shortcutSet.shortcuts.flatMap { KeymapManager.getInstance().activeKeymap.getActionIdList(it) }
-          }
-          else {
+          } else {
             emptyList()
           }
 
@@ -125,7 +125,14 @@ internal object IdeaSpecifics {
           val caretShift = addedTextLength - (editor.caretModel.primaryCaret.offset - prevDocumentOffset)
           val leftArrow = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)
 
-          register.recordText(editor.document.getText(TextRange(prevDocumentOffset, prevDocumentOffset + addedTextLength)))
+          register.recordText(
+            editor.document.getText(
+              TextRange(
+                prevDocumentOffset,
+                prevDocumentOffset + addedTextLength
+              )
+            )
+          )
           repeat(caretShift.coerceAtLeast(0)) {
             register.recordKeyStroke(leftArrow)
           }

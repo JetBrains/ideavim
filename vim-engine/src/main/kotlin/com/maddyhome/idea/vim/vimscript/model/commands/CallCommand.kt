@@ -28,11 +28,17 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
  * see "h :call"
  */
 @ExCommand(command = "cal[l]")
-class CallCommand(val range: Range, val functionCall: Expression) : Command.SingleExecution(range, CommandModifier.NONE) {
+class CallCommand(val range: Range, val functionCall: Expression) :
+  Command.SingleExecution(range, CommandModifier.NONE) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult {
     if (functionCall is FunctionCallExpression) {
       val function = injector.functionService.getFunctionHandlerOrNull(
         functionCall.scope,
@@ -51,8 +57,14 @@ class CallCommand(val range: Range, val functionCall: Expression) : Command.Sing
         return ExecutionResult.Success
       }
 
-      val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
-      val funcref = injector.variableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, vimContext)
+      val name =
+        (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
+      val funcref = injector.variableService.getNullableVariableValue(
+        Variable(functionCall.scope, functionCall.functionName),
+        editor,
+        context,
+        vimContext
+      )
       if (funcref is VimFuncref) {
         funcref.handler.range = range
         funcref.execute(name, functionCall.arguments, editor, context, vimContext)

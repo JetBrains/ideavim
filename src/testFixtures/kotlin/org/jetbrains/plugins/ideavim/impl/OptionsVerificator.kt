@@ -208,52 +208,48 @@ internal class OptionsTracer(
 
   override fun <T : VimDataType> addGlobalOptionChangeListener(
     option: Option<T>,
-    listener: GlobalOptionChangeListener
+    listener: GlobalOptionChangeListener,
   ) {
     ignoreFlag.set(true)
     try {
       vimOptionGroup.addGlobalOptionChangeListener(option, listener)
-    }
-    finally {
+    } finally {
       ignoreFlag.set(false)
     }
   }
 
   override fun <T : VimDataType> removeGlobalOptionChangeListener(
     option: Option<T>,
-    listener: GlobalOptionChangeListener
+    listener: GlobalOptionChangeListener,
   ) {
     ignoreFlag.set(true)
     try {
       vimOptionGroup.removeGlobalOptionChangeListener(option, listener)
-    }
-    finally {
+    } finally {
       ignoreFlag.set(false)
     }
   }
 
   override fun <T : VimDataType> addEffectiveOptionValueChangeListener(
     option: Option<T>,
-    listener: EffectiveOptionValueChangeListener
+    listener: EffectiveOptionValueChangeListener,
   ) {
     ignoreFlag.set(true)
     try {
       vimOptionGroup.addEffectiveOptionValueChangeListener(option, listener)
-    }
-    finally {
+    } finally {
       ignoreFlag.set(false)
     }
   }
 
   override fun <T : VimDataType> removeEffectiveOptionValueChangeListener(
     option: Option<T>,
-    listener: EffectiveOptionValueChangeListener
+    listener: EffectiveOptionValueChangeListener,
   ) {
     ignoreFlag.set(true)
     try {
       vimOptionGroup.removeEffectiveOptionValueChangeListener(option, listener)
-    }
-    finally {
+    } finally {
       ignoreFlag.set(false)
     }
   }
@@ -412,7 +408,8 @@ class VimOptionsInvocationContext(private val options: List<Pair<Option<out VimD
   }
 }
 
-class OptionsSetup(private val options: List<Pair<Option<out VimDataType>, VimDataType?>>) : BeforeTestExecutionCallback {
+class OptionsSetup(private val options: List<Pair<Option<out VimDataType>, VimDataType?>>) :
+  BeforeTestExecutionCallback {
   override fun beforeTestExecution(context: ExtensionContext?) {
     options.forEach { (key, value) ->
       if (value != null) {

@@ -22,7 +22,7 @@ class ExCommandTree {
       val fullCommand = requiredPart + optionalPart
       commandToInstance[fullCommand] = lazyInstance
 
-      for (i in (0 .. optionalPart.length)) {
+      for (i in (0..optionalPart.length)) {
         abbrevToCommand[requiredPart + optionalPart.substring(0, i)] = fullCommand
       }
     }
@@ -48,7 +48,10 @@ class ExCommandTree {
         throw RuntimeException("Invalid ex-command pattern $commandsPattern")
       }
       val primaryPart = command.substring(0, leftBraceIndex ?: command.length)
-      val optionalPart = if (leftBraceIndex != null && rightBraceIndex != null) command.substring(leftBraceIndex + 1, rightBraceIndex) else ""
+      val optionalPart = if (leftBraceIndex != null && rightBraceIndex != null) command.substring(
+        leftBraceIndex + 1,
+        rightBraceIndex
+      ) else ""
       result.add(Pair(primaryPart, optionalPart))
     }
     return result

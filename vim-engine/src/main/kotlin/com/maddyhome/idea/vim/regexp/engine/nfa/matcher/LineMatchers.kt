@@ -18,7 +18,7 @@ internal class AtLineMatcher(private val lineNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line + 1 == lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -35,7 +35,7 @@ internal class BeforeLineMatcher(private val lineNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line + 1 < lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -52,7 +52,7 @@ internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).line + 1 > lineNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -62,21 +62,22 @@ internal class AfterLineMatcher(private val lineNumber: Int) : Matcher {
     return true
   }
 }
+
 internal class AtLineCursorMatcher : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (possibleCursors.any { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset).line }
+      val newPossibleCursors =
+        possibleCursors.filter { editor.offsetToBufferPosition(index).line == editor.offsetToBufferPosition(it.offset).line }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
+    } else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {
@@ -90,15 +91,15 @@ internal class BeforeLineCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (possibleCursors.any { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset).line }
+      val newPossibleCursors =
+        possibleCursors.filter { editor.offsetToBufferPosition(index).line < editor.offsetToBufferPosition(it.offset).line }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
+    } else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {
@@ -112,15 +113,15 @@ internal class AfterLineCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (possibleCursors.any { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset).line }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset).line }
+      val newPossibleCursors =
+        possibleCursors.filter { editor.offsetToBufferPosition(index).line > editor.offsetToBufferPosition(it.offset).line }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
+    } else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {

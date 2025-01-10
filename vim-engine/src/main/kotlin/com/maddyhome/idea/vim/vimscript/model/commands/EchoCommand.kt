@@ -24,9 +24,14 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 data class EchoCommand(val range: Range, val args: List<Expression>) :
   Command.SingleExecution(range, CommandModifier.NONE) {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult.Success {
+  override fun processCommand(
+    editor: VimEditor,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
+  ): ExecutionResult.Success {
     val text = args.joinToString(separator = " ", postfix = "\n") {
       it.evaluate(editor, context, this).toString()
     }

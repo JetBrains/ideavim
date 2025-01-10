@@ -18,7 +18,7 @@ internal class AtColumnMatcher(private val columnNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column + 1 == columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -35,7 +35,7 @@ internal class BeforeColumnMatcher(private val columnNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column + 1 < columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -52,7 +52,7 @@ internal class AfterColumnMatcher(private val columnNumber: Int) : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (editor.offsetToBufferPosition(index).column + 1 > columnNumber) MatcherResult.Success(0)
     else MatcherResult.Failure
@@ -69,15 +69,15 @@ internal class AtColumnCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (possibleCursors.any { editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(it.offset).column }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(it.offset).column }
+      val newPossibleCursors =
+        possibleCursors.filter { editor.offsetToBufferPosition(index).column == editor.offsetToBufferPosition(it.offset).column }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
+    } else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {
@@ -91,15 +91,15 @@ internal class BeforeColumnCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (possibleCursors.any { editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(it.offset).column }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(it.offset).column }
+      val newPossibleCursors =
+        possibleCursors.filter { editor.offsetToBufferPosition(index).column < editor.offsetToBufferPosition(it.offset).column }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
+    } else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {
@@ -113,15 +113,15 @@ internal class AfterColumnCursorMatcher : Matcher {
     index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     return if (possibleCursors.any { editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(it.offset).column }) {
-      val newPossibleCursors = possibleCursors.filter { editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(it.offset).column }
+      val newPossibleCursors =
+        possibleCursors.filter { editor.offsetToBufferPosition(index).column > editor.offsetToBufferPosition(it.offset).column }
       possibleCursors.clear()
       possibleCursors.addAll(newPossibleCursors)
       MatcherResult.Success(0)
-    }
-    else MatcherResult.Failure
+    } else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {

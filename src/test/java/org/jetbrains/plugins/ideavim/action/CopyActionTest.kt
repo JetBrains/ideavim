@@ -265,7 +265,7 @@ class CopyActionTest : VimTestCase() {
   @TestFor(issues = ["VIM-792"])
   fun testLineWiseClipboardYankPaste() {
     configureByText("<caret>foo\n")
-    typeText("\"*yy" +  "\"*p")
+    typeText("\"*yy" + "\"*p")
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup

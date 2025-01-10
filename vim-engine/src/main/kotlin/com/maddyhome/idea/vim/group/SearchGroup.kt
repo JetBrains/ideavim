@@ -79,7 +79,11 @@ fun isInsideString(editor: VimEditor, pos: Int, isInner: Boolean): Boolean {
  * NOTE: Regardless of the [isInner] value, a TextRange will be returned if the caret is positioned on a quote character.
  */
 fun getStringAtPos(editor: VimEditor, pos: Int, isInner: Boolean): TextRange? {
-  return injector.psiService.getDoubleQuotedString(editor, pos, isInner) ?: injector.psiService.getSingleQuotedString(editor, pos, isInner)
+  return injector.psiService.getDoubleQuotedString(editor, pos, isInner) ?: injector.psiService.getSingleQuotedString(
+    editor,
+    pos,
+    isInner
+  )
 }
 
 /**
@@ -201,7 +205,7 @@ private fun getRangeOfNonBlockComments(editor: VimEditor, startComment: TextRang
 }
 
 private fun findNextNonWhitespaceChar(chars: CharSequence, startIndex: Int): Int? {
-  for (i in startIndex .. chars.lastIndex) {
+  for (i in startIndex..chars.lastIndex) {
     if (!chars[i].isWhitespace()) {
       return i
     }
@@ -236,7 +240,15 @@ fun findUnmatchedBlock(editor: VimEditor, pos: Int, type: Char, count: Int): Int
 }
 
 // TODO support delta & refactor me (mb use method below)
-private fun findBlockLocation(editor: VimEditor, range: TextRange, start: Int, charToMatch: Char, pairChar: Char, direction: Direction, delta: Int = 0): Int? {
+private fun findBlockLocation(
+  editor: VimEditor,
+  range: TextRange,
+  start: Int,
+  charToMatch: Char,
+  pairChar: Char,
+  direction: Direction,
+  delta: Int = 0,
+): Int? {
   val strictEscapeMatching = true // Vim's default behavior, see `help cpoptions`
   val chars = editor.text()
 
@@ -251,12 +263,25 @@ private fun findBlockLocation(editor: VimEditor, range: TextRange, start: Int, c
     }
     if (depth == delta && (c == charToMatch || c == pairChar)) return i
     // TODO what should we do inside strings?
-    i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), i + direction.toInt(), escapedRestriction, direction)
+    i = chars.indexOfAnyOrNullInDirection(
+      charArrayOf(charToMatch, pairChar),
+      i + direction.toInt(),
+      escapedRestriction,
+      direction
+    )
   }
   return null
 }
 
-private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, pairChar: Char, direction: Direction, delta: Int, rangeToSearch: TextRange? = null): Int? {
+private fun findBlockLocation(
+  editor: VimEditor,
+  start: Int,
+  charToMatch: Char,
+  pairChar: Char,
+  direction: Direction,
+  delta: Int,
+  rangeToSearch: TextRange? = null,
+): Int? {
   val strictEscapeMatching = true // Vim's default behavior, see `help cpoptions`
   val chars = editor.text()
 
@@ -270,7 +295,12 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
       val rangeToSkip = getStringAtPos(editor, i, false) ?: injector.psiService.getCommentAtPos(editor, i)?.first
       if (rangeToSkip != null) {
         val searchStart = if (direction == Direction.FORWARDS) rangeToSkip.endOffset else rangeToSkip.startOffset - 1
-        i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), searchStart, escapedRestriction, direction)
+        i = chars.indexOfAnyOrNullInDirection(
+          charArrayOf(charToMatch, pairChar),
+          searchStart,
+          escapedRestriction,
+          direction
+        )
         continue
       }
     }
@@ -278,11 +308,14 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
     when (chars[i]) {
       charToMatch -> {
         depth++
-        if (delta > 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
+        if (delta > 0) result =
+          i // For `]}` and similar commands we should return the result even if [delta] is unachievable
       }
+
       pairChar -> {
         depth--
-        if (delta < 0) result = i // For `]}` and similar commands we should return the result even if [delta] is unachievable
+        if (delta < 0) result =
+          i // For `]}` and similar commands we should return the result even if [delta] is unachievable
       }
     }
 
@@ -291,7 +324,12 @@ private fun findBlockLocation(editor: VimEditor, start: Int, charToMatch: Char, 
       break
     }
 
-    i = chars.indexOfAnyOrNullInDirection(charArrayOf(charToMatch, pairChar), i + direction.toInt(), escapedRestriction, direction)
+    i = chars.indexOfAnyOrNullInDirection(
+      charArrayOf(charToMatch, pairChar),
+      i + direction.toInt(),
+      escapedRestriction,
+      direction
+    )
   }
   return result
 }
@@ -415,7 +453,15 @@ private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: 
   //   and caret is located between them,
   //   In this case match is checked only inside the same string or comment
   if (blockAtPos != null) {
-    blockStart = findBlockLocation(editor, pos, charToMatch, pairChar, Direction.BACKWARDS, if (editor.text()[pos] == pairChar) count - 1 else count, blockAtPos)
+    blockStart = findBlockLocation(
+      editor,
+      pos,
+      charToMatch,
+      pairChar,
+      Direction.BACKWARDS,
+      if (editor.text()[pos] == pairChar) count - 1 else count,
+      blockAtPos
+    )
     if (blockStart != null) {
       blockEnd = findBlockLocation(editor, blockStart, pairChar, charToMatch, Direction.FORWARDS, 0, blockAtPos)
       if (blockEnd != null && blockEnd >= pos) return blockStart to blockEnd
@@ -424,7 +470,14 @@ private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: 
 
   //   2. Code contains [charToMatch] to [pairChar], and caret is located between them,
   //   In this case, all comments and strings are skipped and not included in count (see [findBlockLocation] implementation)
-  blockStart = findBlockLocation(editor, pos, charToMatch, pairChar, Direction.BACKWARDS, if (editor.text()[pos] == pairChar) count - 1 else count)
+  blockStart = findBlockLocation(
+    editor,
+    pos,
+    charToMatch,
+    pairChar,
+    Direction.BACKWARDS,
+    if (editor.text()[pos] == pairChar) count - 1 else count
+  )
   if (blockStart != null) {
     blockEnd = findBlockLocation(editor, blockStart, charToMatch, pairChar, Direction.FORWARDS, 0)
     if (blockEnd != null && blockEnd >= pos) return blockStart to blockEnd
@@ -436,7 +489,8 @@ private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: 
   //   It may be found in both code or comment / string
   blockStart = editor.text().indexOfOrNull(charToMatch, pos)
   while (blockStart != null) {
-    val containingBlock = getStringAtPos(editor, blockStart, false) ?: injector.psiService.getCommentAtPos(editor, blockStart)
+    val containingBlock =
+      getStringAtPos(editor, blockStart, false) ?: injector.psiService.getCommentAtPos(editor, blockStart)
     if (containingBlock != null) {
       blockEnd = findMatchingChar(editor, blockStart, charToMatch, pairChar, Direction.FORWARDS)
       if (blockEnd != null) return blockStart to blockEnd
@@ -451,7 +505,12 @@ private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: 
   return null
 }
 
-private fun CharSequence.indexOfAnyOrNullInDirection(chars: CharArray, startIndex: Int, escaped: Boolean?, direction: Direction): Int? {
+private fun CharSequence.indexOfAnyOrNullInDirection(
+  chars: CharArray,
+  startIndex: Int,
+  escaped: Boolean?,
+  direction: Direction,
+): Int? {
   return if (direction == Direction.FORWARDS) {
     this.indexOfAnyOrNull(chars, startIndex, length, escaped)
   } else {
@@ -465,8 +524,13 @@ fun getDoubleQuotesRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boo
 fun getSingleQuotesRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boolean): TextRange? =
   getQuoteRangeNoPSI(chars, currentPos, isInner, true)
 
-private fun getQuoteRangeNoPSI(chars: CharSequence, currentPos: Int, isInner: Boolean, isSingleQuotes: Boolean): TextRange? {
-  require(currentPos in 0 .. chars.lastIndex) // We can't use StrictMode here because I would like to test it without an injector initialized
+private fun getQuoteRangeNoPSI(
+  chars: CharSequence,
+  currentPos: Int,
+  isInner: Boolean,
+  isSingleQuotes: Boolean,
+): TextRange? {
+  require(currentPos in 0..chars.lastIndex) // We can't use StrictMode here because I would like to test it without an injector initialized
 
   val start = chars.lastIndexOf('\n', currentPos) + 1
   val changes = quotesChanges(chars, start).takeWhileInclusive { it.position <= currentPos }
@@ -522,6 +586,7 @@ private fun quotesChanges(chars: CharSequence, startIndex: Int) = sequence {
           yield(State(nextQuoteIndex, false, isInDoubleQuotes))
         }
       }
+
       '\'' -> {
         if (!isInDoubleQuotes) {
           isInSingleQuotes = !isInSingleQuotes

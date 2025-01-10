@@ -33,7 +33,14 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(vimEditor, context, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    registerService.storeText(
+      vimEditor,
+      context,
+      vimEditor.primaryCaret(),
+      before rangeOf "Discovery",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
     typeText(injector.parser.parseKeys("V" + "P"))
     typeText(injector.parser.parseKeys("V" + "P"))
     val after = """

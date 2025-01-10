@@ -88,10 +88,13 @@ abstract class OptionsPropertiesBase(private val scope: OptionAccessScope) {
   // This is arguably simpler, and StringListOption gives us more type safety about using a string vs a list
   protected fun optionProperty(option: ToggleOption): ReadWriteProperty<OptionsPropertiesBase, Boolean> =
     ToggleOptionProperty(option)
+
   protected fun optionProperty(option: NumberOption): ReadWriteProperty<OptionsPropertiesBase, Int> =
     NumberOptionProperty(option)
+
   protected fun optionProperty(option: StringOption): ReadWriteProperty<OptionsPropertiesBase, String> =
     StringOptionProperty(option)
+
   protected fun optionProperty(option: StringListOption): ReadOnlyProperty<OptionsPropertiesBase, StringListOptionValue> =
     StringListOptionProperty(option)
 }
@@ -107,7 +110,7 @@ abstract class OptionsPropertiesBase(private val scope: OptionAccessScope) {
  */
 class StringListOptionValue(
   private val option: StringListOption,
-  private val scope: OptionAccessScope
+  private val scope: OptionAccessScope,
 ) : AbstractList<String>() {
 
   // We cache the value at creation time, and update whenever it's changed via one of its own methods. We lazily fetch

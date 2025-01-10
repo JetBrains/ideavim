@@ -40,7 +40,7 @@ class KeyStrokeTrie<T>(private val name: String) {
     val children = lazy { mutableMapOf<KeyStroke, TrieNodeImpl<T>>() }
 
     val depth: Int
-      get() = parent?.let { it.depth + 1  } ?: 0
+      get() = parent?.let { it.depth + 1 } ?: 0
 
     override fun visit(visitor: (KeyStroke, TrieNode<T>) -> Unit) {
       if (!children.isInitialized()) return
@@ -192,8 +192,7 @@ class KeyStrokeTrie<T>(private val name: String) {
   override fun toString(): String {
     val children = if (root.children.isInitialized()) {
       "${root.children.value.size} children"
-    }
-    else {
+    } else {
       "0 children (not initialized)"
     }
     return "KeyStrokeTrie - '$name', $children"

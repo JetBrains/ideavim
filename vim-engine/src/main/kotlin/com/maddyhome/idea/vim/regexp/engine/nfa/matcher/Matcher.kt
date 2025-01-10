@@ -31,10 +31,10 @@ internal interface Matcher {
    */
   fun matches(
     editor: VimEditor,
-    index : Int,
+    index: Int,
     groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
-    possibleCursors: MutableList<VimCaret>
+    possibleCursors: MutableList<VimCaret>,
   ): MatcherResult
 
   /**

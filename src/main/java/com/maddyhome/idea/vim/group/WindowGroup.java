@@ -56,7 +56,7 @@ public class WindowGroup extends WindowGroupBase {
   }
 
   public void closeAll(@NotNull ExecutionContext context) {
-    getFileEditorManager(((IjEditorExecutionContext) context).getContext()).closeAllFiles();
+    getFileEditorManager(((IjEditorExecutionContext)context).getContext()).closeAllFiles();
   }
 
   @Override
@@ -105,10 +105,13 @@ public class WindowGroup extends WindowGroupBase {
   @Override
   @RWLockLabel.Readonly
   @RequiresReadLock
-  public void selectWindowInRow(@NotNull VimCaret caret, @NotNull ExecutionContext context, int relativePosition, boolean vertical) {
-    final Caret ijCaret = ((IjVimCaret) caret).getCaret();
+  public void selectWindowInRow(@NotNull VimCaret caret,
+                                @NotNull ExecutionContext context,
+                                int relativePosition,
+                                boolean vertical) {
+    final Caret ijCaret = ((IjVimCaret)caret).getCaret();
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow currentWindow =  fileEditorManager.getCurrentWindow();
+    final EditorWindow currentWindow = fileEditorManager.getCurrentWindow();
     if (currentWindow != null) {
       final EditorWindow[] windows = fileEditorManager.getWindows();
       final List<EditorWindow> row = findWindowsInRow(ijCaret, currentWindow, Arrays.asList(windows), vertical);
@@ -116,7 +119,8 @@ public class WindowGroup extends WindowGroupBase {
     }
   }
 
-  private void selectWindow(@NotNull EditorWindow currentWindow, @NotNull List<EditorWindow> windows,
+  private void selectWindow(@NotNull EditorWindow currentWindow,
+                            @NotNull List<EditorWindow> windows,
                             int relativePosition) {
     final int pos = windows.indexOf(currentWindow);
     final int selected = pos + relativePosition;
@@ -126,7 +130,8 @@ public class WindowGroup extends WindowGroupBase {
 
   private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
                                                               @NotNull EditorWindow editorWindow,
-                                                              @NotNull List<EditorWindow> windows, final boolean vertical) {
+                                                              @NotNull List<EditorWindow> windows,
+                                                              final boolean vertical) {
     final Point anchorPoint = getCaretPoint(caret);
     if (anchorPoint != null) {
       final List<EditorWindow> result = new ArrayList<>();

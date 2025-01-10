@@ -72,17 +72,20 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
+
           key.keyCode == KeyEvent.VK_ENTER -> {
             text = commandLine.actualText
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
+
           finishOn != null && key.keyChar == finishOn -> {
             commandLine.handleKey(key)
             text = commandLine.actualText
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
+
           else -> {
             commandLine.handleKey(key)
             true
@@ -126,7 +129,12 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     panel.activate(editor.ij, context.ij, prompt, "")
   }
 
-  override fun createPanel(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {
+  override fun createPanel(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    initText: String,
+  ): VimCommandLine {
     val panel = ExEntryPanel.getInstance()
     panel.activate(editor.ij, context.ij, label, initText)
     return panel
@@ -137,10 +145,16 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
   }
 
   override fun getCurrentModalInput(): VimModalInput? {
-    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive && it.inputInterceptor != null }?.let { WrappedAsModalInputExEntryPanel(it) }
+    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive && it.inputInterceptor != null }
+      ?.let { WrappedAsModalInputExEntryPanel(it) }
   }
 
-  override fun create(editor: VimEditor, context: ExecutionContext, label: String, inputInterceptor: VimInputInterceptor<*>): VimModalInput {
+  override fun create(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    inputInterceptor: VimInputInterceptor<*>,
+  ): VimModalInput {
     val panel = ExEntryPanel.getInstanceWithoutShortcuts()
     panel.inputInterceptor = inputInterceptor
     panel.activate(editor.ij, context.ij, label, "")
@@ -151,7 +165,9 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
 internal class WrappedAsModalInputExEntryPanel(internal val exEntryPanel: ExEntryPanel) : VimModalInputBase() {
   override var inputInterceptor: VimInputInterceptor<*>
     get() = exEntryPanel.inputInterceptor!!
-    set(value) { exEntryPanel.inputInterceptor = value }
+    set(value) {
+      exEntryPanel.inputInterceptor = value
+    }
   override val caret: VimCommandLineCaret = exEntryPanel.caret
   override val label: String = exEntryPanel.label
 

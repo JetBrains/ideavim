@@ -49,7 +49,8 @@ class TextWidthOptionMapperTest : VimNoWriteActionTestCase() {
     super.setUp(testInfo)
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
-    val manager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+    val manager =
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     ApplicationManager.getApplication().invokeAndWait {
@@ -393,8 +394,7 @@ class TextWidthOptionMapperTest : VimNoWriteActionTestCase() {
       val commonSettings = CodeStyle.getSettings(fixture.editor).getCommonSettings(language)
       if (commonSettings.language == Language.ANY) {
         CodeStyle.getSettings(fixture.editor).WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN = value
-      }
-      else {
+      } else {
         commonSettings.WRAP_ON_TYPING = if (value) WrapOnTyping.WRAP.intValue else WrapOnTyping.NO_WRAP.intValue
       }
       // Setting the value directly doesn't invalidate the cached property value. Not sure if there's a better way

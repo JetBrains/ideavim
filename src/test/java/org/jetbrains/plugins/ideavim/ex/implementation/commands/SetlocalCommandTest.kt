@@ -120,8 +120,7 @@ class SetlocalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       assertCommandOutput("setlocal test?", "--test")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -163,8 +162,7 @@ class SetlocalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "notest")
       assertCommandOutput("setlocal test?", "notest")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -187,8 +185,7 @@ class SetlocalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "notest")
       assertCommandOutput("setlocal test?", "--test")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -254,8 +251,7 @@ class SetlocalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       assertCommandOutput("setlocal test?", "  test=-1")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -293,8 +289,7 @@ class SetlocalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "  test=15")
       assertCommandOutput("setlocal test?", "  test=10")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -319,8 +314,7 @@ class SetlocalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "  test=15")
       assertCommandOutput("setlocal test?", "  test=-1")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -383,8 +377,7 @@ class SetlocalCommandTest : VimTestCase() {
       injector.optionGroup.addOption(option)
 
       assertCommandOutput("setlocal test?", "  test=")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -417,8 +410,7 @@ class SetlocalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "  test=globalValue")
       assertCommandOutput("setlocal test?", "  test=testValue")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -440,8 +432,7 @@ class SetlocalCommandTest : VimTestCase() {
 
       assertCommandOutput("setglobal test?", "  test=globalValue")
       assertCommandOutput("setlocal test?", "  test=globalValue")
-    }
-    finally {
+    } finally {
       injector.optionGroup.removeOption(option.name)
     }
   }
@@ -453,7 +444,8 @@ class SetlocalCommandTest : VimTestCase() {
     enterCommand("setlocal fileformat&")
 
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
-    assertCommandOutput("setlocal", """
+    assertCommandOutput(
+      "setlocal", """
       |--- Local option values ---
       |--ideajoin            idearefactormode=   scrolloff=-1        sidescrolloff=-1
       |  fileencoding=utf-8
@@ -471,7 +463,8 @@ class SetlocalCommandTest : VimTestCase() {
 
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("setlocal number relativenumber scrolloff=10 nrformats=alpha,hex,octal sidescrolloff=10")
-    assertCommandOutput("setlocal", """
+    assertCommandOutput(
+      "setlocal", """
       |--- Local option values ---
       |--ideajoin            number              scrolloff=10
       |  idearefactormode=   relativenumber      sidescrolloff=10
@@ -487,7 +480,8 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test show all local option values`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput("setlocal all", """
+    assertCommandOutput(
+      "setlocal all", """
       |--- Local option values ---
       |noargtextobj          ideamarks         norelativenumber      startofline
       |nobomb                idearefactormode=   scroll=0          nosurround
@@ -526,7 +520,8 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show named options`() {
-    assertCommandOutput("setlocal number? relativenumber? scrolloff? nrformats?", """
+    assertCommandOutput(
+      "setlocal number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex     nonumber            norelativenumber      scrolloff=-1
       """.trimMargin()
     )
@@ -539,7 +534,8 @@ class SetlocalCommandTest : VimTestCase() {
     enterCommand("setlocal fileformat&")
 
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
-    assertCommandOutput("setlocal!", """
+    assertCommandOutput(
+      "setlocal!", """
       |--- Local option values ---
       |  fileencoding=utf-8
       |--ideacopypreprocess
@@ -556,7 +552,8 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test show all local option values in single column`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput("setlocal! all", """
+    assertCommandOutput(
+      "setlocal! all", """
       |--- Local option values ---
       |noargtextobj
       |nobomb
@@ -637,7 +634,8 @@ class SetlocalCommandTest : VimTestCase() {
 
   @Test
   fun `test show named options in single column`() {
-    assertCommandOutput("setlocal! number? relativenumber? scrolloff? nrformats?", """
+    assertCommandOutput(
+      "setlocal! number? relativenumber? scrolloff? nrformats?", """
       |  nrformats=hex
       |nonumber
       |norelativenumber

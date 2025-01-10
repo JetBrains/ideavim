@@ -30,7 +30,7 @@ class MotionSentenceNextStartActionTest : VimTestCase() {
         Cras id tellus in 
         
       """.trimIndent(),
-Mode.INSERT,
+      Mode.INSERT,
     )
   }
 }
