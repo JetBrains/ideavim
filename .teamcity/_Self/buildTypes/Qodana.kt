@@ -62,7 +62,6 @@ object Qodana : IdeaVimBuildType({
         minute = 0
         timezone = "SERVER"
       }
-      param("dayOfWeek", "Sunday")
     }
   }
 
