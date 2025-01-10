@@ -162,7 +162,7 @@ internal class VimSurroundExtension : VimExtension {
         // Save old register values for carets
         val surroundings = editor.sortedCarets()
           .map {
-            val oldValue: List<KeyStroke>? = getRegisterForCaret(REGISTER, it)
+            val oldValue: List<KeyStroke>? = getRegisterForCaret(editor, context, REGISTER, it)
             setRegisterForCaret(REGISTER, it, null)
             SurroundingInfo(it, null, oldValue, false)
           }
@@ -179,7 +179,7 @@ internal class VimSurroundExtension : VimExtension {
             editor.deleteString(currentSurrounding)
           }
 
-          val registerValue = getRegisterForCaret(REGISTER, it.caret)
+          val registerValue = getRegisterForCaret(editor, context, REGISTER, it.caret)
           val innerValue = if (registerValue.isNullOrEmpty()) emptyList() else registerValue
           it.innerText = innerValue
 

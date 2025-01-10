@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
@@ -243,8 +242,6 @@ interface VimEditor {
   // Can be used as a key to store something for specific project
   val projectId: String
 
-  @Deprecated("Use overload without OperatorArguments", replaceWith = ReplaceWith("exitInsertMode(context)"))
-  fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments) { exitInsertMode(context) }
   fun exitInsertMode(context: ExecutionContext)
   fun exitSelectModeNative(adjustCaret: Boolean)
 

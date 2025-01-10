@@ -188,22 +188,14 @@ object VimExtensionFacade {
 
   /** Get the current contents of the given register similar to 'getreg()'. */
   @JvmStatic
-  @Deprecated("Please use com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister(com.maddyhome.idea.vim.api.VimEditor, char)")
-  fun getRegister(register: Char): List<KeyStroke>? {
-    val reg = VimPlugin.getRegister().getRegister(register) ?: return null
-    return reg.keys
-  }
-
-  /** Get the current contents of the given register similar to 'getreg()'. */
-  @JvmStatic
   fun getRegister(editor: VimEditor, register: Char): List<KeyStroke>? {
     val reg = VimPlugin.getRegister().getRegister(editor, injector.executionContextManager.getEditorExecutionContext(editor), register) ?: return null
     return reg.keys
   }
 
   @JvmStatic
-  fun getRegisterForCaret(register: Char, caret: VimCaret): List<KeyStroke>? {
-    val reg = caret.registerStorage.getRegister(register) ?: return null
+  fun getRegisterForCaret(editor: VimEditor, context: ExecutionContext, register: Char, caret: VimCaret): List<KeyStroke>? {
+    val reg = caret.registerStorage.getRegister(editor, context, register) ?: return null
     return reg.keys
   }
 

@@ -12,12 +12,14 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.VimStateMachine
+import org.jetbrains.annotations.ApiStatus
 
 /**
  * COMPATIBILITY-LAYER: Additional class
  * Please see: https://jb.gg/zo8n0r
  */
 @Deprecated("Use `injector.vimState`")
+@ApiStatus.ScheduledForRemoval
 class CommandState(private val machine: VimStateMachine) {
 
   val mode: Mode
@@ -34,11 +36,12 @@ class CommandState(private val machine: VimStateMachine) {
       }
     }
 
-  @Deprecated("Use `KeyHandler.keyHandlerState.commandBuilder", ReplaceWith(
+  @get:Deprecated("Use `KeyHandler.keyHandlerState.commandBuilder", ReplaceWith(
     "KeyHandler.getInstance().keyHandlerState.commandBuilder",
     "com.maddyhome.idea.vim.KeyHandler"
   )
   )
+  @get:ApiStatus.ScheduledForRemoval
   val commandBuilder: CommandBuilder
     get() = KeyHandler.getInstance().keyHandlerState.commandBuilder
 
@@ -65,6 +68,7 @@ class CommandState(private val machine: VimStateMachine) {
   companion object {
     @JvmStatic
     @Deprecated("Use `injector.vimState`")
+    @ApiStatus.ScheduledForRemoval
     fun getInstance(editor: Editor): CommandState {
       return CommandState(injector.vimState)
     }

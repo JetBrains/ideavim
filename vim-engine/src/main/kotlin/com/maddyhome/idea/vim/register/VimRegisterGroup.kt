@@ -10,20 +10,13 @@ package com.maddyhome.idea.vim.register
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
 interface VimRegisterGroup {
 
-  /**
-   * Get the last register selected by the user
-   *
-   * @return The register, null if no such register
-   */
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getLastRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
-  val lastRegister: Register?
   var lastRegisterChar: Char
   val currentRegister: Char
 

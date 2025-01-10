@@ -79,15 +79,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return getRegister(editor, context, lastRegisterChar)
   }
 
-  /**
-   * Get the last register selected by the user
-   *
-   * @return The register, null if no such register
-   */
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getLastRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
-  override val lastRegister: Register?
-    get() = getRegister(lastRegisterChar)
-
   private val onClipboardChanged: () -> Unit = {
     val clipboardOptionValue = injector.globalOptions().clipboard
     defaultRegisterChar = when {
