@@ -8,6 +8,9 @@
 
 package com.maddyhome.idea.vim.options
 
+import com.maddyhome.idea.vim.options.OptionDeclaredScope.LOCAL_TO_WINDOW
+
+
 /**
  * Represents the declared scope for an option, e.g. global, global-local or local to window or buffer.
  *

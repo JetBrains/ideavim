@@ -1,8 +1,8 @@
 package com.maddyhome.idea.vim.common
 
+import org.junit.jupiter.api.Test
 import java.nio.file.Files
 import java.nio.file.Paths
-import org.junit.jupiter.api.Test
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.test.assertEquals

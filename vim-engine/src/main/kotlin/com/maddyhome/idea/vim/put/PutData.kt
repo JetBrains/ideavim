@@ -10,9 +10,9 @@ package com.maddyhome.idea.vim.put
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.common.VimCopiedText
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.register.Register
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * [putToLine] has affect only of [insertTextBeforeCaret] is false and [visualSelection] is null

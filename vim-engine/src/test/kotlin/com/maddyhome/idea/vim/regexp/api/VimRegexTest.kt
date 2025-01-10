@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.regexp.VimRegexTestUtils.mockEditorFromText
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.EnumSet
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.fail
 

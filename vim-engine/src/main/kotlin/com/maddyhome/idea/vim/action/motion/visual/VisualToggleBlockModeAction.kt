@@ -15,9 +15,9 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 @CommandOrMotion(keys = ["<C-q>", "<C-v>"], modes = [Mode.NORMAL, Mode.VISUAL])
 class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {

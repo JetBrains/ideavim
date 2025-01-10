@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.EnumSet
+import java.util.*
 
 @CommandOrMotion(keys = ["<Insert>"], modes = [Mode.CMD_LINE])
 class ToggleInsertModeAction : VimActionHandler.SingleExecution() {

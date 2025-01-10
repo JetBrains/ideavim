@@ -11,8 +11,8 @@ package com.maddyhome.idea.vim.put
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 interface VimPut {
   fun doIndent(editor: VimEditor, caret: VimCaret, context: ExecutionContext, startOffset: Int, endOffset: Int): Int

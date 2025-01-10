@@ -32,14 +32,18 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicTextFieldUI;
 import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.Date;
 import java.util.List;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static java.lang.Math.*;
+import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 
 /**
  * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping

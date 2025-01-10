@@ -18,9 +18,9 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 
 @CommandOrMotion(keys = ["<S-End>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
 class MotionShiftEndAction : ShiftedSpecialKeyHandler() {

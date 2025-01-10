@@ -39,8 +39,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.util.stream.Collectors.toList;

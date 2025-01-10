@@ -8,10 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.services
 
-import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 class VimVariableServiceTest : VimTestCase() {
   @Test

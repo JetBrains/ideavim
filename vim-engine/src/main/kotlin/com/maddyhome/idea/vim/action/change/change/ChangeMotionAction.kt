@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.command.CommandFlags.FLAG_NO_REPEAT_INSERT
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.EnumSet
+import java.util.*
 
 @CommandOrMotion(keys = ["c"], modes = [Mode.NORMAL])
 class ChangeMotionAction : ChangeInInsertSequenceAction(), DuplicableOperatorAction {

@@ -9,6 +9,27 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.BlobExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.DictionaryExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.EnvVariableExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FalsyExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FloatExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FunctionCallExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.IntExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.ListExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.LiteralDictionaryExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.OneElementSublistExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.OptionExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.RegisterExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.StringExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.SublistExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.TernaryExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.UnaryExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.VariableContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.VariableExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.WrappedExpressionContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
@@ -34,27 +55,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.UnaryExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.UnaryOperator
-import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.BlobExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.DictionaryExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.EnvVariableExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FalsyExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FloatExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FunctionCallExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.IntExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.ListExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.LiteralDictionaryExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.OneElementSublistExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.OptionExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.RegisterExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.StringExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.SublistExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.TernaryExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.UnaryExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.VariableContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.VariableExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.WrappedExpressionContext
 import org.antlr.v4.runtime.ParserRuleContext
 
 object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {

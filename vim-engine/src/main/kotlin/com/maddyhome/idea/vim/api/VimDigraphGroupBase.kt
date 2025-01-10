@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.helper.EngineStringHelper
 import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
-import kotlin.Char
 import kotlin.math.ceil
 
 private val logger = vimLogger<VimDigraphGroup>()

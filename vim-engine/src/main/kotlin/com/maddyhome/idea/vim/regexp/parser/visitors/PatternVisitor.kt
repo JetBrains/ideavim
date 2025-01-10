@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.regexp.parser.visitors
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
+import com.maddyhome.idea.vim.parser.generated.RegexParser
+import com.maddyhome.idea.vim.parser.generated.RegexParserBaseVisitor
 import com.maddyhome.idea.vim.regexp.engine.nfa.NFA
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.AfterColumnCursorMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.AfterColumnMatcher
@@ -41,8 +43,6 @@ import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.StartOfFileMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.StartOfLineMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.StartOfWordMatcher
 import com.maddyhome.idea.vim.regexp.engine.nfa.matcher.VisualAreaMatcher
-import com.maddyhome.idea.vim.parser.generated.RegexParser
-import com.maddyhome.idea.vim.parser.generated.RegexParserBaseVisitor
 
 /**
  * A tree visitor for converting a parsed Vim pattern into an internal

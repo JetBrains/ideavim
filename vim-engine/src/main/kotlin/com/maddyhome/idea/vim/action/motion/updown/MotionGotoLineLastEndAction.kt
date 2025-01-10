@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 import java.util.*
 
 @CommandOrMotion(keys = ["<C-End>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])

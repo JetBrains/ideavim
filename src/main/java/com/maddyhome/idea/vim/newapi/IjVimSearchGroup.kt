@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
@@ -33,7 +32,6 @@ import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
 import com.maddyhome.idea.vim.helper.vimLastHighlighters
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
-import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler
 import org.jdom.Element
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.TestOnly

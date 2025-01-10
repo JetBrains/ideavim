@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
-import java.util.EnumSet
+import java.util.*
 
 @CommandOrMotion(keys = ["<C-G>u"], modes = [Mode.INSERT])
 class BreakUndoSequenceAction : VimActionHandler.SingleExecution() {

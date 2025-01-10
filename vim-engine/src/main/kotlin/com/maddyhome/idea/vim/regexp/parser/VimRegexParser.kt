@@ -8,11 +8,11 @@
 
 package com.maddyhome.idea.vim.regexp.parser
 
+import com.maddyhome.idea.vim.parser.generated.RegexLexer
+import com.maddyhome.idea.vim.parser.generated.RegexParser
 import com.maddyhome.idea.vim.regexp.parser.error.BailErrorLexer
 import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserErrorStrategy
 import com.maddyhome.idea.vim.regexp.parser.error.VimRegexParserException
-import com.maddyhome.idea.vim.parser.generated.RegexLexer
-import com.maddyhome.idea.vim.parser.generated.RegexParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
