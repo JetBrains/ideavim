@@ -26,8 +26,5 @@ interface VimCommandLineService {
   fun createSearchPrompt(editor: VimEditor, context: ExecutionContext, label: String, initialText: String): VimCommandLine
   fun createCommandPrompt(editor: VimEditor, context: ExecutionContext, count0: Int, initialText: String): VimCommandLine
 
-  @Deprecated("Please use ModalInputService.create()")
-  fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine
-
   fun fullReset()
 }

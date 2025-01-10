@@ -132,13 +132,6 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     return panel
   }
 
-  @Deprecated("Please use ModalInputService.create()")
-  override fun createWithoutShortcuts(editor: VimEditor, context: ExecutionContext, label: String, initText: String): VimCommandLine {
-    val panel = ExEntryPanel.getInstanceWithoutShortcuts()
-    panel.activate(editor.ij, context.ij, label, initText)
-    return panel
-  }
-
   override fun fullReset() {
     ExEntryPanel.fullReset()
   }
