@@ -28,7 +28,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
   name = "Publish $releaseType release"
   description = "Build and publish IdeaVim plugin"
 
-  artifactRules = "build/distributions/*"
+  artifactRules = """
+        build/distributions/*
+        build/reports/*
+    """.trimIndent()
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", RELEASE)
