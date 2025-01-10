@@ -31,65 +31,6 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * TODO: We should understand what logic changes if we use a two or three lines editors.
  *
  * ---
- * # Offset and range deletion
- *
- * [Offset] is a position between characters.
- * A `delete` method, that works on offset-offset, deletes the character *between* two offsets. That means that:
- * - It's possible and simply applicable when the start offset is larger than end offset
- * - Inclusive/Exclusive words are not applicable to such operation. So we don't define the operation
- *      like "... with end offset exclusive". However, technically, the "right" or the "larger" offset is exclusive.
- *
- * ## Other decisions review:
- * - End offset exclusive:
- *   This is a classic approach, that is used in most APIs, however, it's inconvenient for the case where the
- *     start offset is larger than end offset (direction switching) because for such offset switching it turns that
- *     start offset is exclusive and end offset is inclusive.
- * - End offset inclusive:
- *   This approach is convenient for direction switching, however, makes the situation that empty range cannot be
- *     specified. E.g. range 1:1 would delete the character under `1`, however it looks like that nothing should be
- *     deleted.
- *  Also, during the development it turned out that using such approach causes a lot of `+1` and `-1` operations that
- *     seem to be redundant.
- *
- * ---
- * # Offset and pointer
- *
- * It seems line it would be helpful to split "string offset" into [Pointer] and [Offset] where [Pointer] referrers
- *   to a concrete existing character and [Offset] referrers to an in-between position.
- * Apart from semantic improvement (methods like `insertAt(Offset)`, `deleteAt(Pointer)` seem to be more obvious),
- *   looks like it may fix some concrete issues where we pass one type as a parameter, which is a different type.
- *   For example, let's delete a first character on the line. For the classic code it would look like
- *   ```
- *   public fun lineStart(line: Int): Int
- *   public fun deleteAt(offset: Int)
- *
- *   public val lineStart = data.lineStart(x)
- *   data.deleteAt(lineStart)
- *   ```
- *   This code compiles and looks fine. However, with [Offset] and [Pointer] approach it would fail
- *   ```
- *   public fun lineStart(line: Int): Offset // <- return the removed position
- *   public fun deleteAt(offset: Pointer)
- *
- *   public val lineStart: Offset = data.lineStart(x)
- *   data.deleteAt(lineStart) // ERROR: incorrect argument type
- *   ```
- *   So, we have to convert the [Offset] to [Pointer] somehow and during the conversion we may observe the problem
- *   that the line may contain no characters at all (at the file end). So the code is either semantically incorrect,
- *   or we should convert an [Offset] to [Pointer] keeping the fact that [Offset] is not exactly the [Pointer].
- *   ```
- *   ...
- *   public fun Offset.toPointer(forData: String): Pointer? {
- *     return if (this < forData.length) Pointer(this) else null
- *   }
- *
- *   public val lineFirstCharacter: Pointer = data.lineStart(x).toPointer(data)
- *   if (lineFirstCharacter != null) {
- *     data.deleteAt(lineFirstCharacter)
- *   }
- *   ```
- *
- * ---
  * # Lines
  *
  * We use two types of line reference: Offset and pointer. Offset referrers to a between-lines position.
