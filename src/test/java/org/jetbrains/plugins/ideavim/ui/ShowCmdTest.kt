@@ -249,7 +249,7 @@ class ShowCmdTest : VimTestCase() {
   @Test
   fun `test edit autocomplete`() {
     // the test document is called aaa.txt, so we can use it to autocomplete to that filename
-    typeText(injector.parser.parseKeys(":edit aa\t"))
+    typeText(injector.parser.parseKeys(":edit aaa.t" + "<Tab>"))
 
     // check if the text of the panel got autocompleted
     assertEquals("edit aaa.txt", getExEntryPanelText())
@@ -259,7 +259,7 @@ class ShowCmdTest : VimTestCase() {
   @Test
   fun `test e autocomplete`() {
     // the test document is called aaa.txt, so we can use it to autocomplete to that filename
-    typeText(injector.parser.parseKeys(":e aa\t"))
+    typeText(injector.parser.parseKeys(":e aaa.t" + "<Tab>"))
 
     // check if the text of the panel got autocompleted
     assertEquals("e aaa.txt", getExEntryPanelText())
