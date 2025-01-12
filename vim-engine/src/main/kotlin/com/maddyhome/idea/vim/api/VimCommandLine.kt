@@ -166,4 +166,36 @@ interface VimCommandLine {
       caret.offset = txt.length
     }
   }
+
+  fun autocomplete(context: ExecutionContext){
+    if(actualText.startsWith("e ") || actualText.startsWith("edit ")){
+      var filenameStart = actualText.substring(actualText.indexOf(" ") + 1)
+      var potentialFiles = injector.file.findFileStartingWith(filenameStart, context)
+
+      // have we found a match?
+      if(potentialFiles != null && potentialFiles.size > 0) {
+        val first = potentialFiles.first()
+        // find the common starting string
+        var common = ""
+        for ((i, c) in first.withIndex()) {
+          var allSame = true
+          for (name in potentialFiles) {
+            if (name[i] != c) {
+              allSame = false
+              break
+            }
+          }
+          if (allSame) {
+            common += c
+          } else {
+            break
+          }
+        }
+        // append common starting string
+        insertText(actualText.length, common.substring(filenameStart.length))
+        // move caret to the end
+        caret.offset = actualText.length
+      }
+    }
+  }
 }

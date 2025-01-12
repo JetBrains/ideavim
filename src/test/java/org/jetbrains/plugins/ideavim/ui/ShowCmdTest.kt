@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ui
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ui.ShowCmd
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
@@ -244,7 +245,29 @@ class ShowCmdTest : VimTestCase() {
     assertEquals("22\"a22\"a22\"a22\"a22d22", getShowCmdTooltipText())
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
+  @Test
+  fun `test edit autocomplete`() {
+    // the test document is called aaa.txt, so we can use it to autocomplete to that filename
+    typeText(injector.parser.parseKeys(":edit aa\t"))
+
+    // check if the text of the panel got autocompleted
+    assertEquals("edit aaa.txt", getExEntryPanelText())
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
+  @Test
+  fun `test e autocomplete`() {
+    // the test document is called aaa.txt, so we can use it to autocomplete to that filename
+    typeText(injector.parser.parseKeys(":e aa\t"))
+
+    // check if the text of the panel got autocompleted
+    assertEquals("e aaa.txt", getExEntryPanelText())
+  }
+
   private fun getShowCmdText() = ShowCmd.getWidgetText(fixture.editor!!)
 
   private fun getShowCmdTooltipText() = ShowCmd.getFullText(fixture.editor!!)
+
+  private fun getExEntryPanelText() = ExEntryPanel.getInstance().visibleText
 }

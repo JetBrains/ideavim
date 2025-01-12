@@ -941,6 +941,11 @@
     },
     {
         "keys": "<Tab>",
+        "class": "com.maddyhome.idea.vim.action.ex.CommandCompletionAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<Tab>",
         "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction",
         "modes": "N"
     },
