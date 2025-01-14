@@ -195,7 +195,7 @@ private object VimActionsPopup {
     actionGroup.add(
       HelpLink(
         "Take Survey ↗",
-        "https://surveys.jetbrains.com/s3/ideavim-usage-survey",
+        "https://jb.gg/axootm",
         AllIcons.Actions.IntentionBulb,
       ),
     )
