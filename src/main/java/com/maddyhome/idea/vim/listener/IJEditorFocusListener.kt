@@ -80,7 +80,9 @@ class IJEditorFocusListener : EditorListener {
       if (ijEditor.isDisposed) return@invokeLater
       val consoleView: ConsoleViewImpl? = ijEditor.getUserData(ConsoleViewImpl.CONSOLE_VIEW_IN_EDITOR_VIEW)
       if (consoleView != null && consoleView.isRunning && !ijEditor.inInsertMode) {
+        // Switch to Insert mode, but make sure we reset the editor to actually make it apply
         switchToInsertMode.run()
+        KeyHandler.getInstance().reset(editor)
       }
     }
     KeyHandler.getInstance().reset(editor)
