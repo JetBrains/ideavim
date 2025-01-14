@@ -60,7 +60,7 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
         // In order not to show the form for the update, we check if the new version is available. If so,
         //   this may be an update (and may not), and we don't show the form.
         if (descriptor.pluginId == pluginId && !InstalledPluginsState.getInstance().hasNewerVersion(pluginId)) {
-          BrowserUtil.open("https://surveys.jetbrains.com/s3/ideavim-uninstall-feedback")
+          BrowserUtil.open("https://jb.gg/z6c7db")
         }
       }
     })
