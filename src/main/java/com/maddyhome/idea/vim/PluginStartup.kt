@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginStateListener
 import com.intellij.ide.plugins.PluginStateManager
 import com.intellij.openapi.application.ApplicationManager
@@ -54,7 +55,11 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
       }
 
       override fun uninstall(descriptor: IdeaPluginDescriptor) {
-        if (descriptor.pluginId == VimPlugin.getPluginId()) {
+        val pluginId = VimPlugin.getPluginId()
+        // This event is called for both uninstall and update. There is no proper way to distinguish these two events.
+        // In order not to show the form for the update, we check if the new version is available. If so,
+        //   this may be an update (and may not), and we don't show the form.
+        if (descriptor.pluginId == pluginId && !InstalledPluginsState.getInstance().hasNewerVersion(pluginId)) {
           BrowserUtil.open("https://surveys.jetbrains.com/s3/ideavim-uninstall-feedback")
         }
       }
