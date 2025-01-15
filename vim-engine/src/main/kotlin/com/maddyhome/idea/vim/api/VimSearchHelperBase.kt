@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Range
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.abs
-import kotlin.math.min
 
 // todo all this methods should return Long since editor.fileSize is long
 // todo same for TextRange and motions
@@ -1402,7 +1401,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     val startSpace = charType(editor, chars[pos], isBig) === CharacterHelper.CharacterType.WHITESPACE
 
-    // Find word start
+    // Find word start. Note that the caret might be on the word start, but the selection start might not be!
     val onWordStart = pos == 0 || charType(editor, chars[pos - 1], isBig) !== charType(editor, chars[pos], isBig)
     var start = pos
 
@@ -1438,27 +1437,28 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     logger.debug("end=$end")
 
-    var goBack = (startSpace && !hasSelection) || (!startSpace && hasSelection && !onWordStart)
-    if (dir == 1 && isOuter) {
-      // If there's no whitespace after the end of the word/WORD to select, go back for the leading whitespace
-      // This behaviour isn't strictly documented, but you can see it mentioned in `:help v_a'`
-      if (end < max - 1) {
-        val c = chars[end + 1]
-        if (charType(editor, c, false) !== CharacterHelper.CharacterType.WHITESPACE || c == '\n') {
-          goBack = true
-        }
-      }
-      else {
-        goBack = true
-      }
+    val hasForwardHeadingSelection = dir == 1 && hasSelection
+    val hasBackwardHeadingSelection = dir == -1 && hasSelection
+    val hasFollowingWhitespace = if (end < max - 1) {
+      val c = chars[end + 1]
+      charType(editor, c, false) === CharacterHelper.CharacterType.WHITESPACE && c != '\n'
     }
-    if (dir == -1 && isOuter && startSpace) {
-      if (pos > 0) {
-        if (charType(editor, chars[pos - 1], false) !== CharacterHelper.CharacterType.WHITESPACE) {
-          goBack = true
-        }
-      }
+    else {
+      false
     }
+
+    // Include preceding whitespace:
+    // ✓ Outer text object (`aw`) AND
+    // ✓ No forward heading selection AND
+    // ✓ Started on space, and there's no selection
+    // ✓ OR backward heading selection, but didn't start on space
+    // ✓ OR no whitespace after the word under cursor (see `:help v_a'`), as long as there's another word before
+    val includePrecedingWhitespace = isOuter
+      && !hasForwardHeadingSelection
+      && ((startSpace && !hasSelection)
+        || (hasBackwardHeadingSelection && !startSpace)
+        || (!hasFollowingWhitespace && editor.anyNonWhitespace(start, -1))
+      )
 
     var goForward = dir == 1 && isOuter && ((!startSpace && !onWordEnd) || (startSpace && onWordEnd && hasSelection))
     if (!goForward && dir == 1 && isOuter) {
@@ -1480,7 +1480,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       }
     }
 
-    logger.debug("goBack=$goBack")
+    logger.debug("goBack=$includePrecedingWhitespace")
     logger.debug("goForward=$goForward")
 
     if (goForward) {
@@ -1491,11 +1491,12 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         end++
       }
     }
-    if (goBack) {
-      if (editor.anyNonWhitespace(start, -1)) {
-        while (start > 0 && charType(editor, chars[start - 1], false) === CharacterHelper.CharacterType.WHITESPACE) {
-          start--
-        }
+    if (includePrecedingWhitespace) {
+      while (start > 0
+        && chars[start - 1] != '\n'
+        && charType(editor, chars[start - 1], false) === CharacterHelper.CharacterType.WHITESPACE
+      ) {
+        start--
       }
     }
 
